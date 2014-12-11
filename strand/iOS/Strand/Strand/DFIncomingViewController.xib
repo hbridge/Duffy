@@ -40,6 +40,7 @@
                 <constraint firstItem="2mx-jU-aCa" firstAttribute="top" secondItem="zPr-Cm-BJD" secondAttribute="bottom" id="vrB-mW-HXz"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
+            <point key="canvasLocation" x="309" y="368"/>
         </view>
     </objects>
 </document>

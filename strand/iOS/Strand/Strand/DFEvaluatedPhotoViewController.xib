@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFEvaluatedPhotoViewController">
+            <connections>
+                <outlet property="imageView" destination="2EI-BF-puF" id="l4P-LU-Stp"/>
+                <outlet property="profileStackView" destination="bPq-iK-f1R" id="16W-ej-7JW"/>
+                <outlet property="view" destination="hg1-qU-MTo" id="MqH-Um-uCf"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="hg1-qU-MTo">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bPq-iK-f1R" customClass="DFProfileStackView">
+                    <rect key="frame" x="20" y="8" width="560" height="45"/>
+                    <color key="backgroundColor" red="0.90588241820000004" green="0.45490199329999997" blue="0.1215686351" alpha="1" colorSpace="deviceRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="45" id="evf-Hc-Nei"/>
+                    </constraints>
+                </view>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="2EI-BF-puF">
+                    <rect key="frame" x="0.0" y="53" width="600" height="547"/>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="bPq-iK-f1R" firstAttribute="top" secondItem="hg1-qU-MTo" secondAttribute="top" constant="8" id="1U6-Qk-WZE"/>
+                <constraint firstItem="2EI-BF-puF" firstAttribute="leading" secondItem="hg1-qU-MTo" secondAttribute="leading" id="FRu-Cp-Lrp"/>
+                <constraint firstItem="2EI-BF-puF" firstAttribute="top" secondItem="bPq-iK-f1R" secondAttribute="bottom" id="NTi-KH-5Ua"/>
+                <constraint firstAttribute="trailing" secondItem="bPq-iK-f1R" secondAttribute="trailing" constant="20" id="Uza-Yf-Mvp"/>
+                <constraint firstAttribute="bottom" secondItem="2EI-BF-puF" secondAttribute="bottom" id="Wdb-W2-Mqo"/>
+                <constraint firstItem="bPq-iK-f1R" firstAttribute="leading" secondItem="hg1-qU-MTo" secondAttribute="leading" constant="20" id="fu1-Jp-rKo"/>
+                <constraint firstAttribute="trailing" secondItem="2EI-BF-puF" secondAttribute="trailing" id="rYo-YJ-Zev"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <point key="canvasLocation" x="309" y="368"/>
+        </view>
+    </objects>
+</document>

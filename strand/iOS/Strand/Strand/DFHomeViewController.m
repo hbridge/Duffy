@@ -18,6 +18,7 @@
 #import "DFInviteFriendViewController.h"
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"
+#import "DFEvaluatedPhotoViewController.h"
 
 const CGFloat headerHeight = 60.0;
 
@@ -243,6 +244,10 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   
+  DFEvaluatedPhotoViewController *epvc = [[DFEvaluatedPhotoViewController alloc]
+                                          initWithPhotoID:photo.id
+                                          inStrand:strandObject.id];
+  [DFNavigationController presentWithRootController:epvc inParent:self withBackButtonTitle:@"Close"];
 }
 
 - (void)filterChanged:(UISegmentedControl *)sender

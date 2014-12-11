@@ -242,6 +242,8 @@
 		5AC4A970194A42EE00862D9C /* DFPeanutObjectsResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A96F194A42EE00862D9C /* DFPeanutObjectsResponse.m */; };
 		5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A972194A434700862D9C /* DFPeanutSuggestion.m */; };
 		5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */; };
+		5AC59EA61A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC59EA41A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m */; };
+		5AC59EA71A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */; };
 		5AC8B1E819D0D9AC00BAC55F /* DFAssetCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
@@ -723,6 +725,9 @@
 		5AC4A972194A434700862D9C /* DFPeanutSuggestion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPeanutSuggestion.m; path = DuffyCore/DFPeanutSuggestion.m; sourceTree = "<group>"; };
 		5AC4A974194A4AB900862D9C /* DFPeanutNewPhotosAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNewPhotosAdapter.h; sourceTree = "<group>"; };
 		5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNewPhotosAdapter.m; sourceTree = "<group>"; };
+		5AC59EA31A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFEvaluatedPhotoViewController.h; sourceTree = "<group>"; };
+		5AC59EA41A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFEvaluatedPhotoViewController.m; sourceTree = "<group>"; };
+		5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFEvaluatedPhotoViewController.xib; sourceTree = "<group>"; };
 		5AC8B1E619D0D9AC00BAC55F /* DFAssetCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAssetCache.h; sourceTree = "<group>"; };
 		5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAssetCache.m; sourceTree = "<group>"; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -1263,22 +1268,9 @@
 			children = (
 				5A87DE0F1A267BC80058EB38 /* DFSuggestionsPageViewController.h */,
 				5A87DE101A267BC80058EB38 /* DFSuggestionsPageViewController.m */,
-				5A87DE111A267BC80058EB38 /* DFSuggestionViewController.h */,
-				5A87DE121A267BC80058EB38 /* DFSuggestionViewController.m */,
-				5A87DE131A267BC80058EB38 /* DFSuggestionViewController.xib */,
-				5A91C46E1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.h */,
-				5A91C46F1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m */,
-				5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */,
-				5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */,
-				5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */,
-				5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */,
 				5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonImageView.h */,
 				5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */,
 				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */,
-				5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */,
-				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
-				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
-				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
 			);
 			name = "Suggestions Tab";
 			sourceTree = "<group>";
@@ -1345,23 +1337,14 @@
 		5A9636C119E47C8300F3B606 /* Main Views */ = {
 			isa = PBXGroup;
 			children = (
+				5AC59E9D1A39FCE50081CCE5 /* Home view */,
+				5AC59E9C1A39FCD20081CCE5 /* Detail Cards */,
 				5AF64D0119EC618A00EE1473 /* Friends View */,
 				5A87DE0E1A267BB30058EB38 /* Suggestions Tab */,
-				5AA36F0819F80EA8008B37AA /* Swap tab */,
+				5AC59E9B1A39FC8E0081CCE5 /* Old */,
 				5AAF037819AF865E00EF021C /* Create Strand */,
-				5AA38DF2199D19CA00AD1805 /* Notifications */,
-				5ABD835C1A13E31C00A4A7D6 /* All Swaps Gallery */,
-				5A56EFB41986CBC10032CA8A /* Inbox Feed */,
-				5A9E9CFD19D5BE92007328AD /* Strand Detail */,
-				5AA38DFE199EB2D000AD1805 /* Photo Feed */,
 				5A3172CF196C7C6F00CA7693 /* Settings */,
 				65232E9319EC8AF000F3832A /* Table View Cells */,
-				5A91C4861A378AFE00C4F9A6 /* DFHomeViewController.h */,
-				5A91C4871A378AFE00C4F9A6 /* DFHomeViewController.m */,
-				5A91C4881A378AFE00C4F9A6 /* DFHomeViewController.xib */,
-				5A683A191A39110A00308BF1 /* DFSegmentedControlReusableView.h */,
-				5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */,
-				5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */,
 			);
 			name = "Main Views";
 			sourceTree = "<group>";
@@ -1659,6 +1642,55 @@
 			name = "Network Adapters";
 			sourceTree = "<group>";
 		};
+		5AC59E9B1A39FC8E0081CCE5 /* Old */ = {
+			isa = PBXGroup;
+			children = (
+				5AA38DFE199EB2D000AD1805 /* Photo Feed */,
+				5A9E9CFD19D5BE92007328AD /* Strand Detail */,
+				5A56EFB41986CBC10032CA8A /* Inbox Feed */,
+				5ABD835C1A13E31C00A4A7D6 /* All Swaps Gallery */,
+				5AA38DF2199D19CA00AD1805 /* Notifications */,
+				5AA36F0819F80EA8008B37AA /* Swap tab */,
+			);
+			name = Old;
+			sourceTree = "<group>";
+		};
+		5AC59E9C1A39FCD20081CCE5 /* Detail Cards */ = {
+			isa = PBXGroup;
+			children = (
+				5A87DE111A267BC80058EB38 /* DFSuggestionViewController.h */,
+				5A87DE121A267BC80058EB38 /* DFSuggestionViewController.m */,
+				5A87DE131A267BC80058EB38 /* DFSuggestionViewController.xib */,
+				5A91C46E1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.h */,
+				5A91C46F1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m */,
+				5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */,
+				5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */,
+				5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */,
+				5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */,
+				5AC59EA31A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.h */,
+				5AC59EA41A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m */,
+				5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */,
+				5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */,
+				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
+				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
+				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
+			);
+			name = "Detail Cards";
+			sourceTree = "<group>";
+		};
+		5AC59E9D1A39FCE50081CCE5 /* Home view */ = {
+			isa = PBXGroup;
+			children = (
+				5A91C4861A378AFE00C4F9A6 /* DFHomeViewController.h */,
+				5A91C4871A378AFE00C4F9A6 /* DFHomeViewController.m */,
+				5A91C4881A378AFE00C4F9A6 /* DFHomeViewController.xib */,
+				5A683A191A39110A00308BF1 /* DFSegmentedControlReusableView.h */,
+				5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */,
+				5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */,
+			);
+			name = "Home view";
+			sourceTree = "<group>";
+		};
 		5ADD856619465C790037A6D5 = {
 			isa = PBXGroup;
 			children = (
@@ -1897,6 +1929,7 @@
 				5A91C4851A36116300C4F9A6 /* DFIncomingViewController.xib in Resources */,
 				5A83A3DB19F019CE0068F08B /* DFFriendProfileViewController.xib in Resources */,
 				5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */,
+				5AC59EA71A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib in Resources */,
 				5AA9292B19A6502200032A3F /* DFPeoplePickerViewController.xib in Resources */,
 				5A91C4721A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib in Resources */,
 				5AEFA25B19D607150027BC5E /* DFStrandGallerySectionHeaderView.xib in Resources */,
@@ -2085,6 +2118,7 @@
 				651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */,
 				5A883BE21A09653900355C1D /* DFStrandPeopleViewController.m in Sources */,
 				5A65181E19D62754001FE911 /* DFStrandGalleryTitleView.m in Sources */,
+				5AC59EA61A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m in Sources */,
 				5A249C5819C334920047AE91 /* DFInboxTableViewCell.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
 				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
