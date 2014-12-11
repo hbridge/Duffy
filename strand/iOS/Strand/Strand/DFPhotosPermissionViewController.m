@@ -38,7 +38,7 @@
     [super viewDidLoad];
   
   SAMGradientView *gradientView = (SAMGradientView *)self.view;
-  gradientView.gradientColors = @[[DFStrandConstants strandOrange], [DFStrandConstants strandOrange]];
+  gradientView.gradientColors = @[[DFStrandConstants strandBlue], [DFStrandConstants strandBlue]];
   [self.navigationController setNavigationBarHidden:YES];
   [self setNeedsStatusBarAppearanceUpdate];
 }
