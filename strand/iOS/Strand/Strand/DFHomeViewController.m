@@ -132,7 +132,11 @@ const CGFloat headerHeight = 60.0;
 {
   [super viewDidAppear:animated];
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-    [self reviewButtonPressed:self.reviewButton];
+    if ([[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count] > 0) {
+      [self reviewButtonPressed:self.reviewButton];
+    } else {
+      [self sendButtonPressed:self.sendButton];
+    }
   } else {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
