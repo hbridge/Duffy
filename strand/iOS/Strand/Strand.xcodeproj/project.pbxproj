@@ -1440,7 +1440,6 @@
 				5A4C820819EDBACE00C22A12 /* DFSwapUpsellView.m */,
 				5A4C820A19EDBADC00C22A12 /* DFSwapUpsellView.xib */,
 				5A854B391A1D54F900E2DA47 /* Feed Cells */,
-				5A05AD3F1A11603B003AAE1C /* Commenting */,
 			);
 			name = "Photo Feed";
 			sourceTree = "<group>";
@@ -1674,6 +1673,7 @@
 				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
 				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
 				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
+				5A05AD3F1A11603B003AAE1C /* Commenting */,
 			);
 			name = "Detail Cards";
 			sourceTree = "<group>";

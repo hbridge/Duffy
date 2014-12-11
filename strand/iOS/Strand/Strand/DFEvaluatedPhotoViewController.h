@@ -6,17 +6,16 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFHomeSubViewController.h"
+#import "DFCommentViewController.h"
 #import "DFProfileStackView.h"
 
-@interface DFEvaluatedPhotoViewController : DFHomeSubViewController
+@interface DFEvaluatedPhotoViewController : DFCommentViewController
 
-@property (nonatomic) DFPhotoIDType photoID;
-@property (nonatomic) DFStrandIDType strandID;
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
-
-- (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
-                       inStrand:(DFStrandIDType)strandID;
+@property (strong, nonatomic) UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *recipientsProfileStackView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *senderProfileStackView;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *likeBarButtonItem;
+- (IBAction)likeItemPressed:(id)sender;
 
 @end

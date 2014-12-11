@@ -240,13 +240,15 @@ const CGFloat headerHeight = 60.0;
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager]
+                                     strandPostsObjectWithId:photo.strand_id.longLongValue];
   
   DFEvaluatedPhotoViewController *epvc = [[DFEvaluatedPhotoViewController alloc]
-                                          initWithPhotoID:photo.id
-                                          inStrand:strandObject.id];
+                                          initWithPhotoObject:photo
+                                          inPostsObject:strandPosts];
+  
   [DFNavigationController presentWithRootController:epvc inParent:self withBackButtonTitle:@"Close"];
 }
 

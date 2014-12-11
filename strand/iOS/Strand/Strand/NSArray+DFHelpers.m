@@ -19,4 +19,11 @@
   return newArray;
 }
 
+- (NSArray *)arrayByRemovingObject:(id)object
+{
+  NSMutableArray *result = [self mutableCopy];
+  [result removeObject:object];
+  return result;
+}
+
 @end

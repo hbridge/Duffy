@@ -34,6 +34,7 @@
 {
   self = [super init];
   if (self) {
+    _openKeyboardOnAppear = YES;
     _photoObject = photoObject;
     _postsObject = postsObject;
     _templateCell = [DFCommentTableViewCell templateCell];
@@ -46,15 +47,14 @@
   
   [self configureTableView:self.tableView];
   [self textDidChange:self.textField];
+  [self configureTouchTableViewGesture];
 }
 
 - (void)viewWillLayoutSubviews
 {
   [super viewWillLayoutSubviews];
   
-  UIBarButtonItem *textBarButton = [self.toolbar.items firstObject];
-  UIBarButtonItem *sendBarButton = [self.toolbar.items objectAtIndex:1];
-  textBarButton.width = self.toolbar.frame.size.width - sendBarButton.width - 36;
+  self.textFieldItem.width = self.toolbar.frame.size.width - self.sendButton.width - 36;
 }
 
 - (void)configureTableView:(UITableView *)tableView
@@ -68,6 +68,28 @@
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.toolbar.frame.size.height * 2.0, 0);
   self.tableView.separatorInset = [DFCommentTableViewCell edgeInsets];
 }
+
+- (void)configureTouchTableViewGesture
+{
+  UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc]
+                                                  initWithTarget:self
+                                                  action:@selector(tapRecognizerChanged:)];
+  [self.tableView addGestureRecognizer:tapGestureRecognizer];
+  
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+  DDLogVerbose(@"dragging");
+  [self.textField resignFirstResponder];
+}
+
+- (void)tapRecognizerChanged:(UITapGestureRecognizer *)tapRecognizer
+{
+  DDLogVerbose(@"tableview tapped");
+  [self.textField resignFirstResponder];
+}
+
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
@@ -86,8 +108,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self scrollToLast];
-  [self.textField becomeFirstResponder];
+  
+  if (self.openKeyboardOnAppear) {
+    [self scrollToLast];
+    [self.textField becomeFirstResponder];
+  }
   [DFAnalytics logViewController:self
           appearedWithParameters:@{
                                    @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count]
@@ -132,7 +157,7 @@
   
   if ([[self comments] count] == 0) {
     DFNoResultsTableViewCell *noResults = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
-    noResults.noResultsLabel.text = @"No Comments";
+    noResults.noResultsLabel.text = @"No Comments Yet";
     return noResults;
   }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
@@ -327,7 +352,6 @@
   }];
 
 }
-
 
 - (DFPeanutActionAdapter *)actionAdapter
 {
