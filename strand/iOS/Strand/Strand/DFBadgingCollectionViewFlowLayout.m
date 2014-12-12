@@ -21,7 +21,6 @@ NSString *const DFBadgingCollectionViewFlowLayoutBadgeView = @"DFBadgingCollecti
   //go through each cell attribute
   for (UICollectionViewLayoutAttributes *attributes in [super layoutAttributesForElementsInRect:rect])
   {
-    DDLogVerbose(@"attr indexPath: [%@, %@]", @(attributes.indexPath.section), @(attributes.indexPath.row));
     //add a title and a detail supp view for each cell attribute to your copy of all attributes
     [allAttributes addObject:[self
                               layoutAttributesForSupplementaryViewOfKind:DFBadgingCollectionViewFlowLayoutBadgeView
