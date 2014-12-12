@@ -163,7 +163,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildNum, retur
 		strandInvite.invited_user = user
 
 		# Temp solution for using invites to hold incoming pictures
-		if int(buildNum) > 4805:
+		if buildNum and int(buildNum) > 4805:
 			strandInvite.accepted_user = user
 			
 			if user not in strandInvite.strand.users.all():
