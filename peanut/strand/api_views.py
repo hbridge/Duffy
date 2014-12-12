@@ -58,7 +58,7 @@ def addActionsToClusters(clusters, strandId, actionsByPhotoIdCache):
 						entriesToRemove.append(entry)
 
 					entry["actions"] = actionsForThisStrand
-
+			entry["photo"].strand_id = strandId
 		for entry in entriesToRemove:
 			cluster.remove(entry)
 		finalClusters.append(cluster)
@@ -127,7 +127,7 @@ def userHasPostedPhotosToStrand(user, strand, actionsCache):
 
 	TODO(Derek):  If we create users in more places, might want to move this
 """
-def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
+def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildId, returnIfExist = False):
 	try:
 		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=2))
 		
@@ -163,11 +163,12 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		strandInvite.invited_user = user
 
 		# Temp solution for using invites to hold incoming pictures
-		strandInvite.accepted_user = user
-		
-		if user not in strandInvite.strand.users.all():
-			action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-			strandInvite.strand.users.add(user)
+		if int(buildId) > 4805:
+			strandInvite.accepted_user = user
+			
+			if user not in strandInvite.strand.users.all():
+				action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
+				strandInvite.strand.users.add(user)
 
 	if len(strandInvites) > 0:
 		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
@@ -773,18 +774,20 @@ def swaps(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 
-		# First throw in invite objects
-		#inviteObjects = getInviteObjectsDataForUser(user)
-		#responseObjects.extend(inviteObjects)
-
 		inviteObjectIds = list()
 		inviteObjects = list()
-		#for objects in inviteObjects:
-			# This grabs the id of the suggestions post object, which is the private strand id
-		#	suggestedStrands = objects['objects'][1]['objects']
-		#	for suggestedStrand in suggestedStrands:
-		#		inviteObjectIds.append(suggestedStrand['id'])
-		#printStats("swaps-invites")
+
+		# First throw in invite objects
+		if int(self.request.DATA['build_number']) <= 4805:
+			inviteObjects = getInviteObjectsDataForUser(user)
+			responseObjects.extend(inviteObjects)
+
+			for objects in inviteObjects:
+				# This grabs the id of the suggestions post object, which is the private strand id
+				suggestedStrands = objects['objects'][1]['objects']
+				for suggestedStrand in suggestedStrands:
+					inviteObjectIds.append(suggestedStrand['id'])
+			printStats("swaps-invites")
 
 		# Now do neighbor suggestions
 		friendsIdList = friends_util.getFriendsIds(user.id)
@@ -1177,12 +1180,12 @@ def auth_phone(request):
 				return HttpResponse(json.dumps({'access_code': 'Code expired'}), content_type="application/json", status=400)
 			else:
 				# TODO(Derek):  End of August, change returnIfExists to False, so we start archiving again
-				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0], returnIfExist = True)
+				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0], form.cleaned_data['build_id'], returnIfExist = True)
 				serializer = UserSerializer(user)
 				response['user'] = serializer.data
 		else:
 			if accessCode == 2345:
-				user = createStrandUser(phoneNumber, displayName, phoneId, None, returnIfExist = True)
+				user = createStrandUser(phoneNumber, displayName, phoneId, None, form.cleaned_data['build_id'], returnIfExist = True)
 				serializer = UserSerializer(user)
 				response['user'] = serializer.data
 			else:
