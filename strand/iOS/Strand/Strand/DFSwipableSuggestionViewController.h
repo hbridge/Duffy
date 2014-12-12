@@ -7,18 +7,31 @@
 //
 
 #import "DFSuggestionViewController.h"
-#import "DFSwipableButtonImageView.h"
+#import "DFSwipableButtonView.h"
 #import "DFPeoplePickerViewController.h"
 
-@interface DFSwipableSuggestionViewController : DFSuggestionViewController <DFSwipableButtonImageViewDelegate, DFPeoplePickerDelegate>
+@interface DFSwipableSuggestionViewController : DFHomeSubViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
+
+typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
+typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
-@property (weak, nonatomic) IBOutlet DFSwipableButtonImageView *swipableButtonImageView;
+@property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
 @property (weak, nonatomic) IBOutlet UIButton *addRecipientButton;
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 
+@property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
+@property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
+@property (nonatomic, retain) NSArray *selectedPeanutContacts;
+
+@property (nonatomic, copy) DFSuggestionYesHandler yesButtonHandler;
+@property (nonatomic, copy) DFSuggestionNoHandler noButtonHandler;
+
 - (instancetype)initWithNuxStep:(NSUInteger)step;
+
+- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo;
+
 
 @end

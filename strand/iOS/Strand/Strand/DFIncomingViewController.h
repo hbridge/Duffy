@@ -8,14 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "DFProfileWithContextView.h"
-#import "DFSwipableButtonImageView.h"
+#import "DFSwipableButtonView.h"
 #import "DFPeanutUserObject.h"
 #import "DFHomeSubViewController.h"
 
-@interface DFIncomingViewController : DFHomeSubViewController <DFSwipableButtonImageViewDelegate>
+@interface DFIncomingViewController : DFHomeSubViewController <DFSwipableButtonViewDelegate>
 
 @property (weak, nonatomic) IBOutlet DFProfileWithContextView *profileWithContextView;
-@property (weak, nonatomic) IBOutlet DFSwipableButtonImageView *swipableButtonImageView;
+@property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
 
 typedef void (^DFIncomingPhotoNextBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
 typedef void (^DFIncomingPhotoCommentBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
@@ -27,6 +27,8 @@ typedef void (^DFIncomingPhotoLikeBlock)(DFPhotoIDType photoID, DFStrandIDType s
 @property (nonatomic, copy) DFIncomingPhotoNextBlock nextHandler;
 @property (nonatomic, copy) DFIncomingPhotoCommentBlock commentHandler;
 @property (nonatomic, copy) DFIncomingPhotoLikeBlock likeHandler;
+
+@property (nonatomic, retain) UIImageView *imageView;
 
 - (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
                        inStrand:(DFStrandIDType)strandID

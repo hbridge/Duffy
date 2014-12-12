@@ -43,7 +43,7 @@
   [super viewDidLoad];
   
   [self configureProfileWithContext];
-  [self configureSwipableButtonImageView];
+  [self configureSwipableButtonView];
 }
 
 - (void)configureProfileWithContext
@@ -63,52 +63,57 @@
   [self.profileWithContextView.subtitleLabel removeFromSuperview];
 }
 
-- (void)configureSwipableButtonImageView
+- (void)configureSwipableButtonView
 {
-  self.swipableButtonImageView.delegate = self;
-  [self.swipableButtonImageView.noButton
+  self.swipableButtonView.delegate = self;
+  [self.swipableButtonView.noButton
    setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
    forState:UIControlStateNormal];
-  [self.swipableButtonImageView.otherButton
+  [self.swipableButtonView.otherButton
    setImage:[UIImage imageNamed:@"Assets/Icons/IncomingCommentButtonIcon"]
    forState:UIControlStateNormal];
-  [self.swipableButtonImageView.yesButton
+  [self.swipableButtonView.yesButton
    setImage:[UIImage imageNamed:@"Assets/Icons/IncomingLikeButtonIcon"]
    forState:UIControlStateNormal];
-  for (UIButton *button in @[self.swipableButtonImageView.noButton,
-                             self.swipableButtonImageView.otherButton,
-                             self.swipableButtonImageView.yesButton]) {
+  for (UIButton *button in @[self.swipableButtonView.noButton,
+                             self.swipableButtonView.otherButton,
+                             self.swipableButtonView.yesButton]) {
     [button setTitle:nil forState:UIControlStateNormal];
     button.backgroundColor = [UIColor clearColor]; 
   }
+  
+  [self.swipableButtonView configureToUseImage];
+  
 }
 
 - (void)viewDidLayoutSubviews
 {
   if (self.nuxStep) {
-    self.swipableButtonImageView.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"]];
+    imageView.frame =  self.swipableButtonView.centerView.frame;
+    [self.swipableButtonView.centerView addSubview:imageView];
   } else {
     [[DFImageManager sharedManager]
      imageForID:self.photoID
-     pointSize:self.swipableButtonImageView.imageView.frame.size
+     pointSize:self.swipableButtonView.centerView.frame.size
      contentMode:DFImageRequestContentModeAspectFill
      deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
-         self.swipableButtonImageView.imageView.image = image;
+         self.swipableButtonView.imageView.image = image;
        });
      }];
   }
 }
 
-- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
                  buttonSelected:(UIButton *)button
 {
-  if (button == self.swipableButtonImageView.noButton) {
+  if (button == self.swipableButtonView.noButton) {
     if (self.nextHandler) self.nextHandler(self.photoID, self.strandID);
-  } else if (button == self.swipableButtonImageView.otherButton) {
+  } else if (button == self.swipableButtonView.otherButton) {
     if (self.commentHandler) self.commentHandler(self.photoID, self.strandID);
-  } else if (button == self.swipableButtonImageView.yesButton) {
+  } else if (button == self.swipableButtonView.yesButton) {
     if (self.likeHandler) self.likeHandler(self.photoID, self.strandID);
   }
 }

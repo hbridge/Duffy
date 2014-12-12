@@ -1,13 +1,13 @@
 
 //
-//  DFswipableButtonImageView.m
+//  DFswipableButtonView.m
 //  Strand
 //
 //  Created by Henry Bridge on 12/3/14.
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFSwipableButtonImageView.h"
+#import "DFSwipableButtonView.h"
 #import "DFSpringAttachmentBehavior.h"
 
 
@@ -16,7 +16,7 @@ const CGFloat DownGestureThreshold = 75.0;
 const CGFloat LeftGestureThreshold = -75.0;
 const CGFloat RightGestureThreshold = 75.0;
 
-@interface DFSwipableButtonImageView()
+@interface DFSwipableButtonView()
 
 @property (nonatomic, retain) UIDynamicAnimator *animator;
 @property (nonatomic, retain) DFSpringAttachmentBehavior *springBehavior;
@@ -27,7 +27,7 @@ const CGFloat RightGestureThreshold = 75.0;
 
 @end
 
-@implementation DFSwipableButtonImageView
+@implementation DFSwipableButtonView
 
 //- (instancetype)initWithFrame:(CGRect)frame
 //{
@@ -64,9 +64,9 @@ const CGFloat RightGestureThreshold = 75.0;
   _yesEnabled = YES;
   _noEnabled = YES;
   self.animator = [[UIDynamicAnimator alloc] initWithReferenceView:self];
-  self.originalCenter = self.imageView.center;
-  self.imageView.layer.cornerRadius = 3.0;
-  self.imageView.layer.masksToBounds = YES;
+  self.originalCenter = self.centerView.center;
+  self.centerView.layer.cornerRadius = 3.0;
+  self.centerView.layer.masksToBounds = YES;
   
   for (UIButton *button in @[self.noButton, self.otherButton, self.yesButton]) {
     button.layer.cornerRadius = button.frame.size.height / 2.0;
@@ -106,8 +106,8 @@ const CGFloat RightGestureThreshold = 75.0;
 
 - (void)resetView
 {
-  self.imageView.center = self.originalCenter;
-  self.imageView.alpha = 1.0;
+  self.centerView.center = self.originalCenter;
+  self.centerView.alpha = 1.0;
   [self unhighlightAllButtons];
 }
 
@@ -124,10 +124,6 @@ const CGFloat RightGestureThreshold = 75.0;
   self.noButton.enabled = noEnabled;
   self.noButton.alpha = noEnabled ? 1.0 : 0.2;
 }
-
-
-
-
 
 #pragma mark - Drag Handling
 
@@ -151,17 +147,17 @@ const CGFloat RightGestureThreshold = 75.0;
   }
   self.lastPoint = translation;
   
-  if ([self.delegate respondsToSelector:@selector(swipableButtonImageView:didBeginPan:translation:)])
-    [self.delegate swipableButtonImageView:self didBeginPan:self.panGestureRecognizer translation:translation];
+  if ([self.delegate respondsToSelector:@selector(swipableButtonView:didBeginPan:translation:)])
+    [self.delegate swipableButtonView:self didBeginPan:self.panGestureRecognizer translation:translation];
 }
 
 - (void)handleDragMoved:(CGPoint)translation
 {
   // move the image view to the dragged point
-  CGRect frame = self.imageView.frame;
+  CGRect frame = self.centerView.frame;
   frame.origin.x = frame.origin.x - (self.lastPoint.x - translation.x);
   frame.origin.y = frame.origin.y - (self.lastPoint.y - translation.y);
-  [self setImageViewFrames:frame];
+  [self setViewFrames:frame];
   self.lastVelocity = self.lastPoint.x - translation.x;
   self.lastPoint = translation;
   
@@ -174,8 +170,8 @@ const CGFloat RightGestureThreshold = 75.0;
     [self highlightButton:self.yesButton amount:percentRight];
   }
   
-  if ([self.delegate respondsToSelector:@selector(swipableButtonImageView:didMovePan:translation:)])
-    [self.delegate swipableButtonImageView:self didMovePan:self.panGestureRecognizer translation:translation];
+  if ([self.delegate respondsToSelector:@selector(swipableButtonView:didMovePan:translation:)])
+    [self.delegate swipableButtonView:self didMovePan:self.panGestureRecognizer translation:translation];
 }
 
 - (void)handleDragEnded:(CGPoint)translation
@@ -191,12 +187,12 @@ const CGFloat RightGestureThreshold = 75.0;
   }
     
   self.springBehavior = [[DFSpringAttachmentBehavior alloc]
-                         initWithAnchorPoint:self.originalCenter attachedView:self.imageView];
+                         initWithAnchorPoint:self.originalCenter attachedView:self.centerView];
   [self.animator addBehavior:self.springBehavior];
   [self unhighlightAllButtons];
   
-  if ([self.delegate respondsToSelector:@selector(swipableButtonImageView:didEndPan:translation:)])
-    [self.delegate swipableButtonImageView:self didEndPan:self.panGestureRecognizer translation:translation];
+  if ([self.delegate respondsToSelector:@selector(swipableButtonView:didEndPan:translation:)])
+    [self.delegate swipableButtonView:self didEndPan:self.panGestureRecognizer translation:translation];
 }
 
 - (void)unhighlightAllButtons
@@ -226,10 +222,10 @@ const CGFloat RightGestureThreshold = 75.0;
   }
 }
 
-- (void)setImageViewFrames:(CGRect)frame
+- (void)setViewFrames:(CGRect)frame
 {
-  NSArray *imageViews = @[self.imageView, self.overlayImageView];
-  for (UIView *view in imageViews) {
+  NSArray *views = @[self.centerView, self.overlayImageView];
+  for (UIView *view in views) {
     view.frame = frame;
   }
 }
@@ -239,7 +235,7 @@ const CGFloat RightGestureThreshold = 75.0;
 - (void)handleButtonSelected:(UIButton *)button
 {
   BOOL animate = NO;
-  CGRect destFrame = self.imageView.frame;
+  CGRect destFrame = self.centerView.frame;
   if (button == self.noButton) {
     destFrame.origin.x = self.superview.frame.origin.x - destFrame.size.width;
     animate = YES;
@@ -264,17 +260,17 @@ const CGFloat RightGestureThreshold = 75.0;
         initialSpringVelocity:self.lastVelocity
                       options:UIViewAnimationOptionCurveEaseOut
                    animations:^{
-                     self.imageView.frame = destFrame;
-                     self.imageView.alpha = 0.0;
+                     self.centerView.frame = destFrame;
+                     self.centerView.alpha = 0.0;
                    } completion:^(BOOL finished) {
-                     [self.delegate swipableButtonImageView:self buttonSelected:button];
+                     [self.delegate swipableButtonView:self buttonSelected:button];
                    }];
   } else {
-    [self.delegate swipableButtonImageView:self buttonSelected:button];
+    [self.delegate swipableButtonView:self buttonSelected:button];
   }
 }
 
-- (void)animateImageViewToButton:(UIButton *)button
+- (void)animateCenterViewToButton:(UIButton *)button
 {
 
 }
@@ -298,7 +294,60 @@ const CGFloat RightGestureThreshold = 75.0;
 - (void)layoutSubviews
 {
   [super layoutSubviews];
-  self.originalCenter = self.imageView.center;
+  self.originalCenter = self.centerView.center;
+}
+
+/*
+ * Configure this view to use an image.  This doesn't actually take in an image, that should be set later
+ * on the .imageView property
+ */
+- (void)configureToUseImage
+{
+  self.imageView = [UIImageView new];
+  self.imageView.contentMode = UIViewContentModeScaleAspectFill;
+  
+  self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self.centerView addSubview:self.imageView];
+  
+  
+  self.centerView.layer.cornerRadius = 4.0;
+  self.centerView.layer.masksToBounds = YES;
+  [self.centerView addConstraints:[NSLayoutConstraint
+                                                      constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
+                                                      options:0
+                                                      metrics:nil
+                                                      views:@{@"banner" : self.imageView}]];
+  [self.centerView addConstraints:[NSLayoutConstraint
+                                                      constraintsWithVisualFormat:@"V:|-(0)-[banner]-(0)-|"
+                                                      options:0
+                                                      metrics:nil
+                                                      views:@{@"banner" : self.imageView}]];
+}
+
+/*
+ * Configures this view to use a label in the center.  Access the label through the .labelView property
+ */
+- (void)configureToUseLabel
+{
+  self.labelView = [UILabel new];
+  self.labelView.contentMode = UIViewContentModeScaleAspectFill;
+  
+  self.labelView.translatesAutoresizingMaskIntoConstraints = NO;
+  for (UIView *subView in [self.centerView subviews]) {
+    [subView removeFromSuperview];
+  }
+  [self.centerView addSubview:self.labelView];
+  
+  [self.centerView addConstraints:[NSLayoutConstraint
+                                   constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
+                                   options:0
+                                   metrics:nil
+                                   views:@{@"banner" : self.labelView}]];
+  [self.centerView addConstraints:[NSLayoutConstraint
+                                   constraintsWithVisualFormat:@"V:|-(0)-[banner]-(0)-|"
+                                   options:0
+                                   metrics:nil
+                                   views:@{@"banner" : self.labelView}]];
 }
 
 @end

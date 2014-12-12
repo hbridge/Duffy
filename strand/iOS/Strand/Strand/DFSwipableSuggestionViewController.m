@@ -8,6 +8,7 @@
 
 #import "DFSwipableSuggestionViewController.h"
 #import "DFNavigationController.h"
+#import "DFImageManager.h"
 #import <MMPopLabel/MMPopLabel.h>
 
 @interface DFSwipableSuggestionViewController ()
@@ -20,6 +21,8 @@
 
 @implementation DFSwipableSuggestionViewController
 
+@synthesize suggestionFeedObject = _suggestionFeedObject;
+
 - (instancetype)initWithNuxStep:(NSUInteger)step
 {
   self = [super init];
@@ -29,20 +32,36 @@
   return self;
 }
 
-- (void)viewDidLoad {
-  self.imageView = self.swipableButtonImageView.imageView;
+- (void)viewDidLayoutSubviews
+{
+  [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
+                                   pointSize:self.swipableButtonView.centerView.frame.size
+                                 contentMode:DFImageRequestContentModeAspectFill
+                                deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                    self.swipableButtonView.imageView.image = image;
+                                  });
+                                }];
+  
+}
 
-  // Need to set the imageView first since the parent needs it
+- (void)viewDidLoad {
   [super viewDidLoad];
   
-  [self configurePopLabel];
-  [self configureSwipableButtonImageView];
+  if (self.suggestionFeedObject)
+    [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
   
+  [self configurePopLabel];
+  [self configureSwipableButtonView];
+  
+  [self.swipableButtonView configureToUseImage];
+
   if (self.nuxStep > 0) {
     [self configureNuxStep:self.nuxStep];
   }
   
   [self configurePeopleLabel];
+  
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
   self.profileStackView.backgroundColor = [UIColor clearColor];
@@ -57,17 +76,17 @@
   UIImage *nuxImage;
   if (self.nuxStep == 1) {
     nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
-    self.swipableButtonImageView.noEnabled = NO;
+    self.swipableButtonView.noEnabled = NO;
   } else {
     nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
-    self.swipableButtonImageView.yesEnabled = NO;
+    self.swipableButtonView.yesEnabled = NO;
   }
-  self.imageView.image = nuxImage;
+  self.swipableButtonView.imageView.image = nuxImage;
 }
 
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
 {
-  [super setSuggestionFeedObject:suggestionFeedObject];
+  _suggestionFeedObject = suggestionFeedObject;
   if (self.nuxStep == 0) {
     if (self.suggestionFeedObject.actors.count > 0) {
       self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
@@ -81,21 +100,20 @@
   }
 }
 
-- (void)configureSwipableButtonImageView
+- (void)configureSwipableButtonView
 {
-  [self.swipableButtonImageView configureWithShowsOther:NO];
-  self.swipableButtonImageView.delegate = self;
-  [self.swipableButtonImageView.yesButton
+  [self.swipableButtonView configureWithShowsOther:NO];
+  self.swipableButtonView.delegate = self;
+  [self.swipableButtonView.yesButton
    setImage:[UIImage imageNamed:@"Assets/Icons/SendButtonIcon"]
    forState:UIControlStateNormal];
-  [self.swipableButtonImageView.noButton
+  [self.swipableButtonView.noButton
    setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
    forState:UIControlStateNormal];
-  for (UIButton *button in @[self.swipableButtonImageView.yesButton, self.swipableButtonImageView.noButton]) {
+  for (UIButton *button in @[self.swipableButtonView.yesButton, self.swipableButtonView.noButton]) {
     [button setTitle:nil forState:UIControlStateNormal];
     button.backgroundColor = [UIColor clearColor];
   }
-
 }
 
 
@@ -130,24 +148,24 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-  [self.swipableButtonImageView resetView];
+  [self.swipableButtonView resetView];
 }
 
-- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
         buttonSelected:(UIButton *)button
 {
-  if (button == self.swipableButtonImageView.yesButton && self.yesButtonHandler) {
+  if (button == self.swipableButtonView.yesButton && self.yesButtonHandler) {
     if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
       self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
     } else {
       [self.selectPeoplePopLabel popAtView:self.addRecipientButton animatePopLabel:YES animateTargetView:YES];
-      [self.swipableButtonImageView resetView];
+      [self.swipableButtonView resetView];
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.selectPeoplePopLabel dismiss];
       });
     }
   }
-  else if (button == self.swipableButtonImageView.noButton && self.noButtonHandler)
+  else if (button == self.swipableButtonView.noButton && self.noButtonHandler)
     self.noButtonHandler(self.suggestionFeedObject);
 }
 
@@ -188,6 +206,20 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   }
   return result;
 }
-                                                          
+
+- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo
+{
+  self.suggestionFeedObject = suggestion;
+  self.photoFeedObject = photo;
+  
+  if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
+  self.bottomLabel.text = [NSString stringWithFormat:@"Send to %@",
+                           suggestion.actorsString];
+  self.topLabel.text = suggestion.placeAndRelativeTimeString;
+  
+  [self.view setNeedsLayout];
+}
+
+
 
 @end

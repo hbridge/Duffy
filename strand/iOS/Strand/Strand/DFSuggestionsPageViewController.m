@@ -194,7 +194,7 @@ const NSUInteger NumNuxes = 3;
         if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
           [self.alreadyShownPhotoIds addObject:@(photo.id)];
           DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
-          svc.frame = self.view.bounds;
+          svc.view.frame = self.view.bounds;
           [svc configureWithSuggestion:suggestion withPhoto:photo];
           DFSuggestionsPageViewController __weak *weakSelf = self;
 

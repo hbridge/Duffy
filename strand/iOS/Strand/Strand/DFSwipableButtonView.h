@@ -1,5 +1,5 @@
 //
-//  DFswipableButtonImageView.h
+//  DFswipableButtonView.h
 //  Strand
 //
 //  Created by Henry Bridge on 12/3/14.
@@ -8,24 +8,24 @@
 
 #import <UIKit/UIKit.h>
 
-@class DFSwipableButtonImageView;
+@class DFSwipableButtonView;
 
 
-@protocol DFSwipableButtonImageViewDelegate <NSObject>
+@protocol DFSwipableButtonViewDelegate <NSObject>
 
 @required
-- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
         buttonSelected:(UIButton *)button;
 
 
 @optional
-- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
               didBeginPan:(UIPanGestureRecognizer *)panGesture
               translation:(CGPoint)translation;
-- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
               didMovePan:(UIPanGestureRecognizer *)panGesture
               translation:(CGPoint)translation;
-- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
               didEndPan:(UIPanGestureRecognizer *)panGesture
               translation:(CGPoint)translation;
 
@@ -34,20 +34,26 @@
 @end
 
 
-@interface DFSwipableButtonImageView : UIView
+@interface DFSwipableButtonView : UIView
 
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UIView *centerView;
 @property (weak, nonatomic) IBOutlet UIButton *yesButton;
 @property (weak, nonatomic) IBOutlet UIButton *noButton;
 @property (weak, nonatomic) IBOutlet UIButton *otherButton;
-@property (nonatomic, weak) id<DFSwipableButtonImageViewDelegate> delegate;
+@property (nonatomic, weak) id<DFSwipableButtonViewDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIPanGestureRecognizer *panGestureRecognizer;
 @property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
 @property (nonatomic) BOOL yesEnabled;
 @property (nonatomic) BOOL noEnabled;
 
+@property (nonatomic, retain) UIImageView *imageView;
+@property (nonatomic, retain) UILabel *labelView;
+
 - (void)configureWithShowsOther:(BOOL)showsOther;
 - (IBAction)panGestureChanged:(UIPanGestureRecognizer *)sender;
 - (void)resetView;
+
+- (void)configureToUseImage;
+- (void)configureToUseLabel;
 
 @end

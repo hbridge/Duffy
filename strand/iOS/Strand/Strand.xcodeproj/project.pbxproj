@@ -104,8 +104,6 @@
 		5A854B371A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A854B351A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.m */; };
 		5A854B381A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A854B361A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.xib */; };
 		5A87DE141A267BC80058EB38 /* DFSuggestionsPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DE101A267BC80058EB38 /* DFSuggestionsPageViewController.m */; };
-		5A87DE151A267BC80058EB38 /* DFSuggestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DE121A267BC80058EB38 /* DFSuggestionViewController.m */; };
-		5A87DE161A267BC80058EB38 /* DFSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A87DE131A267BC80058EB38 /* DFSuggestionViewController.xib */; };
 		5A87DE1A1A267E240058EB38 /* DFProfileWithContextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DE181A267E240058EB38 /* DFProfileWithContextView.m */; };
 		5A87DE1B1A267E240058EB38 /* DFProfileWithContextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A87DE191A267E240058EB38 /* DFProfileWithContextView.xib */; };
 		5A883BE21A09653900355C1D /* DFStrandPeopleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BE01A09653900355C1D /* DFStrandPeopleViewController.m */; };
@@ -124,8 +122,8 @@
 		5A91C4711A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C46F1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m */; };
 		5A91C4721A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */; };
 		5A91C4781A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */; };
-		5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */; };
-		5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */; };
+		5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonView.m */; };
+		5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonView.xib */; };
 		5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */; };
 		5A91C4841A36116300C4F9A6 /* DFIncomingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */; };
 		5A91C4851A36116300C4F9A6 /* DFIncomingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */; };
@@ -292,6 +290,8 @@
 		65D1C2D91A30C1AA007E7300 /* DFPeanutSharedStrand.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */; };
 		65D1C2DC1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */; };
 		65E2414E1A364EA90044F1CB /* DFHomeSubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */; };
+		65E241551A3A53AF0044F1CB /* DFSuggestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241531A3A53AF0044F1CB /* DFSuggestionViewController.m */; };
+		65E241561A3A53AF0044F1CB /* DFSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E241541A3A53AF0044F1CB /* DFSuggestionViewController.xib */; };
 		65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EF6C601A1563E300E0533F /* DFContactDataManager.m */; };
 /* End PBXBuildFile section */
 
@@ -475,9 +475,6 @@
 		5A854B361A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoFeedFooterCell.xib; sourceTree = "<group>"; };
 		5A87DE0F1A267BC80058EB38 /* DFSuggestionsPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionsPageViewController.h; sourceTree = "<group>"; };
 		5A87DE101A267BC80058EB38 /* DFSuggestionsPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionsPageViewController.m; sourceTree = "<group>"; };
-		5A87DE111A267BC80058EB38 /* DFSuggestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionViewController.h; sourceTree = "<group>"; };
-		5A87DE121A267BC80058EB38 /* DFSuggestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionViewController.m; sourceTree = "<group>"; };
-		5A87DE131A267BC80058EB38 /* DFSuggestionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSuggestionViewController.xib; sourceTree = "<group>"; };
 		5A87DE171A267E240058EB38 /* DFProfileWithContextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFProfileWithContextView.h; sourceTree = "<group>"; };
 		5A87DE181A267E240058EB38 /* DFProfileWithContextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFProfileWithContextView.m; sourceTree = "<group>"; };
 		5A87DE191A267E240058EB38 /* DFProfileWithContextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFProfileWithContextView.xib; sourceTree = "<group>"; };
@@ -510,9 +507,9 @@
 		5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwipableSuggestionViewController.xib; sourceTree = "<group>"; };
 		5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSpringAttachmentBehavior.h; sourceTree = "<group>"; };
 		5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSpringAttachmentBehavior.m; sourceTree = "<group>"; };
-		5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSwipableButtonImageView.h; sourceTree = "<group>"; };
-		5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwipableButtonImageView.m; sourceTree = "<group>"; };
-		5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwipableButtonImageView.xib; sourceTree = "<group>"; };
+		5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSwipableButtonView.h; sourceTree = "<group>"; };
+		5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwipableButtonView.m; sourceTree = "<group>"; };
+		5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwipableButtonView.xib; sourceTree = "<group>"; };
 		5A91C47E1A321FC600C4F9A6 /* DFPhoneNumberUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoneNumberUtils.h; sourceTree = "<group>"; };
 		5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoneNumberUtils.m; sourceTree = "<group>"; };
 		5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIncomingViewController.h; sourceTree = "<group>"; };
@@ -816,6 +813,9 @@
 		65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSharedStrandAdapter.m; sourceTree = "<group>"; };
 		65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFHomeSubViewController.h; sourceTree = "<group>"; };
 		65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFHomeSubViewController.m; sourceTree = "<group>"; };
+		65E241521A3A53AF0044F1CB /* DFSuggestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionViewController.h; sourceTree = "<group>"; };
+		65E241531A3A53AF0044F1CB /* DFSuggestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionViewController.m; sourceTree = "<group>"; };
+		65E241541A3A53AF0044F1CB /* DFSuggestionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSuggestionViewController.xib; sourceTree = "<group>"; };
 		65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactDataManager.h; sourceTree = "<group>"; };
 		65EF6C601A1563E300E0533F /* DFContactDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactDataManager.m; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
@@ -1266,11 +1266,24 @@
 		5A87DE0E1A267BB30058EB38 /* Suggestions Tab */ = {
 			isa = PBXGroup;
 			children = (
+				65E241521A3A53AF0044F1CB /* DFSuggestionViewController.h */,
+				65E241531A3A53AF0044F1CB /* DFSuggestionViewController.m */,
+				65E241541A3A53AF0044F1CB /* DFSuggestionViewController.xib */,
 				5A87DE0F1A267BC80058EB38 /* DFSuggestionsPageViewController.h */,
 				5A87DE101A267BC80058EB38 /* DFSuggestionsPageViewController.m */,
-				5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonImageView.h */,
-				5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */,
-				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */,
+				5A91C46E1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.h */,
+				5A91C46F1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m */,
+				5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */,
+				5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */,
+				5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */,
+				5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */,
+				5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonView.h */,
+				5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonView.m */,
+				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonView.xib */,
+				5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */,
+				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
+				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
+				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
 			);
 			name = "Suggestions Tab";
 			sourceTree = "<group>";
@@ -1657,22 +1670,9 @@
 		5AC59E9C1A39FCD20081CCE5 /* Detail Cards */ = {
 			isa = PBXGroup;
 			children = (
-				5A87DE111A267BC80058EB38 /* DFSuggestionViewController.h */,
-				5A87DE121A267BC80058EB38 /* DFSuggestionViewController.m */,
-				5A87DE131A267BC80058EB38 /* DFSuggestionViewController.xib */,
-				5A91C46E1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.h */,
-				5A91C46F1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m */,
-				5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */,
-				5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */,
-				5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */,
-				5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */,
 				5AC59EA31A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.h */,
 				5AC59EA41A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m */,
 				5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */,
-				5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */,
-				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
-				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
-				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
 				5A05AD3F1A11603B003AAE1C /* Commenting */,
 			);
 			name = "Detail Cards";
@@ -1923,7 +1923,6 @@
 				5A113B1419C2472D004CA85B /* DFGallerySectionFooter.xib in Resources */,
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5A13E09819BF61FE005357D2 /* DFInboxViewController.xib in Resources */,
-				5A87DE161A267BC80058EB38 /* DFSuggestionViewController.xib in Resources */,
 				5A4BBD3019B8BA8500359299 /* DFCardTableViewCell.xib in Resources */,
 				5A883BE31A09653900355C1D /* DFStrandPeopleViewController.xib in Resources */,
 				5A91C4851A36116300C4F9A6 /* DFIncomingViewController.xib in Resources */,
@@ -1958,12 +1957,13 @@
 				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */,
 				5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */,
+				65E241561A3A53AF0044F1CB /* DFSuggestionViewController.xib in Resources */,
 				5AA36F0D19F80ECA008B37AA /* DFSwapViewController.xib in Resources */,
 				5ACE176A1A1BF54800DE998A /* DFPhotoFeedImageCell.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
 				5A0BC49D19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib in Resources */,
-				5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib in Resources */,
+				5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonView.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFSelectPhotosViewController.xib in Resources */,
 				5A83A3D619EED9ED0068F08B /* DFSmallCardTableViewCell.xib in Resources */,
 				5ACE17721A1D20E700DE998A /* DFPhotoFeedActionCell.xib in Resources */,
@@ -2067,7 +2067,7 @@
 				5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */,
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
-				5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m in Sources */,
+				5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonView.m in Sources */,
 				5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5A91C4711A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m in Sources */,
@@ -2162,10 +2162,10 @@
 				5A7B185019707D9600E5A1D1 /* DFPeanutActionResponse.m in Sources */,
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
+				65E241551A3A53AF0044F1CB /* DFSuggestionViewController.m in Sources */,
 				5A4C820519ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m in Sources */,
 				5A91C4891A378AFE00C4F9A6 /* DFHomeViewController.m in Sources */,
 				5ACE17691A1BF54800DE998A /* DFPhotoFeedImageCell.m in Sources */,
-				5A87DE151A267BC80058EB38 /* DFSuggestionViewController.m in Sources */,
 				5ACE17711A1D20E700DE998A /* DFPhotoFeedActionCell.m in Sources */,
 				5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */,
 				5A91C4841A36116300C4F9A6 /* DFIncomingViewController.m in Sources */,
