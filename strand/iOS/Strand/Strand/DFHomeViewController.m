@@ -58,6 +58,10 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                            selector:@selector(reloadData)
                                                name:DFStrandNewSwapsDataNotificationName
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNotificationsUpdatedNotification
+                                             object:nil];
   
 }
 
@@ -214,7 +218,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self reloadData];
   [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
 }
 
@@ -252,28 +255,31 @@ const NSUInteger MinPhotosToShowFilter = 20;
 
 - (void)reloadData
 {
-  NSArray *feedPhotos;
-  NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
-                        allEvaluatedOrSentPhotos];
-  if (allPhotos.count >= MinPhotosToShowFilter) {
-    if (self.selectedFilterIndex == 0) {
-      feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSArray *feedPhotos;
+    NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
+                          allEvaluatedOrSentPhotos];
+    if (allPhotos.count >= MinPhotosToShowFilter) {
+      if (self.selectedFilterIndex == 0) {
+        feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
+      } else {
+        feedPhotos = [[DFPeanutFeedDataManager sharedManager]
+                      allEvaluatedOrSentPhotos];
+      }
+      self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
     } else {
-      feedPhotos = [[DFPeanutFeedDataManager sharedManager]
-                    allEvaluatedOrSentPhotos];
+      feedPhotos = allPhotos;
+      _selectedFilterIndex = 1;
+      self.flowLayout.headerReferenceSize = CGSizeZero;
     }
-    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
-  } else {
-    feedPhotos = allPhotos;
-    _selectedFilterIndex = 1;
-    self.flowLayout.headerReferenceSize = CGSizeZero;
-  }
-
-  [self.datasource setFeedPhotos:feedPhotos];
-  [self.collectionView reloadData];
-  [self configureNoResultsView];
-  [self configureBadges];
-  [self configureFooterLabelText];
+    
+    [self.datasource setFeedPhotos:feedPhotos];
+    [self.collectionView reloadData];
+    [self configureNoResultsView];
+    [self configureBadges];
+    [self configureFooterLabelText];
+    
+  });
 }
 
 

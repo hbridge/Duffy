@@ -56,6 +56,11 @@ static DFPeanutNotificationsManager *defaultManager;
   DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
   user.id = [[DFUser currentUser] userID];
   self.peanutActions = [[DFPeanutFeedDataManager sharedManager] actionsListFilterUser:user];
+  [self postNotificationsUpdatedNotif];
+}
+
+- (void)postNotificationsUpdatedNotif
+{
   [[NSNotificationCenter defaultCenter]
    postNotificationName:DFStrandNotificationsUpdatedNotification
    object:self
@@ -142,13 +147,19 @@ static DFPeanutNotificationsManager *defaultManager;
 - (void)markActionIDsSeen:(NSArray *)actionIDs
 {
   [self.dbQueue inDatabase:^(FMDatabase *db) {
+    BOOL added = NO;
     for (NSNumber *actionID in actionIDs) {
       if (![self.seenActionIDs containsObject:actionID]) {
         [self.seenActionIDs addObject:actionID];
         [self.db executeUpdate:@"INSERT INTO seenNotifications VALUES (?)",
          actionID];
+        added = YES;
       }
     }
+    if (added)
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self postNotificationsUpdatedNotif];
+      });
   }];
 }
 
