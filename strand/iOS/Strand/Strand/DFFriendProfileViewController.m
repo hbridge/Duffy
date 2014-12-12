@@ -9,11 +9,11 @@
 #import "DFFriendProfileViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "UIDevice+DFHelpers.h"
-#import "DFFeedViewController.h"
+#import "DFGalleryViewController.h"
 
 @interface DFFriendProfileViewController ()
 
-@property (nonatomic, retain) DFFeedViewController *feedViewController;
+@property (nonatomic, retain) DFGalleryViewController *galleryViewController;
 
 @end
 
@@ -25,10 +25,9 @@
   self = [super init];
   if (self) {
     _peanutUser = peanutUser;
-    DFStrandIDType strandID = self.peanutUser.shared_strand.longLongValue;
-    _feedViewController = [[DFFeedViewController alloc] initWithStrandPostsId:strandID];
+    _galleryViewController = [[DFGalleryViewController alloc] initWithFilterUser:peanutUser];
     // set their parent view controller so they inherit the nav controller etc
-    [self displayContentController:_feedViewController];
+    [self displayContentController:_galleryViewController];
   }
   return self;
 }
@@ -53,7 +52,7 @@
   self.profilePhotoStackView.profilePhotoWidth = 45.0;
 
   self.nameLabel.text = [self.peanutUser fullName];
-  NSArray *photos = [self.feedViewController.postsObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosSentByUser:self.peanutUser.id];
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
                              (int)photos.count];
   

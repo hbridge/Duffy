@@ -12,7 +12,7 @@
 #import "DFGallerySectionHeader.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UICollectionView+DFExtras.h"
-#import "DFFeedViewController.h"
+#import "DFEvaluatedPhotoViewController.h"
 #import "DFNoTableItemsView.h"
 
 @interface DFGalleryViewController ()
@@ -30,7 +30,7 @@
   if (self) {
     [self configureNavAndTab];
     [self observeNotifications];
-    self.numPhotosPerRow = 4;
+    self.numPhotosPerRow = 3;
   }
   return self;
 }
@@ -75,15 +75,27 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  self.datasource = [[DFImageDataSource alloc]
-                     initWithCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
-                                                    acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id]
-                     collectionView:self.collectionView];
+  if (self.showHeaders) {
+    self.datasource = [[DFImageDataSource alloc]
+                       initWithCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
+                                                      acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id]
+                       collectionView:self.collectionView];
+  } else {
+    NSArray *strands = [[DFPeanutFeedDataManager sharedManager]
+                        acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id];
+    
+    NSArray *photos = [DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto inArrayOfFeedObjects:strands];
+    self.datasource = [[DFImageDataSource alloc]
+                       initWithFeedPhotos:photos
+                       collectionView:self.collectionView];
+  }
   self.datasource.imageDataSourceDelegate = self;
-  [self.collectionView registerNib:[UINib nibForClass:[DFGallerySectionHeader class]]
-        forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-               withReuseIdentifier:@"header"];
-  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, 70);
+  if (self.showHeaders) {
+    [self.collectionView registerNib:[UINib nibForClass:[DFGallerySectionHeader class]]
+          forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                 withReuseIdentifier:@"header"];
+    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, 70);
+  }
   self.collectionView.delegate = self;
   self.datasource.showActionsBadge = YES;
   [self configureNoResultsView];
@@ -172,12 +184,14 @@
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
-  DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath] leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DFFeedViewController *fvc = [[DFFeedViewController alloc] initWithStrandPostsId:strandObject.id];
-  fvc.onViewScrollToPhotoId = photo.id;
-  fvc.showPersonPerPhoto = YES;
-  [self.navigationController pushViewController:fvc animated:YES];
+  DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
+                                leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+  DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager]
+                                     strandPostsObjectWithId:photo.strand_id.longLongValue];
+  DFEvaluatedPhotoViewController *evc = [[DFEvaluatedPhotoViewController alloc]
+                                         initWithPhotoObject:photo
+                                         inPostsObject:postsObject];
+  [DFNavigationController presentWithRootController:evc inParent:self withBackButtonTitle:@"Back"];
 }
 
 - (void)createButtonPressed:(id)sender

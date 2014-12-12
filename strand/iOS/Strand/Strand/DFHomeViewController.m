@@ -15,10 +15,10 @@
 #import "DFNoTableItemsView.h"
 #import "DFIncomingViewController.h"
 #import "DFSettingsViewController.h"
-#import "DFInviteFriendViewController.h"
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"
 #import "DFEvaluatedPhotoViewController.h"
+#import "DFFriendsViewController.h"
 
 const CGFloat headerHeight = 60.0;
 
@@ -63,10 +63,10 @@ const CGFloat headerHeight = 60.0;
                                                target:self
                                                action:@selector(createButtonPressed:)],
                                               [[UIBarButtonItem alloc]
-                                               initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+                                               initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
                                                style:UIBarButtonItemStylePlain
                                                target:self
-                                               action:@selector(inviteButtonPressed:)],
+                                               action:@selector(friendsButtonPressed:)],
                                               ];
   
   self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
@@ -279,10 +279,12 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   [DFSettingsViewController presentModallyInViewController:self];
 }
 
-- (void)inviteButtonPressed:(id)sender
+- (void)friendsButtonPressed:(id)sender
 {
-  DFInviteFriendViewController *inviteController = [[DFInviteFriendViewController alloc] init];
-  [self presentViewController:inviteController animated:YES completion:nil];
+  DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
+  [DFNavigationController presentWithRootController:friendsViewController
+                                           inParent:self
+                                withBackButtonTitle:@"Back"];
 }
 
 @end

@@ -15,6 +15,7 @@
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic) NSUInteger numPhotosPerRow;
 @property (nonatomic, retain) DFPeanutUserObject *userToFilterTo;
+@property (nonatomic) BOOL showHeaders;
 
 - (instancetype)initWithFilterUser:(DFPeanutUserObject *)user;
 
