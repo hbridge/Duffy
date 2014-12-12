@@ -87,7 +87,6 @@ const CGFloat headerHeight = 60.0;
   self.datasource = [[DFImageDataSource alloc]
                      initWithCollectionFeedObjects:nil
                      collectionView:self.collectionView];
-  self.datasource.showActionsBadge = NO;
   self.datasource.imageDataSourceDelegate = self;
   self.collectionView.delegate = self;
   
@@ -103,7 +102,7 @@ const CGFloat headerHeight = 60.0;
           forSupplementaryViewOfKind:DFBadgingCollectionViewFlowLayoutBadgeView
                  withReuseIdentifier:@"badge"];
 
-  self.datasource.showActionsBadge = YES;
+  self.datasource.showActionsBadge = NO;
   self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
