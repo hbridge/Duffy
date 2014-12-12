@@ -68,7 +68,7 @@ const CGFloat RightGestureThreshold = 75.0;
   self.centerView.layer.cornerRadius = 3.0;
   self.centerView.layer.masksToBounds = YES;
   
-  for (UIButton *button in @[self.noButton, self.otherButton, self.yesButton]) {
+  for (UIButton *button in [self allButtons]) {
     button.layer.cornerRadius = button.frame.size.height / 2.0;
     button.layer.masksToBounds = YES;
   }
@@ -195,22 +195,24 @@ const CGFloat RightGestureThreshold = 75.0;
     [self.delegate swipableButtonView:self didEndPan:self.panGestureRecognizer translation:translation];
 }
 
-- (void)unhighlightAllButtons
+- (NSArray *)allButtons
 {
   NSArray *buttons = @[self.yesButton, self.noButton];
-  
+  if (self.otherButton) buttons = [buttons arrayByAddingObject:self.otherButton];
+  return buttons;
+}
+
+- (void)unhighlightAllButtons
+{
   self.overlayImageView.alpha = 0.0;
-  for (UIButton *button in buttons) {
+  for (UIButton *button in [self allButtons]) {
     if (button.enabled) button.alpha = 1.0;
   }
 }
 
 - (void)highlightButton:(UIButton *)buttonToHighlight amount:(CGFloat)highlightAmount
 {
-  NSArray *buttons = @[self.yesButton, self.noButton];
-  if (self.otherButton) buttons = [buttons arrayByAddingObject:self.otherButton];
-  
-  for (UIButton *button in buttons) {
+  for (UIButton *button in [self allButtons]) {
     if (!button.enabled) continue;
     if (button == buttonToHighlight) {
       button.alpha = 0.2 + 0.8 * highlightAmount;
