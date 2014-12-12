@@ -279,15 +279,15 @@ const CGFloat RightGestureThreshold = 75.0;
 }
 
 - (IBAction)yesButtonPressed:(id)sender {
-  self.yesButton.enabled = NO;
-  self.noButton.enabled = NO;
-  self.otherButton.enabled = NO;
+//  self.yesButton.enabled = NO;
+//  self.noButton.enabled = NO;
+//  self.otherButton.enabled = NO;
   [self handleButtonSelected:sender];
 }
 - (IBAction)noButtonPressed:(id)sender {
-  self.noButton.enabled = NO;
-  self.yesButton.enabled = NO;
-  self.otherButton.enabled = NO;
+//  self.noButton.enabled = NO;
+//  self.yesButton.enabled = NO;
+//  self.otherButton.enabled = NO;
   [self handleButtonSelected:sender];
 }
 
