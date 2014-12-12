@@ -242,6 +242,8 @@
 		5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */; };
 		5AC59EA61A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC59EA41A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m */; };
 		5AC59EA71A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */; };
+		5AC59EAB1A3B60530081CCE5 /* DFLabelReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC59EA91A3B60530081CCE5 /* DFLabelReusableView.m */; };
+		5AC59EAC1A3B60530081CCE5 /* DFLabelReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC59EAA1A3B60530081CCE5 /* DFLabelReusableView.xib */; };
 		5AC8B1E819D0D9AC00BAC55F /* DFAssetCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
@@ -725,6 +727,9 @@
 		5AC59EA31A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFEvaluatedPhotoViewController.h; sourceTree = "<group>"; };
 		5AC59EA41A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFEvaluatedPhotoViewController.m; sourceTree = "<group>"; };
 		5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFEvaluatedPhotoViewController.xib; sourceTree = "<group>"; };
+		5AC59EA81A3B60530081CCE5 /* DFLabelReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLabelReusableView.h; sourceTree = "<group>"; };
+		5AC59EA91A3B60530081CCE5 /* DFLabelReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLabelReusableView.m; sourceTree = "<group>"; };
+		5AC59EAA1A3B60530081CCE5 /* DFLabelReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLabelReusableView.xib; sourceTree = "<group>"; };
 		5AC8B1E619D0D9AC00BAC55F /* DFAssetCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAssetCache.h; sourceTree = "<group>"; };
 		5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAssetCache.m; sourceTree = "<group>"; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -1687,6 +1692,9 @@
 				5A683A191A39110A00308BF1 /* DFSegmentedControlReusableView.h */,
 				5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */,
 				5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */,
+				5AC59EA81A3B60530081CCE5 /* DFLabelReusableView.h */,
+				5AC59EA91A3B60530081CCE5 /* DFLabelReusableView.m */,
+				5AC59EAA1A3B60530081CCE5 /* DFLabelReusableView.xib */,
 			);
 			name = "Home view";
 			sourceTree = "<group>";
@@ -1912,6 +1920,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AC59EAC1A3B60530081CCE5 /* DFLabelReusableView.xib in Resources */,
 				5AA9293219A6598600032A3F /* DFNoContactsTableViewCell.xib in Resources */,
 				5AC4A9551947C77300862D9C /* DFCreateAccountViewController.xib in Resources */,
 				5AF64D0619EC61AA00EE1473 /* DFFriendsViewController.xib in Resources */,
@@ -2149,6 +2158,7 @@
 				5ACE176D1A1CF45D00DE998A /* DFFeedDataSource.m in Sources */,
 				5A9BC32819A3E299002D1CD7 /* DFPushNotificationsManager.m in Sources */,
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
+				5AC59EAB1A3B60530081CCE5 /* DFLabelReusableView.m in Sources */,
 				5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */,
 				65D1C2DC1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m in Sources */,
 				5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */,

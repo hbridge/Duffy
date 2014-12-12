@@ -17,6 +17,7 @@
 #import "DFSettingsViewController.h"
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"
+#import "DFLabelReusableView.h"
 #import "DFEvaluatedPhotoViewController.h"
 #import "DFFriendsViewController.h"
 
@@ -27,6 +28,7 @@ const CGFloat headerHeight = 60.0;
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
+@property (nonatomic, retain) UILabel *footerLabel;
 
 @end
 
@@ -83,38 +85,93 @@ const CGFloat headerHeight = 60.0;
                      initWithCollectionFeedObjects:nil
                      collectionView:self.collectionView];
   self.datasource.imageDataSourceDelegate = self;
+  self.collectionView.delegate = self;
   
   [self.collectionView registerNib:[UINib nibForClass:[DFSegmentedControlReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"header"];
-  self.collectionView.delegate = self;
+  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
+  [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
+        forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+               withReuseIdentifier:@"footer"];
+  self.flowLayout.footerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
+
   self.datasource.showActionsBadge = YES;
   self.collectionView.backgroundColor = [UIColor whiteColor];
-  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath
 {
   if (kind == UICollectionElementKindSectionHeader &&
       indexPath.section == 0 &&
       indexPath.row == 0) {
-    DFSegmentedControlReusableView *segmentedView = [self.collectionView
-                                      dequeueReusableSupplementaryViewOfKind:kind
-                                      withReuseIdentifier:@"header"
-                                      forIndexPath:indexPath];
-    [segmentedView.segmentedControl setTitle:@"Liked" forSegmentAtIndex:0];
-    [segmentedView.segmentedControl setTitle:@"All" forSegmentAtIndex:1];
-    [segmentedView.segmentedControl setWidth:100 forSegmentAtIndex:0];
-    [segmentedView.segmentedControl setWidth:100 forSegmentAtIndex:1];
-    segmentedView.segmentedControl.tintColor = [UIColor darkGrayColor];
-    [segmentedView.segmentedControl addTarget:self
-                                       action:@selector(filterChanged:)
-                             forControlEvents:UIControlEventValueChanged];
     
-
-    return segmentedView;
+    return [self headerViewForIndexPath:indexPath];
+  } else if (kind == UICollectionElementKindSectionFooter &&
+             indexPath.section == 0 &&
+             indexPath.row == 0)
+  {
+    return [self footerViewForIndexPath:indexPath];
   }
   return nil;
+}
+
+- (UICollectionReusableView *)headerViewForIndexPath:(NSIndexPath *)indexPath
+{
+  DFSegmentedControlReusableView *segmentedView =
+  [self.collectionView
+   dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+   withReuseIdentifier:@"header"
+   forIndexPath:indexPath];
+  [segmentedView.segmentedControl setTitle:@"Activity" forSegmentAtIndex:0];
+  [segmentedView.segmentedControl setTitle:@"All Photos" forSegmentAtIndex:1];
+  [segmentedView.segmentedControl setWidth:120 forSegmentAtIndex:0];
+  [segmentedView.segmentedControl setWidth:120 forSegmentAtIndex:1];
+  segmentedView.segmentedControl.tintColor = [UIColor darkGrayColor];
+  [segmentedView.segmentedControl addTarget:self
+                                     action:@selector(filterChanged:)
+                           forControlEvents:UIControlEventValueChanged];
+  
+  
+  return segmentedView;
+}
+
+- (UICollectionReusableView *)footerViewForIndexPath:(NSIndexPath *)indexPath
+{
+  DFLabelReusableView *footerView = [self.collectionView
+                                     dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+                                     withReuseIdentifier:@"footer"
+                                     forIndexPath:indexPath];
+  self.footerLabel = footerView.label;
+
+  self.footerLabel.font = [UIFont fontWithName:@"HelvetiaNeue" size:19.0];
+  self.footerLabel.textColor = [UIColor lightGrayColor];
+  self.footerLabel.textAlignment = NSTextAlignmentCenter;
+  
+  
+  [self configureFooterLabelText];
+  return footerView;
+}
+
+- (void)configureFooterLabelText
+{
+  NSString *filterString;
+  if (self.selectedFilterIndex == 0){
+    filterString = @"with Activity";
+  } else {
+    filterString = @"Photos";
+  }
+  
+  if ([self.datasource numberOfSectionsInCollectionView:self.collectionView] > 0) {
+    NSString *text = [NSString stringWithFormat:@"%@ %@",
+                    @([[self.datasource photosForSection:0] count]),
+                    filterString];
+    self.footerLabel.text = text;
+  } else {
+    self.footerLabel.text = @"No Photos Yet";
+  }
 }
 
 - (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
@@ -173,6 +230,7 @@ const CGFloat headerHeight = 60.0;
   [self.collectionView reloadData];
   [self configureNoResultsView];
   [self configureBadges];
+  [self configureFooterLabelText];
 }
 
 
@@ -222,7 +280,6 @@ const CGFloat headerHeight = 60.0;
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"] forState:UIControlStateNormal];
     
   }
-  
 }
 
 #pragma mark - Actions
