@@ -34,15 +34,16 @@
 
 - (void)viewDidLayoutSubviews
 {
-  [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
-                                   pointSize:self.swipableButtonView.centerView.frame.size
-                                 contentMode:DFImageRequestContentModeAspectFill
-                                deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                    self.swipableButtonView.imageView.image = image;
-                                  });
-                                }];
-  
+  if (self.nuxStep == 0) {
+    [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
+                                     pointSize:self.swipableButtonView.centerView.frame.size
+                                   contentMode:DFImageRequestContentModeAspectFill
+                                  deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                      self.swipableButtonView.imageView.image = image;
+                                    });
+                                  }];
+  }
 }
 
 - (void)viewDidLoad {
