@@ -100,6 +100,11 @@ UIColor *DFStrandMainColor;
   return [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
 }
 
++ (UIColor *)teamSwapUserColor
+{
+  return [self strandBlue];
+}
+
 static NSArray *colors;
 
 + (NSArray *)profilePhotoStackColors

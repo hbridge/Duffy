@@ -78,7 +78,7 @@
     DFPeanutUserObject *user = _peanutUsers[i];
     UIColor *color;
     if ([user isEqual:[DFPeanutUserObject TeamSwapUser]]) {
-      color = [DFStrandConstants defaultBackgroundColor];
+      color = [DFStrandConstants teamSwapUserColor];
     } else {
       NSInteger numberForUser = [self numberForUser:user];
       NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);

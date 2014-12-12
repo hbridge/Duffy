@@ -55,6 +55,7 @@ extern const CGFloat StrandGalleryHeaderHeight;
 + (UIColor *)inviteCellBackgroundColor;
 + (UIColor *)photoCellBadgeColor;
 + (NSArray *)profilePhotoStackColors;
++ (UIColor *)teamSwapUserColor;
 
 // for use with Slash
 + (NSDictionary *)defaultTextStyle;
