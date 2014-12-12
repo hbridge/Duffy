@@ -20,6 +20,8 @@ NSTimeInterval const DFNotificationsMinFetchInterval = 2.0;
 @property (nonatomic, retain) NSDate *lastFetchDate;
 @property (atomic) BOOL isUpdatingNotifications;
 @property (nonatomic, readonly, retain) FMDatabase *db;
+@property (nonatomic, readonly, retain) FMDatabaseQueue *dbQueue;
+@property (nonatomic, retain) NSMutableSet *seenActionIDs;
 
 @end
 
@@ -43,7 +45,8 @@ static DFPeanutNotificationsManager *defaultManager;
                                              selector:@selector(updateNotifications)
                                                  name:DFStrandNewActionsDataNotificationName
                                                object:nil];
-
+    // force db to init
+    self.seenActionIDs = [[self allSeenActionIDs] mutableCopy];
   }
   return self;
 }
@@ -77,15 +80,7 @@ static DFPeanutNotificationsManager *defaultManager;
  */
 - (NSArray *)unreadNotifications
 {
-  NSMutableArray *unreadNotifications = [NSMutableArray new];
-  
-  for (int x=0; x < self.notifications.count; x++) {
-    DFPeanutAction *action = (DFPeanutAction *)self.notifications[x];
-    if ([self.lastViewDate compare:action.time_stamp] == NSOrderedAscending) {
-      [unreadNotifications addObject:self.notifications[x]];
-    }
-  }
-  return unreadNotifications;
+  return [self actionsWithReadState:NO];
 }
 
 /*
@@ -94,15 +89,7 @@ static DFPeanutNotificationsManager *defaultManager;
  */
 - (NSArray *)readNotifications
 {
-  NSMutableArray *readNotifications = [NSMutableArray new];
-  
-  for (int x=0; x < self.notifications.count; x++) {
-    DFPeanutAction *action = (DFPeanutAction *)self.notifications[x];
-    if ([self.lastViewDate compare:action.time_stamp] == NSOrderedDescending) {
-      [readNotifications addObject:self.notifications[x]];
-    }
-  }
-  return readNotifications;
+  return [self actionsWithReadState:YES];
 }
 
 /*
@@ -118,21 +105,49 @@ static DFPeanutNotificationsManager *defaultManager;
   }
 }
 
-/*
- * This should be called when the notifications view is shown to the user.
- */
 - (void)markAllNotificationsAsRead
 {
-  [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionViewNotifications];
-  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+  
 }
 
 
-- (NSArray *)actionsWithReadState:(BOOL)state
+- (NSArray *)actionsWithReadState:(BOOL)isRead
 {
-  //FMResultSet *actionIDs = [self.db executeQuery:@"SELECT action_id FROM seenNotifications WHERE user_id=(?) AND isSeen IS 1", @(user.id)];
-  return nil;
+  NSArray *actionIDs = [self.notifications arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
+    return action.id;
+  }];
+  
+  NSMutableSet *resultSet = [[NSMutableSet alloc] initWithArray:actionIDs];
+  if (isRead) {
+    [resultSet intersectSet:self.seenActionIDs];
+  } else {
+    [resultSet minusSet:self.seenActionIDs];
+  }
+  
+  NSMutableArray *resultActions = [NSMutableArray new];
+  for (DFPeanutAction *action in self.notifications ) {
+    if ([resultSet containsObject:action.id]) {
+      [resultActions addObject:action];
+    }
+  }
+  
+  return resultActions;
 }
+
+- (void)markActionIDsSeen:(NSArray *)actionIDs
+{
+  [self.dbQueue inDatabase:^(FMDatabase *db) {
+    for (NSNumber *actionID in actionIDs) {
+      if (![self.seenActionIDs containsObject:actionID]) {
+        [self.seenActionIDs addObject:actionID];
+        [self.db executeUpdate:@"INSERT INTO seenNotifications VALUES (?)",
+         actionID];
+      }
+    }
+  }];
+}
+
+#pragma mark - DB accessor
 
 - (FMDatabase *)db
 {
@@ -144,34 +159,35 @@ static DFPeanutNotificationsManager *defaultManager;
       _db = nil;
     }
     if (![_db tableExists:@"seenNotifications"]) {
-      [_db executeUpdate:@"CREATE TABLE seenNotifications (action_id NUMBER, strand_id NUMBER, photo_id NUMBER)"];
+      [_db executeUpdate:@"CREATE TABLE seenNotifications (action_id NUMBER UNIQUE, PRIMARY KEY (action_id))"];
     }
   }
+  _dbQueue = [FMDatabaseQueue databaseQueueWithPath:[self.class dbPath]];
+  
   return _db;
 }
 
-
-
-- (NSArray *)seenPrivateStrandIDsForUser:(DFPeanutUserObject *)user
+- (NSSet *)seenActionIDsWithQuery:(NSString *)queryString
 {
-  FMResultSet *results = [self.db executeQuery:@"SELECT strand_id FROM seenPeopleSuggestions WHERE user_id=(?) AND isSeen IS 1", @(user.id)];
-  NSMutableArray *resultIDs = [NSMutableArray new];
-  while ([results next]) {
-    [resultIDs addObject:@([results longLongIntForColumn:@"strand_id"])];
+  FMResultSet *fetchResult = [self.db executeQuery:queryString];
+  NSMutableSet *seenActionIDSet = [NSMutableSet new];
+  while ([fetchResult next]) {
+    [seenActionIDSet addObject:@([fetchResult longLongIntForColumn:@"action_id"])];
   }
-  return resultIDs;
+  return seenActionIDSet;
 }
 
-- (void)addSeenPrivateStrandIDs:(NSArray *)privateStrandIDs forUser:(DFPeanutUserObject *)user
+- (NSSet *)allSeenActionIDs
 {
-  for (NSNumber *privateStrandID in privateStrandIDs) {
-    NSString *key = [NSString stringWithFormat:@"%@-%llu", privateStrandID, user.id];
-    [self.db executeUpdate:@"INSERT INTO seenPeopleSuggestions VALUES (?, ?, ?, ?)",
-     key,
-     privateStrandID,
-     @(user.id),
-     @(YES)];
-  }
+  NSString *queryString = [NSString stringWithFormat:@"SELECT action_id FROM seenNotifications"];
+  return [self seenActionIDsWithQuery:queryString];
+}
+
+- (NSSet *)seenActionIDsInArray:(NSArray *)actionIDs
+{
+  NSString *actionIDString = [actionIDs componentsJoinedByString:@","];
+  NSString *queryString = [NSString stringWithFormat:@"SELECT action_id FROM seenNotifications WHERE action_id IN (%@)", actionIDString];
+  return [self seenActionIDsWithQuery:queryString];
 }
 
 + (NSString *)dbPath
@@ -181,10 +197,6 @@ static DFPeanutNotificationsManager *defaultManager;
   return [dbURL path];
 }
 
-- (void)markNotificationsSeen:(NSArray *)notifications
-{
-  
-}
 
 
 @end

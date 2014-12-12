@@ -9,6 +9,7 @@
 #import "DFEvaluatedPhotoViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFImageManager.h"
+#import "DFPeanutNotificationsManager.h"
 
 @interface DFEvaluatedPhotoViewController ()
 
@@ -36,6 +37,16 @@
 
   [self configureProfileWithContext];
   [self configureToolbar];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  NSArray *actionIDs = [self.photoObject.actions arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
+    return action.id;
+  }];
+  
+  [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
 }
 
 - (void)didReceiveMemoryWarning {

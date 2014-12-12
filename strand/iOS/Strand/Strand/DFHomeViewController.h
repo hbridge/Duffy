@@ -10,6 +10,7 @@
 #import "DFFriendsViewController.h"
 #import <LKBadgeView/LKBadgeView.h>
 #import "DFImageDataSource.h"
+#import "DFBadgingCollectionViewFlowLayout.h"
 
 
 @interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate>

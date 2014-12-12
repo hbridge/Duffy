@@ -46,8 +46,6 @@ extern const CGFloat StrandGalleryHeaderHeight;
 
 + (UIColor *)defaultBackgroundColor;
 + (UIColor *)defaultBarForegroundColor;
-+ (UIColor *)strongFeedForegroundTextColor;
-+ (UIColor *)weakFeedForegroundTextColor;
 + (UIColor *)strandOrange;
 + (UIColor *)strandSalmon;
 + (UIColor *)strandGreen;

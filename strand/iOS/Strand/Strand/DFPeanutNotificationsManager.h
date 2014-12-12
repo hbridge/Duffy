@@ -15,6 +15,6 @@
 - (NSArray *)unreadNotifications;
 - (NSArray *)readNotifications;
 - (void)markAllNotificationsAsRead;
-- (void)markNotificationsSeen:(NSArray *)notifications;
+- (void)markActionIDsSeen:(NSArray *)actionIDs;
 
 @end

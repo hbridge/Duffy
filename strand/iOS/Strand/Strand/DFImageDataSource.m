@@ -126,6 +126,7 @@ NSUInteger const SectionSpread = 5;
 - (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath
 {
   NSArray *objects = self.sectionArrays[indexPath.section];
+  if (indexPath.row >= objects.count) return nil;
   DFPeanutFeedObject *feedObject = objects[indexPath.row];
   return feedObject;
 }
