@@ -46,7 +46,7 @@
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle{
-  return UIStatusBarStyleLightContent;
+  return UIStatusBarStyleDefault;
 }
 
 + (void)presentWithRootController:(UIViewController *)rootController

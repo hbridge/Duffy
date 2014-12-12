@@ -75,7 +75,7 @@ const CGFloat headerHeight = 60.0;
                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
                                            style:UIBarButtonItemStylePlain target:self
                                            action:@selector(settingsPressed:)];
-  self.navigationController.navigationBar.barTintColor = [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRedByte:233 green:233 blue:233 alpha:0.6];
   self.navigationController.navigationBar.translucent = NO;
 }
 
@@ -129,7 +129,7 @@ const CGFloat headerHeight = 60.0;
   [segmentedView.segmentedControl setTitle:@"All Photos" forSegmentAtIndex:1];
   [segmentedView.segmentedControl setWidth:120 forSegmentAtIndex:0];
   [segmentedView.segmentedControl setWidth:120 forSegmentAtIndex:1];
-  segmentedView.segmentedControl.tintColor = [UIColor darkGrayColor];
+  segmentedView.segmentedControl.tintColor = [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
   [segmentedView.segmentedControl addTarget:self
                                      action:@selector(filterChanged:)
                            forControlEvents:UIControlEventValueChanged];

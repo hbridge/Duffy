@@ -53,22 +53,12 @@ UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor
 {
-  return [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
+  return [UIColor whiteColor];
 }
 
 + (UIColor *)defaultBarForegroundColor
 {
-  return [UIColor colorWithWhite:0.7 alpha:1.0];
-}
-
-+ (UIColor *)strongFeedForegroundTextColor
-{
-  return [UIColor blackColor];
-}
-
-+ (UIColor *)weakFeedForegroundTextColor
-{
-  return [UIColor colorWithRed:153/255.f green:153/255.f blue:153/255.f alpha:1];
+  return [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
 }
 
 + (UIColor *)strandOrange
@@ -102,7 +92,6 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)inviteCellBackgroundColor
 {
-  //return [UIColor colorWithRedByte:255 green:216 blue:208 alpha:1.0];
   return [UIColor whiteColor];
 }
 
