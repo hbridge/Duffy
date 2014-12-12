@@ -127,7 +127,7 @@ def userHasPostedPhotosToStrand(user, strand, actionsCache):
 
 	TODO(Derek):  If we create users in more places, might want to move this
 """
-def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildId, returnIfExist = False):
+def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildNum, returnIfExist = False):
 	try:
 		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=2))
 		
@@ -163,7 +163,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildId, return
 		strandInvite.invited_user = user
 
 		# Temp solution for using invites to hold incoming pictures
-		if int(buildId) > 4805:
+		if int(buildNum) > 4805:
 			strandInvite.accepted_user = user
 			
 			if user not in strandInvite.strand.users.all():
@@ -778,7 +778,7 @@ def swaps(request):
 		inviteObjects = list()
 
 		# First throw in invite objects
-		if int(self.request.DATA['build_number']) <= 4805:
+		if int(form.cleaned_data['build_number']) <= 4805:
 			inviteObjects = getInviteObjectsDataForUser(user)
 			responseObjects.extend(inviteObjects)
 
@@ -1180,12 +1180,12 @@ def auth_phone(request):
 				return HttpResponse(json.dumps({'access_code': 'Code expired'}), content_type="application/json", status=400)
 			else:
 				# TODO(Derek):  End of August, change returnIfExists to False, so we start archiving again
-				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0], form.cleaned_data['build_id'], returnIfExist = True)
+				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0], form.cleaned_data['build_number'], returnIfExist = True)
 				serializer = UserSerializer(user)
 				response['user'] = serializer.data
 		else:
 			if accessCode == 2345:
-				user = createStrandUser(phoneNumber, displayName, phoneId, None, form.cleaned_data['build_id'], returnIfExist = True)
+				user = createStrandUser(phoneNumber, displayName, phoneId, None, form.cleaned_data['build_number'], returnIfExist = True)
 				serializer = UserSerializer(user)
 				response['user'] = serializer.data
 			else:
