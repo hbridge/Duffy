@@ -900,6 +900,30 @@ static DFPeanutFeedDataManager *defaultManager;
   return nonEvaluatedPhotos;
 }
 
+- (NSArray *)photosWithActionsTypes:(NSArray *)actionTypes
+{
+  NSMutableArray *photosWithAction = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *strandPosts in [self publicStrands]) {
+    for (DFPeanutFeedObject *photo in [strandPosts descendentsOfType:DFFeedObjectPhoto]) {
+      BOOL photoHasAllActions = YES;
+      for (NSNumber *actionTypeNum in actionTypes) {
+        DFPeanutActionType actionType = actionTypeNum.longLongValue;
+        if ([[photo actionsOfType:actionType forUser:0] count] == 0){
+          photoHasAllActions = NO;
+          break;
+        }
+      }
+      if (photoHasAllActions) [photosWithAction addObject:photo];
+      // TODO(Derek): This should be put into a lower level.
+      // Temp here to move things along
+      photo.strand_id = @(strandPosts.id);
+    }
+  }
+  
+  return photosWithAction;
+}
+
 - (NSArray *)photosWithAction:(DFActionID)actionType
 {
   NSMutableArray *photosWithAction = [NSMutableArray new];
@@ -968,8 +992,6 @@ static DFPeanutFeedDataManager *defaultManager;
   return [self photosSortedByEvalTime:merged.allObjects];
 }
 
-
-
 - (NSArray *)favoritedPhotos
 {
   NSArray *photos = [self photosWithAction:DFPeanutActionFavorite];
@@ -982,6 +1004,8 @@ static DFPeanutFeedDataManager *defaultManager;
   NSArray *commentedPhotos = [self photosWithAction:DFPeanutActionComment];
   NSMutableSet *merged = [[NSMutableSet alloc] initWithArray:likedPhotos];
   [merged addObjectsFromArray:commentedPhotos];
+  NSSet *evaledPhotos = [[NSSet alloc] initWithArray:[self allEvaluatedOrSentPhotos]];
+  [merged intersectSet:evaledPhotos];
   return [self photosSortedByEvalTime:merged.allObjects];
 }
 
