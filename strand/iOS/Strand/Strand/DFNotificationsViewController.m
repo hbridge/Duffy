@@ -81,7 +81,7 @@
      @"badgeValue" : [DFAnalytics bucketStringForObjectCount:self.tabBarItem.badgeValue.integerValue]
      }];
   self.tabBarItem.badgeValue = nil;
-  [[DFPeanutNotificationsManager sharedManager] markNotificationsAsRead];
+  [[DFPeanutNotificationsManager sharedManager] markAllNotificationsAsRead];
   
 }
 

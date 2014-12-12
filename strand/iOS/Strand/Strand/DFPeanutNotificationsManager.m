@@ -118,7 +118,7 @@ static DFPeanutNotificationsManager *defaultManager;
 /*
  * This should be called when the notifications view is shown to the user.
  */
-- (void)markNotificationsAsRead
+- (void)markAllNotificationsAsRead
 {
   [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionViewNotifications];
   [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
