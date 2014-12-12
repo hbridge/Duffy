@@ -24,6 +24,7 @@
 #import "DFPeanutNotificationsManager.h"
 
 const CGFloat headerHeight = 60.0;
+const NSUInteger MinPhotosToShowFilter = 20;
 
 @interface DFHomeViewController ()
 
@@ -57,6 +58,7 @@ const CGFloat headerHeight = 60.0;
                                            selector:@selector(reloadData)
                                                name:DFStrandNewSwapsDataNotificationName
                                              object:nil];
+  
 }
 
 - (void)configureNav
@@ -93,7 +95,6 @@ const CGFloat headerHeight = 60.0;
   [self.collectionView registerNib:[UINib nibForClass:[DFSegmentedControlReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"header"];
-  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:@"footer"];
@@ -252,12 +253,22 @@ const CGFloat headerHeight = 60.0;
 - (void)reloadData
 {
   NSArray *feedPhotos;
-  if (self.selectedFilterIndex == 0) {
-    feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
+  NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
+                        allEvaluatedOrSentPhotos];
+  if (allPhotos.count >= MinPhotosToShowFilter) {
+    if (self.selectedFilterIndex == 0) {
+      feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
+    } else {
+      feedPhotos = [[DFPeanutFeedDataManager sharedManager]
+                    allEvaluatedOrSentPhotos];
+    }
+    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
   } else {
-    feedPhotos = [[DFPeanutFeedDataManager sharedManager]
-                  allEvaluatedOrSentPhotos];
+    feedPhotos = allPhotos;
+    _selectedFilterIndex = 1;
+    self.flowLayout.headerReferenceSize = CGSizeZero;
   }
+
   [self.datasource setFeedPhotos:feedPhotos];
   [self.collectionView reloadData];
   [self configureNoResultsView];
