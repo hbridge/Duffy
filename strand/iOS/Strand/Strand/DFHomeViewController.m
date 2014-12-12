@@ -320,14 +320,14 @@ const NSUInteger MinPhotosToShowFilter = 20;
     [self.reviewButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeInbox"] forState:UIControlStateNormal];
   }
   
+  self.sendBadgeView.hidden = YES;
   if (numToSend > 0) {
-    self.sendBadgeView.text = @"★";
-    self.sendBadgeView.hidden = NO;
-    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"] forState:UIControlStateNormal];
+    //self.sendBadgeView.text = @"★";
+    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
+                               forState:UIControlStateNormal];
   } else {
-    self.sendBadgeView.hidden = YES;
-    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"] forState:UIControlStateNormal];
-    
+    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"]
+                               forState:UIControlStateNormal];
   }
 }
 
