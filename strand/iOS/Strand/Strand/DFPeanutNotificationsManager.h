@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFPeanutAction.h"
 
 @interface DFPeanutNotificationsManager : NSObject
 
@@ -16,5 +17,6 @@
 - (NSArray *)readNotifications;
 - (void)markAllNotificationsAsRead;
 - (void)markActionIDsSeen:(NSArray *)actionIDs;
+- (BOOL)isActionIDSeen:(DFActionID)actionID;
 
 @end

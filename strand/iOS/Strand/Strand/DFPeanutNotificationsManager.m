@@ -134,6 +134,11 @@ static DFPeanutNotificationsManager *defaultManager;
   return resultActions;
 }
 
+- (BOOL)isActionIDSeen:(DFActionID)actionID
+{
+  return YES;
+}
+
 - (void)markActionIDsSeen:(NSArray *)actionIDs
 {
   [self.dbQueue inDatabase:^(FMDatabase *db) {
