@@ -163,7 +163,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildNum, retur
 		strandInvite.invited_user = user
 
 		# Temp solution for using invites to hold incoming pictures
-		if buildNum and int(buildNum) > 4805:
+		if not buildNum or (buildNum and int(buildNum) > 4805):
 			strandInvite.accepted_user = user
 			
 			if user not in strandInvite.strand.users.all():
@@ -778,7 +778,7 @@ def swaps(request):
 		inviteObjects = list()
 
 		# First throw in invite objects
-		if int(form.cleaned_data['build_number']) <= 4805:
+		if not form.cleaned_data['build_number'] or (form.cleaned_data['build_number'] and int(form.cleaned_data['build_number']) <= 4805):
 			inviteObjects = getInviteObjectsDataForUser(user)
 			responseObjects.extend(inviteObjects)
 
