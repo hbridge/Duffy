@@ -96,7 +96,12 @@
 - (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
-  CGFloat aspectRatio = self.photoObject.full_height.floatValue / self.photoObject.full_width.floatValue;
+  CGFloat aspectRatio;
+  if (self.photoObject.full_height && self.photoObject.full_width) {
+    aspectRatio = self.photoObject.full_height.floatValue / self.photoObject.full_width.floatValue;
+  } else {
+    aspectRatio = 1.0;
+  }
   CGRect frame = CGRectMake(10,
                             0,
                             self.view.frame.size.width - 20,
