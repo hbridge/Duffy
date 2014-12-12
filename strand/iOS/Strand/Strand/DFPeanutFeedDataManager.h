@@ -51,6 +51,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)unevaluatedPhotosFromOtherUsers;
 - (NSArray *)allEvaluatedOrSentPhotos;
 - (NSArray *)favoritedPhotos;
+- (NSArray *)photosWithActivity;
 
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 - (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID inStrand:(DFStrandIDType)strandID;

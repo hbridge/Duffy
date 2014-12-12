@@ -261,7 +261,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
                           allEvaluatedOrSentPhotos];
     if (allPhotos.count >= MinPhotosToShowFilter) {
       if (self.selectedFilterIndex == 0) {
-        feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
+        feedPhotos = [[DFPeanutFeedDataManager sharedManager] photosWithActivity];
       } else {
         feedPhotos = [[DFPeanutFeedDataManager sharedManager]
                       allEvaluatedOrSentPhotos];

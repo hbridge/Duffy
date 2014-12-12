@@ -976,6 +976,15 @@ static DFPeanutFeedDataManager *defaultManager;
   return [self photosSortedByEvalTime:photos];
 }
 
+- (NSArray *)photosWithActivity
+{
+  NSArray *likedPhotos = [self photosWithAction:DFPeanutActionFavorite];
+  NSArray *commentedPhotos = [self photosWithAction:DFPeanutActionComment];
+  NSMutableSet *merged = [[NSMutableSet alloc] initWithArray:likedPhotos];
+  [merged addObjectsFromArray:commentedPhotos];
+  return [self photosSortedByEvalTime:merged.allObjects];
+}
+
 - (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
 {
   DFPeanutAction *evalAction;
