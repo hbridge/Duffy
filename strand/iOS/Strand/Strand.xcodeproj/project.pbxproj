@@ -296,6 +296,10 @@
 		65E2414E1A364EA90044F1CB /* DFHomeSubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */; };
 		65E241551A3A53AF0044F1CB /* DFSuggestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241531A3A53AF0044F1CB /* DFSuggestionViewController.m */; };
 		65E241561A3A53AF0044F1CB /* DFSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E241541A3A53AF0044F1CB /* DFSuggestionViewController.xib */; };
+		65E241591A3B5BB30044F1CB /* DFNoIncomingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241581A3B5BB30044F1CB /* DFNoIncomingViewController.m */; };
+		65E2415B1A3B64A10044F1CB /* DFNoIncomingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E2415A1A3B64A10044F1CB /* DFNoIncomingViewController.xib */; };
+		65E2416A1A3B876A0044F1CB /* DFTwoLabelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241691A3B876A0044F1CB /* DFTwoLabelView.m */; };
+		65E2416C1A3B87840044F1CB /* DFTwoLabelView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E2416B1A3B87840044F1CB /* DFTwoLabelView.xib */; };
 		65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EF6C601A1563E300E0533F /* DFContactDataManager.m */; };
 /* End PBXBuildFile section */
 
@@ -827,6 +831,12 @@
 		65E241521A3A53AF0044F1CB /* DFSuggestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionViewController.h; sourceTree = "<group>"; };
 		65E241531A3A53AF0044F1CB /* DFSuggestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionViewController.m; sourceTree = "<group>"; };
 		65E241541A3A53AF0044F1CB /* DFSuggestionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSuggestionViewController.xib; sourceTree = "<group>"; };
+		65E241571A3B5BB30044F1CB /* DFNoIncomingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNoIncomingViewController.h; sourceTree = "<group>"; };
+		65E241581A3B5BB30044F1CB /* DFNoIncomingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNoIncomingViewController.m; sourceTree = "<group>"; };
+		65E2415A1A3B64A10044F1CB /* DFNoIncomingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNoIncomingViewController.xib; sourceTree = "<group>"; };
+		65E241681A3B876A0044F1CB /* DFTwoLabelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTwoLabelView.h; sourceTree = "<group>"; };
+		65E241691A3B876A0044F1CB /* DFTwoLabelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTwoLabelView.m; sourceTree = "<group>"; };
+		65E2416B1A3B87840044F1CB /* DFTwoLabelView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFTwoLabelView.xib; sourceTree = "<group>"; };
 		65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactDataManager.h; sourceTree = "<group>"; };
 		65EF6C601A1563E300E0533F /* DFContactDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactDataManager.m; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
@@ -1295,6 +1305,12 @@
 				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
 				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
 				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
+				65E241571A3B5BB30044F1CB /* DFNoIncomingViewController.h */,
+				65E241581A3B5BB30044F1CB /* DFNoIncomingViewController.m */,
+				65E2415A1A3B64A10044F1CB /* DFNoIncomingViewController.xib */,
+				65E241681A3B876A0044F1CB /* DFTwoLabelView.h */,
+				65E241691A3B876A0044F1CB /* DFTwoLabelView.m */,
+				65E2416B1A3B87840044F1CB /* DFTwoLabelView.xib */,
 			);
 			name = "Suggestions Tab";
 			sourceTree = "<group>";
@@ -1940,6 +1956,7 @@
 				5AA36F0719F704FB008B37AA /* DFStrandPeopleBarView.xib in Resources */,
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
 				5A113B1419C2472D004CA85B /* DFGallerySectionFooter.xib in Resources */,
+				65E2415B1A3B64A10044F1CB /* DFNoIncomingViewController.xib in Resources */,
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5A13E09819BF61FE005357D2 /* DFInboxViewController.xib in Resources */,
 				5A4BBD3019B8BA8500359299 /* DFCardTableViewCell.xib in Resources */,
@@ -1981,6 +1998,7 @@
 				5ACE176A1A1BF54800DE998A /* DFPhotoFeedImageCell.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
+				65E2416C1A3B87840044F1CB /* DFTwoLabelView.xib in Resources */,
 				5A0BC49D19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib in Resources */,
 				5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonView.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFSelectPhotosViewController.xib in Resources */,
@@ -2125,6 +2143,7 @@
 				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */,
+				65E241591A3B5BB30044F1CB /* DFNoIncomingViewController.m in Sources */,
 				5A883BF51A0AD63800355C1D /* DFPeanutFaceFeature.m in Sources */,
 				5AED01E019E348DF001F075D /* NSIndexPath+DFHelpers.m in Sources */,
 				5A4C820919EDBACE00C22A12 /* DFSwapUpsellView.m in Sources */,
@@ -2161,6 +2180,7 @@
 				652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */,
 				65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
+				65E2416A1A3B876A0044F1CB /* DFTwoLabelView.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,
 				5A4BBD2B19B7D55500359299 /* DFPeanutFeedAdapter.m in Sources */,

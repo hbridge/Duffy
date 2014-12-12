@@ -54,6 +54,6 @@
 - (void)resetView;
 
 - (void)configureToUseImage;
-- (void)configureToUseLabel;
+- (void)configureToUseView:(UIView *)view;
 
 @end

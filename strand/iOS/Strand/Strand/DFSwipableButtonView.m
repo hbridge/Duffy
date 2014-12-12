@@ -327,27 +327,23 @@ const CGFloat RightGestureThreshold = 75.0;
 /*
  * Configures this view to use a label in the center.  Access the label through the .labelView property
  */
-- (void)configureToUseLabel
+- (void)configureToUseView:(UIView *)view
 {
-  self.labelView = [UILabel new];
-  self.labelView.contentMode = UIViewContentModeScaleAspectFill;
-  
-  self.labelView.translatesAutoresizingMaskIntoConstraints = NO;
   for (UIView *subView in [self.centerView subviews]) {
     [subView removeFromSuperview];
   }
-  [self.centerView addSubview:self.labelView];
+  [self.centerView addSubview:view];
   
   [self.centerView addConstraints:[NSLayoutConstraint
                                    constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
                                    options:0
                                    metrics:nil
-                                   views:@{@"banner" : self.labelView}]];
+                                   views:@{@"banner" : view}]];
   [self.centerView addConstraints:[NSLayoutConstraint
                                    constraintsWithVisualFormat:@"V:|-(0)-[banner]-(0)-|"
                                    options:0
                                    metrics:nil
-                                   views:@{@"banner" : self.labelView}]];
+                                   views:@{@"banner" : view}]];
 }
 
 @end

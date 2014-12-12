@@ -20,6 +20,7 @@
 #import "DFCommentViewController.h"
 #import "DFImageManagerRequest.h"
 #import "DFImageDiskCache.h"
+#import "DFNoIncomingViewController.h"
 
 @interface DFSuggestionsPageViewController ()
 
@@ -34,6 +35,7 @@
 
 @property (retain, nonatomic) NSMutableSet *alreadyShownPhotoIds;
 @property (nonatomic, retain) UIViewController *noSuggestionsViewController;
+@property (nonatomic, retain) DFNoIncomingViewController *noIncomingViewController;
 @property (nonatomic) NSUInteger highestSeenNuxStep;
 
 @end
@@ -43,6 +45,7 @@ const NSUInteger NumNuxes = 3;
 @implementation DFSuggestionsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
 @synthesize noSuggestionsViewController = _noSuggestionsViewController;
+@synthesize noIncomingViewController = _noIncomingViewController;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
 {
@@ -135,7 +138,11 @@ const NSUInteger NumNuxes = 3;
   }
   
   if (!nextController) {
-    nextController = [self noSuggestionsViewController];
+    if (self.preferredType == DFIncomingViewType) {
+      nextController = [self noIncomingViewController];
+    } else {
+      nextController = [self noSuggestionsViewController];
+    }
   } 
   
   [self setViewControllers:@[nextController]
@@ -325,6 +332,24 @@ const NSUInteger NumNuxes = 3;
   return _noSuggestionsViewController;
 }
 
+- (UIViewController *)noIncomingViewController
+{
+  
+  if (!_noIncomingViewController) {
+    _noIncomingViewController = [[DFNoIncomingViewController alloc] init];
+    DFSuggestionsPageViewController __weak *weakSelf = self;
+    
+    _noIncomingViewController.yesButtonHandler = ^() {
+      weakSelf.preferredType = DFSuggestionViewType;
+      [weakSelf gotoNextController];
+    };
+    
+    _noIncomingViewController.noButtonHandler = ^() {
+      [weakSelf dismissViewControllerAnimated:YES completion:^(){}];
+    };
+  }
+  return _noIncomingViewController;
+}
 
 #pragma mark - UIPageViewController Delegate/Datasource
 

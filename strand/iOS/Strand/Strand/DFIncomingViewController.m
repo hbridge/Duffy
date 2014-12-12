@@ -89,9 +89,7 @@
 - (void)viewDidLayoutSubviews
 {
   if (self.nuxStep) {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"]];
-    imageView.frame =  self.swipableButtonView.centerView.frame;
-    [self.swipableButtonView.centerView addSubview:imageView];
+    self.swipableButtonView.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
   } else {
     [[DFImageManager sharedManager]
      imageForID:self.photoID
