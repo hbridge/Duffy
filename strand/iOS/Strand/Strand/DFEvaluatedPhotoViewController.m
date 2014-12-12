@@ -10,6 +10,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFImageManager.h"
 #import "DFPeanutNotificationsManager.h"
+#import "DFInviteStrandViewController.h"
 
 @interface DFEvaluatedPhotoViewController ()
 
@@ -155,6 +156,19 @@
      
    }];
 
+}
+
+- (IBAction)addPersonPressed:(id)sender {
+  NSArray *peanutContacts = [self.postsObject.actors arrayByMappingObjectsWithBlock:^id(id input) {
+    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
+    return contact;
+  }];
+  DFInviteStrandViewController *inviteStrandController = [[DFInviteStrandViewController alloc]
+                                                          initWithSuggestedPeanutContacts:nil
+                                                          notSelectablePeanutContacts:peanutContacts
+                                                          notSelectableReason:@"Already Member"];
+  inviteStrandController.sectionObject = self.postsObject;
+  [self.navigationController pushViewController:inviteStrandController animated:YES];
 }
 
 - (void)setUserLikeActionID:(DFActionID)userLikeActionID

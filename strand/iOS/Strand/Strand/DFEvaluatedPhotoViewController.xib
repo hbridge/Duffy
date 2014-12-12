@@ -57,6 +57,14 @@
                         </barButtonItem>
                     </items>
                 </toolbar>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ibH-dU-jON" customClass="DFProfileStackView">
+                    <rect key="frame" x="59" y="23" width="50" height="50"/>
+                    <color key="backgroundColor" red="0.90588241820000004" green="0.45490199329999997" blue="0.1215686351" alpha="1" colorSpace="deviceRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="3Rn-MY-Zfc"/>
+                        <constraint firstAttribute="width" priority="100" constant="50" id="Bti-1H-A3s"/>
+                    </constraints>
+                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VOD-io-kg3" customClass="DFProfileStackView">
                     <rect key="frame" x="8" y="8" width="50" height="65"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -65,17 +73,20 @@
                         <constraint firstAttribute="height" constant="65" id="gtS-kK-zo3"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ibH-dU-jON" customClass="DFProfileStackView">
-                    <rect key="frame" x="59" y="23" width="541" height="50"/>
-                    <color key="backgroundColor" red="0.90588241820000004" green="0.45490199329999997" blue="0.1215686351" alpha="1" colorSpace="deviceRGB"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="50" id="3Rn-MY-Zfc"/>
-                    </constraints>
-                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BV6-BM-Whi">
+                    <rect key="frame" x="576" y="37" width="16" height="22"/>
+                    <state key="normal" image="Assets/Icons/AddPersonButtonIcon.png">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="addPersonPressed:" destination="-1" eventType="touchUpInside" id="uph-oH-qs2"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="bottom" secondItem="ibH-dU-jON" secondAttribute="bottom" id="3fQ-Z4-E6U"/>
+                <constraint firstAttribute="trailing" secondItem="BV6-BM-Whi" secondAttribute="trailing" constant="8" id="5yi-yO-taK"/>
                 <constraint firstAttribute="bottom" secondItem="gGV-RF-dqd" secondAttribute="bottom" id="81M-RW-Hhu"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" constant="8" id="9JY-vK-N88"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="top" secondItem="mpa-i4-xv8" secondAttribute="top" constant="8" id="Ed5-1o-YVi"/>
@@ -85,13 +96,15 @@
                 <constraint firstAttribute="bottom" secondItem="ahP-4i-91Q" secondAttribute="bottom" id="abf-sI-zaq"/>
                 <constraint firstItem="ibH-dU-jON" firstAttribute="leading" secondItem="VOD-io-kg3" secondAttribute="trailing" constant="1" id="j0x-VC-XdR"/>
                 <constraint firstItem="ahP-4i-91Q" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" id="jDu-NF-tKC"/>
-                <constraint firstAttribute="trailing" secondItem="ibH-dU-jON" secondAttribute="trailing" id="mlJ-BG-bP2"/>
+                <constraint firstItem="BV6-BM-Whi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ibH-dU-jON" secondAttribute="trailing" constant="8" id="kcs-Cc-INU"/>
                 <constraint firstItem="gGV-RF-dqd" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" id="t59-Ti-M7Q"/>
+                <constraint firstItem="BV6-BM-Whi" firstAttribute="centerY" secondItem="ibH-dU-jON" secondAttribute="centerY" id="vTh-d4-D0T"/>
             </constraints>
             <point key="canvasLocation" x="369" y="497"/>
         </view>
     </objects>
     <resources>
+        <image name="Assets/Icons/AddPersonButtonIcon.png" width="16" height="16"/>
         <image name="LikeOnToolbarIcon.png" width="22" height="22"/>
     </resources>
 </document>

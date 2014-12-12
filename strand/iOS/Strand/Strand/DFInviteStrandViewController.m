@@ -142,19 +142,27 @@
 
 - (void)dismissWithErrorString:(NSString *)errorString
 {
-  [self.presentingViewController
-   dismissViewControllerAnimated:YES
-   completion:^{
-     if (!errorString) {
-       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-         [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-       });
-     } else {
-       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-         [SVProgressHUD showErrorWithStatus:errorString];
-       });
-     }
-   }];
+  DFVoidBlock completionBlock = ^{
+    if (!errorString) {
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+      });
+    } else {
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [SVProgressHUD showErrorWithStatus:errorString];
+      });
+    }
+  };
+  
+  
+  if (self.navigationController) {
+    [self.navigationController popViewControllerAnimated:YES];
+    completionBlock();
+  } else {
+    [self.presentingViewController
+     dismissViewControllerAnimated:YES
+     completion:completionBlock];
+  }
 }
 
 - (DFPeanutStrandInviteAdapter *)inviteAdapter

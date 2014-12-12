@@ -17,5 +17,6 @@
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *likeBarButtonItem;
 - (IBAction)likeItemPressed:(id)sender;
+- (IBAction)addPersonPressed:(id)sender;
 
 @end
