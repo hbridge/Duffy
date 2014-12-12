@@ -23,5 +23,6 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic) NSUInteger numPhotosPerRow;
+@property (weak, nonatomic) IBOutlet UIView *buttonBar;
 
 @end

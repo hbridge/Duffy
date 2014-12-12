@@ -53,8 +53,9 @@ UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor
 {
-  return [UIColor whiteColor];
+  return [self strandGray];
 }
+
 
 + (UIColor *)defaultBarForegroundColor
 {
@@ -64,6 +65,11 @@ UIColor *DFStrandMainColor;
 + (UIColor *)strandOrange
 {
   return [UIColor colorWithRed:236/255.f green:102/255.f blue:30/255.f alpha:1];
+}
+
++ (UIColor *)strandGray
+{
+  return [UIColor colorWithRedByte:235 green:235 blue:235 alpha:1.0];
 }
 
 + (UIColor *)strandSalmon
@@ -94,6 +100,17 @@ UIColor *DFStrandMainColor;
 {
   return [UIColor whiteColor];
 }
+
++ (UIColor *)actionButtonBackgroundColor
+{
+  return [self strandBlue];
+}
+
++ (UIColor *)actionButtonForegroundColor
+{
+  return [UIColor whiteColor];
+}
+
 
 + (UIColor *)photoCellBadgeColor
 {

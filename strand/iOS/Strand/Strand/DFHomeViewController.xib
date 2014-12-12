@@ -8,6 +8,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFHomeViewController">
             <connections>
+                <outlet property="buttonBar" destination="MYj-g7-RXb" id="qNg-qC-YE9"/>
                 <outlet property="collectionView" destination="kHh-uZ-vK1" id="QzN-eD-Y9P"/>
                 <outlet property="flowLayout" destination="kcj-Dt-vx5" id="xF5-Md-2po"/>
                 <outlet property="reviewBadgeView" destination="BWa-FG-aqQ" id="NdO-Qj-ZFx"/>

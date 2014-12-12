@@ -39,6 +39,7 @@ const CGFloat headerHeight = 60.0;
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  self.buttonBar.backgroundColor = [DFStrandConstants defaultBackgroundColor];
   self.numPhotosPerRow = 3;
   [self observeNotifications];
   [self configureNav];
@@ -86,6 +87,7 @@ const CGFloat headerHeight = 60.0;
   self.datasource = [[DFImageDataSource alloc]
                      initWithCollectionFeedObjects:nil
                      collectionView:self.collectionView];
+  self.datasource.showActionsBadge = NO;
   self.datasource.imageDataSourceDelegate = self;
   self.collectionView.delegate = self;
   
