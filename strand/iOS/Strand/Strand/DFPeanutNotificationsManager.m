@@ -10,6 +10,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFStrandConstants.h"
 #import "DFDefaultsStore.h"
+#import <FMDB/FMDB.h>
 
 NSTimeInterval const DFNotificationsMinFetchInterval = 2.0;
 
@@ -18,10 +19,12 @@ NSTimeInterval const DFNotificationsMinFetchInterval = 2.0;
 @property (nonatomic, retain) NSArray *peanutActions;
 @property (nonatomic, retain) NSDate *lastFetchDate;
 @property (atomic) BOOL isUpdatingNotifications;
+@property (nonatomic, readonly, retain) FMDatabase *db;
 
 @end
 
 @implementation DFPeanutNotificationsManager
+@synthesize db = _db;
 
 static DFPeanutNotificationsManager *defaultManager;
 
@@ -123,5 +126,65 @@ static DFPeanutNotificationsManager *defaultManager;
   [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionViewNotifications];
   [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
+
+
+- (NSArray *)actionsWithReadState:(BOOL)state
+{
+  //FMResultSet *actionIDs = [self.db executeQuery:@"SELECT action_id FROM seenNotifications WHERE user_id=(?) AND isSeen IS 1", @(user.id)];
+  return nil;
+}
+
+- (FMDatabase *)db
+{
+  if (!_db) {
+    _db = [FMDatabase databaseWithPath:[self.class dbPath]];
+    
+    if (![_db open]) {
+      DDLogError(@"Error opening seen database.");
+      _db = nil;
+    }
+    if (![_db tableExists:@"seenNotifications"]) {
+      [_db executeUpdate:@"CREATE TABLE seenNotifications (action_id NUMBER, strand_id NUMBER, photo_id NUMBER)"];
+    }
+  }
+  return _db;
+}
+
+
+
+- (NSArray *)seenPrivateStrandIDsForUser:(DFPeanutUserObject *)user
+{
+  FMResultSet *results = [self.db executeQuery:@"SELECT strand_id FROM seenPeopleSuggestions WHERE user_id=(?) AND isSeen IS 1", @(user.id)];
+  NSMutableArray *resultIDs = [NSMutableArray new];
+  while ([results next]) {
+    [resultIDs addObject:@([results longLongIntForColumn:@"strand_id"])];
+  }
+  return resultIDs;
+}
+
+- (void)addSeenPrivateStrandIDs:(NSArray *)privateStrandIDs forUser:(DFPeanutUserObject *)user
+{
+  for (NSNumber *privateStrandID in privateStrandIDs) {
+    NSString *key = [NSString stringWithFormat:@"%@-%llu", privateStrandID, user.id];
+    [self.db executeUpdate:@"INSERT INTO seenPeopleSuggestions VALUES (?, ?, ?, ?)",
+     key,
+     privateStrandID,
+     @(user.id),
+     @(YES)];
+  }
+}
+
++ (NSString *)dbPath
+{
+  NSURL *documentsURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+  NSURL *dbURL = [documentsURL URLByAppendingPathComponent:@"seenNotifications.db"];
+  return [dbURL path];
+}
+
+- (void)markNotificationsSeen:(NSArray *)notifications
+{
+  
+}
+
 
 @end
