@@ -1,6 +1,6 @@
 # Swap v2
 
-## Dec 12th 2014 (4807)
+## Dec 12th 2014 (4807-4808)
 
  Total redesign to make swapping photos more fun! Tell us what you think! strand-feedback@duffytech.co
 
