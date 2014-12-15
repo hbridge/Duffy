@@ -28,8 +28,8 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def getActionsCache(strandIds, photoIds):
-	return Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=strandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=strandIds)))
+def getActionsCache(user, strandIds, photoIds):
+	return Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=strandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=strandIds))).exclude(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & ~Q(user=user))
 
 def getActionsByPhotoIdCache(actionsCache):
 	actionsByPhotoId = dict()
@@ -37,6 +37,7 @@ def getActionsByPhotoIdCache(actionsCache):
 	for action in actionsCache:
 		if action.photo_id not in actionsByPhotoId:
 			actionsByPhotoId[action.photo_id] = list()
+
 		actionsByPhotoId[action.photo_id].append(action)
 
 	return actionsByPhotoId
@@ -383,7 +384,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	actionsCache = getActionsCache(Strand.getIds(strands), Strand.getPhotoIds(strands))
+	actionsCache = getActionsCache(user, Strand.getIds(strands), Strand.getPhotoIds(strands))
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	# Pass in none for actions because there are no actions on private photos so don't use anything
 	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = True)
@@ -448,7 +449,7 @@ def getObjectsDataForStrands(strands, user):
 	# Grabbing all the post actions for a strand
 	# Getting the likes and comments for a photo
 	# See if the user has done a post, and if not...put in suggested photos
-	actionsCache = getActionsCache(strandIds, photoIds)
+	actionsCache = getActionsCache(user, strandIds, photoIds)
 
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 
