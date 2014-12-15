@@ -193,5 +193,4 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
   self.iphone_faceboxes_topleft = [dict JSONString];
 }
 
-
 @end

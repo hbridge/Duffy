@@ -30,7 +30,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
-@property (nonatomic, retain) UILabel *footerLabel;
 
 @end
 
@@ -97,11 +96,15 @@ const NSUInteger MinPhotosToShowFilter = 20;
   
   [self.collectionView registerNib:[UINib nibForClass:[DFSegmentedControlReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-               withReuseIdentifier:@"header"];
+               withReuseIdentifier:@"segmentedHeader"];
+  [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
+        forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+               withReuseIdentifier:@"labelHeader"];
+    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:@"footer"];
-  self.flowLayout.footerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
+  //self.flowLayout.footerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
 
   self.datasource.showActionsBadge = NO;
   self.datasource.showUnreadNotifsCount = YES;
@@ -112,38 +115,51 @@ const NSUInteger MinPhotosToShowFilter = 20;
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
 {
-  if (kind == UICollectionElementKindSectionHeader &&
-      indexPath.section == 0 &&
-      indexPath.row == 0) {
-    
+  if (kind == UICollectionElementKindSectionHeader) {
     return [self headerViewForIndexPath:indexPath];
-  } else if (kind == UICollectionElementKindSectionFooter &&
-             indexPath.section == 0 &&
-             indexPath.row == 0)
-  {
+  } else if (kind == UICollectionElementKindSectionFooter) {
     return [self footerViewForIndexPath:indexPath];
   }
+  
+  [NSException raise:@"unexpected type" format:@"unexpected supplementary view type type"];
   return nil;
 }
 
+static BOOL showFilters = NO;
+
 - (UICollectionReusableView *)headerViewForIndexPath:(NSIndexPath *)indexPath
 {
-  DFSegmentedControlReusableView *segmentedView =
-  [self.collectionView
-   dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-   withReuseIdentifier:@"header"
-   forIndexPath:indexPath];
-  [segmentedView.segmentedControl setTitle:@"Liked & Commented" forSegmentAtIndex:0];
-  [segmentedView.segmentedControl setTitle:@"All Photos" forSegmentAtIndex:1];
-  [segmentedView.segmentedControl setWidth:140 forSegmentAtIndex:0];
-  [segmentedView.segmentedControl setWidth:140 forSegmentAtIndex:1];
-  segmentedView.segmentedControl.tintColor = [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
-  [segmentedView.segmentedControl addTarget:self
-                                     action:@selector(filterChanged:)
-                           forControlEvents:UIControlEventValueChanged];
+  UICollectionReusableView *reusableView = nil;
+  if (showFilters) {
+    DFSegmentedControlReusableView *segmentedView =
+    [self.collectionView
+     dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+     withReuseIdentifier:@"segmentedHeader"
+     forIndexPath:indexPath];
+    reusableView = segmentedView;
+    [segmentedView.segmentedControl setTitle:@"Liked & Commented" forSegmentAtIndex:0];
+    [segmentedView.segmentedControl setTitle:@"All Photos" forSegmentAtIndex:1];
+    [segmentedView.segmentedControl setWidth:140 forSegmentAtIndex:0];
+    [segmentedView.segmentedControl setWidth:140 forSegmentAtIndex:1];
+    segmentedView.segmentedControl.tintColor = [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
+    [segmentedView.segmentedControl addTarget:self
+                                       action:@selector(filterChanged:)
+                             forControlEvents:UIControlEventValueChanged];
+  } else {
+    DFLabelReusableView *labelHeader = [self.collectionView
+     dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+     withReuseIdentifier:@"labelHeader"
+     forIndexPath:indexPath];
+    reusableView =  labelHeader;
+    labelHeader.label.textAlignment = NSTextAlignmentCenter;
+    labelHeader.label.textColor = [UIColor lightGrayColor];
+    DFPeanutFeedObject *collectionFeedObject = [[self.datasource collectionFeedObjects] objectAtIndex:indexPath.section];
+    labelHeader.label.text = collectionFeedObject.title;
+  }
   
+  if (!reusableView) [NSException raise:@"null header" format:@"null header"];
   
-  return segmentedView;
+  return reusableView;
 }
 
 - (UICollectionReusableView *)footerViewForIndexPath:(NSIndexPath *)indexPath
@@ -152,35 +168,21 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                      dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                                      withReuseIdentifier:@"footer"
                                      forIndexPath:indexPath];
-  self.footerLabel = footerView.label;
+  UILabel *footerLabel = footerView.label;
 
-  self.footerLabel.font = [UIFont fontWithName:@"HelvetiaNeue" size:19.0];
-  self.footerLabel.textColor = [UIColor lightGrayColor];
-  self.footerLabel.textAlignment = NSTextAlignmentCenter;
+  footerLabel.font = [UIFont fontWithName:@"HelvetiaNeue" size:19.0];
+  footerLabel.textColor = [UIColor lightGrayColor];
+  footerLabel.textAlignment = NSTextAlignmentCenter;
   
+  if ([[self.datasource photosForSection:indexPath.section] count] == 0) {
+    footerLabel.text = @"No Photos";
+  } else {
+    footerLabel.text = @"";
+  }
   
-  [self configureFooterLabelText];
   return footerView;
 }
 
-- (void)configureFooterLabelText
-{
-  NSString *filterString;
-  if (self.selectedFilterIndex == 0){
-    filterString = @"with Activity";
-  } else {
-    filterString = @"Photos";
-  }
-  
-  if ([self.datasource numberOfSectionsInCollectionView:self.collectionView] > 0) {
-    NSString *text = [NSString stringWithFormat:@"%@ %@",
-                    @([[self.datasource photosForSection:0] count]),
-                    filterString];
-    self.footerLabel.text = text;
-  } else {
-    self.footerLabel.text = @"No Photos Yet";
-  }
-}
 
 - (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
 {
@@ -228,30 +230,72 @@ const NSUInteger MinPhotosToShowFilter = 20;
 - (void)reloadData
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSArray *feedPhotos;
-    NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
-                          allEvaluatedOrSentPhotos];
-    if (allPhotos.count >= MinPhotosToShowFilter) {
+    if (showFilters) {
+      NSArray *feedPhotos;
+
       if (self.selectedFilterIndex == 0) {
         feedPhotos = [[DFPeanutFeedDataManager sharedManager] photosWithActivity];
       } else {
         feedPhotos = [[DFPeanutFeedDataManager sharedManager]
                       allEvaluatedOrSentPhotos];
       }
-      self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
+      [self.datasource setFeedPhotos:feedPhotos];
     } else {
-      feedPhotos = allPhotos;
-      _selectedFilterIndex = 1;
-      self.flowLayout.headerReferenceSize = CGSizeZero;
+      NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
+                            allEvaluatedOrSentPhotos];
+      NSArray *collectionObjects = [self.class feedSectionObjectsFromFeedPhotos:allPhotos];
+      [self.datasource setCollectionFeedObjects:collectionObjects];
     }
     
-    [self.datasource setFeedPhotos:feedPhotos];
-    [self.collectionView reloadData];
     [self configureNoResultsView];
     [self configureBadges];
-    [self configureFooterLabelText];
-    
   });
+}
+
++ (NSArray *)feedSectionObjectsFromFeedPhotos:(NSArray *)feedPhotos
+{
+  // sort by activity date
+  NSArray *sorted = [feedPhotos sortedArrayUsingComparator:^NSComparisonResult(DFPeanutFeedObject *photo1, DFPeanutFeedObject *photo2) {
+    DFPeanutAction *photo1Latest = [photo1 mostRecentAction];
+    DFPeanutAction *photo2Latest = [photo2 mostRecentAction];
+    // want reverse sort so reverse comparison
+    return [photo2Latest.time_stamp compare:photo1Latest.time_stamp];
+  }];
+  
+  // create arrays for last week and older
+  NSMutableArray *lastWeek = [NSMutableArray new];
+  NSMutableArray *older = [sorted mutableCopy];
+  for (DFPeanutFeedObject *photo in sorted) {
+    DFPeanutAction *mostRecentAction = [photo mostRecentAction];
+    NSTimeInterval timeAgo = [[mostRecentAction time_stamp] timeIntervalSinceNow];
+    if (timeAgo < -60*60*24*7) break;
+    [lastWeek addObject:photo];
+  }
+  
+  if (older.count >= lastWeek.count && lastWeek.count > 0) {
+    [older removeObjectsInRange:(NSRange){0, lastWeek.count}];
+  }
+  
+  // create section objects for last week and older
+  
+  NSMutableArray *result = [NSMutableArray new];
+  if (lastWeek.count > 0) {
+    DFPeanutFeedObject *section = [[DFPeanutFeedObject alloc] init];
+    section.type = DFFeedObjectSection;
+    section.title = @"Recent Activity";
+    section.objects = lastWeek;
+    [result addObject:section];
+  }
+  
+  if (older.count > 0) {
+    DFPeanutFeedObject *section = [[DFPeanutFeedObject alloc] init];
+    section.type = DFFeedObjectSection;
+    section.title = @"Older";
+    section.objects = older;
+    [result addObject:section];
+  }
+
+  return result;
 }
 
 

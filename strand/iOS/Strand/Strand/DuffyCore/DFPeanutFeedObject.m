@@ -230,6 +230,17 @@ static NSArray *FeedObjectTypes;
           firstObject];
 }
 
+- (DFPeanutAction *)mostRecentAction
+{
+  DFPeanutAction *latestAction;
+  for (DFPeanutAction *action in self.actions) {
+    if (!latestAction || [action.time_stamp compare:latestAction.time_stamp] == NSOrderedDescending) {
+      latestAction = action;
+    }
+  }
+  return latestAction;
+}
+
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction
 {
   NSMutableArray *mutableActions = [[NSMutableArray alloc] initWithArray:self.actions];

@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "DFPeanutObject.h"
 
+@class DFPeanutAction;
+
 @class RKObjectMapping;
 @class DFPhoto;
 
