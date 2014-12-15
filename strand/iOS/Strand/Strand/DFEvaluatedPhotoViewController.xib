@@ -34,7 +34,7 @@
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ahP-4i-91Q">
                     <rect key="frame" x="0.0" y="556" width="600" height="44"/>
                     <items>
-                        <barButtonItem image="LikeOnToolbarIcon.png" id="gOI-Kq-Vqs" userLabel="Like Item">
+                        <barButtonItem image="Assets/Icons/LikeOnToolbarIcon.png" id="gOI-Kq-Vqs" userLabel="Like Item">
                             <connections>
                                 <action selector="likeItemPressed:" destination="-1" id="5cf-td-hsa"/>
                             </connections>
@@ -105,6 +105,6 @@
     </objects>
     <resources>
         <image name="Assets/Icons/AddPersonButtonIcon.png" width="16" height="16"/>
-        <image name="LikeOnToolbarIcon.png" width="22" height="22"/>
+        <image name="Assets/Icons/LikeOnToolbarIcon.png" width="16" height="16"/>
     </resources>
 </document>
