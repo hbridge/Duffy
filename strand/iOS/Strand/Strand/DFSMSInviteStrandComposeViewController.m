@@ -40,7 +40,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
       fromString = [self getDayOfTheWeek:date];
     }
     
-    self.body = [NSString stringWithFormat:@"Hey! Sent you pics from %@. "
+    self.body = [NSString stringWithFormat:@"Hey! Sent you a pic from %@. "
                  "Check out Swap app to see them. %@",
                  fromString,
                  appURL];
