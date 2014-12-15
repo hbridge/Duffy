@@ -596,7 +596,7 @@ class CreateActionAPI(CreateAPIView):
                 return super(CreateActionAPI, self).post(request)
             elif (obj.action_type == constants.ACTION_TYPE_FAVORITE):
                 if obj.photo.user_id != obj.user_id:
-                        msg = "%s just liked your photo" % (obj.user.display_name)
+                        msg = "%s liked your photo" % (obj.user.display_name)
                         logger.debug("going to send %s to user id %s" % (msg, obj.photo.user_id))
                         customPayload = {'strand_id': obj.strand_id, 'id': obj.photo_id}
                         notifications_util.sendNotification(obj.photo.user, msg, constants.NOTIFICATIONS_PHOTO_FAVORITED_ID, customPayload)
