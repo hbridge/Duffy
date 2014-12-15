@@ -432,7 +432,10 @@ def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
 	return objects
 
 def getBuildNumForUser(user):
-	return user.last_build_info.split('-')[1]
+	if user.last_build_info:
+		return user.last_build_info.split('-')[1]
+	else:
+		return "4000"
 
 def getObjectsDataForStrands(strands, user):
 	response = list()
