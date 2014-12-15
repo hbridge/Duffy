@@ -44,6 +44,7 @@ static DFToastNotificationManager *defaultManager;
   NSDictionary *options = @{
                             kCRToastTextAlignmentKey : @(NSTextAlignmentCenter),
                             kCRToastBackgroundColorKey : [DFStrandConstants defaultBackgroundColor],
+                            kCRToastTextColorKey : [DFStrandConstants defaultBarForegroundColor],
                             kCRToastAnimationInTypeKey : @(CRToastAnimationTypeLinear),
                             kCRToastAnimationOutTypeKey : @(CRToastAnimationTypeLinear),
                             kCRToastAnimationInDirectionKey : @(CRToastAnimationDirectionTop),
