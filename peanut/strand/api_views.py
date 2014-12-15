@@ -430,13 +430,14 @@ def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	return objects
 
-
+def getBuildNumForUser(user):
+	return user.last_build_info.split('-')[1]
 
 def getObjectsDataForStrands(strands, user):
 	response = list()
 	strandIds = Strand.getIds(strands)
 	invitesCache =  StrandInvite.objects.prefetch_related('invited_user', 'strand').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user).filter(skip=False)
-
+	
 	photoIds = list()
 	for strand in strands:
 		photoIds.extend(Photo.getIds(strand.photos.all()))
@@ -448,10 +449,10 @@ def getObjectsDataForStrands(strands, user):
 	# Getting the likes and comments for a photo
 	# See if the user has done a post, and if not...put in suggested photos
 	actionsCache = getActionsCache(strandIds, photoIds)
+
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 
 	simCaches = cluster_util.getSimCaches(photoIds)
-
 	for strand in strands:
 		entry = dict()
 
@@ -487,13 +488,14 @@ def getObjectsDataForStrands(strands, user):
 		for post in postActions:
 			entry['objects'].extend(getObjectsDataForPost(user, post, simCaches, actionsByPhotoIdCache))
 
-		# Add in the suggested private photos if the user hasn't done a post yet and has photos that match
-		if not userHasPostedPhotosToStrand(user, strand, actionsCache):
-			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strand)
-			if len(privateStrands) > 0:
-				suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
-				suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, requireInterestedUsers = False, findInterestedUsers = False)
-				entry['objects'].append(suggestionsEntry)
+		if getBuildNumForUser(user) <= 4805:
+			# Add in the suggested private photos if the user hasn't done a post yet and has photos that match
+			if not userHasPostedPhotosToStrand(user, strand, actionsCache):
+				privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strand)
+				if len(privateStrands) > 0:
+					suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
+					suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, requireInterestedUsers = False, findInterestedUsers = False)
+					entry['objects'].append(suggestionsEntry)
 		response.append(entry)
 		
 	return response
@@ -692,8 +694,8 @@ def strand_inbox(request):
 
 		# First throw in invite objects
 		# TODO(Derek): Take this out once new client is pushed
-		responseObjects.extend(getInviteObjectsDataForUser(user))
-		printStats("swaps-invites")
+		#responseObjects.extend(getInviteObjectsDataForUser(user))
+		#printStats("swaps-invites")
 		
 		# Next throw in the list of existing Strands
 		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
