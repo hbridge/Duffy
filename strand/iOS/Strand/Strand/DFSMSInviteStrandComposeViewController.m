@@ -40,8 +40,8 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
       fromString = [self getDayOfTheWeek:date];
     }
     
-    self.body = [NSString stringWithFormat:@"Hey! Sent you photos from %@. "
-                 "Let's try this app to swap photos. %@",
+    self.body = [NSString stringWithFormat:@"Hey! Sent you pics from %@. "
+                 "Check out Swap app to see them. %@",
                  fromString,
                  appURL];
   }
@@ -53,7 +53,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   self = [super init];
   if (self) {
     self.recipients = recipients;
-    self.body = [NSString stringWithFormat:@"Hey! Let's try this app to swap photos. %@", appURL];
+    self.body = [NSString stringWithFormat:@"Hey! Check out Swap app for sharing pics (still in private beta). %@", appURL];
   }
   return self;
 }
