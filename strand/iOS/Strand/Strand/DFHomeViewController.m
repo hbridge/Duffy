@@ -20,7 +20,6 @@
 #import "DFLabelReusableView.h"
 #import "DFEvaluatedPhotoViewController.h"
 #import "DFFriendsViewController.h"
-#import "DFBadgeReusableView.h"
 #import "DFPeanutNotificationsManager.h"
 
 const CGFloat headerHeight = 60.0;
@@ -103,11 +102,9 @@ const NSUInteger MinPhotosToShowFilter = 20;
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:@"footer"];
   self.flowLayout.footerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
-  [self.collectionView registerClass:[DFBadgeReusableView class]
-          forSupplementaryViewOfKind:DFBadgingCollectionViewFlowLayoutBadgeView
-                 withReuseIdentifier:@"badge"];
 
   self.datasource.showActionsBadge = NO;
+  self.datasource.showUnreadNotifsCount = YES;
   self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
@@ -125,8 +122,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
              indexPath.row == 0)
   {
     return [self footerViewForIndexPath:indexPath];
-  } else if (kind == DFBadgingCollectionViewFlowLayoutBadgeView) {
-    return [self unreadBadgeForIndexPath:indexPath];
   }
   return nil;
 }
@@ -166,29 +161,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
   
   [self configureFooterLabelText];
   return footerView;
-}
-
-- (UICollectionReusableView *)unreadBadgeForIndexPath:(NSIndexPath *)indexPath
-{
-  DFPeanutFeedObject *photoObject = [self.datasource feedObjectForIndexPath:indexPath];
-  NSArray *unreadNotifs = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-  NSUInteger unreadCount = 0;
-  for (DFPeanutAction *action in photoObject.actions) {
-    if ([unreadNotifs containsObject:action]) unreadCount++;
-  }
-  
-  DFBadgeReusableView *badgeReusableView = [self.collectionView
-                                            dequeueReusableSupplementaryViewOfKind:DFBadgingCollectionViewFlowLayoutBadgeView
-                                            withReuseIdentifier:@"badge"
-                                            forIndexPath:indexPath];
-  badgeReusableView.badgeView.text = [@(unreadCount) stringValue];
-  if (unreadCount > 0) {
-    badgeReusableView.hidden = NO;
-  } else {
-    badgeReusableView.hidden = YES;
-  }
-  
-  return badgeReusableView;
 }
 
 - (void)configureFooterLabelText

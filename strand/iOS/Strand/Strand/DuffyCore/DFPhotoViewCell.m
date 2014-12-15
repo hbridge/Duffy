@@ -18,6 +18,9 @@
   
   self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
   self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
+  self.countBadgeView.badgeColor = [DFStrandConstants strandRed];
+  self.countBadgeView.textColor = [UIColor whiteColor];
+  self.countBadgeView.widthMode = LKBadgeViewWidthModeSmall;
 }
 
 - (id)initWithFrame:(CGRect)frame

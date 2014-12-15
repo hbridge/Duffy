@@ -13,6 +13,7 @@
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "UIDevice+DFHelpers.h"
+#import "DFPeanutNotificationsManager.h"
 
 @interface DFImageDataSource()
 
@@ -145,7 +146,6 @@ NSUInteger const SectionSpread = 5;
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  
   DFPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
   cell.imageView.image = nil;
   
@@ -166,6 +166,25 @@ NSUInteger const SectionSpread = 5;
     [cell setNumLikes:likes.count numComments:comments.count];
     cell.badgeLabel.hidden = NO;
   }
+  
+  if (self.showUnreadNotifsCount) {
+    NSArray *unreadNotifs = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+    NSUInteger unreadCount = 0;
+    for (DFPeanutAction *action in photoObject.actions) {
+      if ([unreadNotifs containsObject:action]) unreadCount++;
+    }
+    
+    cell.countBadgeView.text =  [@(unreadCount) stringValue];
+    if (unreadCount > 0) {
+      cell.countBadgeView.hidden = NO;
+    } else {
+      cell.countBadgeView.hidden = YES;
+    }
+  } else {
+    cell.countBadgeView.hidden = YES;
+  }
+  
+  
   return cell;
 }
 

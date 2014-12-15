@@ -244,8 +244,6 @@
 		5AC59EA71A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC59EA51A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.xib */; };
 		5AC59EAB1A3B60530081CCE5 /* DFLabelReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC59EA91A3B60530081CCE5 /* DFLabelReusableView.m */; };
 		5AC59EAC1A3B60530081CCE5 /* DFLabelReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC59EAA1A3B60530081CCE5 /* DFLabelReusableView.xib */; };
-		5AC59EAF1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC59EAE1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.m */; };
-		5AC59EB21A3B79FE0081CCE5 /* DFBadgeReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC59EB11A3B79FE0081CCE5 /* DFBadgeReusableView.m */; };
 		5AC8B1E819D0D9AC00BAC55F /* DFAssetCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
@@ -736,10 +734,6 @@
 		5AC59EA81A3B60530081CCE5 /* DFLabelReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLabelReusableView.h; sourceTree = "<group>"; };
 		5AC59EA91A3B60530081CCE5 /* DFLabelReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLabelReusableView.m; sourceTree = "<group>"; };
 		5AC59EAA1A3B60530081CCE5 /* DFLabelReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLabelReusableView.xib; sourceTree = "<group>"; };
-		5AC59EAD1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgingCollectionViewFlowLayout.h; sourceTree = "<group>"; };
-		5AC59EAE1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBadgingCollectionViewFlowLayout.m; sourceTree = "<group>"; };
-		5AC59EB01A3B79FE0081CCE5 /* DFBadgeReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgeReusableView.h; sourceTree = "<group>"; };
-		5AC59EB11A3B79FE0081CCE5 /* DFBadgeReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBadgeReusableView.m; sourceTree = "<group>"; };
 		5AC8B1E619D0D9AC00BAC55F /* DFAssetCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAssetCache.h; sourceTree = "<group>"; };
 		5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAssetCache.m; sourceTree = "<group>"; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -1711,16 +1705,12 @@
 				5A91C4861A378AFE00C4F9A6 /* DFHomeViewController.h */,
 				5A91C4871A378AFE00C4F9A6 /* DFHomeViewController.m */,
 				5A91C4881A378AFE00C4F9A6 /* DFHomeViewController.xib */,
-				5AC59EAD1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.h */,
-				5AC59EAE1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.m */,
 				5A683A191A39110A00308BF1 /* DFSegmentedControlReusableView.h */,
 				5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */,
 				5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */,
 				5AC59EA81A3B60530081CCE5 /* DFLabelReusableView.h */,
 				5AC59EA91A3B60530081CCE5 /* DFLabelReusableView.m */,
 				5AC59EAA1A3B60530081CCE5 /* DFLabelReusableView.xib */,
-				5AC59EB01A3B79FE0081CCE5 /* DFBadgeReusableView.h */,
-				5AC59EB11A3B79FE0081CCE5 /* DFBadgeReusableView.m */,
 			);
 			name = "Home view";
 			sourceTree = "<group>";
@@ -2151,12 +2141,10 @@
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AF32EBF197C42CE004B5CC4 /* DFImageDiskCache.m in Sources */,
-				5AC59EAF1A3B77C00081CCE5 /* DFBadgingCollectionViewFlowLayout.m in Sources */,
 				5AA36F0C19F80ECA008B37AA /* DFSwapViewController.m in Sources */,
 				5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */,
 				651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */,
 				5A883BE21A09653900355C1D /* DFStrandPeopleViewController.m in Sources */,
-				5AC59EB21A3B79FE0081CCE5 /* DFBadgeReusableView.m in Sources */,
 				5A65181E19D62754001FE911 /* DFStrandGalleryTitleView.m in Sources */,
 				5AC59EA61A39FDFB0081CCE5 /* DFEvaluatedPhotoViewController.m in Sources */,
 				5A249C5819C334920047AE91 /* DFInboxTableViewCell.m in Sources */,
