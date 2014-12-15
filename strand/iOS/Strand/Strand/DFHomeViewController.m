@@ -133,10 +133,10 @@ const NSUInteger MinPhotosToShowFilter = 20;
    dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
    withReuseIdentifier:@"header"
    forIndexPath:indexPath];
-  [segmentedView.segmentedControl setTitle:@"Activity" forSegmentAtIndex:0];
+  [segmentedView.segmentedControl setTitle:@"Liked & Commented" forSegmentAtIndex:0];
   [segmentedView.segmentedControl setTitle:@"All Photos" forSegmentAtIndex:1];
-  [segmentedView.segmentedControl setWidth:120 forSegmentAtIndex:0];
-  [segmentedView.segmentedControl setWidth:120 forSegmentAtIndex:1];
+  [segmentedView.segmentedControl setWidth:140 forSegmentAtIndex:0];
+  [segmentedView.segmentedControl setWidth:140 forSegmentAtIndex:1];
   segmentedView.segmentedControl.tintColor = [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
   [segmentedView.segmentedControl addTarget:self
                                      action:@selector(filterChanged:)
