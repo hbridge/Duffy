@@ -11,6 +11,7 @@
 #import "DFImageManager.h"
 #import "DFPeanutNotificationsManager.h"
 #import "DFInviteStrandViewController.h"
+#import "DFNavigationController.h"
 
 @interface DFPhotoDetailViewController ()
 
@@ -72,8 +73,7 @@
     psv.backgroundColor = [UIColor clearColor];
     psv.nameMode = DFProfileStackViewNameShowAlways;
   }
-  self.senderProfileStackView.profilePhotoWidth = 50.0;
-    self.recipientsProfileStackView.profilePhotoWidth = 35.0;
+  self.recipientsProfileStackView.photoMargins = 5;
   
   if (self.nuxStep) {
     self.senderProfileStackView.maxAbbreviationLength = 2;
@@ -151,6 +151,11 @@
 - (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
+  [self configurePhotoView];
+ }
+
+- (void)configurePhotoView
+{
   CGFloat aspectRatio;
   if (self.compressedModeEnabled) {
     aspectRatio = 1.0;
@@ -220,7 +225,9 @@
                                                           notSelectablePeanutContacts:peanutContacts
                                                           notSelectableReason:@"Already Member"];
   inviteStrandController.sectionObject = self.postsObject;
-  [self.navigationController pushViewController:inviteStrandController animated:YES];
+  [DFNavigationController presentWithRootController:inviteStrandController
+                                           inParent:self
+                                withBackButtonTitle:@"Cancel"];
 }
 
 - (void)setUserLikeActionID:(DFActionID)userLikeActionID

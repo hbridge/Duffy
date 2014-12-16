@@ -155,14 +155,11 @@
   };
   
   
-  if (self.navigationController) {
-    [self.navigationController popViewControllerAnimated:YES];
-    completionBlock();
-  } else {
-    [self.presentingViewController
-     dismissViewControllerAnimated:YES
-     completion:completionBlock];
-  }
+ 
+  [self.presentingViewController
+   dismissViewControllerAnimated:YES
+   completion:completionBlock];
+
 }
 
 - (DFPeanutStrandInviteAdapter *)inviteAdapter

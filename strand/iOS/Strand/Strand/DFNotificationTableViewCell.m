@@ -15,7 +15,6 @@
   [super awakeFromNib];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.profilePhotoStackView.maxProfilePhotos = 1;
-  self.profilePhotoStackView.profilePhotoWidth = 45.0;
   self.previewImageView.layer.cornerRadius = 3.0;
   self.previewImageView.layer.masksToBounds = YES;
 }

@@ -17,7 +17,6 @@
   self.previewImageView.layer.masksToBounds = YES;
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.profilePhotoStackView.maxProfilePhotos = 1;
-  self.profilePhotoStackView.profilePhotoWidth = self.profilePhotoStackView.frame.size.height;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

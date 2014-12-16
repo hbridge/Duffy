@@ -20,6 +20,7 @@
 @property (nonatomic, retain) NSMutableDictionary *badgeImagesById;
 @property (nonatomic, retain) UIView *popTargetView;
 @property (nonatomic, retain) MMPopLabel *popLabel;
+@property (nonatomic) CGFloat profilePhotoWidth;
 
 @end
 
@@ -37,7 +38,13 @@
     self.maxAbbreviationLength = 1;
   if (!self.nameLabelFont) {
     self.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+  } 
+  if (self.photoMargins == 0.0) {
+    self.photoMargins = 2.0;
   }
+  if (self.nameLabelVerticalMargin == 0.0) self.nameLabelVerticalMargin = 2.0;
+  
+  [self layoutIfNeeded];
   
   UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                            initWithTarget:self
@@ -151,14 +158,6 @@
   [self setNeedsDisplay];
 }
 
-- (void)setProfilePhotoWidth:(CGFloat)profilePhotoWidth
-{
-  if (profilePhotoWidth != _profilePhotoWidth) {
-  _profilePhotoWidth = profilePhotoWidth;
-    [self reloadImages];
-    [self setNeedsDisplay];
-  }
-}
 
 - (CGSize)intrinsicContentSize
 {
@@ -176,10 +175,17 @@
 {
   if (self.peanutUsers.count == 0) return CGSizeZero;
   CGSize newSize = size;
-  newSize.height = self.profilePhotoWidth + [self nameLabelHeight];
-  newSize.width = (CGFloat)MIN(self.maxProfilePhotos + 1, self.peanutUsers.count) * self.profilePhotoWidth
-  + MAX(self.peanutUsers.count - 1, 0) * 2.0;
+  newSize.height = size.height;
+  NSUInteger numProfiles = MIN(self.maxProfilePhotos + 1, self.peanutUsers.count);
+  NSUInteger numSpaces = MAX(self.peanutUsers.count - 1, 0);
+  newSize.width = (CGFloat)numProfiles * self.profilePhotoWidth
+  + numSpaces * self.photoMargins;
   return newSize;
+}
+
+- (CGFloat)profilePhotoWidth
+{
+  return self.frame.size.height - [self nameLabelHeight];
 }
 
 - (CGRect)rectForCircleAtIndex:(NSUInteger)index
@@ -189,7 +195,7 @@
                            self.profilePhotoWidth,
                            self.profilePhotoWidth);
   if (index > 0) {
-    rect.origin.x = rect.origin.x + (CGFloat)index * 2.0;
+    rect.origin.x = rect.origin.x + (CGFloat)index * self.photoMargins;
   }
   return rect;
 }
@@ -198,8 +204,7 @@
 {
   if (self.nameMode != DFProfileStackViewNameShowAlways) return 0;
   
-  return self.nameLabelFont.pointSize * [[UIScreen mainScreen] scale] + nameLabelMargin * 2.0;
-  
+  return self.nameLabelFont.pointSize + self.nameLabelVerticalMargin * 2;
 }
 
 - (void)drawRect:(CGRect)rect {
@@ -241,12 +246,10 @@
   [label drawTextInRect:rect];
 }
 
-const CGFloat nameLabelMargin = 2.0;
-
 - (void)drawNameText:(NSString *)text belowCircleRect:(CGRect)circleRect context:(CGContextRef)context
 {
   CGRect nameRect = circleRect;
-  nameRect.origin.y = CGRectGetMaxY(circleRect) + nameLabelMargin;
+  nameRect.origin.y = CGRectGetMaxY(circleRect) + self.nameLabelVerticalMargin;
   nameRect.size.height = self.nameLabelFont.pointSize;
   
   UILabel *label = [[UILabel alloc] initWithFrame:nameRect];
@@ -265,7 +268,6 @@ const CGFloat nameLabelMargin = 2.0;
                                 image.size.height);
   [image drawInRect:badgeRect];
 }
-
 
 #pragma mark - Actions
 
@@ -301,7 +303,6 @@ const CGFloat nameLabelMargin = 2.0;
     });
   });
   self.popLabel.delegate = self;
-  
 }
 
 - (void)dismissedPopLabel:(MMPopLabel *)popLabel
@@ -309,5 +310,6 @@ const CGFloat nameLabelMargin = 2.0;
   [popLabel removeFromSuperview];
   [self.popTargetView removeFromSuperview];
 }
+
 
 @end

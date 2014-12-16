@@ -57,6 +57,7 @@
 
 - (void)addRightButtonToView:(UIButton *)button
 {
+  if (!button) return;
   [self addSubview:button];
   [self addConstraints:[NSLayoutConstraint
                         constraintsWithVisualFormat:@"[textfield]-(8)-[button]-(8)-|"
@@ -126,10 +127,5 @@
   }
 }
 
-- (void)layoutSubviews
-{
-  [super layoutSubviews];
-  self.profileStackView.profilePhotoWidth = self.profileStackView.frame.size.width;
-}
 
 @end

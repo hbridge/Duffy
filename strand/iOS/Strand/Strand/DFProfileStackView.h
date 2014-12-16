@@ -20,11 +20,12 @@ typedef NS_ENUM(NSInteger, DFProfileStackViewNameMode) {
 };
 
 @property (nonatomic) NSUInteger maxProfilePhotos;
-@property (nonatomic) CGFloat profilePhotoWidth;
 @property (nonatomic, retain) NSArray *peanutUsers;
 @property (nonatomic) DFProfileStackViewNameMode nameMode;
 @property (nonatomic) NSUInteger maxAbbreviationLength;
 @property (nonatomic, retain) UIFont *nameLabelFont;
+@property (nonatomic) CGFloat photoMargins;
+@property (nonatomic) CGFloat nameLabelVerticalMargin;
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user;
 - (void)setColor:(UIColor *)color forUser:(DFPeanutUserObject *)user;

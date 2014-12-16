@@ -21,6 +21,7 @@
 #import "DFPhotoDetailViewController.h"
 #import "DFFriendsViewController.h"
 #import "DFPeanutNotificationsManager.h"
+#import "DFDismissableModalViewController.h"
 
 const CGFloat headerHeight = 60.0;
 const NSUInteger MinPhotosToShowFilter = 20;
@@ -350,17 +351,15 @@ static BOOL showFilters = NO;
 #pragma mark - Actions
 
 - (IBAction)reviewButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:[[DFSuggestionsPageViewController alloc]
+  [DFDismissableModalViewController presentWithRootController:[[DFSuggestionsPageViewController alloc]
                                                      initWithPreferredType:DFIncomingViewType]
-                                           inParent:self
-                                withBackButtonTitle:@"Close"];
+                                                     inParent:self];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:[[DFSuggestionsPageViewController alloc]
+  [DFDismissableModalViewController presentWithRootController:[[DFSuggestionsPageViewController alloc]
                                                      initWithPreferredType:DFSuggestionViewType]
-                                           inParent:self
-                                withBackButtonTitle:@"Close"];
+                                                     inParent:self];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView
@@ -375,7 +374,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                                           initWithPhotoObject:photo
                                           inPostsObject:strandPosts];
   
-  [DFNavigationController presentWithRootController:epvc inParent:self withBackButtonTitle:@"Close"];
+  [DFDismissableModalViewController presentWithRootController:epvc inParent:self];
 }
 
 - (void)filterChanged:(UISegmentedControl *)sender
