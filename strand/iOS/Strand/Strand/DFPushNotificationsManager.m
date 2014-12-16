@@ -232,7 +232,7 @@
       
       DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID inStrand:strandID];
       
-      if (photoObject && photoObject.userEvalPhotoAction) {
+      if (photoObject && photoObject.evaluated) {
         DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strandID];
         vc =  [[DFPhotoDetailViewController alloc]
                initWithPhotoObject:photoObject

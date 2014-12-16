@@ -86,6 +86,8 @@ static NSArray *FeedObjectTypes;
            @"full_width",
            @"full_height",
            @"strand_id",
+           @"evaluated",
+           @"evaluated_time",
            ];
 }
 
@@ -214,13 +216,6 @@ static NSArray *FeedObjectTypes;
 {
   return [self actionsOfType:DFPeanutActionComment
                       forUser:0];
-}
-
-- (DFPeanutAction *)userEvalPhotoAction
-{
-  return [[self actionsOfType:DFPeanutActionEvalPhoto
-                      forUser:[[DFUser currentUser] userID]]
-          firstObject];
 }
 
 - (DFPeanutAction *)userFavoriteAction

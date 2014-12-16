@@ -886,13 +886,7 @@ static DFPeanutFeedDataManager *defaultManager;
   
   NSArray *photos = [strandPosts descendentsOfType:DFFeedObjectPhoto];
   for (DFPeanutFeedObject *photo in photos) {
-    BOOL photoEvaluated = NO;
-    for (DFPeanutAction *action in photo.actions) {
-      if (action.action_type == DFPeanutActionEvalPhoto) {
-        photoEvaluated = YES;
-      }
-    }
-    if (!photoEvaluated) {
+    if (!photo.evaluated) {
       [nonEvaluatedPhotos addObject:photo];
     }
   }
@@ -938,7 +932,10 @@ static DFPeanutFeedDataManager *defaultManager;
       }
       if (photoHasAction) {
         [photosWithAction addObject:photo];
+      } else if (actionType == DFPeanutActionEvalPhoto && photo.evaluated) {
+        [photosWithAction addObject:photo];
       }
+
       // TODO(Derek): This should be put into a lower level.
       // Temp here to move things along
       photo.strand_id = @(strandPosts.id);
@@ -971,11 +968,8 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   NSArray *sortedArray;
   sortedArray = [photos sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-    DFPeanutAction *first = [(DFPeanutFeedObject*)a userEvalPhotoAction];
-    DFPeanutAction *second = [(DFPeanutFeedObject*)b userEvalPhotoAction];
-    
-    NSDate *firstDate = first.time_stamp;
-    NSDate *secondDate = second.time_stamp;
+    NSDate *firstDate = [(DFPeanutFeedObject*)a evaluated_time];
+    NSDate *secondDate = [(DFPeanutFeedObject*)b evaluated_time];
     return [secondDate compare:firstDate];
   }];
   
@@ -1009,7 +1003,7 @@ static DFPeanutFeedDataManager *defaultManager;
   return [self photosSortedByEvalTime:merged.allObjects];
 }
 
-- (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
+- (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
 {
   DFPeanutAction *evalAction;
   evalAction = [[DFPeanutAction alloc] init];

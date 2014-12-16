@@ -50,6 +50,8 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;
 @property (nonatomic, retain) NSNumber *strand_id;
+@property (nonatomic, retain) NSNumber *evaluated;
+@property (nonatomic, retain) NSDate *evaluated_time;
 
 
 // Relationships
@@ -58,7 +60,6 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 @property (nonatomic, retain) NSArray *actors;
 
 - (DFPeanutAction *)userFavoriteAction;
-- (DFPeanutAction *)userEvalPhotoAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
 - (DFPeanutAction *)mostRecentAction;
 

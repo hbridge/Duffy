@@ -61,7 +61,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
 
 // Methods used for dealing with swap page
-- (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID;
+- (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID;
 - (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users;
 
 /* returns a list of PeanutUsers */

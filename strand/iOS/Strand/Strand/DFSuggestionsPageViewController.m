@@ -468,7 +468,7 @@ const NSUInteger NumNuxes = 3;
 - (void)photoSkipped:(DFPhotoIDType)photoID strand:(DFStrandIDType)strandID
 {
   if (photoID)
-    [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photoID strandID:strandID];
+    [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:photoID strandID:strandID];
   [self gotoNextController];
 }
 
@@ -497,7 +497,7 @@ const NSUInteger NumNuxes = 3;
   } failure:^(NSError *error) {
     
   }];
-  [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo strandID:strand];
+  [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:photo strandID:strand];
   [SVProgressHUD showSuccessWithStatus:@"Liked!"];
   [self gotoNextController];
 }
