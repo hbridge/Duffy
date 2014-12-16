@@ -49,7 +49,6 @@
   
   self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
-  self.profilePhotoStackView.profilePhotoWidth = 45.0;
 
   self.nameLabel.text = [self.peanutUser fullName];
   NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosSentByUser:self.peanutUser.id];
