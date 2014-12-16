@@ -49,9 +49,16 @@ const NSUInteger NumNuxes = 3;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
 {
+  return [self initWithPreferredType:preferredType photoID:0 strandID:0];
+}
+
+- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType photoID:(DFPhotoIDType)photoID strandID:(DFStrandIDType)strandID
+{
   self = [self init];
   if (self) {
     _preferredType = preferredType;
+    _startingPhotoID = photoID;
+    _startingStrandID = strandID;
   }
   return self;
 }
@@ -151,8 +158,36 @@ const NSUInteger NumNuxes = 3;
                 completion:nil];
 }
 
+- (UIViewController *)incomingViewControllerForPhoto:(DFPeanutFeedObject *)photo strandPosts:(DFPeanutFeedObject *)strandPosts
+{
+  DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithPhotoID:photo.id inStrand:strandPosts.id fromSender:[[DFPeanutFeedDataManager sharedManager] userWithID:photo.user]];
+  [self.alreadyShownPhotoIds addObject:@(photo.id)];
+  
+  DFSuggestionsPageViewController __weak *weakSelf = self;
+  ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+    [weakSelf photoSkipped:photoID strand:strandID];
+  };
+  ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+    [weakSelf showCommentsForPhoto:photoID strand:strandID];
+  };
+  ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+    [weakSelf likePhoto:photoID strand:strandID];
+  };
+  
+  return ivc;
+}
+
 - (UIViewController *)nextIncomingViewController
 {
+  if ([self startingPhotoID] > 0) {
+    DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:[self startingStrandID]];
+    DFPeanutFeedObject *photo = [[DFPeanutFeedDataManager sharedManager] photoWithID:[self startingPhotoID] inStrand:[self startingStrandID]];
+    _startingPhotoID = 0;
+    _startingStrandID = 0;
+    
+    return [self incomingViewControllerForPhoto:photo strandPosts:strandPosts];
+  }
+  
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
   // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
   for (DFPeanutUserObject *user in friends) {
@@ -166,21 +201,7 @@ const NSUInteger NumNuxes = 3;
           // Now lets see if the image is loaded yet
           DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
           if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-            DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithPhotoID:photo.id inStrand:strandPosts.id fromSender:user];
-            [self.alreadyShownPhotoIds addObject:@(photo.id)];
-            
-            DFSuggestionsPageViewController __weak *weakSelf = self;
-            ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-              [weakSelf photoSkipped:photoID strand:strandID];
-            };
-            ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-              [weakSelf showCommentsForPhoto:photoID strand:strandID];
-            };
-            ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-              [weakSelf likePhoto:photoID strand:strandID];
-            };
-
-            return ivc;
+            return [self incomingViewControllerForPhoto:photo strandPosts:strandPosts];
           }
         }
       }

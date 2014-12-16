@@ -20,7 +20,10 @@
 
 @property (nonatomic, retain) DFPeanutUserObject *userToFilter;
 @property (nonatomic) DFHomeSubViewType preferredType;
+@property (nonatomic) DFPhotoIDType startingPhotoID;
+@property (nonatomic) DFPhotoIDType startingStrandID;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType;
+- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType photoID:(DFPhotoIDType)photoID strandID:(DFStrandIDType)strandID;
 
 @end

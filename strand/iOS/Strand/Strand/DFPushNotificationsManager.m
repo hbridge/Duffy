@@ -16,7 +16,9 @@
 #import "DFPeanutPushTokenAdapter.h"
 #import "DFPushNotificationsManager.h"
 #import "DFToastNotificationManager.h"
-
+#import "DFEvaluatedPhotoViewController.h"
+#import "DFSuggestionsPageViewController.h"
+#import "SVProgressHUD.h"
 
 @implementation DFPushNotificationsManager
 
@@ -196,7 +198,8 @@
         || pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE
         || pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER
         || pushNotif.type == NOTIFICATIONS_PHOTO_FAVORITED_ID
-        || pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT)
+        || pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT
+        || pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID)
     {
       DFNoticationOpenedHandler handler = [self openedHandlerForNotification:pushNotif];
       handler(pushNotif);
@@ -218,22 +221,44 @@
 - (DFNoticationOpenedHandler)openedHandlerForNotification:(DFPeanutPushNotification *)pushNotif
 {
   DFNoticationOpenedHandler handler = ^(DFPeanutPushNotification *openedNotif) {
-    if (pushNotif.type == NOTIFICATIONS_INVITED_TO_STRAND
-        || pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE) {
-      DFPeanutFeedObject *foundObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:openedNotif.id.longLongValue];
-      
-      if (!foundObject) {
-        // if we don't find an object in the feed, we have to fake it so that when the feed
-        // data manager gets the actual object, we sub in the correct data
-        foundObject = [[DFPeanutFeedObject alloc] init];
-        foundObject.id = openedNotif.id.longLongValue;
-        if (pushNotif.type == NOTIFICATIONS_INVITED_TO_STRAND) foundObject.type = DFFeedObjectInviteStrand;
-        else if (pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE) foundObject.type = DFFeedObjectStrandPosts;
-      }
+    if (pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID ||
+        pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT ||
+        pushNotif.type == NOTIFICATIONS_PHOTO_FAVORITED_ID) {
+      UIViewController *vc;
       UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
                                           rootViewController];
-      [DFFeedViewController presentFeedObject:foundObject modallyInViewController:rootController];
+      DFStrandIDType strandID = openedNotif.strandId.longLongValue;
+      DFPhotoIDType photoID = openedNotif.id.longLongValue;
+      
+      DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID inStrand:strandID];
+      
+      if (photoObject && photoObject.userEvalPhotoAction) {
+        DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strandID];
+        vc =  [[DFEvaluatedPhotoViewController alloc]
+               initWithPhotoObject:photoObject
+               inPostsObject:postsObject];
+        
+      } else {
+        vc = [[DFSuggestionsPageViewController alloc]
+              initWithPreferredType:DFIncomingViewType photoID:photoID strandID:strandID];
+      }
+      
+      if (!photoObject) {
+        [SVProgressHUD show];
+        [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:^() {
+          [SVProgressHUD dismiss];
+          [DFNavigationController presentWithRootController:vc
+                                                   inParent:rootController
+                                        withBackButtonTitle:@"Close"];
+        }];
+      } else {
+        [DFNavigationController presentWithRootController:vc
+                                                 inParent:rootController
+                                      withBackButtonTitle:@"Close"];
+      }
+      
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
+      
     } else if (pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER) {
       // This is very similar code to above, if we change this, might want to pull together
       NSArray *suggestedStrands = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
@@ -257,17 +282,6 @@
       
       [DFCreateStrandFlowViewController presentFeedObject:foundObject modallyInViewController:rootController];
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
-    } else if (pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT || pushNotif.type == NOTIFICATIONS_PHOTO_FAVORITED_ID) {
-      DFPeanutFeedObject *foundObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:openedNotif.strandId.longLongValue];
- 
-      if (foundObject) {
-        UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
-                                            rootViewController];
-        DFFeedViewController *vc = [DFFeedViewController presentFeedObject:foundObject modallyInViewController:rootController];
-        vc.onViewScrollToPhotoId = openedNotif.id.longLongValue;
-        
-        [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
-      }
     }
     
   };
