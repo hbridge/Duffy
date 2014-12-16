@@ -12,7 +12,7 @@
 #import "DFGallerySectionHeader.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UICollectionView+DFExtras.h"
-#import "DFEvaluatedPhotoViewController.h"
+#import "DFPhotoDetailViewController.h"
 #import "DFNoTableItemsView.h"
 
 @interface DFGalleryViewController ()
@@ -188,7 +188,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager]
                                      strandPostsObjectWithId:photo.strand_id.longLongValue];
-  DFEvaluatedPhotoViewController *evc = [[DFEvaluatedPhotoViewController alloc]
+  DFPhotoDetailViewController *evc = [[DFPhotoDetailViewController alloc]
                                          initWithPhotoObject:photo
                                          inPostsObject:postsObject];
   [DFNavigationController presentWithRootController:evc inParent:self withBackButtonTitle:@"Back"];

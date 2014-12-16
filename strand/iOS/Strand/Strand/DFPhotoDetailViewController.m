@@ -6,19 +6,19 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFEvaluatedPhotoViewController.h"
+#import "DFPhotoDetailViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFImageManager.h"
 #import "DFPeanutNotificationsManager.h"
 #import "DFInviteStrandViewController.h"
 
-@interface DFEvaluatedPhotoViewController ()
+@interface DFPhotoDetailViewController ()
 
 @property (nonatomic) DFActionID userLikeActionID;
 
 @end
 
-@implementation DFEvaluatedPhotoViewController
+@implementation DFPhotoDetailViewController
 
 @synthesize userLikeActionID = _userLikeActionID;
 

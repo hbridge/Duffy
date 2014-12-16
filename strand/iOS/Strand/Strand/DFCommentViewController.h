@@ -19,6 +19,7 @@
 @property (nonatomic) BOOL openKeyboardOnAppear;
 @property (nonatomic) BOOL closeOnSend;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *textFieldItem;
+@property (nonatomic) BOOL compressedModeEnabled;
 
 
 - (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject inPostsObject:(DFPeanutFeedObject *)postsObject;

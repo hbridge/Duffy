@@ -18,7 +18,7 @@
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"
 #import "DFLabelReusableView.h"
-#import "DFEvaluatedPhotoViewController.h"
+#import "DFPhotoDetailViewController.h"
 #import "DFFriendsViewController.h"
 #import "DFPeanutNotificationsManager.h"
 
@@ -371,7 +371,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager]
                                      strandPostsObjectWithId:photo.strand_id.longLongValue];
   
-  DFEvaluatedPhotoViewController *epvc = [[DFEvaluatedPhotoViewController alloc]
+  DFPhotoDetailViewController *epvc = [[DFPhotoDetailViewController alloc]
                                           initWithPhotoObject:photo
                                           inPostsObject:strandPosts];
   

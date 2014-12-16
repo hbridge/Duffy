@@ -15,6 +15,9 @@
 #import "DFNoResultsTableViewCell.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFAlertController.h"
+#import "DFButtonTableViewCell.h"
+
+const NSUInteger CompressedModeMaxRows = 1;
 
 @interface DFCommentViewController ()
 
@@ -63,6 +66,8 @@
   self.tableView.delegate = self;
   [tableView registerNib:[UINib nibForClass:[DFCommentTableViewCell class]]
   forCellReuseIdentifier:@"cell"];
+  [tableView registerNib:[UINib nibForClass:[DFButtonTableViewCell class]]
+  forCellReuseIdentifier:@"buttonCell"];
   [tableView registerNib:[UINib nibForClass:[DFNoResultsTableViewCell class]]
   forCellReuseIdentifier:@"noResults"];
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.toolbar.frame.size.height * 2.0, 0);
@@ -74,8 +79,15 @@
   UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc]
                                                   initWithTarget:self
                                                   action:@selector(tapRecognizerChanged:)];
+  tapGestureRecognizer.cancelsTouchesInView = NO;
   [self.tableView addGestureRecognizer:tapGestureRecognizer];
   
+}
+
+- (void)setCompressedModeEnabled:(BOOL)compressedModeEnabled
+{
+  _compressedModeEnabled = compressedModeEnabled;
+  [self.tableView reloadData];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -140,7 +152,9 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return MAX([[self comments] count], 1);
+  if (self.compressedModeEnabled) {
+    return MIN([[self comments] count], CompressedModeMaxRows + 1);
+  } else return MAX([[self comments] count], 1);
 }
 
 - (NSArray *)comments
@@ -151,8 +165,20 @@
   return _comments;
 }
 
+- (BOOL)isShowMoreRow:(NSIndexPath *)indexPath
+{
+  return (self.compressedModeEnabled && indexPath.row == CompressedModeMaxRows);
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  if  ([self isShowMoreRow:indexPath]) {
+    DFButtonTableViewCell *buttonCell = [self.tableView dequeueReusableCellWithIdentifier:@"buttonCell"];
+    NSString *title = [NSString stringWithFormat:@"Show %@ more comments",
+                       @([[self comments] count] - CompressedModeMaxRows)];
+    [buttonCell.button setTitle:title forState:UIControlStateNormal];
+    return buttonCell;
+  }
   DFCommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   
   if ([[self comments] count] == 0) {
@@ -357,6 +383,14 @@
 {
   if (!_actionAdapter) _actionAdapter = [[DFPeanutActionAdapter alloc] init];
   return _actionAdapter;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if ([self isShowMoreRow:indexPath]) {
+    self.compressedModeEnabled = NO;
+    [self.tableView reloadData];
+  }
 }
 
 @end
