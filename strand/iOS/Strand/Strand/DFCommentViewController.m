@@ -51,6 +51,17 @@ const NSUInteger CompressedModeMaxRows = 1;
   [self configureTableView:self.tableView];
   [self textDidChange:self.textField];
   [self configureTouchTableViewGesture];
+  [self.textField addTarget:self
+                     action:@selector(editingStartedOrStopped:)
+           forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
+}
+
+- (void)setTextField:(UITextField *)textField
+{
+  _textField = textField;
+  [self.textField addTarget:self
+                     action:@selector(editingStartedOrStopped:)
+           forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
 }
 
 - (void)viewWillLayoutSubviews
@@ -289,6 +300,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 
 #pragma mark - Actions
+
+- (void)editingStartedOrStopped:(UITextField *)sender
+{
+  self.commentsExpanded = sender.isFirstResponder;
+}
 
 
 - (IBAction)sendButtonPressed:(id)sender {
