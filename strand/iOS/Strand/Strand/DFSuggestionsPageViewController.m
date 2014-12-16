@@ -188,6 +188,9 @@ const NSUInteger NumNuxes = 3;
     return [self incomingViewControllerForPhoto:photo strandPosts:strandPosts];
   }
   
+  DFPeanutFeedObject *firstPhoto;
+  DFPeanutFeedObject *firstStrandPosts;
+  
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
   // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
   for (DFPeanutUserObject *user in friends) {
@@ -202,12 +205,22 @@ const NSUInteger NumNuxes = 3;
           DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
           if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
             return [self incomingViewControllerForPhoto:photo strandPosts:strandPosts];
+          } else if(!firstPhoto) {
+            // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
+            firstPhoto = photo;
+            firstStrandPosts = strandPosts;
           }
         }
       }
     }
   }
-  return nil;
+  
+  if (firstPhoto) {
+    // We didn't find any images loaded but we did have an image...so show that with a spinner
+    return [self incomingViewControllerForPhoto:firstPhoto strandPosts:firstStrandPosts];
+  } else {
+    return nil;
+  }
 }
 
 - (UIViewController *)nextSuggestionViewController
