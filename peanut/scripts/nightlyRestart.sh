@@ -5,12 +5,6 @@
 # Needed because long running python scripts have memory leaks.
 #
 
-/sbin/initctl stop duffy-faces
-sleep 1
-/sbin/initctl start duffy-faces
-
-sleep 5
-
 /sbin/initctl stop duffy-twofishes
 sleep 1
 /sbin/initctl start duffy-twofishes
