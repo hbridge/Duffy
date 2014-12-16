@@ -94,8 +94,10 @@
 {
   if (sendIsHidden) {
     [self.sendButton removeFromSuperview];
-    [self addRightButtonToView:self.likeButton];
-    self.retainedLikeButton = nil;
+    if (!self.likeButtonDisabled) {
+      [self addRightButtonToView:self.likeButton];
+      self.retainedLikeButton = nil;
+    }
   } else {
     self.retainedLikeButton = self.likeButton;
     [self.likeButton removeFromSuperview];
@@ -108,6 +110,11 @@
   
 }
 
+- (void)setLikeButtonDisabled:(BOOL)likeButtonDisabled
+{
+  if (likeButtonDisabled) [self.likeButton removeFromSuperview];
+}
+
 - (void)textChanged:(UITextField *)sender
 {
   if (sender.text.length > 0) {
@@ -117,6 +124,12 @@
     self.sendButton.enabled = NO;
     [self setSendButtonHidden:YES];
   }
+}
+
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  self.profileStackView.profilePhotoWidth = self.profileStackView.frame.size.width;
 }
 
 @end

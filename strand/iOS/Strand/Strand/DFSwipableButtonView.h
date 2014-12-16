@@ -48,6 +48,7 @@
 
 @property (nonatomic, retain) UIImageView *imageView;
 @property (nonatomic, retain) UILabel *labelView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *buttonWrapperHeightConstraint;
 
 - (void)configureWithShowsOther:(BOOL)showsOther;
 - (IBAction)panGestureChanged:(UIPanGestureRecognizer *)sender;
@@ -55,5 +56,6 @@
 
 - (void)configureToUseImage;
 - (void)configureToUseView:(UIView *)view;
+- (void)setButtonsHidden:(BOOL)hidden;
 
 @end

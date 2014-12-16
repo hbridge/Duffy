@@ -7,7 +7,6 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFIncomingViewController">
             <connections>
-                <outlet property="profileWithContextView" destination="zPr-Cm-BJD" id="uzr-Bk-x7m"/>
                 <outlet property="swipableButtonView" destination="2mx-jU-aCa" id="8q6-PE-Jnw"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -17,27 +16,17 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zPr-Cm-BJD" customClass="DFProfileWithContextView">
-                    <rect key="frame" x="20" y="8" width="560" height="45"/>
-                    <color key="backgroundColor" red="0.90588241820000004" green="0.45490199329999997" blue="0.1215686351" alpha="1" colorSpace="deviceRGB"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="45" id="TWY-DJ-5i5"/>
-                    </constraints>
-                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2mx-jU-aCa" customClass="DFSwipableButtonView">
-                    <rect key="frame" x="0.0" y="61" width="600" height="539"/>
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="zPr-Cm-BJD" secondAttribute="trailing" constant="20" id="7E0-nj-uTi"/>
                 <constraint firstAttribute="trailing" secondItem="2mx-jU-aCa" secondAttribute="trailing" id="B5p-f8-xqg"/>
-                <constraint firstItem="zPr-Cm-BJD" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="8" id="FPS-pN-6FD"/>
-                <constraint firstItem="zPr-Cm-BJD" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="IFQ-6k-nMp"/>
+                <constraint firstItem="2mx-jU-aCa" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="OMM-lH-UWo"/>
                 <constraint firstItem="2mx-jU-aCa" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="SnY-My-dtP"/>
                 <constraint firstAttribute="bottom" secondItem="2mx-jU-aCa" secondAttribute="bottom" id="YEq-GX-NQs"/>
-                <constraint firstItem="2mx-jU-aCa" firstAttribute="top" secondItem="zPr-Cm-BJD" secondAttribute="bottom" constant="8" id="vrB-mW-HXz"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <point key="canvasLocation" x="309" y="368"/>

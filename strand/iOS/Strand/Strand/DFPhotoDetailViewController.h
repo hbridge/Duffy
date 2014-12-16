@@ -18,6 +18,10 @@
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet DFCommentToolbar *commentToolbar;
 @property (weak, nonatomic) UIButton *likeButtonItem;
+@property (weak, nonatomic) IBOutlet UIButton *addPersonButton;
+@property (nonatomic) NSUInteger nuxStep;
+
+- (instancetype)initWithNuxStep:(NSUInteger)nuxStep;
 
 - (void)likeItemPressed:(id)sender;
 - (IBAction)addPersonPressed:(id)sender;

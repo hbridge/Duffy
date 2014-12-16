@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -12,20 +13,19 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eIR-5E-V6t" customClass="DFProfileStackView">
-                    <rect key="frame" x="8" y="9" width="35" height="35"/>
+                    <rect key="frame" x="8" y="8" width="36" height="36"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="35" id="3h9-Mw-63g"/>
-                        <constraint firstAttribute="width" constant="35" id="aK1-ku-ehI"/>
+                        <constraint firstAttribute="width" secondItem="eIR-5E-V6t" secondAttribute="height" multiplier="1:1" id="7qB-pX-Zdt"/>
                     </constraints>
                 </view>
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add a comment" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QMA-mD-Dv1">
-                    <rect key="frame" x="51" y="12" width="446" height="30"/>
+                    <rect key="frame" x="52" y="11" width="445" height="30"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits"/>
                 </textField>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rua-gy-tSe">
-                    <rect key="frame" x="505" y="16" width="22" height="22"/>
+                    <rect key="frame" x="505" y="15" width="22" height="22"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="22" id="oQC-v9-H3q"/>
                         <constraint firstAttribute="width" constant="22" id="p2Y-vi-ViU"/>
@@ -37,10 +37,12 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="centerY" secondItem="eIR-5E-V6t" secondAttribute="centerY" id="173-9g-Pnt"/>
                 <constraint firstAttribute="trailing" secondItem="Rua-gy-tSe" secondAttribute="trailing" constant="8" id="51Z-vu-hXG"/>
-                <constraint firstItem="QMA-mD-Dv1" firstAttribute="centerY" secondItem="eIR-5E-V6t" secondAttribute="centerY" constant="0.5" id="CZo-xW-oIT"/>
+                <constraint firstItem="QMA-mD-Dv1" firstAttribute="centerY" secondItem="eIR-5E-V6t" secondAttribute="centerY" id="CZo-xW-oIT"/>
+                <constraint firstItem="eIR-5E-V6t" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="HBX-so-fbg"/>
                 <constraint firstItem="Rua-gy-tSe" firstAttribute="centerY" secondItem="QMA-mD-Dv1" secondAttribute="centerY" id="Rc3-47-aZx"/>
+                <constraint firstAttribute="bottom" secondItem="eIR-5E-V6t" secondAttribute="bottom" constant="8" id="cGy-qa-bQu"/>
+                <constraint firstAttribute="trailing" secondItem="QMA-mD-Dv1" secondAttribute="trailing" priority="999" constant="8" id="e3T-xg-LDV"/>
                 <constraint firstItem="QMA-mD-Dv1" firstAttribute="leading" secondItem="eIR-5E-V6t" secondAttribute="trailing" constant="8" id="hrK-RL-70b"/>
                 <constraint firstItem="eIR-5E-V6t" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="tyf-dw-WCe"/>
                 <constraint firstItem="Rua-gy-tSe" firstAttribute="leading" secondItem="QMA-mD-Dv1" secondAttribute="trailing" constant="8" id="vFJ-eH-heU"/>

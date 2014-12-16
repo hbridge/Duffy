@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPhotoDetailViewController">
             <connections>
+                <outlet property="addPersonButton" destination="BV6-BM-Whi" id="dXy-XZ-RHF"/>
                 <outlet property="commentToolbar" destination="opa-QM-Zd8" id="jXy-O2-nma"/>
                 <outlet property="recipientsProfileStackView" destination="ibH-dU-jON" id="i2l-b0-cYa"/>
                 <outlet property="senderProfileStackView" destination="VOD-io-kg3" id="2Ck-hr-mM8"/>
@@ -19,7 +21,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" allowsMultipleSelectionDuringEditing="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="gGV-RF-dqd">
-                    <rect key="frame" x="0.0" y="81" width="600" height="467"/>
+                    <rect key="frame" x="0.0" y="81" width="600" height="519"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="YtH-72-Of8"/>
@@ -66,7 +68,7 @@
                 <constraint firstItem="VOD-io-kg3" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" constant="8" id="9JY-vK-N88"/>
                 <constraint firstAttribute="trailing" secondItem="opa-QM-Zd8" secondAttribute="trailing" id="Cht-pI-f4J"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="top" secondItem="mpa-i4-xv8" secondAttribute="top" constant="8" id="Ed5-1o-YVi"/>
-                <constraint firstItem="opa-QM-Zd8" firstAttribute="top" secondItem="gGV-RF-dqd" secondAttribute="bottom" id="Ftf-u0-xc5"/>
+                <constraint firstAttribute="bottom" secondItem="gGV-RF-dqd" secondAttribute="bottom" id="M26-Yf-BkK"/>
                 <constraint firstAttribute="bottom" secondItem="opa-QM-Zd8" secondAttribute="bottom" id="PPK-FG-q4r"/>
                 <constraint firstItem="opa-QM-Zd8" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" id="SPk-Of-ByB"/>
                 <constraint firstItem="gGV-RF-dqd" firstAttribute="top" secondItem="VOD-io-kg3" secondAttribute="bottom" constant="8" id="WrZ-EP-rZx"/>

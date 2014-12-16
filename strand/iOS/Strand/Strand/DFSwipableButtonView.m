@@ -299,6 +299,11 @@ const CGFloat RightGestureThreshold = 75.0;
   self.originalCenter = self.centerView.center;
 }
 
+- (void)setButtonsHidden:(BOOL)hidden
+{
+  self.buttonWrapperHeightConstraint.constant = (hidden ? 0 : 65.0);
+}
+
 /*
  * Configure this view to use an image.  This doesn't actually take in an image, that should be set later
  * on the .imageView property

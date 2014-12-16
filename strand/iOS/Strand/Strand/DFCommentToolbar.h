@@ -15,5 +15,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *likeButton;
 @property (nonatomic, retain) UIButton *sendButton;
 @property (nonatomic, retain) UIButton *retainedLikeButton;
+@property (nonatomic) BOOL likeButtonDisabled;
 
 @end

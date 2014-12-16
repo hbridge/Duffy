@@ -11,6 +11,7 @@
 #import "DFSwipableButtonView.h"
 #import "DFPeanutUserObject.h"
 #import "DFHomeSubViewController.h"
+#import "DFPhotoDetailViewController.h"
 
 @interface DFIncomingViewController : DFHomeSubViewController <DFSwipableButtonViewDelegate>
 
@@ -27,6 +28,7 @@ typedef void (^DFIncomingPhotoLikeBlock)(DFPhotoIDType photoID, DFStrandIDType s
 @property (nonatomic, copy) DFIncomingPhotoNextBlock nextHandler;
 @property (nonatomic, copy) DFIncomingPhotoCommentBlock commentHandler;
 @property (nonatomic, copy) DFIncomingPhotoLikeBlock likeHandler;
+@property (nonatomic, retain) DFPhotoDetailViewController *photoDetailViewController;
 
 @property (nonatomic, retain) UIImageView *imageView;
 

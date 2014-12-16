@@ -33,6 +33,15 @@
   return self;
 }
 
+- (instancetype)initWithNuxStep:(NSUInteger)nuxStep
+{
+  self = [super init];
+  if (self) {
+    self.nuxStep = nuxStep;
+  }
+  return self;
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
 
@@ -55,22 +64,33 @@
     // Dispose of any resources that can be recreated.
 }
 
+
 - (void)configureProfileWithContext
 {
+  
   for (DFProfileStackView *psv in @[self.senderProfileStackView, self.recipientsProfileStackView]) {
     psv.backgroundColor = [UIColor clearColor];
     psv.nameMode = DFProfileStackViewNameShowAlways;
   }
+  self.senderProfileStackView.profilePhotoWidth = 50.0;
+    self.recipientsProfileStackView.profilePhotoWidth = 35.0;
+  
+  if (self.nuxStep) {
+    self.senderProfileStackView.maxAbbreviationLength = 2;
+    [self.senderProfileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+    
+    [self.recipientsProfileStackView setPeanutUser:[[DFUser currentUser] peanutUser]];
+    return;
+  }
   
   DFPeanutFeedObject *strandPost = self.postsObject.objects.firstObject;
   DFPeanutUserObject *sender = strandPost.actors.firstObject;
-  self.senderProfileStackView.profilePhotoWidth = 50.0;
+  
   [self.senderProfileStackView setPeanutUser:sender];
   [self.senderProfileStackView
    setBadgeImage:(_userLikeActionID > 0) ? [UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"] : nil
    forUser:sender];
-
-  self.recipientsProfileStackView.profilePhotoWidth = 35.0;
+  
   NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
   [self.recipientsProfileStackView setPeanutUsers:recipients];
   for (DFPeanutUserObject *recipient in recipients) {
@@ -86,6 +106,7 @@
 
 - (void)configureCommentToolbar
 {
+  if (self.nuxStep) [self.commentToolbar removeFromSuperview];
   self.textField = self.commentToolbar.textField;
   [self.commentToolbar.profileStackView setPeanutUser:[[DFUser currentUser] peanutUser]];
   [self setLikeBarButtonItemOn:(self.userLikeActionID > 0)];
@@ -97,6 +118,8 @@
    addTarget:self
    action:@selector(sendButtonPressed:)
    forControlEvents:UIControlEventTouchUpInside];
+  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.commentToolbar.frame.size.height, 0);
+  if (self.compressedModeEnabled) self.commentToolbar.likeButtonDisabled = YES;
 }
 
 - (void)setLikeBarButtonItemOn:(BOOL)on
@@ -108,11 +131,30 @@
   }
 }
 
+- (void)setCommentsExpanded:(BOOL)commentsExpanded
+{
+  [super setCommentsExpanded:commentsExpanded];
+  [self configureToolbarHidden];
+}
+
+- (void)configureToolbarHidden
+{
+  if (self.compressedModeEnabled && [self tableView:self.tableView numberOfRowsInSection:0] == 2 && !self.commentsExpanded) {
+    //self.commentToolbarHeightConstraint.constant = 0;
+    self.commentToolbar.hidden = YES;
+  } else {
+    //self.commentToolbarHeightConstraint.constant = 52;
+    self.commentToolbar.hidden = NO;
+  }
+}
+
 - (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
   CGFloat aspectRatio;
-  if (self.photoObject.full_height && self.photoObject.full_width) {
+  if (self.compressedModeEnabled) {
+    aspectRatio = 1.0;
+  } else if (self.photoObject.full_height && self.photoObject.full_width) {
     aspectRatio = self.photoObject.full_height.floatValue / self.photoObject.full_width.floatValue;
   } else {
     aspectRatio = 1.0;
@@ -123,25 +165,32 @@
                             (self.view.frame.size.width - 20) * aspectRatio);
   if (!self.imageView) {
     self.imageView = [[UIImageView alloc] initWithFrame:frame];
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.imageView.clipsToBounds = YES;
+    self.imageView.contentMode = UIViewContentModeScaleAspectFill;
   } else {
     self.imageView.frame = frame;
   }
   
-  [[DFImageManager sharedManager]
-   imageForID:self.photoObject.id
-   pointSize:self.imageView.frame.size
-   contentMode:DFImageRequestContentModeAspectFill
-   deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
-   completion:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       self.imageView.image = image;
-     });
-   }];
+  self.addPersonButton.hidden = self.compressedModeEnabled;
+  self.tableView.separatorStyle = self.compressedModeEnabled ? UITableViewCellSeparatorStyleNone : UITableViewCellSeparatorStyleSingleLine;
+  [self configureToolbarHidden];
+  
+  if (self.nuxStep) {
+    self.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
+  } else {
+    [[DFImageManager sharedManager]
+     imageForID:self.photoObject.id
+     pointSize:self.imageView.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         self.imageView.image = image;
+       });
+     }];
+  }
   [self.tableView setTableHeaderView:self.imageView];
 }
-
-
 
 - (IBAction)likeItemPressed:(id)sender {
   BOOL newLikeValue = (self.userLikeActionID == 0);

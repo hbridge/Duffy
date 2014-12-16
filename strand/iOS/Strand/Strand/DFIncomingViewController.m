@@ -9,6 +9,7 @@
 #import "DFIncomingViewController.h"
 #import <Slash/Slash.h>
 #import "DFImageManager.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFIncomingViewController ()
 
@@ -26,6 +27,7 @@
     _photoID = photoID;
     _strandID = strandID;
     _sender = peanutUser;
+    [self observeNotifs];
   }
   return self;
 }
@@ -42,25 +44,33 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  [self configureProfileWithContext];
+  [self configurePhotoDetailView];
   [self configureSwipableButtonView];
 }
 
-- (void)configureProfileWithContext
+
+- (void)observeNotifs
 {
-  self.profileWithContextView.profileStackView.profilePhotoWidth = 45.0;
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)configurePhotoDetailView
+{
+  DFPhotoDetailViewController *pdvc;
   if (self.nuxStep) {
-    self.profileWithContextView.profileStackView.maxAbbreviationLength = 2;
-    [self.profileWithContextView.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
-    [self.profileWithContextView setTitleMarkup:[NSString stringWithFormat:@"<name>%@</name> sent you a photo",
-                                         @"Team Swap"]];
+    pdvc = [[DFPhotoDetailViewController alloc] initWithNuxStep:self.nuxStep];
   } else {
-    [self.profileWithContextView.profileStackView setPeanutUser:self.sender];
-    [self.profileWithContextView setTitleMarkup:[NSString
-                                                 stringWithFormat:@"<name>%@</name> sent you a photo",
-                                                 self.sender.firstName]];
+    DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoID
+                                                                                  inStrand:self.strandID];
+    DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:self.strandID];
+    pdvc = [[DFPhotoDetailViewController alloc]
+                                      initWithPhotoObject:photoObject
+                                      inPostsObject:postsObject];
   }
-  [self.profileWithContextView.subtitleLabel removeFromSuperview];
+  self.photoDetailViewController = pdvc;
+  self.photoDetailViewController.compressedModeEnabled = YES;
+  self.photoDetailViewController.view.translatesAutoresizingMaskIntoConstraints = NO;
 }
 
 - (void)configureSwipableButtonView
@@ -69,21 +79,17 @@
   [self.swipableButtonView.noButton
    setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
    forState:UIControlStateNormal];
-  [self.swipableButtonView.otherButton
-   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingCommentButtonIcon"]
-   forState:UIControlStateNormal];
+  [self.swipableButtonView.otherButton removeFromSuperview];
   [self.swipableButtonView.yesButton
    setImage:[UIImage imageNamed:@"Assets/Icons/IncomingLikeButtonIcon"]
    forState:UIControlStateNormal];
   for (UIButton *button in @[self.swipableButtonView.noButton,
-                             self.swipableButtonView.otherButton,
                              self.swipableButtonView.yesButton]) {
     [button setTitle:nil forState:UIControlStateNormal];
     button.backgroundColor = [UIColor clearColor]; 
   }
   
-  [self.swipableButtonView configureToUseImage];
-  
+  [self.swipableButtonView configureToUseView:self.photoDetailViewController.view];
 }
 
 - (void)viewDidLayoutSubviews
@@ -114,6 +120,39 @@
   } else if (button == self.swipableButtonView.yesButton) {
     if (self.likeHandler) self.likeHandler(self.photoID, self.strandID);
   }
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+  [self updateFrameFromKeyboardNotif:notification];
+  [self.swipableButtonView setButtonsHidden:YES];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+  [self updateFrameFromKeyboardNotif:notification];
+  [self.swipableButtonView setButtonsHidden:NO];
+}
+
+- (void)updateFrameFromKeyboardNotif:(NSNotification *)notification
+{
+  CGRect keyboardStartFrame = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+  CGRect keyboardEndFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+  CGFloat yDelta = keyboardStartFrame.origin.y - keyboardEndFrame.origin.y;
+  CGRect frame = self.view.frame;
+  frame.size.height -= yDelta;
+  
+  NSNumber *duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey];
+  NSNumber *animatinoCurve = notification.userInfo[UIKeyboardAnimationCurveUserInfoKey];
+  
+  [UIView
+   animateWithDuration:duration.floatValue
+   delay:0.0
+   options:animatinoCurve.integerValue
+   animations:^{
+     self.view.frame = frame;
+   } completion:^(BOOL finished) {
+     
+   }];
+  
 }
 
 @end

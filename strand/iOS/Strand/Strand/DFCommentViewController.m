@@ -87,6 +87,13 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)setCompressedModeEnabled:(BOOL)compressedModeEnabled
 {
   _compressedModeEnabled = compressedModeEnabled;
+  [self.view setNeedsLayout];
+  [self.tableView reloadData];
+}
+
+- (void)setCommentsExpanded:(BOOL)commentsExpanded
+{
+  _commentsExpanded = commentsExpanded;
   [self.tableView reloadData];
 }
 
@@ -152,7 +159,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  if (self.compressedModeEnabled) {
+  if (self.compressedModeEnabled && !self.commentsExpanded) {
     return MIN([[self comments] count], CompressedModeMaxRows + 1);
   } else return MAX([[self comments] count], 1);
 }
@@ -167,7 +174,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (BOOL)isShowMoreRow:(NSIndexPath *)indexPath
 {
-  return (self.compressedModeEnabled && indexPath.row == CompressedModeMaxRows);
+  return (self.compressedModeEnabled && indexPath.row == CompressedModeMaxRows && !self.commentsExpanded);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -319,7 +326,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   [self.tableView beginUpdates];
   
-  if (self.comments.count == 0)
+  if (self.comments.count == 0 && !self.compressedModeEnabled)
   {
     [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]]
                           withRowAnimation:UITableViewRowAnimationFade];
@@ -388,7 +395,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   if ([self isShowMoreRow:indexPath]) {
-    self.compressedModeEnabled = NO;
+    self.commentsExpanded = YES;
     [self.tableView reloadData];
   }
 }

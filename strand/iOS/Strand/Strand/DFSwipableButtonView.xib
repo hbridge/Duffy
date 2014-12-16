@@ -12,12 +12,9 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="700" translatesAutoresizingMaskIntoConstraints="NO" id="PRr-q5-rca">
-                    <rect key="frame" x="43" y="0.0" width="515" height="515"/>
+                <view clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="700" translatesAutoresizingMaskIntoConstraints="NO" id="PRr-q5-rca" userLabel="Swipable View">
+                    <rect key="frame" x="20" y="0.0" width="560" height="515"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    <constraints>
-                        <constraint firstAttribute="width" secondItem="PRr-q5-rca" secondAttribute="height" multiplier="1:1" id="1TX-GI-WGX"/>
-                    </constraints>
                     <connections>
                         <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="reB-FQ-R71"/>
                     </connections>
@@ -87,7 +84,7 @@
                     </constraints>
                 </view>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
-                    <rect key="frame" x="43" y="0.0" width="515" height="515"/>
+                    <rect key="frame" x="20" y="0.0" width="560" height="515"/>
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -95,11 +92,10 @@
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="PRr-q5-rca" secondAttribute="leading" id="4u2-8Q-y44"/>
                 <constraint firstItem="l10-6U-oyL" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="bottom" constant="10" id="5zL-Rm-vdB"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="PRr-q5-rca" secondAttribute="trailing" id="7iY-Zn-Xcj"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xKd-Cz-PRo" secondAttribute="trailing" id="AId-so-J1d"/>
+                <constraint firstAttribute="trailing" secondItem="xKd-Cz-PRo" secondAttribute="trailing" constant="20" id="AId-so-J1d"/>
                 <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" priority="900" constant="10" id="H8h-um-EvH"/>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" id="U9o-fK-LxD"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="U9o-fK-LxD"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="10" id="aBk-gS-atA"/>
-                <constraint firstAttribute="centerX" secondItem="PRr-q5-rca" secondAttribute="centerX" id="ahz-A8-iMM"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="bottom" secondItem="PRr-q5-rca" secondAttribute="bottom" id="fsn-Zg-Ml8"/>
                 <constraint firstItem="PRr-q5-rca" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="h6L-Et-qCw"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="top" id="oyN-1W-o7a"/>
@@ -107,6 +103,7 @@
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <connections>
+                <outlet property="buttonWrapperHeightConstraint" destination="I7C-Lj-gsK" id="ZRf-9b-Juc"/>
                 <outlet property="centerView" destination="PRr-q5-rca" id="ZCH-9O-P1x"/>
                 <outlet property="noButton" destination="lr5-fU-tFy" id="ceJ-cP-s4b"/>
                 <outlet property="otherButton" destination="pue-vE-jXM" id="baw-SH-BRr"/>

@@ -20,6 +20,7 @@
 @property (nonatomic) BOOL closeOnSend;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *textFieldItem;
 @property (nonatomic) BOOL compressedModeEnabled;
+@property (nonatomic) BOOL commentsExpanded;
 
 
 - (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject inPostsObject:(DFPeanutFeedObject *)postsObject;
