@@ -130,7 +130,8 @@ class PhotoAPI(BasePhotoAPI):
             serializer = PhotoSerializer(photo)
             return Response(serializer.data)
         else:
-            pass
+            logger.warn("Had a request to get photo id %s and didn't find." % photoId)
+            raise Http404
 
     
     def patch(self, request, photoId, format=None):

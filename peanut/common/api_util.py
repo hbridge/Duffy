@@ -2,6 +2,7 @@ import json
 import datetime
 import pytz
 import time
+import logging
 
 from phonenumber_field.phonenumber import PhoneNumber
 
@@ -13,6 +14,8 @@ from peanut.settings import constants
 from common.models import Photo
 from common.serializers import ActionWithUserNameSerializer
 from common import serializers
+
+logger = logging.getLogger(__name__)
 
 class DuffyJsonEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -61,7 +64,6 @@ def getPhotoObject(entry):
 	if (photo.isDbPhoto()):
 		photo = photo.getDbPhoto()
 		photoData.update(serializers.photoDataForApiSerializer(photo))
-
 	else:
 		photoData.update(photo.serialize())
 
@@ -70,7 +72,13 @@ def getPhotoObject(entry):
 		photoData['dist'] = entry['dist']
 	
 	if 'actions' in entry:
-		photoData['actions'] = [serializers.actionDataForApiSerializer(action) for action in entry['actions']]
+		for action in entry['actions']:
+			if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
+				photoData['evaluated'] = True
+			else:
+				if 'actions' not in photoData:
+					photoData['actions'] = list()
+				photoData['actions'].append(serializers.actionDataForApiSerializer(action))
 	
 	return photoData
 
