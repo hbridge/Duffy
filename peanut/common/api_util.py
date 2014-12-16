@@ -75,6 +75,7 @@ def getPhotoObject(entry):
 		for action in entry['actions']:
 			if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
 				photoData['evaluated'] = True
+				photoData['evaluated_time'] = action.added
 			else:
 				if 'actions' not in photoData:
 					photoData['actions'] = list()
