@@ -70,7 +70,7 @@ def getPhotoObject(entry):
 	# Add in extra fields that aren't a part of the SimplePhoto model
 	if 'dist' in entry:
 		photoData['dist'] = entry['dist']
-	
+		
 	if 'actions' in entry:
 		for action in entry['actions']:
 			if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:

@@ -597,7 +597,7 @@ class CreateActionAPI(CreateAPIView):
                 return super(CreateActionAPI, self).post(request)
             elif (obj.action_type == constants.ACTION_TYPE_FAVORITE):
                 if obj.photo.user_id != obj.user_id:
-                        msg = "%s liked your photo" % (obj.user.display_name)
+                        msg = "%s just liked your photo" % (obj.user.display_name)
                         logger.debug("going to send %s to user id %s" % (msg, obj.photo.user_id))
                         customPayload = {'strand_id': obj.strand_id, 'id': obj.photo_id}
                         notifications_util.sendNotification(obj.photo.user, msg, constants.NOTIFICATIONS_PHOTO_FAVORITED_ID, customPayload)
@@ -717,18 +717,26 @@ class CreateStrandAPI(CreateAPIView):
                 action.save()
                 action.photos = strand.photos.all()
 
-            # Created from is the private strand of the user.  We now want to hide it from view
+                # Created from is the private strand of the user.  We now want to hide it from view
 
-            # Go through all the private strands that have any photos we're contributing
-            #   and mark them as such
-            if 'photos' in self.request.DATA:
-                privateStrands = Strand.objects.filter(photos__id__in=self.request.DATA['photos'], private=True, user=user)
-                for privateStrand in privateStrands:
-                    privateStrand.suggestible = False
-                    privateStrand.contributed_to_id = strand.id
-                    privateStrand.save()
+                newPhotoIds = Photo.getIds(strand.photos.all())
+                # Go through all the private strands that have any photos we're contributing
+                #   and mark them as such
+                if 'photos' in self.request.DATA:
+                    privateStrands = Strand.objects.filter(photos__id__in=self.request.DATA['photos'], private=True, user=user)
+                    for privateStrand in privateStrands:
+                        privateStrand.suggestible = False
+                        privateStrand.contributed_to_id = strand.id
+                        privateStrand.save()
 
-                    createNeighborRowsToNewStrand(strand, privateStrand)
+                        createNeighborRowsToNewStrand(strand, privateStrand)
+
+                        privatePhotoIds = Photo.getIds(privateStrand.photos.all())
+                        print "%s %s" % (privatePhotoIds, strand.photos.all())
+                        for photoId in newPhotoIds:
+                            if photoId in privatePhotoIds:
+                                action = Action.objects.create(user=user, strand=privateStrand, photo_id=photoId, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+
 
             logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
             

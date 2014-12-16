@@ -28,17 +28,22 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def getActionsCache(user, strandIds, photoIds):
-	return Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=strandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=strandIds))).exclude(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & ~Q(user=user))
+def getActionsCache(user, publicStrandIds, photoIds):
+	# Need to find all actions that affect the public strands (other people liking, commenting)
+	# but filter down photos to only those strands
+	# also find all actions this user took on any photos on the list
+	# but filter out eval actions by other people
+	return Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=publicStrandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=publicStrandIds)) | (Q(photo_id__in=photoIds) & Q(user=user))).exclude(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & ~Q(user=user))
 
 def getActionsByPhotoIdCache(actionsCache):
 	actionsByPhotoId = dict()
 
 	for action in actionsCache:
-		if action.photo_id not in actionsByPhotoId:
-			actionsByPhotoId[action.photo_id] = list()
+		if action.photo_id:
+			if action.photo_id not in actionsByPhotoId:
+				actionsByPhotoId[action.photo_id] = list()
 
-		actionsByPhotoId[action.photo_id].append(action)
+			actionsByPhotoId[action.photo_id].append(action)
 
 	return actionsByPhotoId
 
@@ -49,16 +54,8 @@ def addActionsToClusters(clusters, strandId, actionsByPhotoIdCache):
 		entriesToRemove = list()
 		for entry in cluster:
 			if entry["photo"].id in actionsByPhotoIdCache:
-				actions = actionsByPhotoIdCache[entry["photo"].id]
-
-				actionsForThisStrand = filter(lambda x: x.strand_id == strandId, actions)
-				if len(actionsForThisStrand) > 0:
-					# We want to pull the photo out of the cluster now and have it on its own
-					if len(cluster) > 1:
-						finalClusters.append([entry])
-						entriesToRemove.append(entry)
-
-					entry["actions"] = actionsForThisStrand
+				entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
+				
 			entry["photo"].strand_id = strandId
 		for entry in entriesToRemove:
 			cluster.remove(entry)
