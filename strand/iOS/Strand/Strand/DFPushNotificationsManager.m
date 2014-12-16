@@ -16,8 +16,8 @@
 #import "DFPeanutPushTokenAdapter.h"
 #import "DFPushNotificationsManager.h"
 #import "DFToastNotificationManager.h"
-#import "DFEvaluatedPhotoViewController.h"
 #import "DFSuggestionsPageViewController.h"
+#import "DFPhotoDetailViewController.h"
 #import "SVProgressHUD.h"
 
 @implementation DFPushNotificationsManager
@@ -234,7 +234,7 @@
       
       if (photoObject && photoObject.userEvalPhotoAction) {
         DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strandID];
-        vc =  [[DFEvaluatedPhotoViewController alloc]
+        vc =  [[DFPhotoDetailViewController alloc]
                initWithPhotoObject:photoObject
                inPostsObject:postsObject];
         
