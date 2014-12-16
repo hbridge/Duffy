@@ -8,6 +8,7 @@
 
 #import "DFCommentViewController.h"
 #import "DFProfileStackView.h"
+#import "DFCommentToolbar.h"
 
 @interface DFEvaluatedPhotoViewController : DFCommentViewController
 
@@ -15,8 +16,9 @@
 @property (weak, nonatomic) IBOutlet DFProfileStackView *recipientsProfileStackView;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *senderProfileStackView;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *likeBarButtonItem;
-- (IBAction)likeItemPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet DFCommentToolbar *commentToolbar;
+@property (weak, nonatomic) UIButton *likeButtonItem;
+- (void)likeItemPressed:(id)sender;
 - (IBAction)addPersonPressed:(id)sender;
 
 @end

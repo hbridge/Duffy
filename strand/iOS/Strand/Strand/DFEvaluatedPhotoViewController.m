@@ -37,7 +37,7 @@
   [super viewDidLoad];
 
   [self configureProfileWithContext];
-  [self configureToolbar];
+  [self configureCommentToolbar];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -84,25 +84,28 @@
   }
 }
 
-- (void)configureToolbar
+- (void)configureCommentToolbar
 {
-  self.textFieldItem.width = self.toolbar.frame.size.width - self.sendButton.width - 36 - self.likeBarButtonItem.width - 36;
+  self.textField = self.commentToolbar.textField;
+  [self.commentToolbar.profileStackView setPeanutUser:[[DFUser currentUser] peanutUser]];
   [self setLikeBarButtonItemOn:(self.userLikeActionID > 0)];
+  [self.commentToolbar.likeButton addTarget:self
+                                     action:@selector(likeItemPressed:)
+                           forControlEvents:UIControlEventTouchUpInside];
+  self.commentToolbar.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+  [self.commentToolbar.sendButton
+   addTarget:self
+   action:@selector(sendButtonPressed:)
+   forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)setLikeBarButtonItemOn:(BOOL)on
 {
   if (on) {
-    self.likeBarButtonItem.image = [UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"];
+    [self.commentToolbar.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"] forState:UIControlStateNormal];
   } else {
-    self.likeBarButtonItem.image = [UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"];
+    [self.commentToolbar.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"] forState:UIControlStateNormal];
   }
-}
-
-- (void)viewWillLayoutSubviews
-{
-  [super viewWillLayoutSubviews];
-  [self configureToolbar];
 }
 
 - (void)viewDidLayoutSubviews
@@ -174,7 +177,7 @@
 - (void)setUserLikeActionID:(DFActionID)userLikeActionID
 {
   _userLikeActionID = userLikeActionID;
-  [self configureToolbar];
+  [self configureCommentToolbar];
 }
 
 @end
