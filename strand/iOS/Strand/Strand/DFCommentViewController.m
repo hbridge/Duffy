@@ -170,9 +170,13 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+  NSUInteger numRows;
   if (self.compressedModeEnabled && !self.commentsExpanded) {
-    return MIN([[self comments] count], CompressedModeMaxRows + 1);
-  } else return MAX([[self comments] count], 1);
+    numRows = MIN([[self comments] count], CompressedModeMaxRows + 1);
+  } else {
+    numRows = [[self comments] count];
+  }
+  return MAX(numRows, 1);
 }
 
 - (NSArray *)comments
@@ -244,7 +248,7 @@ const NSUInteger CompressedModeMaxRows = 1;
                                  actionWithTitle:@"Delete"
                                  style:DFAlertActionStyleDestructive
                                  handler:^(DFAlertAction *action) {
-                                   [self deleteCommentAtIndexPath:indexPath];
+                                   [self deleteComment:comment];
                                  }]];
      [self.alertController addAction:[DFAlertAction
                                  actionWithTitle:@"Cancel"
@@ -259,9 +263,14 @@ const NSUInteger CompressedModeMaxRows = 1;
   cell.defaultColor = [UIColor lightGrayColor];
 }
    
-- (void)deleteCommentAtIndexPath:(NSIndexPath *)indexPath
+- (void)deleteComment:(DFPeanutAction *)comment
    {
-     DFPeanutAction *comment = self.comments[indexPath.row];
+     NSUInteger commentIndex = [self.comments indexOfObject:comment];
+     if (commentIndex == NSNotFound) {
+       [SVProgressHUD showErrorWithStatus:@"Could not delete"];
+       return;
+     }
+     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentIndex inSection:0];
      dispatch_async(dispatch_get_main_queue(), ^{
        [self.tableView beginUpdates];
        [self.comments removeObject:comment];
@@ -308,6 +317,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 
 - (IBAction)sendButtonPressed:(id)sender {
+  if (self.textField.text.length == 0) return;
   DFPeanutAction *action = [[DFPeanutAction alloc] init];
   action.user = [[DFUser currentUser] userID];
   action.action_type = DFPeanutActionComment;
@@ -321,8 +331,14 @@ const NSUInteger CompressedModeMaxRows = 1;
   DFCommentViewController __weak *weakSelf = self;
   [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
     DDLogInfo(@"%@ adding comment succeeded:%@", [DFCommentViewController class], resultObjects);
+    DFPeanutAction *newComment = [resultObjects firstObject];
     NSInteger commentWithNoIDIndex = [weakSelf.comments indexOfObject:action];
-    [weakSelf.comments replaceObjectAtIndex:commentWithNoIDIndex withObject:[resultObjects firstObject]];
+    [weakSelf.comments replaceObjectAtIndex:commentWithNoIDIndex withObject:newComment];
+    // replace the delete action on the cell
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentWithNoIDIndex inSection:0];
+    DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
+    [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+    
     [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
                               result:DFAnalyticsValueResultSuccess
                          photoObject:weakSelf.photoObject
@@ -342,17 +358,18 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   [self.tableView beginUpdates];
   
-  if (self.comments.count == 0 && !self.compressedModeEnabled)
+  if (self.comments.count == 0)
   {
     [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]]
                           withRowAnimation:UITableViewRowAnimationFade];
   }
+
   [self.tableView
    insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.comments.count inSection:0]]
    withRowAnimation:UITableViewRowAnimationFade];
-  
   [self.comments addObject:action];
   [self.tableView endUpdates];
+
   
   [self scrollToLast];
 }
