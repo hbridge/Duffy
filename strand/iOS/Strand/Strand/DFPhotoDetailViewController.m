@@ -288,6 +288,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+  if (self.nuxStep) return 0;
   return 1;
 }
 
