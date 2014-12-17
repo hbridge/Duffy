@@ -97,20 +97,20 @@
      [weakSelf dismissViewControllerAnimated:YES completion:^{
        [SVProgressHUD showSuccessWithStatus:@"Swapped!"];
      }];
-     [DFAnalytics
-      logMatchPhotos:weakSelf.inviteObject
-      withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
-                                         inArrayOfFeedObjects:weakSelf.suggestedSections]
-      selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
-      result:DFAnalyticsValueResultSuccess];
+//     [DFAnalytics
+//      logMatchPhotos:weakSelf.inviteObject
+//      withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+//                                         inArrayOfFeedObjects:weakSelf.suggestedSections]
+//      selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
+//      result:DFAnalyticsValueResultSuccess];
   } failure:^(NSError *error) {
     [SVProgressHUD showErrorWithStatus:@"Error."];
-    [DFAnalytics
-     logMatchPhotos:weakSelf.inviteObject
-     withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
-                                        inArrayOfFeedObjects:weakSelf.suggestedSections]
-     selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
-     result:DFAnalyticsValueResultFailure];
+//    [DFAnalytics
+//     logMatchPhotos:weakSelf.inviteObject
+//     withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+//                                        inArrayOfFeedObjects:weakSelf.suggestedSections]
+//     selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
+//     result:DFAnalyticsValueResultFailure];
   }];
 }
 

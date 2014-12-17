@@ -379,7 +379,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
   [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
   suggestion.suggestible = @NO;
   [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:section]];
-  [DFAnalytics logSuggestionActionTaken:suggestion action:@"hide"];
 }
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController

@@ -22,6 +22,7 @@
 #import "DFFriendsViewController.h"
 #import "DFPeanutNotificationsManager.h"
 #import "DFDismissableModalViewController.h"
+#import "DFAnalytics.h"
 
 const CGFloat headerHeight = 60.0;
 const NSUInteger MinPhotosToShowFilter = 20;
@@ -209,6 +210,7 @@ static BOOL showFilters = NO;
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
   [self configureBadges];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidLayoutSubviews
@@ -354,12 +356,26 @@ static BOOL showFilters = NO;
   [DFDismissableModalViewController presentWithRootController:[[DFSuggestionsPageViewController alloc]
                                                      initWithPreferredType:DFIncomingViewType]
                                                      inParent:self];
+  [self logHomeButtonPressed:sender];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
   [DFDismissableModalViewController presentWithRootController:[[DFSuggestionsPageViewController alloc]
                                                      initWithPreferredType:DFSuggestionViewType]
                                                      inParent:self];
+  [self logHomeButtonPressed:sender];
+}
+
+- (void)logHomeButtonPressed:(id)button
+{
+  NSString *buttonName = @"";
+  if (button == self.reviewButton) buttonName = @"incoming";
+  else if (button == self.sendButton) buttonName = @"outgoing";
+  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
+  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
+  [DFAnalytics logHomeButtonTapped:buttonName
+                incomingBadgeCount:numToReview
+                outgoingBadgeCount:numToSend];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView

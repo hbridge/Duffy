@@ -87,16 +87,22 @@ const NSUInteger CompressedModeMaxRows = 1;
     [self scrollToLast];
     [self.commentToolbar.textField becomeFirstResponder];
   }
+
+  if (!self.compressedModeEnabled)
+    [DFAnalytics
+     logViewController:self
+     appearedWithParameters:
+     @{
+       @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count],
+       @"unreadLikes" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionFavorite] count]],
+       @"unreadComments" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionComment] count]],
+       }];
+  
   // mark the action IDs for the photo object seen
   NSArray *actionIDs = [self.photoObject.actions arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
     return action.id;
   }];
   [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
-  
-  [DFAnalytics logViewController:self
-          appearedWithParameters:@{
-                                   @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count]
-                                   }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -401,8 +407,9 @@ const NSUInteger CompressedModeMaxRows = 1;
    oldActionID:oldID
    success:^(DFActionID actionID) {
      self.userLikeActionID = actionID;
+     [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultSuccess];
    } failure:^(NSError *error) {
-     
+     [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultFailure];
    }];
 
 }
@@ -480,19 +487,21 @@ const NSUInteger CompressedModeMaxRows = 1;
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentWithNoIDIndex inSection:0];
     DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
     [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
-    
-    [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
-                              result:DFAnalyticsValueResultSuccess
-                         photoObject:weakSelf.photoObject
-                         postsObject:weakSelf.postsObject];
+    [weakSelf.class logController:weakSelf actionType:DFPeanutActionComment result:DFAnalyticsValueResultSuccess];
   } failure:^(NSError *error) {
     DDLogError(@"%@ adding comment error:%@", weakSelf.class, error);
     [weakSelf showCommentError:action];
-    [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
-                              result:DFAnalyticsValueResultFailure
-                         photoObject:weakSelf.photoObject
-                         postsObject:weakSelf.postsObject];
+    [weakSelf.class logController:weakSelf actionType:DFPeanutActionComment result:DFAnalyticsValueResultFailure];
   }];
+}
+
++ (void)logController:(DFPhotoDetailViewController *)controller actionType:(DFPeanutActionType)actionType result:(NSString *)result
+{
+  [DFAnalytics logPhotoActionTaken:actionType
+                fromViewController:controller.compressedModeEnabled ? controller.parentViewController : controller
+                            result:result
+                       photoObject:controller.photoObject
+                       postsObject:controller.postsObject];
 }
 
 

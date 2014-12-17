@@ -15,7 +15,8 @@
 
 @required
 - (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
-        buttonSelected:(UIButton *)button;
+            buttonSelected:(UIButton *)button
+                   isSwipe:(BOOL)isSwipe;
 
 
 @optional

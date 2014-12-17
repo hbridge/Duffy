@@ -10,6 +10,7 @@
 #import <Slash/Slash.h>
 #import "DFImageManager.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFAnalytics.h"
 
 @interface DFIncomingViewController ()
 
@@ -113,14 +114,23 @@
 
 - (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
                  buttonSelected:(UIButton *)button
+                   isSwipe:(BOOL)isSwipe
 {
+  NSString *logResult;
   if (button == self.swipableButtonView.noButton) {
     if (self.nextHandler) self.nextHandler(self.photoID, self.strandID);
+    logResult = @"skip";
   } else if (button == self.swipableButtonView.otherButton) {
     if (self.commentHandler) self.commentHandler(self.photoID, self.strandID);
+    logResult = @"other";
   } else if (button == self.swipableButtonView.yesButton) {
     if (self.likeHandler) self.likeHandler(self.photoID, self.strandID);
+    logResult = @"like";
   }
+  
+  [DFAnalytics
+   logIncomingCardProcessedWithResult:logResult
+   actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {

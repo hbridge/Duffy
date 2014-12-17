@@ -30,6 +30,7 @@
 /*** Generic Keys and values ***/
 
 NSString* const ActionTypeKey = @"actionType";
+NSString* const DFAnalyticsActionTypeTap = @"tap";
 NSString* const DFAnalyticsActionTypeSwipe = @"swipe";
 NSString* const NumberKey = @"number";
 
@@ -97,7 +98,7 @@ static DFAnalytics *defaultLogger;
 #ifdef DEBUG
   [[LocalyticsSession shared]
    LocalyticsSession:@"7790abca456e78bb24ebdbb-8e7455f6-fe36-11e3-9fb0-009c5fda0a25"];
-  // [[LocalyticsSession shared] setLoggingEnabled:YES];
+   [[LocalyticsSession shared] setLoggingEnabled:YES];
 #else
   [[LocalyticsSession shared]
    LocalyticsSession:@"b9370b33afb6b68728b25b7-952efd94-8487-11e4-5060-00a426b17dd8"];
@@ -123,6 +124,9 @@ static DFAnalytics *defaultLogger;
 + (void)logEvent:(NSString *)eventName withParameters:(NSDictionary *)parameters
 {
   [[LocalyticsSession shared] tagEvent:eventName attributes:parameters];
+  if ([[LocalyticsSession shared] loggingEnabled]) {
+    DDLogVerbose(@"%@: \n%@", eventName, parameters);
+  }
 }
 
 + (void)logEvent:(NSString *)eventName
@@ -251,6 +255,7 @@ static DFAnalytics *defaultLogger;
 
 
 + (void)logPhotoActionTaken:(DFPeanutActionType)action
+         fromViewController:(UIViewController *)viewController
                      result:(NSString *)result
                 photoObject:(DFPeanutFeedObject *)photo
                 postsObject:(DFPeanutFeedObject *)postsObject
@@ -270,6 +275,7 @@ static DFAnalytics *defaultLogger;
                           @"PhotosInThread" : [self bucketStringForObjectCount:photosInPosts.count],
                           @"NumComments" : [self bucketStringForObjectCount:comments.count],
                           @"NumLikes" : [self bucketStringForObjectCount:likes.count],
+                          @"View" : [self screenNameForControllerViewed:viewController]
                           }];
 }
 
@@ -506,6 +512,53 @@ static DFAnalytics *defaultLogger;
                                      }];
   [self logEvent:@"URLOpenedApp" withParameters:params];
 }
+
+
++ (void)logIncomingCardProcessedWithResult:(NSString *)result actionType:(NSString *)actionType
+{
+  [self logEvent:@"IncomingCardProcessed" withParameters:@{
+                                                           ResultKey: result,
+                                                           ActionTypeKey: actionType
+                                                           }];
+}
+
++ (void)logOutgoingCardProcessedWithSuggestion:(DFPeanutFeedObject *)suggestion
+                                        result:(NSString *)result
+                                   actionType:(NSString *)actionType
+{
+  NSMutableDictionary *parameters = [suggestion.suggestionAnalyticsSummary mutableCopy];
+  [parameters addEntriesFromDictionary:@{
+                                         ResultKey: result,
+                                         ActionTypeKey: actionType
+                                         }];
+  [self logEvent:@"OutgoingCardProcessed" withParameters:parameters];
+}
+
++ (void)logOtherCardType:(NSString *)type
+     processedWithResult:(NSString *)result
+              actionType:(NSString *)actionType
+{
+  [self logEvent:@"OtherCardProcessed" withParameters:@{
+                                                        @"cardType": type,
+                                                        ResultKey: result,
+                                                        ActionTypeKey: actionType
+                                                           }];
+
+}
+
++ (void)logHomeButtonTapped:(NSString *)buttonName
+         incomingBadgeCount:(NSUInteger)incomingCount
+         outgoingBadgeCount:(NSUInteger)outgoingCount
+{
+  [self logEvent:@"HomeButtonPressed"
+  withParameters:@{
+                   @"button" : buttonName,
+                   @"incomingCount" : [self bucketStringForObjectCount:incomingCount],
+                   @"suggestionsCount" : [self bucketStringForObjectCount:outgoingCount]
+                   }];
+}
+
+
 
 #pragma mark - Bucket Value helpers
 

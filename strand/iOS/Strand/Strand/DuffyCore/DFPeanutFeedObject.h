@@ -62,6 +62,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
 - (DFPeanutAction *)mostRecentAction;
+- (NSArray *)unreadActionsOfType:(DFPeanutActionType)actionType;
 
 - (NSArray *)commentActions;
 

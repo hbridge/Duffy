@@ -9,6 +9,7 @@
 #import "DFSwipableSuggestionViewController.h"
 #import "DFNavigationController.h"
 #import "DFImageManager.h"
+#import "DFAnalytics.h"
 
 @interface DFSwipableSuggestionViewController ()
 
@@ -155,7 +156,9 @@
 
 - (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
         buttonSelected:(UIButton *)button
+                   isSwipe:(BOOL)isSwipe
 {
+  NSString *logResult;
   if (button == self.swipableButtonView.yesButton && self.yesButtonHandler) {
     if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
       self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
@@ -166,9 +169,16 @@
         [self.suggestionContentView dismissAddPeoplePopup];
       });
     }
+    logResult = @"send";
   }
-  else if (button == self.swipableButtonView.noButton && self.noButtonHandler)
+  else if (button == self.swipableButtonView.noButton && self.noButtonHandler) {
     self.noButtonHandler(self.suggestionFeedObject);
+    logResult = @"skip";
+  }
+  
+  [DFAnalytics logOutgoingCardProcessedWithSuggestion:self.suggestionFeedObject
+                                               result:logResult
+                                           actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
 }
 
 - (IBAction)addPersonButtonPressed:(id)sender {

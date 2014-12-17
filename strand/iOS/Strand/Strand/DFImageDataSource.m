@@ -164,13 +164,8 @@ NSUInteger const SectionSpread = 5;
   if (self.showActionsBadge) {
     NSArray *likes = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
     NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
-    NSArray *unreadNotifs = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-    NSUInteger unreadLikes = 0;
-    NSUInteger unreadComments = 0;
-    for (DFPeanutAction *action in photoObject.actions) {
-      if ([unreadNotifs containsObject:action] && action.action_type == DFPeanutActionComment) unreadComments++;
-      else if ([unreadNotifs containsObject:action] && action.action_type == DFPeanutActionFavorite) unreadLikes++;
-    }
+    NSUInteger unreadLikes = [[photoObject unreadActionsOfType:DFPeanutActionFavorite] count];
+    NSUInteger unreadComments = [[photoObject unreadActionsOfType:DFPeanutActionComment] count];
     
     [cell setNumLikes:likes.count numComments:comments.count
        numUnreadLikes:unreadLikes numUnreadComments:unreadComments];

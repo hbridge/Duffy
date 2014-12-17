@@ -14,6 +14,7 @@
 
 @interface DFAnalytics : NSObject
 
+extern NSString * const DFAnalyticsActionTypeTap;
 extern NSString * const DFAnalyticsActionTypeSwipe;
 extern NSString* const DFAnalyticsValueResultSuccess;
 extern NSString* const DFAnalyticsValueResultFailure;
@@ -58,17 +59,10 @@ disappearedWithParameters:(NSDictionary *)params;
                              numPhotosSelected:(NSUInteger)numPhotos
                              numPeopleSelected:(NSUInteger)numPeople
                                      extraInfo:(NSDictionary *)extraInfo;
-+ (void)logSuggestionActionTaken:(DFPeanutFeedObject *)suggestion
-                          action:(NSString *)action;
-
-/* Match photos */
-+ (void)logMatchPhotos:(DFPeanutFeedObject *)inviteObject
-     withMatchedPhotos:(NSArray *)matchedPhotos
-        selectedPhotos:(NSArray *)pickedPhotos
-                result:(NSString *)result;
 
 /* Log camera and photo actions */
 + (void)logPhotoActionTaken:(DFPeanutActionType)action
+         fromViewController:(UIViewController *)viewController
                      result:(NSString *)result
                 photoObject:(DFPeanutFeedObject *)photo
                 postsObject:(DFPeanutFeedObject *)postsObject;
@@ -85,7 +79,6 @@ disappearedWithParameters:(NSDictionary *)params;
 + (void)logNotificationViewItemOpened:(NSString *)type notifDate:(NSDate *)notifDate;
 
 /* Inviting */
-
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
 
@@ -95,6 +88,30 @@ disappearedWithParameters:(NSDictionary *)params;
 /* external urls */
 + (void)logURLOpenedAppWithURL:(NSURL *)url
                    otherParams:(NSDictionary *)otherParams;
+
+/* Card processing */
++ (void)logIncomingCardProcessedWithResult:(NSString *)result
+                               actionType:(NSString *)actionType;
++ (void)logOutgoingCardProcessedWithSuggestion:(DFPeanutFeedObject *)suggestion
+                                        result:(NSString *)result
+                               actionType:(NSString *)actionType;
+
++ (void)logHomeButtonTapped:(NSString *)buttonName
+         incomingBadgeCount:(NSUInteger)incomingCount
+         outgoingBadgeCount:(NSUInteger)outgoingCount;
+
++ (void)logOtherCardType:(NSString *)type
+     processedWithResult:(NSString *)result
+              actionType:(NSString *)actionType;
+
+// incoming/outgoing (done)
+// detail photo view (done)
+// top buttons tapped (done)
+// interstitial (
+
+//like and comment origins
+
+
 
 #pragma mark - Utilities
 

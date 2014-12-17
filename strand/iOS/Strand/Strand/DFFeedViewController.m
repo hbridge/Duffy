@@ -412,11 +412,11 @@
        [self setStrandActionsEnabled:YES];
      } failure:^(NSError *error) {
      }];
-    [DFAnalytics
-     logMatchPhotos:self.inviteObject
-     withMatchedPhotos:nil
-     selectedPhotos:nil
-     result:DFAnalyticsValueResultSuccess];
+//    [DFAnalytics
+//     logMatchPhotos:self.inviteObject
+//     withMatchedPhotos:nil
+//     selectedPhotos:nil
+//     result:DFAnalyticsValueResultSuccess];
   } else {
     DFReviewSwapViewController *addPhotosController = [[DFReviewSwapViewController alloc]
                                                       initWithSuggestions:self.suggestionsObject.objects
@@ -457,13 +457,13 @@
 - (void)dismissMatch:(id)sender
 {
   [self dismissViewControllerAnimated:YES completion:nil];
-  NSArray *suggestions = [self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos];
-  [DFAnalytics
-   logMatchPhotos:self.inviteObject
-   withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
-                                      inArrayOfFeedObjects:suggestions]
-   selectedPhotos:nil
-   result:DFAnalyticsValueResultAborted];
+//  NSArray *suggestions = [self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos];
+//  [DFAnalytics
+//   logMatchPhotos:self.inviteObject
+//   withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+//                                      inArrayOfFeedObjects:suggestions]
+//   selectedPhotos:nil
+//   result:DFAnalyticsValueResultAborted];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -565,6 +565,7 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
      
      [DFAnalytics
       logPhotoActionTaken:DFPeanutActionFavorite
+      fromViewController:self
       result:DFAnalyticsValueResultSuccess
       photoObject:photoObject
       postsObject:self.postsObject
@@ -580,6 +581,7 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
      [alert show];
      [DFAnalytics
       logPhotoActionTaken:DFPeanutActionFavorite
+      fromViewController:self
       result:DFAnalyticsValueResultFailure
       photoObject:photoObject
       postsObject:self.postsObject

@@ -8,6 +8,7 @@
 
 #import "DFNoIncomingViewController.h"
 #import "DFTwoLabelView.h"
+#import "DFAnalytics.h"
 
 
 @implementation DFNoIncomingViewController
@@ -33,12 +34,19 @@
 
 - (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
             buttonSelected:(UIButton *)button
+                   isSwipe:(BOOL)isSwipe
 {
+  NSString *result;
   if (button == self.swipableButtonView.yesButton) {
     if (self.yesButtonHandler) self.yesButtonHandler();
+    result = @"yes";
   } else if (button == self.swipableButtonView.noButton) {
     if (self.noButtonHandler) self.noButtonHandler();
+    result = @"no";
   }
+  [DFAnalytics logOtherCardType:@"NoIncomingInterstitial"
+            processedWithResult:result
+                     actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
 }
 
 

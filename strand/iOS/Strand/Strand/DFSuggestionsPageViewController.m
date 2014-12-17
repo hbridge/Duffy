@@ -20,6 +20,7 @@
 #import "DFImageManagerRequest.h"
 #import "DFImageDiskCache.h"
 #import "DFNoIncomingViewController.h"
+#import "DFAnalytics.h"
 
 @interface DFSuggestionsPageViewController ()
 

@@ -11,6 +11,7 @@
 #import "DFPeanutUserObject.h"
 #import "NSString+DFHelpers.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFPeanutNotificationsManager.h"
 
 @implementation DFPeanutFeedObject
 
@@ -234,6 +235,18 @@ static NSArray *FeedObjectTypes;
     }
   }
   return latestAction;
+}
+
+- (NSArray *)unreadActionsOfType:(DFPeanutActionType)actionType
+{
+  NSMutableArray *result = [NSMutableArray new];
+  NSArray *unreadNotifs = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+  for (DFPeanutAction *action in self.actions) {
+    if ([unreadNotifs containsObject:action] && action.action_type == actionType)
+      [result addObject:action];
+  }
+
+  return result;
 }
 
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction

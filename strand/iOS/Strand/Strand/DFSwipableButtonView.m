@@ -145,7 +145,7 @@ const CGFloat RightGestureThreshold = 75.0;
   }
   [self handleDragMoved:translation];
   if (recognizer.state == UIGestureRecognizerStateEnded) {
-    [self handleDragEnded:translation];
+    [self handleDragEnded:translation sender:recognizer];
   }
 }
 
@@ -180,15 +180,15 @@ const CGFloat RightGestureThreshold = 75.0;
     [self.delegate swipableButtonView:self didMovePan:self.panGestureRecognizer translation:translation];
 }
 
-- (void)handleDragEnded:(CGPoint)translation
+- (void)handleDragEnded:(CGPoint)translation sender:(id)sender
 {
   DDLogVerbose(@"finishing point y:%.02f", translation.y);
   if (translation.x < LeftGestureThreshold && self.noEnabled) {
     //left
-    [self handleButtonSelected:self.noButton];
+    [self handleButtonSelected:self.noButton sender:sender];
     return;
   } else if (translation.x > RightGestureThreshold && self.yesEnabled){
-    [self handleButtonSelected:self.yesButton];
+    [self handleButtonSelected:self.yesButton sender:sender];
     return;
   }
   
@@ -243,7 +243,7 @@ const CGFloat RightGestureThreshold = 75.0;
 
 #pragma mark - Selection Handlers
 
-- (void)handleButtonSelected:(UIButton *)button
+- (void)handleButtonSelected:(UIButton *)button sender:(id)sender
 {
   BOOL animate = NO;
   CGRect destFrame = self.centerView.frame;
@@ -264,6 +264,7 @@ const CGFloat RightGestureThreshold = 75.0;
 //                   } completion:^(BOOL finished) {
 //                     [self.delegate swipableButtonImageView:self buttonSelected:button];
 //                   }];
+  BOOL isSwipe = [[sender class] isSubclassOfClass:[UIGestureRecognizer class]];
   if (animate) {
     [UIView animateWithDuration:0.5
                         delay:0
@@ -274,10 +275,12 @@ const CGFloat RightGestureThreshold = 75.0;
                      self.centerView.frame = destFrame;
                      self.centerView.alpha = 0.0;
                    } completion:^(BOOL finished) {
-                     [self.delegate swipableButtonView:self buttonSelected:button];
+                     [self.delegate swipableButtonView:self
+                                        buttonSelected:button
+                                               isSwipe:isSwipe];
                    }];
   } else {
-    [self.delegate swipableButtonView:self buttonSelected:button];
+    [self.delegate swipableButtonView:self buttonSelected:button isSwipe:isSwipe];
   }
 }
 
@@ -286,20 +289,20 @@ const CGFloat RightGestureThreshold = 75.0;
 
 }
 - (IBAction)commentButtonPressed:(id)sender {
-  [self handleButtonSelected:sender];
+  [self handleButtonSelected:sender sender:sender];
 }
 
 - (IBAction)yesButtonPressed:(id)sender {
 //  self.yesButton.enabled = NO;
 //  self.noButton.enabled = NO;
 //  self.otherButton.enabled = NO;
-  [self handleButtonSelected:sender];
+  [self handleButtonSelected:sender sender:sender];
 }
 - (IBAction)noButtonPressed:(id)sender {
 //  self.noButton.enabled = NO;
 //  self.yesButton.enabled = NO;
 //  self.otherButton.enabled = NO;
-  [self handleButtonSelected:sender];
+  [self handleButtonSelected:sender sender:sender];
 }
 
 - (void)layoutSubviews
