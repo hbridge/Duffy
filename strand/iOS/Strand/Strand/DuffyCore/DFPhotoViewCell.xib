@@ -17,12 +17,6 @@
                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="h88-b8-2wa" userLabel="Loading indicator">
                     <rect key="frame" x="50" y="52" width="20" height="20"/>
                 </activityIndicatorView>
-                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Badges Label" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hZx-IC-zZX">
-                    <rect key="frame" x="4" y="103" width="83" height="16"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I8d-Zy-E5C" userLabel="Count Badge View" customClass="LKBadgeView">
                     <rect key="frame" x="97" y="1" width="22" height="20"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -31,13 +25,21 @@
                         <constraint firstAttribute="width" constant="22" id="mP3-aG-Z4F"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JbE-Vh-plj" customClass="DFBadgeView">
+                    <rect key="frame" x="76" y="4" width="40" height="22"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="22" id="PIA-jU-M2z"/>
+                        <constraint firstAttribute="width" priority="100" constant="40" id="xMO-Zm-EFi"/>
+                    </constraints>
+                </view>
             </subviews>
             <constraints>
-                <constraint firstItem="hZx-IC-zZX" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="4" id="Cuk-8i-yjv"/>
+                <constraint firstAttribute="trailing" secondItem="JbE-Vh-plj" secondAttribute="trailing" constant="4" id="8xz-2x-wHv"/>
                 <constraint firstAttribute="centerX" secondItem="h88-b8-2wa" secondAttribute="centerX" id="EiX-RP-7kZ"/>
                 <constraint firstAttribute="trailing" secondItem="2gT-dn-UU6" secondAttribute="trailing" id="P3Z-Ut-YxP"/>
                 <constraint firstAttribute="trailing" secondItem="I8d-Zy-E5C" secondAttribute="trailing" constant="1" id="SL1-Fi-9lH"/>
-                <constraint firstAttribute="bottom" secondItem="hZx-IC-zZX" secondAttribute="bottom" constant="4" id="mKA-Pk-OSO"/>
+                <constraint firstItem="JbE-Vh-plj" firstAttribute="top" secondItem="1" secondAttribute="top" constant="4" id="qM1-fA-lFz"/>
                 <constraint firstAttribute="bottom" secondItem="2gT-dn-UU6" secondAttribute="bottom" id="qgQ-L9-sD2"/>
                 <constraint firstItem="I8d-Zy-E5C" firstAttribute="top" secondItem="1" secondAttribute="top" constant="1" id="r8a-Z7-pCr"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="wIE-LC-HI3"/>
@@ -47,7 +49,7 @@
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
-                <outlet property="badgeLabel" destination="hZx-IC-zZX" id="JwI-L4-3MF"/>
+                <outlet property="badgeView" destination="JbE-Vh-plj" id="8Z0-kC-J3N"/>
                 <outlet property="countBadgeView" destination="I8d-Zy-E5C" id="QX1-Kf-jcb"/>
                 <outlet property="imageView" destination="2gT-dn-UU6" id="nAC-fk-qaT"/>
                 <outlet property="loadingActivityIndicator" destination="h88-b8-2wa" id="3y9-X2-3eS"/>

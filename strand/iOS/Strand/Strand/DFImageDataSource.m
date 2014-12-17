@@ -14,6 +14,7 @@
 #import "DFPhotoStore.h"
 #import "UIDevice+DFHelpers.h"
 #import "DFPeanutNotificationsManager.h"
+#import "DFPeanutAction.h"
 
 @interface DFImageDataSource()
 
@@ -162,9 +163,18 @@ NSUInteger const SectionSpread = 5;
   [self setImageForCell:cell photoObject:photoObject indexPath:indexPath];
   if (self.showActionsBadge) {
     NSArray *likes = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
-        NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
-    [cell setNumLikes:likes.count numComments:comments.count];
-    cell.badgeLabel.hidden = NO;
+    NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
+    NSArray *unreadNotifs = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+    NSUInteger unreadLikes = 0;
+    NSUInteger unreadComments = 0;
+    for (DFPeanutAction *action in photoObject.actions) {
+      if ([unreadNotifs containsObject:action] && action.action_type == DFPeanutActionComment) unreadComments++;
+      else if ([unreadNotifs containsObject:action] && action.action_type == DFPeanutActionFavorite) unreadLikes++;
+    }
+    
+    [cell setNumLikes:likes.count numComments:comments.count
+       numUnreadLikes:unreadLikes numUnreadComments:unreadComments];
+    cell.badgeView.hidden = NO;
   }
   
   if (self.showUnreadNotifsCount) {

@@ -122,6 +122,17 @@ UIColor *DFStrandMainColor;
   return [self strandBlue];
 }
 
++ (UIColor *)alertBackgroundColor
+{
+  return [self strandRed];
+}
+
++ (UIColor *)alertForegroundColor
+{
+  return [UIColor whiteColor];
+}
+
+
 static NSArray *colors;
 
 + (NSArray *)profilePhotoStackColors
@@ -175,7 +186,7 @@ static NSArray *colors;
         defaultStyle[@"photoBadge"] = @{
                                         NSFontAttributeName : [helveticaNeue fontWithSize:11.0],
                                         NSForegroundColorAttributeName : [UIColor whiteColor],
-                                        NSShadowAttributeName : badgeShadow
+                                        NSShadowAttributeName : badgeShadow,
                                         };
       }
       if (helveticaNeueBold) {

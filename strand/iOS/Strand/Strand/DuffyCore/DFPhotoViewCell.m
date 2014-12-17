@@ -32,48 +32,44 @@
     return self;
 }
 
-- (void)setNumLikes:(NSUInteger)numLikes numComments:(NSUInteger)numComments
+
+- (void)setNumLikes:(NSUInteger)numLikes
+        numComments:(NSUInteger)numComments
+     numUnreadLikes:(NSUInteger)numUnreadLikes
+  numUnreadComments:(NSUInteger)numUnreadComments
 {
   if (numLikes == 0 && numComments == 0) {
-    self.badgeLabel.text = nil;
+    self.badgeView.badgeImages = nil;
     return;
   }
   
-  NSString *markup = [NSString stringWithFormat:@"<photoBadge>%@#likes%@#comments</photoBadge>",
-                      numLikes > 0 ? @(numLikes) : @"",
-                      numComments > 0 ? @(numComments) : @""];
-  NSError *error;
-  NSMutableAttributedString *attributedsString = [[SLSMarkupParser
-                                           attributedStringWithMarkup:markup
-                                           style:[DFStrandConstants defaultTextStyle]
-                                           error:&error] mutableCopy];
-  NSRange likesRange = [attributedsString.string rangeOfString:@"#likes"];
-  if (numLikes > 0) {
-    
-    NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-    attachment.bounds = CGRectMake(0, -4, 13.0, 13.0);
-     attachment.image = [[UIImage imageNamed:@"Assets/Icons/LikersListIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [attributedsString replaceCharactersInRange:likesRange
-                           withAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
-  } else {
-    [attributedsString replaceCharactersInRange:likesRange
-                                     withString:@""];
-
+  NSMutableArray *badgeImages = [NSMutableArray new];
+  NSMutableArray *badgeColors = [NSMutableArray new];
+  NSMutableArray *badgeSizes = [NSMutableArray new];
+  
+  if (numUnreadComments > 0) {
+    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/CommentsUnreadIcon"]];
+    [badgeColors addObject:[DFStrandConstants alertBackgroundColor]];
+    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(22.0, 22.0)]];
+  } else if (numComments > 0) {
+    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/CommentsReadIcon"]];
+    [badgeColors addObject:[UIColor whiteColor]];
+    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(13.0, 13.0)]];
   }
   
-  NSRange commentsRange = [attributedsString.string rangeOfString:@"#comments"];
-  if (numComments > 0) {
-    NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-    attachment.bounds = CGRectMake(0, -4, 13.0, 13.0);
-    attachment.image = [[UIImage imageNamed:@"Assets/Icons/CommentersListIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [attributedsString replaceCharactersInRange:commentsRange
-                           withAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
-  } else {
-    [attributedsString replaceCharactersInRange:commentsRange withString:@""];
+  if (numUnreadLikes > 0) {
+    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/LikesUnreadIcon"]];
+    [badgeColors addObject:[DFStrandConstants alertBackgroundColor]];
+    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(22.0, 22.0)]];
+  } else if (numLikes > 0) {
+//    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/LikesReadIcon"]];
+//    [badgeColors addObject:[UIColor whiteColor]];
+//    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(13.0, 13.0)]];
   }
-
   
-  self.badgeLabel.attributedText = attributedsString;
+  self.badgeView.badgeImages = badgeImages;
+  self.badgeView.badgeSizes = badgeSizes;
+  self.badgeView.badgeColors = badgeColors;
 }
 
 @end

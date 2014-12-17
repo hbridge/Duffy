@@ -99,7 +99,7 @@
   
   if ([self.id isEqual:otherAction.id]
       && self.user == otherAction.user
-      && [self.text isEqualToString:otherAction.text]) {
+      && (self.text == otherAction.text || [self.text isEqualToString:otherAction.text])) {
     return YES;
   }
   
