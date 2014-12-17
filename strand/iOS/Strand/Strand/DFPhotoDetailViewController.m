@@ -360,6 +360,7 @@ const NSUInteger CompressedModeMaxRows = 1;
                        comment:(DFPeanutAction *)comment
                      indexPath:(NSIndexPath *)indexPath
 {
+  if (![cell.class isSubclassOfClass:[DFCommentTableViewCell class]]) return;
   UILabel *hideLabel = [[UILabel alloc] init];
   hideLabel.text = @"Delete";
   hideLabel.textColor = [UIColor whiteColor];
