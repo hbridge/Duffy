@@ -11,13 +11,13 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="topLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fre-vW-7O3">
-                    <rect key="frame" x="266" y="259" width="68" height="21"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="900" text="topLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fre-vW-7O3">
+                    <rect key="frame" x="266" y="258" width="68" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="bottomLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cvc-BD-Jj7">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="900" text="bottomLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cvc-BD-Jj7">
                     <rect key="frame" x="251" y="289" width="98" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -26,9 +26,11 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstItem="Fre-vW-7O3" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" priority="250" constant="20" id="H3o-7m-Aca"/>
                 <constraint firstAttribute="centerY" secondItem="cvc-BD-Jj7" secondAttribute="centerY" id="KCU-IV-AJg"/>
                 <constraint firstAttribute="centerX" secondItem="cvc-BD-Jj7" secondAttribute="centerX" id="O2I-Jn-Yhc"/>
                 <constraint firstItem="Fre-vW-7O3" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="ZAI-3R-aF6"/>
+                <constraint firstAttribute="bottom" secondItem="cvc-BD-Jj7" secondAttribute="bottom" priority="250" constant="20" id="hIe-s8-hkY"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="cvc-BD-Jj7" secondAttribute="bottom" constant="10" id="sT3-cx-TZ0"/>
                 <constraint firstItem="cvc-BD-Jj7" firstAttribute="top" secondItem="Fre-vW-7O3" secondAttribute="bottom" constant="10" id="w0G-ke-LW5"/>
                 <constraint firstAttribute="centerX" secondItem="Fre-vW-7O3" secondAttribute="centerX" id="xOz-fj-QoU"/>

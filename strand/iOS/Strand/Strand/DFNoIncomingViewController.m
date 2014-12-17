@@ -20,12 +20,13 @@
   [self configureSwipableButtonView];
   
   DFTwoLabelView *view = [UINib instantiateViewWithClass:[DFTwoLabelView class]];
-  view.frame = self.swipableButtonView.centerView.bounds;
+  view.frame = CGRectMake(0, 0, self.swipableButtonView.centerView.frame.size.width, 24 * 4);
   
+  view.translatesAutoresizingMaskIntoConstraints = NO;
   view.topLabel.text = @"No More Photos To Review";
   view.bottomLabel.text = @"Review Suggestions?";
   
-  view.bottomLabel.font = [UIFont systemFontOfSize:30];
+  view.bottomLabel.font = [UIFont systemFontOfSize:24];
 
   [self.swipableButtonView configureToUseView:view];
 }

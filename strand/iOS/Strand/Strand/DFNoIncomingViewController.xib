@@ -17,14 +17,14 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C3p-V0-JPw" customClass="DFSwipableButtonView">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <rect key="frame" x="0.0" y="200" width="600" height="400"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="C3p-V0-JPw" secondAttribute="trailing" id="4Fv-0J-Ulu"/>
-                <constraint firstItem="C3p-V0-JPw" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="PYa-Wt-oSv"/>
+                <constraint firstItem="C3p-V0-JPw" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="200" id="PYa-Wt-oSv"/>
                 <constraint firstItem="C3p-V0-JPw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="bKl-jq-8VR"/>
                 <constraint firstAttribute="bottom" secondItem="C3p-V0-JPw" secondAttribute="bottom" id="e1E-ZJ-TdG"/>
             </constraints>
