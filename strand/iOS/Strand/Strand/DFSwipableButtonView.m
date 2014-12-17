@@ -18,8 +18,6 @@ const CGFloat RightGestureThreshold = 75.0;
 
 @interface DFSwipableButtonView()
 
-@property (nonatomic, retain) UIDynamicAnimator *animator;
-@property (nonatomic, retain) DFSpringAttachmentBehavior *springBehavior;
 @property (nonatomic) CGPoint originalCenter;
 @property (nonatomic) CGPoint lastPoint;
 @property (nonatomic) CGFloat lastVelocity;
@@ -63,7 +61,6 @@ const CGFloat RightGestureThreshold = 75.0;
   [super awakeFromNib];
   _yesEnabled = YES;
   _noEnabled = YES;
-  self.animator = [[UIDynamicAnimator alloc] initWithReferenceView:self];
   self.originalCenter = self.centerView.center;
   self.centerView.layer.cornerRadius = 3.0;
   self.centerView.layer.masksToBounds = YES;
@@ -141,10 +138,6 @@ const CGFloat RightGestureThreshold = 75.0;
 
 - (void)handleDragBegan:(CGPoint)translation
 {
-  if (self.springBehavior) {
-    [self.animator removeBehavior:self.springBehavior];
-    self.springBehavior = nil;
-  }
   self.lastPoint = translation;
   
   if ([self.delegate respondsToSelector:@selector(swipableButtonView:didBeginPan:translation:)])
@@ -185,10 +178,13 @@ const CGFloat RightGestureThreshold = 75.0;
     [self handleButtonSelected:self.yesButton];
     return;
   }
+  
+  [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.3 initialSpringVelocity:self.lastVelocity options:UIViewAnimationOptionCurveEaseOut animations:^{
+    self.centerView.center = self.originalCenter;
+  } completion:^(BOOL finished) {
     
-  self.springBehavior = [[DFSpringAttachmentBehavior alloc]
-                         initWithAnchorPoint:self.originalCenter attachedView:self.centerView];
-  [self.animator addBehavior:self.springBehavior];
+  }];
+    
   [self unhighlightAllButtons];
   
   if ([self.delegate respondsToSelector:@selector(swipableButtonView:didEndPan:translation:)])
