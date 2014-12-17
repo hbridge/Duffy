@@ -329,7 +329,7 @@ static BOOL showFilters = NO;
     badgeView.textColor = [UIColor whiteColor];
   }
   if (numToReview > 0) {
-    self.reviewBadgeView.text = [@(numToReview) stringValue];
+    self.reviewBadgeView.text = [@(MIN(numToReview, 99)) stringValue];
     self.reviewBadgeView.hidden = NO;
     [self.reviewButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeInboxHighlighted"] forState:UIControlStateNormal];
   } else {
