@@ -880,18 +880,16 @@ def swaps(request):
 			"""
 			# Last resort, try throwing in recent photos
 			if len(responseObjects) < 3:
-				# Grab all the latest strands
-				strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).order_by('-first_photo_time')[:20]
+				now = datetime.datetime.utcnow()
+				lower = now - datetime.timedelta(days=7)
 
-				timedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=neighborStrandsByStrandId,  neighborUsersByStrandId = neighborUsersByStrandId, locationRequired=False, requireInterestedUsers=False)
-				timedSuggestions = sorted(timedSuggestions, key=lambda x: x['time_taken'], reverse=True)
+				lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
+				rankNum += len(lastWeekObjects)
+			
+				for objects in lastWeekObjects:
+					if objects['id'] not in inviteObjectIds:
+						responseObjects.append(objects)
 
-				for suggestion in timedSuggestions:
-					suggestion['suggestion_rank'] = rankNum
-					suggestion['suggestion_type'] = "recent-photos"
-					suggestion['title'] = "%s" % (api_util.prettyDate(suggestion['time_taken']))
-					rankNum += 1
-					responseObjects.append(suggestion)
 				printStats("swaps-recent-photos")
 		response['objects'] = responseObjects
 	else:
