@@ -257,6 +257,12 @@ const NSUInteger CompressedModeMaxRows = 1;
     self.imageView.frame = frame;
   }
   
+  if (self.compressedModeEnabled) {
+    self.imageView.layer.cornerRadius = 4.0;
+    self.imageView.layer.masksToBounds = YES;
+  }
+
+  
   self.addPersonButton.hidden = self.compressedModeEnabled;
   self.tableView.separatorStyle = self.compressedModeEnabled ? UITableViewCellSeparatorStyleNone : UITableViewCellSeparatorStyleSingleLine;
   [self configureToolbarHidden];

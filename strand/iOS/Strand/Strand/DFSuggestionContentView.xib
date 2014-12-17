@@ -38,7 +38,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7AH-le-Yhh">
-                    <rect key="frame" x="48" y="95" width="505" height="505"/>
+                    <rect key="frame" x="58" y="95" width="485" height="485"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="7AH-le-Yhh" secondAttribute="height" multiplier="1:1" id="QBy-fh-BaE"/>
                     </constraints>
@@ -58,7 +58,7 @@
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="PWh-IR-G1U"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="top" secondItem="wuM-t7-6bp" secondAttribute="bottom" constant="8" id="jbU-R6-ZCj"/>
                 <constraint firstItem="7AH-le-Yhh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" id="jfS-7P-WCj"/>
-                <constraint firstAttribute="bottom" secondItem="7AH-le-Yhh" secondAttribute="bottom" priority="100" id="k8Z-3r-QkV"/>
+                <constraint firstAttribute="bottom" secondItem="7AH-le-Yhh" secondAttribute="bottom" constant="20" id="k8Z-3r-QkV"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="centerY" secondItem="z8y-4t-v0a" secondAttribute="centerY" constant="0.5" id="mgq-3u-La0"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="top" secondItem="wuM-t7-6bp" secondAttribute="bottom" constant="8" id="ukw-aG-KEA"/>
             </constraints>
