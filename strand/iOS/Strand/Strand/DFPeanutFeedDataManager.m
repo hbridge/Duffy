@@ -376,7 +376,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)unevaluatedPhotosFromOtherUsers
 {
-  NSMutableArray *result = [NSMutableArray new];
+  NSMutableOrderedSet *result = [NSMutableOrderedSet new];
   for (DFPeanutUserObject *user in self.friendsList) {
     NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
     for (DFPeanutFeedObject *strandPosts in strands) {
@@ -388,7 +388,7 @@ static DFPeanutFeedDataManager *defaultManager;
       }
     }
   }
-  return result;
+  return [result array];
 }
 
 
