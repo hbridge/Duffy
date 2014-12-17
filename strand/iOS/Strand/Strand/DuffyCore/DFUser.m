@@ -137,6 +137,9 @@ static DFUser *currentUser;
 #ifdef DEBUG
   return YES;
 #else
+  if ([self.phoneNumberString isEqualToString:@"+19172827255"]
+      || [self.phoneNumberString isEqualToString:@"+16505759014"]
+      || [self.phoneNumberString isEqualToString:@"+16508158274"]) return YES;
   return NO;
 #endif
 }
