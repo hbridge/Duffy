@@ -9,11 +9,9 @@
 #import "DFSwipableSuggestionViewController.h"
 #import "DFNavigationController.h"
 #import "DFImageManager.h"
-#import <MMPopLabel/MMPopLabel.h>
 
 @interface DFSwipableSuggestionViewController ()
 
-@property (nonatomic, retain) MMPopLabel *selectPeoplePopLabel;
 
 @end
 
@@ -36,11 +34,11 @@
 {
   if (self.nuxStep == 0) {
     [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
-                                     pointSize:self.swipableButtonView.centerView.frame.size
+                                     pointSize:self.suggestionContentView.imageView.frame.size
                                    contentMode:DFImageRequestContentModeAspectFill
                                   deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
                                     dispatch_async(dispatch_get_main_queue(), ^{
-                                      self.swipableButtonView.imageView.image = image;
+                                      self.suggestionContentView.imageView.image = image;
                                     });
                                   }];
   }
@@ -49,10 +47,10 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  [self configureSuggestionContentView];
   if (self.suggestionFeedObject)
     [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
   
-  [self configurePopLabel];
   [self configureSwipableButtonView];
   
   [self.swipableButtonView configureToUseImage];
@@ -63,15 +61,26 @@
   
   [self configurePeopleLabel];
   
-  self.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
-  self.profileStackView.backgroundColor = [UIColor clearColor];
+  self.suggestionContentView.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
+  self.suggestionContentView.profileStackView.backgroundColor = [UIColor clearColor];
+}
+
+- (void)configureSuggestionContentView
+{
+  if (!self.suggestionContentView) self.suggestionContentView =
+    [UINib instantiateViewWithClass:[DFSuggestionContentView class]];
+  self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
+  DFSwipableSuggestionViewController __weak *weakSelf = self;
+  self.suggestionContentView.addHandler = ^{
+    [weakSelf addPersonButtonPressed:weakSelf.suggestionContentView.addButton];
+  };
 }
 
 - (void)configureNuxStep:(NSUInteger)nuxStep
 {
-  self.addRecipientButton.hidden = YES;
-  self.profileStackView.maxAbbreviationLength = 2;
-  [self.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+  self.suggestionContentView.addButton.hidden = YES;
+  self.suggestionContentView.profileStackView.maxAbbreviationLength = 2;
+  [self.suggestionContentView.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
   
   UIImage *nuxImage;
   if (self.nuxStep == 1) {
@@ -81,7 +90,7 @@
     nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
     self.swipableButtonView.yesEnabled = NO;
   }
-  self.swipableButtonView.imageView.image = nuxImage;
+  self.suggestionContentView.imageView.image = nuxImage;
 }
 
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
@@ -89,12 +98,12 @@
   _suggestionFeedObject = suggestionFeedObject;
   if (self.nuxStep == 0) {
     if (self.suggestionFeedObject.actors.count > 0) {
-      self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+      self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
     } else {
       DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
       dummyUser.display_name = @"?";
       dummyUser.phone_number = @"?";
-      self.profileStackView.peanutUsers = @[dummyUser];
+      self.suggestionContentView.profileStackView.peanutUsers = @[dummyUser];
     }
     self.selectedPeanutContacts = [self suggestedPeanutContacts];
   }
@@ -114,13 +123,7 @@
     [button setTitle:nil forState:UIControlStateNormal];
     button.backgroundColor = [UIColor clearColor];
   }
-}
-
-
-- (void)configurePopLabel
-{
-  self.selectPeoplePopLabel = [MMPopLabel popLabelWithText:@"Select people first"];
-  [self.view addSubview:self.selectPeoplePopLabel];
+  [self.swipableButtonView configureToUseView:self.suggestionContentView];
 }
 
 - (void)configurePeopleLabel
@@ -131,14 +134,13 @@
         return [contact firstName];
       }];
       NSString *commaList = [contactNames componentsJoinedByString:@", "];
-      self.peopleLabel.text = [NSString stringWithFormat:@"Send to %@",commaList];
+      self.suggestionContentView.topLabel.text = [NSString stringWithFormat:@"Send to %@",commaList];
     } else {
-      self.peopleLabel.text = @"Pick Recipients";
+      self.suggestionContentView.topLabel.text = @"Pick Recipients";
     }
   } else {
-    self.peopleLabel.text = @"Send to Team Swap";
+    self.suggestionContentView.topLabel.text = @"Send to Team Swap";
   }
-  [self.peopleLabel invalidateIntrinsicContentSize];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -158,10 +160,10 @@
     if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
       self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
     } else {
-      [self.selectPeoplePopLabel popAtView:self.addRecipientButton animatePopLabel:YES animateTargetView:YES];
+      [self.suggestionContentView showAddPeoplePopup];
       [self.swipableButtonView resetView];
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.selectPeoplePopLabel dismiss];
+        [self.suggestionContentView dismissAddPeoplePopup];
       });
     }
   }
@@ -183,7 +185,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   self.selectedPeanutContacts = peanutContacts;
   [self configurePeopleLabel];
-  [self.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
+  [self.suggestionContentView.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
   [self.view setNeedsLayout];
   [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -211,11 +213,8 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   self.suggestionFeedObject = suggestion;
   self.photoFeedObject = photo;
-  
-  if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
-  self.bottomLabel.text = [NSString stringWithFormat:@"Send to %@",
-                           suggestion.actorsString];
-  self.topLabel.text = suggestion.placeAndRelativeTimeString;
+
+  [self configurePeopleLabel];
   
   [self.view setNeedsLayout];
 }

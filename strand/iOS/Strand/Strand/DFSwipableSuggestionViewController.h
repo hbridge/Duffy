@@ -9,18 +9,16 @@
 #import "DFSuggestionViewController.h"
 #import "DFSwipableButtonView.h"
 #import "DFPeoplePickerViewController.h"
+#import "DFSuggestionContentView.h"
 
 @interface DFSwipableSuggestionViewController : DFHomeSubViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 
-@property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
-@property (weak, nonatomic) IBOutlet UILabel *topLabel;
-@property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
+
 @property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
-@property (weak, nonatomic) IBOutlet UIButton *addRecipientButton;
-@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
+@property (nonatomic, strong) DFSuggestionContentView *suggestionContentView;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
