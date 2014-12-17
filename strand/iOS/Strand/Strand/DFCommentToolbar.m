@@ -108,7 +108,7 @@
 
 - (void)editingStartedStopped:(UITextField *)sender
 {
-  
+  [self textChanged:sender];
 }
 
 - (void)setLikeButtonDisabled:(BOOL)likeButtonDisabled

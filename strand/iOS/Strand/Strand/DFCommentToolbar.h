@@ -17,4 +17,6 @@
 @property (nonatomic, retain) UIButton *retainedLikeButton;
 @property (nonatomic) BOOL likeButtonDisabled;
 
+
+- (void)textChanged:(UITextField *)sender;
 @end

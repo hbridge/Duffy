@@ -8,7 +8,6 @@
 
 #import "DFFeedViewController.h"
 #import "DFAnalytics.h"
-#import "DFCommentViewController.h"
 #import "DFImageManager.h"
 #import "DFInviteStrandViewController.h"
 #import "DFNavigationController.h"
@@ -496,10 +495,10 @@
 commentButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
 {
   DDLogVerbose(@"Comment button for %@ pressed", photoObject);
-  DFCommentViewController *cvc = [[DFCommentViewController alloc]
-                                  initWithPhotoObject:photoObject
-                                  inPostsObject:self.postsObject];
-  [self.navigationController pushViewController:cvc animated:YES];
+//  DFCommentViewController *cvc = [[DFCommentViewController alloc]
+//                                  initWithPhotoObject:photoObject
+//                                  inPostsObject:self.postsObject];
+//  [self.navigationController pushViewController:cvc animated:YES];
 }
 
 - (void)addComment:(NSNumber *)objectIDNumber commentString:(NSString *)commentString sender:(id)sender

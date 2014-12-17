@@ -15,8 +15,6 @@
 		5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */; };
 		5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */; };
 		5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */; };
-		5A05AD331A114D12003AAE1C /* DFCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A05AD311A114D12003AAE1C /* DFCommentViewController.m */; };
-		5A05AD341A114D12003AAE1C /* DFCommentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */; };
 		5A05AD3D1A115B65003AAE1C /* DFCommentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A05AD3B1A115B65003AAE1C /* DFCommentTableViewCell.m */; };
 		5A05AD3E1A115B65003AAE1C /* DFCommentTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A05AD3C1A115B65003AAE1C /* DFCommentTableViewCell.xib */; };
 		5A05AD431A127EEA003AAE1C /* DFColorPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A05AD411A127EEA003AAE1C /* DFColorPreviewController.m */; };
@@ -334,9 +332,6 @@
 		5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutTrueFalseResponse.m; sourceTree = "<group>"; };
 		5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationStore.h; sourceTree = "<group>"; };
 		5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationStore.m; sourceTree = "<group>"; };
-		5A05AD301A114D12003AAE1C /* DFCommentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCommentViewController.h; sourceTree = "<group>"; };
-		5A05AD311A114D12003AAE1C /* DFCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCommentViewController.m; sourceTree = "<group>"; };
-		5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCommentViewController.xib; sourceTree = "<group>"; };
 		5A05AD3A1A115B65003AAE1C /* DFCommentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCommentTableViewCell.h; sourceTree = "<group>"; };
 		5A05AD3B1A115B65003AAE1C /* DFCommentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCommentTableViewCell.m; sourceTree = "<group>"; };
 		5A05AD3C1A115B65003AAE1C /* DFCommentTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCommentTableViewCell.xib; sourceTree = "<group>"; };
@@ -885,9 +880,6 @@
 		5A05AD3F1A11603B003AAE1C /* Commenting */ = {
 			isa = PBXGroup;
 			children = (
-				5A05AD301A114D12003AAE1C /* DFCommentViewController.h */,
-				5A05AD311A114D12003AAE1C /* DFCommentViewController.m */,
-				5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */,
 				5A05AD3A1A115B65003AAE1C /* DFCommentTableViewCell.h */,
 				5A05AD3B1A115B65003AAE1C /* DFCommentTableViewCell.m */,
 				5A05AD3C1A115B65003AAE1C /* DFCommentTableViewCell.xib */,
@@ -1992,7 +1984,6 @@
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
 				5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
-				5A05AD341A114D12003AAE1C /* DFCommentViewController.xib in Resources */,
 				5AF499141A3FA4EF000CF9DB /* DFCommentToolbar.xib in Resources */,
 				5A4C820B19EDBADC00C22A12 /* DFSwapUpsellView.xib in Resources */,
 				5ABD83611A13EBD500A4A7D6 /* DFGalleryViewController.xib in Resources */,
@@ -2195,7 +2186,6 @@
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */,
 				65232E9919EC90CD00F3832A /* DFSingleFriendViewController.m in Sources */,
-				5A05AD331A114D12003AAE1C /* DFCommentViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */,
 				65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */,

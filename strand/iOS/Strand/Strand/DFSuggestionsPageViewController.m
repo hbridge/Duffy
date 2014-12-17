@@ -17,7 +17,6 @@
 #import "DFUploadController.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFDefaultsStore.h"
-#import "DFCommentViewController.h"
 #import "DFImageManagerRequest.h"
 #import "DFImageDiskCache.h"
 #import "DFNoIncomingViewController.h"
@@ -489,10 +488,10 @@ const NSUInteger NumNuxes = 3;
 {
   DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strand];
   DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photo inStrand:strand];
-  DFCommentViewController *cvc = [[DFCommentViewController alloc]
+  DFPhotoDetailViewController *pdvc = [[DFPhotoDetailViewController alloc]
                                   initWithPhotoObject:photoObject
                                   inPostsObject:strandPosts];
-  [DFNavigationController presentWithRootController:cvc
+  [DFNavigationController presentWithRootController:pdvc
                                            inParent:self
                                 withBackButtonTitle:@"Close"];
   

@@ -71,6 +71,7 @@
   self.photoDetailViewController = pdvc;
   self.photoDetailViewController.compressedModeEnabled = YES;
   self.photoDetailViewController.view.translatesAutoresizingMaskIntoConstraints = NO;
+  self.photoDetailViewController.disableKeyboardHandler = YES;
 }
 
 - (void)configureSwipableButtonView

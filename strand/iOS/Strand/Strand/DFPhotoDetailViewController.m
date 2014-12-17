@@ -12,23 +12,42 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFInviteStrandViewController.h"
 #import "DFNavigationController.h"
+#import "DFPeanutActionAdapter.h"
+#import "DFAlertController.h"
+#import "DFCommentTableViewCell.h"
+#import "DFAnalytics.h"
+#import "DFButtonTableViewCell.h"
+#import "DFNoResultsTableViewCell.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import <SVProgressHUD/SVProgressHUD.h>
+
+const NSUInteger CompressedModeMaxRows = 1;
 
 @interface DFPhotoDetailViewController ()
 
 @property (nonatomic) DFActionID userLikeActionID;
+@property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
+@property (nonatomic, retain) NSMutableArray *comments;
+@property (nonatomic, retain) DFCommentTableViewCell *templateCell;
+@property (nonatomic, retain) DFAlertController *alertController;
 
 @end
 
 @implementation DFPhotoDetailViewController
 
+@synthesize actionAdapter = _actionAdapter;
 @synthesize userLikeActionID = _userLikeActionID;
 
 
-- (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject inPostsObject:(DFPeanutFeedObject *)postsObject
+- (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject
+                      inPostsObject:(DFPeanutFeedObject *)postsObject
 {
-  self = [super initWithPhotoObject:photoObject inPostsObject:postsObject];
+  self = [super init];
   if (self) {
-    self.openKeyboardOnAppear = NO;
+    _openKeyboardOnAppear = NO;
+    _photoObject = photoObject;
+    _postsObject = postsObject;
+    _templateCell = [DFCommentTableViewCell templateCell];
     _userLikeActionID = [[[self.photoObject userFavoriteAction] id] longLongValue];
   }
   return self;
@@ -46,18 +65,71 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  [self configureTableView:self.tableView];
+  [self textDidChange:self.commentToolbar.textField];
+  [self configureTouchTableViewGesture];
   [self configureProfileWithContext];
   [self configureCommentToolbar];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  
+  if (self.openKeyboardOnAppear) {
+    [self scrollToLast];
+    [self.commentToolbar.textField becomeFirstResponder];
+  }
+  // mark the action IDs for the photo object seen
   NSArray *actionIDs = [self.photoObject.actions arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
     return action.id;
   }];
-  
   [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
+  
+  [DFAnalytics logViewController:self
+          appearedWithParameters:@{
+                                   @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count]
+                                   }];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [super viewWillDisappear:animated];
+  
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+
+#pragma mark - View Configuration
+
+- (void)configureTableView:(UITableView *)tableView
+{
+  self.tableView.dataSource = self;
+  self.tableView.delegate = self;
+  [tableView registerNib:[UINib nibForClass:[DFCommentTableViewCell class]]
+  forCellReuseIdentifier:@"cell"];
+  [tableView registerNib:[UINib nibForClass:[DFButtonTableViewCell class]]
+  forCellReuseIdentifier:@"buttonCell"];
+  [tableView registerNib:[UINib nibForClass:[DFNoResultsTableViewCell class]]
+  forCellReuseIdentifier:@"noResults"];
+  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.commentToolbar.frame.size.height * 2.0, 0);
+  self.tableView.separatorInset = [DFCommentTableViewCell edgeInsets];
+}
+
+- (void)configureTouchTableViewGesture
+{
+  UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc]
+                                                  initWithTarget:self
+                                                  action:@selector(tapRecognizerChanged:)];
+  tapGestureRecognizer.cancelsTouchesInView = NO;
+  [self.tableView addGestureRecognizer:tapGestureRecognizer];
+  
 }
 
 - (void)didReceiveMemoryWarning {
@@ -107,13 +179,16 @@
 - (void)configureCommentToolbar
 {
   if (self.nuxStep) [self.commentToolbar removeFromSuperview];
-  self.textField = self.commentToolbar.textField;
   [self.commentToolbar.profileStackView setPeanutUser:[[DFUser currentUser] peanutUser]];
   [self setLikeBarButtonItemOn:(self.userLikeActionID > 0)];
   [self.commentToolbar.likeButton addTarget:self
                                      action:@selector(likeItemPressed:)
                            forControlEvents:UIControlEventTouchUpInside];
+  [self.commentToolbar.textField addTarget:self
+                     action:@selector(editingStartedOrStopped:)
+           forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
   self.commentToolbar.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+  
   [self.commentToolbar.sendButton
    addTarget:self
    action:@selector(sendButtonPressed:)
@@ -131,19 +206,25 @@
   }
 }
 
+- (void)setCompressedModeEnabled:(BOOL)compressedModeEnabled
+{
+  _compressedModeEnabled = compressedModeEnabled;
+  [self.view setNeedsLayout];
+  [self.tableView reloadData];
+}
+
 - (void)setCommentsExpanded:(BOOL)commentsExpanded
 {
-  [super setCommentsExpanded:commentsExpanded];
+  _commentsExpanded = commentsExpanded;
   [self configureToolbarHidden];
+  [self.tableView reloadData];
 }
 
 - (void)configureToolbarHidden
 {
   if (self.compressedModeEnabled && [self tableView:self.tableView numberOfRowsInSection:0] == 2 && !self.commentsExpanded) {
-    //self.commentToolbarHeightConstraint.constant = 0;
     self.commentToolbar.hidden = YES;
   } else {
-    //self.commentToolbarHeightConstraint.constant = 52;
     self.commentToolbar.hidden = NO;
   }
 }
@@ -197,6 +278,110 @@
   [self.tableView setTableHeaderView:self.imageView];
 }
 
+#pragma mark - UITableView Delegate/Datasource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+  return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+  NSUInteger numRows;
+  if (self.compressedModeEnabled && !self.commentsExpanded) {
+    numRows = MIN([[self comments] count], CompressedModeMaxRows + 1);
+  } else {
+    numRows = [[self comments] count];
+  }
+  return MAX(numRows, 1);
+}
+
+- (NSArray *)comments
+{
+  if (!_comments) {
+    _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
+  }
+  return _comments;
+}
+
+- (BOOL)isShowMoreRow:(NSIndexPath *)indexPath
+{
+  return (self.compressedModeEnabled && indexPath.row == CompressedModeMaxRows && !self.commentsExpanded);
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if  ([self isShowMoreRow:indexPath]) {
+    DFButtonTableViewCell *buttonCell = [self.tableView dequeueReusableCellWithIdentifier:@"buttonCell"];
+    NSString *title = [NSString stringWithFormat:@"Show %@ more comments",
+                       @([[self comments] count] - CompressedModeMaxRows)];
+    [buttonCell.button setTitle:title forState:UIControlStateNormal];
+    return buttonCell;
+  }
+  DFCommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+  
+  if ([[self comments] count] == 0) {
+    DFNoResultsTableViewCell *noResults = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
+    noResults.noResultsLabel.text = @"No Comments Yet";
+    return noResults;
+  }
+  DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
+  [cell.profilePhotoStackView setPeanutUser:[self.postsObject actorWithID:comment.user]];
+  cell.nameLabel.text = [comment fullNameOrYou];
+  cell.commentLabel.text = comment.text;
+  cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:comment.time_stamp
+                                                               abbreviate:YES];
+  
+  
+  if (comment.user == [[DFUser currentUser] userID]) {
+    [self addDeleteActionForCell:cell
+                         comment:comment
+                       indexPath:indexPath];
+  }
+  
+  if (!cell) [NSException raise:@"nil cell" format:@"nil cell"];
+  return cell;
+}
+
+- (void)addDeleteActionForCell:(DFCommentTableViewCell *)cell
+                       comment:(DFPeanutAction *)comment
+                     indexPath:(NSIndexPath *)indexPath
+{
+  UILabel *hideLabel = [[UILabel alloc] init];
+  hideLabel.text = @"Delete";
+  hideLabel.textColor = [UIColor whiteColor];
+  [hideLabel sizeToFit];
+  [cell
+   setSwipeGestureWithView:hideLabel
+   color:[UIColor redColor]
+   mode:MCSwipeTableViewCellModeExit
+   state:MCSwipeTableViewCellState3
+   completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+     [self.commentToolbar.textField resignFirstResponder];
+     self.alertController = [DFAlertController alertControllerWithTitle:@"Delete this comment?"
+                                                                message:nil
+                                                         preferredStyle:DFAlertControllerStyleActionSheet];
+     [self.alertController addAction:[DFAlertAction
+                                      actionWithTitle:@"Delete"
+                                      style:DFAlertActionStyleDestructive
+                                      handler:^(DFAlertAction *action) {
+                                        [self deleteComment:comment];
+                                      }]];
+     [self.alertController addAction:[DFAlertAction
+                                      actionWithTitle:@"Cancel"
+                                      style:DFAlertActionStyleCancel
+                                      handler:^(DFAlertAction *action) {
+                                        [cell swipeToOriginWithCompletion:nil];
+                                      }]];
+     [self.alertController showWithParentViewController:self animated:YES completion:nil];
+   }];
+  // the default color is the color that appears before you swipe far enough for the action
+  // we set to the group tableview background color to blend in
+  cell.defaultColor = [UIColor lightGrayColor];
+}
+
+#pragma mark - Actions
+
 - (IBAction)likeItemPressed:(id)sender {
   BOOL newLikeValue = (self.userLikeActionID == 0);
   DFActionID oldID = self.userLikeActionID;
@@ -234,6 +419,208 @@
 {
   _userLikeActionID = userLikeActionID;
   [self configureCommentToolbar];
+}
+
+- (void)deleteComment:(DFPeanutAction *)comment
+{
+  NSUInteger commentIndex = [self.comments indexOfObject:comment];
+  if (commentIndex == NSNotFound) {
+    [SVProgressHUD showErrorWithStatus:@"Could not delete"];
+    return;
+  }
+  NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentIndex inSection:0];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.tableView beginUpdates];
+    [self.comments removeObject:comment];
+    if (self.comments.count > 0) {
+      [self.tableView deleteRowsAtIndexPaths:@[indexPath]
+                            withRowAnimation:UITableViewRowAnimationFade];
+    } else {
+      [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
+    [self.tableView endUpdates];
+  });
+  
+  [self.actionAdapter removeAction:comment success:^(NSArray *resultObjects) {
+    DDLogInfo(@"%@ successfully removed action: %@", self.class, comment);
+    [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+  } failure:^(NSError *error) {
+    DDLogError(@"%@ failed to remove action: %@", self.class, error);
+    [SVProgressHUD showErrorWithStatus:@"Failed to delete comment"];
+  }];
+}
+
+- (IBAction)sendButtonPressed:(id)sender {
+  if (self.commentToolbar.textField.text.length == 0) return;
+  DFPeanutAction *action = [[DFPeanutAction alloc] init];
+  action.user = [[DFUser currentUser] userID];
+  action.action_type = DFPeanutActionComment;
+  action.text = self.commentToolbar.textField.text;
+  action.photo = self.photoObject.id;
+  action.strand = self.postsObject.id;
+  action.time_stamp = [NSDate date];
+  
+  [self addComment:action];
+  self.commentToolbar.textField.text = @"";
+  [self.commentToolbar textChanged:self.commentToolbar.textField];
+  DFPhotoDetailViewController __weak *weakSelf = self;
+  [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
+    DDLogInfo(@"%@ adding comment succeeded:%@", weakSelf.class, resultObjects);
+    DFPeanutAction *newComment = [resultObjects firstObject];
+    NSInteger commentWithNoIDIndex = [weakSelf.comments indexOfObject:action];
+    [weakSelf.comments replaceObjectAtIndex:commentWithNoIDIndex withObject:newComment];
+    // replace the delete action on the cell
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentWithNoIDIndex inSection:0];
+    DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
+    [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+    
+    [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
+                              result:DFAnalyticsValueResultSuccess
+                         photoObject:weakSelf.photoObject
+                         postsObject:weakSelf.postsObject];
+  } failure:^(NSError *error) {
+    DDLogError(@"%@ adding comment error:%@", weakSelf.class, error);
+    [weakSelf showCommentError:action];
+    [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
+                              result:DFAnalyticsValueResultFailure
+                         photoObject:weakSelf.photoObject
+                         postsObject:weakSelf.postsObject];
+  }];
+}
+
+
+- (void)addComment:(DFPeanutAction *)action
+{
+  [self.tableView beginUpdates];
+  
+  if (self.comments.count == 0)
+  {
+    [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]]
+                          withRowAnimation:UITableViewRowAnimationFade];
+  }
+  
+  [self.tableView
+   insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.comments.count inSection:0]]
+   withRowAnimation:UITableViewRowAnimationFade];
+  [self.comments addObject:action];
+  [self.tableView endUpdates];
+  
+  
+  [self scrollToLast];
+}
+
+- (void)showCommentError:(DFPeanutAction *)action
+{
+  [SVProgressHUD showErrorWithStatus:@"Posting comment failed."];
+}
+
+- (IBAction)textDidChange:(UITextField *)sender {
+  if (sender.text.length > 0) {
+    self.commentToolbar.sendButton.enabled = YES;
+  } else {
+    self.commentToolbar.sendButton.enabled = NO;
+  }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if ([self isShowMoreRow:indexPath]) {
+    self.commentsExpanded = YES;
+    [self.tableView reloadData];
+  }
+}
+
+- (void)scrollToLast
+{
+  if (self.comments.count > 0) {
+    DFPhotoDetailViewController __weak *weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [weakSelf.tableView
+       scrollToRowAtIndexPath:[NSIndexPath
+                               indexPathForRow:weakSelf.comments.count-1 inSection:0]
+       atScrollPosition:UITableViewScrollPositionTop
+       animated:YES];
+    });
+  }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  return 69.0;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if ([[self comments] count] == 0) {
+    return [DFNoResultsTableViewCell desiredHeight];
+  }
+  DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
+  self.templateCell.commentLabel.text = comment.text;
+  return self.templateCell.rowHeight;
+}
+
+
+#pragma mark - State changes
+
+
+- (void)editingStartedOrStopped:(UITextField *)sender
+{
+  self.commentsExpanded = sender.isFirstResponder;
+  if (sender.isFirstResponder)
+    [self scrollToLast];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+  DDLogVerbose(@"dragging");
+  [self.commentToolbar.textField resignFirstResponder];
+}
+
+- (void)tapRecognizerChanged:(UITapGestureRecognizer *)tapRecognizer
+{
+  DDLogVerbose(@"tableview tapped");
+  [self.commentToolbar.textField resignFirstResponder];
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+  [self updateFrameFromKeyboardNotif:notification];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+  [self updateFrameFromKeyboardNotif:notification];
+}
+
+- (void)updateFrameFromKeyboardNotif:(NSNotification *)notification
+{
+  if (self.disableKeyboardHandler) return;
+  //CGRect keyboardStartFrame = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+  CGRect keyboardEndFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+  CGFloat keyboardEndBottomDistance = self.view.frame.size.height - CGRectGetMinY(keyboardEndFrame);
+
+  self.contentBottomConstraint.constant = keyboardEndBottomDistance;
+  [self.view setNeedsUpdateConstraints];
+  
+  NSNumber *duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey];
+  NSNumber *animatinoCurve = notification.userInfo[UIKeyboardAnimationCurveUserInfoKey];
+  
+  [self.view setNeedsLayout];
+  [UIView
+   animateWithDuration:duration.floatValue
+   delay:0.0
+   options:animatinoCurve.integerValue
+   animations:^{
+     [self.view layoutIfNeeded];
+   } completion:^(BOOL finished) {
+     
+   }];
+}
+
+#pragma mark - Adapters
+
+- (DFPeanutActionAdapter *)actionAdapter
+{
+  if (!_actionAdapter) _actionAdapter = [[DFPeanutActionAdapter alloc] init];
+  return _actionAdapter;
 }
 
 @end
