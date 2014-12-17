@@ -131,6 +131,7 @@
 
 - (void)setBadgeImage:(UIImage *)badgeImage forUser:(DFPeanutUserObject *)user
 {
+  if (!user) return;
   if (!self.badgeImagesById) self.badgeImagesById = [NSMutableDictionary new];
   if (badgeImage) {
     self.badgeImagesById[[self.class idForUser:user]] = badgeImage;
