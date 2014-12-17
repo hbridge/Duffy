@@ -104,14 +104,6 @@ disappearedWithParameters:(NSDictionary *)params;
      processedWithResult:(NSString *)result
               actionType:(NSString *)actionType;
 
-// incoming/outgoing (done)
-// detail photo view (done)
-// top buttons tapped (done)
-// interstitial (
-
-//like and comment origins
-
-
 
 #pragma mark - Utilities
 
