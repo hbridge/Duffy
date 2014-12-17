@@ -62,13 +62,26 @@ const CGFloat RightGestureThreshold = 75.0;
   _yesEnabled = YES;
   _noEnabled = YES;
   self.originalCenter = self.centerView.center;
-  self.centerView.layer.cornerRadius = 3.0;
-  self.centerView.layer.masksToBounds = YES;
+  [self configureCenterViewLayer];
   
   for (UIButton *button in [self allButtons]) {
     button.layer.cornerRadius = button.frame.size.height / 2.0;
     button.layer.masksToBounds = YES;
   }
+}
+
+- (void)configureCenterViewLayer
+{
+  self.centerView.backgroundColor = [UIColor whiteColor];
+  self.centerView.layer.cornerRadius = 3.0;
+  self.centerView.layer.masksToBounds = NO;
+  
+  self.centerView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+  self.centerView.layer.borderWidth = 0.5;
+  self.centerView.layer.shadowColor = [[UIColor colorWithWhite:0 alpha:0.3] CGColor];
+  self.centerView.layer.shadowOffset = CGSizeMake(5, 5);
+  self.centerView.layer.shadowOpacity = 0.5;
+
 }
 
 - (void)configureWithShowsOther:(BOOL)showsOther
@@ -312,9 +325,6 @@ const CGFloat RightGestureThreshold = 75.0;
   self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
   [self.centerView addSubview:self.imageView];
   
-  
-  self.centerView.layer.cornerRadius = 4.0;
-  self.centerView.layer.masksToBounds = YES;
   [self.centerView addConstraints:[NSLayoutConstraint
                                                       constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
                                                       options:0
@@ -338,12 +348,12 @@ const CGFloat RightGestureThreshold = 75.0;
   [self.centerView addSubview:view];
   
   [self.centerView addConstraints:[NSLayoutConstraint
-                                   constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
+                                   constraintsWithVisualFormat:@"|-(8)-[banner]-(8)-|"
                                    options:0
                                    metrics:nil
                                    views:@{@"banner" : view}]];
   [self.centerView addConstraints:[NSLayoutConstraint
-                                   constraintsWithVisualFormat:@"V:|-(0)-[banner]-(0)-|"
+                                   constraintsWithVisualFormat:@"V:|-(8)-[banner]-(8)-|"
                                    options:0
                                    metrics:nil
                                    views:@{@"banner" : view}]];
