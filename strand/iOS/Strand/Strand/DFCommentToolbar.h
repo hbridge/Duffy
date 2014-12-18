@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DFProfileStackView.h"
 
-@interface DFCommentToolbar : UIView
+@interface DFCommentToolbar : UIView <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UIButton *likeButton;
@@ -17,6 +17,9 @@
 @property (nonatomic, retain) UIButton *retainedLikeButton;
 @property (nonatomic) BOOL likeButtonDisabled;
 
-
 - (void)textChanged:(UITextField *)sender;
+
+typedef void (^DFCommentToolbarSendBlock)(NSString *text);
+@property (nonatomic, copy) DFCommentToolbarSendBlock sendBlock;
+
 @end

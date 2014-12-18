@@ -19,6 +19,7 @@
   self.sendButton.translatesAutoresizingMaskIntoConstraints = NO;
   [self.sendButton setTitleColor:[DFStrandConstants strandBlue] forState:UIControlStateNormal];
   [self.sendButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+  [self.sendButton addTarget:self action:@selector(sendPressed:) forControlEvents:UIControlEventTouchUpInside];
   [self.textField addTarget:self
                      action:@selector(editingStartedStopped:)
            forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
@@ -26,6 +27,7 @@
                      action:@selector(textChanged:)
            forControlEvents:UIControlEventEditingChanged];
   [self textChanged:self.textField];
+  self.textField.delegate = self;
 }
 
 - (id)awakeAfterUsingCoder:(NSCoder *)aDecoder
@@ -114,6 +116,16 @@
 - (void)setLikeButtonDisabled:(BOOL)likeButtonDisabled
 {
   if (likeButtonDisabled) [self.likeButton removeFromSuperview];
+}
+
+- (IBAction)sendPressed:(id)sender {
+  if (self.sendBlock) self.sendBlock(self.textField.text);
+  [self textChanged:self.textField];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+  [self sendPressed:self.textField];
+  return NO;
 }
 
 - (void)textChanged:(UITextField *)sender

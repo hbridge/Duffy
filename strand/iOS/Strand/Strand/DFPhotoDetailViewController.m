@@ -195,10 +195,11 @@ const NSUInteger CompressedModeMaxRows = 1;
            forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
   self.commentToolbar.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
   
-  [self.commentToolbar.sendButton
-   addTarget:self
-   action:@selector(sendButtonPressed:)
-   forControlEvents:UIControlEventTouchUpInside];
+  DFPhotoDetailViewController __weak *weakSelf = self;
+  self.commentToolbar.sendBlock = ^(NSString *text) {
+    [weakSelf sendComment:text];
+  };
+  
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.commentToolbar.frame.size.height, 0);
   if (self.compressedModeEnabled) self.commentToolbar.likeButtonDisabled = YES;
 }
@@ -465,12 +466,12 @@ const NSUInteger CompressedModeMaxRows = 1;
   }];
 }
 
-- (IBAction)sendButtonPressed:(id)sender {
+- (IBAction)sendComment:(NSString *)comment {
   if (self.commentToolbar.textField.text.length == 0) return;
   DFPeanutAction *action = [[DFPeanutAction alloc] init];
   action.user = [[DFUser currentUser] userID];
   action.action_type = DFPeanutActionComment;
-  action.text = self.commentToolbar.textField.text;
+  action.text = comment;
   action.photo = self.photoObject.id;
   action.strand = self.postsObject.id;
   action.time_stamp = [NSDate date];
