@@ -84,8 +84,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
                                            style:UIBarButtonItemStylePlain target:self
                                            action:@selector(settingsPressed:)];
-    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRedByte:233 green:233 blue:233 alpha:0.6];
-  self.navigationController.navigationBar.translucent = NO;
 }
 
 - (void)configureCollectionView
