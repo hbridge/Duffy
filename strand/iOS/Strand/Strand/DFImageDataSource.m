@@ -164,7 +164,10 @@ NSUInteger const SectionSpread = 5;
   if (self.showActionsBadge) {
     NSArray *likes = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
     NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
-    NSUInteger unreadLikes = [[photoObject unreadActionsOfType:DFPeanutActionFavorite] count];
+    NSUInteger unreadLikes = 0;
+    // only set unread likes badge if the photo is the current user's
+    if (photoObject.user == [[DFUser currentUser] userID])
+      unreadLikes = [[photoObject unreadActionsOfType:DFPeanutActionFavorite] count];
     NSUInteger unreadComments = [[photoObject unreadActionsOfType:DFPeanutActionComment] count];
     
     [cell setNumLikes:likes.count numComments:comments.count
