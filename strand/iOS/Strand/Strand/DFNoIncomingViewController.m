@@ -56,10 +56,10 @@
   [self.swipableButtonView configureWithShowsOther:NO];
   self.swipableButtonView.delegate = self;
   [self.swipableButtonView.yesButton
-   setImage:[UIImage imageNamed:@"Assets/Icons/SendButtonIcon"]
+   setImage:[UIImage imageNamed:@"Assets/Icons/SwipeCheckButton"]
    forState:UIControlStateNormal];
   [self.swipableButtonView.noButton
-   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
+   setImage:[UIImage imageNamed:@"Assets/Icons/SwipeXButton"]
    forState:UIControlStateNormal];
   for (UIButton *button in @[self.swipableButtonView.yesButton, self.swipableButtonView.noButton]) {
     [button setTitle:nil forState:UIControlStateNormal];
