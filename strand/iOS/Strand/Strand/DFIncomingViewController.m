@@ -47,6 +47,7 @@
   
   [self configurePhotoDetailView];
   [self configureSwipableButtonView];
+  self.view.backgroundColor = [UIColor clearColor];
 }
 
 

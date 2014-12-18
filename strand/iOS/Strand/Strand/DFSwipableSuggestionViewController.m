@@ -59,6 +59,7 @@
   if (self.nuxStep > 0) {
     [self configureNuxStep:self.nuxStep];
   }
+  self.view.backgroundColor = [UIColor clearColor];
   
   [self configurePeopleLabel];
   

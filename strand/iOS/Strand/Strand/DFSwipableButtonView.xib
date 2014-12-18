@@ -87,7 +87,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="600" height="505"/>
                 </imageView>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="PRr-q5-rca" secondAttribute="leading" id="4u2-8Q-y44"/>
                 <constraint firstItem="l10-6U-oyL" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="bottom" constant="10" id="5zL-Rm-vdB"/>

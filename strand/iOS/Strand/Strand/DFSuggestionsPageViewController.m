@@ -108,7 +108,7 @@ const NSUInteger NumNuxes = 3;
 - (void)viewDidLoad {
   [super viewDidLoad];
   // Do any additional setup after loading the view.
-  self.view.backgroundColor = [UIColor whiteColor];
+  self.view.backgroundColor = [DFStrandConstants cardPagerBackground];
   [self reloadData];
 }
 
@@ -262,7 +262,9 @@ const NSUInteger NumNuxes = 3;
 - (void)configureLoadingView
 {
   if (self.viewControllers.count == 0) {
-    if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    if (!self.noResultsView) {
+      self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    }
     [self.noResultsView setSuperView:self.view];
     if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
       self.noResultsView.titleLabel.text = @"";
@@ -358,6 +360,9 @@ const NSUInteger NumNuxes = 3;
   if (!_noSuggestionsViewController) {
   _noSuggestionsViewController = [[UIViewController alloc] init];
     DFNoTableItemsView *noSuggestionsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    noSuggestionsView.titleLabel.textColor = [UIColor whiteColor];
+    noSuggestionsView.subtitleLabel.textColor = [UIColor whiteColor];
+
     if (self.preferredType == DFSuggestionViewType) {
       noSuggestionsView.titleLabel.text = @"No More Suggestions";
       noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends.";

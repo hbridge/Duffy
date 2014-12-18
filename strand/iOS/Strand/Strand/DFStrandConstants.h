@@ -61,6 +61,7 @@ extern const CGFloat StrandGalleryHeaderHeight;
 + (UIColor *)alertBackgroundColor;
 + (UIColor *)alertForegroundColor;
 + (UIColor *)unreadNotificationBackgroundColor;
++ (UIColor *)cardPagerBackground;
 
 // for use with Slash
 + (NSDictionary *)defaultTextStyle;

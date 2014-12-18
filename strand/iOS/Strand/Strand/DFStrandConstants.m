@@ -137,6 +137,11 @@ UIColor *DFStrandMainColor;
   return [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
 }
 
++ (UIColor *)cardPagerBackground
+{
+  return [UIColor colorWithRed:47.0/255.0 green:47.0/255.0 blue:47.0/255.0 alpha:1];
+}
+
 
 static NSArray *colors;
 

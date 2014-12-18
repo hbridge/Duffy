@@ -20,7 +20,7 @@
   [self configureSwipableButtonView];
   
   DFTwoLabelView *view = [UINib instantiateViewWithClass:[DFTwoLabelView class]];
-  view.frame = CGRectMake(0, 0, self.swipableButtonView.centerView.frame.size.width, 24 * 4);
+  view.frame = CGRectMake(0, 0, self.swipableButtonView.centerView.frame.size.width, 24 * 3);
   
   view.translatesAutoresizingMaskIntoConstraints = NO;
   view.topLabel.text = @"No More Photos To Review";
