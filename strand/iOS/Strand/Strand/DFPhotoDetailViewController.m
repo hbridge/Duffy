@@ -418,6 +418,17 @@ const NSUInteger CompressedModeMaxRows = 1;
   BOOL newLikeValue = (self.userLikeActionID == 0);
   DFActionID oldID = self.userLikeActionID;
   self.userLikeActionID = newLikeValue;
+  if (newLikeValue) {
+    DFPeanutAction *fakeAction = [[DFPeanutAction alloc] init];
+    fakeAction.action_type = DFPeanutActionFavorite;
+    fakeAction.user = [[DFUser currentUser] userID];
+    self.photoObject.actions = [self.photoObject.actions arrayByAddingObject:fakeAction];
+  } else {
+    DFPeanutAction *oldAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite
+                                                        forUser:[[DFUser currentUser] userID]] firstObject];
+    if (oldAction)
+      self.photoObject.actions = [self.photoObject.actions arrayByRemovingObject:oldAction];
+  }
   [self configureProfileWithContext];
   [[DFPeanutFeedDataManager sharedManager]
    setLikedByUser:newLikeValue
