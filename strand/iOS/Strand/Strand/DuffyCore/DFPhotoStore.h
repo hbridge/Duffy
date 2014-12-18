@@ -81,6 +81,7 @@ typedef enum {
                  withMetadata:(NSDictionary *)metadata
                    completion:(void(^)(NSURL *assetURL, NSError *error))completion;
 
+/* DEPRECATED this method seems to cause crasehs and should be rewritten for iOS8 */
 + (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
                 promptUserIfNecessary:(BOOL)promptUser;
 

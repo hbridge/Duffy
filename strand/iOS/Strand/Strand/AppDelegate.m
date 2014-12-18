@@ -291,13 +291,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
     DDLogInfo(@"%@ became active", [DFAppInfo appInfoString]);
     if ([self isAppSetupComplete]) {
-      // Tell the server what the last photo in our camera roll is
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [DFPhotoStore fetchMostRecentSavedPhotoDate:^(NSDate *timestamp) {
-          DDLogVerbose(@"Setting last photo timestamp to %@", timestamp);
-          [[DFUserInfoManager sharedManager] setLastPhotoTimestamp:timestamp];
-        } promptUserIfNecessary:NO];
-      });
       [[DFCameraRollSyncManager sharedManager] sync];
       [[DFCameraRollSyncManager sharedManager] deletedPhotoSync];
       [[DFContactSyncManager sharedManager] sync];
@@ -492,12 +485,6 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     self.backgroundSyncTotalBytes += sessionStats.numBytesUploaded;
   };
   [[DFCameraRollSyncManager sharedManager] sync];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [DFPhotoStore fetchMostRecentSavedPhotoDate:^(NSDate *timestamp) {
-        DDLogVerbose(@"Setting last photo timestamp to %@", timestamp);
-        [[DFUserInfoManager sharedManager] setLastPhotoTimestamp:timestamp];
-    } promptUserIfNecessary:NO];
-  });
 }
 
 - (void)resetApplication

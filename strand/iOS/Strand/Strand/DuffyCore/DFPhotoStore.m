@@ -729,6 +729,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 + (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
                 promptUserIfNecessary:(BOOL)promptUser
 {
+  DDLogWarn(@"WARNING: %@ fetchMostRecentSavedPhotoDate should be rewritten.", self);
   if ([ALAssetsLibrary authorizationStatus] != ALAuthorizationStatusAuthorized
       && !promptUser) {
     DDLogVerbose(@"Not authorized to check for last photo date and promptUser false.");
