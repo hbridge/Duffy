@@ -580,6 +580,8 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   if ([[self comments] count] == 0) {
     return [DFNoResultsTableViewCell desiredHeight];
+  } else if ([self isShowMoreRow:indexPath]) {
+    return 44.0;
   }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
   self.templateCell.commentLabel.text = comment.text;
