@@ -30,8 +30,6 @@
 {
   [super awakeFromNib];
   
-  if (self.maxProfilePhotos == 0)
-    self.maxProfilePhotos = 4;
   if (self.profilePhotoWidth == 0.0)
     self.profilePhotoWidth = 35.0;
   if (self.maxAbbreviationLength == 0)
@@ -60,6 +58,8 @@
     DDLogWarn(@"%@ asked to show a nil user", self.class);
   }
 }
+
+
 
 + (id<NSCopying>)idForUser:(DFPeanutUserObject *)user
 {
@@ -177,11 +177,16 @@
   if (self.peanutUsers.count == 0) return CGSizeZero;
   CGSize newSize = size;
   newSize.height = size.height;
-  NSUInteger numProfiles = MIN(self.maxProfilePhotos + 1, self.peanutUsers.count);
+  NSUInteger numProfiles = [self maxPeanutUsersToDraw];
   NSUInteger numSpaces = MAX(self.peanutUsers.count - 1, 0);
   newSize.width = (CGFloat)numProfiles * self.profilePhotoWidth
   + numSpaces * self.photoMargins;
   return newSize;
+}
+
+- (NSUInteger)maxPeanutUsersToDraw
+{
+  return self.maxProfilePhotos ? MIN(self.maxProfilePhotos, self.peanutUsers.count) : self.peanutUsers.count;
 }
 
 - (CGFloat)profilePhotoWidth
@@ -208,33 +213,74 @@
   return self.nameLabelFont.pointSize + self.nameLabelVerticalMargin * 2;
 }
 
+- (BOOL)shouldDrawUserAtIndex:(NSUInteger)i inRect:(CGRect)rect
+{
+  NSUInteger numUsersThatFitInRect = [self numUsersThatFitInRect:rect];
+  return (i < numUsersThatFitInRect - 1 ||
+          (i == [self maxPeanutUsersToDraw] - 1 && i == numUsersThatFitInRect - 1));
+}
+
+- (NSUInteger)numUsersThatFitInRect:(CGRect)rect
+{
+  CGFloat numWithoutSpaces = floor(rect.size.width / self.profilePhotoWidth);
+  if (numWithoutSpaces * self.profilePhotoWidth + (numWithoutSpaces - 1) * self.photoMargins > rect.size.width) {
+    return (NSUInteger)numWithoutSpaces - 1;
+  }
+  return (NSUInteger)numWithoutSpaces;
+}
+
 - (void)drawRect:(CGRect)rect {
-  CGContextRef context = UIGraphicsGetCurrentContext();
   
-  for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
-    DFPeanutUserObject *user = self.peanutUsers[i];
-    id userID = [self.class idForUser:user];
-    UIColor *fillColor = self.fillColorsById[userID];
-    NSString *abbreviation = self.abbreviationsById[userID];
-    NSString *firstName = self.firstNamesById[userID];
-    UIImage *image = self.imagesById[userID];
-    
+  for (NSUInteger i = 0; i < [self maxPeanutUsersToDraw]; i++) {
     CGRect circleRect = [self rectForCircleAtIndex:i];
-    if (!image) {
-      CGContextSetFillColorWithColor(context, fillColor.CGColor);
-      CGContextFillEllipseInRect(context, circleRect);
-      [self drawAbbreviationText:abbreviation inRect:circleRect context:context];
+    
+    if (CGRectGetMaxX(circleRect) > rect.size.width) break;
+    if ([self shouldDrawUserAtIndex:i inRect:rect]) {
+      // if this is the last user or the next circle fits entirely in the bounds, draw a user
+      DFPeanutUserObject *user = self.peanutUsers[i];
+      [self drawProfileForPeanutUser:user inCircleRect:circleRect];
     } else {
-      [image drawInRect:circleRect];
-    }
-    if (self.nameMode == DFProfileStackViewNameShowAlways) {
-      [self drawNameText:firstName belowCircleRect:circleRect context:context];
-    }
-    UIImage *badgeImage = self.badgeImagesById[userID];
-    if (badgeImage) {
-      [self drawBadgeImage:badgeImage onCircleRect:circleRect context:context];
+      [self drawElipsisInCircleRect:circleRect];
     }
   }
+}
+
+- (void)drawProfileForPeanutUser:(DFPeanutUserObject *)user inCircleRect:(CGRect)circleRect
+{
+  CGContextRef context = UIGraphicsGetCurrentContext();
+  
+  id userID = [self.class idForUser:user];
+  UIColor *fillColor = self.fillColorsById[userID];
+  NSString *abbreviation = self.abbreviationsById[userID];
+  NSString *firstName = self.firstNamesById[userID];
+  UIImage *image = self.imagesById[userID];
+  
+  if (abbreviation.length == 0 && !image) {
+    image = [UIImage imageNamed:@"Assets/Icons/NoRecipientAvatar"];
+  }
+  
+  if (!image) {
+    CGContextSetFillColorWithColor(context, fillColor.CGColor);
+    CGContextFillEllipseInRect(context, circleRect);
+    [self drawAbbreviationText:abbreviation inRect:circleRect context:context];
+  } else {
+    [image drawInRect:circleRect];
+  }
+  if (self.nameMode == DFProfileStackViewNameShowAlways) {
+    [self drawNameText:firstName belowCircleRect:circleRect context:context];
+  }
+  UIImage *badgeImage = self.badgeImagesById[userID];
+  if (badgeImage) {
+    [self drawBadgeImage:badgeImage onCircleRect:circleRect context:context];
+  }
+}
+
+- (void)drawElipsisInCircleRect:(CGRect)circleRect
+{
+  CGContextRef context = UIGraphicsGetCurrentContext();
+  CGContextSetFillColorWithColor(context, [[UIColor lightGrayColor] CGColor]);
+  CGContextFillEllipseInRect(context, circleRect);
+  [self drawAbbreviationText:@"..." inRect:circleRect context:context];
 }
 
 - (void)drawAbbreviationText:(NSString *)text inRect:(CGRect)rect context:(CGContextRef)context
@@ -276,16 +322,25 @@
 {
   if (self.nameMode == DFProfileStackViewNameModeNone) return;
   
-  for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
+  for (NSUInteger i = 0; i < [self maxPeanutUsersToDraw]; i++) {
     CGRect rectForName = [self rectForCircleAtIndex:i];
     CGPoint tapPoint = [sender locationInView:self];
     if (CGRectContainsPoint(rectForName, tapPoint)) {
-      [self iconTappedForPeanutUser:self.peanutUsers[i] inRect:rectForName];
+      if ([self shouldDrawUserAtIndex:i inRect:self.bounds]) {
+        DFPeanutUserObject *user = self.peanutUsers[i];
+        if (user.fullName.length > 0) {
+          [self popLabelAtRect:rectForName withText:user.fullName];
+        } else {
+          [self popLabelAtRect:rectForName withText:[NSString stringWithFormat:@"%@ (invited)", user.phone_number]];
+        }
+      } else {
+        [self elipseTappedInRect:rectForName];
+      }
     }
   }
 }
 
-- (void)iconTappedForPeanutUser:(DFPeanutUserObject *)peanutUser inRect:(CGRect)rect
+- (void)popLabelAtRect:(CGRect)rect withText:(NSString *)text
 {
   CGRect rectInSuper = [self.superview convertRect:rect fromView:self];
   self.popTargetView = [[UIView alloc] initWithFrame:rectInSuper];
@@ -294,7 +349,7 @@
   [self.superview addSubview:self.popTargetView];
   
   [self.popLabel dismiss];
-  self.popLabel = [MMPopLabel popLabelWithText:peanutUser.fullName];
+  self.popLabel = [MMPopLabel popLabelWithText:text];
   [self.superview addSubview:self.popLabel];
   [self.popLabel setNeedsLayout];
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -304,6 +359,17 @@
     });
   });
   self.popLabel.delegate = self;
+}
+
+- (void)elipseTappedInRect:(CGRect)rect
+{
+  NSUInteger numUsersThatFitInRect = [self numUsersThatFitInRect:self.bounds];
+  NSRange range = (NSRange){numUsersThatFitInRect - 1, self.peanutUsers.count - numUsersThatFitInRect + 1};
+  NSArray *peanutUsers = [self.peanutUsers subarrayWithRange:range];
+  NSArray *names = [peanutUsers arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+    return user.fullName;
+  }];
+  [self popLabelAtRect:rect withText:[names componentsJoinedByString:@",\n"]];
 }
 
 - (void)dismissedPopLabel:(MMPopLabel *)popLabel
