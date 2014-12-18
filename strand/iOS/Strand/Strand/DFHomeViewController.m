@@ -109,7 +109,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   //self.flowLayout.footerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
 
   self.datasource.showActionsBadge = YES;
-  self.datasource.showUnreadNotifsCount = NO;
+  self.datasource.showUnreadNotifsCount = YES;
   self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 

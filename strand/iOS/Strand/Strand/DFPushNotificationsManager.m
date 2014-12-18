@@ -19,6 +19,7 @@
 #import "DFSuggestionsPageViewController.h"
 #import "DFPhotoDetailViewController.h"
 #import "SVProgressHUD.h"
+#import "DFDismissableModalViewController.h"
 
 @implementation DFPushNotificationsManager
 
@@ -247,14 +248,12 @@
         [SVProgressHUD show];
         [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:^() {
           [SVProgressHUD dismiss];
-          [DFNavigationController presentWithRootController:vc
-                                                   inParent:rootController
-                                        withBackButtonTitle:@"Close"];
+          [DFDismissableModalViewController presentWithRootController:vc
+                                                             inParent:rootController];
         }];
       } else {
-        [DFNavigationController presentWithRootController:vc
-                                                 inParent:rootController
-                                      withBackButtonTitle:@"Close"];
+        [DFDismissableModalViewController presentWithRootController:vc
+                                                           inParent:rootController];
       }
       
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];

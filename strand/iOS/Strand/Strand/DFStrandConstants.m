@@ -132,6 +132,11 @@ UIColor *DFStrandMainColor;
   return [UIColor whiteColor];
 }
 
++ (UIColor *)unreadNotificationBackgroundColor
+{
+  return [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
+}
+
 
 static NSArray *colors;
 

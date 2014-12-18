@@ -17,6 +17,14 @@
                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="h88-b8-2wa" userLabel="Loading indicator">
                     <rect key="frame" x="50" y="52" width="20" height="20"/>
                 </activityIndicatorView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JbE-Vh-plj" userLabel="Acitons Badge View" customClass="DFBadgeView">
+                    <rect key="frame" x="74" y="6" width="40" height="22"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="22" id="PIA-jU-M2z"/>
+                        <constraint firstAttribute="width" priority="100" constant="40" id="xMO-Zm-EFi"/>
+                    </constraints>
+                </view>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I8d-Zy-E5C" userLabel="Count Badge View" customClass="LKBadgeView">
                     <rect key="frame" x="97" y="1" width="22" height="20"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -25,21 +33,13 @@
                         <constraint firstAttribute="width" constant="22" id="mP3-aG-Z4F"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JbE-Vh-plj" customClass="DFBadgeView">
-                    <rect key="frame" x="76" y="4" width="40" height="22"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="22" id="PIA-jU-M2z"/>
-                        <constraint firstAttribute="width" priority="100" constant="40" id="xMO-Zm-EFi"/>
-                    </constraints>
-                </view>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="JbE-Vh-plj" secondAttribute="trailing" constant="4" id="8xz-2x-wHv"/>
+                <constraint firstAttribute="trailing" secondItem="JbE-Vh-plj" secondAttribute="trailing" constant="6" id="8xz-2x-wHv"/>
                 <constraint firstAttribute="centerX" secondItem="h88-b8-2wa" secondAttribute="centerX" id="EiX-RP-7kZ"/>
                 <constraint firstAttribute="trailing" secondItem="2gT-dn-UU6" secondAttribute="trailing" id="P3Z-Ut-YxP"/>
                 <constraint firstAttribute="trailing" secondItem="I8d-Zy-E5C" secondAttribute="trailing" constant="1" id="SL1-Fi-9lH"/>
-                <constraint firstItem="JbE-Vh-plj" firstAttribute="top" secondItem="1" secondAttribute="top" constant="4" id="qM1-fA-lFz"/>
+                <constraint firstItem="JbE-Vh-plj" firstAttribute="top" secondItem="1" secondAttribute="top" constant="6" id="qM1-fA-lFz"/>
                 <constraint firstAttribute="bottom" secondItem="2gT-dn-UU6" secondAttribute="bottom" id="qgQ-L9-sD2"/>
                 <constraint firstItem="I8d-Zy-E5C" firstAttribute="top" secondItem="1" secondAttribute="top" constant="1" id="r8a-Z7-pCr"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="wIE-LC-HI3"/>

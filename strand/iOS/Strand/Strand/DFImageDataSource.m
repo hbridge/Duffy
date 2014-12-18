@@ -161,29 +161,26 @@ NSUInteger const SectionSpread = 5;
   }
   
   [self setImageForCell:cell photoObject:photoObject indexPath:indexPath];
+  
+  
+  //NSArray *likes = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
+  NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
+  NSUInteger numUnreadLikes = 0;
+  // only count likes as unread if the photo is the current user's
+  if (photoObject.user == [[DFUser currentUser] userID])
+    numUnreadLikes = [[photoObject unreadActionsOfType:DFPeanutActionFavorite] count];
+  NSUInteger numUnreadComments = [[photoObject unreadActionsOfType:DFPeanutActionComment] count];
+  
   if (self.showActionsBadge) {
-    NSArray *likes = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
-    NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
-    NSUInteger unreadLikes = 0;
-    // only set unread likes badge if the photo is the current user's
-    if (photoObject.user == [[DFUser currentUser] userID])
-      unreadLikes = [[photoObject unreadActionsOfType:DFPeanutActionFavorite] count];
-    NSUInteger unreadComments = [[photoObject unreadActionsOfType:DFPeanutActionComment] count];
-    
-    [cell setNumLikes:likes.count numComments:comments.count
-       numUnreadLikes:unreadLikes numUnreadComments:unreadComments];
+    [cell setNumLikes:0 numComments:comments.count
+       numUnreadLikes:0 numUnreadComments:0];
     cell.badgeView.hidden = NO;
   }
   
   if (self.showUnreadNotifsCount) {
-    NSArray *unreadNotifs = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-    NSUInteger unreadCount = 0;
-    for (DFPeanutAction *action in photoObject.actions) {
-      if ([unreadNotifs containsObject:action]) unreadCount++;
-    }
-    
-    cell.countBadgeView.text =  [@(unreadCount) stringValue];
-    if (unreadCount > 0) {
+    NSUInteger totalUnread = numUnreadComments + numUnreadLikes;
+    cell.countBadgeView.text =  [@(totalUnread) stringValue];
+    if (totalUnread > 0) {
       cell.countBadgeView.hidden = NO;
     } else {
       cell.countBadgeView.hidden = YES;

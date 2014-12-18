@@ -20,6 +20,7 @@
 #import "DFNoResultsTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFPeanutNotificationsManager.h"
 
 const NSUInteger CompressedModeMaxRows = 1;
 
@@ -30,6 +31,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) NSMutableArray *comments;
 @property (nonatomic, retain) DFCommentTableViewCell *templateCell;
 @property (nonatomic, retain) DFAlertController *alertController;
+@property (nonatomic, retain) NSArray *unreadActions;
 
 @end
 
@@ -64,7 +66,8 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-
+  
+  self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
   [self configureTableView:self.tableView];
   [self textDidChange:self.commentToolbar.textField];
   [self configureTouchTableViewGesture];
@@ -74,7 +77,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
@@ -167,17 +169,30 @@ const NSUInteger CompressedModeMaxRows = 1;
   DFPeanutUserObject *sender = strandPost.actors.firstObject;
   
   [self.senderProfileStackView setPeanutUser:sender];
-  if ([[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:sender.id] count] > 0)
-      [self.senderProfileStackView
-       setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
-       forUser:sender];
+  DFPeanutAction *senderLikeAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite
+                                                              forUser:sender.id] firstObject];
+  if (senderLikeAction && [self.unreadActions containsObject:senderLikeAction]) {
+    [self.senderProfileStackView
+     setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeUnreadButtonIcon"]
+     forUser:sender];
+  } else if (senderLikeAction) {
+    [self.senderProfileStackView
+     setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
+     forUser:sender];
+  }
   
   NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
   [self.recipientsProfileStackView setPeanutUsers:recipients];
   for (DFPeanutUserObject *recipient in recipients) {
-    if ([[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id] count] > 0) {
-      [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
-                                           forUser:recipient];
+    DFPeanutAction *likeAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id] firstObject];
+    if (likeAction) {
+      if ([self.unreadActions containsObject:likeAction]) {
+        [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeUnreadButtonIcon"]
+                                               forUser:recipient];
+      } else {
+        [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
+                                               forUser:recipient];
+      }
     } else {
       [self.recipientsProfileStackView setBadgeImage:nil
                                              forUser:recipient];
@@ -368,6 +383,12 @@ const NSUInteger CompressedModeMaxRows = 1;
     [self addDeleteActionForCell:cell
                          comment:comment
                        indexPath:indexPath];
+  }
+  
+  if ([self.unreadActions containsObject:comment]) {
+    cell.backgroundColor = [DFStrandConstants unreadNotificationBackgroundColor];
+  } else {
+    cell.backgroundColor = [UIColor clearColor];
   }
   
   if (!cell) [NSException raise:@"nil cell" format:@"nil cell"];
