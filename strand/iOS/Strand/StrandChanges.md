@@ -1,7 +1,8 @@
 # Swap v2
 
-## Dec 13th, 2014 (4816-4817)
+## Dec 13th, 2014 (4816-4818)
 
+- UI tweaks
 - Badge photos with activity more prominently and show you what changed in the photo view
 - Fix ends of comments getting cut off
 - Send comments from the Send button on the keyboard
