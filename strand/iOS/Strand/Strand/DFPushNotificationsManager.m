@@ -99,6 +99,7 @@
     [DFDefaultsStore setLastUserNotificationType:settings.types];
     if (settings.types != UIUserNotificationTypeNone) notifsEnabled = YES;
   } else {
+    // iOS 7
     UIRemoteNotificationType notifTypes = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
     [DFDefaultsStore setLastNotificationType:notifTypes];
     if (notifTypes != UIRemoteNotificationTypeNone) notifsEnabled = YES;
@@ -170,9 +171,13 @@
 + (void)registerFailedWithError:(NSError *)error
 {
   DDLogWarn(@"%@ failed to get push token, error: %@", self, error);
-  if (error.code == 3010) {
+  if (error.code == 3010) { // simulator
     [DFDefaultsStore setState:DFPermissionStateUnavailable
                 forPermission:DFPermissionRemoteNotifications];
+  } else if (error.code == 3000){ // app not provisioned
+    if ([[DFUser currentUser] isUserDeveloper])
+      [UIAlertView showSimpleAlertWithTitle:@"Push Failure"
+                              formatMessage:@"Registration failed. Bad provisionining profile."];
   } else {
     [DFDefaultsStore setState:DFPermissionStateDenied
                 forPermission:DFPermissionRemoteNotifications];
