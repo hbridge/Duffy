@@ -167,9 +167,10 @@ const NSUInteger CompressedModeMaxRows = 1;
   DFPeanutUserObject *sender = strandPost.actors.firstObject;
   
   [self.senderProfileStackView setPeanutUser:sender];
-  [self.senderProfileStackView
-   setBadgeImage:(_userLikeActionID > 0) ? [UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"] : nil
-   forUser:sender];
+  if ([[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:sender.id] count] > 0)
+      [self.senderProfileStackView
+       setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
+       forUser:sender];
   
   NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
   [self.recipientsProfileStackView setPeanutUsers:recipients];
