@@ -25,7 +25,7 @@
                         <constraint firstAttribute="height" constant="133" id="ucq-fO-Dx9"/>
                     </constraints>
                 </view>
-                <tabBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d2X-ih-8kb">
+                <tabBar hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d2X-ih-8kb">
                     <rect key="frame" x="0.0" y="431" width="480" height="49"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
