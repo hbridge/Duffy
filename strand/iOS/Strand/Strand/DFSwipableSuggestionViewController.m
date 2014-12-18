@@ -98,14 +98,7 @@
 {
   _suggestionFeedObject = suggestionFeedObject;
   if (self.nuxStep == 0) {
-    if (self.suggestionFeedObject.actors.count > 0) {
-      self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
-    } else {
-      DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
-      dummyUser.display_name = @"?";
-      dummyUser.phone_number = @"?";
-      self.suggestionContentView.profileStackView.peanutUsers = @[dummyUser];
-    }
+    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
     self.selectedPeanutContacts = [self suggestedPeanutContacts];
   }
 }
@@ -194,10 +187,22 @@
 didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   self.selectedPeanutContacts = peanutContacts;
-  [self configurePeopleLabel];
-  [self.suggestionContentView.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
-  [self.view setNeedsLayout];
   [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)setSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
+{
+  _selectedPeanutContacts = selectedPeanutContacts;
+  [self configurePeopleLabel];
+  if (selectedPeanutContacts.count > 0) {
+    [self.suggestionContentView.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
+  } else {
+    DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
+    dummyUser.display_name = @"?";
+    dummyUser.phone_number = @"?";
+    self.suggestionContentView.profileStackView.peanutUsers = @[dummyUser];
+  }
+  [self.view setNeedsLayout];
 }
 
 - (NSArray *)suggestedPeanutContacts

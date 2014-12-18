@@ -236,7 +236,11 @@ const NSUInteger NumNuxes = 3;
           [self.alreadyShownPhotoIds addObject:@(photo.id)];
           DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
           svc.view.frame = self.view.bounds;
+          
           [svc configureWithSuggestion:suggestion withPhoto:photo];
+          if (suggestion.actors.count == 0 && self.lastSentContacts.count > 0) {
+            svc.selectedPeanutContacts = self.lastSentContacts;
+          }
           DFSuggestionsPageViewController __weak *weakSelf = self;
 
           svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
