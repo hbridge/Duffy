@@ -14,6 +14,7 @@
 #import "UICollectionView+DFExtras.h"
 #import "DFPhotoDetailViewController.h"
 #import "DFNoTableItemsView.h"
+#import "DFDismissableModalViewController.h"
 
 @interface DFGalleryViewController ()
 
@@ -191,7 +192,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPhotoDetailViewController *evc = [[DFPhotoDetailViewController alloc]
                                          initWithPhotoObject:photo
                                          inPostsObject:postsObject];
-  [DFNavigationController presentWithRootController:evc inParent:self withBackButtonTitle:@"Back"];
+  [DFDismissableModalViewController presentWithRootController:evc inParent:self];
 }
 
 - (void)createButtonPressed:(id)sender
