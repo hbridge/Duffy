@@ -115,6 +115,7 @@ def getActionStats(date, length, newUsers):
 	dataDict['PhotosAddedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
 	dataDict['FavsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_FAVORITE)
 	dataDict['CommentsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_COMMENT)
+	dataDict['PhotoEvalsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_PHOTO_EVALUATED)
 
 	# new users
 	actionTypeCounts = Action.objects.values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Count('action_type'))
@@ -124,6 +125,7 @@ def getActionStats(date, length, newUsers):
 	dataDict['PhotosAddedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
 	dataDict['FavsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_FAVORITE)
 	dataDict['CommentsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_COMMENT)
+	dataDict['PhotoEvalsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_PHOTO_EVALUATED)	
 
 
 	return dataDict
@@ -159,7 +161,8 @@ def dataDictToString(dataDict, length):
 	msg += "\n--- ACTIONS (OLD USERS) ---\n"	
 	msg += "Swaps Created: " + str(dataDict['SwapsCreatedOldUsers']) + '\n'
 	msg += "Swaps Joined: " + str(dataDict['SwapsJoinedOldUsers']) + '\n'	
-	msg += "Photos Added: " + str(dataDict['PhotosAddedOldUsers']) + '\n'	
+	msg += "Photos Added: " + str(dataDict['PhotosAddedOldUsers']) + '\n'
+	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsOldUsers']) + '\n'		
 	msg += "Favorites: " + str(dataDict['FavsOldUsers']) + '\n'
 	msg += "Comments: " + str(dataDict['CommentsOldUsers']) + '\n'
 
@@ -168,6 +171,7 @@ def dataDictToString(dataDict, length):
 	msg += "Swaps Created: " + str(dataDict['SwapsCreatedNewUsers']) + '\n'
 	msg += "Swaps Joined: " + str(dataDict['SwapsJoinedNewUsers']) + '\n'	
 	msg += "Photos Added: " + str(dataDict['PhotosAddedNewUsers']) + '\n'	
+	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsNewUsers']) + '\n'			
 	msg += "Favorites: " + str(dataDict['FavsNewUsers']) + '\n'
 	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'	
 	return msg
