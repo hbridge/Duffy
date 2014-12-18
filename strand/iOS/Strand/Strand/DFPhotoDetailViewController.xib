@@ -76,6 +76,7 @@
                         <constraint firstAttribute="bottom" secondItem="gGV-RF-dqd" secondAttribute="bottom" id="M26-Yf-BkK"/>
                         <constraint firstAttribute="bottom" secondItem="opa-QM-Zd8" secondAttribute="bottom" id="PPK-FG-q4r"/>
                         <constraint firstItem="opa-QM-Zd8" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" id="SPk-Of-ByB"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ibH-dU-jON" secondAttribute="trailing" constant="8" id="VCH-Ty-l1A"/>
                         <constraint firstItem="gGV-RF-dqd" firstAttribute="top" secondItem="VOD-io-kg3" secondAttribute="bottom" constant="8" id="WrZ-EP-rZx"/>
                         <constraint firstAttribute="trailing" secondItem="gGV-RF-dqd" secondAttribute="trailing" id="X0I-pQ-m3J"/>
                         <constraint firstItem="ibH-dU-jON" firstAttribute="leading" secondItem="VOD-io-kg3" secondAttribute="trailing" constant="5" id="j0x-VC-XdR"/>
