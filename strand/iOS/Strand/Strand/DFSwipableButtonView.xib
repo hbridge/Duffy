@@ -13,7 +13,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="999" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="700" translatesAutoresizingMaskIntoConstraints="NO" id="PRr-q5-rca" userLabel="CenterView">
-                    <rect key="frame" x="20" y="0.0" width="560" height="505"/>
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="505"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <connections>
                         <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="reB-FQ-R71"/>
@@ -84,7 +84,7 @@
                     </constraints>
                 </view>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
-                    <rect key="frame" x="20" y="0.0" width="560" height="505"/>
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="505"/>
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -92,9 +92,9 @@
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="PRr-q5-rca" secondAttribute="leading" id="4u2-8Q-y44"/>
                 <constraint firstItem="l10-6U-oyL" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="bottom" constant="10" id="5zL-Rm-vdB"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="PRr-q5-rca" secondAttribute="trailing" id="7iY-Zn-Xcj"/>
-                <constraint firstAttribute="trailing" secondItem="xKd-Cz-PRo" secondAttribute="trailing" constant="20" id="AId-so-J1d"/>
+                <constraint firstAttribute="trailing" secondItem="xKd-Cz-PRo" secondAttribute="trailing" id="AId-so-J1d"/>
                 <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" priority="100" constant="20" id="H8h-um-EvH"/>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="U9o-fK-LxD"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="U9o-fK-LxD"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="20" id="aBk-gS-atA"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="bottom" secondItem="PRr-q5-rca" secondAttribute="bottom" id="fsn-Zg-Ml8"/>
                 <constraint firstItem="PRr-q5-rca" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="h6L-Et-qCw"/>

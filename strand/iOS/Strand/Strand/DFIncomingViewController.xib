@@ -17,15 +17,15 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2mx-jU-aCa" customClass="DFSwipableButtonView">
-                    <rect key="frame" x="0.0" y="30" width="600" height="570"/>
+                    <rect key="frame" x="8" y="30" width="584" height="570"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="2mx-jU-aCa" secondAttribute="trailing" id="B5p-f8-xqg"/>
+                <constraint firstAttribute="trailing" secondItem="2mx-jU-aCa" secondAttribute="trailing" constant="8" id="B5p-f8-xqg"/>
                 <constraint firstItem="2mx-jU-aCa" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="30" id="OMM-lH-UWo"/>
-                <constraint firstItem="2mx-jU-aCa" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="SnY-My-dtP"/>
+                <constraint firstItem="2mx-jU-aCa" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="8" id="SnY-My-dtP"/>
                 <constraint firstAttribute="bottom" secondItem="2mx-jU-aCa" secondAttribute="bottom" id="YEq-GX-NQs"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
