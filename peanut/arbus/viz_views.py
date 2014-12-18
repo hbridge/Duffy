@@ -89,7 +89,9 @@ def userbaseSummary(request):
 	weeklyPhotosAddedById = dict() #action_type=2
 	weeklyStrandsJoinedById = dict() #action_type =3
 	weeklyCommentsById = dict() #action_type = 4
+	weeklyPhotoEvalsById = dict() #action_type = 5
 	lastActionTimeById = dict()
+
 
 	for actionData in actionDataRaw:
 		if (actionData['action_type'] == constants.ACTION_TYPE_FAVORITE):
@@ -102,6 +104,8 @@ def userbaseSummary(request):
 			weeklyStrandsJoinedById[actionData['user']] = actionData['weeklyActions']
 		elif (actionData['action_type'] == constants.ACTION_TYPE_COMMENT):
 			weeklyCommentsById[actionData['user']] = actionData['weeklyActions']
+		elif (actionData['action_type'] == constants.ACTION_TYPE_PHOTO_EVALUATED):
+			weeklyPhotoEvalsById[actionData['user']] = actionData['weeklyActions']
 
 	for lastActionDate in lastActionDateRaw:
 		if lastActionDate['user'] in lastActionTimeById:
@@ -170,6 +174,11 @@ def userbaseSummary(request):
 			entry['weeklyComments'] = weeklyCommentsById[user.id]
 		else:
 			entry['weeklyComments'] = '-'
+
+		if user.id in weeklyPhotoEvalsById:
+			entry['weeklyPhotoEvals'] = weeklyPhotoEvalsById[user.id]
+		else:
+			entry['weeklyPhotoEvals'] = '-'
 
 		if user.id in weeklyStrandsCreatedById:
 			entry['weeklyStrandsCreated'] = weeklyStrandsCreatedById[user.id]
