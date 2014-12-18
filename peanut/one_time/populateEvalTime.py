@@ -24,34 +24,37 @@ def main(argv):
     maxFileAtTime = 16
     count = 0
 
-    userIds = [5009]
+    userIds = range(5020, 5500)
 
 
     for userId in userIds:
-        user = User.objects.get(id=userId)
-        print "Starting populate eval"
-        # Get all photos in pipeline_state 0 which means "not copied to image server"
-        strands = Strand.objects.filter(users__in=[userId]).filter(private=False)
-        
-        strandIds = Strand.getIds(strands)
+        try:
+            user = User.objects.get(id=userId)
+            print "Starting populate eval for user %s" % userId
+            
+            publicStrands = Strand.objects.filter(users__in=[userId]).filter(private=False)
+            
+            publicStrandIds = Strand.getIds(publicStrands)
 
-        actions = Action.objects.prefetch_related('photos').filter(strand__in=strandIds).filter(Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED))
+            actions = Action.objects.prefetch_related('photos').filter(strand__in=publicStrandIds).filter(Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED))
 
-        alreadyEvaledIds = list()
+            alreadyEvaledIds = list()
 
-        for action in actions:
-            if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user_id == user.id:
-                alreadyEvaledIds.append(action.photo_id)
+            for action in actions:
+                if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user_id == user.id:
+                    alreadyEvaledIds.append(action.photo_id)
 
-        for action in actions:
-            for photo in action.photos.all():
-                if photo.id not in alreadyEvaledIds:
-                    newAction = Action(user=user, strand=action.strand, photo_id=photo.id, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-                    newAction.save()
-                    newAction.added = action.added
-                    newAction.updated = action.updated
-                    newAction.save()
-                    print "%s" % newAction.id
+            for action in actions:
+                for photo in action.photos.all():
+                    if photo.id not in alreadyEvaledIds:
+                        newAction = Action(user=user, strand=action.strand, photo_id=photo.id, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+                        newAction.save()
+                        newAction.added = action.added
+                        newAction.updated = action.updated
+                        newAction.save()
+                        print "%s" % newAction.id
+        except User.DoesNotExist:
+            print "No user %s" % userId
 
 
         
