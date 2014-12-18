@@ -215,16 +215,20 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)setCompressedModeEnabled:(BOOL)compressedModeEnabled
 {
-  _compressedModeEnabled = compressedModeEnabled;
-  [self.view setNeedsLayout];
-  [self.tableView reloadData];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    _compressedModeEnabled = compressedModeEnabled;
+    [self.view setNeedsLayout];
+    [self.tableView reloadData];
+  });
 }
 
 - (void)setCommentsExpanded:(BOOL)commentsExpanded
 {
-  _commentsExpanded = commentsExpanded;
-  [self configureToolbarHidden];
-  [self.tableView reloadData];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    _commentsExpanded = commentsExpanded;
+    [self configureToolbarHidden];
+    [self.tableView reloadData];
+  });
 }
 
 - (void)configureToolbarHidden
@@ -488,7 +492,10 @@ const NSUInteger CompressedModeMaxRows = 1;
     // replace the delete action on the cell
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentWithNoIDIndex inSection:0];
     DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
-    [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+    if (cell && [cell.class isSubclassOfClass:[DFCommentTableViewCell class]]) {
+      // if comments are not expanded, we might not have a comment cell showing for it
+      [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+    }
     [weakSelf.class logController:weakSelf actionType:DFPeanutActionComment result:DFAnalyticsValueResultSuccess];
   } failure:^(NSError *error) {
     DDLogError(@"%@ adding comment error:%@", weakSelf.class, error);
