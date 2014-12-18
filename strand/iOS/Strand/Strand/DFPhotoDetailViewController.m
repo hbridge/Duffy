@@ -236,6 +236,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   dispatch_async(dispatch_get_main_queue(), ^{
     _compressedModeEnabled = compressedModeEnabled;
     [self.view setNeedsLayout];
+    if (self.compressedModeEnabled) self.commentToolbar.likeButtonDisabled = YES;
     [self.tableView reloadData];
   });
 }
