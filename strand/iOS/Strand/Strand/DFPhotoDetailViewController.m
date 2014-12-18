@@ -246,7 +246,17 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   [super viewDidLayoutSubviews];
   [self configurePhotoView];
+  [self configureTemplateCell];
  }
+
+- (void)configureTemplateCell
+{
+  CGRect frame = self.templateCell.frame;
+  frame.size.width = self.view.frame.size.width;
+  DDLogVerbose(@"setting template cell frame:%@", NSStringFromCGRect(frame));
+  self.templateCell.frame = frame;
+  [self.templateCell setNeedsLayout];
+}
 
 - (void)configurePhotoView
 {
@@ -583,11 +593,14 @@ const NSUInteger CompressedModeMaxRows = 1;
   } else if ([self isShowMoreRow:indexPath]) {
     return 44.0;
   }
+
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
-  self.templateCell.commentLabel.text = comment.text;
+  if (![self.templateCell.commentLabel.text isEqualToString:comment.text]) {
+    self.templateCell.commentLabel.text = comment.text;
+    [self.templateCell setNeedsLayout];
+  }
   return self.templateCell.rowHeight;
 }
-
 
 #pragma mark - State changes
 
