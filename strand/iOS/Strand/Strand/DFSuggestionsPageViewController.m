@@ -198,6 +198,7 @@ const NSUInteger NumOutgoingNuxes = 2;
 - (UIViewController *)nextIncomingViewController
 {
   DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
+  if (!nextPhoto) return nil;
   DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:nextPhoto.strand_id.longLongValue];
   return [self incomingViewControllerForPhoto:nextPhoto strandPosts:strandPosts];
 }
