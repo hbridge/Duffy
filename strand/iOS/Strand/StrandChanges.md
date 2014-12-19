@@ -1,5 +1,9 @@
 # Swap v2
 
+## Dec 14th, 2014 (4819)
+
+- Updated new user experience
+
 ## Dec 13th, 2014 (4816-4818)
 
 - UI tweaks
