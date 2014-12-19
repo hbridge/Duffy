@@ -35,12 +35,16 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+  [super viewDidLoad];
   
   SAMGradientView *gradientView = (SAMGradientView *)self.view;
-  gradientView.gradientColors = @[[DFStrandConstants strandBlue], [DFStrandConstants strandBlue]];
+  gradientView.gradientColors = @[[DFStrandConstants strandBlue], [[DFStrandConstants strandBlue] colorWithAlphaComponent:0.9]];
   [self.navigationController setNavigationBarHidden:YES];
   [self setNeedsStatusBarAppearanceUpdate];
+  
+  self.imageView.alpha = 0.9;
+  self.imageView.layer.cornerRadius = 6.0;
+  self.imageView.layer.masksToBounds = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated

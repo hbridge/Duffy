@@ -172,7 +172,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 {
   return  ([[DFUser currentUser] userID]
            && ![[DFUser currentUser] userID] == 0
-           && ![[DFDefaultsStore stateForPermission:DFPermissionContacts]
+           && ![[DFDefaultsStore stateForPermission:DFPermissionPhotos]
                 isEqual:DFPermissionStateNotRequested]);
 }
 

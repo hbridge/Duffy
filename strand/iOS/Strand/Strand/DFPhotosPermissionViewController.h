@@ -12,5 +12,6 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *learnMoreButtonPressed;
 - (IBAction)grantPhotosAccessPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
 
 @end
