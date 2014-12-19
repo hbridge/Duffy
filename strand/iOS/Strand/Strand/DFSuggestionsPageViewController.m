@@ -40,7 +40,8 @@
 
 @end
 
-const NSUInteger NumNuxes = 3;
+const NSUInteger NumIncomingNuxes = 1;
+const NSUInteger NumOutgoingNuxes = 2;
 
 @implementation DFSuggestionsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
@@ -133,8 +134,16 @@ const NSUInteger NumNuxes = 3;
 {
   UIViewController *nextController;
   
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
-      && self.highestSeenNuxStep < NumNuxes) {
+  BOOL incomingNuxPassed = [DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux];
+  BOOL outgoingNuxPassed =[DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux];
+  
+  if (! incomingNuxPassed
+      && self.preferredType == DFIncomingViewType
+      && self.highestSeenNuxStep < NumIncomingNuxes) {
+    nextController = [self viewControllerForNuxStep:self.highestSeenNuxStep];
+  } else if (!outgoingNuxPassed
+             && self.preferredType == DFSuggestionViewType
+             && self.highestSeenNuxStep < NumOutgoingNuxes) {
     nextController = [self viewControllerForNuxStep:self.highestSeenNuxStep];
   } else {
     if (self.preferredType == DFIncomingViewType) {
@@ -160,7 +169,11 @@ const NSUInteger NumNuxes = 3;
 
 - (UIViewController *)incomingViewControllerForPhoto:(DFPeanutFeedObject *)photo strandPosts:(DFPeanutFeedObject *)strandPosts
 {
-  DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithPhotoID:photo.id inStrand:strandPosts.id fromSender:[[DFPeanutFeedDataManager sharedManager] userWithID:photo.user]];
+  DFIncomingViewController *ivc = [[DFIncomingViewController alloc]
+                                   initWithPhotoID:photo.id
+                                   inStrand:strandPosts.id
+                                   fromSender:[[DFPeanutFeedDataManager sharedManager]
+                                               userWithID:photo.user]];
   [self.alreadyShownPhotoIds addObject:@(photo.id)];
   
   DFSuggestionsPageViewController __weak *weakSelf = self;
@@ -179,13 +192,19 @@ const NSUInteger NumNuxes = 3;
 
 - (UIViewController *)nextIncomingViewController
 {
+  DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
+  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:nextPhoto.strand_id.longLongValue];
+  return [self incomingViewControllerForPhoto:nextPhoto strandPosts:strandPosts];
+}
+
+- (DFPeanutFeedObject *)nextIncomingPhotoToShow
+{
   if ([self startingPhotoID] > 0) {
-    DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:[self startingStrandID]];
     DFPeanutFeedObject *photo = [[DFPeanutFeedDataManager sharedManager] photoWithID:[self startingPhotoID] inStrand:[self startingStrandID]];
     _startingPhotoID = 0;
     _startingStrandID = 0;
     
-    return [self incomingViewControllerForPhoto:photo strandPosts:strandPosts];
+    return photo;
   }
   
   DFPeanutFeedObject *firstPhoto;
@@ -200,11 +219,10 @@ const NSUInteger NumNuxes = 3;
       for (DFPeanutFeedObject *photo in photos) {
         if (photo.user != [[DFUser currentUser] userID] &&
             ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-          
           // Now lets see if the image is loaded yet
           DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
           if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-            return [self incomingViewControllerForPhoto:photo strandPosts:strandPosts];
+            return photo;
           } else if(!firstPhoto) {
             // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
             firstPhoto = photo;
@@ -217,7 +235,7 @@ const NSUInteger NumNuxes = 3;
   
   if (firstPhoto) {
     // We didn't find any images loaded but we did have an image...so show that with a spinner
-    return [self incomingViewControllerForPhoto:firstPhoto strandPosts:firstStrandPosts];
+    return firstPhoto;
   } else {
     return nil;
   }
@@ -309,29 +327,29 @@ const NSUInteger NumNuxes = 3;
 - (DFHomeSubViewController *)viewControllerForNuxStep:(NSUInteger)index
 {
   DFHomeSubViewController *nuxController;
-  if (index == 0) {
+  if (index == 0 && self.preferredType == DFIncomingViewType) {
     DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithNuxStep:1];
     nuxController = ivc;
-    ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      [SVProgressHUD showSuccessWithStatus:@"Aw, man!"];
-      [self gotoNextController];
-    };
-    ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      [SVProgressHUD showErrorWithStatus:@"Let's keep things simple..."];
-    };
-    ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      [SVProgressHUD showSuccessWithStatus:@"Sweet!"];
-      [self gotoNextController];
-    };
-
-  } else {
-    DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
-                                               initWithNuxStep:index];
-    nuxController = svc;
-    svc.index = index;
-    svc.nuxStep = index;
     
-    if (index == 1) {
+    NSString *incomingCompletionString = nil;
+    if ([self nextIncomingPhotoToShow]) {
+      incomingCompletionString = @"Someone else sent you photos!";
+    }
+    DFIncomingPhotoNextBlock block = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      if (incomingCompletionString) {
+        [SVProgressHUD showSuccessWithStatus:incomingCompletionString];
+      }
+      [DFDefaultsStore setSetupStepPassed:DFSetupStepIncomingNux Passed:YES];
+      [self gotoNextController];
+    };
+    
+    ivc.nextHandler = block;
+    ivc.likeHandler = block;
+  } else if (self.preferredType == DFSuggestionViewType){
+    DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
+                                               initWithNuxStep:index + 1];
+    nuxController = svc;
+    if (index == 0) {
       svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
         [SVProgressHUD showSuccessWithStatus:@"Nice!"];
         [self gotoNextController];
@@ -339,7 +357,7 @@ const NSUInteger NumNuxes = 3;
       svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion) {
         [SVProgressHUD showErrorWithStatus:@"Tap Send to continue"];
       };
-    } else if (index == 2) {
+    } else if (index == 1) {
       svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
         [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
         [self gotoNextController];

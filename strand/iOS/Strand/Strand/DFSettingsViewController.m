@@ -296,7 +296,9 @@
   [mapping button:@"Reset Nux..."
        identifier:@"resetNux"
           handler:^(id object) {
+            
             [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:NO];
+            [DFDefaultsStore setSetupStepPassed:DFSetupStepIncomingNux Passed:NO];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [SVProgressHUD showSuccessWithStatus:@"Reset"];
           }

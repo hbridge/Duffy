@@ -198,18 +198,14 @@ static BOOL showFilters = NO;
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-    if ([[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count] > 0) {
-      [self reviewButtonPressed:self.reviewButton];
-    } else {
-      [self sendButtonPressed:self.sendButton];
-    }
-  } else {
+  if ([DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
   [self configureBadges];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
+
+
 
 - (void)viewDidLayoutSubviews
 {
@@ -328,6 +324,18 @@ static BOOL showFilters = NO;
     badgeView.badgeColor = [DFStrandConstants strandRed];
     badgeView.textColor = [UIColor whiteColor];
   }
+  
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
+    numToReview++;
+  } else if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+    numToSend++;
+  }
+  
+  [self configureButtonsWithIncomingCount:numToReview outgoingCount:numToSend];
+}
+
+- (void)configureButtonsWithIncomingCount:(NSUInteger)numToReview outgoingCount:(NSUInteger)numToSend
+{
   if (numToReview > 0) {
     self.reviewBadgeView.text = [@(MIN(numToReview, 99)) stringValue];
     self.reviewBadgeView.hidden = NO;
