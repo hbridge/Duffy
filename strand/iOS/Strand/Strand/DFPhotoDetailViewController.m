@@ -579,14 +579,17 @@ const NSUInteger CompressedModeMaxRows = 1;
   [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
     DDLogInfo(@"%@ adding comment succeeded:%@", weakSelf.class, resultObjects);
     DFPeanutAction *newComment = [resultObjects firstObject];
-    NSInteger commentWithNoIDIndex = [weakSelf.comments indexOfObject:action];
-    [weakSelf.comments replaceObjectAtIndex:commentWithNoIDIndex withObject:newComment];
-    // replace the delete action on the cell
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentWithNoIDIndex inSection:0];
-    DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
-    if (cell && [cell.class isSubclassOfClass:[DFCommentTableViewCell class]]) {
-      // if comments are not expanded, we might not have a comment cell showing for it
-      [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+    NSUInteger commentWithNoIDIndex = [weakSelf.comments indexOfObject:action];
+    if (commentWithNoIDIndex != NSNotFound) {
+      // need to check fo NSNotFound as a refresh from server may have already replaced it
+      [weakSelf.comments replaceObjectAtIndex:commentWithNoIDIndex withObject:newComment];
+      // replace the delete action on the cell
+      NSIndexPath *indexPath = [NSIndexPath indexPathForRow:commentWithNoIDIndex inSection:0];
+      DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
+      if (cell && [cell.class isSubclassOfClass:[DFCommentTableViewCell class]]) {
+        // if comments are not expanded, we might not have a comment cell showing for it
+        [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+      }
     }
     [weakSelf.class logController:weakSelf actionType:DFPeanutActionComment result:DFAnalyticsValueResultSuccess];
   } failure:^(NSError *error) {
