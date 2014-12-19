@@ -154,8 +154,13 @@ const NSUInteger NumOutgoingNuxes = 2;
   }
   
   if (!nextController) {
-    if (self.preferredType == DFIncomingViewType) {
-      nextController = [self noIncomingViewController];
+    if (self.preferredType == DFIncomingViewType && !self.viewControllers.firstObject) {
+      // This actually handles the IncomingViewType, even though its named otherwise
+      nextController = [self noSuggestionsViewController];
+    } else if (self.preferredType == DFIncomingViewType) {
+      // If we don't have any more suggestions, and we've been showing stuff, close
+      [self dismissViewControllerAnimated:YES completion:^(){}];
+      return;
     } else {
       nextController = [self noSuggestionsViewController];
     }
@@ -385,8 +390,8 @@ const NSUInteger NumOutgoingNuxes = 2;
       noSuggestionsView.titleLabel.text = @"No More Suggestions";
       noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends.";
     } else {
-      noSuggestionsView.titleLabel.text = @"No More to Review";
-      noSuggestionsView.subtitleLabel.text = @"Send some photos to friends";
+      noSuggestionsView.titleLabel.text = @"No More Photos in Your Inbox";
+      noSuggestionsView.subtitleLabel.text = @"";
     }
     noSuggestionsView.superView = _noSuggestionsViewController.view;
   }
