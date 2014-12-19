@@ -337,9 +337,9 @@ static BOOL showFilters = NO;
     [self.reviewButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeInbox"] forState:UIControlStateNormal];
   }
   
-  self.sendBadgeView.hidden = YES;
+  self.sendBadgeView.hidden = NO;
   if (numToSend > 0) {
-    //self.sendBadgeView.text = @"★";
+    self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
                                forState:UIControlStateNormal];
   } else {
