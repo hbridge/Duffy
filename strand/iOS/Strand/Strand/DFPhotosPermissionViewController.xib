@@ -8,7 +8,6 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPhotosPermissionViewController">
             <connections>
                 <outlet property="imageView" destination="JU1-qK-iVT" id="Gme-N6-EPr"/>
-                <outlet property="learnMoreButtonPressed" destination="TOc-TO-Gbk" id="jMY-dm-iSL"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -20,56 +19,47 @@
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to Swap" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vtd-FE-1Jp">
                     <rect key="frame" x="74" y="47" width="172" height="24"/>
                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="20"/>
-                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="deviceRGB"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Swap makes it easy to share photos by matching photos you took with friends. Your photos won't be shared until you send them." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="285" translatesAutoresizingMaskIntoConstraints="NO" id="3j1-n9-YIe">
-                    <rect key="frame" x="24" y="94" width="273" height="77"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TOc-TO-Gbk">
-                    <rect key="frame" x="126" y="175" width="69" height="28"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                    <state key="normal" title="Learn More">
-                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                    </state>
-                </button>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Nux/PhotosAccessGraphic.png" translatesAutoresizingMaskIntoConstraints="NO" id="JU1-qK-iVT">
-                    <rect key="frame" x="51" y="203" width="219" height="150"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="219" id="2Wb-xh-XuN"/>
-                        <constraint firstAttribute="height" constant="150" id="sOk-8y-VN3"/>
-                    </constraints>
-                </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="56U-G0-LkK">
-                    <rect key="frame" x="60" y="393" width="200" height="40"/>
-                    <color key="backgroundColor" white="1" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    <rect key="frame" x="60" y="400" width="200" height="40"/>
+                    <color key="backgroundColor" red="0.21960784310000001" green="0.47058823529999999" blue="0.87058823529999996" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="40" id="2Tz-eK-448"/>
                     </constraints>
-                    <state key="normal" title="Match my Photos">
+                    <state key="normal" title="Grant Photos Access">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
                         <action selector="grantPhotosAccessPressed:" destination="-1" eventType="touchUpInside" id="VKT-BY-6IQ"/>
                     </connections>
                 </button>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Nux/PhotosAccessGraphic.png" translatesAutoresizingMaskIntoConstraints="NO" id="JU1-qK-iVT">
+                    <rect key="frame" x="70" y="91" width="180" height="180"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="180" id="2Wb-xh-XuN"/>
+                        <constraint firstAttribute="height" constant="180" id="sOk-8y-VN3"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Swap makes it easy to share photos with friends. Please grant photos access to continue." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="285" translatesAutoresizingMaskIntoConstraints="NO" id="3j1-n9-YIe">
+                    <rect key="frame" x="25" y="291" width="270" height="101"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="21"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
-            <color key="backgroundColor" red="0.97254908080000002" green="0.4156863093" blue="0.29019609089999998" alpha="1" colorSpace="deviceRGB"/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="centerX" secondItem="56U-G0-LkK" secondAttribute="centerX" id="0a0-cs-yhI"/>
-                <constraint firstItem="JU1-qK-iVT" firstAttribute="top" secondItem="TOc-TO-Gbk" secondAttribute="bottom" id="1Mr-4c-Jy5"/>
                 <constraint firstAttribute="centerX" secondItem="3j1-n9-YIe" secondAttribute="centerX" id="1pL-7W-hQk"/>
-                <constraint firstAttribute="bottom" secondItem="56U-G0-LkK" secondAttribute="bottom" constant="47" id="EbQ-wA-DMv"/>
+                <constraint firstAttribute="bottom" secondItem="56U-G0-LkK" secondAttribute="bottom" constant="40" id="EbQ-wA-DMv"/>
                 <constraint firstAttribute="trailing" secondItem="56U-G0-LkK" secondAttribute="trailing" constant="60" id="FGv-OC-ujp"/>
-                <constraint firstAttribute="centerX" secondItem="TOc-TO-Gbk" secondAttribute="centerX" id="Jbx-l6-ML9"/>
                 <constraint firstAttribute="centerX" secondItem="JU1-qK-iVT" secondAttribute="centerX" id="OTJ-hW-kdn"/>
-                <constraint firstItem="TOc-TO-Gbk" firstAttribute="top" secondItem="3j1-n9-YIe" secondAttribute="bottom" constant="4" id="SL2-eP-KIH"/>
                 <constraint firstItem="56U-G0-LkK" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="60" id="Ymb-c1-m5j"/>
-                <constraint firstItem="3j1-n9-YIe" firstAttribute="top" secondItem="Vtd-FE-1Jp" secondAttribute="bottom" constant="23" id="aQy-yy-TE0"/>
+                <constraint firstItem="3j1-n9-YIe" firstAttribute="top" secondItem="JU1-qK-iVT" secondAttribute="bottom" constant="20" id="c0e-Yf-dVW"/>
+                <constraint firstItem="JU1-qK-iVT" firstAttribute="top" secondItem="Vtd-FE-1Jp" secondAttribute="bottom" constant="20" id="mqg-Cu-zjJ"/>
                 <constraint firstAttribute="centerX" secondItem="Vtd-FE-1Jp" secondAttribute="centerX" id="t0h-wy-ktB"/>
                 <constraint firstItem="Vtd-FE-1Jp" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="47" id="zIg-dE-UNP"/>
             </constraints>
