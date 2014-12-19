@@ -20,7 +20,7 @@
 {
   self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                   navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
-                                options:nil];
+                                options:@{UIPageViewControllerOptionInterPageSpacingKey :@(20)}];
   if (self) {
     _photos = photos;
     DFPhotoDetailViewController *pdvc = [self detailViewControllerForPhotoObject:photo];
