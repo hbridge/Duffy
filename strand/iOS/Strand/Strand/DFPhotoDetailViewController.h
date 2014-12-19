@@ -14,8 +14,6 @@
 @interface DFPhotoDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (strong, nonatomic) UIImageView *imageView;
-@property (nonatomic, retain) DFPeanutFeedObject *photoObject;
-@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *recipientsProfileStackView;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *senderProfileStackView;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;

@@ -33,6 +33,12 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
 
+@property (nonatomic, retain) DFPeanutFeedObject *photoObject;
+@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
+
+@property (nonatomic) DFPhotoIDType photoID;
+@property (nonatomic) DFStrandIDType strandID;
+
 @end
 
 @implementation DFPhotoDetailViewController
@@ -47,10 +53,11 @@ const NSUInteger CompressedModeMaxRows = 1;
   self = [super init];
   if (self) {
     _openKeyboardOnAppear = NO;
-    _photoObject = photoObject;
-    _postsObject = postsObject;
+    self.photoID = photoObject.id;
+    self.strandID = postsObject.id;
     _templateCell = [DFCommentTableViewCell templateCell];
     _userLikeActionID = [[[self.photoObject userFavoriteAction] id] longLongValue];
+    [self observeNotifications];
   }
   return self;
 }
@@ -64,15 +71,57 @@ const NSUInteger CompressedModeMaxRows = 1;
   return self;
 }
 
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(newDataArrived)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
+}
+
+- (void)reloadData
+{
+  self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+  _photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoID
+                                                             inStrand:self.strandID];
+  _postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:self.strandID];
+  
+  // Need to reload this because its a singlton
+  _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
+}
+
+- (void)newDataArrived
+{
+  [self reloadData];
+  [self configureDataBasedElements];
+  [self markActionsAsSeen];
+  [self.tableView reloadData];
+}
+
+- (void)configureDataBasedElements
+{
+  [self configureTableView:self.tableView];
+  [self configureProfileWithContext];
+  [self configureCommentToolbar];
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-  [self configureTableView:self.tableView];
+  [self reloadData];
+  [self configureDataBasedElements];
+  
   [self textDidChange:self.commentToolbar.textField];
   [self configureTouchTableViewGesture];
-  [self configureProfileWithContext];
-  [self configureCommentToolbar];
+}
+
+- (void)markActionsAsSeen
+{
+  // mark the action IDs for the photo object seen
+  NSArray *actionIDs = [self.photoObject.actions arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
+    return action.id;
+  }];
+  [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -100,11 +149,7 @@ const NSUInteger CompressedModeMaxRows = 1;
        @"unreadComments" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionComment] count]],
        }];
   
-  // mark the action IDs for the photo object seen
-  NSArray *actionIDs = [self.photoObject.actions arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
-    return action.id;
-  }];
-  [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
+  [self markActionsAsSeen];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
