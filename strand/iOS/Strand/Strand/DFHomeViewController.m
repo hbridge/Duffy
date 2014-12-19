@@ -193,6 +193,7 @@ static BOOL showFilters = NO;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+  [self configureBadges];
   [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
 }
 
