@@ -41,7 +41,7 @@
 @end
 
 const NSUInteger NumIncomingNuxes = 1;
-const NSUInteger NumOutgoingNuxes = 2;
+const NSUInteger NumOutgoingNuxes = 3;
 
 @implementation DFSuggestionsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
@@ -357,13 +357,17 @@ const NSUInteger NumOutgoingNuxes = 2;
     nuxController = svc;
     if (index == 0) {
       svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
-        [SVProgressHUD showSuccessWithStatus:@"Nice!"];
+        [self gotoNextController];
+      };
+    } else if (index == 1) {
+      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+        [SVProgressHUD showSuccessWithStatus:@"Thanks!"];
         [self gotoNextController];
       };
       svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion) {
         [SVProgressHUD showErrorWithStatus:@"Tap Send to continue"];
       };
-    } else if (index == 1) {
+    } else if (index == 2) {
       svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
         [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
         [self gotoNextController];

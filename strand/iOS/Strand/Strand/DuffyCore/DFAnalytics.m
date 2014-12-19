@@ -526,7 +526,7 @@ static DFAnalytics *defaultLogger;
                                         result:(NSString *)result
                                    actionType:(NSString *)actionType
 {
-  NSMutableDictionary *parameters = [suggestion.suggestionAnalyticsSummary mutableCopy];
+  NSMutableDictionary *parameters = [[NSMutableDictionary alloc] initWithDictionary:suggestion.suggestionAnalyticsSummary];
   [parameters addEntriesFromDictionary:@{
                                          ResultKey: result,
                                          ActionTypeKey: actionType

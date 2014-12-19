@@ -86,6 +86,14 @@
   
   UIImage *nuxImage;
   if (self.nuxStep == 1) {
+    nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxMatchImage"];
+    [self.suggestionContentView.topLabel removeFromSuperview];
+    [self.suggestionContentView.profileStackView removeFromSuperview];
+    [self.swipableButtonView.yesButton setImage:[UIImage imageNamed:@"Assets/Icons/SwipeRightButton"]
+                                       forState:UIControlStateNormal];
+    self.swipableButtonView.noButton.hidden = YES;
+    self.swipableButtonView.noEnabled = NO;
+  } else if (self.nuxStep == 2) {
     nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
     self.swipableButtonView.noEnabled = NO;
   } else {
