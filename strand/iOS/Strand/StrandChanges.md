@@ -1,8 +1,10 @@
 # Swap v2
 
-## Dec 14th, 2014 (4819)
+## Dec 14th, 2014 (4819-4820)
 
 - Updated new user experience
+- Views automatically refresh when new comments come in
+- Swipe between viewed photos in the gallery
 
 ## Dec 13th, 2014 (4816-4818)
 
