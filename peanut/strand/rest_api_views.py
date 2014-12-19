@@ -12,6 +12,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.forms.models import model_to_dict
+from django.http import Http404
 from django.http import HttpResponse
 
 from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
