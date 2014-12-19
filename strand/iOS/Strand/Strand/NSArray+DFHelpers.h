@@ -13,4 +13,8 @@
 - (NSArray *)arrayByMappingObjectsWithBlock:(id(^)(id input))mappingBlock;
 - (NSArray *)arrayByRemovingObject:(id)object;
 
+- (id)objectAfterObject:(id)object wrap:(BOOL)wrap;
+- (id)objectBeforeObject:(id)object wrap:(BOOL)wrap;
+- (id)objectWithDistance:(NSInteger)distance fromObject:(id)object wrap:(BOOL)wrap;
+
 @end

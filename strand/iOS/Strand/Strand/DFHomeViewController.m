@@ -23,6 +23,7 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFDismissableModalViewController.h"
 #import "DFAnalytics.h"
+#import "DFMutliPhotoDetailPageController.h"
 
 const CGFloat headerHeight = 60.0;
 const NSUInteger MinPhotosToShowFilter = 20;
@@ -392,11 +393,12 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager]
                                      strandPostsObjectWithId:photo.strand_id.longLongValue];
   
-  DFPhotoDetailViewController *epvc = [[DFPhotoDetailViewController alloc]
-                                          initWithPhotoObject:photo
-                                          inPostsObject:strandPosts];
+  DFMutliPhotoDetailPageController *mpvc = [[DFMutliPhotoDetailPageController alloc] initWithCurrentPhoto:photo inPhotos:[self.datasource photosForSection:indexPath.section]];
+//  DFPhotoDetailViewController *epvc = [[DFPhotoDetailViewController alloc]
+//                                          initWithPhotoObject:photo
+//                                          inPostsObject:strandPosts];
   
-  [DFDismissableModalViewController presentWithRootController:epvc inParent:self];
+  [DFDismissableModalViewController presentWithRootController:mpvc inParent:self];
 }
 
 - (void)filterChanged:(UISegmentedControl *)sender

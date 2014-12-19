@@ -33,9 +33,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
 
-@property (nonatomic, retain) DFPeanutFeedObject *photoObject;
-@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
-
 @property (nonatomic) DFPhotoIDType photoID;
 @property (nonatomic) DFStrandIDType strandID;
 

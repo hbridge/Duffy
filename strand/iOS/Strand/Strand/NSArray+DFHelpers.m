@@ -26,4 +26,33 @@
   return result;
 }
 
+- (id)objectAfterObject:(id)object wrap:(BOOL)wrap
+{
+  return [self objectWithDistance:1 fromObject:object wrap:wrap];
+}
+
+- (id)objectBeforeObject:(id)object wrap:(BOOL)wrap
+{
+  return [self objectWithDistance:-1 fromObject:object wrap:wrap];
+}
+
+- (id)objectWithDistance:(NSInteger)distance fromObject:(id)object wrap:(BOOL)wrap
+{
+  if (self.count == 0) return nil;
+  NSUInteger objectIndex = [self indexOfObject:object];
+  if (objectIndex == NSNotFound)
+    return nil;
+  
+  NSInteger requestedIndex = objectIndex + distance;
+  if (requestedIndex >= self.count) {
+    if (wrap) requestedIndex = 0;
+    else return nil;
+  } else if (requestedIndex < 0) {
+    if (wrap) requestedIndex = self.count - 1;
+    else return nil;
+  }
+  
+  return self[requestedIndex];
+}
+
 @end
