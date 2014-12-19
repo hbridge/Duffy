@@ -390,13 +390,13 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager]
-                                     strandPostsObjectWithId:photo.strand_id.longLongValue];
-  
-  DFMutliPhotoDetailPageController *mpvc = [[DFMutliPhotoDetailPageController alloc] initWithCurrentPhoto:photo inPhotos:[self.datasource photosForSection:indexPath.section]];
-//  DFPhotoDetailViewController *epvc = [[DFPhotoDetailViewController alloc]
-//                                          initWithPhotoObject:photo
-//                                          inPostsObject:strandPosts];
+   
+  NSMutableArray *allPhotos = [NSMutableArray new];
+  for (NSUInteger section = 0; section < [self.datasource numberOfSectionsInCollectionView:self.collectionView]; section++) {
+    [allPhotos addObjectsFromArray:[self.datasource photosForSection:section]];
+  }
+  DFMutliPhotoDetailPageController *mpvc = [[DFMutliPhotoDetailPageController alloc]
+                                            initWithCurrentPhoto:photo inPhotos:allPhotos];
   
   [DFDismissableModalViewController presentWithRootController:mpvc inParent:self];
 }
