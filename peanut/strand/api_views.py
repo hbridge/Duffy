@@ -514,6 +514,7 @@ def getInviteObjectsDataForUser(user):
 			if user not in strandInvite.strand.users.all():
 				action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
 				strandInvite.strand.users.add(user)
+			strandInvite.save()
 		return responseObjects
 
 	
