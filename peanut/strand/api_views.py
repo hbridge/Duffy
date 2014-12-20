@@ -168,9 +168,9 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, buildNum, retur
 				action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
 				strandInvite.strand.users.add(user)
 
+		strandInvite.save()
+		
 	if len(strandInvites) > 0:
-		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
-
 		user.first_run_sync_timestamp = strandInvites[0].strand.first_photo_time
 
 		logger.debug("Updated %s invites with user id %s and set first_run_sync_timestamp to %s" % (len(strandInvites), user.id, user.first_run_sync_timestamp))
@@ -506,6 +506,16 @@ def getInviteObjectsDataForUser(user):
 
 	strandInvites = StrandInvite.objects.prefetch_related('strand', 'strand__photos', 'strand__users').filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 	friends = friends_util.getFriends(user.id)
+
+	# Temp solution for using invites to hold incoming pictures 
+	if (getBuildNumForUser(user)) > 4805:
+		for strandInvite in strandInvites:
+			strandInvite.accepted_user = user
+			if user not in strandInvite.strand.users.all():
+				action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
+				strandInvite.strand.users.add(user)
+		return responseObjects
+
 	
 	strands = [x.strand for x in strandInvites]
 

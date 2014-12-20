@@ -514,6 +514,12 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         # This will filter out 3-byte and up unicode strings.
         obj.name = self.re_pattern.sub(u'\uFFFD', obj.name) 
 
+def getBuildNumForUser(user):
+    if user.last_build_info:
+        return int(user.last_build_info.split('-')[1])
+    else:
+        return 4000
+        
 """
    Strand invite API
 """
@@ -549,8 +555,8 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
                 user = User.objects.get(phone_number=strandInvite.phone_number, product_id=2)
                 strandInvite.invited_user = user
                 
-                if int(self.request.DATA['build_number']) > 4805:
-                # Temp solution for using invites to hold incoming pictures    
+                # Temp solution for using invites to hold incoming pictures 
+                if (getBuildNumForUser(user)) > 4805:
                     strandInvite.accepted_user = user
                     if user not in strandInvite.strand.users.all():
                         action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
