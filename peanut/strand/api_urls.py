@@ -7,7 +7,7 @@ from strand import api_views as strand_api_views
 from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import User, ContactEntry, Strand, StrandInvite, Action
+from common.models import User, ContactEntry, Strand, StrandInvite, Action, ShareInstance
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
@@ -42,6 +42,9 @@ urlpatterns = patterns('',
 
 	url(r'^strand_invite/$', strand_rest_api_views.StrandInviteBulkAPI.as_view()),
 	url(r'^strand_invite/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyStrandInviteAPI.as_view(model=StrandInvite, lookup_field='id')),
+
+	url(r'^share_instance/$', strand_rest_api_views.CreateShareInstanceAPI.as_view(model=ShareInstance, lookup_field='id')),	
+
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),

@@ -701,7 +701,8 @@ def createNeighborRowsToNewStrand(strand, privateStrand):
         logger.info("Wrote out or updated %s strand neighbor rows connecting neighbors of %s to new strand %s" % (len(newNeighbors), privateStrand.id, strand.id))
 
 
-class CreateShareInstanceAPI(CreateAPIView):
+class CreateShareInstanceAPI(KeyedCreateAPIView):
+    key = "share_instances"
     def pre_save(self, shareInstance):
         now = datetime.datetime.utcnow()
         shareInstance.shared_at_timestamp = now

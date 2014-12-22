@@ -759,8 +759,8 @@ class ShareInstance(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	photo = models.ForeignKey(Photo, db_index=True)
 	users = models.ManyToManyField(User, related_name = "si_users")
-	shared_at_timestamp = models.DateTimeField(db_index=True)
-	last_action_timestamp = models.DateTimeField(db_index=True)
+	shared_at_timestamp = models.DateTimeField(db_index=True, null=True)
+	last_action_timestamp = models.DateTimeField(db_index=True, null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
