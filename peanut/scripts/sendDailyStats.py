@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys, os
+import sys, os, requests, json
 import pytz
 import logging
 from datetime import datetime, date, timedelta
@@ -58,11 +58,12 @@ def compileData(date, length):
 
 	newUsers = getNewUsers(date, length)
 	dataDictDate = {'date': (date-relativedelta(days=1)).strftime('%m/%d/%y')}
+	dataDictLocalytics = getStatsFromLocalytics(date, length)
 	dataDictUsers = getUserStats(date, length, newUsers)
 	dataDictPhotos = getPhotoStats(date, length, newUsers)
 	dataDictActions = getActionStats(date, length, newUsers)
 
-	return dict(dataDictDate.items() + dataDictUsers.items() + dataDictPhotos.items() + dataDictActions.items())
+	return dict(dataDictDate.items() + dataDictLocalytics.items() + dataDictUsers.items() + dataDictPhotos.items() + dataDictActions.items())
 
 def getNewUsers(date, length):
 	newUsers = User.objects.filter(product_id=2).filter(added__lt=date).filter(added__gt=date-relativedelta(days=length))
@@ -142,6 +143,7 @@ def dataDictToString(dataDict, length):
 
 	# users	
 	msg += "\n--- USERS ---\n"
+	msg += "Localytics Users: " + str(dataDict['LocalyticsActiveUsers']) + "\n"
 	msg += "Active Users: " + str(dataDict['ActiveUsers']) + "\n"
 	msg += "New Users: " + str(dataDict['NewUsers']) + "\n"
 	msg += "New Friends: " + str(dataDict['NewFriends']) + "\n"
@@ -176,6 +178,55 @@ def dataDictToString(dataDict, length):
 	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'	
 	return msg
 
+def getStatsFromLocalytics(date, length):
+
+	# Localytics API info
+
+	url = 'https://api.localytics.com/v1/query?'
+	apiKey = '3dbadf00bdd71c6a99286ba-b9ff00a6-89c4-11e4-29be-004a77f8b47f'
+	apiSecret = 'd19228fc63c4336a11d9d30-b9ff05d6-89c4-11e4-29be-004a77f8b47f'
+	appID = 'b9370b33afb6b68728b25b7-952efd94-8487-11e4-5060-00a426b17dd8' #swap v2
+	#appID = 'dd0a7a0a4c9c1a5a602904f-285e4dea-5c55-11e4-a3a4-005cf8cbabd8' #swap v1
+	headers = {'Content-Type': "application/json"}
+
+	payload = {'api_key': apiKey,
+				'api_secret': apiSecret,
+				'app_id': appID,
+				'metrics': 'users'}
+
+	#Format payloads and dates
+	# NOTE: Localytics doesn't have rolling 7-day actives. They are only avaiable for Mondays.
+	# 7-day actives for week of 12-15-2014 to 12-22-2014 will be under 12/15/2014
+
+	dateEndFormatted = date.strftime('%Y-%m-%d')
+
+	if length == 1:
+		dimension = 'day'
+		dateBeginFormatted = (date-relativedelta(days=1)).strftime('%Y-%m-%d')
+		conditions = {'day': ['between', dateBeginFormatted, dateEndFormatted]}
+		payload['dimensions'] = dimension
+	elif length == 7:
+		dimension = 'week'
+		dateBeginFormatted = (date-relativedelta(days=7)).strftime('%Y-%m-%d')
+		conditions = {'week': ['between', dateBeginFormatted, dateEndFormatted]}
+		payload['dimensions'] = dimension
+	else:
+		print "ERROR: length needs to be either 1 or 7"
+		sys.exit()
+
+	# Send the request to Localytics
+	response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+	# parse results
+	parsedResponse = json.loads(response.text)
+
+	if 'results' in parsedResponse:
+		for entry in parsedResponse['results']:
+			if dimension in entry and entry[dimension] == dateBeginFormatted:
+				return {'LocalyticsActiveUsers': entry['users']} 
+				break
+
+	return {}
 
 def writeToSpreadsheet(dataDict, length):
 
