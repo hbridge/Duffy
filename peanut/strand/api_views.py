@@ -430,9 +430,9 @@ def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
 
 def getBuildNumForUser(user):
 	if user.last_build_info:
-		return user.last_build_info.split('-')[1]
+		return int(user.last_build_info.split('-')[1])
 	else:
-		return "4000"
+		return 4000
 
 def getObjectsDataForStrands(strands, user):
 	response = list()
@@ -508,7 +508,7 @@ def getInviteObjectsDataForUser(user):
 	friends = friends_util.getFriends(user.id)
 
 	# Temp solution for using invites to hold incoming pictures 
-	if (getBuildNumForUser(user)) > 4805:
+	if getBuildNumForUser(user) > 4805:
 		for strandInvite in strandInvites:
 			strandInvite.accepted_user = user
 			if user not in strandInvite.strand.users.all():
