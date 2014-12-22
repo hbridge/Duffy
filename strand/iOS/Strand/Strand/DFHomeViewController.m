@@ -24,6 +24,7 @@
 #import "DFDismissableModalViewController.h"
 #import "DFAnalytics.h"
 #import "DFMutliPhotoDetailPageController.h"
+#import <MMPopLabel/MMPopLabel.h>
 
 const CGFloat headerHeight = 60.0;
 const NSUInteger MinPhotosToShowFilter = 20;
@@ -33,6 +34,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
+@property (nonatomic, retain) MMPopLabel *popLabel;
 
 @end
 
@@ -47,6 +49,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   [self configureNav];
   [self configureCollectionView];
   [self configureNoResultsView];
+  [self configurePopLabel];
 }
 
 - (void)observeNotifications
@@ -318,6 +321,12 @@ static BOOL showFilters = NO;
   });
 }
 
+- (void)configurePopLabel
+{
+  self.popLabel = [MMPopLabel popLabelWithText:@"No photos at this time"];
+  [self.view addSubview:self.popLabel];
+}
+
 - (void)configureBadges
 {
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
@@ -361,16 +370,34 @@ static BOOL showFilters = NO;
 #pragma mark - Actions
 
 - (IBAction)reviewButtonPressed:(id)sender {
-  [DFDismissableModalViewController presentWithRootController:[[DFSuggestionsPageViewController alloc]
-                                                     initWithPreferredType:DFIncomingViewType]
-                                                     inParent:self];
+  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
+  if (numToReview > 0) {
+  [DFDismissableModalViewController
+   presentWithRootController:[[DFSuggestionsPageViewController alloc]
+                              initWithPreferredType:DFIncomingViewType]
+   inParent:self];
+  } else {
+    [self.popLabel popAtView:sender animatePopLabel:YES animateTargetView:NO];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self.popLabel dismiss];
+    });
+  }
   [self logHomeButtonPressed:sender];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
-  [DFDismissableModalViewController presentWithRootController:[[DFSuggestionsPageViewController alloc]
-                                                     initWithPreferredType:DFSuggestionViewType]
-                                                     inParent:self];
+  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
+  if (numToSend > 0) {
+  [DFDismissableModalViewController
+   presentWithRootController:[[DFSuggestionsPageViewController alloc]
+                              initWithPreferredType:DFSuggestionViewType]
+   inParent:self];
+  } else {
+    [self.popLabel popAtView:sender animatePopLabel:YES animateTargetView:NO];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self.popLabel dismiss];
+    });
+  }
   [self logHomeButtonPressed:sender];
 }
 
