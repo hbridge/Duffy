@@ -15,7 +15,7 @@ from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord, ShareInstance
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util, serializers
@@ -690,6 +690,27 @@ def private_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+
+def swap_inbox(request):
+	startProfiling()
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		responseObjects = list()
+
+		shareInstances = ShareInstance.objects.prefetch_related('photo', 'actions').filter(users__in=[user.id])
+
+		print shareInstances
+		for shareInstance in shareInstances:
+			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, user))
+
+		response["objects"] = responseObjects
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 	Returns back the invites and strands a user has

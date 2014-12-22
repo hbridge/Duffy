@@ -11,7 +11,7 @@ from peanut.settings import constants
 
 from strand import geo_util, friends_util
 
-from common.models import Strand, StrandNeighbor, Photo, Action
+from common.models import Strand, StrandNeighbor, Photo, Action, ShareInstance, User
 
 logger = logging.getLogger(__name__)
 
@@ -253,5 +253,36 @@ def checkStrandForAllPhotosEvaluated(strand):
 		strand.save()
 	else:
 		logger.debug("Created action and had %s photos till not seen in the strand: %s" % (len(notSeenPhotoIds), notSeenPhotoIds))
+
+def convertStrandToShareInstance(strand):
+	strandActions = Action.objects.filter(strand_id=strand.id)
+
+	for photo in strand.photos.all():
+		addAction = None
+		for action in strandActions:
+			if action.action_type == constants.ACTION_TYPE_CREATE_STRAND or action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and photo in action.photos.all():
+				addAction = action
+
+		if not addAction:
+			print "couldn't find add action for %s %s" % (photo.id, strand.id)
+			return False
+
+		photoActions = Action.objects.filter(photo_id=photo.id, strand_id=strand.id)
+
+		lastTimeStamp = addAction.added
+		for action in photoActions:
+			if action.action_type == constants.ACTION_TYPE_COMMENT or action.action_type == constants.ACTION_TYPE_FAVORITE:
+				if not lastTimeStamp:
+					lastTimeStamp = action.added
+				elif lastTimeStamp < action.added:
+					lastTimeStamp = action.added
+
+		shareInstance = ShareInstance.objects.create(user=photo.user, photo = photo, shared_at_timestamp=addAction.added, last_action_timestamp=lastTimeStamp)
+		shareInstance.users = User.getIds(strand.users.all())
+		shareInstance.actions = Action.getIds(photoActions)
+
+	return True
+
+
 
 

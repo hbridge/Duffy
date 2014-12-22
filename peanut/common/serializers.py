@@ -1,7 +1,7 @@
 import logging
 
 from rest_framework import serializers
-from common.models import Photo, User, Action, ContactEntry, StrandInvite, Strand
+from common.models import Photo, User, Action, ContactEntry, StrandInvite, Strand, ShareInstance
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -54,6 +54,33 @@ class BulkStrandInviteSerializer(serializers.Serializer):
 	# key in the json that links to the list of objects
 	bulk_key = 'invites'
 
+def objectDataForShareInstance(shareInstance, user):
+	shareInstanceData = dict()
+	shareInstanceData['type'] = "photo"
+	shareInstanceData['user'] = shareInstance.user_id
+	shareInstanceData['id'] = shareInstance.photo_id
+	shareInstanceData['time_taken'] = shareInstance.photo.time_taken
+	shareInstanceData['full_image_path'] = shareInstance.photo.getFullUrlImagePath()
+	shareInstanceData['thumb_image_path'] = shareInstance.photo.getThumbUrlImagePath()
+	shareInstanceData['actors'] = [actor.id for actor in shareInstance.users.all()]
+	shareInstanceData['last_action_timestamp'] = shareInstance.last_action_timestamp
+	shareInstanceData['shared_at_timestamp'] = shareInstance.shared_at_timestamp
+
+	publicActions = list()
+	userEvalAction = None
+	for action in shareInstance.actions.all():
+		if action.action_type != constants.ACTION_TYPE_PHOTO_EVALUATED:
+			publicActions.append(action)
+		elif action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user == user:
+			userEvalAction = action
+
+	if userEvalAction:
+		shareInstanceData['evaluated'] = True
+		shareInstanceData['evaluated_time'] = action.added
+		
+	shareInstanceData['actions'] = [actionDataForApiSerializer(action) for action in publicActions]
+
+	return shareInstanceData
 def photoDataForApiSerializer(photo):
 	photoData = dict()
 	photoData['id'] = photo.id

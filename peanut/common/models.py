@@ -543,6 +543,9 @@ class Strand(models.Model):
 	contributed_to_id = models.IntegerField(null=True)
 
 	suggestible = models.BooleanField(default=True)
+
+	swap_converted = models.BooleanField(default=False)
+	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
@@ -773,6 +776,10 @@ class Action(models.Model):
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.user.id, self.action_type, self.strand, self.added)
 
+	@classmethod
+	def getIds(cls, objs):
+		return doGetIds(cls, objs)
+
 	class Meta:
 		db_table = 'strand_action'
 		index_together = ('strand', 'action_type')
@@ -803,6 +810,26 @@ class LocationRecord(models.Model):
 
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
+
+class ShareInstance(models.Model):
+	user = models.ForeignKey(User, db_index=True)
+	photo = models.ForeignKey(Photo, db_index=True)
+	users = models.ManyToManyField(User, related_name = "si_users")
+	actions = models.ManyToManyField(Action, related_name = "si_actions")
+	shared_at_timestamp = models.DateTimeField(db_index=True)
+	last_action_timestamp = models.DateTimeField(db_index=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'swap_share_instance'
+	
+
+def doGetIds(cls, objs):
+	ids = list()
+	for obj in objs:
+		ids.append(obj.id)
+	return ids
 
 def doBulkUpdate(cls, objs, attributesList):
 	if not isinstance(objs, list) and not isinstance(objs, QuerySet):
