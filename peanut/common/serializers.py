@@ -66,6 +66,8 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	shareInstanceData['last_action_timestamp'] = shareInstance.last_action_timestamp
 	shareInstanceData['shared_at_timestamp'] = shareInstance.shared_at_timestamp
 	shareInstanceData['share_instance'] = shareInstance.id
+	shareInstanceData['full_width'] = shareInstance.photo.full_width
+	shareInstanceData['full_height'] = shareInstance.photo.full_height
 
 	publicActions = list()
 	userEvalAction = None
