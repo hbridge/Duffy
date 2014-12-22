@@ -72,20 +72,29 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	for action in actions:
 		if action.action_type != constants.ACTION_TYPE_PHOTO_EVALUATED:
 			publicActions.append(action)
-		elif action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user == user:
+		elif action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user_id == user.id:
 			userEvalAction = action
 
-	if shareInstance.id == 8:
-		print actions
 	if userEvalAction:
 		shareInstanceData['evaluated'] = True
 		shareInstanceData['evaluated_time'] = action.added
 	else:
 		shareInstanceData['evaluated'] = False
 		
-	shareInstanceData['actions'] = [actionDataForApiSerializer(action) for action in publicActions]
+	shareInstanceData['actions'] = [actionDataForShareInstance(action) for action in publicActions]
 
 	return shareInstanceData
+
+def actionDataForShareInstance(action):
+	actionData = dict()
+	actionData['id'] = action.id
+	actionData['user'] = action.user_id
+	actionData['time_stamp'] = action.added
+	actionData['action_type'] = action.action_type
+	actionData['text'] = action.text
+
+	return actionData
+
 def photoDataForApiSerializer(photo):
 	photoData = dict()
 	photoData['id'] = photo.id

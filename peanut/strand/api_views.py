@@ -701,23 +701,27 @@ def swap_inbox(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 
-		shareInstances = ShareInstance.objects.prefetch_related('photo').filter(users__in=[user.id])
+		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id])
 
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
+		printStats("swaps_inbox-1")
 
+		actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
 		actionsByShareInstanceId = dict()
 		for action in actions:
 			if action.share_instance_id not in actionsByShareInstanceId:
 				actionsByShareInstanceId[action.share_instance_id] = list()
 			actionsByShareInstanceId[action.share_instance_id].append(action)
-			
+		
+		printStats("swaps_inbox-2")
+
 		for shareInstance in shareInstances:
 			actions = list()
 			if shareInstance.id in actionsByShareInstanceId:
 				actions = actionsByShareInstanceId[shareInstance.id]
 			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, actions, user))
 
+		printStats("swaps_inbox-end")
 		response["objects"] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
