@@ -226,6 +226,9 @@ const NSUInteger CompressedModeMaxRows = 1;
   NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
   [self.recipientsProfileStackView setPeanutUsers:recipients];
   for (DFPeanutUserObject *recipient in recipients) {
+    // if the recipient has no UID they can't have taken an action
+    // and the actionsOfType:forUser uses UID 0 as an "any" val, so we should skip UID 0 recipients
+    if (recipient.id == 0) continue;
     DFPeanutAction *likeAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id] firstObject];
     if (likeAction) {
       if ([self.unreadActions containsObject:likeAction]) {
