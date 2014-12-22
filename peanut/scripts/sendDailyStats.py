@@ -12,7 +12,7 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Count, Sum
 from django.db.models import Q
 
@@ -275,6 +275,8 @@ def genHTML(emailBody):
 
 	html += emailBody
 
+	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image">'
+
 	html +="</body></html>"
 
 	return html
@@ -310,7 +312,8 @@ def main(argv):
 
 	print emailBody
 
-	#html = genHTML(emailBody)
+	html = genHTML(emailBody)
+
 
 	# Send to spreadsheet
 	if publishToSpreadSheet:
@@ -324,10 +327,11 @@ def main(argv):
 
 	# Send to email
 	if sendEmail:
-		emailTo = ['swap-stats@duffytech.co']
+		emailTo = ['aseem@duffytech.co']
 		emailSubj = 'Daily Stats'
-		email = EmailMessage(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
+		email = EmailMultiAlternatives(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
 			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
+		#email.attach_alternative(html, "text/html")
 		email.send(fail_silently=False)
 		print 'Email Sent to: ' + ' '.join(emailTo)	
 
