@@ -54,7 +54,7 @@ class BulkStrandInviteSerializer(serializers.Serializer):
 	# key in the json that links to the list of objects
 	bulk_key = 'invites'
 
-def objectDataForShareInstance(shareInstance, user):
+def objectDataForShareInstance(shareInstance, actions, user):
 	shareInstanceData = dict()
 	shareInstanceData['type'] = "photo"
 	shareInstanceData['user'] = shareInstance.user_id
@@ -65,18 +65,23 @@ def objectDataForShareInstance(shareInstance, user):
 	shareInstanceData['actors'] = [actor.id for actor in shareInstance.users.all()]
 	shareInstanceData['last_action_timestamp'] = shareInstance.last_action_timestamp
 	shareInstanceData['shared_at_timestamp'] = shareInstance.shared_at_timestamp
+	shareInstanceData['share_instance'] = shareInstance.id
 
 	publicActions = list()
 	userEvalAction = None
-	for action in shareInstance.actions.all():
+	for action in actions:
 		if action.action_type != constants.ACTION_TYPE_PHOTO_EVALUATED:
 			publicActions.append(action)
 		elif action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user == user:
 			userEvalAction = action
 
+	if shareInstance.id == 8:
+		print actions
 	if userEvalAction:
 		shareInstanceData['evaluated'] = True
 		shareInstanceData['evaluated_time'] = action.added
+	else:
+		shareInstanceData['evaluated'] = False
 		
 	shareInstanceData['actions'] = [actionDataForApiSerializer(action) for action in publicActions]
 

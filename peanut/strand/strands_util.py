@@ -267,10 +267,14 @@ def convertStrandToShareInstance(strand):
 			print "couldn't find add action for %s %s" % (photo.id, strand.id)
 			return False
 
-		photoActions = Action.objects.filter(photo_id=photo.id, strand_id=strand.id)
+		photoActions = Action.objects.filter(photo_id=photo.id)
 
 		lastTimeStamp = addAction.added
+		actionsForThisShare = list()
 		for action in photoActions:
+			if action.strand_id == strand.id or (action.user == photo.user and action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED):
+				actionsForThisShare.append(action)
+
 			if action.action_type == constants.ACTION_TYPE_COMMENT or action.action_type == constants.ACTION_TYPE_FAVORITE:
 				if not lastTimeStamp:
 					lastTimeStamp = action.added
@@ -279,7 +283,10 @@ def convertStrandToShareInstance(strand):
 
 		shareInstance = ShareInstance.objects.create(user=photo.user, photo = photo, shared_at_timestamp=addAction.added, last_action_timestamp=lastTimeStamp)
 		shareInstance.users = User.getIds(strand.users.all())
-		shareInstance.actions = Action.getIds(photoActions)
+
+		for action in actionsForThisShare:
+			action.share_instance = shareInstance
+			action.save()
 
 	return True
 

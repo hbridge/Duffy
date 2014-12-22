@@ -625,6 +625,12 @@ class CreateActionAPI(CreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
+    def post_save(self, action, created):
+        if create:
+            if action.share_instance:
+                action.share_instance.last_action_timestamp = action.added
+                action.share_instance.save()
+            
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def pre_save(self, user):
         if self.request.DATA['build_id'] and self.request.DATA['build_number']:
@@ -695,6 +701,12 @@ def createNeighborRowsToNewStrand(strand, privateStrand):
         logger.info("Wrote out or updated %s strand neighbor rows connecting neighbors of %s to new strand %s" % (len(newNeighbors), privateStrand.id, strand.id))
 
 
+class CreateShareInstanceAPI(CreateAPIView):
+    def pre_save(self, shareInstance):
+        now = datetime.datetime.utcnow()
+        shareInstance.shared_at_timestamp = now
+        shareInstance.last_action_timestamp = now
+        
 """
     REST interface for creating and editing strands
 

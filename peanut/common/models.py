@@ -755,6 +755,22 @@ class FriendConnection(models.Model):
 		# TODO(Derek): If thie above loop gets bad, put back in the bulk calls
 		#FriendConnection.objects.bulk_create(newFriendConnections)
 
+class ShareInstance(models.Model):
+	user = models.ForeignKey(User, db_index=True)
+	photo = models.ForeignKey(Photo, db_index=True)
+	users = models.ManyToManyField(User, related_name = "si_users")
+	shared_at_timestamp = models.DateTimeField(db_index=True)
+	last_action_timestamp = models.DateTimeField(db_index=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	@classmethod
+	def getIds(cls, objs):
+		return doGetIds(cls, objs)
+		
+	class Meta:
+		db_table = 'swap_share_instance'
+	
 
 class Action(models.Model):
 	user = models.ForeignKey(User, db_index=True)
@@ -764,6 +780,7 @@ class Action(models.Model):
 	strand = models.ForeignKey(Strand, db_index=True, null=True)
 	notification_sent = models.DateTimeField(null=True)
 	text = models.TextField(null=True)
+	share_instance = models.ForeignKey(ShareInstance, db_index=True, null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -811,19 +828,7 @@ class LocationRecord(models.Model):
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
 
-class ShareInstance(models.Model):
-	user = models.ForeignKey(User, db_index=True)
-	photo = models.ForeignKey(Photo, db_index=True)
-	users = models.ManyToManyField(User, related_name = "si_users")
-	actions = models.ManyToManyField(Action, related_name = "si_actions")
-	shared_at_timestamp = models.DateTimeField(db_index=True)
-	last_action_timestamp = models.DateTimeField(db_index=True)
-	added = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
 
-	class Meta:
-		db_table = 'swap_share_instance'
-	
 
 def doGetIds(cls, objs):
 	ids = list()

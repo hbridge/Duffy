@@ -26,7 +26,7 @@ def main(argv):
     maxFileAtTime = 16
     count = 0
 
-    strands = Strand.objects.prefetch_related('photos').filter(swap_converted=False).filter(private=False).order_by('-id')[:1]
+    strands = Strand.objects.prefetch_related('photos').filter(swap_converted=False).filter(private=False).order_by('-id')[:1000]
 
     for strand in strands:
         print "Starting converstion for strand %s" % strand.id
