@@ -558,6 +558,11 @@ static DFAnalytics *defaultLogger;
                    }];
 }
 
++ (void)logNux:(NSString *)nuxName completedWithResult:(NSString *)result
+{
+  [self logEvent:@"NuxCompleted" withParameters:@{ResultKey : result}];
+}
+
 
 
 #pragma mark - Bucket Value helpers

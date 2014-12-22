@@ -178,9 +178,14 @@
     logResult = @"skip";
   }
   
-  [DFAnalytics logOutgoingCardProcessedWithSuggestion:self.suggestionFeedObject
-                                               result:logResult
-                                           actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
+  if (self.nuxStep > 0) {
+    [DFAnalytics logNux:[NSString stringWithFormat:@"MatchStep%d", (int)self.nuxStep]
+    completedWithResult:logResult];
+  } else {
+    [DFAnalytics logOutgoingCardProcessedWithSuggestion:self.suggestionFeedObject
+                                                 result:logResult
+                                             actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
+  }
 }
 
 - (IBAction)addPersonButtonPressed:(id)sender {

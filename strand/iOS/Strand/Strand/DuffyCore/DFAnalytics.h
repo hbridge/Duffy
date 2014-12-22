@@ -104,6 +104,9 @@ disappearedWithParameters:(NSDictionary *)params;
      processedWithResult:(NSString *)result
               actionType:(NSString *)actionType;
 
++ (void)logNux:(NSString *)nuxName
+completedWithResult:(NSString *)result;
+
 
 #pragma mark - Utilities
 

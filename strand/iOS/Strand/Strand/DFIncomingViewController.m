@@ -129,9 +129,14 @@
     logResult = @"like";
   }
   
-  [DFAnalytics
+  if (self.nuxStep > 0) {
+    [DFAnalytics logNux:[NSString stringWithFormat:@"IncomingStep%d", (int)self.nuxStep]
+    completedWithResult:logResult];
+  }else {
+    [DFAnalytics
    logIncomingCardProcessedWithResult:logResult
    actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
+  }
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
