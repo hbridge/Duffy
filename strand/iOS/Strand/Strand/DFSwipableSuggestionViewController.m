@@ -221,8 +221,8 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 
 - (NSArray *)suggestedPeanutContacts
 {
-  return [self.suggestionFeedObject.actors arrayByMappingObjectsWithBlock:^id(id input) {
-    return [[DFPeanutContact alloc] initWithPeanutUser:input];
+  return [self.suggestionFeedObject.actorUsers arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+    return [[DFPeanutContact alloc] initWithPeanutUser:user];
   }];
 }
 
