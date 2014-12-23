@@ -444,10 +444,11 @@ class BulkCreateModelMixin(CreateModelMixin):
                 for rawData in request.DATA[serializer.bulk_key]:
                     obj = self.sub_serializer(rawData)
                     objects.append(obj)
+
+                    print obj
             else:
                 objects = serializer.object[serializer.bulk_key]
 
-            
             [self.pre_save(obj) for obj in objects]
 
             results = list()
