@@ -725,7 +725,7 @@ def swap_inbox(request):
 
 		# Add in the list of all friends at the end
 		friends = friends_util.getFriends(user.id)
-		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(user.id, friends, True)}
+		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'friends': getActorsObjectData(user.id, friends, True)}
 		responseObjects.append(friendsEntry)
 
 		printStats("swaps_inbox-end")
