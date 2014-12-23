@@ -269,8 +269,6 @@
 		65437DE419F810AA00D57F9D /* DFImageDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */; };
 		65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */; };
 		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
-		65D005201A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D0051F1A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.m */; };
-		65D005231A48A3F800AF7B4E /* DFPeanutShareInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D005221A48A3F800AF7B4E /* DFPeanutShareInstance.m */; };
 		65D1C2CD1A2D0930007E7300 /* UIBarButtonItem+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2CC1A2D0930007E7300 /* UIBarButtonItem+Badge.m */; };
 		65D1C2D01A2D095E007E7300 /* UIButton+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2CF1A2D095E007E7300 /* UIButton+Badge.m */; };
 		65D1C2D91A30C1AA007E7300 /* DFPeanutSharedStrand.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */; };
@@ -770,10 +768,6 @@
 		65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFIOS7CameraRollSyncOperation.h; sourceTree = "<group>"; };
 		65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS8CameraRollSyncOperation.m; sourceTree = "<group>"; };
 		65BEA79D19E351310087930F /* DFIOS8CameraRollSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIOS8CameraRollSyncOperation.h; sourceTree = "<group>"; };
-		65D0051E1A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutShareInstanceAdapter.h; sourceTree = "<group>"; };
-		65D0051F1A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutShareInstanceAdapter.m; sourceTree = "<group>"; };
-		65D005211A48A3F800AF7B4E /* DFPeanutShareInstance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutShareInstance.h; sourceTree = "<group>"; };
-		65D005221A48A3F800AF7B4E /* DFPeanutShareInstance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutShareInstance.m; sourceTree = "<group>"; };
 		65D1C2CB1A2D0930007E7300 /* UIBarButtonItem+Badge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+Badge.h"; sourceTree = "<group>"; };
 		65D1C2CC1A2D0930007E7300 /* UIBarButtonItem+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+Badge.m"; sourceTree = "<group>"; };
 		65D1C2CE1A2D095E007E7300 /* UIButton+Badge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Badge.h"; sourceTree = "<group>"; };
@@ -1165,8 +1159,6 @@
 				652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */,
 				65D1C2DA1A30C246007E7300 /* DFPeanutSharedStrandAdapter.h */,
 				65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */,
-				65D0051E1A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.h */,
-				65D0051F1A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -1202,8 +1194,6 @@
 				5A883BF41A0AD63800355C1D /* DFPeanutFaceFeature.m */,
 				65D1C2D71A30C1AA007E7300 /* DFPeanutSharedStrand.h */,
 				65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */,
-				65D005211A48A3F800AF7B4E /* DFPeanutShareInstance.h */,
-				65D005221A48A3F800AF7B4E /* DFPeanutShareInstance.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -2030,7 +2020,6 @@
 				5A87DE1A1A267E240058EB38 /* DFProfileWithContextView.m in Sources */,
 				5AA36F1019F82813008B37AA /* NSAttributedString+DFHelpers.m in Sources */,
 				5A9115EC19DB7F90003F2A68 /* UINib+DFHelpers.m in Sources */,
-				65D005231A48A3F800AF7B4E /* DFPeanutShareInstance.m in Sources */,
 				5AAF03A319B4D5B200EF021C /* DFPeoplePickerViewController.m in Sources */,
 				5AB7BEC51A042081000BEB67 /* DFInviteFriendViewController.m in Sources */,
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
@@ -2041,7 +2030,6 @@
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */,
 				65E241591A3B5BB30044F1CB /* DFNoIncomingViewController.m in Sources */,
-				65D005201A48A3DB00AF7B4E /* DFPeanutShareInstanceAdapter.m in Sources */,
 				5A883BF51A0AD63800355C1D /* DFPeanutFaceFeature.m in Sources */,
 				5AED01E019E348DF001F075D /* NSIndexPath+DFHelpers.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
