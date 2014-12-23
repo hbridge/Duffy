@@ -275,7 +275,8 @@ def genHTML(emailBody):
 	html = "<html><body>"
 	html += '<h2> 7-day users </h2>'
 	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image&rand=' + str(time) + '">'
-	html += '<h2> 1-day users </h2>'	
+	html += '<h3>* Localytics only has 7-day actives for Mondays. No rolling 7-day actives.</h3>'
+	html += '<h2> 1-day users </h2>'
 	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=60601290&format=image&rand=' + str(time) + '">'
 	html += '<h2> Actions </h2>'
 	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=1473168963&format=image&rand='+ str(time) + '">'
