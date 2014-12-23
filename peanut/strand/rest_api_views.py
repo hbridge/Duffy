@@ -730,6 +730,11 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
         now = datetime.datetime.utcnow()
         shareInstance.shared_at_timestamp = now
         shareInstance.last_action_timestamp = now
+
+
+    def post_save(self, shareInstance, created):
+        if created:
+            action = Action.objects.create(user=shareInstance.user, photo_id=shareInstance.photo_id, share_instance=shareInstance, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
         
 """
     REST interface for creating and editing strands
