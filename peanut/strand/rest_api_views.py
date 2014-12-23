@@ -31,7 +31,7 @@ from common import location_util, api_util
 # TODO(Derek): move this to common
 from arbus import image_util
 
-from strand import notifications_util, strands_util
+from strand import notifications_util, strands_util, users_util
 
 logger = logging.getLogger(__name__)
 
@@ -630,7 +630,13 @@ class CreateActionAPI(CreateAPIView):
             if action.share_instance:
                 action.share_instance.last_action_timestamp = action.added
                 action.share_instance.save()
-            
+
+         
+class CreateUserAPI(CreateAPIView):
+    def post_save(self, user, created):
+        if created:
+            users_util.initNewUser(user)
+
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def pre_save(self, user):
         if self.request.DATA['build_id'] and self.request.DATA['build_number']:

@@ -33,6 +33,7 @@ urlpatterns = patterns('',
 	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
 	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),
 
+	url(r'^users/$', strand_rest_api_views.CreateUserAPI.as_view(model=User, lookup_field='id')),
 	url(r'^users/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateUserAPI.as_view(model=User, lookup_field='id', serializer_class=UserSerializer)),
 
 	url(r'^contacts/$', strand_rest_api_views.ContactEntryBulkAPI.as_view()),
@@ -44,6 +45,7 @@ urlpatterns = patterns('',
 	url(r'^strand_invite/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyStrandInviteAPI.as_view(model=StrandInvite, lookup_field='id')),
 
 	url(r'^share_instance/$', strand_rest_api_views.CreateShareInstanceAPI.as_view(model=ShareInstance, lookup_field='id')),	
+	url(r'^share_instance/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=ShareInstance, lookup_field='id')),
 
 
 	# experimental

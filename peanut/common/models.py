@@ -46,6 +46,7 @@ class User(models.Model):
 	last_build_info = models.CharField(max_length=100, null=True)
 	last_actions_list_request_timestamp = models.DateTimeField(null=True)
 	install_num = models.IntegerField(default=0)
+	has_sms_authed = models.BooleanField(default=0)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
