@@ -51,8 +51,16 @@ class StrandInviteSerializer(serializers.ModelSerializer):
 class BulkStrandInviteSerializer(serializers.Serializer):
 	invites = StrandInviteSerializer(many=True)
 
+class ShareInstanceSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = ShareInstance
+
+class BulkShareInstanceSerializer(serializers.Serializer):
+	share_instances = ShareInstanceSerializer(many=True)
+
 	# key in the json that links to the list of objects
-	bulk_key = 'invites'
+	bulk_key = 'share_instances'
+
 
 class ShareInstanceSerializer(serializers.ModelSerializer):
 	class Meta:

@@ -25,7 +25,7 @@ from rest_framework.views import APIView
 from peanut.settings import constants
 
 from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, ShareInstance
-from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer, BulkShareInstanceSerializer
+from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer, BulkShareInstanceSerializer, ShareInstanceSerializer
 from common import location_util, api_util
 
 # TODO(Derek): move this to common
@@ -439,7 +439,14 @@ class BulkCreateModelMixin(CreateModelMixin):
 
         model = self.model
         if serializer.is_valid():
-            objects = serializer.object[serializer.bulk_key]
+            if self.many_to_many_field:
+                objects = list()
+                for rawData in request.DATA[serializer.bulk_key]:
+                    obj = self.sub_serializer(rawData)
+                    objects.append(obj)
+            else:
+                objects = serializer.object[serializer.bulk_key]
+
             
             [self.pre_save(obj) for obj in objects]
 
@@ -694,12 +701,14 @@ def createNeighborRowsToNewStrand(strand, privateStrand):
 
 
 class CreateShareInstanceAPI(BulkCreateAPIView):
-    model = ShareInstance
+    model = StrandInvite
     lookup_field = 'id'
     serializer_class = BulkShareInstanceSerializer
+    many_to_many_field = "users"
 
+    def sub_serializer(self, data):
+        return ShareInstanceSerializer(data)
 
-    key = "share_instances"
     def pre_save(self, shareInstance):
         now = datetime.datetime.utcnow()
         shareInstance.shared_at_timestamp = now
