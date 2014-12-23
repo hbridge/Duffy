@@ -4,7 +4,7 @@ import os
 
 from django.db.models import Q
 
-from common.models import User, FriendConnection, ContactEntry
+from common.models import User, FriendConnection, ContactEntry, StrandInvite
 
 logger = logging.getLogger(__name__)
 
