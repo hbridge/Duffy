@@ -13,5 +13,6 @@
 + (DFUserInfoManager *)sharedManager;
 - (void)setFirstTimeSyncCount:(NSNumber *)photoCount;
 - (void)setLastPhotoTimestamp:(NSDate *)timestamp;
+- (void)setLastCheckinTimestamp:(NSDate *)timestamp;
 
 @end

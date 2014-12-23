@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSString *device_token;
 @property (nonatomic, retain) NSString *last_location_point;
 @property (nonatomic, retain) NSNumber *last_location_accuracy;
+@property (nonatomic, retain) NSDate *last_checkin_timestamp;
 @property (nonatomic, retain) NSDate *last_photo_timestamp;
 @property (nonatomic, retain) NSDate *last_photo_update_timestamp;
 @property (nonatomic, retain) NSDate *first_run_sync_timestamp;
