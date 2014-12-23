@@ -440,7 +440,7 @@ class BulkCreateModelMixin(CreateModelMixin):
         model = self.model
         if serializer.is_valid():
             manyToManyFieldData = dict()
-            if self.many_to_many_field:
+            if hasattr(self, 'many_to_many_field'):
                 # when we have a many to many field, we have to go through and create a lookup table
                 # from the raw data (with the info) to a unique key per object
                 objects = list()
@@ -476,7 +476,7 @@ class BulkCreateModelMixin(CreateModelMixin):
                 dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
                 results.extend(model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt))
 
-            if self.many_to_many_field:
+            if hasattr(self, 'many_to_many_field'):
                 for obj in results:
                     mtmField = getattr(obj, self.many_to_many_field)
                     for data in manyToManyFieldData[obj.mtm_key]:
