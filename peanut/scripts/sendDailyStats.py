@@ -226,7 +226,7 @@ def getStatsFromLocalytics(date, length):
 				return {'LocalyticsActiveUsers': entry['users']} 
 				break
 
-	return {}
+	return {'LocalyticsActiveUsers': ''}
 
 def writeToSpreadsheet(dataDict, length):
 
@@ -272,13 +272,15 @@ def writeToSpreadsheet(dataDict, length):
 
 def genHTML(emailBody):
 	html = "<html><body>"
-
-	html += emailBody
-
+	html += '<h2> 7-day users </h2>'
 	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image">'
-
+	html += '<h2> 1-day users </h2>'	
+	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=60601290&format=image">'
+	html += '<h2> Actions </h2>'
+	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=1473168963&format=image">'
+	html += '<h3><a href ="https://docs.google.com/a/duffytech.co/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/edit#gid=1659973534">Raw data and stats</a></h3>'
+	html += '<pre>' + emailBody + '</pre>'	
 	html +="</body></html>"
-
 	return html
 
 
@@ -306,7 +308,6 @@ def main(argv):
 	dataDict7day = compileData(date, 7)
 
 	# compile string to publish to console and/or email
-	emailBody = '\nGraphs: https://docs.google.com/a/duffytech.co/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/edit#gid=1659973534\n'
 	emailBody += dataDictToString(dataDict7day, 7)
 	emailBody += dataDictToString(dataDict1day, 1)
 
@@ -327,11 +328,11 @@ def main(argv):
 
 	# Send to email
 	if sendEmail:
-		emailTo = ['aseem@duffytech.co']
+		emailTo = ['swap-stats@duffytech.co']
 		emailSubj = 'Daily Stats'
 		email = EmailMultiAlternatives(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
 			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
-		#email.attach_alternative(html, "text/html")
+		email.attach_alternative(html, "text/html")
 		email.send(fail_silently=False)
 		print 'Email Sent to: ' + ' '.join(emailTo)	
 
