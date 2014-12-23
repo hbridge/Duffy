@@ -721,7 +721,16 @@ def swap_inbox(request):
 				actions = actionsByShareInstanceId[shareInstance.id]
 			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, actions, user))
 
+		printStats("swaps_inbox-3")
+
+		# Add in the list of all friends at the end
+		friends = friends_util.getFriends(user.id)
+		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(user.id, friends, True)}
+		responseObjects.append(friendsEntry)
+
 		printStats("swaps_inbox-end")
+
+
 		response["objects"] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
