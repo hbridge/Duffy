@@ -45,6 +45,5 @@ typedef UInt64 DFActionID;
 @property (nonatomic, retain) NSDate *time_stamp;
 
 + (NSArray *)simpleAttributeKeys;
-- (DFPeanutUserObject *)peanutUser;
 
 @end
