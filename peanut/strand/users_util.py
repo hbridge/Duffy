@@ -92,6 +92,6 @@ def createStrandUserThroughSmsAuth(phoneNumber, displayName, smsAuth, buildNum):
 		smsAuth.user_created = user
 		smsAuth.save()
 
-	logger.info("Created new user %s from sms auth %s" % (user, smsAuth.id))
+	logger.info("Created new user %s from sms auth" % (user))
 
 	return user
