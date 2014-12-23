@@ -37,6 +37,7 @@ class User(models.Model):
 	last_location_timestamp = models.DateTimeField(null=True)
 	last_photo_timestamp = models.DateTimeField(null=True)
 	last_photo_update_timestamp = models.DateTimeField(null=True)
+	last_checkin_timestamp = models.DateTimeField(null=True)
 	first_run_sync_timestamp = models.DateTimeField(null=True)
 	first_run_sync_count = models.IntegerField(null=True)
 	first_run_sync_complete = models.BooleanField(default=False)
