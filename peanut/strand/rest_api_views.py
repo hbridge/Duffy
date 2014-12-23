@@ -616,7 +616,7 @@ class CreateActionAPI(CreateAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return super(CreateActionAPI, self).post(request)
-            elif (obj.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED):
+            elif (obj.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and obj.strand):
                 strands_util.checkStrandForAllPhotosEvaluated(obj.strand)
                 return super(CreateActionAPI, self).post(request)
             else:

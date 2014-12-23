@@ -238,21 +238,22 @@ def updateOrCreateStrandNeighbors(strandNeighbors):
 	return
 
 def checkStrandForAllPhotosEvaluated(strand):
-	photoIds = Photo.getIds(strand.photos.all())
+	if strand:
+		photoIds = Photo.getIds(strand.photos.all())
 
-	actions = Action.objects.filter(photo_id__in=photoIds).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+		actions = Action.objects.filter(photo_id__in=photoIds).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
 
-	notSeenPhotoIds = photoIds
-	for action in actions:
-		if action.photo_id in notSeenPhotoIds:
-			notSeenPhotoIds.remove(action.photo_id)
-			
-	if len(notSeenPhotoIds) == 0:
-		logger.debug("All photos have been seen for strand %s, marking as suggestible = False" % strand.id)
-		strand.suggestible = False
-		strand.save()
-	else:
-		logger.debug("Created action and had %s photos till not seen in the strand: %s" % (len(notSeenPhotoIds), notSeenPhotoIds))
+		notSeenPhotoIds = photoIds
+		for action in actions:
+			if action.photo_id in notSeenPhotoIds:
+				notSeenPhotoIds.remove(action.photo_id)
+				
+		if len(notSeenPhotoIds) == 0:
+			logger.debug("All photos have been seen for strand %s, marking as suggestible = False" % strand.id)
+			strand.suggestible = False
+			strand.save()
+		else:
+			logger.debug("Created action and had %s photos till not seen in the strand: %s" % (len(notSeenPhotoIds), notSeenPhotoIds))
 
 def convertStrandToShareInstance(strand):
 	strandActions = Action.objects.filter(strand_id=strand.id)
