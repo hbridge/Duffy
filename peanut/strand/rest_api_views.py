@@ -413,7 +413,7 @@ class BulkCreateModelMixin(CreateModelMixin):
         Return back all new objects, filtering out existing if they already exist
         based on the unique fields
     """
-    def getNewObjects(self, objects, model):
+    def getNewObjects(self, objects):
         newObjects = list()
         for obj in objects:
             result = self.fetchWithUniqueKeys(obj)
@@ -439,13 +439,21 @@ class BulkCreateModelMixin(CreateModelMixin):
 
         model = self.model
         if serializer.is_valid():
+            manyToManyFieldData = dict()
             if self.many_to_many_field:
+                # when we have a many to many field, we have to go through and create a lookup table
+                # from the raw data (with the info) to a unique key per object
                 objects = list()
+                count = 0
                 for rawData in request.DATA[serializer.bulk_key]:
-                    obj = self.sub_serializer(rawData)
-                    objects.append(obj)
+                    subSerializer = self.sub_serializer(rawData)
 
-                    print obj
+                    if subSerializer.is_valid():
+                        manyToManyFieldData[count] = rawData[self.many_to_many_field]
+                        subSerializer.object.mtm_key = count
+                        objects.append(subSerializer.object)
+
+                        count += 1
             else:
                 objects = serializer.object[serializer.bulk_key]
 
@@ -461,14 +469,21 @@ class BulkCreateModelMixin(CreateModelMixin):
                 try:
                     model.objects.bulk_create(chunk)
                 except IntegrityError:
-                    newObjects = self.getNewObjects(chunk, model)
+                    newObjects = self.getNewObjects(chunk)
                     model.objects.bulk_create(newObjects)
 
                 # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
                 dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
                 results.extend(model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt))
 
+            if self.many_to_many_field:
+                for obj in results:
+                    mtmField = getattr(obj, self.many_to_many_field)
+                    for data in manyToManyFieldData[obj.mtm_key]:
+                        mtmField.add(data)
+                                        
             serializer.object[serializer.bulk_key] = results
+
             [self.post_save(obj, created=True) for obj in serializer.object[serializer.bulk_key]]
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -702,13 +717,14 @@ def createNeighborRowsToNewStrand(strand, privateStrand):
 
 
 class CreateShareInstanceAPI(BulkCreateAPIView):
-    model = StrandInvite
     lookup_field = 'id'
     serializer_class = BulkShareInstanceSerializer
     many_to_many_field = "users"
 
+    # This is used right now by the bulk api so it can serialize each object
+    # Could be refactored into parent if we use it more
     def sub_serializer(self, data):
-        return ShareInstanceSerializer(data)
+        return ShareInstanceSerializer(data=data)
 
     def pre_save(self, shareInstance):
         now = datetime.datetime.utcnow()
