@@ -288,11 +288,10 @@ void (^_completionHandler)(UIBackgroundFetchResult);
     DDLogInfo(@"%@ became active", [DFAppInfo appInfoString]);
     if ([self isAppSetupComplete]) {
       // Tell the server that the app was woken up and register timestamp
-      dispatch_async(dispatch_get_main_queue(), ^{
-        NSDate *now = [[NSDate alloc] init];
-        DDLogVerbose(@"Setting last checkin time to %@", now);
-        [[DFUserInfoManager sharedManager] setLastCheckinTimestamp:now];
-      });
+      NSDate *now = [[NSDate alloc] init];
+      DDLogVerbose(@"Setting last checkin time to %@", now);
+      [[DFUserInfoManager sharedManager] setLastCheckinTimestamp:now];
+      
       [[DFCameraRollSyncManager sharedManager] sync];
       [[DFCameraRollSyncManager sharedManager] deletedPhotoSync];
       [[DFContactSyncManager sharedManager] sync];
@@ -489,11 +488,10 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   };
   [[DFCameraRollSyncManager sharedManager] sync];
   // Tell the server that the app was woken up and register timestamp
-  dispatch_async(dispatch_get_main_queue(), ^{
-    NSDate *now = [[NSDate alloc] init];
-    DDLogVerbose(@"Setting last checkin time to %@", now);
-    [[DFUserInfoManager sharedManager] setLastCheckinTimestamp:now];
-  });
+  NSDate *now = [[NSDate alloc] init];
+  DDLogVerbose(@"Setting last checkin time to %@", now);
+  [[DFUserInfoManager sharedManager] setLastCheckinTimestamp:now];
+
 }
 
 - (void)resetApplication
