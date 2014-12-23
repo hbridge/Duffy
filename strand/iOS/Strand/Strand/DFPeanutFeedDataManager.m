@@ -356,7 +356,7 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutUserObject *user in self.friendsList) {
     NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
     for (DFPeanutFeedObject *photoObject in photos) {
-      if (photoObject.evaluated.boolValue == NO) {
+      if (photoObject.evaluated.boolValue == NO && photoObject.user != [[DFUser currentUser] userID]) {
         [result addObject:photoObject];
       }
     }

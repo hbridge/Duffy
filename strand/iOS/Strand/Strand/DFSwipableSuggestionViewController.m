@@ -107,7 +107,7 @@
 {
   _suggestionFeedObject = suggestionFeedObject;
   if (self.nuxStep == 0) {
-    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actorUsers;
     self.selectedPeanutContacts = [self suggestedPeanutContacts];
   }
 }

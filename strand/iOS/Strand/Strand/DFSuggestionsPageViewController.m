@@ -215,23 +215,17 @@ const NSUInteger NumOutgoingNuxes = 3;
   }
   
   DFPeanutFeedObject *firstPhoto;
-  NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
-  // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
-  for (DFPeanutUserObject *user in friends) {
-    NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
-    for (DFPeanutFeedObject *photo in photos) {
-      if (photo.user != [[DFUser currentUser] userID] &&
-          ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-        // Now lets see if the image is loaded yet
-        DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
-        if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-          return photo;
-        } else if(!firstPhoto) {
-          // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
-          firstPhoto = photo;
-        }
-      }
+  NSArray *photos = [[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers];
+  for (DFPeanutFeedObject *photo in photos) {
+    // Now lets see if the image is loaded yet
+    DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
+    if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
+      return photo;
+    } else if(!firstPhoto) {
+      // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
+      firstPhoto = photo;
     }
+
   }
   
   if (firstPhoto) {
