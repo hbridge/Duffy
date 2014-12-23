@@ -626,7 +626,7 @@ class CreateActionAPI(CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
     def post_save(self, action, created):
-        if create:
+        if created:
             if action.share_instance:
                 action.share_instance.last_action_timestamp = action.added
                 action.share_instance.save()
