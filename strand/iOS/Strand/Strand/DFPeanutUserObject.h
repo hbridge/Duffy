@@ -29,6 +29,7 @@
 @property (nonatomic, retain) NSNumber *invites_remaining;
 @property (nonatomic, retain) NSNumber *invites_sent;
 @property (nonatomic, retain) NSNumber *shared_strand;
+@property (nonatomic, retain) NSNumber *has_sms_authed;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSNumber *invited;
 

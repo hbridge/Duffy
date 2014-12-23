@@ -41,6 +41,7 @@
            @"invites_remaining",
            @"invites_sent",
            @"shared_strand",
+           @"has_sms_authed",
            @"added",
            @"invited",
            ];
