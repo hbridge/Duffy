@@ -363,7 +363,7 @@ static BOOL showFilters = NO;
 
 - (IBAction)reviewButtonPressed:(id)sender {
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
-  if (numToReview > 0) {
+  if (numToReview > 0 || ![DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
   [DFDismissableModalViewController
    presentWithRootController:[[DFSuggestionsPageViewController alloc]
                               initWithPreferredType:DFIncomingViewType]
@@ -379,7 +379,7 @@ static BOOL showFilters = NO;
 
 - (IBAction)sendButtonPressed:(id)sender {
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
-  if (numToSend > 0) {
+  if (numToSend > 0 || ![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
   [DFDismissableModalViewController
    presentWithRootController:[[DFSuggestionsPageViewController alloc]
                               initWithPreferredType:DFSuggestionViewType]
@@ -410,6 +410,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+  DDLogVerbose(@"%@ photo tapped: %@", self.class, photo);
    
   NSMutableArray *allPhotos = [NSMutableArray new];
   for (NSUInteger section = 0; section < [self.datasource numberOfSectionsInCollectionView:self.collectionView]; section++) {
