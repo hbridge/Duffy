@@ -54,6 +54,16 @@ class BulkStrandInviteSerializer(serializers.Serializer):
 	# key in the json that links to the list of objects
 	bulk_key = 'invites'
 
+class ShareInstanceSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = ShareInstance
+
+class BulkShareInstanceSerializer(serializers.Serializer):
+	share_instances = ShareInstanceSerializer(many=True)
+
+	# key in the json that links to the list of objects
+	bulk_key = 'share_instances'
+
 def objectDataForShareInstance(shareInstance, actions, user):
 	shareInstanceData = dict()
 	shareInstanceData['type'] = "photo"

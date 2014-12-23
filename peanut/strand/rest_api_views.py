@@ -25,7 +25,7 @@ from rest_framework.views import APIView
 from peanut.settings import constants
 
 from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor
-from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer
+from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer, BulkShareInstanceSerializer
 from common import location_util, api_util
 
 # TODO(Derek): move this to common
@@ -475,20 +475,6 @@ class BulkCreateAPIView(BulkCreateModelMixin,
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-class KeyedCreateAPIView(CreateModelMixin,
-                         GenericAPIView):
-    key = None
-    def post(self, request, *args, **kwargs):
-        if isinstance(request.DATA[self.key], list):
-            dataEntry = request.DATA[self.key][0]
-        else:
-            dataEntry = request.DATA[self.key]
-
-        for key, value in dataEntry.iteritems():
-            request.DATA[key] = value
-
-        return self.create(request, *args, **kwargs)
-
 class ContactEntryBulkAPI(BulkCreateAPIView):
     model = ContactEntry
     lookup_field = 'id'
@@ -707,7 +693,12 @@ def createNeighborRowsToNewStrand(strand, privateStrand):
         logger.info("Wrote out or updated %s strand neighbor rows connecting neighbors of %s to new strand %s" % (len(newNeighbors), privateStrand.id, strand.id))
 
 
-class CreateShareInstanceAPI(KeyedCreateAPIView):
+class CreateShareInstanceAPI(BulkCreateAPIView):
+    model = ShareInstance
+    lookup_field = 'id'
+    serializer_class = BulkShareInstanceSerializer
+
+
     key = "share_instances"
     def pre_save(self, shareInstance):
         now = datetime.datetime.utcnow()
