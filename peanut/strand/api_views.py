@@ -201,6 +201,20 @@ def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None)
 
 	userData = list()
 	for user in users:
+		userData.append(user.id)
+
+	if invitedUsers:
+		for user in invitedUsers:
+			userData.append(user.id)
+
+	return userData
+
+def getFriendsObjectData(userId, users, includePhone = True, invitedUsers = None):
+	if not isinstance(users, list):
+		users = [users]
+
+	userData = list()
+	for user in users:
 		entry = {'display_name': user.display_name, 'id': user.id}
 
 		if includePhone:
@@ -725,7 +739,7 @@ def swap_inbox(request):
 
 		# Add in the list of all friends at the end
 		friends = friends_util.getFriends(user.id)
-		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'friends': getActorsObjectData(user.id, friends, True)}
+		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'friends': getFriendsObjectData(user.id, friends, True)}
 		responseObjects.append(friendsEntry)
 
 		printStats("swaps_inbox-end")
