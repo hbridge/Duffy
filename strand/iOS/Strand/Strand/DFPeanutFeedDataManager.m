@@ -19,6 +19,7 @@
 #import "DFPhotoStore.h"
 #import "DFPhoneNumberUtils.h"
 #import "DFAnalytics.h"
+#import "DFPeanutShareInstanceAdapter.h"
 
 @interface DFPeanutFeedDataManager ()
 
@@ -30,6 +31,7 @@
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (readonly, nonatomic, retain) DFPeanutSharedStrandAdapter *sharedStrandAdapter;
+@property (readonly, nonatomic, retain) DFPeanutShareInstanceAdapter *shareInstanceAdapter;
 
 
 @property (atomic) BOOL inboxRefreshing;
@@ -53,16 +55,6 @@
 @end
 
 @implementation DFPeanutFeedDataManager
-
-@synthesize inboxFeedAdapter = _inboxFeedAdapter;
-@synthesize swapsFeedAdapter = _swapsFeedAdapter;
-@synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
-@synthesize actionsFeedAdapter = _actionsFeedAdapter;
-
-@synthesize strandAdapter = _strandAdapter;
-@synthesize inviteAdapter = _inviteAdapter;
-@synthesize actionAdapter = _actionAdapter;
-@synthesize sharedStrandAdapter = _sharedStrandAdapter;
 
 @synthesize cachedFriendsList = _cachedFriendsList;
 
@@ -356,7 +348,7 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutUserObject *user in self.friendsList) {
     NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
     for (DFPeanutFeedObject *photoObject in photos) {
-      if (photoObject.evaluated.boolValue == NO && photoObject.user != [[DFUser currentUser] userID]) {
+      if (photoObject.evaluated.boolValue == NO) {
         [result addObject:photoObject];
       }
     }
@@ -534,49 +526,6 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-
-- (void)addFeedObjects:(NSArray *)feedObjects
-            toStrandID:(DFStrandIDType)strandID
-               success:(DFSuccessBlock)success
-               failure:(DFFailureBlock)failure
-{
-  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
-  requestStrand.id = @(strandID);
-  
-  NSMutableArray *photos = [NSMutableArray new];
-  for (DFPeanutFeedObject *feedObject in feedObjects) {
-    if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
-      [photos addObject:feedObject];
-    } else {
-      [photos addObjectsFromArray:[feedObject descendentsOfType:DFFeedObjectPhoto]];
-    }
-  }
-  
-  NSMutableArray *photoIDs = [NSMutableArray new];
-  [photoIDs addObjectsFromArray:[photos arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photoObject) {
-    return @(photoObject.id);
-  }]];
-  
-  __weak typeof(self) weakSelf = self;
-  
-  [self.strandAdapter
-   addPhotos:photos toStrandID:strandID success:^() {
-     // cache the photos locally
-     [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:photoIDs];
-     [[DFPhotoStore sharedStore] markPhotosForUpload:photoIDs];
-     
-     [[NSNotificationCenter defaultCenter]
-      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-      object:weakSelf];
-     
-     if (success) success();
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ failed to add photos to strand: %llu, error: %@",
-                weakSelf.class, strandID, error);
-     if (failure) failure(error);
-   }];
-}
-
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible
 {
   DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
@@ -603,72 +552,95 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
-- (void)createNewStrandWithFeedObjects:(NSArray *)feedObjects
-                     additionalUserIds:(NSArray *)additionalUserIds
-                          success:(void(^)(DFPeanutStrand *resultStrand))success
-                          failure:(DFFailureBlock)failure
-
+- (void)sharePhotoObjects:(NSArray *)photoObjects
+              withPhoneNumbers:(NSArray *)phoneNumbers
+                  success:(void(^)(NSArray *photos, NSArray *createdPhoneNumbers))success
+                  failure:(DFFailureBlock)failure
 {
-  // Create the strand
-  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
-  NSMutableArray *userIds = [NSMutableArray arrayWithObject:@([[DFUser currentUser] userID])];
-  if (additionalUserIds) {
-    [userIds addObjectsFromArray:additionalUserIds];
-  }
-  requestStrand.users = userIds;
-  NSMutableArray *photoObjects = [NSMutableArray new];
-  for (DFPeanutFeedObject *feedObject in feedObjects) {
-    [photoObjects addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
-  }
+  // Get UIDs
   
-  requestStrand.photos = [photoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photoObject) {
-    return @(photoObject.id);
+  [self userIDsFromPhoneNumbers:phoneNumbers success:^(NSArray *userIDs, NSArray *createdUserPhoneNumbers) {
+    // Create the strand
+    NSMutableArray *shareInstances = [NSMutableArray new];
+    for (DFPeanutFeedObject *photo in photoObjects) {
+      DFPeanutShareInstance *shareInstance = [DFPeanutShareInstance new];
+      shareInstance.photo = @(photo.id);
+      NSMutableSet *users = [[NSMutableSet alloc] initWithArray:userIDs];
+      [users addObject:@([[DFUser currentUser] userID])];
+      shareInstance.users = users.allObjects;
+      shareInstance.user = @([[DFUser currentUser] userID]);
+      [shareInstances addObject:shareInstance];
+    }
+    
+    [self.shareInstanceAdapter
+     createShareInstances:shareInstances
+     success:^(NSArray *resultObjects) {
+       DDLogInfo(@"%@ successfully create share instances: %@", self.class, resultObjects);
+       [[NSNotificationCenter defaultCenter]
+        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+        object:self];
+       
+       // start uploading the photos
+       NSArray *photoIDs = [photoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photo) {
+         return @(photo.id);
+       }];
+       [[DFPhotoStore sharedStore] markPhotosForUpload:photoIDs];
+       [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:photoIDs];
+       success(resultObjects, createdUserPhoneNumbers);
+     } failure:^(NSError *error) {
+       failure(error);
+     }];
+
+  } failure:^(NSError *error) {
+    failure(error);
   }];
-  requestStrand.private = @(NO);
-  [self setTimesForStrand:requestStrand fromPhotoObjects:photoObjects];
-  
-  [self.strandAdapter
-   performRequest:RKRequestMethodPOST
-   withPeanutStrand:requestStrand
-   success:^(DFPeanutStrand *peanutStrand) {
-     DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
-     
-     [[NSNotificationCenter defaultCenter]
-      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-      object:self];
-     
-     // start uploading the photos
-     [[DFPhotoStore sharedStore] markPhotosForUpload:peanutStrand.photos];
-     [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:peanutStrand.photos];
-     if (success) success(peanutStrand);
-   } failure:^(NSError *error) {
-     if (failure) failure(error);
-     DDLogError(@"%@ failed to create strand: %@, error: %@",
-                self.class, requestStrand, error);
-   }];
 }
 
-/*
- * When we share a photo we create a new strand with just that photo and the set of users
- */
-- (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users
+- (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
+                        success:(void(^)(NSArray *userIDs, NSArray *createdUserPhoneNumbers))success
+                        failure:(DFFailureBlock)failure
 {
-  NSMutableArray *friendUserIds = [NSMutableArray new];
-  
-  for (DFPeanutUserObject *user in users) {
-    [friendUserIds addObject:@(user.id)];
+  NSMutableArray *userIDs = [NSMutableArray new];
+  NSMutableArray *phoneNumbersToCreateUser = [NSMutableArray new];
+  for (NSString *phoneNumber in  phoneNumbers) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
+                                userWithPhoneNumber:phoneNumber];
+    if (user) {
+      [userIDs addObject:@(user.id)];
+    } else {
+      [phoneNumbersToCreateUser addObject:phoneNumber];
+    }
   }
   
-  [self
-   createNewStrandWithFeedObjects:[NSArray arrayWithObject:photo]
-   additionalUserIds:friendUserIds
-   success:^(DFPeanutStrand *resultStrand) {
-     DDLogInfo(@"Successfully created new strand %@", resultStrand.id);
-        }
-   failure:nil
-   ];
+  if (phoneNumbersToCreateUser.count > 0) {
+    // create users
+    
+    
+  } else {
+    success(userIDs, nil);
+  }
 }
 
+
+- (void)addUsersWithPhoneNumbers:(NSArray *)phoneNumbers
+ toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
+           success:(void(^)(NSArray *numbersToText))success
+           failure:(DFFailureBlock)failure
+{
+  [self userIDsFromPhoneNumbers:phoneNumbers success:^(NSArray *userIDs, NSArray *createdUserPhoneNumbers) {
+    [self.shareInstanceAdapter addUserIDs:userIDs
+                        toShareInstanceID:shareInstanceID
+                                  success:^(NSArray *resultObjects) {
+                                    success(createdUserPhoneNumbers);
+                                  } failure:^(NSError *error) {
+                                    failure(error);
+                                  }];
+    
+    
+  } failure:^(NSError *error) {
+    failure(error);
+  }];
+}
 
 - (NSArray *)photosWithAction:(DFActionID)actionType
 {
@@ -755,42 +727,6 @@ static DFPeanutFeedDataManager *defaultManager;
   [self.actionAdapter addAction:evalAction success:nil failure:nil];
 }
 
-
-- (void)removePhoto:(DFPeanutFeedObject *)photoObject
-     fromStrandPosts:(DFPeanutFeedObject *)strandPosts
-            success:(DFSuccessBlock)success
-            failure:(DFFailureBlock)failure
-{
-  DFPeanutStrand *reqStrand = [[DFPeanutStrand alloc] init];
-  reqStrand.id = @(strandPosts.id);
-  
-  DDLogInfo(@"Going to delete photo %llu", photoObject.id);
-  
-  // first get the strand
-  [self.strandAdapter
-   performRequest:RKRequestMethodGET
-   withPeanutStrand:reqStrand success:^(DFPeanutStrand *peanutStrand) {
-     //remove the photo from the strand's list of photos
-     NSMutableArray *newPhotosList = [peanutStrand.photos mutableCopy];
-     [newPhotosList removeObject:@(photoObject.id)];
-     peanutStrand.photos = newPhotosList;
-
-     // patch the strand with the new list
-     [self.strandAdapter
-      performRequest:RKRequestMethodPATCH
-      withPeanutStrand:peanutStrand success:^(DFPeanutStrand *peanutStrand) {
-        DDLogInfo(@"%@ removed photo %@ from %@", self.class, photoObject, peanutStrand);
-        success();
-      } failure:^(NSError *error) {
-        DDLogError(@"%@ couldn't patch strand: %@", self.class, error);
-        failure(error);
-      }];
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ couldn't get strand: %@", self.class, error);
-     failure(error);
-   }];
-}
-
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
 {
   NSDate *minDateFound;
@@ -873,7 +809,19 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-#pragma mark - Network Adapter
+
+
+#pragma mark - Network Adapters
+
+@synthesize inboxFeedAdapter = _inboxFeedAdapter;
+@synthesize swapsFeedAdapter = _swapsFeedAdapter;
+@synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
+@synthesize actionsFeedAdapter = _actionsFeedAdapter;
+@synthesize strandAdapter = _strandAdapter;
+@synthesize inviteAdapter = _inviteAdapter;
+@synthesize actionAdapter = _actionAdapter;
+@synthesize sharedStrandAdapter = _sharedStrandAdapter;
+@synthesize shareInstanceAdapter = _shareInstanceAdapter;
 
 - (DFPeanutFeedAdapter *)inboxFeedAdapter
 {
@@ -921,6 +869,12 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_sharedStrandAdapter) _sharedStrandAdapter = [[DFPeanutSharedStrandAdapter alloc] init];
   return _sharedStrandAdapter;
+}
+
+- (DFPeanutShareInstanceAdapter *)shareInstanceAdapter
+{
+  if (!_shareInstanceAdapter) _shareInstanceAdapter = [DFPeanutShareInstanceAdapter new];
+  return _shareInstanceAdapter;
 }
 
 - (NSArray *)cachedFriendsList

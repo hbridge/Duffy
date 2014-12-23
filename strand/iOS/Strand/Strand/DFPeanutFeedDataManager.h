@@ -53,31 +53,28 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 // Methods used for dealing with swap page
 - (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID shareInstance:(DFShareInstanceIDType)privateStrandID;
-- (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users;
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
 - (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
 
-- (void)addFeedObjects:(NSArray *)feedObjects
-            toStrandID:(DFStrandIDType)strandID
-               success:(DFSuccessBlock)success
-               failure:(DFFailureBlock)failure;
-
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
 
+- (void)sharePhotoObjects:(NSArray *)photoObjects
+     withPhoneNumbers:(NSArray *)phoneNumbers
+              success:(void(^)(NSArray *photos, NSArray *createdPhoneNumbers))success
+              failure:(DFFailureBlock)failure;
 
-- (void)createNewStrandWithFeedObjects:(NSArray *)feedObjects
-                     additionalUserIds:(NSArray *)additionalUserIds
-                               success:(void(^)(DFPeanutStrand *resultStrand))success
-                               failure:(DFFailureBlock)failure;
+- (void)addUsersWithPhoneNumbers:(NSArray *)phoneNumbers
+               toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
+                         success:(void(^)(NSArray *numbersToText))success
+                         failure:(DFFailureBlock)failure;
 
-- (void)removePhoto:(DFPeanutFeedObject *)photoObject
-    fromStrandPosts:(DFPeanutFeedObject *)strandPosts
-            success:(DFSuccessBlock)success
-            failure:(DFFailureBlock)failure;
-
+/* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
+- (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
+                        success:(void(^)(NSArray *userIDs, NSArray *createdUserPhoneNumbers))success
+                        failure:(DFFailureBlock)failure;
 
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
@@ -85,4 +82,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
            oldActionID:(DFActionID)oldActionID
                success:(void(^)(DFActionID actionID))success
                failure:(DFFailureBlock)failure;
+
+
+
 @end

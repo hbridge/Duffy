@@ -423,84 +423,45 @@ const NSUInteger NumOutgoingNuxes = 3;
   }
   
   self.lastSentContacts = contacts;
-  // figure out which selected contacts are users
-  NSMutableArray *users = [NSMutableArray new];
-  for (DFPeanutContact *contact in contacts) {
-    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
-                                userWithPhoneNumber:contact.phone_number];
-    if (user) [users addObject:user];
-  }
   
-  // if any are users share photos with them
-  if (users.count > 0) {
-    [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:photo users:users];
-  }
+  NSArray *phoneNumbers = [contacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+    return contact.phone_number;
+  }];
   
-  // if there are more contacts, create a strand for each and send invites
-  if (contacts.count > users.count) {
-    [self createStrandsForPhoto:photo sendInvitesToContacts:contacts fromSuggestion:suggestion];
-  }
+  [[DFPeanutFeedDataManager sharedManager]
+   sharePhotoObjects:@[photo]
+   withPhoneNumbers:phoneNumbers
+   success:^(NSArray *photos, NSArray *createdPhoneNumbers) {
+     if (createdPhoneNumbers.count > 0) {
+       [self sendTextToPhoneNumbers:createdPhoneNumbers forPhoto:photo];
+     }
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ send failed: %@", self.class, error);
+   }];
   
   [SVProgressHUD showSuccessWithStatus:@"Sent!"];
   [self gotoNextController];
 }
 
-- (void)createStrandsForPhoto:(DFPeanutFeedObject *)photo
-        sendInvitesToContacts:(NSArray *)contacts
-               fromSuggestion:(DFPeanutFeedObject *)suggestion
+- (void)sendTextToPhoneNumbers:(NSArray *)phoneNumbers forPhoto:(DFPeanutFeedObject *)photo
 {
-  DFSuggestionsPageViewController __weak *weakSelf = self;
-  [SVProgressHUD show];
-  for (DFPeanutContact *contact in contacts) {
-    [[DFPeanutFeedDataManager sharedManager]
-     createNewStrandWithFeedObjects:@[photo]
-     additionalUserIds:nil
-     success:^(DFPeanutStrand *createdStrand){
-       [weakSelf sendInvitesForStrand:createdStrand
-                     toPeanutContacts:@[contact]
-                           suggestion:suggestion];
-     } failure:^(NSError *error) {
-       [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-       DDLogError(@"%@ create failed: %@", weakSelf.class, error);
-     }];
-  }
-}
-
-- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
-            toPeanutContacts:(NSArray *)peanutContacts
-                  suggestion:(DFPeanutFeedObject *)suggestion
-{
-  DFSuggestionsPageViewController __weak *weakSelf = self;
-  [self.inviteAdapter
-   sendInvitesForStrand:peanutStrand
-   toPeanutContacts:peanutContacts
-   inviteLocationString:suggestion.location
-   invitedPhotosDate:suggestion.time_taken
-   success:^(DFSMSInviteStrandComposeViewController *vc) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       DDLogInfo(@"Created strand successfully");
-       if (vc && [DFSMSInviteStrandComposeViewController canSendText]) {
-         // Some of the invitees aren't Strand users, send them a text
-         vc.messageComposeDelegate = weakSelf;
-         [weakSelf presentViewController:vc
-                                animated:YES
-                              completion:^{
-                                [SVProgressHUD dismiss];
-                              }];
-       } else {
-         [SVProgressHUD dismiss];
-       }
-     });
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
-                weakSelf.class, peanutStrand, error);
-   }];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc] initWithRecipients:phoneNumbers locationString:nil date:photo.time_taken];
+    if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
+      // Some of the invitees aren't Strand users, send them a text
+      smsvc.messageComposeDelegate = self;
+      [self presentViewController:smsvc
+                         animated:YES
+                       completion:^{
+                         [SVProgressHUD dismiss];
+                       }];
+    }
+  });
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
-  
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 

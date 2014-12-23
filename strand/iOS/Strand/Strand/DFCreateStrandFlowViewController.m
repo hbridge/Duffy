@@ -138,55 +138,47 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 
 - (void)createStrand
 {
-  NSArray *suggestedObjects = [self.selectPhotosController.selectPhotosController
-                               collectionFeedObjectsWithSelectedObjects];
-  
   DFCreateStrandFlowViewController __weak *weakSelf = self;
   
+  
   [SVProgressHUD show];
+  
+  NSArray *phoneNumbers = [self.peoplePickerController.selectedPeanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+    return contact.phone_number;
+  }];
+  
   [[DFPeanutFeedDataManager sharedManager]
-   createNewStrandWithFeedObjects:self.selectPhotosController.selectedObjects
-   additionalUserIds:nil
-   success:^(DFPeanutStrand *createdStrand){
-     [weakSelf sendInvitesForStrand:createdStrand
-               toPeanutContacts:weakSelf.peoplePickerController.selectedPeanutContacts
-                     suggestion:suggestedObjects.firstObject];
+   sharePhotoObjects:self.selectPhotosController.selectedObjects
+   withPhoneNumbers:phoneNumbers
+   success:^(NSArray *photos, NSArray *createdPhoneNumbers) {
+     if (createdPhoneNumbers.count > 0) {
+       [self sendTextToPhoneNumbers:createdPhoneNumbers];
+     } else {
+       [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
+     }
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:error.localizedDescription];
      DDLogError(@"%@ create failed: %@", weakSelf.class, error);
    }];
 }
 
-- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
-            toPeanutContacts:(NSArray *)peanutContacts
-                  suggestion:(DFPeanutFeedObject *)suggestion
+- (void)sendTextToPhoneNumbers:(NSArray *)phoneNumbers
 {
-  DFCreateStrandFlowViewController __weak *weakSelf = self;
-  [self.inviteAdapter
-   sendInvitesForStrand:peanutStrand
-   toPeanutContacts:peanutContacts
-   inviteLocationString:suggestion.location
-   invitedPhotosDate:suggestion.time_taken
-   success:^(DFSMSInviteStrandComposeViewController *vc) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       DDLogInfo(@"Created strand successfully");
-       if (vc && [DFSMSInviteStrandComposeViewController canSendText]) {
-         // Some of the invitees aren't Strand users, send them a text
-         vc.messageComposeDelegate = weakSelf;
-         [weakSelf presentViewController:vc
-                            animated:YES
-                          completion:^{
-                            [SVProgressHUD dismiss];
-                          }];
-       } else {
-         [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
-       }
-     });
-   } failure:^(NSError *error) {
-     [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:@"Invite failed"];
-     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
-                weakSelf.class, peanutStrand, error);
-   }];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    DFPeanutFeedObject *photo = self.selectPhotosController.selectPhotosController.selectedFeedObjects.firstObject;
+    DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc] initWithRecipients:phoneNumbers locationString:nil date:photo.time_taken];
+    if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
+      // Some of the invitees aren't Strand users, send them a text
+      smsvc.messageComposeDelegate = self;
+      [self presentViewController:smsvc
+                         animated:YES
+                       completion:^{
+                         [SVProgressHUD dismiss];
+                       }];
+    } else {
+      [self dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
+    }
+  });
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
