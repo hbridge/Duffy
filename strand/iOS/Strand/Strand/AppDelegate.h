@@ -15,8 +15,6 @@
 - (void)resetApplication;
 - (void)firstTimeSetupComplete;
 - (void)firstTimeSetupUserIdStepCompleteWithSyncTimestamp:(NSDate *)date;
-- (void)showStrandWithID:(DFStrandIDType)strandID
-              completion:(void(^)(void))completion;
 
 @end
 

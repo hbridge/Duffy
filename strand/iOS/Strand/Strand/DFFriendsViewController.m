@@ -10,11 +10,9 @@
 #import <AddressBook/AddressBook.h>
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutUserObject.h"
-#import "DFSingleFriendViewController.h"
 #import "DFStrandConstants.h"
 #import "DFPersonSelectionTableViewCell.h"
 #import "DFFriendProfileViewController.h"
-#import "DFSwapUpsellView.h"
 #import "UINib+DFHelpers.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFContactSyncManager.h"
@@ -35,7 +33,6 @@
 @property (nonatomic, retain) DFPeanutFeedDataManager *peanutDataManager;
 @property (nonatomic, strong) NSArray *friendPeanutUsers;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
-@property (nonatomic, retain) DFSwapUpsellView *contactsUpsellView;
 @property (nonatomic, retain) DFNoTableItemsView *noFriendsView;
 
 @end
@@ -100,7 +97,6 @@
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  [self configureContactsUpsell];
   [self reloadData];
 }
 
@@ -141,52 +137,6 @@
 - (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
-  [self configureContactsUpsell];
-}
-
-static BOOL showContactsUpsell = NO;
-- (void)configureContactsUpsell
-{
-  ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
-  if (status != kABAuthorizationStatusAuthorized && showContactsUpsell) {
-    // ask for contacts
-    if (!self.contactsUpsellView) {
-      self.contactsUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
-      [self.view addSubview:self.contactsUpsellView];
-      [self.contactsUpsellView configureForContactsWithError:(status != kABAuthorizationStatusNotDetermined)
-                                                buttonTarget:self
-                                                    selector:@selector(contactsUpsellButtonPressed:)];
-    }
-    CGFloat swapUpsellHeight = MAX(self.view.frame.size.height * .66, DFUpsellMinHeight);
-    self.contactsUpsellView.frame = CGRectMake(0,
-                                           self.view.frame.size.height - swapUpsellHeight,
-                                           self.view.frame.size.width,
-                                           swapUpsellHeight);
-  } else {
-    [self.contactsUpsellView removeFromSuperview];
-  }
-}
-
-- (void)contactsUpsellButtonPressed:(id)sender
-{
-  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusNotDetermined) {
-    [DFContactSyncManager showContactsDeniedAlert];
-    return;
-  }
-  [DFContactSyncManager askForContactsPermissionWithSuccess:^{
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [[NSNotificationCenter defaultCenter]
-       postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-       object:self];
-      self.contactsUpsellView.hidden = YES;
-      [self.contactsUpsellView removeFromSuperview];
-    });
-  } failure:^(NSError *error) {
-    [self.contactsUpsellView removeFromSuperview];
-    self.contactsUpsellView = nil;
-    [self configureContactsUpsell];
-    [self reloadData];
-  }];
 }
 
 #pragma mark - Data Refresh/Reload
@@ -229,10 +179,7 @@ static BOOL showContactsUpsell = NO;
     if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
       self.noFriendsView.titleLabel.text = @"No Friends Yet";
       [self.noFriendsView.activityIndicator stopAnimating];
-      if (!self.contactsUpsellView.superview) {
-        self.noFriendsView.titleLabel.text = @"No Friends On Swap Yet";
-        self.noFriendsView.subtitleLabel.text = @"Tap + to invite friends";
-      }
+    
     } else {
       self.noFriendsView.titleLabel.text = @"Loading...";
       [self.noFriendsView.activityIndicator startAnimating];
@@ -313,14 +260,6 @@ static BOOL showContactsUpsell = NO;
   DFFriendProfileViewController *profileView = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
   [self.navigationController pushViewController:profileView animated:YES];
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-  
-
-  NSArray *unseenIDs = [self unseenPrivateStrandIDsForUser:user];
-  if (unseenIDs.count > 0) {
-    [[DFSeenStateManager sharedManager] addSeenPrivateStrandIDs:unseenIDs
-                                                        forUser:user];
-    [self reloadData];
-  }
 }
 
 

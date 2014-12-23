@@ -13,7 +13,6 @@
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFGallerySectionHeader.h"
-#import "DFCardTableViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosController.h"
@@ -21,7 +20,6 @@
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
-#import "DFInboxTableViewCell.h"
 #import "UIDevice+DFHelpers.h"
 #import "NSArray+DFHelpers.h"
 #import "UINib+DFHelpers.h"
@@ -208,29 +206,29 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)scrollToHighlightedFeedObject
 {
-  DFSelectPhotosViewController __weak *weakSelf = self;// avoid capture
-
-  dispatch_async(dispatch_get_main_queue(), ^{
-    NSInteger sectionForObject = [weakSelf.selectPhotosController.collectionFeedObjects
-                                  indexOfObject:weakSelf.highlightedFeedObject];
-    NSIndexPath *indexPathForObject = [NSIndexPath indexPathForItem:0 inSection:sectionForObject];
-    
-    if ([weakSelf isIndexPathValid:indexPathForObject]) {
-      UICollectionView *collectionView = weakSelf.collectionView;
-      UICollectionViewLayoutAttributes *headerLayoutAttributes =
-      [collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
-                                                        atIndexPath:indexPathForObject];
-      CGRect rectToScroll = headerLayoutAttributes.frame;
-      if (!self.didAppear) {
-        // for some reason, the origin calculation for layout is off before viewDidAppear
-        rectToScroll.origin.y -= collectionView.contentInset.bottom;
-      }
-      rectToScroll.size.height = collectionView.frame.size.height;
-      [collectionView scrollRectToVisible:rectToScroll animated:NO];
-      
-      [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
-    }
-  });
+//  DFSelectPhotosViewController __weak *weakSelf = self;// avoid capture
+//
+//  dispatch_async(dispatch_get_main_queue(), ^{
+//    NSInteger sectionForObject = [weakSelf.selectPhotosController.collectionFeedObjects
+//                                  indexOfObject:weakSelf.highlightedFeedObject];
+//    NSIndexPath *indexPathForObject = [NSIndexPath indexPathForItem:0 inSection:sectionForObject];
+//    
+//    if ([weakSelf isIndexPathValid:indexPathForObject]) {
+//      UICollectionView *collectionView = weakSelf.collectionView;
+//      UICollectionViewLayoutAttributes *headerLayoutAttributes =
+//      [collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
+//                                                        atIndexPath:indexPathForObject];
+//      CGRect rectToScroll = headerLayoutAttributes.frame;
+//      if (!self.didAppear) {
+//        // for some reason, the origin calculation for layout is off before viewDidAppear
+//        rectToScroll.origin.y -= collectionView.contentInset.bottom;
+//      }
+//      rectToScroll.size.height = collectionView.frame.size.height;
+//      [collectionView scrollRectToVisible:rectToScroll animated:NO];
+//      
+//      [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
+//    }
+//  });
 }
 
 - (BOOL)isIndexPathValid:(NSIndexPath *)indexPath
@@ -283,7 +281,8 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (UICollectionReusableView *)headerForIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *suggestion = self.selectPhotosController.collectionFeedObjects[indexPath.section];
+  DFSection *sectionObject = (DFSection *)self.selectPhotosController.sections[indexPath.section];
+  DFPeanutFeedObject *suggestion = (DFPeanutFeedObject *)sectionObject.object;
   DFPhotoPickerHeaderStyle style = [self styleForSuggestion:suggestion];
 
   DFPhotoPickerHeaderReusableView *headerView = [self.collectionView
@@ -349,7 +348,8 @@ const CGFloat CreateCellTitleSpacing = 8;
                   layout:(UICollectionViewLayout *)collectionViewLayout
 referenceSizeForHeaderInSection:(NSInteger)section
 {
-  DFPeanutFeedObject *suggestion = self.selectPhotosController.collectionFeedObjects[section];
+  DFSection *sectionObject = (DFSection *)self.selectPhotosController.sections[section];
+  DFPeanutFeedObject *suggestion = (DFPeanutFeedObject *)sectionObject.object;
   DFPhotoPickerHeaderStyle style = [self styleForSuggestion:suggestion];
   
   NSNumber *result = self.stylesToHeaderHeights[@(style)];
@@ -375,7 +375,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)removeSuggestionPressedForHeaderView:(DFPhotoPickerHeaderReusableView *)headerView
                                            section:(NSUInteger)section
 {
-  DFPeanutFeedObject *suggestion = self.selectPhotosController.collectionFeedObjects[section];
+  DFSection *sectionObject = (DFSection *)self.selectPhotosController.sections[section];
+  DFPeanutFeedObject *suggestion = (DFPeanutFeedObject *)sectionObject.object;
   [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
   suggestion.suggestible = @NO;
   [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:section]];

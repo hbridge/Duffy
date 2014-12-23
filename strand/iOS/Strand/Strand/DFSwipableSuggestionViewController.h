@@ -14,7 +14,7 @@
 @interface DFSwipableSuggestionViewController : DFHomeSubViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
-typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
+typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 
 
 @property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;

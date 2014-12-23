@@ -38,21 +38,13 @@ typedef UInt64 DFActionID;
 
 @property (nonatomic, retain) NSNumber *id;
 @property (nonatomic) DFPeanutActionType action_type;
-@property (nonatomic) DFPhotoIDType photo;
-@property (nonatomic) DFStrandIDType strand;
 @property (nonatomic) DFUserIDType user;
-@property (nonatomic, retain) NSString *user_display_name;
-@property (nonatomic, retain) NSString *user_phone_number;
+@property (nonatomic, retain) NSNumber *photo;
+@property (nonatomic, retain) NSNumber *share_instance;
 @property (nonatomic, retain) NSString *text;
 @property (nonatomic, retain) NSDate *time_stamp;
 
 + (NSArray *)simpleAttributeKeys;
-+ (NSArray *)arrayOfLikerNamesFromActions:(NSArray *)actionArray;
-
-- (NSString *)firstNameOrYou;
-- (NSString *)firstName;
-- (NSString *)fullNameOrYou;
-- (NSString *)fullName;
 - (DFPeanutUserObject *)peanutUser;
 
 @end

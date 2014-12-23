@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "DFPhotoViewCell.h"
 #import "DFPeanutFeedObject.h"
+#import "DFSection.h"
 
 @class DFImageDataSource;
 @protocol DFImageDataSourceDelegate <NSObject>
@@ -26,12 +27,14 @@
 
 @property (nonatomic, weak) UICollectionView *collectionView;
 @property (nonatomic, weak) id<DFImageDataSourceDelegate> imageDataSourceDelegate;
-@property (nonatomic, retain) NSArray *collectionFeedObjects;
+@property (nonatomic, retain) NSArray *sections;
 @property (nonatomic) BOOL showActionsBadge;
 @property (nonatomic) BOOL showUnreadNotifsCount;
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedPhotos
                     collectionView:(UICollectionView *)collectionView;
+- (instancetype)initWithSections:(NSArray *)sections
+                  collectionView:(UICollectionView *)collectionView;
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
                                collectionView:(UICollectionView *)collectionView;
 

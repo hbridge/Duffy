@@ -11,7 +11,7 @@
 
 // Used
 NSString *const PrivateStrandsPath = @"unshared_strands";
-NSString *const InboxPath = @"strand_inbox";
+NSString *const InboxPath = @"swap_inbox";
 NSString *const SwapsPath = @"swaps";
 NSString *const ActionsListPath = @"actions_list";
 

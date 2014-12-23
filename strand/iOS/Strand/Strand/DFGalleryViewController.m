@@ -76,20 +76,13 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  if (self.showHeaders) {
-    self.datasource = [[DFImageDataSource alloc]
-                       initWithCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
-                                                      acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id]
-                       collectionView:self.collectionView];
-  } else {
-    NSArray *strands = [[DFPeanutFeedDataManager sharedManager]
-                        acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id];
-    
-    NSArray *photos = [DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto inArrayOfFeedObjects:strands];
-    self.datasource = [[DFImageDataSource alloc]
-                       initWithFeedPhotos:photos
-                       collectionView:self.collectionView];
-  }
+  NSArray *photos = [[DFPeanutFeedDataManager sharedManager]
+                     photosWithUserID:self.userToFilterTo.id
+                     evaluated:YES];
+  self.datasource = [[DFImageDataSource alloc]
+                     initWithFeedPhotos:photos
+                     collectionView:self.collectionView];
+  
   self.datasource.imageDataSourceDelegate = self;
   if (self.showHeaders) {
     [self.collectionView registerNib:[UINib nibForClass:[DFGallerySectionHeader class]]
@@ -133,16 +126,19 @@
 
 - (void)reloadData
 {
-    self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
-                                             acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id];
+  NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:self.userToFilterTo.id
+                                                                  evaluated:YES];
+  if (photos) {
+    self.datasource.sections = [NSArray new];
     [self.collectionView reloadData];
+  }
     [self configureNoResultsView];
 }
 
 - (void)configureNoResultsView
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    if (self.datasource.collectionFeedObjects.count == 0) {
+    if ([self.datasource numberOfSectionsInCollectionView:self.collectionView] == 0) {
       if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
       [self.noResultsView setSuperView:self.collectionView];
       if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
@@ -167,10 +163,10 @@
                                               withReuseIdentifier:@"header"
                                               forIndexPath:indexPath];
   
-  DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
-  header.titleLabel.text = strandObject.title;
-  header.profilePhotoStackView.peanutUsers = strandObject.actors;
-  header.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:strandObject.time_taken];
+//  DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
+//  header.titleLabel.text = strandObject.title;
+//  header.profilePhotoStackView.peanutUsers = strandObject.actors;
+//  header.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:strandObject.time_taken];
   
   return header;
 }
@@ -187,11 +183,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager]
-                                     strandPostsObjectWithId:photo.strand_id.longLongValue];
   DFPhotoDetailViewController *evc = [[DFPhotoDetailViewController alloc]
-                                         initWithPhotoObject:photo
-                                         inPostsObject:postsObject];
+                                      initWithPhotoObject:photo];
   [DFDismissableModalViewController presentWithRootController:evc inParent:self];
 }
 

@@ -18,8 +18,6 @@
 
 @interface DFImageDataSource()
 
-@property (nonatomic, retain) NSArray *sectionArrays;
-
 @end
 
 @implementation DFImageDataSource
@@ -28,11 +26,8 @@
 - (instancetype)initWithFeedPhotos:(NSArray *)feedObjects
                         collectionView:(UICollectionView *)collectionView
 {
-  DFPeanutFeedObject *dummyObject = [[DFPeanutFeedObject alloc] init];
-  dummyObject.objects = feedObjects;
-  return [self initWithCollectionFeedObjects:@[dummyObject]
-                              collectionView:collectionView
-          ];
+  DFSection *section = [DFSection sectionWithTitle:nil object:nil rows:feedObjects];
+  return [self initWithSections:@[section] collectionView:collectionView];
 }
 
 - (void)setFeedPhotos:(NSArray *)feedPhotos
@@ -46,42 +41,58 @@
 {
   DFImageDataSource __weak *weakSelf = self;
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSUInteger previousCount = [_collectionFeedObjects count];
-    _collectionFeedObjects = collectionFeedObjects;
-    NSMutableArray *sectionArrays = [NSMutableArray new];
+    NSMutableArray *sections = [[NSMutableArray alloc] initWithCapacity:collectionFeedObjects.count];
     for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
-      [sectionArrays addObject:feedObject.objects];
+      DFSection *section = [DFSection sectionWithTitle:feedObject.title
+                                                object:feedObject
+                                                  rows:feedObject.objects];
+      [sections addObject:section];
     }
-    _sectionArrays = sectionArrays;
+    weakSelf.sections = sections;
+  });
+}
+
+- (void)setSections:(NSArray *)sections
+{
+  DFImageDataSource __weak *weakSelf = self;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSUInteger previousCount = [_sections count];
+    _sections = sections;
     [weakSelf.collectionView reloadData];
     
-    if (previousCount == 0 && _collectionFeedObjects.count > 0) {
+    if (previousCount == 0 && _sections.count > 0) {
       // this is the first data we've gotten, cache the bottom and send messages to delegate
-      [self cacheImagesAroundSection:sectionArrays.count - 1];
+      [self cacheImagesAroundSection:sections.count - 1];
       if ([self.imageDataSourceDelegate respondsToSelector:@selector(didFinishFirstLoadForDatasource:)]) {
         [self.imageDataSourceDelegate didFinishFirstLoadForDatasource:self];
       }
     }
   });
+
+}
+
+- (instancetype)initWithSections:(NSArray *)sections
+                  collectionView:(UICollectionView *)collectionView
+{
+  self = [super init];
+  if (self) {
+    _collectionView = collectionView;
+    [collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFPhotoViewCell class]) bundle:nil]
+     forCellWithReuseIdentifier:@"cell"];
+    _collectionView.dataSource = self;
+    self.sections = sections;
+  }
+  return self;
 }
 
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
                                collectionView:(UICollectionView *)collectionView
 {
-  self = [super init];
-  if (self) {
-    NSMutableArray *sectionArrays = [NSMutableArray new];
-    for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
-      [sectionArrays addObject:feedObject.objects];
-    }
-    _collectionFeedObjects = [collectionFeedObjects copy];
-    _sectionArrays = sectionArrays;
-    _collectionView = collectionView;
-    [collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFPhotoViewCell class]) bundle:nil]
-     forCellWithReuseIdentifier:@"cell"];
-    _collectionView.dataSource = self;
-  }
-  return self;
+  NSArray *sections = [collectionFeedObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *collection) {
+    return [DFSection sectionWithTitle:collection.title object:collection rows:collection.objects];
+    
+  }];
+  return [self initWithSections:sections collectionView:collectionView];
 }
 
 NSUInteger const SectionSpread = 5;
@@ -89,8 +100,8 @@ NSUInteger const SectionSpread = 5;
 {
   NSMutableArray *idsToFetch = [NSMutableArray new];
   for (NSInteger section = targetSection - SectionSpread; section <= targetSection + SectionSpread; section++) {
-    if (section < 0 || section > self.sectionArrays.count - 1) continue;
-    for (DFPeanutFeedObject *feedObject in self.sectionArrays[section]) {
+    if (section < 0 || section > self.sections.count - 1) continue;
+    for (DFPeanutFeedObject *feedObject in [self.sections[section] rows]) {
       if ([feedObject.type isEqualToString:DFFeedObjectCluster]) {
         DFPeanutFeedObject *photoObject = feedObject.objects.firstObject;
         [idsToFetch addObject:@(photoObject.id)];
@@ -112,7 +123,7 @@ NSUInteger const SectionSpread = 5;
 
 - (NSArray *)feedObjectsForSection:(NSUInteger)section
 {
-  return self.sectionArrays[section];
+  return [self.sections[section] rows];
 }
 
 - (NSArray *)photosForSection:(NSUInteger)section
@@ -127,7 +138,7 @@ NSUInteger const SectionSpread = 5;
 
 - (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *objects = self.sectionArrays[indexPath.section];
+  NSArray *objects = [self feedObjectsForSection:indexPath.section];
   if (indexPath.row >= objects.count) return nil;
   DFPeanutFeedObject *feedObject = objects[indexPath.row];
   return feedObject;
@@ -135,12 +146,12 @@ NSUInteger const SectionSpread = 5;
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return self.sectionArrays.count;
+  return self.sections.count;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  NSArray *objects = self.sectionArrays[section];
+  NSArray *objects = [self feedObjectsForSection:section];
   return objects.count;
 }
 

@@ -101,7 +101,7 @@
   NSMutableArray *feedObjects = [NSMutableArray new];
   for (NSUInteger i = 0; i < [self numberOfSectionsInCollectionView:self.collectionView]; i++) {
     if ([[self selectedItemsFromSection:i] count] > 0) {
-      [feedObjects addObject:self.collectionFeedObjects[i]];
+      [feedObjects addObject:[self.sections[i] object]];
     }
   }
   return feedObjects;

@@ -12,6 +12,6 @@
 
 @interface DFInviteStrandViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
-@property (nonatomic, retain) DFPeanutFeedObject *sectionObject;
+@property (nonatomic) DFShareInstanceIDType shareInstance;
 
 @end

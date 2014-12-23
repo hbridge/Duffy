@@ -21,9 +21,11 @@
 @property (nonatomic, retain) DFPeanutUserObject *userToFilter;
 @property (nonatomic) DFHomeSubViewType preferredType;
 @property (nonatomic) DFPhotoIDType startingPhotoID;
-@property (nonatomic) DFPhotoIDType startingStrandID;
+@property (nonatomic) DFShareInstanceIDType startingShareInstanceID;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType;
-- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType photoID:(DFPhotoIDType)photoID strandID:(DFStrandIDType)strandID;
+- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
+                              photoID:(DFPhotoIDType)photoID
+                        shareInstance:(DFShareInstanceIDType)shareID;
 
 @end

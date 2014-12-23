@@ -64,8 +64,7 @@ disappearedWithParameters:(NSDictionary *)params;
 + (void)logPhotoActionTaken:(DFPeanutActionType)action
          fromViewController:(UIViewController *)viewController
                      result:(NSString *)result
-                photoObject:(DFPeanutFeedObject *)photo
-                postsObject:(DFPeanutFeedObject *)postsObject;
+                photoObject:(DFPeanutFeedObject *)photo;
 + (void)logPhotoSavedWithResult:(NSString *)result;
 + (void)logPhotoDeletedWithResult:(NSString *)result
            timeIntervalSinceTaken:(NSTimeInterval)timeInterval;

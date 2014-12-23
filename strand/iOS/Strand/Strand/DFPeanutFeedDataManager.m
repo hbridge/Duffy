@@ -130,7 +130,7 @@ static DFPeanutFeedDataManager *defaultManager;
            if ([object.type isEqual:DFFeedObjectFriendsList]) {
              // This grabs the local first name which we want to sort by
              NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
-             _cachedFriendsList = [NSMutableArray arrayWithArray:[object.actors sortedArrayUsingDescriptors:@[sort]]];
+             _cachedFriendsList = [NSMutableArray arrayWithArray:[object.friends sortedArrayUsingDescriptors:@[sort]]];
            }
          }
          
@@ -273,23 +273,20 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user includeInvites:(BOOL)includeInvites
+- (NSArray *)photosWithUserID:(DFUserIDType)userID evaluated:(BOOL)evaluated
 {
-  NSMutableArray *strands = [NSMutableArray new];
+  NSMutableArray *photos = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts] ||
-        ([object.type isEqual:DFFeedObjectInviteStrand] && includeInvites)) {
-      for (NSUInteger i = 0; i < object.actors.count; i++) {
-        DFPeanutUserObject *actor = object.actors[i];
-        if (user.id == actor.id) {
-          [strands addObject:object];
-        }
+  for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
+    for (NSUInteger i = 0; i < photo.actors.count; i++) {
+      NSNumber *actorID = photo.actors[i];
+      if (userID == actorID.longLongValue && photo.evaluated.boolValue == evaluated) {
+        [photos addObject:photo];
       }
     }
   }
   
-  return strands;
+  return photos;
 }
 
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user
@@ -341,22 +338,11 @@ static DFPeanutFeedDataManager *defaultManager;
   return photos;
 }
 
-- (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId
+- (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID
+                      shareInstance:(DFStrandIDType)shareInstance
 {
-  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts] && object.id == strandPostsId) {
-      return object;
-    }
-  }
-  return nil;
-}
-
-- (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID inStrand:(DFStrandIDType)strandID
-{
-  DFPeanutFeedObject *strandposts = [self strandPostsObjectWithId:strandID];
-  NSArray *photoObjects = [strandposts leafNodesFromObjectOfType:DFFeedObjectPhoto];
-  for (DFPeanutFeedObject *photo in photoObjects) {
-    if (photo.id == photoID) {
+  for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
+    if (photo.id == photoID && photo.share_instance.longLongValue == shareInstance) {
       return photo;
     }
   }
@@ -364,27 +350,14 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-- (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId
-{
-  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectInviteStrand] && object.id == inviteId) {
-      return object;
-    }
-  }
-  return nil;
-}
-
 - (NSArray *)unevaluatedPhotosFromOtherUsers
 {
   NSMutableOrderedSet *result = [NSMutableOrderedSet new];
   for (DFPeanutUserObject *user in self.friendsList) {
-    NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
-    for (DFPeanutFeedObject *strandPosts in strands) {
-      NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
-      for (DFPeanutFeedObject *photo in photos) {
-        if (photo.user != [[DFUser currentUser] userID]) {
-          [result addObject:photo];
-        }
+    NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
+    for (DFPeanutFeedObject *photoObject in photos) {
+      if (photoObject.evaluated.boolValue == NO) {
+        [result addObject:photoObject];
       }
     }
   }
@@ -451,92 +424,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
-- (NSArray *)publicStrands
-{
-  NSMutableArray *strands = [NSMutableArray new];
-  
-  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts] || [object.type isEqual:DFFeedObjectInviteStrand]) {
-      [strands addObject:object];
-    }
-  }
-  return strands;
-}
-
-- (NSArray *)inviteStrands
-{
-  NSMutableArray *inviteStrands = [NSMutableArray new];
-  for (DFPeanutFeedObject *strand in self.swapsFeedObjects) {
-    if ([strand.type isEqual:DFFeedObjectInviteStrand]
-        && ![strand.actors containsObject:[[DFUser currentUser] peanutUser]]) {
-      [inviteStrands addObject:strand];
-    }
-  }
-  return inviteStrands;
-}
-
-- (NSArray *)acceptedStrands
-{
-  return [self acceptedStrandsWithPostsCollapsed:NO
-                                    filterToUser:0
-                               feedObjectSortKey:@"time_stamp"
-                                       ascending:NO];
-}
-
-- (NSArray *)acceptedStrandsWithPostsCollapsedAndFilteredToUser:(DFUserIDType)userID
-{
-  return [self acceptedStrandsWithPostsCollapsed:YES
-                                    filterToUser:userID
-                               feedObjectSortKey:@"time_stamp"
-                                       ascending:YES];
-}
-
-- (NSArray *)getStrandPostListFromStrandPosts:(DFPeanutFeedObject *)strandPosts
-{
-  NSMutableArray *strandPostList = [NSMutableArray new];
-  for (DFPeanutFeedObject *object in strandPosts.objects) {
-    if ([object.type isEqual:DFFeedObjectStrandPost]) {
-      [strandPostList addObject:object];
-    }
-  }
-  return strandPostList;
-}
-
-- (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
-                                  filterToUser:(DFUserIDType)filterToUserID
-                             feedObjectSortKey:(NSString *)sortKey
-                                     ascending:(BOOL)ascending;
-{
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectStrandPosts];
-  NSArray *postsObjects = [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
-  if (!collapsed)return postsObjects;
-  
-  NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sortKey ascending:ascending];
-  NSMutableArray *collapsedResult = [NSMutableArray new];
-  for (DFPeanutFeedObject *strandPosts in postsObjects) {
-    if (filterToUserID > 0) {
-      BOOL foundUser = NO;
-      for (DFPeanutUserObject *user in strandPosts.actors) {
-        if (user.id == filterToUserID) {
-          foundUser = YES;
-          break;
-        }
-      }
-      if (!foundUser) continue;
-    }
-    DFPeanutFeedObject *collapsedObj = [strandPosts copy];
-    collapsedObj.type = DFFeedObjectStrandPosts;
-    collapsedObj.actors = [strandPosts.actors copy];
-    NSMutableArray *collapsedSubObjects = [NSMutableArray new];
-    for (DFPeanutFeedObject *strandPost in [self getStrandPostListFromStrandPosts:strandPosts]) {
-      [collapsedSubObjects addObjectsFromArray:strandPost.objects];
-    }
-    collapsedObj.objects = [collapsedSubObjects sortedArrayUsingDescriptors:@[sortDescriptor]];
-    [collapsedResult addObject:collapsedObj];
-  }
-  return [collapsedResult sortedArrayUsingDescriptors:@[sortDescriptor]];
-}
-
 - (NSArray *)privateStrands
 {
   return self.privateStrandsFeedObjects;
@@ -597,22 +484,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
-- (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
-{
-  if (userID == [[DFUser currentUser] userID]) {
-    return [[DFUser currentUser] peanutUser];
-  }
-  for (DFPeanutFeedObject *strandPosts in self.inboxFeedObjects) {
-    if (![strandPosts.type isEqual:DFFeedObjectStrandPosts]) continue;
-    for (DFPeanutUserObject *actor in strandPosts.actors) {
-      if (actor.id == userID) {
-        return actor;
-      }
-    }
-  }
-  return nil;
-}
-
 - (NSArray *)actionsList
 {
   return [self actionsListFilterUser:nil];
@@ -641,8 +512,9 @@ static DFPeanutFeedDataManager *defaultManager;
   return self.cachedFriendsList;
 }
 
-- (DFPeanutUserObject *)getUserWithId:(DFUserIDType)userID
+- (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
 {
+  if (userID == [[DFUser currentUser] userID]) return [[DFUser currentUser] peanutUser];
   for (DFPeanutUserObject *user in self.cachedFriendsList) {
     if (user.id == userID) {
       return user;
@@ -651,7 +523,7 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-- (DFPeanutUserObject *)getUserWithPhoneNumber:(NSString *)phoneNumber
+- (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber
 {
   NSString *normalizedPhoneNumber = [DFPhoneNumberUtils normalizePhoneNumber:phoneNumber];
   for (DFPeanutUserObject *user in self.cachedFriendsList) {
@@ -662,70 +534,6 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-- (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
-         addPhotoIDs:(NSArray *)photoIDs
-             success:(void(^)(void))success
-             failure:(void(^)(NSError *error))failure
-{
-  DFPeanutFeedObject *invitedStrandPosts = [[inviteFeedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
-  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
-  requestStrand.id = @(invitedStrandPosts.id);
-  
-  [self.strandAdapter
-   performRequest:RKRequestMethodGET
-   withPeanutStrand:requestStrand
-   success:^(DFPeanutStrand *peanutStrand) {
-     // add current user to list of users if not there
-     NSNumber *userID = @([[DFUser currentUser] userID]);
-     if (![peanutStrand.users containsObject:userID]) {
-       peanutStrand.users = [peanutStrand.users arrayByAddingObject:userID];
-     }
-     
-     // add any selected photos to the list of shared photos
-     if (photoIDs.count > 0) {
-       NSMutableSet *newPhotoIDs = [[NSMutableSet alloc] initWithArray:peanutStrand.photos];
-       [newPhotoIDs addObjectsFromArray:photoIDs];
-       peanutStrand.photos = [newPhotoIDs allObjects];
-     }
-     
-     // Patch the new peanut strand
-     [self.strandAdapter
-      performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
-      success:^(DFPeanutStrand *peanutStrand) {
-        DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
-        // cache the photos locally
-        [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:photoIDs];
-        
-        // even if there is an invite, you've been joined to the strand, so we count
-        //  either result of the invite marking as success
-        success();
-        [[NSNotificationCenter defaultCenter]
-         postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-         object:self];
-        [[DFPhotoStore sharedStore] markPhotosForUpload:photoIDs];
-
-        // now mark the invite as used
-        if (inviteFeedObject) {
-          [self.inviteAdapter
-           markInviteWithIDUsed:@(inviteFeedObject.id)
-           success:^(NSArray *resultObjects) {
-             DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
-             [[NSNotificationCenter defaultCenter]
-              postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-              object:self];
-           } failure:^(NSError *error) {
-             DDLogError(@"Failed to mark invite used: %@", error);
-           }];
-        }
-      } failure:^(NSError *error) {
-        DDLogError(@"%@ failed to patch strand: %@, error: %@",
-                   self.class, peanutStrand, error);
-      }];
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ failed to get strand: %@, error: %@",
-                self.class, requestStrand, error);
-   }];
-}
 
 - (void)addFeedObjects:(NSArray *)feedObjects
             toStrandID:(DFStrandIDType)strandID
@@ -861,84 +669,22 @@ static DFPeanutFeedDataManager *defaultManager;
    ];
 }
 
-// Not used right now, take out if still not needed
-- (NSArray *)sortedStrandPostList
-{
-  NSMutableArray *strandPostList = [NSMutableArray new];
-  for (DFPeanutFeedObject *strandPosts in self.inboxFeedObjects) {
-    [strandPostList addObjectsFromArray:[strandPosts descendentsOfType:DFFeedObjectStrandPost]];
-  }
-  
-  NSSortDescriptor *sortDescriptor;
-  sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time_stamp"
-                                               ascending:YES];
-  NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-  NSArray *sortedPosts;
-  sortedPosts = [strandPostList sortedArrayUsingDescriptors:sortDescriptors];
-  
-  return sortedPosts;
-}
-
-// This could be refactored with methods below if we keep using this method
-- (NSArray *)nonEvaluatedPhotosInStrandPosts:(DFPeanutFeedObject *)strandPosts
-{
-  NSMutableArray *nonEvaluatedPhotos = [NSMutableArray new];
-  
-  NSArray *photos = [strandPosts descendentsOfType:DFFeedObjectPhoto];
-  for (DFPeanutFeedObject *photo in photos) {
-    if (!photo.evaluated) {
-      [nonEvaluatedPhotos addObject:photo];
-    }
-  }
-  
-  return nonEvaluatedPhotos;
-}
-
-- (NSArray *)photosWithActionsTypes:(NSArray *)actionTypes
-{
-  NSMutableArray *photosWithAction = [NSMutableArray new];
-  
-  for (DFPeanutFeedObject *strandPosts in [self publicStrands]) {
-    for (DFPeanutFeedObject *photo in [strandPosts descendentsOfType:DFFeedObjectPhoto]) {
-      BOOL photoHasAllActions = YES;
-      for (NSNumber *actionTypeNum in actionTypes) {
-        DFPeanutActionType actionType = actionTypeNum.longLongValue;
-        if ([[photo actionsOfType:actionType forUser:0] count] == 0){
-          photoHasAllActions = NO;
-          break;
-        }
-      }
-      if (photoHasAllActions) [photosWithAction addObject:photo];
-      // TODO(Derek): This should be put into a lower level.
-      // Temp here to move things along
-      photo.strand_id = @(strandPosts.id);
-    }
-  }
-  
-  return photosWithAction;
-}
 
 - (NSArray *)photosWithAction:(DFActionID)actionType
 {
   NSMutableArray *photosWithAction = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *strandPosts in [self publicStrands]) {
-    for (DFPeanutFeedObject *photo in [strandPosts descendentsOfType:DFFeedObjectPhoto]) {
-      BOOL photoHasAction = NO;
-      for (DFPeanutAction *action in photo.actions) {
-        if (action.action_type == actionType) {
-          photoHasAction = YES;
-        }
+  for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
+    BOOL photoHasAction = NO;
+    for (DFPeanutAction *action in photo.actions) {
+      if (action.action_type == actionType) {
+        photoHasAction = YES;
       }
-      if (photoHasAction) {
-        [photosWithAction addObject:photo];
-      } else if (actionType == DFPeanutActionEvalPhoto && photo.evaluated) {
-        [photosWithAction addObject:photo];
-      }
-
-      // TODO(Derek): This should be put into a lower level.
-      // Temp here to move things along
-      photo.strand_id = @(strandPosts.id);
+    }
+    if (photoHasAction) {
+      [photosWithAction addObject:photo];
+    } else if (actionType == DFPeanutActionEvalPhoto && photo.evaluated) {
+      [photosWithAction addObject:photo];
     }
   }
   
@@ -949,16 +695,10 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   NSMutableArray *photosSentByUser = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *strandPosts in [self publicStrands]) {
-    for (DFPeanutFeedObject *strandPost in strandPosts.objects) {
-      DFPeanutUserObject *sender = strandPost.actors.firstObject;
-      if (sender.id == user) {
-        for (DFPeanutFeedObject *photo in [strandPost leafNodesFromObjectOfType:DFFeedObjectPhoto]) {
-          [photosSentByUser addObject:photo];
-          photo.strand_id = @(strandPosts.id);
-        }
+  for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
+      if (photo.user == user) {
+        [photosSentByUser addObject:photo];
       }
-    }
   }
   
   return photosSentByUser;
@@ -1003,14 +743,14 @@ static DFPeanutFeedDataManager *defaultManager;
   return [self photosSortedByEvalTime:merged.allObjects];
 }
 
-- (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
+- (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID shareInstance:(DFStrandIDType)shareInstance
 {
   DFPeanutAction *evalAction;
   evalAction = [[DFPeanutAction alloc] init];
   evalAction.user = [[DFUser currentUser] userID];
   evalAction.action_type = DFPeanutActionEvalPhoto;
-  evalAction.photo = photoID;
-  evalAction.strand = privateStrandID;
+  evalAction.photo = @(photoID);
+  evalAction.share_instance = @(shareInstance);
   
   [self.actionAdapter addAction:evalAction success:nil failure:nil];
 }
@@ -1096,7 +836,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
-              inStrand:(DFStrandIDType)strand
+              shareInstance:(DFStrandIDType)shareInstance
            oldActionID:(DFActionID)oldActionID
               success:(void(^)(DFActionID actionID))success
                failure:(DFFailureBlock)failure
@@ -1111,8 +851,8 @@ static DFPeanutFeedDataManager *defaultManager;
   DFPeanutAction *action = [[DFPeanutAction alloc] init];
   action.user = [[DFUser currentUser] userID];
   action.action_type = DFPeanutActionFavorite;
-  action.photo = photoID;
-  action.strand = strand;
+  action.photo = @(photoID);
+  action.share_instance = @(shareInstance);
   if (oldActionID) action.id = @(oldActionID);
 
   RKRequestMethod method = liked ? RKRequestMethodPOST : RKRequestMethodDELETE;

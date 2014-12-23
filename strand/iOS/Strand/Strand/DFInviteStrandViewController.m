@@ -94,10 +94,12 @@
   DDLogVerbose(@"picked contacts: %@", peanutContacts);
   self.pickedContacts = peanutContacts;
   [SVProgressHUD show];
-  DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
-  peanutStrand.id = @(self.sectionObject.id);
-  [self sendInvitesForStrand:peanutStrand
-            toPeanutContacts:self.pickedContacts];
+  //  DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
+  
+  //TODO (make this actuallly send invites)
+//  peanutStrand.id = @(self.sectionObject.id);
+//  [self sendInvitesForStrand:peanutStrand
+//            toPeanutContacts:self.pickedContacts];
 }
 
 - (void)cancelButtonPressed:(id)sender
@@ -108,26 +110,26 @@
 - (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
             toPeanutContacts:(NSArray *)peanutContacts
 {
-  [self.inviteAdapter
-   sendInvitesForStrand:peanutStrand
-   toPeanutContacts:peanutContacts
-   inviteLocationString:self.sectionObject.location
-   invitedPhotosDate:self.sectionObject.time_taken
-   success:^(DFSMSInviteStrandComposeViewController *vc) {
-     vc.messageComposeDelegate = self;
-     if (vc) {
-       [self presentViewController:vc
-                          animated:YES
-                        completion:nil];
-       [SVProgressHUD dismiss];
-     } else {
-       [self dismissWithErrorString:nil];
-     }
-   } failure:^(NSError *error) {
-     [SVProgressHUD showErrorWithStatus:@"Failed."];
-     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
-                self.class, peanutStrand, error);
-   }];
+//  [self.inviteAdapter
+//   sendInvitesForStrand:peanutStrand
+//   toPeanutContacts:peanutContacts
+//   inviteLocationString:self.sectionObject.location
+//   invitedPhotosDate:self.sectionObject.time_taken
+//   success:^(DFSMSInviteStrandComposeViewController *vc) {
+//     vc.messageComposeDelegate = self;
+//     if (vc) {
+//       [self presentViewController:vc
+//                          animated:YES
+//                        completion:nil];
+//       [SVProgressHUD dismiss];
+//     } else {
+//       [self dismissWithErrorString:nil];
+//     }
+//   } failure:^(NSError *error) {
+//     [SVProgressHUD showErrorWithStatus:@"Failed."];
+//     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
+//                self.class, peanutStrand, error);
+//   }];
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller

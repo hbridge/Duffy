@@ -10,7 +10,6 @@
 #import "DFBackgroundLocationManager.h"
 #import "DFCreateStrandFlowViewController.h"
 #import "DFDefaultsStore.h"
-#import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutPushNotification.h"
 #import "DFPeanutPushTokenAdapter.h"
@@ -233,20 +232,18 @@
       UIViewController *vc;
       UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
                                           rootViewController];
-      DFStrandIDType strandID = openedNotif.strandId.longLongValue;
+      DFShareInstanceIDType shareID = openedNotif.strandId.longLongValue;
       DFPhotoIDType photoID = openedNotif.id.longLongValue;
       
-      DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID inStrand:strandID];
+      DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID shareInstance:shareID];
       
       if (photoObject && photoObject.evaluated) {
-        DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strandID];
         vc =  [[DFPhotoDetailViewController alloc]
-               initWithPhotoObject:photoObject
-               inPostsObject:postsObject];
+               initWithPhotoObject:photoObject];
         
       } else {
         vc = [[DFSuggestionsPageViewController alloc]
-              initWithPreferredType:DFIncomingViewType photoID:photoID strandID:strandID];
+              initWithPreferredType:DFIncomingViewType photoID:photoID shareInstance:shareID];
       }
       
       if (!photoObject) {

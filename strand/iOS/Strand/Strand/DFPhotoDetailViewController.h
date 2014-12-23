@@ -28,14 +28,12 @@
 @property (nonatomic) BOOL disableKeyboardHandler;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
 @property (nonatomic, retain) DFPeanutFeedObject *photoObject;
-@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
 
 - (instancetype)initWithNuxStep:(NSUInteger)nuxStep;
 
 - (void)likeItemPressed:(id)sender;
 - (IBAction)addPersonPressed:(id)sender;
 
-- (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject
-                      inPostsObject:(DFPeanutFeedObject *)postsObject;
+- (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject;
 
 @end

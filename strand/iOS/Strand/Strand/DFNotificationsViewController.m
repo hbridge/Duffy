@@ -14,7 +14,6 @@
 #import "DFImageManager.h"
 #import "DFAnalytics.h"
 #import <Slash/Slash.h>
-#import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSIndexPath+DFHelpers.h"
 
@@ -165,10 +164,11 @@
   } else if (action.action_type == DFPeanutActionAddedPhotos) {
     actionString = @"added photos.";
   }
-  
+
+  DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:action.user];
   NSString *markup =
   [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@ ago</gray>",
-   [action firstNameOrYou],
+   [user firstName],
    actionString,
    action.action_type == DFPeanutActionComment ? [action.text stringByEscapingCharsInString:@"<>"] : @"",
    [NSDateFormatter relativeTimeStringSinceDate:action.time_stamp abbreviate:YES]
@@ -198,7 +198,7 @@
   cell.previewImageView.image = nil;
   if (action.photo > 0) {
     [[DFImageManager sharedManager]
-     imageForID:action.photo
+     imageForID:action.photo.longLongValue
      pointSize:cell.previewImageView.frame.size
      contentMode:DFImageRequestContentModeAspectFill
      deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
@@ -243,12 +243,11 @@
   [DFAnalytics logNotificationViewItemOpened:[DFAnalytics actionStringForType:action.action_type]
                                    notifDate:action.time_stamp];
   
-  DFPeanutFeedObject *strandPostsObject = [[DFPeanutFeedDataManager sharedManager]
-                                           strandPostsObjectWithId:action.strand];
-  DFFeedViewController *fvc = [DFFeedViewController
-                               presentFeedObject:strandPostsObject
-                               modallyInViewController:self];
-  fvc.onViewScrollToPhotoId = action.photo;
+
+//  DFFeedViewController *fvc = [DFFeedViewController
+//                               presentFeedObject:strandPostsObject
+//                               modallyInViewController:self];
+//  fvc.onViewScrollToPhotoId = action.photo;
 }
 
 @end

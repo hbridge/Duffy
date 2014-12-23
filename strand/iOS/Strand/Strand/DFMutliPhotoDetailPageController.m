@@ -42,10 +42,8 @@
 
 - (DFPhotoDetailViewController *)detailViewControllerForPhotoObject:(DFPeanutFeedObject *)photoObject
 {
-  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager]
-                                     strandPostsObjectWithId:photoObject.strand_id.longLongValue];
   DFPhotoDetailViewController *pdvc = [[DFPhotoDetailViewController alloc]
-                                       initWithPhotoObject:photoObject inPostsObject:strandPosts];
+                                       initWithPhotoObject:photoObject];
   return pdvc;
 }
 

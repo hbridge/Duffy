@@ -18,22 +18,20 @@
 @property (weak, nonatomic) IBOutlet DFProfileWithContextView *profileWithContextView;
 @property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
 
-typedef void (^DFIncomingPhotoNextBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
-typedef void (^DFIncomingPhotoCommentBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
-typedef void (^DFIncomingPhotoLikeBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
+typedef void (^DFIncomingPhotoActionHandler)(DFPhotoIDType photoID, DFShareInstanceIDType shareInstanceID);
 
 @property (nonatomic) DFPhotoIDType photoID;
-@property (nonatomic) DFStrandIDType strandID;
+@property (nonatomic) DFShareInstanceIDType shareInstance;
 @property (nonatomic, retain) DFPeanutUserObject *sender;
-@property (nonatomic, copy) DFIncomingPhotoNextBlock nextHandler;
-@property (nonatomic, copy) DFIncomingPhotoCommentBlock commentHandler;
-@property (nonatomic, copy) DFIncomingPhotoLikeBlock likeHandler;
+@property (nonatomic, copy) DFIncomingPhotoActionHandler nextHandler;
+@property (nonatomic, copy) DFIncomingPhotoActionHandler commentHandler;
+@property (nonatomic, copy) DFIncomingPhotoActionHandler likeHandler;
 @property (nonatomic, retain) DFPhotoDetailViewController *photoDetailViewController;
 
 @property (nonatomic, retain) UIImageView *imageView;
 
 - (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
-                       inStrand:(DFStrandIDType)strandID
+                  shareInstance:(DFShareInstanceIDType)shareInstance
                      fromSender:(DFPeanutUserObject *)peanutUser;
 
 - (instancetype)initWithNuxStep:(NSUInteger)nuxStep;

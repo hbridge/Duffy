@@ -33,9 +33,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
 
-@property (nonatomic) DFPhotoIDType photoID;
-@property (nonatomic) DFStrandIDType strandID;
-
 @end
 
 @implementation DFPhotoDetailViewController
@@ -45,13 +42,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 
 - (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject
-                      inPostsObject:(DFPeanutFeedObject *)postsObject
 {
   self = [super init];
   if (self) {
     _openKeyboardOnAppear = NO;
-    self.photoID = photoObject.id;
-    self.strandID = postsObject.id;
+    _photoObject = photoObject;
     _templateCell = [DFCommentTableViewCell templateCell];
     _userLikeActionID = [[[self.photoObject userFavoriteAction] id] longLongValue];
     [self observeNotifications];
@@ -79,9 +74,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)reloadData
 {
   self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-  _photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoID
-                                                             inStrand:self.strandID];
-  _postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:self.strandID];
+  _photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoObject.id shareInstance:self.photoObject.share_instance.longLongValue];
   
   // Need to reload this because its a singlton
   _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
@@ -207,8 +200,8 @@ const NSUInteger CompressedModeMaxRows = 1;
     return;
   }
   
-  DFPeanutFeedObject *strandPost = self.postsObject.objects.firstObject;
-  DFPeanutUserObject *sender = strandPost.actors.firstObject;
+  DFPeanutUserObject *sender = [[DFPeanutFeedDataManager sharedManager]
+                                userWithID:self.photoObject.user];
   
   [self.senderProfileStackView setPeanutUser:sender];
   DFPeanutAction *senderLikeAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite
@@ -223,9 +216,13 @@ const NSUInteger CompressedModeMaxRows = 1;
      forUser:sender];
   }
   
-  NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
-  [self.recipientsProfileStackView setPeanutUsers:recipients];
-  for (DFPeanutUserObject *recipient in recipients) {
+  
+  NSArray *recipientIDs = [self.photoObject.actors arrayByRemovingObject:@(sender.id)];
+  NSArray *recipientUsers = [recipientIDs arrayByMappingObjectsWithBlock:^id(NSNumber *userID) {
+    return [[DFPeanutFeedDataManager sharedManager] userWithID:userID.longLongValue];
+  }];
+  [self.recipientsProfileStackView setPeanutUsers:recipientUsers];
+  for (DFPeanutUserObject *recipient in recipientUsers) {
     // if the recipient has no UID they can't have taken an action
     // and the actionsOfType:forUser uses UID 0 as an "any" val, so we should skip UID 0 recipients
     if (recipient.id == 0) continue;
@@ -419,8 +416,9 @@ const NSUInteger CompressedModeMaxRows = 1;
     return noResults;
   }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
-  [cell.profilePhotoStackView setPeanutUser:[self.postsObject actorWithID:comment.user]];
-  cell.nameLabel.text = [comment fullNameOrYou];
+  [cell.profilePhotoStackView setPeanutUser:[[DFPeanutFeedDataManager sharedManager] userWithID:comment.user]];
+  DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:comment.user];
+  cell.nameLabel.text = [user fullName];
   cell.commentLabel.text = comment.text;
   cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:comment.time_stamp
                                                                abbreviate:YES];
@@ -501,7 +499,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   [[DFPeanutFeedDataManager sharedManager]
    setLikedByUser:newLikeValue
    photo:self.photoObject.id
-   inStrand:self.photoObject.strand_id.longLongValue
+   shareInstance:self.photoObject.share_instance.longLongValue
    oldActionID:oldID
    success:^(DFActionID actionID) {
      self.userLikeActionID = actionID;
@@ -513,7 +511,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 }
 
 - (IBAction)addPersonPressed:(id)sender {
-  NSArray *peanutContacts = [self.postsObject.actors arrayByMappingObjectsWithBlock:^id(id input) {
+  NSArray *peanutContacts = [[self.photoObject actorUsers] arrayByMappingObjectsWithBlock:^id(id input) {
     DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
     return contact;
   }];
@@ -521,7 +519,7 @@ const NSUInteger CompressedModeMaxRows = 1;
                                                           initWithSuggestedPeanutContacts:nil
                                                           notSelectablePeanutContacts:peanutContacts
                                                           notSelectableReason:@"Already Member"];
-  inviteStrandController.sectionObject = self.postsObject;
+  inviteStrandController.shareInstance = self.photoObject.share_instance.longLongValue;
   [DFNavigationController presentWithRootController:inviteStrandController
                                            inParent:self
                                 withBackButtonTitle:@"Cancel"];
@@ -568,8 +566,8 @@ const NSUInteger CompressedModeMaxRows = 1;
   action.user = [[DFUser currentUser] userID];
   action.action_type = DFPeanutActionComment;
   action.text = comment;
-  action.photo = self.photoObject.id;
-  action.strand = self.postsObject.id;
+  action.photo = @(self.photoObject.id);
+  action.share_instance = @(self.photoObject.share_instance.longLongValue);
   action.time_stamp = [NSDate date];
   
   [self addComment:action];
@@ -604,8 +602,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   [DFAnalytics logPhotoActionTaken:actionType
                 fromViewController:controller.compressedModeEnabled ? controller.parentViewController : controller
                             result:result
-                       photoObject:controller.photoObject
-                       postsObject:controller.postsObject];
+                       photoObject:controller.photoObject];
 }
 
 

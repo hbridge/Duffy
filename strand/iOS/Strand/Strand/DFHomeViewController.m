@@ -93,7 +93,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
 - (void)configureCollectionView
 {
   self.datasource = [[DFImageDataSource alloc]
-                     initWithCollectionFeedObjects:nil
+                     initWithSections:nil
                      collectionView:self.collectionView];
   self.datasource.imageDataSourceDelegate = self;
   self.collectionView.delegate = self;
@@ -157,8 +157,8 @@ static BOOL showFilters = NO;
     reusableView =  labelHeader;
     labelHeader.label.textAlignment = NSTextAlignmentCenter;
     labelHeader.label.textColor = [UIColor lightGrayColor];
-    DFPeanutFeedObject *collectionFeedObject = [[self.datasource collectionFeedObjects] objectAtIndex:indexPath.section];
-    labelHeader.label.text = collectionFeedObject.title;
+    DFSection *section = self.datasource.sections[indexPath.section];
+    labelHeader.label.text = section.title;
   }
   
   if (!reusableView) [NSException raise:@"null header" format:@"null header"];
@@ -245,8 +245,8 @@ static BOOL showFilters = NO;
     } else {
       NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
                             allEvaluatedOrSentPhotos];
-      NSArray *collectionObjects = [self.class feedSectionObjectsFromFeedPhotos:allPhotos];
-      [self.datasource setCollectionFeedObjects:collectionObjects];
+      NSArray *sections = [self.class sectionsFromFeedPhotos:allPhotos];
+      [self.datasource setSections:sections];
     }
     
     [self configureNoResultsView];
@@ -254,7 +254,7 @@ static BOOL showFilters = NO;
   });
 }
 
-+ (NSArray *)feedSectionObjectsFromFeedPhotos:(NSArray *)feedPhotos
++ (NSArray *)sectionsFromFeedPhotos:(NSArray *)feedPhotos
 {
   // sort by activity date
   NSArray *sorted = [feedPhotos sortedArrayUsingComparator:^NSComparisonResult(DFPeanutFeedObject *photo1, DFPeanutFeedObject *photo2) {
@@ -282,19 +282,11 @@ static BOOL showFilters = NO;
   
   NSMutableArray *result = [NSMutableArray new];
   if (lastWeek.count > 0) {
-    DFPeanutFeedObject *section = [[DFPeanutFeedObject alloc] init];
-    section.type = DFFeedObjectSection;
-    section.title = @"Recent Activity";
-    section.objects = lastWeek;
-    [result addObject:section];
+    [result addObject:[DFSection sectionWithTitle:@"Recent Activity" object:nil rows:lastWeek]];
   }
   
   if (older.count > 0) {
-    DFPeanutFeedObject *section = [[DFPeanutFeedObject alloc] init];
-    section.type = DFFeedObjectSection;
-    section.title = @"Older";
-    section.objects = older;
-    [result addObject:section];
+    [result addObject:[DFSection sectionWithTitle:@"Older" object:nil rows:older]];
   }
 
   return result;
@@ -304,7 +296,7 @@ static BOOL showFilters = NO;
 - (void)configureNoResultsView
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    if (self.datasource.collectionFeedObjects.count == 0) {
+    if ([self.datasource numberOfSectionsInCollectionView:self.collectionView] == 0) {
       if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
       [self.noResultsView setSuperView:self.collectionView];
       if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {

@@ -12,7 +12,6 @@
 #import "DFStrandConstants.h"
 #import "DFPeanutAction.h"
 #import "DFPeanutFeedDataManager.h"
-#import "DFFeedViewController.h"
 
 @implementation DFToastNotificationManager
 

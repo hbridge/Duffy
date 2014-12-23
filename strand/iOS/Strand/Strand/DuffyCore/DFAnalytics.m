@@ -258,11 +258,9 @@ static DFAnalytics *defaultLogger;
          fromViewController:(UIViewController *)viewController
                      result:(NSString *)result
                 photoObject:(DFPeanutFeedObject *)photo
-                postsObject:(DFPeanutFeedObject *)postsObject
 {
   NSTimeInterval takenInterval = [[NSDate date] timeIntervalSinceDate:photo.time_taken];
-  NSTimeInterval postedInterval = [[NSDate date] timeIntervalSinceDate:postsObject.time_stamp];
-  NSArray *photosInPosts = [postsObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  NSTimeInterval postedInterval = [[NSDate date] timeIntervalSinceDate:photo.time_stamp];
   NSArray *comments = [photo actionsOfType:DFPeanutActionComment forUser:0];
   NSArray *likes = [photo actionsOfType:DFPeanutActionFavorite forUser:0];
   
@@ -272,7 +270,6 @@ static DFAnalytics *defaultLogger;
                           @"ActionType" : [self actionStringForType:action],
                           PhotoAgeKey : [self bucketStringForTimeInternval:takenInterval],
                           PostAge : [self bucketStringForTimeInternval:postedInterval],
-                          @"PhotosInThread" : [self bucketStringForObjectCount:photosInPosts.count],
                           @"NumComments" : [self bucketStringForObjectCount:comments.count],
                           @"NumLikes" : [self bucketStringForObjectCount:likes.count],
                           @"View" : [self screenNameForControllerViewed:viewController]

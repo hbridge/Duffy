@@ -19,45 +19,45 @@ typedef NSString *const DFFeedObjectType;
 
 extern DFFeedObjectType DFFeedObjectSection;
 extern DFFeedObjectType DFFeedObjectPhoto;
-extern DFFeedObjectType DFFeedObjectCluster;
-extern DFFeedObjectType DFFeedObjectDocstack;
-extern DFFeedObjectType DFFeedObjectInviteStrand;
-extern DFFeedObjectType DFFeedObjectStrand;
-extern DFFeedObjectType DFFeedObjectStrandPost;
-extern DFFeedObjectType DFFeedObjectStrandPosts;
 extern DFFeedObjectType DFFeedObjectFriendsList;
 extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
-extern DFFeedObjectType DFFeedObjectStrandJoin;
 extern DFFeedObjectType DFFeedObjectSwapSuggestion;
-extern DFFeedObjectType DFFeedObjectActionsList;
+extern DFFeedObjectType DFFeedObjectCluster;
+
+
 
 // Simple attribures
 @property (nonatomic) DFPhotoIDType id;
 @property (nonatomic, retain) DFFeedObjectType type;
+@property (nonatomic) DFUserIDType user;
+@property (nonatomic, retain) NSNumber *share_instance;
+@property (nonatomic, retain) NSDate *shared_at_timestamp;
 @property (nonatomic, retain) NSString *title;
-@property (nonatomic, retain) NSString *subtitle;
+//@property (nonatomic, retain) NSString *subtitle;
 @property (nonatomic, retain) NSString *location;
 @property (nonatomic, retain) NSString *thumb_image_path;
 @property (nonatomic, retain) NSString *full_image_path;
 @property (nonatomic, retain) NSDate *time_taken;
-@property (nonatomic) DFUserIDType user;
-@property (nonatomic, retain) NSString *user_display_name;
+//@property (nonatomic, retain) NSString *user_display_name;
 @property (nonatomic, retain) NSDate *time_stamp;
+@property (nonatomic, retain) NSDate *last_action_timestamp;
 @property (nonatomic, retain) NSNumber *ready;
+@property (nonatomic, retain) NSArray *actors;
 @property (nonatomic, retain) NSNumber *suggestible;
 @property (nonatomic, retain) NSNumber *suggestion_rank;
 @property (nonatomic, retain) NSString *suggestion_type;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;
-@property (nonatomic, retain) NSNumber *strand_id;
+//@property (nonatomic, retain) NSNumber *strand_id;
 @property (nonatomic, retain) NSNumber *evaluated;
 @property (nonatomic, retain) NSDate *evaluated_time;
-
 
 // Relationships
 @property (nonatomic, retain) NSArray *objects;
 @property (nonatomic, retain) NSArray *actions;
-@property (nonatomic, retain) NSArray *actors;
+// used only in the friends object type
+@property (nonatomic, retain) NSArray *friends;
+
 
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
@@ -70,6 +70,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 - (NSEnumerator *)enumeratorOfDescendents;
 
 - (NSArray *)actorNames;
+- (NSArray *)actorUsers;
 
 /* 
 - (NSString *)actorsString; 

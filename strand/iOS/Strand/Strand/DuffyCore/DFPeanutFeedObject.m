@@ -12,6 +12,7 @@
 #import "NSString+DFHelpers.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFPeanutNotificationsManager.h"
+#import "DFPeanutFeedDataManager.h"
 
 @implementation DFPeanutFeedObject
 
@@ -61,7 +62,7 @@ static NSArray *FeedObjectTypes;
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects" mapping:objectMapping];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"actions" mapping:[DFPeanutAction objectMapping]];
-  [objectMapping addRelationshipMappingWithSourceKeyPath:@"actors" mapping:[DFPeanutUserObject objectMapping]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"friends" mapping:[DFPeanutUserObject objectMapping]];
   
   return objectMapping;
 }
@@ -71,22 +72,23 @@ static NSArray *FeedObjectTypes;
 {
   return @[@"id",
            @"type",
+           @"user",
+           @"share_instance",
+           @"shared_at_timestamp",
            @"title",
-           @"subtitle",
            @"location",
            @"thumb_image_path",
            @"full_image_path",
            @"time_taken",
-           @"user",
-           @"user_display_name",
            @"time_stamp",
+           @"last_action_timestamp",
            @"ready",
+           @"actors",
            @"suggestible",
            @"suggestion_rank",
            @"suggestion_type",
            @"full_width",
            @"full_height",
-           @"strand_id",
            @"evaluated",
            @"evaluated_time",
            ];
@@ -275,6 +277,13 @@ static NSArray *FeedObjectTypes;
 
 #pragma mark - Actor Accessors
 
+- (NSArray *)actorUsers
+{
+  return [self.actors arrayByMappingObjectsWithBlock:^id(NSNumber *userID) {
+    return [[DFPeanutFeedDataManager sharedManager] userWithID:userID.longLongValue];
+  }];
+}
+
 - (NSArray *)actorNames
 {
   NSMutableOrderedSet *names = [NSMutableOrderedSet new];
@@ -385,16 +394,25 @@ static NSArray *FeedObjectTypes;
 {
   DFPeanutFeedObject *newObject = [[DFPeanutFeedObject allocWithZone:zone] init];
   newObject.id = self.id;
+  newObject.type = self.type;
+  newObject.user = self.user;
+  newObject.share_instance = [self.share_instance copyWithZone:zone];
+  newObject.shared_at_timestamp = [self.shared_at_timestamp copyWithZone:zone];
   newObject.title = [self.title copyWithZone:zone];
-  newObject.subtitle = [self.subtitle copyWithZone:zone];
   newObject.location = [self.location copyWithZone:zone];
   newObject.thumb_image_path = [self.thumb_image_path copyWithZone:zone];
   newObject.full_image_path = [self.full_image_path copyWithZone:zone];
   newObject.time_taken = [self.time_taken copyWithZone:zone];
-  newObject.user = self.user;
-  newObject.user_display_name =[self.user_display_name copy];
+  newObject.time_stamp = [self.time_stamp copyWithZone:zone];
+  newObject.last_action_timestamp = [self.time_stamp copyWithZone:zone];
   newObject.ready = self.ready;
   newObject.suggestible = self.suggestible;
+  newObject.suggestion_rank = [self.suggestion_rank copyWithZone:zone];
+  newObject.suggestion_type = [self.suggestion_type copyWithZone:zone];
+  newObject.full_height = [self.full_height copyWithZone:zone];
+  newObject.full_width = [self.full_width copyWithZone:zone];
+  newObject.evaluated = [self.evaluated copyWithZone:zone];
+  newObject.evaluated_time = [self.evaluated_time copyWithZone:zone];
   
   return newObject;
 }

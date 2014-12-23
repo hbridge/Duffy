@@ -12,7 +12,6 @@
 #import "DFPhotoStore.h"
 #import "SVProgressHUD.h"
 #import "DFStrandConstants.h"
-#import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFAnalytics.h"
 
@@ -81,37 +80,8 @@
 
 - (void)swapPressed:(id)sender {
   if (self.inviteObject) {
-    [self acceptInvite];
+//    [self acceptInvite];
   }
-}
-
-- (void)acceptInvite
-{
-  [SVProgressHUD showWithStatus:@"Swapping..."];
-  DFReviewSwapViewController __weak *weakSelf = self;
-  [[DFPeanutFeedDataManager sharedManager]
-   acceptInvite:self.inviteObject
-   addPhotoIDs:self.selectPhotosController.selectedPhotoIDs
-   success:^{
-     if (weakSelf.swapSuccessful) weakSelf.swapSuccessful();
-     [weakSelf dismissViewControllerAnimated:YES completion:^{
-       [SVProgressHUD showSuccessWithStatus:@"Swapped!"];
-     }];
-//     [DFAnalytics
-//      logMatchPhotos:weakSelf.inviteObject
-//      withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
-//                                         inArrayOfFeedObjects:weakSelf.suggestedSections]
-//      selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
-//      result:DFAnalyticsValueResultSuccess];
-  } failure:^(NSError *error) {
-    [SVProgressHUD showErrorWithStatus:@"Error."];
-//    [DFAnalytics
-//     logMatchPhotos:weakSelf.inviteObject
-//     withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
-//                                        inArrayOfFeedObjects:weakSelf.suggestedSections]
-//     selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
-//     result:DFAnalyticsValueResultFailure];
-  }];
 }
 
 - (DFPeanutStrandInviteAdapter *)inviteAdapter

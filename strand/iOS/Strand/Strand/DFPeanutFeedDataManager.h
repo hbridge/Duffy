@@ -31,49 +31,34 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (BOOL)isRefreshingInbox;
 
-- (NSArray *)publicStrands;
-- (NSArray *)inviteStrands;
-- (NSArray *)acceptedStrands;
-- (NSArray *)acceptedStrandsWithPostsCollapsedAndFilteredToUser:(DFUserIDType)userID;
 - (NSArray *)privateStrands;
 - (NSArray *)privatePhotos;
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;
-- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user includeInvites:(BOOL)includeInvites;
+- (NSArray *)photosWithUserID:(DFUserIDType)userID evaluated:(BOOL)evaluated;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)actionsList;
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user;
 
-- (NSArray *)getStrandPostListFromStrandPosts:(DFPeanutFeedObject *)strandPosts;
-
-- (NSArray *)nonEvaluatedPhotosInStrandPosts:(DFPeanutFeedObject *)strandPosts;
 - (NSArray *)unevaluatedPhotosFromOtherUsers;
 - (NSArray *)allEvaluatedOrSentPhotos;
 - (NSArray *)favoritedPhotos;
 - (NSArray *)photosWithActivity;
 
-- (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
-- (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID inStrand:(DFStrandIDType)strandID;
+- (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID shareInstance:(DFStrandIDType)shareInstance;
 - (NSArray *)photosSentByUser:(DFUserIDType)user;
 
-- (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;
 - (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
 
 // Methods used for dealing with swap page
-- (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID;
+- (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID shareInstance:(DFShareInstanceIDType)privateStrandID;
 - (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users;
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
-- (DFPeanutUserObject *)getUserWithPhoneNumber:(NSString *)phoneNumber;
-
-
-- (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
-         addPhotoIDs:(NSArray *)photoIDs
-             success:(void(^)(void))success
-             failure:(void(^)(NSError *error))failure;
+- (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
 
 - (void)addFeedObjects:(NSArray *)feedObjects
             toStrandID:(DFStrandIDType)strandID
@@ -96,7 +81,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
-              inStrand:(DFStrandIDType)strand
+         shareInstance:(DFStrandIDType)shareInstance
            oldActionID:(DFActionID)oldActionID
                success:(void(^)(DFActionID actionID))success
                failure:(DFFailureBlock)failure;

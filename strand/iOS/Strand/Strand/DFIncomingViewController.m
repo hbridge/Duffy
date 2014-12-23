@@ -20,13 +20,13 @@
 
 
 - (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
-                       inStrand:(DFStrandIDType)strandID
+                       shareInstance:(DFShareInstanceIDType)shareInstance
                      fromSender:(DFPeanutUserObject *)peanutUser
 {
   self = [super init];
   if (self) {
     _photoID = photoID;
-    _strandID = strandID;
+    _shareInstance = shareInstance;
     _sender = peanutUser;
     [self observeNotifications];
   }
@@ -64,11 +64,9 @@
     pdvc = [[DFPhotoDetailViewController alloc] initWithNuxStep:self.nuxStep];
   } else {
     DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoID
-                                                                                  inStrand:self.strandID];
-    DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:self.strandID];
+                                                                             shareInstance:self.shareInstance];
     pdvc = [[DFPhotoDetailViewController alloc]
-                                      initWithPhotoObject:photoObject
-                                      inPostsObject:postsObject];
+                                      initWithPhotoObject:photoObject];
   }
   self.photoDetailViewController = pdvc;
   self.photoDetailViewController.compressedModeEnabled = YES;
@@ -119,13 +117,13 @@
 {
   NSString *logResult;
   if (button == self.swipableButtonView.noButton) {
-    if (self.nextHandler) self.nextHandler(self.photoID, self.strandID);
+    if (self.nextHandler) self.nextHandler(self.photoID, self.shareInstance);
     logResult = @"skip";
   } else if (button == self.swipableButtonView.otherButton) {
-    if (self.commentHandler) self.commentHandler(self.photoID, self.strandID);
+    if (self.commentHandler) self.commentHandler(self.photoID, self.shareInstance);
     logResult = @"other";
   } else if (button == self.swipableButtonView.yesButton) {
-    if (self.likeHandler) self.likeHandler(self.photoID, self.strandID);
+    if (self.likeHandler) self.likeHandler(self.photoID, self.shareInstance);
     logResult = @"like";
   }
   

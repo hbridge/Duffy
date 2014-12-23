@@ -50,16 +50,16 @@ const NSUInteger NumOutgoingNuxes = 3;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
 {
-  return [self initWithPreferredType:preferredType photoID:0 strandID:0];
+  return [self initWithPreferredType:preferredType photoID:0 shareInstance:0];
 }
 
-- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType photoID:(DFPhotoIDType)photoID strandID:(DFStrandIDType)strandID
+- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType photoID:(DFPhotoIDType)photoID shareInstance:(DFShareInstanceIDType)shareID
 {
   self = [self init];
   if (self) {
     _preferredType = preferredType;
     _startingPhotoID = photoID;
-    _startingStrandID = strandID;
+    _startingShareInstanceID = shareID;
   }
   return self;
 }
@@ -172,24 +172,24 @@ const NSUInteger NumOutgoingNuxes = 3;
                 completion:nil];
 }
 
-- (UIViewController *)incomingViewControllerForPhoto:(DFPeanutFeedObject *)photo strandPosts:(DFPeanutFeedObject *)strandPosts
+- (UIViewController *)incomingViewControllerForPhoto:(DFPeanutFeedObject *)photo
 {
   DFIncomingViewController *ivc = [[DFIncomingViewController alloc]
                                    initWithPhotoID:photo.id
-                                   inStrand:strandPosts.id
+                                   shareInstance:photo.share_instance.longLongValue
                                    fromSender:[[DFPeanutFeedDataManager sharedManager]
                                                userWithID:photo.user]];
   [self.alreadyShownPhotoIds addObject:@(photo.id)];
   
   DFSuggestionsPageViewController __weak *weakSelf = self;
-  ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-    [weakSelf photoSkipped:photoID strand:strandID];
+  ivc.nextHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
+    [weakSelf photoSkipped:photo];
   };
-  ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-    [weakSelf showCommentsForPhoto:photoID strand:strandID];
+  ivc.commentHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
+    [weakSelf showCommentsForPhoto:photoID shareInstance:shareInstance];
   };
-  ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-    [weakSelf likePhoto:photoID strand:strandID];
+  ivc.likeHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
+    [weakSelf likePhoto:photoID shareInstance:shareInstance];
   };
   
   return ivc;
@@ -199,41 +199,36 @@ const NSUInteger NumOutgoingNuxes = 3;
 {
   DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
   if (!nextPhoto) return nil;
-  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:nextPhoto.strand_id.longLongValue];
-  return [self incomingViewControllerForPhoto:nextPhoto strandPosts:strandPosts];
+  return [self incomingViewControllerForPhoto:nextPhoto];
 }
 
 - (DFPeanutFeedObject *)nextIncomingPhotoToShow
 {
   if ([self startingPhotoID] > 0) {
-    DFPeanutFeedObject *photo = [[DFPeanutFeedDataManager sharedManager] photoWithID:[self startingPhotoID] inStrand:[self startingStrandID]];
+    DFPeanutFeedObject *photo = [[DFPeanutFeedDataManager sharedManager]
+                                 photoWithID:[self startingPhotoID]
+                                 shareInstance:[self startingShareInstanceID]];
     _startingPhotoID = 0;
-    _startingStrandID = 0;
+    _startingShareInstanceID = 0;
     
     return photo;
   }
   
   DFPeanutFeedObject *firstPhoto;
-  DFPeanutFeedObject *firstStrandPosts;
-  
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
   // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
   for (DFPeanutUserObject *user in friends) {
-    NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
-    for (DFPeanutFeedObject *strandPosts in strands) {
-      NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
-      for (DFPeanutFeedObject *photo in photos) {
-        if (photo.user != [[DFUser currentUser] userID] &&
-            ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-          // Now lets see if the image is loaded yet
-          DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
-          if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-            return photo;
-          } else if(!firstPhoto) {
-            // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
-            firstPhoto = photo;
-            firstStrandPosts = strandPosts;
-          }
+    NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
+    for (DFPeanutFeedObject *photo in photos) {
+      if (photo.user != [[DFUser currentUser] userID] &&
+          ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+        // Now lets see if the image is loaded yet
+        DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
+        if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
+          return photo;
+        } else if(!firstPhoto) {
+          // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
+          firstPhoto = photo;
         }
       }
     }
@@ -270,8 +265,8 @@ const NSUInteger NumOutgoingNuxes = 3;
           svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
             [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
           };
-          svc.noButtonHandler = ^(DFPeanutFeedObject *strand){
-            [weakSelf photoSkipped:photo.id strand:strand.id];
+          svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
+            [weakSelf photoSkipped:photo];
           };
           return svc;
           
@@ -341,7 +336,7 @@ const NSUInteger NumOutgoingNuxes = 3;
     if ([self nextIncomingPhotoToShow]) {
       incomingCompletionString = @"Someone else sent you photos!";
     }
-    DFIncomingPhotoNextBlock block = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+    DFIncomingPhotoActionHandler block = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
       if (incomingCompletionString) {
         [SVProgressHUD showSuccessWithStatus:incomingCompletionString];
       }
@@ -438,7 +433,7 @@ const NSUInteger NumOutgoingNuxes = 3;
   NSMutableArray *users = [NSMutableArray new];
   for (DFPeanutContact *contact in contacts) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
-                                getUserWithPhoneNumber:contact.phone_number];
+                                userWithPhoneNumber:contact.phone_number];
     if (user) [users addObject:user];
   }
   
@@ -515,39 +510,39 @@ const NSUInteger NumOutgoingNuxes = 3;
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)photoSkipped:(DFPhotoIDType)photoID strand:(DFStrandIDType)strandID
+- (void)photoSkipped:(DFPeanutFeedObject *)photo
 {
-  if (photoID)
-    [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:photoID strandID:strandID];
+  if (photo)
+    [[DFPeanutFeedDataManager sharedManager]
+     setHasEvaluatedPhoto:photo.id
+     shareInstance:photo.share_instance.longLongValue];
   [self gotoNextController];
 }
 
-- (void)showCommentsForPhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand
+- (void)showCommentsForPhoto:(DFPhotoIDType)photo shareInstance:(DFShareInstanceIDType)shareInstance
 {
-  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strand];
-  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photo inStrand:strand];
+  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photo shareInstance:shareInstance];
   DFPhotoDetailViewController *pdvc = [[DFPhotoDetailViewController alloc]
-                                  initWithPhotoObject:photoObject
-                                  inPostsObject:strandPosts];
+                                       initWithPhotoObject:photoObject];
   [DFNavigationController presentWithRootController:pdvc
                                            inParent:self
                                 withBackButtonTitle:@"Close"];
   
 }
 
-- (void)likePhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand
+- (void)likePhoto:(DFPhotoIDType)photo shareInstance:(DFShareInstanceIDType)shareInstance
 {
   [[DFPeanutFeedDataManager sharedManager]
    setLikedByUser:YES
    photo:photo
-   inStrand:strand
+   shareInstance:shareInstance
    oldActionID:0
    success:^(DFActionID actionID) {
     
   } failure:^(NSError *error) {
     
   }];
-  [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:photo strandID:strand];
+  [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:photo shareInstance:shareInstance];
   [SVProgressHUD showSuccessWithStatus:@"Liked!"];
   [self gotoNextController];
 }

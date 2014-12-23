@@ -35,14 +35,11 @@
 #import "DFSocketsManager.h"
 #import "DFContactsStore.h"
 #import "DFPushNotificationsManager.h"
-#import "DFFeedViewController.h"
 #import "DFSettingsViewController.h"
-#import "DFInboxViewController.h"
 #import "DFFriendsViewController.h"
 #import "DFUserInfoManager.h"
 #import "DFImageDownloadManager.h"
 #import "DFImageDiskCache.h"
-#import "DFSwapViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFGalleryViewController.h"
 #import "DFContactDataManager.h"
@@ -55,7 +52,6 @@
 
 @property (nonatomic, retain) UITabBarController *tabBarController;
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
-@property (nonatomic, retain) DFInboxViewController *inboxViewController;
 
 // These are used to track the state of background fetch signals from the syncer and uploader
 @property (nonatomic, assign) BOOL backgroundSyncHasFinished;
@@ -512,13 +508,6 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   });
 }
 
-- (void)showStrandWithID:(DFStrandIDType)strandID
-              completion:(void(^)(void))completion
-{
-  DDLogInfo(@"%@ showStrandWithID:%@", self.class, @(strandID));
-  [self.inboxViewController showStrandPostsForStrandID:strandID completion:completion];
-
-}
 
 
 #pragma mark - BITCrashManagerDelegate
