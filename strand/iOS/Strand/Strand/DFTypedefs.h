@@ -13,6 +13,7 @@ typedef NS_OPTIONS(unsigned int, DFImageType) {
 typedef UInt64 DFShareInstanceIDType;
 typedef UInt64 DFStrandIDType;
 typedef UInt64 DFInviteIDType;
+typedef UInt64 DFShareInstanceIDType;
 
 typedef NS_OPTIONS(unsigned int, DFFeedType) {
   DFInboxFeed,

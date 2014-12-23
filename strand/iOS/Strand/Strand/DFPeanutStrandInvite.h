@@ -13,6 +13,7 @@
 
 @property (nonatomic, retain) NSNumber *id;
 @property (nonatomic) NSNumber *strand;
+@property (nonatomic) NSNumber *share_instance;
 @property (nonatomic) NSNumber *user;
 @property (nonatomic, retain) NSString *phone_number;
 @property (nonatomic, retain) NSNumber *accepted_user;

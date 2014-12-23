@@ -39,8 +39,14 @@ typedef UInt64 DFActionID;
 @property (nonatomic, retain) NSNumber *id;
 @property (nonatomic) DFPeanutActionType action_type;
 @property (nonatomic) DFUserIDType user;
+<<<<<<< HEAD
 @property (nonatomic, retain) NSNumber *photo;
 @property (nonatomic, retain) NSNumber *share_instance;
+=======
+@property (nonatomic) DFShareInstanceIDType share_instance;
+@property (nonatomic, retain) NSString *user_display_name;
+@property (nonatomic, retain) NSString *user_phone_number;
+>>>>>>> Add in basics for Share Instances
 @property (nonatomic, retain) NSString *text;
 @property (nonatomic, retain) NSDate *time_stamp;
 

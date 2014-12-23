@@ -1,16 +1,15 @@
 //
-//  DFPeanutStrandInvite.m
+//  DFPeanutShareInstance.m
 //  Strand
 //
-//  Created by Henry Bridge on 9/1/14.
+//  Created by Derek Parham on 12/22/14.
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPeanutStrandInvite.h"
+#import "DFPeanutShareInstance.h"
 #import "RestKit/RestKit.h"
-#import "NSDictionary+DFJSON.h"
 
-@implementation DFPeanutStrandInvite
+@implementation DFPeanutShareInstance
 
 + (RKObjectMapping *)objectMapping {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
@@ -21,13 +20,13 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"id", @"user", @"strand", @"share_instance", @"phone_number", @"accepted_user", @"invited_user"];
+  return @[@"id", @"user", @"photo", @"users"];
 }
 
 - (NSString *)description
 {
   NSDictionary *dictRep = [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
-  return [dictRep JSONStringPrettyPrinted:NO];
+  return dictRep.description;
 }
 
 @end
