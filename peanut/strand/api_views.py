@@ -35,9 +35,9 @@ def getActionsCache(user, publicStrandIds, photoIds):
 	# but filter out eval actions by other people
 	
 	oldActions = list(Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=publicStrandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=publicStrandIds)) | (Q(photo_id__in=photoIds) & Q(user=user))).exclude(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & ~Q(user=user)))
-	newActions = Action.objects.prefetch_related('photo', 'user').filter(Q(share_instance__isnull=False) & Q(photo_id__in=photoIds))
+	evalActions = Action.objects.prefetch_related('photo', 'user').filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & Q(user=user) & Q(photo_id__in=photoIds))
 
-	oldActions.extend(newActions)
+	oldActions.extend(evalActions)
 
 	return oldActions
 	
