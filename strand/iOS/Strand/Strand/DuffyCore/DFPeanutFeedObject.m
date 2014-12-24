@@ -308,7 +308,8 @@ static NSArray *FeedObjectTypes;
   NSUInteger numUnnamed = 0;
   
   for (NSUInteger i = 0; i < self.actors.count; i++) {
-    DFPeanutUserObject *actor = self.actors[i];
+    NSNumber *actorID = self.actors[i];
+    DFPeanutUserObject *actor = [[DFPeanutFeedDataManager sharedManager] userWithID:actorID.longLongValue];
     if (actor.invited.boolValue != invited) continue;
     if (![[actor firstName] isNotEmpty]) {
       numUnnamed++;
