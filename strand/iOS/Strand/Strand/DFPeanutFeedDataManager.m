@@ -722,7 +722,9 @@ static DFPeanutFeedDataManager *defaultManager;
   evalAction.user = [[DFUser currentUser] userID];
   evalAction.action_type = DFPeanutActionEvalPhoto;
   evalAction.photo = @(photoID);
-  evalAction.share_instance = @(shareInstance);
+  if (shareInstance) {
+    evalAction.share_instance = @(shareInstance);
+  }
   
   [self.actionAdapter addAction:evalAction success:nil failure:nil];
 }
