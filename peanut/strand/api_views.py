@@ -33,8 +33,14 @@ def getActionsCache(user, publicStrandIds, photoIds):
 	# but filter down photos to only those strands
 	# also find all actions this user took on any photos on the list
 	# but filter out eval actions by other people
-	return Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=publicStrandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=publicStrandIds)) | (Q(photo_id__in=photoIds) & Q(user=user))).exclude(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & ~Q(user=user))
+	
+	oldActions = list(Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=publicStrandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=publicStrandIds)) | (Q(photo_id__in=photoIds) & Q(user=user))).exclude(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & ~Q(user=user)))
+	newActions = Action.objects.prefetch_related('photo', 'user').filter(Q(share_instance__isnull=False) & Q(photo_id__in=photoIds))
 
+	oldActions.extend(newActions)
+
+	return oldActions
+	
 def getActionsByPhotoIdCache(actionsCache):
 	actionsByPhotoId = dict()
 
