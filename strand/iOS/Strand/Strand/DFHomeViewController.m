@@ -322,7 +322,7 @@ static BOOL showFilters = NO;
 - (void)configureBadges
 {
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
-  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
+  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
   for (LKBadgeView *badgeView in @[self.reviewBadgeView, self.sendBadgeView]) {
     badgeView.badgeColor = [DFStrandConstants strandRed];
     badgeView.textColor = [UIColor whiteColor];

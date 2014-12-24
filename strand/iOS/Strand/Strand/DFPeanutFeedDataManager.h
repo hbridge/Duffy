@@ -36,6 +36,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;
+- (NSArray *)photosFromSuggestedStrands;
 - (NSArray *)photosWithUserID:(DFUserIDType)userID evaluated:(BOOL)evaluated;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)actionsList;

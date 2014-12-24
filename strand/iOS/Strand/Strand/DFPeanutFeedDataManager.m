@@ -476,6 +476,19 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
+
+- (NSArray *)photosFromSuggestedStrands
+{
+  NSArray *suggestedStrands = [self suggestedStrands];
+  NSMutableArray *allPhotos = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *strand in suggestedStrands) {
+    [allPhotos addObjectsFromArray:[strand leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+  }
+     
+  return allPhotos;
+}
+
 - (NSArray *)actionsList
 {
   return [self actionsListFilterUser:nil];
