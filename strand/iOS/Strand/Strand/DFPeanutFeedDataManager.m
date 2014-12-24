@@ -348,7 +348,7 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutUserObject *user in self.friendsList) {
     NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
     for (DFPeanutFeedObject *photoObject in photos) {
-      if (photoObject.evaluated.boolValue == NO) {
+      if (photoObject.evaluated.boolValue == NO && photoObject.user != [[DFUser currentUser] userID]) {
         [result addObject:photoObject];
       }
     }
@@ -679,10 +679,10 @@ static DFPeanutFeedDataManager *defaultManager;
 - (NSArray *)photosSortedByEvalTime:(NSArray *)photos
 {
   NSArray *sortedArray;
-  sortedArray = [photos sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-    NSDate *firstDate = [(DFPeanutFeedObject*)a evaluated_time];
-    NSDate *secondDate = [(DFPeanutFeedObject*)b evaluated_time];
-    return [secondDate compare:firstDate];
+  sortedArray = [photos sortedArrayUsingComparator:^NSComparisonResult(DFPeanutFeedObject *a, DFPeanutFeedObject *b) {
+    NSDate *dateA = a.evaluated_time ? a.evaluated_time : a.shared_at_timestamp;
+    NSDate *dateB = b.evaluated_time ? b.evaluated_time : b.shared_at_timestamp;
+    return [dateB compare:dateA];
   }];
   
   return sortedArray;
