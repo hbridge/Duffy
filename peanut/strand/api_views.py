@@ -315,7 +315,7 @@ def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends =
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(user.id, interestedUsers), 'suggestible': suggestible}
+		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(thisUser.id, interestedUsers), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
