@@ -253,11 +253,11 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None, f
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True, findInterestedUsers = True):
+def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True, findInterestedUsers = True):
 	groups = list()
 
 	if friends == None:
-		friends = friends_util.getFriends(user.id)
+		friends = friends_util.getFriends(thisUser.id)
 
 	if (neighborStrandsByStrandId == None or neighborUsersByStrandId == None) and findInterestedUsers:
 		neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends)
@@ -283,17 +283,17 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 				for neighborStrand in neighborStrandsByStrandId[strand.id]:
 					if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
 						val, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
-						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+						interestedUsers.extend(friends_util.filterUsersByFriends(thisUser.id, friends, neighborStrand.users.all()))
 
-						for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+						for user in friends_util.filterUsersByFriends(thisUser.id, friends, neighborStrand.users.all()):
 							dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
 							matchReasons[user.id] = "location-strand %s" % reason
 
 
 					elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
-						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+						interestedUsers.extend(friends_util.filterUsersByFriends(thisUser.id, friends, neighborStrand.users.all()))
 						
-						for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+						for user in friends_util.filterUsersByFriends(thisUser.id, friends, neighborStrand.users.all()):
 							matchReasons[user.id] = "nolocation-strand"
 
 				if strand.id in neighborUsersByStrandId:
@@ -322,7 +322,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	actionsCache = getActionsCache(user, Strand.getIds(strands), Strand.getPhotoIds(strands))
+	actionsCache = getActionsCache(thisUser, Strand.getIds(strands), Strand.getPhotoIds(strands))
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	# Pass in none for actions because there are no actions on private photos so don't use anything
 	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = True)
@@ -334,7 +334,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	# These are strands that are found to have no valid photos.  So maybe they were all deleted photos
 	# Can remove them here since they're private strands so something with no valid photos shouldn't exist
 	for strand in strandsToDelete:
-		logger.info("Deleting private strand %s for user %s" % (strand.id, user.id))
+		logger.info("Deleting private strand %s for user %s" % (strand.id, thisUser.id))
 		strand.delete()
 
 	return objects
