@@ -170,7 +170,7 @@
                                       initWithSuggestedPeanutContacts:nil
                                       notSelectablePeanutContacts:contactsArray
                                       notSelectableReason:@"Already Member"];
-  self.inviteViewController.shareInstance = self.strandPostsObject.share_instance.longLongValue;
+  //self.inviteViewController.photoObject = self.strandPostsObject.share_instance.longLongValue;
   self.inviteViewController.navigationItem.title = @"Add Members";
   [self presentViewController:[[DFNavigationController alloc]
                                initWithRootViewController:self.inviteViewController]

@@ -519,7 +519,7 @@ const NSUInteger CompressedModeMaxRows = 1;
                                                           initWithSuggestedPeanutContacts:nil
                                                           notSelectablePeanutContacts:peanutContacts
                                                           notSelectableReason:@"Already Member"];
-  inviteStrandController.shareInstance = self.photoObject.share_instance.longLongValue;
+  inviteStrandController.photoObject = self.photoObject;
   [DFNavigationController presentWithRootController:inviteStrandController
                                            inParent:self
                                 withBackButtonTitle:@"Cancel"];

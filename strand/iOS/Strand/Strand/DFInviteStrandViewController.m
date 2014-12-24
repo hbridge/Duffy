@@ -10,6 +10,7 @@
 #import "DFPeanutStrandInviteAdapter.h"
 #import "SVProgressHUD.h"
 #import "DFAnalytics.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFInviteStrandViewController ()
 
@@ -94,12 +95,20 @@
   DDLogVerbose(@"picked contacts: %@", peanutContacts);
   self.pickedContacts = peanutContacts;
   [SVProgressHUD show];
-  //  DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
   
-  //TODO (make this actuallly send invites)
-//  peanutStrand.id = @(self.sectionObject.id);
-//  [self sendInvitesForStrand:peanutStrand
-//            toPeanutContacts:self.pickedContacts];
+  NSArray *phoneNumbers = [peanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+    return contact.phone_number;
+  }];
+  [[DFPeanutFeedDataManager sharedManager]
+   addUsersWithPhoneNumbers:phoneNumbers
+   toShareInstanceID:self.photoObject.share_instance.longLongValue
+   success:^(NSArray *numbersToText) {
+     [self sendTextToPhoneNumbers:numbersToText];
+     
+   } failure:^(NSError *error) {
+     [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+     DDLogError(@"%@ adding users failed: %@", self.class, error);
+   }];
 }
 
 - (void)cancelButtonPressed:(id)sender
@@ -107,29 +116,25 @@
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
-            toPeanutContacts:(NSArray *)peanutContacts
+- (void)sendTextToPhoneNumbers:(NSArray *)phoneNumbers
 {
-//  [self.inviteAdapter
-//   sendInvitesForStrand:peanutStrand
-//   toPeanutContacts:peanutContacts
-//   inviteLocationString:self.sectionObject.location
-//   invitedPhotosDate:self.sectionObject.time_taken
-//   success:^(DFSMSInviteStrandComposeViewController *vc) {
-//     vc.messageComposeDelegate = self;
-//     if (vc) {
-//       [self presentViewController:vc
-//                          animated:YES
-//                        completion:nil];
-//       [SVProgressHUD dismiss];
-//     } else {
-//       [self dismissWithErrorString:nil];
-//     }
-//   } failure:^(NSError *error) {
-//     [SVProgressHUD showErrorWithStatus:@"Failed."];
-//     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
-//                self.class, peanutStrand, error);
-//   }];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
+                                                     initWithRecipients:phoneNumbers
+                                                     locationString:nil
+                                                     date:self.photoObject.time_taken];
+    if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
+      // Some of the invitees aren't Strand users, send them a text
+      smsvc.messageComposeDelegate = self;
+      [self presentViewController:smsvc
+                         animated:YES
+                       completion:^{
+                         [SVProgressHUD dismiss];
+                       }];
+    } else {
+      [self dismissWithErrorString:nil];
+    }
+  });
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller

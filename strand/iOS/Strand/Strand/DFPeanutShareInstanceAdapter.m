@@ -64,9 +64,9 @@ toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
    success:^(NSArray *resultObjects) {
      // add the new IDs
      DFPeanutShareInstance *shareInstance = resultObjects.firstObject;
-     NSMutableSet *userIDs = [[NSMutableSet alloc] initWithArray:shareInstance.users];
-     [userIDs addObjectsFromArray:shareInstance.users];
-     shareInstance.users = [userIDs allObjects];
+     NSMutableSet *accumulatedIDs = [[NSMutableSet alloc] initWithArray:shareInstance.users];
+     [accumulatedIDs addObjectsFromArray:userIDs];
+     shareInstance.users = [accumulatedIDs allObjects];
      
      // patch
      [super
