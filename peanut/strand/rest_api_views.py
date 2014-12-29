@@ -535,6 +535,11 @@ class UsersBulkAPI(BulkCreateAPIView):
     lookup_field = 'id'
     serializer_class = BulkUserSerializer
 
+    def fetchWithUniqueKeys(self, obj):
+        try:
+            return self.model.objects.get(phone_number=obj.phone_number, product_id=2)
+        except self.model.DoesNotExist:
+            return None 
 
 """
    Strand invite API
