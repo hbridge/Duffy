@@ -628,13 +628,17 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   if (phoneNumbersToCreateUser.count > 0) {
-    [self.userAdapter createUsersForPhoneNumbers:phoneNumbers withSuccessBlock:^(NSArray *resultObjects) {
-      DDLogVerbose(@"added users %@", resultObjects);
+    [self.userAdapter
+     createUsersForPhoneNumbers:phoneNumbers
+     withSuccessBlock:^(NSArray *resultObjects) {
+       DDLogVerbose(@"added users %@", resultObjects);
+       for (DFPeanutUserObject *user in resultObjects) {
+         [userIDs addObject:@(user.id)];
+       }
+       success(userIDs, phoneNumbersToCreateUser);
     } failureBlock:^(NSError *error) {
-      
+      failure(error);
     }];
-    
-    
   } else {
     success(userIDs, nil);
   }
