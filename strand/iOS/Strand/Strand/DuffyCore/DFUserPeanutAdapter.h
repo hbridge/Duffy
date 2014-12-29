@@ -6,29 +6,30 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import "DFPeanutRestEndpointAdapter.h"
 #import "DFNetworkAdapter.h"
 #import "DFPeanutUserObject.h"
 #import <RKHTTPUtilities.h>
 
-@interface DFUserPeanutAdapter : NSObject <DFNetworkAdapter>
+@interface DFUserPeanutAdapter : DFPeanutRestEndpointAdapter <DFNetworkAdapter>
 
-typedef void (^DFUserFetchSuccessBlock)(DFPeanutUserObject *user);
-typedef void (^DFUserFetchFailureBlock)(NSError *error);
+- (void)authDeviceID:(NSString *)deviceId
+          deviceName:(NSString *)deviceName
+         phoneNumber:(NSString *)phoneNumberString
+       smsAuthString:(NSString *)smsAuthString
+    withSuccessBlock:(void(^)(DFPeanutUserObject *peanutUser))successBlock
+        failureBlock:(DFPeanutRestFetchFailure)failureBlock;
 
-- (void)createUserForDeviceID:(NSString *)deviceId
-                   deviceName:(NSString *)deviceName
-                  phoneNumber:(NSString *)phoneNumberString
-                smsAuthString:(NSString *)smsAuthString
-             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
-                 failureBlock:(DFUserFetchFailureBlock)failureBlock;
+- (void)createUsersForPhoneNumbers:(NSArray *)phoneNumbers
+                  withSuccessBlock:(DFPeanutRestFetchSuccess)successBlock
+                      failureBlock:(DFPeanutRestFetchFailure)failureBlock;
+
+- (void)getCurrentUserWithSuccess:(DFPeanutRestFetchSuccess)succcess
+                          failure:(DFPeanutRestFetchFailure)failure;
 
 - (void)performRequest:(RKRequestMethod)requestMethod
         withPeanutUser:(DFPeanutUserObject *)peanutUser
-               success:(DFUserFetchSuccessBlock)success
-               failure:(DFUserFetchFailureBlock)failure;
-
-- (void)getCurrentUserWithSuccess:(DFUserFetchSuccessBlock)succcess
-                          failure:(DFUserFetchFailureBlock)failure;
+               success:(void(^)(DFPeanutUserObject *peanutUser))success
+               failure:(DFPeanutRestFetchFailure)failure;
 
 @end

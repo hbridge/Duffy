@@ -14,8 +14,9 @@
 #import "DFPeanutUserObject.h"
 #import "DFPeanutInvalidField.h"
 
-NSString *const RestUserPath = @"users/:id/";
-NSString *const CreateUserPath = @"auth_phone";
+NSString *const RestUserBasePath = @"users/";
+NSString *const AuthPhonePath = @"auth_phone/";
+NSString *const CreateUserPath = @"users/";
 NSString *const DisplayNameKey = @"display_name";
 NSString *const DFUserPeanutPhoneNumberKey = @"phone_number";
 NSString *const SMSAccessCodeKey = @"sms_access_code";
@@ -30,97 +31,38 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
 
 + (NSArray *)responseDescriptors
 {
-  RKResponseDescriptor *restSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutUserObject objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:RestUserPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-  RKResponseDescriptor *restErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:RestUserPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
-  RKResponseDescriptor *createSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutUserObject objectMapping]
-                                               method:RKRequestMethodPOST
-                                          pathPattern:CreateUserPath
-                                              keyPath:@"user"
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-  RKResponseDescriptor *createErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:CreateUserPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
-  
-  return @[restSuccessResponse, restErrorResponse, createSuccessResponse, createErrorResponse];
+  NSMutableArray *responseDescriptors =
+  [[super responseDescriptorsForPeanutObjectClass:[DFPeanutUserObject class]
+                                        basePath:RestUserBasePath
+                                      bulkKeyPath:@"users"] mutableCopy];
+  [responseDescriptors
+   addObjectsFromArray:@[
+                         [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutUserObject objectMapping]
+                                                                      method:RKRequestMethodPOST
+                                                                 pathPattern:AuthPhonePath
+                                                                     keyPath:@"user"
+                                                                 statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)],
+                         [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+                                                                      method:RKRequestMethodAny
+                                                                 pathPattern:AuthPhonePath
+                                                                     keyPath:nil
+                                                                 statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)],
+                         ]];
+
+  return responseDescriptors;
 }
 
 + (NSArray *)requestDescriptors
 {
-  RKObjectMapping *mapping = [[DFPeanutUserObject objectMapping] inverseMapping];
-  RKRequestDescriptor *restRequestDescriptor =
-  [RKRequestDescriptor requestDescriptorWithMapping:mapping
-                                        objectClass:[DFPeanutUserObject class]
-                                        rootKeyPath:nil
-                                             method:RKRequestMethodPATCH];
-  return @[restRequestDescriptor];
+  return [super requestDescriptorsForPeanutObjectClass:[DFPeanutUserObject class] bulkPostKeyPath:@"users"];
 }
 
-
-- (void)performRequest:(RKRequestMethod)requestMethod
-              withPeanutUser:(DFPeanutUserObject *)peanutUser
-               success:(DFUserFetchSuccessBlock)success
-               failure:(DFUserFetchFailureBlock)failure
-{
-  NSString *requestPath;
-  if (requestMethod == RKRequestMethodPOST) {
-    requestPath = CreateUserPath;
-  } else {
-    NSString *idString = [NSString stringWithFormat:@"%llu", peanutUser.id];
-    requestPath = [RestUserPath stringByReplacingOccurrencesOfString:@":id" withString:idString];
-  }
-  //NSDictionary *parameters = [peanutUser requestParameters];
-
-  NSURLRequest *request = [DFObjectManager
-                              requestWithObject:peanutUser
-                              method:requestMethod
-                              path:requestPath
-                              parameters:nil];
-  
-  
-//  DDLogVerbose(@"%@ getting endpoint: %@ \n  body:%@ \n",
-//            [[self class] description],
-//            request.URL.absoluteString,
-//            [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
-  
-  RKObjectRequestOperation *operation =
-  [[DFObjectManager sharedManager]
-   objectRequestOperationWithRequest:request
-   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-   {
-     DFPeanutUserObject *user = [mappingResult firstObject];
-     //DDLogInfo(@"%@ response received: %@", [self.class description], user);
-     success(user);
-   }
-   failure:^(RKObjectRequestOperation *operation, NSError *error)
-   {
-     NSError *betterError = [DFPeanutInvalidField invalidFieldsErrorForError:error];
-     DDLogWarn(@"%@ got error: %@", [self.class description], betterError);
-     failure(betterError);
-   }];
-  
-  [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
-}
-
-- (void)createUserForDeviceID:(NSString *)deviceId
-                   deviceName:(NSString *)deviceName
-                  phoneNumber:(NSString *)phoneNumberString
-                smsAuthString:(NSString *)smsAuthString
-             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
-                 failureBlock:(DFUserFetchFailureBlock)failureBlock
+- (void)authDeviceID:(NSString *)deviceId
+          deviceName:(NSString *)deviceName
+         phoneNumber:(NSString *)phoneNumberString
+       smsAuthString:(NSString *)smsAuthString
+    withSuccessBlock:(void(^)(DFPeanutUserObject *peanutUser))successBlock
+        failureBlock:(DFPeanutRestFetchFailure)failureBlock
 {
   NSDictionary *parameters = @{
                                DFDeviceIDParameterKey: deviceId,
@@ -128,24 +70,24 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
                                DFUserPeanutPhoneNumberKey: phoneNumberString,
                                SMSAccessCodeKey: smsAuthString,
                                };
-  NSURLRequest *createRequest = [DFObjectManager
+  NSURLRequest *authRequest = [DFObjectManager
                                  requestWithObject:[[DFPeanutUserObject alloc] init]
                                  method:RKRequestMethodGET
                                  path:CreateUserPath
                                  parameters:parameters];
   DDLogInfo(@"%@ getting endpoint: %@, body:%@ parameters:%@",
             [[self class] description],
-            createRequest.URL.absoluteString,
-            [[NSString alloc] initWithData:createRequest.HTTPBody encoding:NSUTF8StringEncoding],
+            authRequest.URL.absoluteString,
+            [[NSString alloc] initWithData:authRequest.HTTPBody encoding:NSUTF8StringEncoding],
             parameters);
   
   RKObjectRequestOperation *operation =
   [[DFObjectManager sharedManager]
-   objectRequestOperationWithRequest:createRequest
+   objectRequestOperationWithRequest:authRequest
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
      DFPeanutUserObject *user = [mappingResult firstObject];
-     DDLogInfo(@"User create response received resulting user: %@", user);
+     DDLogInfo(@"Auth device response received resulting user: %@", user);
      successBlock(user);
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
@@ -159,12 +101,53 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
 }
 
-- (void)getCurrentUserWithSuccess:(DFUserFetchSuccessBlock)succcess
-                          failure:(DFUserFetchFailureBlock)failure
+- (void)getCurrentUserWithSuccess:(DFPeanutRestFetchSuccess)succcess
+                          failure:(DFPeanutRestFetchFailure)failure
 {
   DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
   user.id = [[DFUser currentUser] userID];
-  [self performRequest:RKRequestMethodGET withPeanutUser:user success:succcess failure:failure];
+  [super performRequest:RKRequestMethodGET
+               withPath:RestUserBasePath
+                objects:@[user] parameters:nil
+        forceCollection:NO
+                success:succcess
+                failure:failure];
+}
+
+- (void)createUsersForPhoneNumbers:(NSArray *)phoneNumbers
+                withSuccessBlock:(DFPeanutRestFetchSuccess)successBlock
+                    failureBlock:(DFPeanutRestFetchFailure)failureBlock
+{
+  NSArray *peanutUsers = [phoneNumbers arrayByMappingObjectsWithBlock:^id(NSString *phoneNumber) {
+    DFPeanutUserObject *newUser = [[DFPeanutUserObject alloc] init];
+    newUser.phone_number = phoneNumber;
+    return newUser;
+  }];
+  [self
+   performRequest:RKRequestMethodPOST
+   withPath:RestUserBasePath
+   objects:peanutUsers
+   parameters:nil
+   forceCollection:YES
+   success:^(NSArray *resultObjects) {
+     DDLogInfo(@"%@ createUser received response: %@", self.class, resultObjects);
+     successBlock(resultObjects);
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ createUser error: %@", self.class, error);
+     failureBlock(error);
+   }];
+}
+
+- (void)performRequest:(RKRequestMethod)requestMethod
+        withPeanutUser:(DFPeanutUserObject *)peanutUser
+               success:(void(^)(DFPeanutUserObject *peanutUser))success
+               failure:(DFPeanutRestFetchFailure)failure
+{
+  [super performRequest:requestMethod withPath:RestUserBasePath
+                objects:@[peanutUser]
+             parameters:nil forceCollection:NO success:^(NSArray *resultObjects) {
+               success(resultObjects.firstObject);
+             } failure:failure];
 }
 
 

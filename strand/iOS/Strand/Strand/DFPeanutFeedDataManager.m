@@ -20,6 +20,7 @@
 #import "DFPhoneNumberUtils.h"
 #import "DFAnalytics.h"
 #import "DFPeanutShareInstanceAdapter.h"
+#import "DFUserPeanutAdapter.h"
 
 @interface DFPeanutFeedDataManager ()
 
@@ -32,6 +33,7 @@
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (readonly, nonatomic, retain) DFPeanutSharedStrandAdapter *sharedStrandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutShareInstanceAdapter *shareInstanceAdapter;
+@property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
 
 
 @property (atomic) BOOL inboxRefreshing;
@@ -626,7 +628,11 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   if (phoneNumbersToCreateUser.count > 0) {
-    // create users
+    [self.userAdapter createUsersForPhoneNumbers:phoneNumbers withSuccessBlock:^(NSArray *resultObjects) {
+      DDLogVerbose(@"added users %@", resultObjects);
+    } failureBlock:^(NSError *error) {
+      
+    }];
     
     
   } else {
@@ -837,6 +843,7 @@ static DFPeanutFeedDataManager *defaultManager;
 @synthesize actionAdapter = _actionAdapter;
 @synthesize sharedStrandAdapter = _sharedStrandAdapter;
 @synthesize shareInstanceAdapter = _shareInstanceAdapter;
+@synthesize userAdapter = _userAdapter;
 
 - (DFPeanutFeedAdapter *)inboxFeedAdapter
 {
@@ -890,6 +897,12 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_shareInstanceAdapter) _shareInstanceAdapter = [DFPeanutShareInstanceAdapter new];
   return _shareInstanceAdapter;
+}
+
+- (DFUserPeanutAdapter *)userAdapter
+{
+  if (!_userAdapter) _userAdapter = [DFUserPeanutAdapter new];
+  return _userAdapter;
 }
 
 - (NSArray *)cachedFriendsList
