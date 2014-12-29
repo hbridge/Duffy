@@ -574,13 +574,15 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   // Get UIDs
   
-  [self userIDsFromPhoneNumbers:phoneNumbers success:^(NSArray *userIDs, NSArray *createdUserPhoneNumbers) {
+  [self
+   userIDsFromPhoneNumbers:phoneNumbers
+   success:^(NSDictionary *phoneNumbersToUserIDs, NSArray *createdUserPhoneNumbers) {
     // Create the strand
     NSMutableArray *shareInstances = [NSMutableArray new];
     for (DFPeanutFeedObject *photo in photoObjects) {
       DFPeanutShareInstance *shareInstance = [DFPeanutShareInstance new];
       shareInstance.photo = @(photo.id);
-      NSMutableSet *users = [[NSMutableSet alloc] initWithArray:userIDs];
+      NSMutableSet *users = [[NSMutableSet alloc] initWithArray:phoneNumbersToUserIDs.allValues];
       [users addObject:@([[DFUser currentUser] userID])];
       shareInstance.users = users.allObjects;
       shareInstance.user = @([[DFUser currentUser] userID]);
@@ -612,16 +614,16 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
-                        success:(void(^)(NSArray *userIDs, NSArray *createdUserPhoneNumbers))success
+                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *createdUserPhoneNumbers))success
                         failure:(DFFailureBlock)failure
 {
-  NSMutableArray *userIDs = [NSMutableArray new];
+  NSMutableDictionary *phoneNumbersToUserIDs = [NSMutableDictionary new];
   NSMutableArray *phoneNumbersToCreateUser = [NSMutableArray new];
   for (NSString *phoneNumber in  phoneNumbers) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
                                 userWithPhoneNumber:phoneNumber];
     if (user) {
-      [userIDs addObject:@(user.id)];
+      phoneNumbersToUserIDs[phoneNumber] = @(user.id);
     } else {
       [phoneNumbersToCreateUser addObject:phoneNumber];
     }
@@ -633,14 +635,15 @@ static DFPeanutFeedDataManager *defaultManager;
      withSuccessBlock:^(NSArray *resultObjects) {
        DDLogVerbose(@"added users %@", resultObjects);
        for (DFPeanutUserObject *user in resultObjects) {
-         [userIDs addObject:@(user.id)];
+         if (user.id != 0)
+           phoneNumbersToUserIDs[user.phone_number] = @(user.id);
        }
-       success(userIDs, phoneNumbersToCreateUser);
+       success(phoneNumbersToUserIDs, phoneNumbersToCreateUser);
     } failureBlock:^(NSError *error) {
       failure(error);
     }];
   } else {
-    success(userIDs, nil);
+    success(phoneNumbersToUserIDs, nil);
   }
 }
 
@@ -652,14 +655,15 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   [self
    userIDsFromPhoneNumbers:phoneNumbers
-   success:^(NSArray *userIDs, NSArray *createdUserPhoneNumbers) {
-     [self.shareInstanceAdapter addUserIDs:userIDs
-                         toShareInstanceID:shareInstanceID
-                                   success:^(NSArray *resultObjects) {
-                                     success(createdUserPhoneNumbers);
-                                   } failure:^(NSError *error) {
-                                     failure(error);
-                                   }];
+   success:^(NSDictionary *phoneNumbersToUserIDs, NSArray *createdUserPhoneNumbers) {
+     [self.shareInstanceAdapter
+      addUserIDs:phoneNumbersToUserIDs.allValues
+      toShareInstanceID:shareInstanceID
+      success:^(NSArray *resultObjects) {
+        success(createdUserPhoneNumbers);
+      } failure:^(NSError *error) {
+        failure(error);
+      }];
      
      
    } failure:^(NSError *error) {
