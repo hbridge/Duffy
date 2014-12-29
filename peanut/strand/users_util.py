@@ -73,6 +73,7 @@ def createStrandUserThroughSmsAuth(phoneNumber, displayName, smsAuth, buildNum):
 			user.install_num = user.install_num + 1
 		else:
 			user.install_num = 0
+			user.display_name = displayName
 			user.has_sms_authed = True
 		user.save()
 
