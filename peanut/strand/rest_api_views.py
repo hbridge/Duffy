@@ -413,14 +413,17 @@ class BulkCreateModelMixin(CreateModelMixin):
         Return back all new objects, filtering out existing if they already exist
         based on the unique fields
     """
-    def getNewObjects(self, objects):
+    def getNewAndExistingObjects(self, objects):
         newObjects = list()
+        existingObjects = list()
         for obj in objects:
             result = self.fetchWithUniqueKeys(obj)
             if not result:
                 newObjects.append(obj)
+            else:
+                existingObjects.append(result)
 
-        return newObjects
+        return newObjects, existingObjects
         
     """
     Either create a single or many model instances in bulk by using the
@@ -469,8 +472,9 @@ class BulkCreateModelMixin(CreateModelMixin):
                 try:
                     model.objects.bulk_create(chunk)
                 except IntegrityError:
-                    newObjects = self.getNewObjects(chunk)
+                    newObjects, existingObjects = self.getNewAndExistingObjects(chunk)
                     model.objects.bulk_create(newObjects)
+                    results.extend(existingObjects)
 
                 # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
                 dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
@@ -529,7 +533,6 @@ def getBuildNumForUser(user):
     else:
         return 4000
 
-
 class UsersBulkAPI(BulkCreateAPIView):
     model = User
     lookup_field = 'id'
@@ -537,9 +540,13 @@ class UsersBulkAPI(BulkCreateAPIView):
 
     def fetchWithUniqueKeys(self, obj):
         try:
-            return self.model.objects.get(phone_number=obj.phone_number, product_id=2)
+            return self.model.objects.get(phone_number=obj.phone_number, product_id=obj.product_id)
         except self.model.DoesNotExist:
-            return None 
+            return None
+
+    def post_save(self, user, created):
+        if created:
+            users_util.initNewUser(user, False, None)
 
 """
    Strand invite API
@@ -651,12 +658,6 @@ class CreateActionAPI(CreateAPIView):
             if action.share_instance:
                 action.share_instance.last_action_timestamp = action.added
                 action.share_instance.save()
-
-         
-class CreateUserAPI(CreateAPIView):
-    def post_save(self, user, created):
-        if created:
-            users_util.initNewUser(user)
 
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def pre_save(self, user):
