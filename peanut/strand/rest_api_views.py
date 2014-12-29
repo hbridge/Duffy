@@ -460,10 +460,17 @@ class BulkCreateModelMixin(CreateModelMixin):
             else:
                 objects = serializer.object[serializer.bulk_key]
 
-            [self.pre_save(obj) for obj in objects]
-
             results = list()
-            for chunk in self.chunks(objects, self.batchSize):
+
+            toCreateObjects = list()
+            for obj in objects:
+                self.pre_save(obj)
+                if hasattr(obj, 'skip') and obj.skip:
+                    results.append(obj)
+                else:
+                    toCreateObjects.append(obj)
+            
+            for chunk in self.chunks(toCreateObjects, self.batchSize):
 
                 batchKey = randint(1,10000)
                 for obj in chunk:
@@ -543,6 +550,22 @@ class UsersBulkAPI(BulkCreateAPIView):
             return self.model.objects.get(phone_number=obj.phone_number, product_id=obj.product_id)
         except self.model.DoesNotExist:
             return None
+
+    """
+        Clean up the phone number and set it.  Should only be one number per entry
+
+        TODO(Derek): Can this be combined with ContactEntryBulkAPI?
+    """
+    def pre_save(self, obj):
+        foundMatch = False 
+        
+        for match in phonenumbers.PhoneNumberMatcher(str(obj.phone_number), "US"):
+            foundMatch = True
+            obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+            
+        if not foundMatch:
+            logger.error("Parse error for new user entry: %s" % obj.phone_number)
+            obj.skip = True
 
     def post_save(self, user, created):
         if created:
