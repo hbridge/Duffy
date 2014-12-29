@@ -33,7 +33,7 @@ urlpatterns = patterns('',
 	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
 	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),
 
-	url(r'^users/$', strand_rest_api_views.CreateUserAPI.as_view(model=User, lookup_field='id')),
+	url(r'^users/$', strand_rest_api_views.UsersBulkAPI.as_view()),
 	url(r'^users/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateUserAPI.as_view(model=User, lookup_field='id', serializer_class=UserSerializer)),
 
 	url(r'^contacts/$', strand_rest_api_views.ContactEntryBulkAPI.as_view()),

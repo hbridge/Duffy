@@ -44,6 +44,12 @@ class BulkContactEntrySerializer(serializers.Serializer):
 	# key in the json that links to the list of objects
 	bulk_key = 'contacts'
 
+class BulkUserSerializer(serializers.Serializer):
+	users = UserSerializer(many=True)
+
+	bulk_key = 'users'
+
+
 class StrandInviteSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = StrandInvite

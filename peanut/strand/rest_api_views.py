@@ -25,7 +25,7 @@ from rest_framework.views import APIView
 from peanut.settings import constants
 
 from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, ShareInstance
-from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer, BulkShareInstanceSerializer, ShareInstanceSerializer
+from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer
 from common import location_util, api_util
 
 # TODO(Derek): move this to common
@@ -528,7 +528,14 @@ def getBuildNumForUser(user):
         return int(user.last_build_info.split('-')[1])
     else:
         return 4000
-        
+
+
+class UsersBulkAPI(BulkCreateAPIView):
+    model = User
+    lookup_field = 'id'
+    serializer_class = BulkUserSerializer
+
+
 """
    Strand invite API
 """
