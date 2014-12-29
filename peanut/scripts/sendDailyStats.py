@@ -180,6 +180,8 @@ def dataDictToString(dataDict, length):
 
 def getStatsFromLocalytics(date, length):
 
+	print "Fetching data from Localytics for %s-day"%(length)
+
 	# Localytics API info
 
 	url = 'https://api.localytics.com/v1/query?'
@@ -220,12 +222,15 @@ def getStatsFromLocalytics(date, length):
 	# parse results
 	parsedResponse = json.loads(response.text)
 
+	print "Looking for date %s in Localytics results (%s-day)"%(dateBeginFormatted, length)
+
 	if 'results' in parsedResponse:
 		for entry in parsedResponse['results']:
-			if dimension in entry and entry[dimension] == dateBeginFormatted:
+			if dimension in entry and (entry[dimension] == dateBeginFormatted or entry[dimension] == (dateBeginFormatted+'T00:00:00Z')):
+				print "found!"
 				return {'LocalyticsActiveUsers': entry['users']} 
 				break
-
+	print "Not found!"
 	return {'LocalyticsActiveUsers': ''}
 
 def writeToSpreadsheet(dataDict, length):
@@ -345,7 +350,7 @@ def main(argv):
 		
 		
 if __name__ == "__main__":
-	logging.basicConfig(filename='/var/log/duffy/strand-notifications.log',
+	logging.basicConfig(filename='/var/log/duffy/daily-stats.log',
 						level=logging.DEBUG,
 						format='%(asctime)s %(levelname)s %(message)s')
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
