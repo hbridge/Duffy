@@ -642,23 +642,25 @@ static DFPeanutFeedDataManager *defaultManager;
 
 
 - (void)addUsersWithPhoneNumbers:(NSArray *)phoneNumbers
- toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
-           success:(void(^)(NSArray *numbersToText))success
-           failure:(DFFailureBlock)failure
+               toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
+                         success:(void(^)(NSArray *numbersToText))success
+                         failure:(DFFailureBlock)failure
 {
-  [self userIDsFromPhoneNumbers:phoneNumbers success:^(NSArray *userIDs, NSArray *createdUserPhoneNumbers) {
-    [self.shareInstanceAdapter addUserIDs:userIDs
-                        toShareInstanceID:shareInstanceID
-                                  success:^(NSArray *resultObjects) {
-                                    success(createdUserPhoneNumbers);
-                                  } failure:^(NSError *error) {
-                                    failure(error);
-                                  }];
-    
-    
-  } failure:^(NSError *error) {
-    failure(error);
-  }];
+  [self
+   userIDsFromPhoneNumbers:phoneNumbers
+   success:^(NSArray *userIDs, NSArray *createdUserPhoneNumbers) {
+     [self.shareInstanceAdapter addUserIDs:userIDs
+                         toShareInstanceID:shareInstanceID
+                                   success:^(NSArray *resultObjects) {
+                                     success(createdUserPhoneNumbers);
+                                   } failure:^(NSError *error) {
+                                     failure(error);
+                                   }];
+     
+     
+   } failure:^(NSError *error) {
+     failure(error);
+   }];
 }
 
 - (NSArray *)photosWithAction:(DFActionID)actionType
