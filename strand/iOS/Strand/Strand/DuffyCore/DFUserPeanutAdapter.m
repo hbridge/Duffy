@@ -73,7 +73,7 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
   NSURLRequest *authRequest = [DFObjectManager
                                  requestWithObject:[[DFPeanutUserObject alloc] init]
                                  method:RKRequestMethodGET
-                                 path:CreateUserPath
+                                 path:AuthPhonePath
                                  parameters:parameters];
   DDLogInfo(@"%@ getting endpoint: %@, body:%@ parameters:%@",
             [[self class] description],
