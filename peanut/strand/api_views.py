@@ -145,7 +145,7 @@ def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None)
 		return userData
 
 def getFriendsObjectData(userId, users, includePhone = True, invitedUsers = None):
-	if not isinstance(users, list):
+	if not isinstance(users, list) and not isinstance(users, set):
 		users = [users]
 
 	userData = list()
@@ -678,7 +678,13 @@ def swap_inbox(request):
 		printStats("swaps_inbox-3")
 
 		# Add in the list of all friends at the end
-		friends = friends_util.getFriends(user.id)
+		friendsIds = friends_util.getFriendsIds(user.id)
+
+		# Also add in all of the actors they're dealing with
+		for obj in responseObjects:
+			friendsIds.extend(obj['actors'])
+
+		friends = set(User.objects.filter(id__in=friendsIds))
 		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'friends': getFriendsObjectData(user.id, friends, True)}
 		responseObjects.append(friendsEntry)
 
