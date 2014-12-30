@@ -15,7 +15,7 @@
 #import "DFPeanutPushTokenAdapter.h"
 #import "DFPushNotificationsManager.h"
 #import "DFToastNotificationManager.h"
-#import "DFSuggestionsPageViewController.h"
+#import "DFCardsPageViewController.h"
 #import "DFPhotoDetailViewController.h"
 #import "SVProgressHUD.h"
 #import "DFDismissableModalViewController.h"
@@ -291,7 +291,7 @@
            initWithPhotoObject:photoObject];
     
   } else {
-    vc = [[DFSuggestionsPageViewController alloc]
+    vc = [[DFCardsPageViewController alloc]
           initWithPreferredType:DFIncomingViewType photoID:photoObject.id
           shareInstance:photoObject.share_instance.longLongValue];
   }

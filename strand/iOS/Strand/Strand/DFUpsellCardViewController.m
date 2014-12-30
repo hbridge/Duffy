@@ -6,12 +6,12 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFNoIncomingViewController.h"
+#import "DFUpsellCardViewController.h"
 #import "DFTwoLabelView.h"
 #import "DFAnalytics.h"
 
 
-@implementation DFNoIncomingViewController
+@implementation DFUpsellCardViewController
 
 
 - (void)viewDidLoad {

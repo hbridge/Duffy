@@ -9,16 +9,16 @@
 #import "DFSuggestionViewController.h"
 #import "DFSwipableButtonView.h"
 #import "DFPeoplePickerViewController.h"
-#import "DFSuggestionContentView.h"
+#import "DFOutgoingCardContentView.h"
 
-@interface DFSwipableSuggestionViewController : DFHomeSubViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
+@interface DFOutgoingCardViewController : DFCardViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 
 
 @property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
-@property (nonatomic, strong) DFSuggestionContentView *suggestionContentView;
+@property (nonatomic, strong) DFOutgoingCardContentView *suggestionContentView;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;

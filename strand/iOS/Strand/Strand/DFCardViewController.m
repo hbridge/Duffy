@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFHomeSubViewController.h"
+#import "DFCardViewController.h"
 
-@implementation DFHomeSubViewController
+@implementation DFCardViewController
 
 DFHomeSubViewType DFSuggestionViewType = 0;
 DFHomeSubViewType DFIncomingViewType = 1;

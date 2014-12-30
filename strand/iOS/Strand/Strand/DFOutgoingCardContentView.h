@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DFProfileStackView.h"
 
-@interface DFSuggestionContentView : UIView
+@interface DFOutgoingCardContentView : UIView
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UIButton *addButton;

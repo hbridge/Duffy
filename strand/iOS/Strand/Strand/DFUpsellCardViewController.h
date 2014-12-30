@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "DFSwipableButtonView.h"
 
-@interface DFNoIncomingViewController : UIViewController <DFSwipableButtonViewDelegate>
+@interface DFUpsellCardViewController : UIViewController <DFSwipableButtonViewDelegate>
 
 typedef void(^DFNoIncomingYesHandler)(void);
 typedef void(^DFNoIncomingNoHandler)(void);

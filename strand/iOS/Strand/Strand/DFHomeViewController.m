@@ -7,13 +7,13 @@
 //
 
 #import "DFHomeViewController.h"
-#import "DFSuggestionsPageViewController.h"
+#import "DFCardsPageViewController.h"
 #import "DFNavigationController.h"
 #import "DFDefaultsStore.h"
 #import "DFPushNotificationsManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNoTableItemsView.h"
-#import "DFIncomingViewController.h"
+#import "DFIncomingCardViewController.h"
 #import "DFSettingsViewController.h"
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"
@@ -369,7 +369,7 @@ static BOOL showFilters = NO;
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
   if (numToReview > 0 || ![DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
   [DFDismissableModalViewController
-   presentWithRootController:[[DFSuggestionsPageViewController alloc]
+   presentWithRootController:[[DFCardsPageViewController alloc]
                               initWithPreferredType:DFIncomingViewType]
    inParent:self];
   } else {
@@ -385,7 +385,7 @@ static BOOL showFilters = NO;
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
   if (numToSend > 0 || ![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
   [DFDismissableModalViewController
-   presentWithRootController:[[DFSuggestionsPageViewController alloc]
+   presentWithRootController:[[DFCardsPageViewController alloc]
                               initWithPreferredType:DFSuggestionViewType]
    inParent:self];
   } else {

@@ -6,17 +6,17 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFIncomingViewController.h"
+#import "DFIncomingCardViewController.h"
 #import <Slash/Slash.h>
 #import "DFImageManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFAnalytics.h"
 
-@interface DFIncomingViewController ()
+@interface DFIncomingCardViewController ()
 
 @end
 
-@implementation DFIncomingViewController
+@implementation DFIncomingCardViewController
 
 
 - (instancetype)initWithPhotoID:(DFPhotoIDType)photoID

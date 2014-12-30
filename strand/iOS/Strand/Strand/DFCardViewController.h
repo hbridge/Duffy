@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DFHomeSubViewController : UIViewController
+@interface DFCardViewController : UIViewController
 
 @property (nonatomic) NSUInteger index;
 @property (nonatomic) NSUInteger nuxStep;

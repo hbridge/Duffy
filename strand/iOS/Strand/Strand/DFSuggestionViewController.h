@@ -11,13 +11,13 @@
 #import <SAMGradientView.h>
 #import "DFProfileWithContextView.h"
 #import "DFPeanutFeedObject.h"
-#import "DFHomeSubViewController.h"
+#import "DFCardViewController.h"
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 
 
-@interface DFSuggestionViewController : DFHomeSubViewController
+@interface DFSuggestionViewController : DFCardViewController
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;

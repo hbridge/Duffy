@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFSuggestionsPageViewController.h"
-#import "DFSwipableSuggestionViewController.h"
-#import "DFIncomingViewController.h"
+#import "DFCardsPageViewController.h"
+#import "DFOutgoingCardViewController.h"
+#import "DFIncomingCardViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNavigationController.h"
 #import "DFPeanutStrandInviteAdapter.h"
@@ -19,10 +19,10 @@
 #import "DFDefaultsStore.h"
 #import "DFImageManagerRequest.h"
 #import "DFImageDiskCache.h"
-#import "DFNoIncomingViewController.h"
+#import "DFUpsellCardViewController.h"
 #import "DFAnalytics.h"
 
-@interface DFSuggestionsPageViewController ()
+@interface DFCardsPageViewController ()
 
 @property (nonatomic, retain) DFPeanutFeedObject *pickedSuggestion;
 @property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
@@ -35,7 +35,7 @@
 
 @property (retain, nonatomic) NSMutableSet *alreadyShownPhotoIds;
 @property (nonatomic, retain) UIViewController *noSuggestionsViewController;
-@property (nonatomic, retain) DFNoIncomingViewController *noIncomingViewController;
+@property (nonatomic, retain) DFUpsellCardViewController *noIncomingViewController;
 @property (nonatomic) NSUInteger highestSeenNuxStep;
 
 @end
@@ -43,7 +43,7 @@
 const NSUInteger NumIncomingNuxes = 1;
 const NSUInteger NumOutgoingNuxes = 3;
 
-@implementation DFSuggestionsPageViewController
+@implementation DFCardsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
 @synthesize noSuggestionsViewController = _noSuggestionsViewController;
 @synthesize noIncomingViewController = _noIncomingViewController;
@@ -177,14 +177,14 @@ const NSUInteger NumOutgoingNuxes = 3;
   DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
   if (!nextPhoto) return nil;
   
-  DFIncomingViewController *ivc = [[DFIncomingViewController alloc]
+  DFIncomingCardViewController *ivc = [[DFIncomingCardViewController alloc]
                                    initWithPhotoID:nextPhoto.id
                                    shareInstance:nextPhoto.share_instance.longLongValue
                                    fromSender:[[DFPeanutFeedDataManager sharedManager]
                                                userWithID:nextPhoto.user]];
   [self.alreadyShownPhotoIds addObject:@(nextPhoto.id)];
   
-  DFSuggestionsPageViewController __weak *weakSelf = self;
+  DFCardsPageViewController __weak *weakSelf = self;
   ivc.nextHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
     [weakSelf photoSkipped:nextPhoto];
   };
@@ -246,14 +246,14 @@ const NSUInteger NumOutgoingNuxes = 3;
         DFPeanutFeedObject *photo = photos[x];
         if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
           [self.alreadyShownPhotoIds addObject:@(photo.id)];
-          DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
+          DFOutgoingCardViewController *svc = [[DFOutgoingCardViewController alloc] init];
           svc.view.frame = self.view.bounds;
           
           [svc configureWithSuggestion:suggestion withPhoto:photo];
           if (suggestion.actor_ids.count == 0 && self.lastSentContacts.count > 0) {
             svc.selectedPeanutContacts = self.lastSentContacts;
           }
-          DFSuggestionsPageViewController __weak *weakSelf = self;
+          DFCardsPageViewController __weak *weakSelf = self;
 
           svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
             [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
@@ -295,8 +295,8 @@ const NSUInteger NumOutgoingNuxes = 3;
  */
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController
 {
-  if (![[viewController class] isSubclassOfClass:[DFHomeSubViewController class]]) return -1;
-  DFHomeSubViewController *subVC = (DFHomeSubViewController *)viewController;
+  if (![[viewController class] isSubclassOfClass:[DFCardViewController class]]) return -1;
+  DFCardViewController *subVC = (DFCardViewController *)viewController;
   
   return subVC.index;
 }
@@ -304,8 +304,8 @@ const NSUInteger NumOutgoingNuxes = 3;
 // TODO(Derek): This might not be needed anymore
 - (void)updateIndexOfViewController:(UIViewController *)viewController index:(NSUInteger)index
 {
-  if (![[viewController class] isSubclassOfClass:[DFHomeSubViewController class]]) return;
-  DFHomeSubViewController *subVC = (DFHomeSubViewController *)viewController;
+  if (![[viewController class] isSubclassOfClass:[DFCardViewController class]]) return;
+  DFCardViewController *subVC = (DFCardViewController *)viewController;
   
   subVC.index = index;
 }
@@ -317,11 +317,11 @@ const NSUInteger NumOutgoingNuxes = 3;
   return  [self indexOfViewController:currentController];
 }
 
-- (DFHomeSubViewController *)viewControllerForNuxStep:(NSUInteger)index
+- (DFCardViewController *)viewControllerForNuxStep:(NSUInteger)index
 {
-  DFHomeSubViewController *nuxController;
+  DFCardViewController *nuxController;
   if (index == 0 && self.preferredType == DFIncomingViewType) {
-    DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithNuxStep:1];
+    DFIncomingCardViewController *ivc = [[DFIncomingCardViewController alloc] initWithNuxStep:1];
     nuxController = ivc;
     
     NSString *incomingCompletionString = nil;
@@ -339,7 +339,7 @@ const NSUInteger NumOutgoingNuxes = 3;
     ivc.nextHandler = block;
     ivc.likeHandler = block;
   } else if (self.preferredType == DFSuggestionViewType){
-    DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
+    DFOutgoingCardViewController *svc = [[DFOutgoingCardViewController alloc]
                                                initWithNuxStep:index + 1];
     nuxController = svc;
     if (index == 0) {
@@ -394,8 +394,8 @@ const NSUInteger NumOutgoingNuxes = 3;
 {
   
   if (!_noIncomingViewController) {
-    _noIncomingViewController = [[DFNoIncomingViewController alloc] init];
-    DFSuggestionsPageViewController __weak *weakSelf = self;
+    _noIncomingViewController = [[DFUpsellCardViewController alloc] init];
+    DFCardsPageViewController __weak *weakSelf = self;
     
     _noIncomingViewController.yesButtonHandler = ^() {
       weakSelf.preferredType = DFSuggestionViewType;

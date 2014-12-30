@@ -7,17 +7,17 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFSuggestionContentView.h"
+#import "DFOutgoingCardContentView.h"
 #import <MMPopLabel/MMPopLabel.h>
 
 
-@interface DFSuggestionContentView()
+@interface DFOutgoingCardContentView()
 
 @property (nonatomic) MMPopLabel *selectPeoplePopLabel;
 
 @end
 
-@implementation DFSuggestionContentView
+@implementation DFOutgoingCardContentView
 
 - (void)awakeFromNib
 {

@@ -43,7 +43,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFGalleryViewController.h"
 #import "DFContactDataManager.h"
-#import "DFSuggestionsPageViewController.h"
+#import "DFCardsPageViewController.h"
 #import "DFHomeViewController.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}

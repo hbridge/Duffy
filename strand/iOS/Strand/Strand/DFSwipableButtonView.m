@@ -8,8 +8,6 @@
 //
 
 #import "DFSwipableButtonView.h"
-#import "DFSpringAttachmentBehavior.h"
-
 
 const CGFloat UpGestureThreshold   = -75.0;
 const CGFloat DownGestureThreshold = 75.0;
@@ -27,34 +25,6 @@ const CGFloat RightGestureThreshold = 75.0;
 
 @implementation DFSwipableButtonView
 
-//- (instancetype)initWithFrame:(CGRect)frame
-//{
-//  self = [super initWithFrame:frame];
-//  if (self)
-//    [self setupNib];
-//  return self;
-//}
-
-//- (instancetype)initWithCoder:(NSCoder *)aDecoder
-//{
-//  self = [super initWithCoder:aDecoder];
-//  if (self)
-//    [self setupNib];
-//  return self;
-//}
-
-//- (void)setupNib
-//{
-//  UIView *view = [self loadNib];
-//  view.frame = self.bounds;
-//  view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-//  [self addSubview:view];
-//}
-//
-//- (UIView *)loadNib
-//{
-//  return [UINib instantiateViewWithClass:[self class]];
-//}
 
 - (void)awakeFromNib
 {

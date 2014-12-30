@@ -6,19 +6,19 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFSwipableSuggestionViewController.h"
+#import "DFOutgoingCardViewController.h"
 #import "DFNavigationController.h"
 #import "DFImageManager.h"
 #import "DFAnalytics.h"
 
-@interface DFSwipableSuggestionViewController ()
+@interface DFOutgoingCardViewController ()
 
 
 @end
 
 
 
-@implementation DFSwipableSuggestionViewController
+@implementation DFOutgoingCardViewController
 
 @synthesize suggestionFeedObject = _suggestionFeedObject;
 
@@ -70,9 +70,9 @@
 - (void)configureSuggestionContentView
 {
   if (!self.suggestionContentView) self.suggestionContentView =
-    [UINib instantiateViewWithClass:[DFSuggestionContentView class]];
+    [UINib instantiateViewWithClass:[DFOutgoingCardContentView class]];
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
-  DFSwipableSuggestionViewController __weak *weakSelf = self;
+  DFOutgoingCardViewController __weak *weakSelf = self;
   self.suggestionContentView.addHandler = ^{
     [weakSelf addPersonButtonPressed:weakSelf.suggestionContentView.addButton];
   };
