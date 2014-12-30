@@ -714,7 +714,7 @@ def strand_inbox(request):
 		#printStats("swaps-invites")
 		
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False).order_by('-added')[:50])
+		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False).order_by('-added'))
 		printStats("inbox-2")
 
 		strandsWithPhotos = list()
