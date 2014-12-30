@@ -34,7 +34,8 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
-@property (nonatomic, retain) MMPopLabel *popLabel;
+@property (nonatomic, retain) MMPopLabel *incomingPopLabel;
+@property (nonatomic, retain) MMPopLabel *outgoingPopLabel;
 
 @end
 
@@ -49,7 +50,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   [self configureNav];
   [self configureCollectionView];
   [self configureNoResultsView];
-  [self configurePopLabel];
+  [self configurePopLabels];
 }
 
 - (void)observeNotifications
@@ -313,10 +314,12 @@ static BOOL showFilters = NO;
   });
 }
 
-- (void)configurePopLabel
+- (void)configurePopLabels
 {
-  self.popLabel = [MMPopLabel popLabelWithText:@"No photos at this time"];
-  [self.view addSubview:self.popLabel];
+  self.incomingPopLabel = [MMPopLabel popLabelWithText:@"No incoming photos"];
+  self.outgoingPopLabel = [MMPopLabel popLabelWithText:@"No matches"];
+  [self.view addSubview:self.incomingPopLabel];
+  [self.view addSubview:self.outgoingPopLabel];
 }
 
 - (void)configureBadges
@@ -370,9 +373,9 @@ static BOOL showFilters = NO;
                               initWithPreferredType:DFIncomingViewType]
    inParent:self];
   } else {
-    [self.popLabel popAtView:sender animatePopLabel:YES animateTargetView:NO];
+    [self.incomingPopLabel popAtView:sender animatePopLabel:YES animateTargetView:NO];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self.popLabel dismiss];
+      [self.incomingPopLabel dismiss];
     });
   }
   [self logHomeButtonPressed:sender];
@@ -386,9 +389,9 @@ static BOOL showFilters = NO;
                               initWithPreferredType:DFSuggestionViewType]
    inParent:self];
   } else {
-    [self.popLabel popAtView:sender animatePopLabel:YES animateTargetView:NO];
+    [self.outgoingPopLabel popAtView:self.sendButton animatePopLabel:YES animateTargetView:NO];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self.popLabel dismiss];
+      [self.outgoingPopLabel dismiss];
     });
   }
   [self logHomeButtonPressed:sender];
