@@ -272,12 +272,8 @@ static DFPeanutFeedDataManager *defaultManager;
   NSMutableArray *photos = [NSMutableArray new];
   
   for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
-    for (NSUInteger i = 0; i < photo.actors.count; i++) {
-      NSNumber *actorID = photo.actors[i];
-      if (userID == actorID.longLongValue && photo.evaluated.boolValue == evaluated) {
-        [photos addObject:photo];
-      }
-    }
+    if (!photo.evaluated.boolValue == evaluated) continue;
+    if ([photo.actor_ids containsObject:@(userID)]) [photos addObject:photo];
   }
   
   return photos;
@@ -288,12 +284,8 @@ static DFPeanutFeedDataManager *defaultManager;
   NSMutableArray *strands = [NSMutableArray new];
 
   for (DFPeanutFeedObject *object in self.privateStrandsFeedObjects) {
-    for (NSUInteger i = 0; i < object.actors.count; i++) {
-      DFPeanutUserObject *actor = object.actors[i];
-      if (user.id == actor.id && [object.suggestible isEqual:@(YES)]) {
-        [strands addObject:object];
-      }
-    }
+    if (!object.suggestible.boolValue) continue;
+    if ([object.actor_ids containsObject:@(user.id)]) [strands addObject:object];
   }
   
   return strands;

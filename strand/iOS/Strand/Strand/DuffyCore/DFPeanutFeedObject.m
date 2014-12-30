@@ -13,6 +13,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFPeanutContact.h"
 
 @implementation DFPeanutFeedObject
 
@@ -286,6 +287,14 @@ static NSArray *FeedObjectTypes;
     if (user) [result addObject:user];
   }
   return result;
+}
+
+- (NSArray *)actorPeanutContacts
+{
+  return [self.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:user];
+    return contact;
+  }];
 }
 
 - (NSArray *)actorNames

@@ -73,6 +73,7 @@ extern DFFeedObjectType DFFeedObjectCluster;
 - (NSEnumerator *)enumeratorOfDescendents;
 
 - (NSArray *)actorNames;
+- (NSArray *)actorPeanutContacts;
 
 /* 
 - (NSString *)actorsString; 

@@ -108,7 +108,7 @@
   _suggestionFeedObject = suggestionFeedObject;
   if (self.nuxStep == 0) {
     self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
-    self.selectedPeanutContacts = [self suggestedPeanutContacts];
+    self.selectedPeanutContacts = self.suggestionFeedObject.actorPeanutContacts;
   }
 }
 
@@ -217,13 +217,6 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     self.suggestionContentView.profileStackView.peanutUsers = @[dummyUser];
   }
   [self.view setNeedsLayout];
-}
-
-- (NSArray *)suggestedPeanutContacts
-{
-  return [self.suggestionFeedObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
-    return [[DFPeanutContact alloc] initWithPeanutUser:user];
-  }];
 }
 
 - (NSArray *)selectedPeanutUsers

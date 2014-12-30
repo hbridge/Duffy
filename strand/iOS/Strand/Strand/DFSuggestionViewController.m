@@ -52,7 +52,7 @@
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo
 {
   self.suggestionFeedObject = suggestion;
-  if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
+  if (suggestion.actor_ids.count == 0) self.bottomLabel.hidden = YES;
   self.bottomLabel.text = [NSString stringWithFormat:@"Send to %@",
                                                  suggestion.actorsString];
   self.topLabel.text = suggestion.placeAndRelativeTimeString;
@@ -72,7 +72,7 @@
 
 - (IBAction)yesButtonPressed:(id)sender {
   if (self.yesButtonHandler) self.yesButtonHandler(self.suggestionFeedObject,
-                                                   self.suggestionFeedObject.actors);
+                                                   self.suggestionFeedObject.actorPeanutContacts);
 }
 
 - (IBAction)noButtonPressed:(id)sender {

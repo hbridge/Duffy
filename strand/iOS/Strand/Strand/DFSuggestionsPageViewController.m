@@ -250,7 +250,7 @@ const NSUInteger NumOutgoingNuxes = 3;
           svc.view.frame = self.view.bounds;
           
           [svc configureWithSuggestion:suggestion withPhoto:photo];
-          if (suggestion.actors.count == 0 && self.lastSentContacts.count > 0) {
+          if (suggestion.actor_ids.count == 0 && self.lastSentContacts.count > 0) {
             svc.selectedPeanutContacts = self.lastSentContacts;
           }
           DFSuggestionsPageViewController __weak *weakSelf = self;

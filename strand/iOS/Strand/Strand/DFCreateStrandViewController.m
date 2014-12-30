@@ -85,12 +85,8 @@ NSUInteger const NumPhotosPerRow = 4;
 
 
 - (void)nextPressed:(id)sender {
-  NSArray *peanutContacts = [self.suggestedSection.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
-    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:user];
-    return contact;
-  }];
-  DFPeoplePickerViewController *peoplePicker =[[DFPeoplePickerViewController alloc]
-                                               initWithSuggestedPeanutContacts:peanutContacts];
+  DFPeoplePickerViewController *peoplePicker = [[DFPeoplePickerViewController alloc]
+                                               initWithSuggestedPeanutContacts:self.suggestedSection.actorPeanutContacts];
   peoplePicker.delegate = self;
   peoplePicker.allowsMultipleSelection = YES;
   [self.navigationController pushViewController:peoplePicker animated:YES];

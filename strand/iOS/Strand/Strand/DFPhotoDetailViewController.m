@@ -217,7 +217,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   }
   
   
-  NSArray *recipientIDs = [self.photoObject.actors arrayByRemovingObject:@(sender.id)];
+  NSArray *recipientIDs = [self.photoObject.actor_ids arrayByRemovingObject:@(sender.id)];
   NSArray *recipientUsers = [recipientIDs arrayByMappingObjectsWithBlock:^id(NSNumber *userID) {
     return [[DFPeanutFeedDataManager sharedManager] userWithID:userID.longLongValue];
   }];
@@ -511,10 +511,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 }
 
 - (IBAction)addPersonPressed:(id)sender {
-  NSArray *peanutContacts = [self.photoObject.actors arrayByMappingObjectsWithBlock:^id(id input) {
-    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
-    return contact;
-  }];
+  NSArray *peanutContacts = self.photoObject.actorPeanutContacts;
   DFInviteStrandViewController *inviteStrandController = [[DFInviteStrandViewController alloc]
                                                           initWithSuggestedPeanutContacts:nil
                                                           notSelectablePeanutContacts:peanutContacts
