@@ -122,17 +122,26 @@ def userHasPostedPhotosToStrand(user, strand, actionsCache):
 
 # ------------------------
 def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None):
-		if not isinstance(users, list):
-			users = [users]
+	if not isinstance(users, list) and not isinstance(users, set):
+		users = [users]
 
-		userData = list()
-		for user in users:
-			userData.append(user.id)
+	friendList = friends_util.getFriendsIds(userId)
 
-		if invitedUsers:
-			for user in invitedUsers:
-				userData.append(user.id)
-		return userData
+	userData = list()
+	for user in users:
+		if user.id in friendList:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
+		else:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
+		
+		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
+
+		if includePhone:
+			entry['phone_number'] = user.phone_number
+
+		userData.append(entry)
+
+	return userData
 
 def getFriendsObjectData(userId, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
