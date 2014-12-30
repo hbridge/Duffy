@@ -684,12 +684,19 @@ static DFPeanutFeedDataManager *defaultManager;
     }
     if (photoHasAction) {
       [photosWithAction addObject:photo];
-    } else if (actionType == DFPeanutActionEvalPhoto && photo.evaluated) {
-      [photosWithAction addObject:photo];
     }
   }
   
   return photosWithAction;
+}
+
+- (NSArray *)evaluatedPhotos
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
+    if (photo.evaluated.boolValue) [result addObject:photo];
+  }
+  return result;
 }
 
 - (NSArray *)photosSentByUser:(DFUserIDType)user
@@ -719,7 +726,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)allEvaluatedOrSentPhotos
 {
-  NSArray *evaledPhotos = [self photosWithAction:DFPeanutActionEvalPhoto];
+  NSArray *evaledPhotos = [self evaluatedPhotos];
   NSArray *myPhotos = [self photosSentByUser:[[DFUser currentUser] userID]];
   NSMutableSet *merged = [[NSMutableSet alloc] initWithCapacity:evaledPhotos.count + myPhotos.count];
   [merged addObjectsFromArray:evaledPhotos];
