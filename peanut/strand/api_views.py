@@ -687,11 +687,6 @@ def swap_inbox(request):
 		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'people': getFriendsObjectData(user.id, people, True)}		
 		responseObjects.append(peopleEntry)
 
-		# Double adding friend list for backwards compatibility
-		# (TODO) Remove after we move to the new prod build (past 4820)
-		peopleEntry = {'type': 'friends_list', 'actors': getFriendsObjectData(user.id, people, True)}
-		responseObjects.append(peopleEntry)
-
 		printStats("swaps_inbox-end")
 
 
