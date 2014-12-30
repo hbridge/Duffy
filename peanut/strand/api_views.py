@@ -249,7 +249,7 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None, f
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True, findInterestedUsers = True):
+def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True, findInterestedUsers = True, filterOutEvaluated = True):
 	groups = list()
 
 	if friends == None:
@@ -321,7 +321,7 @@ def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends =
 	actionsCache = getActionsCache(thisUser, Strand.getIds(strands), Strand.getPhotoIds(strands))
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	# Pass in none for actions because there are no actions on private photos so don't use anything
-	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = True)
+	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = filterOutEvaluated)
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
@@ -625,7 +625,7 @@ def private_strands(request):
 
 		friends = friends_util.getFriends(user.id)
 		
-		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, locationRequired = True)
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, locationRequired = True, filterOutEvaluated = False)
 		
 		printStats("private-3")
 	else:
