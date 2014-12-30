@@ -1,5 +1,11 @@
 # Swap v2
 
+## Dec 30th, 2014 (4822)
+
+- Performance improvements
+- Minor bug fixes
+
+
 ## Dec 14th, 2014 (4819-4820)
 
 - Updated new user experience
