@@ -367,15 +367,20 @@ def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
 	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user)}
 	photos = postAction.photos.all()
 	photos = sorted(photos, key=lambda x: x.time_taken)
+
+	photos = filter(lambda x: x.full_filename, photos)
 	
-	metadata['title'] = "added %s photos" % len(photos)
+	if len(photos) > 0:
+		metadata['title'] = "added %s photos" % len(photos)
 
-	groupEntry = {'photos': photos, 'metadata': metadata}
+		groupEntry = {'photos': photos, 'metadata': metadata}
 
-	formattedGroups = getFormattedGroups([groupEntry], simCaches = simCaches, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = False)
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
-	return objects
+		formattedGroups = getFormattedGroups([groupEntry], simCaches = simCaches, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = False)
+		# Lastly, we turn our groups into sections which is the object we convert to json for the api
+		objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
+		return objects
+	else:
+		return []
 
 def getBuildNumForUser(user):
 	if user.last_build_info:
