@@ -128,6 +128,7 @@ def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None)
 	friendList = friends_util.getFriendsIds(userId)
 
 	userData = list()
+
 	for user in users:
 		if user.id in friendList:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
@@ -361,7 +362,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	return strandsThatMatch
 	
 def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
-	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user), 'actor_ids': [postAction.user]}
+	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user), 'actor_ids': [postAction.user.id]}
 	photos = postAction.photos.all()
 	photos = sorted(photos, key=lambda x: x.time_taken)
 
