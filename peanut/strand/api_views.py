@@ -656,21 +656,33 @@ def swap_inbox(request):
 		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id])
 
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		printStats("swaps_inbox-1")
+		printStats("swaps_inbox-1", printQueries=True)
 
-		actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
+		photoIds = list()
+		for shareInstance in shareInstances:
+			photoIds.append(shareInstance.photo_id)
+
+		actions = Action.objects.filter(Q(share_instance_id__in=shareInstanceIds) | Q(photo_id__in=photoIds))
 		actionsByShareInstanceId = dict()
+		actionsByPhotoId = dict()
 		for action in actions:
 			if action.share_instance_id not in actionsByShareInstanceId:
 				actionsByShareInstanceId[action.share_instance_id] = list()
 			actionsByShareInstanceId[action.share_instance_id].append(action)
-		
+
+			if action.photo_id not in actionsByPhotoId:
+				actionsByPhotoId[action.photo_id] = list()
+			actionsByPhotoId[action.photo_id].append(action)
+
 		printStats("swaps_inbox-2")
 
 		for shareInstance in shareInstances:
 			actions = list()
 			if shareInstance.id in actionsByShareInstanceId:
 				actions = actionsByShareInstanceId[shareInstance.id]
+
+			if shareInstance.photo_id in actionsByPhotoId:
+				actions.extend(actionsByPhotoId[shareInstance.photo_id])
 			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, actions, user))
 
 		printStats("swaps_inbox-3")
