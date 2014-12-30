@@ -77,7 +77,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	shareInstanceData['time_taken'] = shareInstance.photo.time_taken
 	shareInstanceData['full_image_path'] = shareInstance.photo.getFullUrlImagePath()
 	shareInstanceData['thumb_image_path'] = shareInstance.photo.getThumbUrlImagePath()
-	shareInstanceData['actors'] = [actor.id for actor in shareInstance.users.all()]
+	shareInstanceData['actor_ids'] = [actor.id for actor in shareInstance.users.all()]
 	shareInstanceData['last_action_timestamp'] = shareInstance.last_action_timestamp
 	shareInstanceData['shared_at_timestamp'] = shareInstance.shared_at_timestamp
 	shareInstanceData['share_instance'] = shareInstance.id
