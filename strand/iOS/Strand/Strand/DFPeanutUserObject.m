@@ -11,8 +11,10 @@
 #import <CoreLocation/CoreLocation.h>
 #import "UIImage+Resize.h"
 #import "UIImage+RoundedCorner.h"
-
 #import "DFContactDataManager.h"
+
+DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend = @"friend";
+DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 
 @implementation DFPeanutUserObject
 
@@ -45,6 +47,7 @@
            @"has_sms_authed",
            @"added",
            @"invited",
+           @"relationship",
            ];
 }
 

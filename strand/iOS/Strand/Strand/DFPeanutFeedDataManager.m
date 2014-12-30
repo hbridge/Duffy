@@ -121,10 +121,10 @@ static DFPeanutFeedDataManager *defaultManager;
          // For inbox only, we update our local cache of friends
          // If we refactor these methods to be common this will need to be pulled out
          for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-           if ([object.type isEqual:DFFeedObjectFriendsList]) {
+           if ([object.type isEqual:DFFeedObjectPeopleList]) {
              // This grabs the local first name which we want to sort by
              NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
-             _cachedFriendsList = [NSMutableArray arrayWithArray:[object.friends sortedArrayUsingDescriptors:@[sort]]];
+             _cachedFriendsList = [NSMutableArray arrayWithArray:[object.people sortedArrayUsingDescriptors:@[sort]]];
            }
          }
          
@@ -516,7 +516,11 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)friendsList
 {
-  return self.cachedFriendsList;
+  NSMutableArray *friends = [NSMutableArray new];
+  for (DFPeanutUserObject *user in self.cachedFriendsList) {
+    if ([user.relationship isEqual:DFPeanutUserRelationshipFriend]) [friends addObject:user];
+  }
+  return friends;
 }
 
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID

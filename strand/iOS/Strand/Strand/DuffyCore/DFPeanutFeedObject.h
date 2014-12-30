@@ -19,7 +19,7 @@ typedef NSString *const DFFeedObjectType;
 
 extern DFFeedObjectType DFFeedObjectSection;
 extern DFFeedObjectType DFFeedObjectPhoto;
-extern DFFeedObjectType DFFeedObjectFriendsList;
+extern DFFeedObjectType DFFeedObjectPeopleList;
 extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
 extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 extern DFFeedObjectType DFFeedObjectCluster;
@@ -55,8 +55,8 @@ extern DFFeedObjectType DFFeedObjectCluster;
 // Relationships
 @property (nonatomic, retain) NSArray *objects;
 @property (nonatomic, retain) NSArray *actions;
-// used only in the friends object type
-@property (nonatomic, retain) NSArray *friends;
+// used only in the people_list object type
+@property (nonatomic, retain) NSArray *people;
 
 
 - (DFPeanutAction *)userFavoriteAction;

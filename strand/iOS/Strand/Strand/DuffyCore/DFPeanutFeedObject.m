@@ -24,7 +24,7 @@ DFFeedObjectType DFFeedObjectInviteStrand = @"invite_strand";
 DFFeedObjectType DFFeedObjectStrand = @"strand";
 DFFeedObjectType DFFeedObjectStrandPost = @"strand_post";
 DFFeedObjectType DFFeedObjectStrandPosts = @"strand_posts";
-DFFeedObjectType DFFeedObjectFriendsList = @"friends_list";
+DFFeedObjectType DFFeedObjectPeopleList = @"people_list";
 DFFeedObjectType DFFeedObjectSuggestedPhotos = @"suggested_photos";
 DFFeedObjectType DFFeedObjectStrandJoin = @"strand_join";
 DFFeedObjectType DFFeedObjectSwapSuggestion = @"section";
@@ -62,7 +62,7 @@ static NSArray *FeedObjectTypes;
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects" mapping:objectMapping];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"actions" mapping:[DFPeanutAction objectMapping]];
-  [objectMapping addRelationshipMappingWithSourceKeyPath:@"friends" mapping:[DFPeanutUserObject objectMapping]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"people" mapping:[DFPeanutUserObject objectMapping]];
   
   return objectMapping;
 }

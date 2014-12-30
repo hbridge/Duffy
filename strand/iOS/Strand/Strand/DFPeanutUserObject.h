@@ -14,6 +14,10 @@
 
 @interface DFPeanutUserObject : NSObject <DFPeanutObject>
 
+typedef NSString *const DFPeanutUserRelationshipType;
+extern DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend;
+extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
+
 @property (nonatomic) DFUserIDType id;
 @property (nonatomic, retain) NSString *display_name;
 @property (nonatomic, retain) NSString *phone_number;
@@ -33,6 +37,7 @@
 @property (nonatomic, retain) NSNumber *has_sms_authed;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSNumber *invited;
+@property (nonatomic, retain) NSString *relationship;
 
 - (NSDictionary *)requestParameters;
 - (void)setLocation:(CLLocation *)location;
@@ -42,5 +47,6 @@
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
 
 + (DFPeanutUserObject *)TeamSwapUser;
+
 
 @end
