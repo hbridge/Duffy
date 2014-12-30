@@ -673,6 +673,7 @@ def swap_inbox(request):
 			peopleIds.extend(obj['actors'])
 
 		people = set(User.objects.filter(id__in=peopleIds))
+
 		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'people': getFriendsObjectData(user.id, people, True)}		
 		responseObjects.append(peopleEntry)
 
@@ -724,11 +725,23 @@ def strand_inbox(request):
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
 
 		# Add in the list of all friends at the end
-		friends = friends_util.getFriends(user.id)
-		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(user.id, friends, True)}
-		printStats("inbox-4")
+		peopleIds = friends_util.getFriendsIds(user.id)
 
-		responseObjects.append(friendsEntry)
+		# Also add in all of the actors they're dealing with
+		for obj in responseObjects:
+			peopleIds.extend(obj['actors'])
+
+		people = set(User.objects.filter(id__in=peopleIds))
+
+		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'people': getFriendsObjectData(user.id, people, True)}		
+		responseObjects.append(peopleEntry)
+
+		# Double adding friend list for backwards compatibility
+		# (TODO) Remove after we move to the new prod build (past 4820)
+		peopleEntry = {'type': 'friends_list', 'people': getFriendsObjectData(user.id, people, True)}
+		responseObjects.append(peopleEntry)
+
+		printStats("inbox-4")
 
 		response['objects'] = responseObjects
 	else:
