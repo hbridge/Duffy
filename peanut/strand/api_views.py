@@ -142,7 +142,7 @@ def getFriendsObjectData(userId, users, includePhone = True):
 
 	userData = list()
 	for user in users:
-		if user in friendList:
+		if user.id in friendList:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
 		else:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
