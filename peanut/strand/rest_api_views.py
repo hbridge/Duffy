@@ -654,10 +654,11 @@ class CreateActionAPI(CreateAPIView):
                             notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_PHOTO_COMMENT, customPayload)
                 elif obj.share_instance:
                     for user in obj.share_instance.users.all():
-                        msg = "%s: %s" % (obj.user.display_name, obj.text)
-                        logger.debug("going to send %s to user id %s" % (msg, user.id))
-                        customPayload = {'share_instance_id': obj.share_instance_id, 'id': obj.photo_id}
-                        notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_PHOTO_COMMENT, customPayload)
+                        if user.id != obj.user_id:
+                            msg = "%s: %s" % (obj.user.display_name, obj.text)
+                            logger.debug("going to send %s to user id %s" % (msg, user.id))
+                            customPayload = {'share_instance_id': obj.share_instance_id, 'id': obj.photo_id}
+                            notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_PHOTO_COMMENT, customPayload)
 
                 return super(CreateActionAPI, self).post(request)
             elif (obj.action_type == constants.ACTION_TYPE_FAVORITE):
