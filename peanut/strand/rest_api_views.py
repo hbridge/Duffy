@@ -665,10 +665,12 @@ class CreateActionAPI(CreateAPIView):
                 if obj.photo.user_id != obj.user_id:
                         msg = "%s just liked your photo" % (obj.user.display_name)
                         logger.debug("going to send %s to user id %s" % (msg, obj.photo.user_id))
-                        customPayload = {'strand_id': obj.strand_id, 'id': obj.photo_id}
+                        customPayload = {'share_instance_id': obj.share_instance_id, 'id': obj.photo_id}
                         notifications_util.sendNotification(obj.photo.user, msg, constants.NOTIFICATIONS_PHOTO_FAVORITED_ID, customPayload)
-
-                results = Action.objects.filter(photo_id=obj.photo_id, strand_id=obj.strand_id, user_id=obj.user_id, action_type=obj.action_type)
+                if obj.strand:
+                    results = Action.objects.filter(photo_id=obj.photo_id, strand_id=obj.strand_id, user_id=obj.user_id, action_type=obj.action_type)
+                elif obj.share_instance:
+                    results = Action.objects.filter(photo_id=obj.photo_id, share_instance_id=obj.share_instance_id, user_id=obj.user_id, action_type=obj.action_type)
 
                 if len(results) > 0:
                     serializer = self.get_serializer(results[0])
