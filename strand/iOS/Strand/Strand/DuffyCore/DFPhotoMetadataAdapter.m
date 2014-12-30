@@ -512,13 +512,6 @@ const BOOL UseNetworkingQueue = YES;
     }
   }
   
-  #ifdef DEBUG
-  if (error) {
-    [NSException raise:@"Server response failed verification"
-                format:@"Reason: %@", error.localizedDescription];
-  }
-  #endif
-  
   return error;
 }
 
