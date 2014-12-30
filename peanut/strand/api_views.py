@@ -134,27 +134,25 @@ def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None)
 				userData.append(user.id)
 		return userData
 
-def getFriendsObjectData(userId, users, includePhone = True, invitedUsers = None):
+def getFriendsObjectData(userId, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
 		users = [users]
 
+	friendList = friends_util.getFriendsIds(userId)
+
 	userData = list()
 	for user in users:
-		entry = {'display_name': user.display_name, 'id': user.id}
+		if user in friendList:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
+		else:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
+		
+		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
 
 		if includePhone:
 			entry['phone_number'] = user.phone_number
 
 		userData.append(entry)
-
-	if invitedUsers:
-		for user in invitedUsers:
-			entry = {'display_name': user.display_name, 'id': user.id, 'invited': True}
-
-			if includePhone:
-				entry['phone_number'] = user.phone_number
-
-			userData.append(entry)
 
 	return userData
 
@@ -668,15 +666,15 @@ def swap_inbox(request):
 		printStats("swaps_inbox-3")
 
 		# Add in the list of all friends at the end
-		friendsIds = friends_util.getFriendsIds(user.id)
+		peopleIds = friends_util.getFriendsIds(user.id)
 
 		# Also add in all of the actors they're dealing with
 		for obj in responseObjects:
-			friendsIds.extend(obj['actors'])
+			peopleIds.extend(obj['actors'])
 
-		friends = set(User.objects.filter(id__in=friendsIds))
-		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'friends': getFriendsObjectData(user.id, friends, True)}
-		responseObjects.append(friendsEntry)
+		people = set(User.objects.filter(id__in=peopleIds))
+		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'people': getFriendsObjectData(user.id, people, True)}
+		responseObjects.append(peopleEntry)
 
 		printStats("swaps_inbox-end")
 
