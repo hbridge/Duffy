@@ -296,7 +296,7 @@ const CGFloat CreateCellTitleSpacing = 8;
                                                                 abbreviate:NO];
   headerView.badgeIconView.image = [UIImage imageNamed:@"Assets/Icons/MatchedIcon"];
   
-  if (suggestion.actors.count == 1) {
+  if (suggestion.actor_ids.count == 1) {
     headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap", suggestion.actorsString];
   } else {
     headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap", suggestion.actorsString];
@@ -324,7 +324,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   DFPhotoPickerHeaderStyle style = DFPhotoPickerHeaderStyleTimeOnly;
   if (suggestion.location) style |= DFPhotoPickerHeaderStyleLocation;
   if (suggestion.suggestible.boolValue) {
-    if (suggestion.actors.count > 0) style |= DFPhotoPickerHeaderStyleBadge;
+    if (suggestion.actor_ids.count > 0) style |= DFPhotoPickerHeaderStyleBadge;
   }
   
   return style;

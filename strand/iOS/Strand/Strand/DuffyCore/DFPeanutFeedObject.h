@@ -42,7 +42,7 @@ extern DFFeedObjectType DFFeedObjectCluster;
 @property (nonatomic, retain) NSDate *time_stamp;
 @property (nonatomic, retain) NSDate *last_action_timestamp;
 @property (nonatomic, retain) NSNumber *ready;
-@property (nonatomic, retain) NSArray *actors;
+@property (readonly, nonatomic, retain) NSArray *actor_ids;
 @property (nonatomic, retain) NSNumber *suggestible;
 @property (nonatomic, retain) NSNumber *suggestion_rank;
 @property (nonatomic, retain) NSString *suggestion_type;
@@ -58,6 +58,9 @@ extern DFFeedObjectType DFFeedObjectCluster;
 // used only in the people_list object type
 @property (nonatomic, retain) NSArray *people;
 
+// converted from actorIDs
+@property (readonly, nonatomic, retain) NSArray *actors;
+
 
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
@@ -70,7 +73,6 @@ extern DFFeedObjectType DFFeedObjectCluster;
 - (NSEnumerator *)enumeratorOfDescendents;
 
 - (NSArray *)actorNames;
-- (NSArray *)actorUsers;
 
 /* 
 - (NSString *)actorsString; 

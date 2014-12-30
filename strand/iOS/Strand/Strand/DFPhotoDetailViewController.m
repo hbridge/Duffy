@@ -511,7 +511,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 }
 
 - (IBAction)addPersonPressed:(id)sender {
-  NSArray *peanutContacts = [[self.photoObject actorUsers] arrayByMappingObjectsWithBlock:^id(id input) {
+  NSArray *peanutContacts = [self.photoObject.actors arrayByMappingObjectsWithBlock:^id(id input) {
     DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
     return contact;
   }];

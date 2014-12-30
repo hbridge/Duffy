@@ -107,7 +107,7 @@
 {
   _suggestionFeedObject = suggestionFeedObject;
   if (self.nuxStep == 0) {
-    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actorUsers;
+    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
     self.selectedPeanutContacts = [self suggestedPeanutContacts];
   }
 }
@@ -221,7 +221,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 
 - (NSArray *)suggestedPeanutContacts
 {
-  return [self.suggestionFeedObject.actorUsers arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+  return [self.suggestionFeedObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
     return [[DFPeanutContact alloc] initWithPeanutUser:user];
   }];
 }

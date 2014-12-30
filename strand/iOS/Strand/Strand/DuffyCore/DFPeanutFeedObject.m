@@ -83,7 +83,7 @@ static NSArray *FeedObjectTypes;
            @"time_stamp",
            @"last_action_timestamp",
            @"ready",
-           @"actors",
+           @"actor_ids",
            @"suggestible",
            @"suggestion_rank",
            @"suggestion_type",
@@ -277,11 +277,15 @@ static NSArray *FeedObjectTypes;
 
 #pragma mark - Actor Accessors
 
-- (NSArray *)actorUsers
+- (NSArray *)actors
 {
-  return [self.actors arrayByMappingObjectsWithBlock:^id(NSNumber *userID) {
-    return [[DFPeanutFeedDataManager sharedManager] userWithID:userID.longLongValue];
-  }];
+  NSMutableArray *result = [NSMutableArray new];
+  for (NSNumber *userID in self.actor_ids) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
+                                userWithID:userID.longLongValue];
+    if (user) [result addObject:user];
+  }
+  return result;
 }
 
 - (NSArray *)actorNames
@@ -306,10 +310,10 @@ static NSArray *FeedObjectTypes;
   BOOL includeYou = false;
   NSUInteger numOtherMembers = 0;
   NSUInteger numUnnamed = 0;
-  
-  for (NSUInteger i = 0; i < self.actors.count; i++) {
-    NSNumber *actorID = self.actors[i];
-    DFPeanutUserObject *actor = [[DFPeanutFeedDataManager sharedManager] userWithID:actorID.longLongValue];
+
+  NSArray *actors = self.actors;
+  for (NSUInteger i = 0; i < actors.count; i++) {
+    DFPeanutUserObject *actor = actors[i];
     if (actor.invited.boolValue != invited) continue;
     if (![[actor firstName] isNotEmpty]) {
       numUnnamed++;
@@ -384,7 +388,7 @@ static NSArray *FeedObjectTypes;
   return @{
            @"suggestionType" : self.suggestion_type ? self.suggestion_type : @"",
            @"suggestionRank" : self.suggestion_rank? self.suggestion_rank : @(0),
-           @"suggestionActorsCount" : @(self.actors.count),
+           @"suggestionActorsCount" : @(self.actor_ids.count),
            };
 }
 

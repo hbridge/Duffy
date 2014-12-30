@@ -72,7 +72,8 @@
     user.phone_number = contact.phone_number;
     [newUsers addObject:user];
   }
-  self.strandPostsObject.actors = [self.strandPostsObject.actors arrayByAddingObjectsFromArray:newUsers];
+  [NSException raise:@"deprecated" format:@"deprecated"];
+  //self.strandPostsObject.actors = [self.strandPostsObject.actors arrayByAddingObjectsFromArray:newUsers];
   [self.tableView reloadData];
 
 }
