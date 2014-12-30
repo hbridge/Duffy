@@ -4,7 +4,7 @@ PODS:
   - BWLongTextViewController (1.0)
   - BWSelectViewController (0.4.3)
   - CocoaLumberjack (1.8.1):
-    - CocoaLumberjack/Extensions
+    - CocoaLumberjack/Extensions (= 1.8.1)
   - CocoaLumberjack/Core (1.8.1)
   - CocoaLumberjack/Extensions (1.8.1):
     - CocoaLumberjack/Core
@@ -26,7 +26,7 @@ PODS:
   - MCSwipeTableViewCell (2.1.2)
   - MMPopLabel (0.1.1)
   - RestKit (0.20.3):
-    - RestKit/Core
+    - RestKit/Core (= 0.20.3)
   - RestKit/Core (0.20.3):
     - RestKit/CoreData
     - RestKit/Network
@@ -43,8 +43,8 @@ PODS:
   - RHAddressBook (1.1.1)
   - SAMGradientView (0.2.1)
   - Slash (0.1.2):
-    - Slash/arc
-    - Slash/no-arc
+    - Slash/arc (= 0.1.2)
+    - Slash/no-arc (= 0.1.2)
   - Slash/arc (0.1.2)
   - Slash/no-arc (0.1.2)
   - SOCKit (1.1)
@@ -81,6 +81,17 @@ EXTERNAL SOURCES:
   SVProgressHUD:
     :git: https://github.com/samvermette/SVProgressHUD.git
 
+CHECKOUT OPTIONS:
+  HockeySDK:
+    :commit: 6e87975b413b0fc3d8980f21ee5846647285d665
+    :git: https://github.com/bitstadium/HockeySDK-iOS.git
+  MMPopLabel:
+    :commit: 1508f67bad9530f0389f32a1ce7057685c3bcaf0
+    :git: https://github.com/hbridge/MMPopLabel.git
+  SVProgressHUD:
+    :commit: 5badd27a33c193090f5d68e9b49c6a48a1ffc5be
+    :git: https://github.com/samvermette/SVProgressHUD.git
+
 SPEC CHECKSUMS:
   ActionSheetPicker2: 29191d3581b49cc10d3200de3f028548ac1aa9dd
   AFNetworking: 80c4e0652b08eb34e25b9c0ff3c82556fe5967b4
@@ -107,4 +118,4 @@ SPEC CHECKSUMS:
   UIColor+BFPaperColors: c7e4c6e4d82e889d507b3c2d09e6caf816529f18
   WYPopoverController: c233d69fdfd5c7e316b481df1060624d7a9e629d
 
-COCOAPODS: 0.34.1
+COCOAPODS: 0.35.0
