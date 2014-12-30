@@ -172,18 +172,21 @@ const NSUInteger NumOutgoingNuxes = 3;
                 completion:nil];
 }
 
-- (UIViewController *)incomingViewControllerForPhoto:(DFPeanutFeedObject *)photo
+- (UIViewController *)nextIncomingViewController
 {
+  DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
+  if (!nextPhoto) return nil;
+  
   DFIncomingViewController *ivc = [[DFIncomingViewController alloc]
-                                   initWithPhotoID:photo.id
-                                   shareInstance:photo.share_instance.longLongValue
+                                   initWithPhotoID:nextPhoto.id
+                                   shareInstance:nextPhoto.share_instance.longLongValue
                                    fromSender:[[DFPeanutFeedDataManager sharedManager]
-                                               userWithID:photo.user]];
-  [self.alreadyShownPhotoIds addObject:@(photo.id)];
+                                               userWithID:nextPhoto.user]];
+  [self.alreadyShownPhotoIds addObject:@(nextPhoto.id)];
   
   DFSuggestionsPageViewController __weak *weakSelf = self;
   ivc.nextHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
-    [weakSelf photoSkipped:photo];
+    [weakSelf photoSkipped:nextPhoto];
   };
   ivc.commentHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
     [weakSelf showCommentsForPhoto:photoID shareInstance:shareInstance];
@@ -193,13 +196,7 @@ const NSUInteger NumOutgoingNuxes = 3;
   };
   
   return ivc;
-}
 
-- (UIViewController *)nextIncomingViewController
-{
-  DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
-  if (!nextPhoto) return nil;
-  return [self incomingViewControllerForPhoto:nextPhoto];
 }
 
 - (DFPeanutFeedObject *)nextIncomingPhotoToShow
@@ -217,15 +214,17 @@ const NSUInteger NumOutgoingNuxes = 3;
   DFPeanutFeedObject *firstPhoto;
   NSArray *photos = [[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers];
   for (DFPeanutFeedObject *photo in photos) {
+    //don't return photos we've already shown
+    if ([self.alreadyShownPhotoIds containsObject:@(photo.id)]) continue;
     // Now lets see if the image is loaded yet
     DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
     if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
       return photo;
     } else if(!firstPhoto) {
-      // Keep track of the first photo incase non of our photos are loaded...just use this one and show the spinner
+      // Keep track of the first photo incase none of our photos are loaded
+      // just use this one and show the spinner
       firstPhoto = photo;
     }
-
   }
   
   if (firstPhoto) {
@@ -263,7 +262,6 @@ const NSUInteger NumOutgoingNuxes = 3;
             [weakSelf photoSkipped:photo];
           };
           return svc;
-          
         }
       }
     }
