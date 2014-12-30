@@ -414,7 +414,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DDLogVerbose(@"%@ photo tapped: %@", self.class, photo);
+  DDLogVerbose(@"%@ photo id %@ tapped", self.class, @(photo.id));
    
   NSMutableArray *allPhotos = [NSMutableArray new];
   for (NSUInteger section = 0; section < [self.datasource numberOfSectionsInCollectionView:self.collectionView]; section++) {

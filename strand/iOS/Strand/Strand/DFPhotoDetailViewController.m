@@ -312,7 +312,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   CGRect frame = self.templateCell.frame;
   frame.size.width = self.view.frame.size.width;
-  DDLogVerbose(@"setting template cell frame:%@", NSStringFromCGRect(frame));
   self.templateCell.frame = frame;
   [self.templateCell setNeedsLayout];
 }

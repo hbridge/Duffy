@@ -30,7 +30,7 @@
                         <constraint firstAttribute="height" constant="22" id="oQC-v9-H3q"/>
                         <constraint firstAttribute="width" constant="22" id="p2Y-vi-ViU"/>
                     </constraints>
-                    <state key="normal" image="LikeOnToolbarIcon.png">
+                    <state key="normal">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
@@ -57,7 +57,4 @@
             <point key="canvasLocation" x="323.5" y="700"/>
         </view>
     </objects>
-    <resources>
-        <image name="LikeOnToolbarIcon.png" width="22" height="22"/>
-    </resources>
 </document>
