@@ -354,6 +354,7 @@ static BOOL showFilters = NO;
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
                                forState:UIControlStateNormal];
   } else {
+    self.sendBadgeView.hidden = YES;
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"]
                                forState:UIControlStateNormal];
   }
