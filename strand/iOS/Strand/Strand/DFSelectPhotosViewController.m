@@ -323,9 +323,6 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   DFPhotoPickerHeaderStyle style = DFPhotoPickerHeaderStyleTimeOnly;
   if (suggestion.location) style |= DFPhotoPickerHeaderStyleLocation;
-  if (suggestion.suggestible.boolValue) {
-    if (suggestion.actor_ids.count > 0) style |= DFPhotoPickerHeaderStyleBadge;
-  }
   
   return style;
 }
