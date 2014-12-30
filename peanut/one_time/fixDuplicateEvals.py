@@ -69,7 +69,7 @@ def main(argv):
 		print "UserId: %s"%(user.id)
 		actionList = getActionsListForUserId(user.id)
 		dupActionList = getDuplicateEvals(actionList)
-		totalActionsToDelete += deleteActions(dupActionList, False)
+		totalActionsToDelete += deleteActions(dupActionList, False) # Change to true to delete actions
 
 	print totalActionsToDelete
 
