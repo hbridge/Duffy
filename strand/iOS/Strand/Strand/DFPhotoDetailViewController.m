@@ -690,13 +690,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-  DDLogVerbose(@"dragging");
   [self.commentToolbar.textField resignFirstResponder];
 }
 
 - (void)tapRecognizerChanged:(UITapGestureRecognizer *)tapRecognizer
 {
-  DDLogVerbose(@"tableview tapped");
   [self.commentToolbar.textField resignFirstResponder];
 }
 
