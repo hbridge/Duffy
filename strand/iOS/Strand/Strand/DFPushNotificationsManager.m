@@ -229,37 +229,30 @@
     if (pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID ||
         pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT ||
         pushNotif.type == NOTIFICATIONS_PHOTO_FAVORITED_ID) {
-      UIViewController *vc;
-      UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
-                                          rootViewController];
-      DFShareInstanceIDType shareID = openedNotif.strandId.longLongValue;
+      
+      DFShareInstanceIDType shareID = openedNotif.shareInstanceID.longLongValue;
       DFPhotoIDType photoID = openedNotif.id.longLongValue;
       
       DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID shareInstance:shareID];
-      
-      if (photoObject && photoObject.evaluated) {
-        vc =  [[DFPhotoDetailViewController alloc]
-               initWithPhotoObject:photoObject];
-        
-      } else {
-        vc = [[DFSuggestionsPageViewController alloc]
-              initWithPreferredType:DFIncomingViewType photoID:photoID shareInstance:shareID];
-      }
-      
       if (!photoObject) {
         [SVProgressHUD show];
         [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:^() {
-          [SVProgressHUD dismiss];
-          [DFDismissableModalViewController presentWithRootController:vc
-                                                             inParent:rootController];
+          
+          DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
+                                             photoWithID:photoID
+                                             shareInstance:shareID];
+          if (photoObject) {
+            [self openPhotoObject:photoObject];
+            [SVProgressHUD dismiss];
+          } else {
+            [SVProgressHUD showErrorWithStatus:@"Failed"];
+          }
         }];
       } else {
-        [DFDismissableModalViewController presentWithRootController:vc
-                                                           inParent:rootController];
+        [self openPhotoObject:photoObject];
       }
       
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
-      
     } else if (pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER) {
       // This is very similar code to above, if we change this, might want to pull together
       NSArray *suggestedStrands = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
@@ -287,6 +280,34 @@
     
   };
   return handler;
+}
+
+- (void)openPhotoObject:(DFPeanutFeedObject *)photoObject
+{
+  UIViewController *vc;
+  
+  if (photoObject.evaluated.boolValue) {
+    vc =  [[DFPhotoDetailViewController alloc]
+           initWithPhotoObject:photoObject];
+    
+  } else {
+    vc = [[DFSuggestionsPageViewController alloc]
+          initWithPreferredType:DFIncomingViewType photoID:photoObject.id
+          shareInstance:photoObject.share_instance.longLongValue];
+  }
+
+  
+  UIViewController *keyViewController = [[[[UIApplication sharedApplication] delegate] window]
+                                         rootViewController];
+  if (keyViewController.presentedViewController){
+    [keyViewController dismissViewControllerAnimated:YES completion:^{
+      [DFDismissableModalViewController presentWithRootController:vc
+                                                         inParent:keyViewController];
+    }];
+  } else {
+    [DFDismissableModalViewController presentWithRootController:vc
+                                                       inParent:keyViewController];
+  }
 }
 
 

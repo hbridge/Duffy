@@ -65,9 +65,9 @@
   return self.userInfo[@"id"];
 }
 
-- (NSNumber *)strandId
+- (NSNumber *)shareInstanceID
 {
-  return self.userInfo[@"strand_id"];
+  return self.userInfo[@"share_instance_id"];
 }
 - (BOOL)isUpdateLocationRequest
 {

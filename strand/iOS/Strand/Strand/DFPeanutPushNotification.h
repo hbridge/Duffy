@@ -15,7 +15,7 @@
 @property (readonly, nonatomic, retain) NSString *message;
 @property (readonly, nonatomic) DFPushNotifType type;
 @property (readonly, nonatomic) NSNumber *id;
-@property (readonly, nonatomic) NSNumber *strandId;
+@property (readonly, nonatomic) NSNumber *shareInstanceID;
 @property (readonly, nonatomic) BOOL contentAvailable;
 @property (readonly, nonatomic) BOOL isUpdateLocationRequest;
 @property (readonly, nonatomic) BOOL isUpdateFeedRequest;
