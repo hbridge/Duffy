@@ -187,8 +187,8 @@ def sendNotificationsUponActions(sender, **kwargs):
 
 	users = list()
 
-	if action.strand:
-		users = list(action.strand.users.all())
+	if action.share_instance:
+		users = list(action.share_instance.users.all())
 		
 	if action.user and action.user not in users:
 		users.append(action.user)
