@@ -320,7 +320,7 @@ def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends =
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(thisUser.id, interestedUsers), 'suggestible': suggestible}
+		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(thisUser.id, interestedUsers), 'actor_ids': User.getIds(interestedUsers), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
@@ -361,7 +361,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	return strandsThatMatch
 	
 def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
-	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user)}
+	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user), 'actor_ids': [postAction.user]}
 	photos = postAction.photos.all()
 	photos = sorted(photos, key=lambda x: x.time_taken)
 
@@ -433,7 +433,7 @@ def getObjectsDataForStrands(strands, user):
 				invitedUsers.append(invite.invited_user)
 			elif not invite.invited_user:
 				invitedUsers.append(User(id=0, display_name="", phone_number=invite.phone_number))
-		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(user.id, list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
+		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(user.id, list(strand.users.all()), invitedUsers=invitedUsers), 'actor_ids': User.getIds(strand.users.all()), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
 
 		# Add the individual posts to the list
 		entry['objects'] = list()
@@ -519,7 +519,7 @@ def getInviteObjectsDataForUser(user):
 			else:
 				title = "would like your photos"
 				
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(user.id, list(invite.strand.users.all())), 'time_stamp': invite.added}
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(user.id, list(invite.strand.users.all())), 'actor_ids': User.getIds(invite.strand.users.all()), 'time_stamp': invite.added}
 			entry['ready'] = inviteIsReady
 			entry['objects'] = list()
 			entry['objects'].append(strandObjectDataById[invite.strand.id])
@@ -679,7 +679,7 @@ def swap_inbox(request):
 
 		# Also add in all of the actors they're dealing with
 		for obj in responseObjects:
-			peopleIds.extend(obj['actors'])
+			peopleIds.extend(obj['actor_ids'])
 
 		people = set(User.objects.filter(id__in=peopleIds))
 
@@ -738,7 +738,7 @@ def strand_inbox(request):
 
 		# Also add in all of the actors they're dealing with
 		for obj in responseObjects:
-			peopleIds.extend(obj['actors'])
+			peopleIds.extend(obj['actor_ids'])
 
 		people = set(User.objects.filter(id__in=peopleIds))
 
