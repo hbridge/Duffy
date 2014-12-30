@@ -22,46 +22,29 @@ from strand import notifications_util, geo_util, strands_util, friends_util
 
 logger = logging.getLogger(__name__)
 
-def sendNewPhotoActionNotifications(action):
+def sendNewPhotoNotifications(action):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	logger.debug("in sendNewPhotoActionNotifications for strand id %s" % action.strand.id)
-	location = strands_util.getLocationForStrand(action.strand)
-	prettyDate = api_util.prettyDate(action.strand.first_photo_time)
+	logger.debug("in sendNewPhotoNotifications for action id %s" % action.id)
+	location = strands_util.getBestLocation(action.photo)
+	prettyDate = api_util.prettyDate(action.photo.time_taken)
 
-	count = action.photos.count()
-	if count == 0:
-		# Just say we sent it when we really didn't
-		return True
-
-	elif count == 1:
-		if now - action.strand.first_photo_time < datetime.timedelta(days=3):
-			msg = "%s sent you a photo from %s" % (action.user.display_name, prettyDate)			
-			#msg = "%s sent you a photo from %s" % (action.user.display_name, strands_util.getLocationForStrand(action.strand))
-		elif location:
-			msg = "%s sent you a photo from %s" % (action.user.display_name, location)
-		else:
-			msg = "%s sent you a photo" % (action.user.display_name)
-
-	else: #count > 1
-		if now - action.strand.first_photo_time < datetime.timedelta(days=3):
-			msg = "%s sent you photos from %s" % (action.user.display_name, prettyDate)
-		elif location:
-			msg = "%s sent you photos from %s" % (action.user.display_name, location)
-		else:
-			msg = "%s sent you a photo" % (action.user.display_name)
-
+	if now - action.photo.time_taken < datetime.timedelta(days=3):
+		msg = "%s sent you a photo from %s" % (action.user.display_name, prettyDate)
+	elif location:
+		msg = "%s sent you a photo from %s" % (action.user.display_name, location)
+	else:
+		msg = "%s sent you a photo" % (action.user.display_name)
 		
 	doNotification = True
 
-	for photo in action.photos.all():
-		if not photo.full_filename:
-			doNotification = False
+	if not action.photo.full_filename:
+		doNotification = False
 
 	if doNotification:
-		for user in action.strand.users.all():
+		for user in action.share_instance.users.all():
 			if user.id != action.user.id:
 				logger.debug("going to send %s to user id %s" % (msg, user.id))
-				customPayload = {'strand_id': action.strand.id, 'id': action.strand.photos.all()[0].id}
+				customPayload = {'share_instance_id': action.share_instance.id, 'id': action.photo.id}
 
 				notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
 		
@@ -77,12 +60,13 @@ def main(argv):
 		inviteNotificationsSent = list()
 		actionNotificationsSent = list()
 
-		actions = Action.objects.filter(notification_sent__isnull=True).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND)).filter(added__gt=now-notificationTimedelta)
+		actions = Action.objects.filter(notification_sent__isnull=True).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).filter(added__gt=now-notificationTimedelta)
 
 		for action in actions:
-			if sendNewPhotoActionNotifications(action):
-				action.notification_sent = now
-				actionNotificationsSent.append(action)
+			if (action.user.id == action.photo.user.id): #check to make sure that photo is owned by the same person who evaluated it
+				if sendNewPhotoNotifications(action):
+					action.notification_sent = now
+					actionNotificationsSent.append(action)
 
 		if len(actionNotificationsSent) > 0:
 			Action.bulkUpdate(actionNotificationsSent, ['notification_sent'])
