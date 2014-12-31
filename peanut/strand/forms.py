@@ -93,6 +93,19 @@ class AuthPhoneForm(StrandApiForm):
 class OnlyUserIdForm(StrandApiForm, UserIdMixin):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 
+class UserIdAndLastTimestampForm(StrandApiForm, UserIdMixin):
+	user_id = forms.IntegerField(min_value=1, max_value=10000)
+	last_timestamp = forms.IntegerField(min_value=0, required=False)
+
+	def clean_last_timestamp(self):
+		timestamp = self.cleaned_data['last_timestamp']
+
+		if not timestamp:
+			timestamp = 0
+
+		return datetime.datetime.fromtimestamp(timestamp)
+
+
 class UserIdAndStrandIdForm(StrandApiForm, UserIdMixin, StrandIdMixin):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 	strand_id = forms.IntegerField(min_value=1, max_value=10000000)

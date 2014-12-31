@@ -21,7 +21,7 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util, serializers
 
 from strand import geo_util, notifications_util, friends_util, strands_util, users_util
-from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
+from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, UserIdAndLastTimestampForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -664,17 +664,19 @@ def swap_inbox(request):
 	startProfiling()
 	response = dict({'result': True})
 
-	form = OnlyUserIdForm(api_util.getRequestData(request))
+	form = UserIdAndLastTimestampForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
+		lastTimestamp = form.cleaned_data['last_timestamp']
+
 		responseObjects = list()
 
-		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id])
+		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp)
 
 		shareInstances = filter(lambda x: x.photo.thumb_filename, shareInstances)
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		printStats("swaps_inbox-1", printQueries=True)
+		printStats("swaps_inbox-1")
 
 		photoIds = list()
 		for shareInstance in shareInstances:
@@ -724,6 +726,7 @@ def swap_inbox(request):
 
 
 		response["objects"] = responseObjects
+		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
