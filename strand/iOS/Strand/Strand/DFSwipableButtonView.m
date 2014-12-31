@@ -286,6 +286,14 @@ const CGFloat RightGestureThreshold = 75.0;
   self.buttonWrapperHeightConstraint.constant = (hidden ? 0 : 65.0);
 }
 
+- (void)setButtonsHidden:(BOOL)hidden animated:(BOOL)animated
+{
+  [self setButtonsHidden:hidden];
+  [UIView animateWithDuration:0.5 animations:^{
+    [self setNeedsLayout];
+  }];
+}
+
 /*
  * Configure this view to use an image.  This doesn't actually take in an image, that should be set later
  * on the .imageView property

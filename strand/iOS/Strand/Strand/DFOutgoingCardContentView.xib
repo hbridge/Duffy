@@ -39,13 +39,19 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7AH-le-Yhh">
-                    <rect key="frame" x="58" y="95" width="485" height="485"/>
+                    <rect key="frame" x="73" y="95" width="455" height="455"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="7AH-le-Yhh" secondAttribute="height" multiplier="1:1" id="QBy-fh-BaE"/>
                     </constraints>
                 </imageView>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Write a caption..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZKW-hs-o8O">
+                    <rect key="frame" x="15" y="560" width="570" height="30"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
+                </textField>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <gestureRecognizers/>
             <constraints>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="z8y-4t-v0a" secondAttribute="trailing" constant="8" id="4nt-1N-bIH"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7AH-le-Yhh" secondAttribute="trailing" id="65U-dt-zEk"/>
@@ -56,11 +62,14 @@
                 <constraint firstItem="7AH-le-Yhh" firstAttribute="top" secondItem="5G5-OR-sYm" secondAttribute="bottom" constant="8" id="JPR-p0-arS"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="centerX" secondItem="wuM-t7-6bp" secondAttribute="centerX" id="LC6-rI-4hZ"/>
                 <constraint firstItem="wuM-t7-6bp" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="N5e-ez-FKR"/>
+                <constraint firstAttribute="trailing" secondItem="ZKW-hs-o8O" secondAttribute="trailing" constant="15" id="Ncv-qa-Pcs"/>
                 <constraint firstAttribute="trailing" secondItem="wuM-t7-6bp" secondAttribute="trailing" constant="8" id="ODO-Kr-yY0"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="PWh-IR-G1U"/>
+                <constraint firstAttribute="bottom" secondItem="ZKW-hs-o8O" secondAttribute="bottom" constant="10" id="QRm-TK-uFf"/>
+                <constraint firstAttribute="bottom" secondItem="7AH-le-Yhh" secondAttribute="bottom" constant="50" id="Sl3-W3-KoK"/>
+                <constraint firstItem="ZKW-hs-o8O" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="TS7-cc-OtS"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="top" secondItem="wuM-t7-6bp" secondAttribute="bottom" constant="8" id="jbU-R6-ZCj"/>
                 <constraint firstItem="7AH-le-Yhh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" id="jfS-7P-WCj"/>
-                <constraint firstAttribute="bottom" secondItem="7AH-le-Yhh" secondAttribute="bottom" constant="20" id="k8Z-3r-QkV"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="centerY" secondItem="z8y-4t-v0a" secondAttribute="centerY" constant="0.5" id="mgq-3u-La0"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="top" secondItem="wuM-t7-6bp" secondAttribute="bottom" constant="8" id="ukw-aG-KEA"/>
             </constraints>
@@ -68,11 +77,20 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="addButton" destination="z8y-4t-v0a" id="Jl6-HC-R2I"/>
+                <outlet property="commentTextField" destination="ZKW-hs-o8O" id="pmd-R8-UnO"/>
+                <outlet property="commentTextFieldBottomConstraint" destination="QRm-TK-uFf" id="Xjs-dw-uRh"/>
                 <outlet property="imageView" destination="7AH-le-Yhh" id="ijF-vE-6Af"/>
                 <outlet property="profileStackView" destination="5G5-OR-sYm" id="wy5-dB-pKX"/>
                 <outlet property="topLabel" destination="wuM-t7-6bp" id="ITl-R6-yrm"/>
+                <outletCollection property="gestureRecognizers" destination="xs6-8j-AqU" appends="YES" id="Tbd-sh-RXZ"/>
             </connections>
+            <point key="canvasLocation" x="382.5" y="487"/>
         </view>
+        <tapGestureRecognizer id="xs6-8j-AqU">
+            <connections>
+                <action selector="contentViewTapped:" destination="iN0-l3-epB" id="wM9-C3-IxO"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
     <resources>
         <image name="Assets/Icons/AddPersonButtonIcon.png" width="16" height="16"/>

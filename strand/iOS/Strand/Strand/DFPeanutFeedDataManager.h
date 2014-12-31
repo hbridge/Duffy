@@ -64,7 +64,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (void)sharePhotoObjects:(NSArray *)photoObjects
      withPhoneNumbers:(NSArray *)phoneNumbers
-              success:(void(^)(NSArray *photos, NSArray *createdPhoneNumbers))success
+              success:(void(^)(NSArray *shareInstances, NSArray *createdPhoneNumbers))success
               failure:(DFFailureBlock)failure;
 
 - (void)addUsersWithPhoneNumbers:(NSArray *)phoneNumbers
@@ -79,10 +79,16 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
-         shareInstance:(DFStrandIDType)shareInstance
+         shareInstance:(DFShareInstanceIDType)shareInstance
            oldActionID:(DFActionID)oldActionID
                success:(void(^)(DFActionID actionID))success
                failure:(DFFailureBlock)failure;
+
+- (void)addComment:(NSString *)comment
+         toPhotoID:(DFPhotoIDType)photoID
+     shareInstance:(DFShareInstanceIDType)shareInstance
+           success:(void(^)(DFActionID actionID))success
+           failure:(DFFailureBlock)failure;
 
 
 

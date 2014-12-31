@@ -22,6 +22,7 @@
 #import "DFUpsellCardViewController.h"
 #import "DFAnalytics.h"
 #import "DFBackgroundLocationManager.h"
+#import "DFPeanutShareInstance.h"
 
 @interface DFCardsPageViewController ()
 
@@ -131,6 +132,27 @@ const NSUInteger NumOutgoingNuxes = 3;
   [self configureLoadingView];
 }
 
+- (void)configureLoadingView
+{
+  if (self.viewControllers.count == 0) {
+    if (!self.noResultsView) {
+      self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    }
+    [self.noResultsView setSuperView:self.view];
+    if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
+      self.noResultsView.titleLabel.text = @"";
+      [self.noResultsView.activityIndicator stopAnimating];
+    } else {
+      self.noResultsView.titleLabel.text = @"Loading...";
+      [self.noResultsView.activityIndicator startAnimating];
+    }
+  } else {
+    if (self.noResultsView) [self.noResultsView removeFromSuperview];
+    self.noResultsView = nil;
+  }
+}
+
+
 - (void)gotoNextController
 {
   UIViewController *nextController;
@@ -164,6 +186,8 @@ const NSUInteger NumOutgoingNuxes = 3;
                   animated:YES
                 completion:nil];
 }
+
+#pragma mark - Incoming View Controllers
 
 - (UIViewController *)nextIncomingViewController
 {
@@ -228,6 +252,8 @@ const NSUInteger NumOutgoingNuxes = 3;
   }
 }
 
+#pragma mark - Outgoing View Controllers
+
 - (UIViewController *)nextOutgoingViewController
 {
   NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
@@ -248,8 +274,10 @@ const NSUInteger NumOutgoingNuxes = 3;
           }
           DFCardsPageViewController __weak *weakSelf = self;
 
-          svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
-            [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
+          svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
+                                   NSArray *contacts,
+                                   NSString *caption){
+            [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo caption:caption];
           };
           svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
             [weakSelf photoSkipped:photo];
@@ -287,53 +315,7 @@ const NSUInteger NumOutgoingNuxes = 3;
   return nil;
 }
 
-
-- (void)configureLoadingView
-{
-  if (self.viewControllers.count == 0) {
-    if (!self.noResultsView) {
-      self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-    }
-    [self.noResultsView setSuperView:self.view];
-    if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
-      self.noResultsView.titleLabel.text = @"";
-      [self.noResultsView.activityIndicator stopAnimating];
-    } else {
-      self.noResultsView.titleLabel.text = @"Loading...";
-      [self.noResultsView.activityIndicator startAnimating];
-    }
-  } else {
-    if (self.noResultsView) [self.noResultsView removeFromSuperview];
-    self.noResultsView = nil;
-  }
-}
-
-/*
- * We need to return the IndexPath which corrisponds to the given view controller
- */
-- (NSUInteger)indexOfViewController:(UIViewController *)viewController
-{
-  if (![[viewController class] isSubclassOfClass:[DFCardViewController class]]) return -1;
-  DFCardViewController *subVC = (DFCardViewController *)viewController;
-  
-  return subVC.index;
-}
-
-// TODO(Derek): This might not be needed anymore
-- (void)updateIndexOfViewController:(UIViewController *)viewController index:(NSUInteger)index
-{
-  if (![[viewController class] isSubclassOfClass:[DFCardViewController class]]) return;
-  DFCardViewController *subVC = (DFCardViewController *)viewController;
-  
-  subVC.index = index;
-}
-
-
-- (NSUInteger)currentViewControllerIndex
-{
-  UIViewController *currentController = self.viewControllers.firstObject;
-  return  [self indexOfViewController:currentController];
-}
+#pragma mark - NUX and Special Cards
 
 - (DFCardViewController *)viewControllerForNuxStep:(NSUInteger)index
 {
@@ -361,11 +343,11 @@ const NSUInteger NumOutgoingNuxes = 3;
                                                initWithNuxStep:index + 1];
     nuxController = svc;
     if (index == 0) {
-      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption){
         [self gotoNextController];
       };
     } else if (index == 1) {
-      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption){
         [SVProgressHUD showSuccessWithStatus:@"Thanks!"];
         [self gotoNextController];
       };
@@ -378,7 +360,7 @@ const NSUInteger NumOutgoingNuxes = 3;
         [self gotoNextController];
         [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
       };
-      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption){
         [SVProgressHUD showErrorWithStatus:@"Tap Skip to continue"];
       };
     }
@@ -427,11 +409,12 @@ const NSUInteger NumOutgoingNuxes = 3;
   return _noIncomingViewController;
 }
 
-#pragma mark - UIPageViewController Delegate/Datasource
+#pragma mark - Action Handlers
 
 - (void)suggestionSelected:(DFPeanutFeedObject *)suggestion
                   contacts:(NSArray *)contacts
                      photo:(DFPeanutFeedObject *)photo
+                   caption:(NSString *)caption
 {
   if (!suggestion) {
     [self gotoNextController];
@@ -447,7 +430,19 @@ const NSUInteger NumOutgoingNuxes = 3;
   [[DFPeanutFeedDataManager sharedManager]
    sharePhotoObjects:@[photo]
    withPhoneNumbers:phoneNumbers
-   success:^(NSArray *photos, NSArray *createdPhoneNumbers) {
+   success:^(NSArray *shareInstances, NSArray *createdPhoneNumbers) {
+     DFPeanutShareInstance *shareInstance = shareInstances.firstObject;
+     if ([caption isNotEmpty]) {
+       [[DFPeanutFeedDataManager sharedManager]
+        addComment:caption
+        toPhotoID:shareInstance.photo.longLongValue
+        shareInstance:shareInstance.id.longLongValue
+        success:^(DFActionID actionID) {
+          
+        } failure:^(NSError *error) {
+          
+        }];
+     }
      if (createdPhoneNumbers.count > 0) {
        [self sendTextToPhoneNumbers:createdPhoneNumbers forPhoto:photo];
      }
@@ -516,18 +511,6 @@ const NSUInteger NumOutgoingNuxes = 3;
   [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:photo shareInstance:shareInstance];
   [SVProgressHUD showSuccessWithStatus:@"Liked!"];
   [self gotoNextController];
-}
-
-#pragma mark - DFCreateStrandFlowController delegate
-
-- (void)createStrandFlowController:(DFCreateStrandFlowViewController *)controller
-               completedWithResult:(DFCreateStrandResult)result
-                            photos:(NSArray *)photos
-                          contacts:(NSArray *)contacts
-{
-  if (result == DFCreateStrandResultSuccess) {
-    [self gotoNextController];
-  }
 }
 
 - (DFPeanutStrandInviteAdapter *)inviteAdapter

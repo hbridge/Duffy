@@ -25,9 +25,11 @@
   [self configurePopLabel];
   self.imageView.layer.cornerRadius = 4.0;
   self.imageView.layer.masksToBounds = YES;
+  self.commentTextField.delegate = self;
 }
 
 - (IBAction)addButtonPressed:(id)sender {
+  [self.commentTextField resignFirstResponder];
   if (self.addHandler) self.addHandler();
 }
 
@@ -46,5 +48,16 @@
 {
   [self.selectPeoplePopLabel dismiss];
 }
+
+- (IBAction)contentViewTapped:(id)sender {
+  [self.commentTextField resignFirstResponder];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+  [self.commentTextField resignFirstResponder];
+  return YES;
+}
+
 
 @end

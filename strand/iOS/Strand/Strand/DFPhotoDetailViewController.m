@@ -558,6 +558,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (IBAction)sendComment:(NSString *)comment {
   if (self.commentToolbar.textField.text.length == 0) return;
+  
   DFPeanutAction *action = [[DFPeanutAction alloc] init];
   action.user = [[DFUser currentUser] userID];
   action.action_type = DFPeanutActionComment;

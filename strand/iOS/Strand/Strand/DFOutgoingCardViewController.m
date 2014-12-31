@@ -48,29 +48,35 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  self.view.backgroundColor = [UIColor clearColor];
   [self configureSuggestionContentView];
   if (self.suggestionFeedObject)
     [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
   
   [self configureSwipableButtonView];
   
-  [self.swipableButtonView configureToUseImage];
-
   if (self.nuxStep > 0) {
     [self configureNuxStep:self.nuxStep];
   }
-  self.view.backgroundColor = [UIColor clearColor];
   
   [self configurePeopleLabel];
-  
-  self.suggestionContentView.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
-  self.suggestionContentView.profileStackView.backgroundColor = [UIColor clearColor];
+  [self observeNotifications];
+}
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)configureSuggestionContentView
 {
-  if (!self.suggestionContentView) self.suggestionContentView =
+  if (!self.suggestionContentView) {
+    self.suggestionContentView =
     [UINib instantiateViewWithClass:[DFOutgoingCardContentView class]];
+    self.suggestionContentView.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
+    self.suggestionContentView.profileStackView.backgroundColor = [UIColor clearColor];
+  }
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
   DFOutgoingCardViewController __weak *weakSelf = self;
   self.suggestionContentView.addHandler = ^{
@@ -114,6 +120,7 @@
 
 - (void)configureSwipableButtonView
 {
+  [self.swipableButtonView configureToUseImage];
   [self.swipableButtonView configureWithShowsOther:NO];
   self.swipableButtonView.delegate = self;
   [self.swipableButtonView.yesButton
@@ -163,7 +170,9 @@
   NSString *logResult;
   if (button == self.swipableButtonView.yesButton && self.yesButtonHandler) {
     if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
-      self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
+      self.yesButtonHandler(self.suggestionFeedObject,
+                            self.selectedPeanutContacts,
+                            self.suggestionContentView.commentTextField.text);
     } else {
       [self.suggestionContentView showAddPeoplePopup];
       [self.swipableButtonView resetView];
@@ -241,6 +250,23 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   [self.view setNeedsLayout];
 }
 
+- (void)keyboardWillShow:(NSNotification *)notification {
+  [self.swipableButtonView setButtonsHidden:YES];
+  [self updateFrameFromKeyboardNotif:notification otherAnimationsBlock:^{
+    [self.swipableButtonView setNeedsLayout];
+  }];
+}
 
+- (void)keyboardWillHide:(NSNotification *)notification {
+  [self.swipableButtonView setButtonsHidden:NO];
+  [self updateFrameFromKeyboardNotif:notification otherAnimationsBlock:^{
+    [self.swipableButtonView setNeedsLayout];
+  }];
+}
+
+- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView didBeginPan:(UIPanGestureRecognizer *)panGesture translation:(CGPoint)translation
+{
+  [self.suggestionContentView.commentTextField resignFirstResponder];
+}
 
 @end

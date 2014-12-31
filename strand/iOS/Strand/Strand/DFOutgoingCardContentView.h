@@ -8,12 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "DFProfileStackView.h"
+#import "UIViewController+DFKeyboardObserving.h"
 
-@interface DFOutgoingCardContentView : UIView
+@interface DFOutgoingCardContentView : UIView <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UIButton *addButton;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UITextField *commentTextField;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *commentTextFieldBottomConstraint;
 
 - (IBAction)addButtonPressed:(id)sender;
 

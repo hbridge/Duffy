@@ -257,6 +257,7 @@
 		5AF499291A44D4A3000CF9DB /* DFMutliPhotoDetailPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF499281A44D4A2000CF9DB /* DFMutliPhotoDetailPageController.m */; };
 		5AF64D0519EC61AA00EE1473 /* DFFriendsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF64D0319EC61AA00EE1473 /* DFFriendsViewController.m */; };
 		5AF64D0619EC61AA00EE1473 /* DFFriendsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AF64D0419EC61AA00EE1473 /* DFFriendsViewController.xib */; };
+		5AF9FC6E1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9FC6D1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m */; };
 		5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */; };
 		5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */; };
 		5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */; };
@@ -746,6 +747,8 @@
 		5AF64D0219EC61AA00EE1473 /* DFFriendsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFriendsViewController.h; sourceTree = "<group>"; };
 		5AF64D0319EC61AA00EE1473 /* DFFriendsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFriendsViewController.m; sourceTree = "<group>"; };
 		5AF64D0419EC61AA00EE1473 /* DFFriendsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFriendsViewController.xib; sourceTree = "<group>"; };
+		5AF9FC6C1A54748E00200A87 /* UIViewController+DFKeyboardObserving.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+DFKeyboardObserving.h"; sourceTree = "<group>"; };
+		5AF9FC6D1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+DFKeyboardObserving.m"; sourceTree = "<group>"; };
 		5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationPermissionViewController.h; sourceTree = "<group>"; };
 		5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPermissionViewController.m; sourceTree = "<group>"; };
 		5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionViewController.xib; sourceTree = "<group>"; };
@@ -1250,6 +1253,8 @@
 				5AF499251A4210E0000CF9DB /* DFOutgoingCardContentView.xib */,
 				5A91C4811A36116300C4F9A6 /* DFIncomingCardViewController.h */,
 				5A91C4821A36116300C4F9A6 /* DFIncomingCardViewController.m */,
+				5AF9FC6C1A54748E00200A87 /* UIViewController+DFKeyboardObserving.h */,
+				5AF9FC6D1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m */,
 				5A91C4831A36116300C4F9A6 /* DFIncomingCardViewController.xib */,
 				65E241571A3B5BB30044F1CB /* DFUpsellCardViewController.h */,
 				65E241581A3B5BB30044F1CB /* DFUpsellCardViewController.m */,
@@ -2119,6 +2124,7 @@
 				5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */,
 				5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */,
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
+				5AF9FC6E1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m in Sources */,
 				651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */,
 				5A9F792D1A14168C00875E38 /* DFProfileStackView.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,

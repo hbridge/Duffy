@@ -613,7 +613,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)sharePhotoObjects:(NSArray *)photoObjects
               withPhoneNumbers:(NSArray *)phoneNumbers
-                  success:(void(^)(NSArray *photos, NSArray *createdPhoneNumbers))success
+                  success:(void(^)(NSArray *shareInstances, NSArray *createdPhoneNumbers))success
                   failure:(DFFailureBlock)failure
 {
   // Get UIDs
@@ -890,7 +890,28 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
-
+- (void)addComment:(NSString *)comment
+         toPhotoID:(DFPhotoIDType)photoID
+     shareInstance:(DFShareInstanceIDType)shareInstance
+           success:(void(^)(DFActionID actionID))success
+           failure:(DFFailureBlock)failure
+{
+  DFPeanutAction *action = [[DFPeanutAction alloc] init];
+  action.user = [[DFUser currentUser] userID];
+  action.action_type = DFPeanutActionComment;
+  action.text = comment;
+  action.photo = @(photoID);
+  action.share_instance = @(shareInstance);
+  action.time_stamp = [NSDate date];
+  
+  [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
+    DDLogError(@"%@ added comment: %@", [DFPeanutFeedDataManager class], resultObjects.firstObject);
+    DFPeanutAction *newComment = [resultObjects firstObject];
+    success(newComment.id.longLongValue);
+  } failure:^(NSError *error) {
+    DDLogError(@"%@ adding comment error:%@", [DFPeanutFeedDataManager class], error);
+  }];
+}
 
 
 #pragma mark - Network Adapters

@@ -72,7 +72,8 @@
 
 - (IBAction)yesButtonPressed:(id)sender {
   if (self.yesButtonHandler) self.yesButtonHandler(self.suggestionFeedObject,
-                                                   self.suggestionFeedObject.actorPeanutContacts);
+                                                   self.suggestionFeedObject.actorPeanutContacts,
+                                                   @"");
 }
 
 - (IBAction)noButtonPressed:(id)sender {

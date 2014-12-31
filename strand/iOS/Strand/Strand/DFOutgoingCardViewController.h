@@ -13,7 +13,7 @@
 
 @interface DFOutgoingCardViewController : DFCardViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
 
-typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
+typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 
 
