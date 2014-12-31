@@ -204,8 +204,7 @@ static DFUser *currentUser;
 
 - (NSURL *)imageServerURL
 {
-  NSString *URLString = [DFImageServerBaseURL mutableCopy];
-  return [NSURL URLWithString:URLString];
+  return [NSURL URLWithString:DFImageServerBaseURL];
 }
 
 - (NSURL *)apiURL
