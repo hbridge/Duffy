@@ -165,6 +165,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
 		os.rename(tempFilepath, photo.getDefaultThumbPath())
+		copyFileToS3(photo.getDefaultThumbPath(), '/'.join([photo.getUserDataId(),photo.getDefaultThumbFilename()]))
 		photo.thumb_filename = photo.getDefaultThumbFilename()
 
 		if not bulk:
@@ -175,6 +176,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		photo.full_filename = photo.getDefaultFullFilename()
 
 		os.rename(tempFilepath, photo.getDefaultFullPath())
+		copyFileToS3(photo.getDefaultFullPath(), '/'.join([photo.getUserDataId(),photo.getDefaultFullFilename()]))	
 
 		im = Image.open(photo.getDefaultFullPath())
 
@@ -230,4 +232,14 @@ def writeOutUploadedFile(uploadedFile, newFilePath):
 	with open(newFilePath, 'wb+') as destination:
 		for chunk in uploadedFile.chunks():
 			destination.write(chunk)
+
+"""
+	Copies a file to s3
+"""
+def copyFileToS3(localFilePath, s3FilePath):
+	localFile = open(localFilePath, 'rb')
+	with default_storage.open(s3FilePath, 'wb+') as destination:
+		destination.write(localFile.read())
+	destination.close()
+	localFile.close()
 

@@ -101,3 +101,6 @@ ADMINS = (
 )
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com"]
+
+#S3 Prod server settings
+AWS_STORAGE_BUCKET_NAME = 'strand-prod'
