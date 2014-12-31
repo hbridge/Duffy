@@ -12,7 +12,7 @@
 
 // Used
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
-- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters;
 - (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 

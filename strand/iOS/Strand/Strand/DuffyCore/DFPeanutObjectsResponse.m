@@ -21,14 +21,12 @@
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects"
                                                  mapping:[DFPeanutFeedObject objectMapping]];
-  [objectMapping addRelationshipMappingWithSourceKeyPath:@"retry_suggestions"
-                                                 mapping:[DFPeanutSuggestion objectMapping]];
   
   return objectMapping;
 }
 
 + (NSArray *)simpleAttributeKeys {
-  return @[@"result", @"next_start_date_time", @"thumb_image_path", @"full_image_path"];
+  return @[@"result", @"timestamp"];
 }
 
 

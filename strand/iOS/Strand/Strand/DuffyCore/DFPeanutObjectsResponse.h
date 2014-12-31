@@ -13,11 +13,8 @@
 @interface DFPeanutObjectsResponse : NSObject <DFPeanutObject>
 
 @property (nonatomic) BOOL result;
-@property (nonatomic, retain) NSString *next_start_date_time;
+@property (nonatomic, retain) NSString *timestamp;
 @property (nonatomic, retain) NSArray *objects;
-@property (nonatomic, retain) NSArray *retry_suggestions;
-@property (nonatomic, retain) NSString *thumb_image_path;
-@property (nonatomic, retain) NSString *full_image_path;
 
 - (NSArray *)topLevelSectionObjects;
 - (NSArray *)topLevelObjectsOfType:(DFFeedObjectType)type;

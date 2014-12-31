@@ -45,6 +45,8 @@
 @property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
 @property (nonatomic, retain) NSData *actionsLastResponseHash;
 
+@property (nonatomic, retain) NSString *inboxLastTimestamp;
+
 @property (nonatomic, retain) NSArray *inboxFeedObjects;
 @property (nonatomic, retain) NSArray *swapsFeedObjects;
 @property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
@@ -68,6 +70,7 @@
   if (self) {
     [self observeNotifications];
     _deferredCompletionBlocks = [NSMutableDictionary new];
+    self.inboxLastTimestamp = @"0";
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     [self refreshFromServer];
   }
@@ -101,6 +104,45 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshActionsFromServer:nil];
 }
 
+
+- (NSArray *)processFeedObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects
+{
+  if (!currentObjects) {
+    return newObjects;
+  }
+  
+  NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
+  
+  for (DFPeanutFeedObject *object in currentObjects) {
+    [combinedObjectsById setObject:object forKey:@(object.id)];
+  }
+  
+  for (DFPeanutFeedObject *object in newObjects) {
+    [combinedObjectsById setObject:object forKey:@(object.id)];
+  }
+  
+  return [combinedObjectsById allValues];
+}
+
+- (NSArray *)processPeopleList:(NSArray *)currentPeopleList withNewPeople:(NSArray *)newPeople
+{
+  if (!currentPeopleList) {
+    return newPeople;
+  }
+  
+  NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
+  
+  for (DFPeanutUserObject *object in currentPeopleList) {
+    [combinedObjectsById setObject:object forKey:@(object.id)];
+  }
+  
+  for (DFPeanutUserObject *object in newPeople) {
+    [combinedObjectsById setObject:object forKey:@(object.id)];
+  }
+  
+  return [combinedObjectsById allValues];
+}
+
 - (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
@@ -108,6 +150,8 @@ static DFPeanutFeedDataManager *defaultManager;
   
   if (!self.inboxRefreshing) {
     self.inboxRefreshing = YES;
+    NSMutableDictionary *parameters = [NSMutableDictionary new];
+    [parameters setObject:self.inboxLastTimestamp forKey:@"last_timestamp"];
     [self.inboxFeedAdapter
      fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
                                 NSData *responseHash,
@@ -116,15 +160,18 @@ static DFPeanutFeedDataManager *defaultManager;
        
        if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
          self.inboxLastResponseHash = responseHash;
-         self.inboxFeedObjects = response.objects;
+         self.inboxLastTimestamp = response.timestamp;
+         self.inboxFeedObjects = [self processFeedObjects:self.inboxFeedObjects withNewObjects:response.objects];
          
          // For inbox only, we update our local cache of friends
          // If we refactor these methods to be common this will need to be pulled out
          for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
            if ([object.type isEqual:DFFeedObjectPeopleList]) {
+             NSArray *peopleList = [self processPeopleList:_cachedFriendsList withNewPeople:object.people];
+             
              // This grabs the local first name which we want to sort by
              NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
-             _cachedFriendsList = [NSMutableArray arrayWithArray:[object.people sortedArrayUsingDescriptors:@[sort]]];
+             _cachedFriendsList = [NSMutableArray arrayWithArray:[peopleList sortedArrayUsingDescriptors:@[sort]]];
            }
          }
          
@@ -137,6 +184,7 @@ static DFPeanutFeedDataManager *defaultManager;
        [self executeDeferredCompletionsForFeedType:DFInboxFeed];
        self.inboxRefreshing = NO;
      }
+     parameters:parameters
      ];
   }
 }

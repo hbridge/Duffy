@@ -52,9 +52,9 @@ NSString *const ActivityPath = @"strand_activity";
 
 // Used
 
-- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters
 {
-  [super fetchObjectsAtPath:InboxPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:InboxPath withCompletionBlock:completionBlock parameters:parameters];
 }
 
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
