@@ -734,7 +734,7 @@ def swap_inbox(request):
 
 
 		response["objects"] = responseObjects
-		response["timestamp"] = datetime.datetime.now()
+		response["timestamp"] = datetime.datetime.now() - datetime.timedelta(seconds=10)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
