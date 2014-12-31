@@ -57,6 +57,8 @@ class StrandInviteSerializer(serializers.ModelSerializer):
 class BulkStrandInviteSerializer(serializers.Serializer):
 	invites = StrandInviteSerializer(many=True)
 
+	bulk_key = 'invites'
+
 class ShareInstanceSerializer(serializers.ModelSerializer):
 	lookup_field = 'id'
 	
