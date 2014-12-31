@@ -166,7 +166,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
 		os.rename(tempFilepath, photo.getDefaultThumbPath())
-		copyFileToS3(photo.getDefaultThumbPath(), '/'.join([photo.getUserDataId(),photo.getDefaultThumbFilename()]))
+		copyFileToS3(photo.getDefaultThumbPath(), '/'.join([photo.user.getUserDataId(),photo.getDefaultThumbFilename()]))
 		photo.thumb_filename = photo.getDefaultThumbFilename()
 
 		if not bulk:
@@ -177,7 +177,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		photo.full_filename = photo.getDefaultFullFilename()
 
 		os.rename(tempFilepath, photo.getDefaultFullPath())
-		copyFileToS3(photo.getDefaultFullPath(), '/'.join([photo.getUserDataId(),photo.getDefaultFullFilename()]))	
+		copyFileToS3(photo.getDefaultFullPath(), '/'.join([photo.user.getUserDataId(),photo.getDefaultFullFilename()]))	
 
 		im = Image.open(photo.getDefaultFullPath())
 
