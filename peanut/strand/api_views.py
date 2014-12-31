@@ -28,6 +28,24 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
+def uniqueObjects(seq, idfun=None): 
+   # order preserving
+   if idfun is None:
+	   def idfun(x): return x.id
+   seen = {}
+   result = []
+   for item in seq:
+	   marker = idfun(item)
+	   # in old Python versions:
+	   # if seen.has_key(marker)
+	   # but in new ones:
+	   if marker in seen: continue
+	   seen[marker] = 1
+	   result.append(item)
+   return result
+
+
+
 def getActionsCache(user, publicStrandIds, photoIds):
 	# Need to find all actions that affect the public strands (other people liking, commenting)
 	# but filter down photos to only those strands
@@ -642,7 +660,6 @@ def private_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-
 def swap_inbox(request):
 	startProfiling()
 	response = dict({'result': True})
@@ -666,6 +683,7 @@ def swap_inbox(request):
 		actions = Action.objects.filter(Q(share_instance_id__in=shareInstanceIds) | Q(photo_id__in=photoIds))
 		actionsByShareInstanceId = dict()
 		actionsByPhotoId = dict()
+		
 		for action in actions:
 			if action.share_instance_id not in actionsByShareInstanceId:
 				actionsByShareInstanceId[action.share_instance_id] = list()
@@ -684,6 +702,8 @@ def swap_inbox(request):
 
 			if shareInstance.photo_id in actionsByPhotoId:
 				actions.extend(actionsByPhotoId[shareInstance.photo_id])
+
+			actions = uniqueObjects(actions)
 			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, actions, user))
 
 		printStats("swaps_inbox-3")
