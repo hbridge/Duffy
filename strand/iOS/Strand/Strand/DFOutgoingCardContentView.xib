@@ -39,13 +39,16 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7AH-le-Yhh">
-                    <rect key="frame" x="73" y="95" width="455" height="455"/>
+                    <rect key="frame" x="71" y="95" width="459" height="459"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="7AH-le-Yhh" secondAttribute="height" multiplier="1:1" id="QBy-fh-BaE"/>
                     </constraints>
                 </imageView>
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Write a caption..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZKW-hs-o8O">
-                    <rect key="frame" x="15" y="560" width="570" height="30"/>
+                    <rect key="frame" x="15" y="562" width="570" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="VnS-ip-Azx"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                 </textField>
@@ -65,9 +68,10 @@
                 <constraint firstAttribute="trailing" secondItem="ZKW-hs-o8O" secondAttribute="trailing" constant="15" id="Ncv-qa-Pcs"/>
                 <constraint firstAttribute="trailing" secondItem="wuM-t7-6bp" secondAttribute="trailing" constant="8" id="ODO-Kr-yY0"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="PWh-IR-G1U"/>
-                <constraint firstAttribute="bottom" secondItem="ZKW-hs-o8O" secondAttribute="bottom" constant="10" id="QRm-TK-uFf"/>
-                <constraint firstAttribute="bottom" secondItem="7AH-le-Yhh" secondAttribute="bottom" constant="50" id="Sl3-W3-KoK"/>
+                <constraint firstAttribute="bottom" secondItem="ZKW-hs-o8O" secondAttribute="bottom" constant="8" id="QRm-TK-uFf"/>
+                <constraint firstAttribute="bottom" secondItem="7AH-le-Yhh" secondAttribute="bottom" priority="999" constant="8" id="Sl3-W3-KoK"/>
                 <constraint firstItem="ZKW-hs-o8O" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="TS7-cc-OtS"/>
+                <constraint firstItem="ZKW-hs-o8O" firstAttribute="top" secondItem="7AH-le-Yhh" secondAttribute="bottom" constant="8" id="Ud6-D1-qpF"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="top" secondItem="wuM-t7-6bp" secondAttribute="bottom" constant="8" id="jbU-R6-ZCj"/>
                 <constraint firstItem="7AH-le-Yhh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" id="jfS-7P-WCj"/>
                 <constraint firstItem="5G5-OR-sYm" firstAttribute="centerY" secondItem="z8y-4t-v0a" secondAttribute="centerY" constant="0.5" id="mgq-3u-La0"/>

@@ -89,6 +89,7 @@
   self.suggestionContentView.addButton.hidden = YES;
   self.suggestionContentView.profileStackView.maxAbbreviationLength = 2;
   [self.suggestionContentView.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+  [self.suggestionContentView.commentTextField removeFromSuperview];
   
   UIImage *nuxImage;
   if (self.nuxStep == 1) {
