@@ -10,9 +10,11 @@
 #import "DFNavigationController.h"
 #import "DFImageManager.h"
 #import "DFAnalytics.h"
+#import <WYPopoverController/WYPopoverController.h>
 
 @interface DFOutgoingCardViewController ()
 
+@property (nonatomic ,retain) WYPopoverController *addPersonPopoverController;
 
 @end
 
@@ -198,20 +200,36 @@
   }
 }
 
-- (IBAction)addPersonButtonPressed:(id)sender {
+- (IBAction)addPersonButtonPressed:(UIButton *)sender {
   DFPeoplePickerViewController *peoplePickerController = [[DFPeoplePickerViewController alloc]
                                                           initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
   peoplePickerController.doneButtonActionText = @"Select";
   peoplePickerController.allowsMultipleSelection = YES;
   peoplePickerController.delegate = self;
-  [DFNavigationController presentWithRootController:peoplePickerController inParent:self];
+  
+  WYPopoverBackgroundView *appearance = [WYPopoverBackgroundView appearance];
+  appearance.fillTopColor = [UIColor colorWithRed:201.0/255.0 green:201.0/255.0 blue:206.0/255.0 alpha:1.0];
+  self.addPersonPopoverController = [[WYPopoverController alloc]
+                                     initWithContentViewController:peoplePickerController];
+  
+  CGRect rect = [self.view convertRect:sender.frame fromView:sender.superview];
+  [self.addPersonPopoverController presentPopoverFromRect:rect
+                                                   inView:self.view
+                                 permittedArrowDirections:WYPopoverArrowDirectionUp
+                                                 animated:YES
+                                                  options:WYPopoverAnimationOptionFadeWithScale
+                                               completion:nil];
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
 didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   self.selectedPeanutContacts = peanutContacts;
-  [self dismissViewControllerAnimated:YES completion:nil];
+  if (self.presentedViewController) {
+    [self dismissViewControllerAnimated:YES completion:nil];
+  } else {
+    [self.addPersonPopoverController dismissPopoverAnimated:YES];
+  }
 }
 
 - (void)setSelectedPeanutContacts:(NSArray *)selectedPeanutContacts

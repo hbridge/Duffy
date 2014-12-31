@@ -39,10 +39,11 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
     } else if (daysSincePhotos < 8) {
       fromString = [self getDayOfTheWeek:date];
     }
+    if (fromString) fromString = [NSString stringWithFormat:@" from %@", fromString];
     
     self.body = [NSString stringWithFormat:@"Hey! Sent you a pic from %@. "
                  "Check out Swap app to see them. %@",
-                 fromString,
+                 fromString ? fromString : @"",
                  appURL];
   }
   return self;

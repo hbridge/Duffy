@@ -103,8 +103,11 @@
    addUsersWithPhoneNumbers:phoneNumbers
    toShareInstanceID:self.photoObject.share_instance.longLongValue
    success:^(NSArray *numbersToText) {
-     [self sendTextToPhoneNumbers:numbersToText];
-     
+     if (numbersToText.count > 0) {
+       [self sendTextToPhoneNumbers:numbersToText];
+     } else {
+       [self dismissWithErrorString:nil];
+     }
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:error.localizedDescription];
      DDLogError(@"%@ adding users failed: %@", self.class, error);
