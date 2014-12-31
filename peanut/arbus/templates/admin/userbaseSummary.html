@@ -179,8 +179,7 @@
 				<th class='before b-r' colspan='1' > Shared <br> Instances </th>
 				<th class='actions b-r' colspan='3'> Actions (7d) </th>
 				<th class='notifications b-r' colspan='2'> Notifications </th>
-				<!-- <th class='location b-r' colspan='2'> Location </th> -->
-				<th class='after' colspan='8' > </th>
+				<th class='after' colspan='6' > </th>
 			</tr>
 			<tr class='ui-row-header' >
 				<td class='userid b-r'> ID </td>
@@ -194,12 +193,12 @@
 				<td class='comments center b-r'> Comments </td>
 				<td class='notifications center b-r'> Sent <br> (7d)</td>
 				<td class='last-not-timestamp b-r'> Timestamp </td>
-				<!-- <td class='location b-r'> GPS </td>
-				<td class='location-timestamp b-r'> Timestamp </td> -->
+				<!-- <td class='location b-r'> GPS </td> -->
 				<td class='contacts b-r'> Friends | <br> Contacts </td> 
 				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 				<td class='last-action-timestamp b-r'> Last Action </td>
+				<td class='location-timestamp b-r'> Last Location <br> update </td>				
 				<td class='last-checkin-timestamp b-r'> Last Checkin </td>
 			</tr>
 		{% for entry in swapUserList %}
@@ -222,12 +221,12 @@
 					{% if entry.user.last_location_accuracy %}
 					(&plusmn;{{ entry.user.last_location_accuracy }}m)
 					{% endif %}
-				</td>
-				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td> -->
+				</td>-->
 				<td class='contacts b-r center'> {{ entry.friendCount}} | {{ entry.contactCount }} </td>
 				<td class='last-build b-r'> {{ entry.build }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 				<td class='last-action-timestamp timeago b-r' title="{{ entry.lastActionTime }}"> </td>
+				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>				
 				<td class='last-checkin-timestamp timeago b-r' title="{{ entry.lastCheckinTime }}"> </td>				
 			</tr>
 		{% endfor %}

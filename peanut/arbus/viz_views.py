@@ -17,7 +17,7 @@ from django.db import connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, NotificationLog, Action, ShareInstance
+from common.models import Photo, User, Classification, NotificationLog, Action, ShareInstance, LocationRecord
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -36,6 +36,7 @@ def userbaseSummary(request):
 	siDataForWeeklyPhotos = list(ShareInstance.objects.exclude(shared_at_timestamp__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(weeklyPhotosShared=Count('user')))
 	siDataForAllPhotos = list(ShareInstance.objects.values('user').annotate(allPhotosShared=Count('user')))
 
+	locationData = list(LocationRecord.objects.values('user').annotate(lastUpdated=Max('updated')))
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=2).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
@@ -59,6 +60,7 @@ def userbaseSummary(request):
 	weeklyPhotosById = dict()
 	PhotosDataById = dict()
 	allSiById = dict()
+	locationById = dict()
 	
 	for photosData in photoDataRaw:
 		PhotosDataById[photosData['user']] = photosData
@@ -68,6 +70,9 @@ def userbaseSummary(request):
 
 	for siData in siDataForAllPhotos:
 		allSiById[siData['user']] = siData['allPhotosShared']
+
+	for loc in locationData:
+		locationById[loc['user']] = loc['lastUpdated']
 
 	weeklyFavsById = dict() #action_type=0
 	weeklyCommentsById = dict() #action_type = 4
@@ -124,6 +129,9 @@ def userbaseSummary(request):
 			user.siCount = allSiById[user.id]
 		else:
 			user.siCount = 0
+
+		if user.id in locationById:
+			user.lastLocationTimestamp = locationById[user.id]
 
 		if (user.totalCount > 0):
 			entry['lastUploadTime'] = user.lastUpdated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
