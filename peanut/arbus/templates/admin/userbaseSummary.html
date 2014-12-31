@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="refresh" content="300">
-	<title>{{ strandV2List|length }} Swap Accounts</title> 
+	<title>{{ swapUserList|length }} Swap Accounts</title> 
 </head>
 <style>
 	html, body { padding: 0; margin: 0; font-family: arial; font-size: 12px;}
@@ -53,6 +53,9 @@
 	.right{
 		text-align: right;
 	}
+	.left{
+		text-align: left;
+	}
 	.center{
 		text-align: center;
 	}
@@ -96,12 +99,8 @@
 				<td class='counts'> {{ peopleCounts.friends }} </td>
 			</tr>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> Swaps </td>
-				<td class='counts'> {{ strandCounts.all }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> Requests </td>
-				<td class='counts'> {{ inviteCounts.all }} </td>
+				<td class='col1 right b-r'> ShareInstances </td>
+				<td class='counts'> {{ userCounts.all }} </td>
 			</tr>
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> Photos (shared) </td>
@@ -122,12 +121,8 @@
 				<td class='counts'> {{ statsCounts.friendsPerUser|floatformat:1 }} </td>
 			</tr>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> Swaps/User </td>
-				<td class='counts'> {{ statsCounts.strandsPerUser|floatformat:1 }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> Requests/User </td>
-				<td class='counts'> {{ statsCounts.invitesPerUser|floatformat:1 }} </td>
+				<td class='col1 right b-r'> ShareInstances/User </td>
+				<td class='counts'> {{ statsCounts.sisPerUser|floatformat:1 }} </td>
 			</tr>
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> Photos (shared)/User </td>
@@ -143,94 +138,46 @@
 			</tr>
 
 		</table>
-	</div>					
-	<div class='top-table'>
-		<div class='ui-header center'> Swap Photos </div>
-		<table class='ui-table' cellpadding='3'>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> All Swaps </td>
-				<td class='counts'> {{ strandCounts.all }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 1 photo </td>
-				<td class='counts'> {{ strandCounts.b1 }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 2-4 photos </td>
-				<td class='counts'> {{ strandCounts.b2 }} </td>
-			</tr>			
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 5-10 photos </td>
-				<td class='counts'> {{ strandCounts.b3 }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 10+ photos </td>
-				<td class='counts'> {{ strandCounts.b4 }} </td>
-			</tr>			
-
-		</table>
-	</div>
+	</div>	
 
 	<div class='top-table'>
-		<div class='ui-header center'> Swap Users </div>
+		<div class='ui-header center'> Split by users </div>
 		<table class='ui-table' cellpadding='3'>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> All Swaps </td>
-				<td class='counts'> {{ userCounts.all }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 1 person </td>
-				<td class='counts'> {{ userCounts.b1 }} </td>
-			</tr>
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> w/ 2 people </td>
-				<td class='counts'> {{ userCounts.b2 }} </td>
-			</tr>			
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 3 people </td>
-				<td class='counts'> {{ userCounts.b3 }} </td>
+				<td class='counts right title="{{ userCounts.b1 }}"'> {{ userCounts.b1p|floatformat:1 }}% </td>
 			</tr>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> w/ 4-5 people </td>
-				<td class='counts'> {{ userCounts.b4 }} </td>
+				<td class='col1 right b-r'> w/ 3 people </td>
+				<td class='counts right title="{{ userCounts.b2 }}"'> {{ userCounts.b2p|floatformat:1 }}% </td>
+			</tr>			
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> w/ 4 people </td>
+				<td class='counts right title="{{ userCounts.b3 }}"'> {{ userCounts.b3p|floatformat:1 }}% </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> w/ 5 people </td>
+				<td class='counts right title="{{ userCounts.b4 }}"'> {{ userCounts.b4p|floatformat:1 }}% </td>
 			</tr>			
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> w/ 5+ people </td>
-				<td class='counts'> {{ userCounts.b5 }} </td>
+				<td class='counts right title="{{ userCounts.b5 }}"'> {{ userCounts.b5p|floatformat:1 }}%	 </td>
 			</tr>
 
 		</table>
 	</div>
 
-	<div class='top-table'>
-		<div class='ui-header center'> Requests </div>
-		<table class='ui-table' cellpadding='3'>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> All Requests </td>
-				<td class='counts'> {{ inviteCounts.all }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> Accepted </td>
-				<td class='counts'> {{ inviteCounts.accepted }} </td>
-			</tr>
-			<tr class='ui-row' >
-				<td class='col1 right b-r'> Swapped </td>
-				<td class='counts'> {{ inviteCounts.swapped }} </td>
-			</tr>
-		</table>
-	</div>	
-
 </div>
 
-	{% if strandV2List %}
+	{% if swapUserList %}
 	<div class='bottom-summary'>
-		<div class='ui-header'> Swap &mdash; {{ strandV2List|length }} accounts </div>
+		<div class='ui-header'> Swap &mdash; {{ swapUserList|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row-header' >
 				<th class='before b-r' colspan='3' > </th>
-				<th class='before b-r' colspan='3' > Photos </th>
-				<th class='before b-r' colspan='1' > </th>				
-				<th class='actions b-r' colspan='6'> Actions (7d) </th>
+				<th class='before b-r' colspan='2' > Photos </th>
+				<th class='before b-r' colspan='1' > Shared <br> Instances </th>
+				<th class='actions b-r' colspan='3'> Actions (7d) </th>
 				<th class='notifications b-r' colspan='2'> Notifications </th>
 				<!-- <th class='location b-r' colspan='2'> Location </th> -->
 				<th class='after' colspan='8' > </th>
@@ -241,11 +188,7 @@
 				<td class='created b-r'> Created </td>
 				<td class='db-count center b-r'> Metadata </td>
 				<td class='gps-count center b-r'> with GPS <br> (%)</td>
-				<td class='thumbs center b-r'> Shared <br> (7d | all) </td>
-				<td class='requests center b-r'> Requests <br> Sent </td>
-				<td class='strands_created center b-r'> Swaps <br> Created </td>
-				<td class='strands_joined center b-r'> Swaps <br> Joined </td>
-				<td class='photos_added center b-r'> Photos <br> Added  </td>
+				<td class='si center b-r'> 7d | all </td>
 				<td class='photos_eval center b-r' > Photos <br> Eval'ed </td>
 				<td class='favs center b-r'> Favs </td>
 				<td class='comments center b-r'> Comments </td>
@@ -259,18 +202,14 @@
 				<td class='last-action-timestamp b-r'> Last Action </td>
 				<td class='last-checkin-timestamp b-r'> Last Checkin </td>
 			</tr>
-		{% for entry in strandV2List %}
+		{% for entry in swapUserList %}
 			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
 				<td class='userid b-r'> {{ entry.user.id }} </td>
-				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_blank href='/strand/api/strand_inbox?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
+				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_blank href='/strand/api/swap_inbox?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 				<td class='db-count right b-r'>	{{ entry.metadataCount }} </td>	
 				<td class='gps-count center b-r'> {{ entry.photosWithGPS|floatformat:0 }}</td>					
-				<td class='thumbs right b-r'> {{ entry.weeklyPhotos }} | {{ entry.user.thumbsCount }} </td>
-				<td class='requests right b-r'> {{ entry.inviteCount }} </td>
-				<td class='strands_created center b-r'> {{ entry.weeklyStrandsCreated }} </td>
-				<td class='strands_joined center b-r'> {{ entry.weeklyStrandsJoined }} </td>
-				<td class='photos_added center b-r'> {{ entry.weeklyPhotosAdded }} </td>
+				<td class='si right b-r'> {{ entry.weeklyPhotos }} | {{ entry.user.thumbsCount }} </td>
 				<td class='photos_eval center b-r' > {{ entry.weeklyPhotoEvals }} </td>
 				<td class='favs center b-r'> {{entry.weeklyFavs }} </td>
 				<td class='comments center b-r'> {{entry.weeklyComments }} </td>

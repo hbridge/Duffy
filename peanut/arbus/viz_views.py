@@ -12,12 +12,12 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from django.template import RequestContext, loader
-from django.db.models import Q, Count, Max
+from django.db.models import Q, Count, Max, Sum, F
 from django.db import connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, NotificationLog, Strand, Action, StrandInvite
+from common.models import Photo, User, Classification, NotificationLog, Action, ShareInstance
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -26,31 +26,27 @@ logger = logging.getLogger(__name__)
 	
 def userbaseSummary(request):
 
-
 	# database calls
 	userStats = list(User.objects.filter(product_id=2))
 	photoDataRaw = list(Photo.objects.exclude(id__lt=7463).exclude(Q(install_num=-1) & Q(thumb_filename = None)).values('user').annotate(
-		totalPhotos=Count('user'), thumbsCount=Count('thumb_filename'), 
-		photosWithGPS=Count('location_point'), lastUpdated=Max('updated')))
+		totalPhotos=Count('user'), thumbsCount=Count('thumb_filename'), photosWithGPS=Count('location_point'), lastUpdated=Max('updated')))
 
-	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'), weeklyPhotos=Count('photos__user'))
-	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(weeklyActions=Count('user'))
-	actionDataWithPhotos = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(totalPhotos=Count('photos'))
-	lastActionDateRaw = Action.objects.all().exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(lastActionTimestamp=Max('added'))
+	actionDataRaw = list(Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) | Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).values('user', 'action_type').annotate(weeklyActions=Count('user'), lastActionTimestamp=Max('added')))
 
-	inviteCount = list(User.objects.filter(product_id=2).annotate(totalInvites=Count('inviting_user')).order_by('-id'))
+	siDataForWeeklyPhotos = list(ShareInstance.objects.exclude(shared_at_timestamp__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(weeklyPhotosShared=Count('user')))
+	siDataForAllPhotos = list(ShareInstance.objects.values('user').annotate(allPhotosShared=Count('user')))
+
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=2).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
 	# Exclude type GPS fetch since it happens so frequently
-	notificationDataRaw = NotificationLog.objects.filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(msg_type=constants.NOTIFICATIONS_REFRESH_FEED).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
+	notificationDataRaw = list(NotificationLog.objects.filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(msg_type=constants.NOTIFICATIONS_REFRESH_FEED).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added')))
 
 	extras = dict() #store additional information per user
 	for i in range(len(userStats)):
 		entry = dict()
 		entry['contacts'] = contactCount[i].totalContacts
 		entry['friends'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
-		entry['invites'] = inviteCount[i].totalInvites
 		extras[contactCount[i].id] = entry
 
 	notificationCountById = dict()
@@ -61,33 +57,19 @@ def userbaseSummary(request):
 		notificationLastById[notificationData['user']] = notificationData['lastSent']	
 
 	weeklyPhotosById = dict()
-	weeklyStrandsById = dict()
 	PhotosDataById = dict()
+	allSiById = dict()
 	
 	for photosData in photoDataRaw:
 		PhotosDataById[photosData['user']] = photosData
 
-	for strandData in strandDataRaw:
-		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
+	for actionData in siDataForWeeklyPhotos:
+		weeklyPhotosById[actionData['user']] = actionData['weeklyPhotosShared']
 
-	for actionData in actionDataWithPhotos:
-		if (actionData['action_type'] == constants.ACTION_TYPE_CREATE_STRAND or 
-			actionData['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
-			if actionData['user'] not in weeklyPhotosById:
-				weeklyPhotosById[actionData['user']] = 0
-			weeklyPhotosById[actionData['user']] += actionData['totalPhotos']		
-
-	''' # from constants.py
-	ACTION_TYPE_FAVORITE = 0
-	ACTION_TYPE_CREATE_STRAND = 1
-	ACTION_TYPE_ADD_PHOTOS_TO_STRAND = 2
-	ACTION_TYPE_JOIN_STRAND = 3
-	'''
+	for siData in siDataForAllPhotos:
+		allSiById[siData['user']] = siData['allPhotosShared']
 
 	weeklyFavsById = dict() #action_type=0
-	weeklyStrandsCreatedById = dict() #action_type=1
-	weeklyPhotosAddedById = dict() #action_type=2
-	weeklyStrandsJoinedById = dict() #action_type =3
 	weeklyCommentsById = dict() #action_type = 4
 	weeklyPhotoEvalsById = dict() #action_type = 5
 	lastActionTimeById = dict()
@@ -96,25 +78,20 @@ def userbaseSummary(request):
 	for actionData in actionDataRaw:
 		if (actionData['action_type'] == constants.ACTION_TYPE_FAVORITE):
 			weeklyFavsById[actionData['user']] = actionData['weeklyActions']
-		elif (actionData['action_type'] == constants.ACTION_TYPE_CREATE_STRAND):
-			weeklyStrandsCreatedById[actionData['user']] = actionData['weeklyActions']
-		elif (actionData['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
-			weeklyPhotosAddedById[actionData['user']] = actionData['weeklyActions']		
-		elif (actionData['action_type'] == constants.ACTION_TYPE_JOIN_STRAND):
-			weeklyStrandsJoinedById[actionData['user']] = actionData['weeklyActions']
 		elif (actionData['action_type'] == constants.ACTION_TYPE_COMMENT):
 			weeklyCommentsById[actionData['user']] = actionData['weeklyActions']
 		elif (actionData['action_type'] == constants.ACTION_TYPE_PHOTO_EVALUATED):
 			weeklyPhotoEvalsById[actionData['user']] = actionData['weeklyActions']
 
-	for lastActionDate in lastActionDateRaw:
-		if lastActionDate['user'] in lastActionTimeById:
-			if lastActionTimeById[lastActionDate['user']] < lastActionDate['lastActionTimestamp']:
-				lastActionTimeById[lastActionDate['user']] = lastActionDate['lastActionTimestamp']
+		# append the last action time
+		if actionData['user'] in lastActionTimeById:
+			if lastActionTimeById[actionData['user']] < actionData['lastActionTimestamp']:
+				lastActionTimeById[actionData['user']] = actionData['lastActionTimestamp']
 		else:
-			lastActionTimeById[lastActionDate['user']] = lastActionDate['lastActionTimestamp']
+			lastActionTimeById[actionData['user']] = actionData['lastActionTimestamp']
 
-	strandV2List = list()
+
+	swapUserList = list()
 	to_zone = tz.gettz('America/New_York')
 	peopleCounts = dict()
 	peopleCounts['photosMetadata'] = 0
@@ -129,8 +106,8 @@ def userbaseSummary(request):
 		if (user.last_location_timestamp):
 			entry['lastLocationTimestamp'] = user.last_location_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 
-		if (user.last_photo_update_timestamp):
-			entry['lastCheckinTime'] = user.last_photo_update_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')			
+		if (user.last_checkin_timestamp):
+			entry['lastCheckinTime'] = user.last_checkin_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')			
 
 		if (user.id in PhotosDataById):
 			user.totalCount = PhotosDataById[user.id]['totalPhotos']
@@ -142,6 +119,11 @@ def userbaseSummary(request):
 			user.thumbsCount = 0
 			user.photoWithGPS = 0
 			user.lastUpdated = 0
+
+		if user.id in allSiById:
+			user.siCount = allSiById[user.id]
+		else:
+			user.siCount = 0
 
 		if (user.totalCount > 0):
 			entry['lastUploadTime'] = user.lastUpdated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
@@ -160,11 +142,6 @@ def userbaseSummary(request):
 		else:
 			entry['weeklyPhotos'] = '-'
 
-		if user.id in weeklyStrandsById:
-			entry['weeklyStrands'] = weeklyStrandsById[user.id]
-		else:
-			entry['weeklyStrands'] = '-'
-
 		if user.id in weeklyFavsById:
 			entry['weeklyFavs'] = weeklyFavsById[user.id]
 		else:
@@ -180,21 +157,6 @@ def userbaseSummary(request):
 		else:
 			entry['weeklyPhotoEvals'] = '-'
 
-		if user.id in weeklyStrandsCreatedById:
-			entry['weeklyStrandsCreated'] = weeklyStrandsCreatedById[user.id]
-		else:
-			entry['weeklyStrandsCreated'] = '-'
-
-		if user.id in weeklyPhotosAddedById:
-			entry['weeklyPhotosAdded'] = weeklyPhotosAddedById[user.id]
-		else:
-			entry['weeklyPhotosAdded'] = '-'
-
-		if user.id in weeklyStrandsJoinedById:
-			entry['weeklyStrandsJoined'] = weeklyStrandsJoinedById[user.id]
-		else:
-			entry['weeklyStrandsJoined'] = '-'
-
 		if user.id in lastActionTimeById:
 			entry['lastActionTimestamp'] = lastActionTimeById[user.id]
 		else:
@@ -205,7 +167,6 @@ def userbaseSummary(request):
 
 		entry['contactCount'] = extras[user.id]['contacts']
 		entry['friendCount'] = extras[user.id]['friends']
-		entry['inviteCount'] = extras[user.id]['invites']
 
 
 		if user.last_build_info:
@@ -232,82 +193,56 @@ def userbaseSummary(request):
 		peopleCounts['photosShared'] += user.thumbsCount
 		peopleCounts['friends'] += entry['friendCount']
 
-		strandV2List.append(entry)
+		swapUserList.append(entry)
 
-	strandV2List = sorted(strandV2List, key=lambda x: x['lastActionTimestamp'], reverse=True)
+	swapUserList = sorted(swapUserList, key=lambda x: x['lastActionTimestamp'], reverse=True)
 
 	# database calls for top tables
-	strands = Strand.objects.prefetch_related('photos', 'users').filter(product_id=2).filter(private=False)
+	shareInstances = ShareInstance.objects.prefetch_related('users')
 
-	strandBucket1 = strandBucket2 = strandBucket3 = strandBucket4 = 0
-	
-	for strand in strands:
-		if strand.photos.count() == 1:
-			strandBucket1 += 1
-		elif strand.photos.count() < 5:
-			strandBucket2 += 1
-		elif strand.photos.count() < 10:
-			strandBucket3 += 1
-		else:
-			strandBucket4 += 1
-
-	strandCounts = dict()
-	strandCounts['all'] = len(strands)
-	strandCounts['b1'] = strandBucket1
-	strandCounts['b2'] = strandBucket2
-	strandCounts['b3'] = strandBucket3
-	strandCounts['b4'] = strandBucket4
-
-	# stats on strand users
-
+	# stats on # of users per share_instance
 	userBucket1 = userBucket2 = userBucket3 = userBucket4 = userBucket5 = 0
 	
-	for strand in strands:
-		if strand.users.count() == 1:
+	for si in shareInstances:
+		if si.users.count() == 2:
 			userBucket1 += 1
-		elif strand.users.count() == 2:
+		elif si.users.count() == 3:
 			userBucket2 += 1
-		elif strand.users.count() == 3:
+		elif si.users.count() == 4:
 			userBucket3 += 1
-		elif strand.users.count() < 6:
+		elif si.users.count() == 5:
 			userBucket4 += 1
 		else:
 			userBucket5 += 1
 
 	userCounts = dict()
-	userCounts['all'] = len(strands)
+	userCounts['all'] = len(shareInstances)
 	userCounts['b1'] = userBucket1
 	userCounts['b2'] = userBucket2
 	userCounts['b3'] = userBucket3
 	userCounts['b4'] = userBucket4
 	userCounts['b5'] = userBucket5
 
+	# calculate percentages
+	userCounts['b1p'] = float(userBucket1)/float(userCounts['all'])*100.0
+	userCounts['b2p'] = float(userBucket2)/float(userCounts['all'])*100.0
+	userCounts['b3p'] = float(userBucket3)/float(userCounts['all'])*100.0
+	userCounts['b4p'] = float(userBucket4)/float(userCounts['all'])*100.0
+	userCounts['b5p'] = float(userBucket5)/float(userCounts['all'])*100.0
 
-	# stats on invites
-	invites = StrandInvite.objects.filter(added__gt='2014-09-25 00:50:19')
-	accepted = invites.filter(accepted_user_id__isnull=False)
-
-	inviteCounts = dict()
-	inviteCounts['all'] = invites.count()
-	inviteCounts['accepted'] = accepted.count()
-
-	inviteCounts['swapped'] = Action.objects.select_related().filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND).annotate(strandUsers=Count('strand__users')).filter(strandUsers__gt=1).count()
 
 	peopleCounts['friends'] = peopleCounts['friends']/2 #dividing by two to count relationships
-	peopleCounts['all'] = len(strandV2List)
+	peopleCounts['all'] = len(swapUserList)
 
 	statsCounts = dict()
 	statsCounts['friendsPerUser'] = float(peopleCounts['friends'])/float(peopleCounts['all'])
-	statsCounts['strandsPerUser'] = float(strandCounts['all'])/float(peopleCounts['all'])
-	statsCounts['invitesPerUser'] = float(inviteCounts['all'])/float(peopleCounts['all'])
+	statsCounts['sisPerUser'] = float(userCounts['all'])/float(peopleCounts['all'])
 	statsCounts['photosSharedPerUser'] = float(peopleCounts['photosShared'])/float(peopleCounts['all'])
 	statsCounts['photosMetadataPerUser'] = float(peopleCounts['photosMetadata'])/float(peopleCounts['all'])
 	statsCounts['percentPhotosShared'] = float(peopleCounts['photosShared'])/float(peopleCounts['photosMetadata'])*100.0
 
-	context = {	'strandV2List': strandV2List,
-				'strandCounts': strandCounts,
+	context = {	'swapUserList': swapUserList,
 				'userCounts': userCounts,
-				'inviteCounts': inviteCounts,
 				'peopleCounts': peopleCounts,
 				'statsCounts': statsCounts}
 
