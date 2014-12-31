@@ -176,7 +176,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		photo.orig_filename = origFileName
 		photo.full_filename = photo.getDefaultFullFilename()
 
-		os.rename(tempFilepath, photo.getDefaultFullPath())
+		os.system('mv %s %s' % (tempFilepath, photo.getDefaultFullPath()))
 		copyFileToS3(photo.getDefaultFullPath(), '/'.join([photo.user.getUserDataId(),photo.getDefaultFullFilename()]))	
 
 		im = Image.open(photo.getDefaultFullPath())
