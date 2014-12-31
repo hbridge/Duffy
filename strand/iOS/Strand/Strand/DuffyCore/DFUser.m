@@ -202,6 +202,18 @@ static DFUser *currentUser;
   return [NSURL URLWithString:URLString];
 }
 
+- (NSURL *)imageServerURL
+{
+  NSMutableString *URLString;
+  if (self.userServerURLString && ![self.userServerURLString isEqualToString:@""]) {
+    URLString = [self.userServerURLString mutableCopy];
+  } else {
+    URLString = [DFImageServerBaseURL mutableCopy];
+  }
+  
+  return [NSURL URLWithString:URLString];
+}
+
 - (NSURL *)apiURL
 {
   return [[self serverURL] URLByAppendingPathComponent:DFServerAPIPath isDirectory:NO];

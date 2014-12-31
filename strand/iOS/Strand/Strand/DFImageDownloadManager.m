@@ -137,7 +137,7 @@ static DFImageDownloadManager *defaultManager;
                    priority:(NSOperationQueuePriority)queuePriority
             completionBlock:(DFImageFetchCompletionBlock)completion
 {
-  NSURL *url = [[[DFUser currentUser] serverURL]
+  NSURL *url = [[[DFUser currentUser] imageServerURL]
                 URLByAppendingPathComponent:path];
   
   // add the operation to our local download queue so we don't swamp the network with download

@@ -20,6 +20,7 @@
 @property (readonly, nonatomic) BOOL isUserDeveloper;
 
 @property (readonly, nonatomic, retain) NSURL *serverURL;
+@property (readonly, nonatomic, retain) NSURL *imageServerURL;
 @property (readonly, nonatomic, retain) NSURL *apiURL;
 @property (readwrite, nonatomic, retain) NSString *userServerURLString;
 @property (readwrite, nonatomic, retain) NSString *userServerPortString;
