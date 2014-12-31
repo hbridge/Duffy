@@ -674,7 +674,15 @@ def swap_inbox(request):
 
 		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp)
 
-		shareInstances = filter(lambda x: x.photo.thumb_filename, shareInstances)
+		# First, filter out anything that doesn't have a thumb...unless its your own photo
+		filteredShareInstances = list()
+		for shareInstance in shareInstances:
+			if shareInstance.user_id == user.id:
+				filteredShareInstances.append(shareInstance)
+			elif shareInstance.photo.thumb_filename:
+				filteredShareInstances.append(shareInstance)
+		shareInstances = filteredShareInstances
+		
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
 		printStats("swaps_inbox-1")
 
