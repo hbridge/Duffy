@@ -165,7 +165,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 	(width, height) = im.size
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
-		os.rename(tempFilepath, photo.getDefaultThumbPath())
+		os.system('mv %s %s' % (tempFilepath, photo.getDefaultThumbPath()))
 		copyFileToS3(photo.getDefaultThumbPath(), '/'.join([photo.user.getUserDataId(),photo.getDefaultThumbFilename()]))
 		photo.thumb_filename = photo.getDefaultThumbFilename()
 
