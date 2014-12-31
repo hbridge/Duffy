@@ -655,6 +655,7 @@ def swap_inbox(request):
 
 		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id])
 
+		shareInstances = filter(lambda x: x.photo.full_filename, shareInstances)
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
 		printStats("swaps_inbox-1", printQueries=True)
 
@@ -726,7 +727,7 @@ def strand_inbox(request):
 		#printStats("swaps-invites")
 		
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False).order_by('-added'))
+		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False).order_by('-added')[:50])
 		printStats("inbox-2")
 
 		strandsWithPhotos = list()
