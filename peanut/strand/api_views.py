@@ -727,7 +727,7 @@ def swap_inbox(request):
 
 		people = set(User.objects.filter(id__in=peopleIds))
 
-		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'id': -1, 'people': getFriendsObjectData(user.id, people, True)}		
+		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'share_instance': -1, 'people': getFriendsObjectData(user.id, people, True)}		
 		responseObjects.append(peopleEntry)
 
 		printStats("swaps_inbox-end")
