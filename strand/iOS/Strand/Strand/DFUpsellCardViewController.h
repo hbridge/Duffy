@@ -8,15 +8,23 @@
 
 #import <Foundation/Foundation.h>
 #import "DFSwipableButtonView.h"
+#import "DFUpsellContentView.h"
+
 
 @interface DFUpsellCardViewController : UIViewController <DFSwipableButtonViewDelegate>
 
-typedef void(^DFNoIncomingYesHandler)(void);
-typedef void(^DFNoIncomingNoHandler)(void);
+typedef NS_ENUM(NSInteger, DFUpsellCardViewType) {
+  DFUpsellCardViewGotoSuggestions,
+  DFUpsellCardViewBackgroundLocation,
+};
 
-@property (nonatomic, copy) DFNoIncomingYesHandler yesButtonHandler;
-@property (nonatomic, copy) DFNoIncomingNoHandler noButtonHandler;
+@property (nonatomic) DFUpsellCardViewType upsellType;
+@property (nonatomic, retain) DFUpsellContentView *upsellContentView;
+@property (nonatomic, copy) DFVoidBlock yesButtonHandler;
+@property (nonatomic, copy) DFVoidBlock noButtonHandler;
 
 @property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
+
+- (instancetype)initWithType:(DFUpsellCardViewType)upsellType;
 
 @end

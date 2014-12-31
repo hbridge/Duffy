@@ -7,28 +7,49 @@
 //
 
 #import "DFUpsellCardViewController.h"
-#import "DFTwoLabelView.h"
 #import "DFAnalytics.h"
 
 
 @implementation DFUpsellCardViewController
 
+- (instancetype)initWithType:(DFUpsellCardViewType)upsellType
+{
+  self = [super init];
+  if (self) {
+    _upsellType = upsellType;
+  }
+  return self;
+}
 
 - (void)viewDidLoad {
   [super viewDidLoad];
   
   [self configureSwipableButtonView];
   
-  DFTwoLabelView *view = [UINib instantiateViewWithClass:[DFTwoLabelView class]];
-  view.frame = CGRectMake(0, 0, self.swipableButtonView.centerView.frame.size.width, 24 * 3);
+  self.upsellContentView = [UINib instantiateViewWithClass:[DFUpsellContentView class]];
+  self.upsellContentView.frame = CGRectMake(0, 0, self.swipableButtonView.centerView.frame.size.width, 24 * 3);
   
-  view.translatesAutoresizingMaskIntoConstraints = NO;
-  view.topLabel.text = @"No More Photos To Review";
-  view.bottomLabel.text = @"Review Suggestions?";
+  self.upsellContentView.translatesAutoresizingMaskIntoConstraints = NO;
   
-  view.bottomLabel.font = [UIFont systemFontOfSize:24];
+  self.upsellContentView.topLabel.font = [UIFont systemFontOfSize:24];
+  self.upsellContentView.bottomLabel.font = [UIFont systemFontOfSize:17];
 
-  [self.swipableButtonView configureToUseView:view];
+  [self.swipableButtonView configureToUseView:self.upsellContentView];
+  
+  [self configureUpsellContent];
+}
+
+- (void)configureUpsellContent
+{
+  if (self.upsellType == DFUpsellCardViewGotoSuggestions) {
+    self.upsellContentView.topLabel.text = @"No More Photos To Review";
+    self.upsellContentView.bottomLabel.text = @"Review Suggestions?";
+  } else if (self.upsellType == DFUpsellCardViewBackgroundLocation) {
+    self.upsellContentView.topLabel.text = @"Get More Suggestions";
+    self.upsellContentView.bottomLabel.text = @"Grant location permission to get suggestions "
+    "even when you don't take a photo";
+    self.upsellContentView.imageView.image = [UIImage imageNamed:@"Assets/Nux/LocationAccessGraphic"];
+  }
 }
 
 

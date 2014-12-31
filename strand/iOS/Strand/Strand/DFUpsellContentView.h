@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFTwoLabelView : UIView
+@interface DFUpsellContentView : UIView
 
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
 

@@ -279,8 +279,8 @@
 		65E241561A3A53AF0044F1CB /* DFSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E241541A3A53AF0044F1CB /* DFSuggestionViewController.xib */; };
 		65E241591A3B5BB30044F1CB /* DFUpsellCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241581A3B5BB30044F1CB /* DFUpsellCardViewController.m */; };
 		65E2415B1A3B64A10044F1CB /* DFUpsellCardViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E2415A1A3B64A10044F1CB /* DFUpsellCardViewController.xib */; };
-		65E2416A1A3B876A0044F1CB /* DFTwoLabelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241691A3B876A0044F1CB /* DFTwoLabelView.m */; };
-		65E2416C1A3B87840044F1CB /* DFTwoLabelView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E2416B1A3B87840044F1CB /* DFTwoLabelView.xib */; };
+		65E2416A1A3B876A0044F1CB /* DFUpsellContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E241691A3B876A0044F1CB /* DFUpsellContentView.m */; };
+		65E2416C1A3B87840044F1CB /* DFUpsellContentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65E2416B1A3B87840044F1CB /* DFUpsellContentView.xib */; };
 		65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EF6C601A1563E300E0533F /* DFContactDataManager.m */; };
 /* End PBXBuildFile section */
 
@@ -787,9 +787,9 @@
 		65E241571A3B5BB30044F1CB /* DFUpsellCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUpsellCardViewController.h; sourceTree = "<group>"; };
 		65E241581A3B5BB30044F1CB /* DFUpsellCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUpsellCardViewController.m; sourceTree = "<group>"; };
 		65E2415A1A3B64A10044F1CB /* DFUpsellCardViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUpsellCardViewController.xib; sourceTree = "<group>"; };
-		65E241681A3B876A0044F1CB /* DFTwoLabelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTwoLabelView.h; sourceTree = "<group>"; };
-		65E241691A3B876A0044F1CB /* DFTwoLabelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTwoLabelView.m; sourceTree = "<group>"; };
-		65E2416B1A3B87840044F1CB /* DFTwoLabelView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFTwoLabelView.xib; sourceTree = "<group>"; };
+		65E241681A3B876A0044F1CB /* DFUpsellContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUpsellContentView.h; sourceTree = "<group>"; };
+		65E241691A3B876A0044F1CB /* DFUpsellContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUpsellContentView.m; sourceTree = "<group>"; };
+		65E2416B1A3B87840044F1CB /* DFUpsellContentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUpsellContentView.xib; sourceTree = "<group>"; };
 		65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactDataManager.h; sourceTree = "<group>"; };
 		65EF6C601A1563E300E0533F /* DFContactDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactDataManager.m; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
@@ -842,9 +842,9 @@
 				5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonView.h */,
 				5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonView.m */,
 				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonView.xib */,
-				65E241681A3B876A0044F1CB /* DFTwoLabelView.h */,
-				65E241691A3B876A0044F1CB /* DFTwoLabelView.m */,
-				65E2416B1A3B87840044F1CB /* DFTwoLabelView.xib */,
+				65E241681A3B876A0044F1CB /* DFUpsellContentView.h */,
+				65E241691A3B876A0044F1CB /* DFUpsellContentView.m */,
+				65E2416B1A3B87840044F1CB /* DFUpsellContentView.xib */,
 				5A87DE171A267E240058EB38 /* DFProfileWithContextView.h */,
 				5A87DE181A267E240058EB38 /* DFProfileWithContextView.m */,
 				5A87DE191A267E240058EB38 /* DFProfileWithContextView.xib */,
@@ -1893,7 +1893,7 @@
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5AF4991E1A40BF5E000CF9DB /* DFDismissableModalViewController.xib in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
-				65E2416C1A3B87840044F1CB /* DFTwoLabelView.xib in Resources */,
+				65E2416C1A3B87840044F1CB /* DFUpsellContentView.xib in Resources */,
 				5A0BC49D19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib in Resources */,
 				5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonView.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFSelectPhotosViewController.xib in Resources */,
@@ -2065,7 +2065,7 @@
 				652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */,
 				65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
-				65E2416A1A3B876A0044F1CB /* DFTwoLabelView.m in Sources */,
+				65E2416A1A3B876A0044F1CB /* DFUpsellContentView.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,
 				5A4BBD2B19B7D55500359299 /* DFPeanutFeedAdapter.m in Sources */,

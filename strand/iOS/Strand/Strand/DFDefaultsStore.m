@@ -84,6 +84,7 @@ DFUserActionType DFUserActionTakeExternalPhoto = @"TakeExternalPhoto";
 DFUserActionType DFUserActionSyncContacts = @"SyncContacts";
 DFUserActionType DFUserActionSyncManualContacts = @"SyncManualContacts";
 DFUserActionType DFUserActionViewNotifications = @"ViewNotifications";
+DFUserActionType DFUserActionLocationUpsellProcessed = @"DFUserActionLocationUpsellNotNowed";
 
 + (void)incrementCountForAction:(DFUserActionType)action
 {

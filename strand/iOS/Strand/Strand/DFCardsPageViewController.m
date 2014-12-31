@@ -21,6 +21,7 @@
 #import "DFImageDiskCache.h"
 #import "DFUpsellCardViewController.h"
 #import "DFAnalytics.h"
+#import "DFBackgroundLocationManager.h"
 
 @interface DFCardsPageViewController ()
 
@@ -149,21 +150,13 @@ const NSUInteger NumOutgoingNuxes = 3;
     if (self.preferredType == DFIncomingViewType) {
       nextController = [self nextIncomingViewController];
     } else {
-      nextController = [self nextSuggestionViewController];
+      nextController = [self nextOutgoingViewController];
     }
   }
   
   if (!nextController) {
-    if (self.preferredType == DFIncomingViewType && !self.viewControllers.firstObject) {
-      // This actually handles the IncomingViewType, even though its named otherwise
-      nextController = [self noSuggestionsViewController];
-    } else if (self.preferredType == DFIncomingViewType) {
-      // If we don't have any more suggestions, and we've been showing stuff, close
-      [self dismissViewControllerAnimated:YES completion:^(){}];
-      return;
-    } else {
-      nextController = [self noSuggestionsViewController];
-    }
+    [self dismissViewControllerAnimated:YES completion:^(){}];
+    return;
   } 
   
   [self setViewControllers:@[nextController]
@@ -235,7 +228,7 @@ const NSUInteger NumOutgoingNuxes = 3;
   }
 }
 
-- (UIViewController *)nextSuggestionViewController
+- (UIViewController *)nextOutgoingViewController
 {
   NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
   for (DFPeanutFeedObject *suggestion in allSuggestions) {
@@ -266,6 +259,31 @@ const NSUInteger NumOutgoingNuxes = 3;
       }
     }
   }
+  
+  // we didn't find an outgoing, return an upsell if there's valid one
+  return [self nextOutgoingUpsell];
+}
+
+- (UIViewController *)nextOutgoingUpsell
+{
+  DFCardsPageViewController __weak *weakSelf = self;
+  if (![[DFBackgroundLocationManager sharedManager] isPermssionGranted]
+      && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
+    DFUpsellCardViewController *locationUpsellController = [[DFUpsellCardViewController alloc]
+                                                            initWithType:DFUpsellCardViewBackgroundLocation];
+    locationUpsellController.yesButtonHandler = ^{
+      [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
+      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
+      [weakSelf gotoNextController];
+    };
+    locationUpsellController.noButtonHandler = ^{
+      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
+      [weakSelf gotoNextController];
+    };
+    
+    return locationUpsellController;
+  }
+  
   return nil;
 }
 

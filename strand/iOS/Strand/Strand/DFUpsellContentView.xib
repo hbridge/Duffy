@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFUpsellContentView">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="900" text="bottomLabel that is very very very very very long and will wrap to the next line if it is allowed to" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="cvc-BD-Jj7">
+                    <rect key="frame" x="15" y="241" width="290" height="61"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lqQ-Lt-yzM">
+                    <rect key="frame" x="70" y="20" width="180" height="180"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="180" id="8k3-z8-dpa"/>
+                        <constraint firstAttribute="height" constant="180" id="vQV-tX-gyt"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="900" text="topLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fre-vW-7O3">
+                    <rect key="frame" x="126" y="210" width="68" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="cvc-BD-Jj7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="0NJ-xl-Smt"/>
+                <constraint firstItem="Fre-vW-7O3" firstAttribute="top" secondItem="lqQ-Lt-yzM" secondAttribute="bottom" constant="10" id="6Ry-Hz-1ca"/>
+                <constraint firstItem="Fre-vW-7O3" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" priority="250" constant="20" id="H3o-7m-Aca"/>
+                <constraint firstAttribute="centerX" secondItem="cvc-BD-Jj7" secondAttribute="centerX" id="O2I-Jn-Yhc"/>
+                <constraint firstItem="Fre-vW-7O3" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="top" priority="500" constant="10" id="ZAI-3R-aF6"/>
+                <constraint firstAttribute="trailing" secondItem="cvc-BD-Jj7" secondAttribute="trailing" constant="15" id="g9t-kc-XUd"/>
+                <constraint firstAttribute="bottom" secondItem="cvc-BD-Jj7" secondAttribute="bottom" priority="500" constant="80" id="hIe-s8-hkY"/>
+                <constraint firstItem="lqQ-Lt-yzM" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="20" id="j4o-3H-H7Z"/>
+                <constraint firstAttribute="centerX" secondItem="lqQ-Lt-yzM" secondAttribute="centerX" id="pZb-b2-ohI"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="cvc-BD-Jj7" secondAttribute="bottom" constant="10" id="sT3-cx-TZ0"/>
+                <constraint firstItem="cvc-BD-Jj7" firstAttribute="top" secondItem="Fre-vW-7O3" secondAttribute="bottom" constant="10" id="w0G-ke-LW5"/>
+                <constraint firstAttribute="centerX" secondItem="Fre-vW-7O3" secondAttribute="centerX" id="xOz-fj-QoU"/>
+            </constraints>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="bottomLabel" destination="cvc-BD-Jj7" id="Ocn-4Y-cZb"/>
+                <outlet property="imageView" destination="lqQ-Lt-yzM" id="jqM-BY-Tqk"/>
+                <outlet property="topLabel" destination="Fre-vW-7O3" id="cCd-xk-hVa"/>
+            </connections>
+            <point key="canvasLocation" x="546" y="520"/>
+        </view>
+    </objects>
+</document>
