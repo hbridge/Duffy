@@ -711,7 +711,9 @@ def swap_inbox(request):
 				actions = actionsByShareInstanceId[shareInstance.id]
 
 			if shareInstance.photo_id in actionsByPhotoId:
-				actions.extend(actionsByPhotoId[shareInstance.photo_id])
+				for action in actionsByPhotoId[shareInstance.photo_id]:
+					if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
+						actions.append(action)
 
 			actions = uniqueObjects(actions)
 			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, actions, user))
