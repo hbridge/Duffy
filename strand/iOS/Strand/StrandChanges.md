@@ -1,5 +1,10 @@
 # Swap v2
 
+## Dec 31st, 2014 (4823)
+
+- Performance improvements
+- Location functionality
+
 ## Dec 30th, 2014 (4822)
 
 - Performance improvements
