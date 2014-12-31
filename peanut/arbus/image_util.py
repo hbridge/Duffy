@@ -7,6 +7,7 @@ import tempfile
 import logging
 from datetime import datetime
 
+from django.core.files.storage import default_storage
 from django.utils import timezone
 
 import cv2
