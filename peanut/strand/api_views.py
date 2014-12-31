@@ -655,7 +655,7 @@ def swap_inbox(request):
 
 		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id])
 
-		shareInstances = filter(lambda x: x.photo.full_filename, shareInstances)
+		shareInstances = filter(lambda x: x.photo.thumb_filename, shareInstances)
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
 		printStats("swaps_inbox-1", printQueries=True)
 
