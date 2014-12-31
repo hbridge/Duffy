@@ -281,7 +281,7 @@ class Photo(models.Model):
 	"""
 	def getFullUrlImagePath(self):
 		if self.full_filename:
-			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
+			return "/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
 		else:
 			return ""
 
@@ -290,7 +290,7 @@ class Photo(models.Model):
 	"""
 	def getThumbUrlImagePath(self):
 		if self.thumb_filename:
-			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename) 
+			return "/%s/%s" % (self.user.getUserDataId(), self.thumb_filename) 
 		else:
 			return ""
 
@@ -672,17 +672,12 @@ class ShareInstance(models.Model):
 	last_action_timestamp = models.DateTimeField(db_index=True, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	mtm_key = models.IntegerField(null=True)
-	notification_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
 	@classmethod
 	def getIds(cls, objs):
 		return doGetIds(cls, objs)
-
-	@classmethod
-	def bulkUpdate(cls, objs, attributesList):
-		doBulkUpdate(cls, objs, attributesList)
 		
 	class Meta:
 		db_table = 'swap_share_instance'
