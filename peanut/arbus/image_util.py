@@ -241,6 +241,5 @@ def copyFileToS3(localFilePath, s3FilePath):
 	localFile = open(localFilePath, 'rb')
 	with default_storage.open(s3FilePath, 'wb+') as destination:
 		destination.write(localFile.read())
-	destination.close()
 	localFile.close()
 
