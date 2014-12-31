@@ -21,6 +21,7 @@
 @property (nonatomic, retain) UIView *popTargetView;
 @property (nonatomic, retain) MMPopLabel *popLabel;
 @property (nonatomic) CGFloat profilePhotoWidth;
+@property (nonatomic) CGRect lastFrame;
 
 @end
 
@@ -376,6 +377,15 @@
 {
   [popLabel removeFromSuperview];
   [self.popTargetView removeFromSuperview];
+}
+
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  if (!CGRectEqualToRect(self.frame, self.lastFrame)) {
+    self.lastFrame = self.frame;
+    [self invalidateIntrinsicContentSize];
+  }
 }
 
 
