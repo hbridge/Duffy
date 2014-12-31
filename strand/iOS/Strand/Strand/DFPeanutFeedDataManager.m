@@ -70,7 +70,6 @@
   if (self) {
     [self observeNotifications];
     _deferredCompletionBlocks = [NSMutableDictionary new];
-    self.inboxLastTimestamp = @"0";
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     [self refreshFromServer];
   }
@@ -105,7 +104,7 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-- (NSArray *)processFeedObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects
+- (NSArray *)processInboxFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects
 {
   if (!currentObjects) {
     return newObjects;
@@ -114,11 +113,11 @@ static DFPeanutFeedDataManager *defaultManager;
   NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
   
   for (DFPeanutFeedObject *object in currentObjects) {
-    [combinedObjectsById setObject:object forKey:@(object.id)];
+    [combinedObjectsById setObject:object forKey:object.share_instance];
   }
   
   for (DFPeanutFeedObject *object in newObjects) {
-    [combinedObjectsById setObject:object forKey:@(object.id)];
+    [combinedObjectsById setObject:object forKey:object.share_instance];
   }
   
   return [combinedObjectsById allValues];
@@ -151,17 +150,18 @@ static DFPeanutFeedDataManager *defaultManager;
   if (!self.inboxRefreshing) {
     self.inboxRefreshing = YES;
     NSMutableDictionary *parameters = [NSMutableDictionary new];
-    [parameters setObject:self.inboxLastTimestamp forKey:@"last_timestamp"];
+    if (self.inboxLastTimestamp) {
+      [parameters setObject:self.inboxLastTimestamp forKey:@"last_timestamp"];
+    }
     [self.inboxFeedAdapter
      fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
                                 NSData *responseHash,
                                 NSError *error) {
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
-       if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
-         self.inboxLastResponseHash = responseHash;
+       if (!error && ([response.objects count] > 1 || !self.inboxLastTimestamp)) {
          self.inboxLastTimestamp = response.timestamp;
-         self.inboxFeedObjects = [self processFeedObjects:self.inboxFeedObjects withNewObjects:response.objects];
+         self.inboxFeedObjects = [self processInboxFeed:self.inboxFeedObjects withNewObjects:response.objects];
          
          // For inbox only, we update our local cache of friends
          // If we refactor these methods to be common this will need to be pulled out
