@@ -538,6 +538,7 @@ static int const FetchStride = 500;
 static NSManagedObjectModel *_managedObjectModel = nil;
 static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 
+NSString * const MOMLock = @"momlock";
 // Returns the managed object model for the application.
 // If the model doesn't already exist, it is created from the application's model.
 + (NSManagedObjectModel *)managedObjectModel
@@ -545,11 +546,17 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   if (_managedObjectModel != nil) {
     return _managedObjectModel;
   }
-  NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Duffy" withExtension:@"momd"];
-  _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+  
+  @synchronized(MOMLock) {
+    if (_managedObjectModel) return _managedObjectModel;
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Duffy" withExtension:@"momd"];
+    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+  }
   return _managedObjectModel;
 }
 
+
+NSString * const PSCLock = @"lock";
 // Returns the persistent store coordinator for the application.
 // If the coordinator doesn't already exist, it is created and the application's store added to it.
 + (NSPersistentStoreCoordinator *)persistentStoreCoordinator
@@ -558,21 +565,24 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
     return _persistentStoreCoordinator;
   }
   
-  NSError *error = nil;
-  _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc]
-                                 initWithManagedObjectModel:[self managedObjectModel]];
-  if (![_persistentStoreCoordinator
-        addPersistentStoreWithType:NSSQLiteStoreType
-        configuration:nil
-        URL:[self storeURL]
-        options: @{
-                   NSMigratePersistentStoresAutomaticallyOption:@YES,
-                   }
-        error:&error]) {
-    
-    DDLogError(@"%@ error loading persistent store %@, %@", self, error, [error userInfo]);
-    [self deleteLocalDB];
-    [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
+  @synchronized(PSCLock) {
+    if (_persistentStoreCoordinator) return _persistentStoreCoordinator;
+    NSError *error = nil;
+    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc]
+                                   initWithManagedObjectModel:[self managedObjectModel]];
+    if (![_persistentStoreCoordinator
+          addPersistentStoreWithType:NSSQLiteStoreType
+          configuration:nil
+          URL:[self storeURL]
+          options: @{
+                     NSMigratePersistentStoresAutomaticallyOption:@YES,
+                     }
+          error:&error]) {
+      
+      DDLogError(@"%@ error loading persistent store %@, %@", self, error, [error userInfo]);
+      [self deleteLocalDB];
+      [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
+    }
   }
   
   return _persistentStoreCoordinator;
@@ -730,6 +740,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                 promptUserIfNecessary:(BOOL)promptUser
 {
   DDLogWarn(@"WARNING: %@ fetchMostRecentSavedPhotoDate should be rewritten.", self);
+  
   if ([ALAssetsLibrary authorizationStatus] != ALAuthorizationStatusAuthorized
       && !promptUser) {
     DDLogVerbose(@"Not authorized to check for last photo date and promptUser false.");
