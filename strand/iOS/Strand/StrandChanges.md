@@ -1,20 +1,16 @@
 # Swap v2
 
-## Dec 31st, 2014 (4823)
+## Dec 31st, 2014 (4822-4824)
 
 - Performance improvements
 - Location functionality
-
-## Dec 30th, 2014 (4822)
-
-- Performance improvements
 - Minor bug fixes
 
 
 ## Dec 14th, 2014 (4819-4820)
 
 - Updated new user experience
-- Views automatically refresh when new comments come in
+- Views automat∂ically refresh when new comments come in
 - Swipe between viewed photos in the gallery
 
 ## Dec 13th, 2014 (4816-4818)
