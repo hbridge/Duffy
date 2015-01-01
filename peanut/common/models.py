@@ -679,6 +679,10 @@ class ShareInstance(models.Model):
 	@classmethod
 	def getIds(cls, objs):
 		return doGetIds(cls, objs)
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		doBulkUpdate(cls, objs, attributesList)
 		
 	class Meta:
 		db_table = 'swap_share_instance'
