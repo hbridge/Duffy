@@ -672,6 +672,7 @@ class ShareInstance(models.Model):
 	last_action_timestamp = models.DateTimeField(db_index=True, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	mtm_key = models.IntegerField(null=True)
+	notification_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
