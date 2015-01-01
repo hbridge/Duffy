@@ -40,7 +40,6 @@
 @property (atomic) BOOL swapsRefreshing;
 @property (atomic) BOOL privateStrandsRefreshing;
 @property (atomic) BOOL actionsRefreshing;
-@property (nonatomic, retain) NSData *inboxLastResponseHash;
 @property (nonatomic, retain) NSData *swapsLastResponseHash;
 @property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
 @property (nonatomic, retain) NSData *actionsLastResponseHash;
@@ -279,12 +278,12 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (BOOL)hasInboxData{
-  return (self.inboxLastResponseHash != nil);
+  return (self.inboxLastTimestamp != nil);
 }
 
 - (BOOL)hasPrivateStrandData
 {
-  return (self.inboxLastResponseHash != nil);
+  return (self.privateStrandsLastResponseHash != nil);
 }
 
 - (BOOL)hasSwapsData
