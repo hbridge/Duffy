@@ -329,7 +329,7 @@ class Photo(models.Model):
 	"""
 	def getThumbUrlImagePath(self):
 		if self.thumb_filename:
-			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename)
+			return "/%s/%s" % (self.user.getUserDataId(), self.thumb_filename)
 		else:
 			return ""
 
