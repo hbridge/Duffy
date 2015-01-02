@@ -24,9 +24,9 @@ class StrandApiForm(forms.Form):
 		timestamp = self.cleaned_data['last_timestamp']
 
 		if not timestamp:
-			timestamp = 0
-
-		return datetime.datetime.fromtimestamp(timestamp)
+			return None
+		else:
+			return datetime.datetime.fromtimestamp(timestamp)
 
 class UserIdMixin():
 	def clean_user_id(self):

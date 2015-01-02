@@ -660,6 +660,21 @@ def private_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+# Need to create a key that is sortable, consistant (to deal with partial updates) and handles
+# many photos shared at once
+def getSortRanking(user, shareInstance, actions):
+	lastTimestamp = shareInstance.last_action_timestamp
+	for action in actions:
+		if (action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
+			action.user_id == user.id and
+			action.added > lastTimestamp):
+			lastTimestamp = action.added
+
+	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
+	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
+
+	return -1 * (a + b)
+
 def swap_inbox(request):
 	startProfiling()
 	response = dict({'result': True})
@@ -668,17 +683,35 @@ def swap_inbox(request):
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		lastTimestamp = form.cleaned_data['last_timestamp']
 		num = form.cleaned_data['num']
+
+		# Add in buffer for the last timestamp, or if not sent in, use long ago date
+		if form.cleaned_data['last_timestamp']:
+			lastTimestamp = form.cleaned_data['last_timestamp'] - datetime.timedelta(seconds=10)
+		else:
+			lastTimestamp = datetime.datetime.fromtimestamp(0)
 
 		responseObjects = list()
 
-		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp).order_by("-updated")
-
+		# Grab all share instances we want.  Might filter by a last timestamp for speed
+		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp).order_by("-updated", "id")
 		if num:
 			shareInstances = shareInstances[:num]
+
+		# The above search won't find photos that this user has evaluated if the last_action_timestamp
+		# is before the given lastTimestamp
+		# So in that case, lets search for all the actions since that timestamp and add those
+		# ShareInstances into the mix to be sorted
+		if form.cleaned_data['last_timestamp']:
+			recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(updated__gt=lastTimestamp).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
+
+			shareInstanceIds = ShareInstance.getIds(shareInstances)
+			shareInstances = list(shareInstances)
+			for action in recentlyEvaluatedActions:
+				if action.share_instance_id and action.share_instance_id not in shareInstanceIds:
+					shareInstances.append(action.share_instance)
 			
-		# First, filter out anything that doesn't have a thumb...unless its your own photo
+		# Now filter out anything that doesn't have a thumb...unless its your own photo
 		filteredShareInstances = list()
 		for shareInstance in shareInstances:
 			if shareInstance.user_id == user.id:
@@ -687,48 +720,35 @@ def swap_inbox(request):
 				filteredShareInstances.append(shareInstance)
 		shareInstances = filteredShareInstances
 		
+		# Now grab all the actions for these ShareInstances (comments, evals, likes)
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
 		printStats("swaps_inbox-1")
 
-		photoIds = list()
-		for shareInstance in shareInstances:
-			photoIds.append(shareInstance.photo_id)
-
-		actions = Action.objects.filter(Q(share_instance_id__in=shareInstanceIds) | Q(photo_id__in=photoIds))
+		actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
 		actionsByShareInstanceId = dict()
-		actionsByPhotoId = dict()
 		
 		for action in actions:
 			if action.share_instance_id not in actionsByShareInstanceId:
 				actionsByShareInstanceId[action.share_instance_id] = list()
 			actionsByShareInstanceId[action.share_instance_id].append(action)
 
-			if action.photo_id not in actionsByPhotoId:
-				actionsByPhotoId[action.photo_id] = list()
-			actionsByPhotoId[action.photo_id].append(action)
-
 		printStats("swaps_inbox-2")
 
-		count = 0
+		# Loop through all the share instances and create the feed data
 		for shareInstance in shareInstances:
 			actions = list()
 			if shareInstance.id in actionsByShareInstanceId:
 				actions = actionsByShareInstanceId[shareInstance.id]
 
-			if shareInstance.photo_id in actionsByPhotoId:
-				for action in actionsByPhotoId[shareInstance.photo_id]:
-					if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
-						actions.append(action)
-
 			actions = uniqueObjects(actions)
 			objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
 
 			# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
-			objectData['suggestion_rank'] = count
-			objectData['sort_rank'] = count
+			objectData['sort_rank'] = getSortRanking(user, shareInstance, actions)
+			objectData['suggestion_rank'] = objectData['sort_rank']
 			responseObjects.append(objectData)
-			count += 1
 
+		responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
 		printStats("swaps_inbox-3")
 
 		# Add in the list of all friends at the end
@@ -745,9 +765,8 @@ def swap_inbox(request):
 
 		printStats("swaps_inbox-end")
 
-
 		response["objects"] = responseObjects
-		response["timestamp"] = datetime.datetime.now() - datetime.timedelta(seconds=10)
+		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

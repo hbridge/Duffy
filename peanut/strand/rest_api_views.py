@@ -688,7 +688,7 @@ class CreateActionAPI(CreateAPIView):
             
     def post_save(self, action, created):
         if created:
-            if action.share_instance:
+            if action.share_instance and action.action_type == constants.ACTION_TYPE_COMMENT:
                 action.share_instance.last_action_timestamp = action.added
                 action.share_instance.save()
 
