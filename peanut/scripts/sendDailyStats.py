@@ -31,6 +31,7 @@ def compileData(date, length):
 		New Users:
 		New Friends: 
 		Check-ins:
+		Location Updates:
 		
 		--- PHOTOS (OLD USERS) ---
 		Photos Uploaded:		
@@ -71,12 +72,14 @@ def getUserStats(date, length, newUsers):
 	newUsers = len(newUsers)
 	newFriends = FriendConnection.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).count()
 	checkIns = User.objects.filter(last_checkin_timestamp__lt=date).filter(last_checkin_timestamp__gt=date-relativedelta(days=length)).count()
+	locationUpdates = User.objects.filter(last_location_timestamp__lt=date).filter(last_location_timestamp__gt=date-relativedelta(days=length)).count()	
 
 	# note that gdata api requires that dictionary keys be all lowercase and no spaces
 	return {'ActiveUsers': activeUsers,
 			'NewUsers': newUsers, 
 			'NewFriends': newFriends, 
-			'CheckIns': checkIns}
+			'CheckIns': checkIns,
+			'LocationUpdates': locationUpdates}
 
 
 def getPhotoStats(date, length, newUsers):
@@ -138,6 +141,7 @@ def dataDictToString(dataDict, length):
 	msg += "New Users: " + str(dataDict['NewUsers']) + "\n"
 	msg += "New Friends: " + str(dataDict['NewFriends']) + "\n"
 	msg += "Check-ins: " + str(dataDict['CheckIns']) + "\n"
+	msg += "Location Updates: " + str(dataDict['LocationUpdates']) + "\n"	
 
 	# photos, old users
 	msg += "\n--- PHOTOS (OLD USERS) ---\n"
@@ -197,7 +201,7 @@ def getStatsFromLocalytics(date, length):
 		conditions = {'week': ['between', dateBeginFormatted, dateEndFormatted]}
 		payload['dimensions'] = dimension
 	else:
-		logger.info("ERROR: length needs to be either 1 or 7")
+		logger.error("ERROR: length needs to be either 1 or 7")
 		sys.exit()
 
 	# Send the request to Localytics
@@ -252,10 +256,10 @@ def writeToSpreadsheet(dataDict, length):
 		if isinstance(result, gdata.spreadsheet.SpreadsheetsList):
 			return True
 		else:
-			logger.info("...FAILED worksheet for %s-day stats" % (length))
+			logger.error("...FAILED worksheet for %s-day stats" % (length))
 			return False
 	else:
-		logger.info('Error: date not found in spreadsheet. Please update first!')
+		logger.error('Error: date not found in spreadsheet. Please update first!')
 
 	return False
 
@@ -331,6 +335,7 @@ def main(argv):
 		print 'TEST RUN: Email not sent and nothing published.'
 		print "Use 'python scripts/sendDailyStats.py [sendall|sendemail|publish] '!\n"
 
+	logger.info('Finished')
 		
 		
 if __name__ == "__main__":
