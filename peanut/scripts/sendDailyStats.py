@@ -41,15 +41,11 @@ def compileData(date, length):
 		Photos Shared: 
 
 		--- ACTIONS (OLD USERS) ---
-		Swaps Created: 
-		Swaps Joined:
 		Photos Added:
 		Favorites:
 		Comments:
 
 		--- ACTIONS (NEW USERS) ---
-		Swaps Created: 
-		Swaps Joined:
 		Photos Added:
 		Favorites:
 		Comments:
