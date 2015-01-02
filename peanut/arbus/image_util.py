@@ -242,4 +242,9 @@ def copyFileToS3(localFilePath, s3FilePath):
 	with default_storage.open(s3FilePath, 'wb+') as destination:
 		destination.write(localFile.read())
 	localFile.close()
+	if default_storage.exists(s3FilePath):
+		logger.info("Uploaded file to s3: %s"%(s3FilePath))
+	else:
+		logger.error("Failed to upload file to s3: %s"%(s3FilePath))
+
 
