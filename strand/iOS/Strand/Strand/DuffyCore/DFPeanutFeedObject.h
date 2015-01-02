@@ -25,7 +25,6 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 extern DFFeedObjectType DFFeedObjectCluster;
 
 
-
 // Simple attribures
 @property (nonatomic) DFPhotoIDType id;
 @property (nonatomic, retain) DFFeedObjectType type;
@@ -44,7 +43,7 @@ extern DFFeedObjectType DFFeedObjectCluster;
 @property (nonatomic, retain) NSNumber *ready;
 @property (readonly, nonatomic, retain) NSArray *actor_ids;
 @property (nonatomic, retain) NSNumber *suggestible;
-@property (nonatomic, retain) NSNumber *suggestion_rank;
+@property (nonatomic, retain) NSNumber *sort_rank;
 @property (nonatomic, retain) NSString *suggestion_type;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;

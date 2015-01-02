@@ -143,15 +143,25 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion
 {
+  [self refreshInboxFromServer:completion fullRefresh:NO];
+}
+
+- (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion fullRefresh:(BOOL)fullRefresh
+{
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFInboxFeed];
   
   if (!self.inboxRefreshing) {
     self.inboxRefreshing = YES;
     NSMutableDictionary *parameters = [NSMutableDictionary new];
-    if (self.inboxLastTimestamp) {
+    if (self.inboxLastTimestamp && !fullRefresh) {
       [parameters setObject:self.inboxLastTimestamp forKey:@"last_timestamp"];
+    } else if (!self.inboxLastTimestamp && !fullRefresh) {
+      // If we don't have a last timestamp then we're doing a cold start.
+      // This fetch, grab just 20 elements, but also kick off a full refresh after this first one comes back
+      [parameters setObject:@(20) forKey:@"num"];
     }
+    
     [self.inboxFeedAdapter
      fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
                                 NSData *responseHash,
@@ -159,6 +169,11 @@ static DFPeanutFeedDataManager *defaultManager;
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
        if (!error && ([response.objects count] > 1 || !self.inboxLastTimestamp)) {
+         if (!self.inboxLastTimestamp && !fullRefresh) {
+             dispatch_async(dispatch_get_main_queue(), ^{
+               [self refreshInboxFromServer:completion fullRefresh:YES];
+             });
+         }
          self.inboxLastTimestamp = response.timestamp;
          self.inboxFeedObjects = [self processInboxFeed:self.inboxFeedObjects withNewObjects:response.objects];
          
@@ -507,12 +522,12 @@ static DFPeanutFeedDataManager *defaultManager;
   NSArray *suggestibleStrands = [self.swapsFeedObjects filteredArrayUsingPredicate:predicate];
   return [suggestibleStrands sortedArrayUsingComparator:
           ^NSComparisonResult(DFPeanutFeedObject *obj1, DFPeanutFeedObject *obj2) {
-            if (obj1.suggestion_rank && !obj2.suggestion_rank) {
+            if (obj1.sort_rank && !obj2.sort_rank) {
               return NSOrderedAscending;
-            } else if (obj2.suggestion_rank && !obj2.suggestion_rank) {
+            } else if (obj2.sort_rank && !obj2.sort_rank) {
               return NSOrderedDescending;
             } else {
-              return [obj1.suggestion_rank compare:obj2.suggestion_rank];
+              return [obj1.sort_rank compare:obj2.sort_rank];
             }
   }];
 }
@@ -755,13 +770,11 @@ static DFPeanutFeedDataManager *defaultManager;
   return photosSentByUser;
 }
 
-- (NSArray *)photosSortedByEvalTime:(NSArray *)photos
+- (NSArray *)sortedPhotos:(NSArray *)photos
 {
   NSArray *sortedArray;
   sortedArray = [photos sortedArrayUsingComparator:^NSComparisonResult(DFPeanutFeedObject *a, DFPeanutFeedObject *b) {
-    NSDate *dateA = a.evaluated_time ? a.evaluated_time : a.shared_at_timestamp;
-    NSDate *dateB = b.evaluated_time ? b.evaluated_time : b.shared_at_timestamp;
-    return [dateB compare:dateA];
+    return [a.sort_rank compare:b.sort_rank];
   }];
   
   return sortedArray;
@@ -774,13 +787,13 @@ static DFPeanutFeedDataManager *defaultManager;
   NSMutableSet *merged = [[NSMutableSet alloc] initWithCapacity:evaledPhotos.count + myPhotos.count];
   [merged addObjectsFromArray:evaledPhotos];
   [merged addObjectsFromArray:myPhotos];
-  return [self photosSortedByEvalTime:merged.allObjects];
+  return [self sortedPhotos:merged.allObjects];
 }
 
 - (NSArray *)favoritedPhotos
 {
   NSArray *photos = [self photosWithAction:DFPeanutActionFavorite];
-  return [self photosSortedByEvalTime:photos];
+  return [self sortedPhotos:photos];
 }
 
 - (NSArray *)photosWithActivity
@@ -791,7 +804,7 @@ static DFPeanutFeedDataManager *defaultManager;
   [merged addObjectsFromArray:commentedPhotos];
   NSSet *evaledPhotos = [[NSSet alloc] initWithArray:[self allEvaluatedOrSentPhotos]];
   [merged intersectSet:evaledPhotos];
-  return [self photosSortedByEvalTime:merged.allObjects];
+  return [self sortedPhotos:merged.allObjects];
 }
 
 - (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID shareInstance:(DFStrandIDType)shareInstance

@@ -86,7 +86,7 @@ static NSArray *FeedObjectTypes;
            @"ready",
            @"actor_ids",
            @"suggestible",
-           @"suggestion_rank",
+           @"sort_rank",
            @"suggestion_type",
            @"full_width",
            @"full_height",
@@ -396,7 +396,7 @@ static NSArray *FeedObjectTypes;
 {
   return @{
            @"suggestionType" : self.suggestion_type ? self.suggestion_type : @"",
-           @"suggestionRank" : self.suggestion_rank? self.suggestion_rank : @(0),
+           @"suggestionRank" : self.sort_rank? self.sort_rank : @(0),
            @"suggestionActorsCount" : @(self.actor_ids.count),
            };
 }
@@ -421,7 +421,7 @@ static NSArray *FeedObjectTypes;
   newObject.last_action_timestamp = [self.time_stamp copyWithZone:zone];
   newObject.ready = self.ready;
   newObject.suggestible = self.suggestible;
-  newObject.suggestion_rank = [self.suggestion_rank copyWithZone:zone];
+  newObject.sort_rank = [self.sort_rank copyWithZone:zone];
   newObject.suggestion_type = [self.suggestion_type copyWithZone:zone];
   newObject.full_height = [self.full_height copyWithZone:zone];
   newObject.full_width = [self.full_width copyWithZone:zone];
