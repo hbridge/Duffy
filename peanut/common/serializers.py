@@ -134,7 +134,7 @@ def actionDataForApiSerializer(action):
 	actionData['user'] = action.user_id
 	actionData['time_stamp'] = action.added
 	actionData['action_type'] = action.action_type
-	actionData['strand'] = action.strand_id
+	actionData['share_instance'] = action.share_instance_id
 
 	# TODO(Derek): This fetching of photos.all() can be removed in December once we've gone through a couple weeks of writing
 	#   out the photo element for Add actions

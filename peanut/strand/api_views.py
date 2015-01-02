@@ -839,20 +839,14 @@ def actions_list(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 
-		# This code is duplicated in notifications_util
-		# TODO(Derek): possibly refactor if we do stuff with this
-		strands = Strand.objects.filter(users__in=[user]).filter(private=False)
+		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-updated", "id")[:50]
 
-		strandIds = Strand.getIds(strands)
+		shareInstanceIds = ShareInstance.getIds(shareInstances)
 		
-		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(strand_id__in=strandIds).order_by("-added")[:40]
+		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance_id__in=shareInstanceIds).order_by("-added")
 
 		actionsData = list()
 		for action in actions:
-			# This filters out creates or requests with 0 photos
-			if len(action.photos.all()) == 0 and (action.action_type == constants.ACTION_TYPE_CREATE_STRAND or action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
-				continue
-				
 			actionsData.append(serializers.actionDataForApiSerializer(action))
 
 		actionsData = {'type': 'actions_list', 'actions': actionsData}
