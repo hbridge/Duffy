@@ -21,7 +21,7 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util, serializers
 
 from strand import geo_util, notifications_util, friends_util, strands_util, users_util
-from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, UserIdAndLastTimestampForm
+from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -664,16 +664,20 @@ def swap_inbox(request):
 	startProfiling()
 	response = dict({'result': True})
 
-	form = UserIdAndLastTimestampForm(api_util.getRequestData(request))
+	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		lastTimestamp = form.cleaned_data['last_timestamp']
+		num = form.cleaned_data['num']
 
 		responseObjects = list()
 
-		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp)
+		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp).order_by("-updated")
 
+		if num:
+			shareInstances = shareInstances[:num]
+			
 		# First, filter out anything that doesn't have a thumb...unless its your own photo
 		filteredShareInstances = list()
 		for shareInstance in shareInstances:
@@ -705,6 +709,7 @@ def swap_inbox(request):
 
 		printStats("swaps_inbox-2")
 
+		count = 0
 		for shareInstance in shareInstances:
 			actions = list()
 			if shareInstance.id in actionsByShareInstanceId:
@@ -716,7 +721,13 @@ def swap_inbox(request):
 						actions.append(action)
 
 			actions = uniqueObjects(actions)
-			responseObjects.append(serializers.objectDataForShareInstance(shareInstance, actions, user))
+			objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
+
+			# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
+			objectData['suggestion_rank'] = count
+			objectData['sort_rank'] = count
+			responseObjects.append(objectData)
+			count += 1
 
 		printStats("swaps_inbox-3")
 

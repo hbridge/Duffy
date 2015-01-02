@@ -17,7 +17,7 @@ from django.db.models import Count, Sum
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import User, FriendConnection, Action, StrandInvite, Photo, StrandNeighbor
+from common.models import User, FriendConnection, Action, StrandInvite, Photo, StrandNeighbor, ShareInstance
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,7 @@ def compileData(date, length):
 		New Users:
 		New Friends: 
 		Check-ins:
+		Location Updates:
 		
 		--- PHOTOS (OLD USERS) ---
 		Photos Uploaded:		
@@ -41,15 +42,11 @@ def compileData(date, length):
 		Photos Shared: 
 
 		--- ACTIONS (OLD USERS) ---
-		Swaps Created: 
-		Swaps Joined:
 		Photos Added:
 		Favorites:
 		Comments:
 
 		--- ACTIONS (NEW USERS) ---
-		Swaps Created: 
-		Swaps Joined:
 		Photos Added:
 		Favorites:
 		Comments:
@@ -71,29 +68,31 @@ def getNewUsers(date, length):
 
 def getUserStats(date, length, newUsers):
 
-	activeUsers = Action.objects.values('user').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).distinct().count()
+	activeUsers = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) | Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).values('user').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).distinct().count()
 	newUsers = len(newUsers)
 	newFriends = FriendConnection.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).count()
-	checkIns = User.objects.filter(last_photo_update_timestamp__lt=date).filter(last_photo_update_timestamp__gt=date-relativedelta(days=length)).count()
+	checkIns = User.objects.filter(last_checkin_timestamp__lt=date).filter(last_checkin_timestamp__gt=date-relativedelta(days=length)).count()
+	locationUpdates = User.objects.filter(last_location_timestamp__lt=date).filter(last_location_timestamp__gt=date-relativedelta(days=length)).count()	
 
 	# note that gdata api requires that dictionary keys be all lowercase and no spaces
 	return {'ActiveUsers': activeUsers,
 			'NewUsers': newUsers, 
 			'NewFriends': newFriends, 
-			'CheckIns': checkIns}
+			'CheckIns': checkIns,
+			'LocationUpdates': locationUpdates}
 
 
 def getPhotoStats(date, length, newUsers):
 
 	# Old users
 	newPhotosUploadedOldUsers = Photo.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).count()
-	newPhotosSharedOldUsers = Action.objects.prefetch_related('photos').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
+	newPhotosSharedOldUsers = ShareInstance.objects.exclude(user__in=newUsers).exclude(shared_at_timestamp__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(totalPhotos=Count('user')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
 	if newPhotosSharedOldUsers == None:
 		newPhotosSharedOldUsers = 0
 
 	# new users
 	newPhotosUploadedNewUsers = Photo.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).count()
-	newPhotosSharedNewUsers = Action.objects.prefetch_related('photos').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
+	newPhotosSharedNewUsers = ShareInstance.objects.filter(user__in=newUsers).exclude(shared_at_timestamp__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(totalPhotos=Count('user')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
 	if newPhotosSharedNewUsers == None:
 		newPhotosSharedNewUsers = 0
 
@@ -109,21 +108,15 @@ def getActionStats(date, length, newUsers):
 	dataDict = {}
 
 	# old users
-	actionTypeCounts = Action.objects.values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).annotate(totals=Count('action_type'))
+	actionTypeCounts = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) | Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).annotate(totals=Count('action_type'))
 
-	dataDict['SwapsCreatedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_CREATE_STRAND)
-	dataDict['SwapsJoinedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_JOIN_STRAND)
-	dataDict['PhotosAddedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
 	dataDict['FavsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_FAVORITE)
 	dataDict['CommentsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_COMMENT)
 	dataDict['PhotoEvalsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_PHOTO_EVALUATED)
 
 	# new users
-	actionTypeCounts = Action.objects.values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Count('action_type'))
+	actionTypeCounts = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) | Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Count('action_type'))
 
-	dataDict['SwapsCreatedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_CREATE_STRAND)
-	dataDict['SwapsJoinedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_JOIN_STRAND)
-	dataDict['PhotosAddedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
 	dataDict['FavsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_FAVORITE)
 	dataDict['CommentsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_COMMENT)
 	dataDict['PhotoEvalsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_PHOTO_EVALUATED)	
@@ -148,6 +141,7 @@ def dataDictToString(dataDict, length):
 	msg += "New Users: " + str(dataDict['NewUsers']) + "\n"
 	msg += "New Friends: " + str(dataDict['NewFriends']) + "\n"
 	msg += "Check-ins: " + str(dataDict['CheckIns']) + "\n"
+	msg += "Location Updates: " + str(dataDict['LocationUpdates']) + "\n"	
 
 	# photos, old users
 	msg += "\n--- PHOTOS (OLD USERS) ---\n"
@@ -160,19 +154,13 @@ def dataDictToString(dataDict, length):
 	msg += "Photos Shared: " + format(dataDict['PhotosSharedNewUsers'], ",d") + "\n"
 
 	# actions, old users
-	msg += "\n--- ACTIONS (OLD USERS) ---\n"	
-	msg += "Swaps Created: " + str(dataDict['SwapsCreatedOldUsers']) + '\n'
-	msg += "Swaps Joined: " + str(dataDict['SwapsJoinedOldUsers']) + '\n'	
-	msg += "Photos Added: " + str(dataDict['PhotosAddedOldUsers']) + '\n'
+	msg += "\n--- ACTIONS (OLD USERS) ---\n"
 	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsOldUsers']) + '\n'		
 	msg += "Favorites: " + str(dataDict['FavsOldUsers']) + '\n'
 	msg += "Comments: " + str(dataDict['CommentsOldUsers']) + '\n'
 
 	# actions, new users
 	msg += "\n--- ACTIONS (NEW USERS) ---\n"	
-	msg += "Swaps Created: " + str(dataDict['SwapsCreatedNewUsers']) + '\n'
-	msg += "Swaps Joined: " + str(dataDict['SwapsJoinedNewUsers']) + '\n'	
-	msg += "Photos Added: " + str(dataDict['PhotosAddedNewUsers']) + '\n'	
 	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsNewUsers']) + '\n'			
 	msg += "Favorites: " + str(dataDict['FavsNewUsers']) + '\n'
 	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'	
@@ -180,7 +168,7 @@ def dataDictToString(dataDict, length):
 
 def getStatsFromLocalytics(date, length):
 
-	print "Fetching data from Localytics for %s-day"%(length)
+	logger.info("Fetching data from Localytics for %s-day"%(length))
 
 	# Localytics API info
 
@@ -213,7 +201,7 @@ def getStatsFromLocalytics(date, length):
 		conditions = {'week': ['between', dateBeginFormatted, dateEndFormatted]}
 		payload['dimensions'] = dimension
 	else:
-		print "ERROR: length needs to be either 1 or 7"
+		logger.error("ERROR: length needs to be either 1 or 7")
 		sys.exit()
 
 	# Send the request to Localytics
@@ -222,15 +210,15 @@ def getStatsFromLocalytics(date, length):
 	# parse results
 	parsedResponse = json.loads(response.text)
 
-	print "Looking for date %s in Localytics results (%s-day)"%(dateBeginFormatted, length)
+	logger.info("Looking for date %s in Localytics results (%s-day)"%(dateBeginFormatted, length))
 
 	if 'results' in parsedResponse:
 		for entry in parsedResponse['results']:
 			if dimension in entry and (entry[dimension] == dateBeginFormatted or entry[dimension] == (dateBeginFormatted+'T00:00:00Z')):
-				print "found!"
+				logger.info("found!")
 				return {'LocalyticsActiveUsers': entry['users']} 
 				break
-	print "Not found!"
+	logger.info("Not found!")
 	return {'LocalyticsActiveUsers': ''}
 
 def writeToSpreadsheet(dataDict, length):
@@ -249,7 +237,7 @@ def writeToSpreadsheet(dataDict, length):
 		idParts = feed.entry[1].id.text.split('/')
 		worksheetId = idParts[len(idParts) - 1]
 	else:
-		print "...FAILED: Invalid length field. Not writing to spreadsheet!"
+		logger.info("...FAILED: Invalid length field. Not writing to spreadsheet!")
 		return False
 
 	# convert all keys to lowercase (Gdata requirement) and all values to string
@@ -268,10 +256,10 @@ def writeToSpreadsheet(dataDict, length):
 		if isinstance(result, gdata.spreadsheet.SpreadsheetsList):
 			return True
 		else:
-			print "...FAILED worksheet for %s-day stats" % (length)
+			logger.error("...FAILED worksheet for %s-day stats" % (length))
 			return False
 	else:
-		print 'Error: date not found in spreadsheet. Please update first!'
+		logger.error('Error: date not found in spreadsheet. Please update first!')
 
 	return False
 
@@ -308,7 +296,7 @@ def main(argv):
 		elif ("publish" in argv):
 			publishToSpreadSheet = True
 
-	print "Generating stats for %s " % (date-relativedelta(days=1)).strftime('%m/%d/%y')
+	logger.info("Generating stats for %s " % (date-relativedelta(days=1)).strftime('%m/%d/%y'))
 
 	# Compile data
 	dataDict1day = compileData(date, 1)
@@ -318,20 +306,20 @@ def main(argv):
 	emailBody = dataDictToString(dataDict7day, 7)
 	emailBody += dataDictToString(dataDict1day, 1)
 
-	print emailBody
+	logger.info(emailBody)
 
 	html = genHTML(emailBody)
 
 
 	# Send to spreadsheet
 	if publishToSpreadSheet:
-		print "Publishing to spreadsheet..."
+		logger.info("Publishing to spreadsheet...")
 		writeSeven = writeToSpreadsheet(dataDict7day, 7) # second param is length of stats like 7-day
 		writeOne = writeToSpreadsheet(dataDict1day, 1) # second param is useful for figuring out which worksheet
 		if writeSeven:
-			print '...Published %s-day stats' % (7)
+			logger.info('...Published %s-day stats' % (7))
 		if writeOne:
-			print '...Published %s-day stats' % (1)
+			logger.info('...Published %s-day stats' % (1))
 
 	# Send to email
 	if sendEmail:
@@ -341,12 +329,13 @@ def main(argv):
 			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
 		email.attach_alternative(html, "text/html")
 		email.send(fail_silently=False)
-		print 'Email Sent to: ' + ' '.join(emailTo)	
+		logger.info('Email Sent to: ' + ' '.join(emailTo))
 
 	if not publishToSpreadSheet and not sendEmail:
 		print 'TEST RUN: Email not sent and nothing published.'
 		print "Use 'python scripts/sendDailyStats.py [sendall|sendemail|publish] '!\n"
 
+	logger.info('Finished')
 		
 		
 if __name__ == "__main__":

@@ -44,25 +44,75 @@ def sendNewPhotoNotifications(shareInstance):
 		if user.id != shareInstance.user.id:
 			logger.debug("going to send %s to user id %s" % (msg, user.id))
 			customPayload = {'share_instance_id': shareInstance.id, 'id': shareInstance.photo.id}
-
 			notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
 	
 	return True
 
+def sendNewPhotoNotificationBatch(user, siList):
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	logger.debug("in sendNewPhotoNotificationsBatch for user id %s" % user.id)
+
+	if len(siList) == 1:
+		msg = "You have %s new photo from %s" % (len(siList), siListToUserPhrase(siList))		
+	else:
+		msg = "You have %s new photos from %s" % (len(siList), siListToUserPhrase(siList))
+
+	logger.info("going to send '%s' to user id %s" %(msg, user.id))
+	customPayload = {'share_instance_id': siList[0].id, 'id': siList[0].photo.id}
+	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
+
+
+def siListToUserPhrase(siList):
+	userNames = set()
+	
+	for si in siList:
+		userNames.add(si.user.display_name.split(' ', 1)[0])
+
+	userPhrase = ""
+	userNames = list(userNames)
+	if len(userNames) == 1:
+		userPhrase = userNames[0]
+	elif len(userNames) == 2:
+		userPhrase = userNames[0] + " and " + userNames[1]
+	elif len(userNames) > 2:
+		userPhrase = ', '.join(userNames[:-1]) + ', and ' + userNames[-1]
+	
+	return userPhrase
+
 def main(argv):
 	logger.info("Starting... ")
 	notificationTimedelta = datetime.timedelta(seconds=300)
+	recencyTimedelta = datetime.timedelta(seconds=30)
 	
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		notificationsSent = list()
 
-		shareInstances = ShareInstance.objects.filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta)
+		shareInstancesSent = ShareInstance.objects.filter(notification_sent__isnull=False).filter(added__gt=now-recencyTimedelta)
+		shareInstancesPending = ShareInstance.objects.filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(photo__full_filename__isnull=False)
 
-		for shareInstance in shareInstances:
-			if sendNewPhotoNotifications(shareInstance):
-				shareInstance.notification_sent = now
-				notificationsSent.append(shareInstance)
+		usersSentNotsRecently = [si.user.id for si in shareInstancesSent]
+		logger.debug("Users who sent a notification recently: %s"%(str(usersSentNotsRecently)))
+
+		siByUser = dict()
+
+		for si in shareInstancesPending:
+			if si.user.id in usersSentNotsRecently:
+				# skip if this user has sent a shareInstance (that we notified someone of) recently
+				logger.info("skipping userId %s"%(si.user.id))
+				continue
+			else:
+				notificationsSent.append(si)
+				si.notification_sent = now
+				for user in si.users.all():
+					if user != si.user:
+						if user in siByUser:
+							siByUser[user].append(si)
+						else:
+							siByUser[user] = [si]
+
+		for user, siList in siByUser.items():
+			sendNewPhotoNotificationBatch(user, siList)
 
 		if len(notificationsSent) > 0:
 			ShareInstance.bulkUpdate(notificationsSent, ['notification_sent'])
