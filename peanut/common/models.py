@@ -683,10 +683,14 @@ class ShareInstance(models.Model):
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		doBulkUpdate(cls, objs, attributesList)
+
+	def __unicode__(self):
+		return '%s | %s | %s | %s'%(self.id, self.user, self.photo, self.shared_at_timestamp)
 		
 	class Meta:
 		db_table = 'swap_share_instance'
-	
+
+
 
 	
 class StrandInvite(models.Model):
