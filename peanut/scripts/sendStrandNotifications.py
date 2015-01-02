@@ -52,7 +52,10 @@ def sendNewPhotoNotificationBatch(user, siList):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	logger.debug("in sendNewPhotoNotificationsBatch for user id %s" % user.id)
 
-	msg = "You have %s new photos from %s in Swap" % (len(siList), siListToUserPhrase(siList))
+	if len(siList) == 1:
+		msg = "You have %s new photo from %s" % (len(siList), siListToUserPhrase(siList))		
+	else:
+		msg = "You have %s new photos from %s" % (len(siList), siListToUserPhrase(siList))
 
 	logger.info("going to send '%s' to user id %s" %(msg, user.id))
 	logger.debug("going to send %s to user id %s" % (msg, user.id))
