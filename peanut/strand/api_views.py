@@ -675,6 +675,11 @@ def getSortRanking(user, shareInstance, actions):
 			if not lastTimestamp or action.added > lastTimestamp:
 				lastTimestamp = action.added
 
+
+	if not lastTimestamp:
+		# this will happen for photos that need to be evaluated
+		return 0
+		
 	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
 	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
 
@@ -755,6 +760,11 @@ def swap_inbox(request):
 
 		responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
 		
+		count = 0
+		for responseObject in responseObjects:
+			responseObject["debug_rank"] = count
+			count += 1
+
 		printStats("swaps_inbox-3")
 
 		# Add in the list of all friends at the end

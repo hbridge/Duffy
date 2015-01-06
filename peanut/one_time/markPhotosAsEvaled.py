@@ -49,7 +49,7 @@ def main(argv):
                 if photoAction.added > shareInstance.added:
                     newAction.added = photoAction.added
                 else:
-                    newAction.added = shareInstance.added
+                    newAction.added = shareInstance.shared_at_timestamp
                 newAction.save()
 
                 print "Created action %s for photo %s and user %s" % (newAction.id, newAction.photo_id, newAction.user_id)
