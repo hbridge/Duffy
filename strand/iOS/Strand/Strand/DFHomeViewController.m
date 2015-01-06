@@ -257,18 +257,10 @@ static BOOL showFilters = NO;
 
 + (NSArray *)sectionsFromFeedPhotos:(NSArray *)feedPhotos
 {
-  // sort by activity date
-  NSArray *sorted = [feedPhotos sortedArrayUsingComparator:^NSComparisonResult(DFPeanutFeedObject *photo1, DFPeanutFeedObject *photo2) {
-    DFPeanutAction *photo1Latest = [photo1 mostRecentAction];
-    DFPeanutAction *photo2Latest = [photo2 mostRecentAction];
-    // want reverse sort so reverse comparison
-    return [photo2Latest.time_stamp compare:photo1Latest.time_stamp];
-  }];
-  
   // create arrays for last week and older
   NSMutableArray *lastWeek = [NSMutableArray new];
-  NSMutableArray *older = [sorted mutableCopy];
-  for (DFPeanutFeedObject *photo in sorted) {
+  NSMutableArray *older = [feedPhotos mutableCopy];
+  for (DFPeanutFeedObject *photo in feedPhotos) {
     DFPeanutAction *mostRecentAction = [photo mostRecentAction];
     NSTimeInterval timeAgo = [[mostRecentAction time_stamp] timeIntervalSinceNow];
     if (timeAgo < -60*60*24*7) break;
