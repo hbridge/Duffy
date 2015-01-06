@@ -744,11 +744,16 @@ def swap_inbox(request):
 			objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
 
 			# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
-			objectData['sort_rank'] = getSortRanking(user, shareInstance, actions)
-			objectData['suggestion_rank'] = objectData['sort_rank']
+			objectData['sort_rank_1'] = getSortRanking(user, shareInstance, actions)
+			objectData['suggestion_rank'] = objectData['sort_rank_1']
 			responseObjects.append(objectData)
 
-		responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
+		responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank_1'])
+
+		count = 0
+		for responseObject in responseObjects:
+			responseObject['sort_rank'] = count
+			count += 1
 		printStats("swaps_inbox-3")
 
 		# Add in the list of all friends at the end
