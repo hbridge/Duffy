@@ -296,9 +296,9 @@ class Photo(models.Model):
 
 	def photoHtml(self):
 		if self.thumb_filename:
-			return "<img src='%s'></img>" % (self.getThumbUrlImagePath())
+			return "<img src='%s%s'></img>" % (constants.AWS_IMAGES_PATH, self.getThumbUrlImagePath())
 		if self.full_filename:
-			return "<img src='%s'></img>" % (self.getFullUrlImagePath())
+			return "<img src='%s%s'></img>" % (constants.AWS_IMAGES_PATH, self.getFullUrlImagePath())
 		else:
 			return "No image"
 	photoHtml.allow_tags = True
