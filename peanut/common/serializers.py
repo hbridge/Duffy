@@ -94,9 +94,9 @@ def objectDataForShareInstance(shareInstance, actions, user):
 		elif action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user_id == user.id:
 			userEvalAction = action
 
-	if userEvalAction:
+	if userEvalAction or shareInstance.user_id == user.id:
 		shareInstanceData['evaluated'] = True
-		shareInstanceData['evaluated_time'] = action.added
+		shareInstanceData['evaluated_time'] = ""
 	else:
 		shareInstanceData['evaluated'] = False
 		
