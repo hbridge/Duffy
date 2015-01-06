@@ -663,12 +663,17 @@ def private_strands(request):
 # Need to create a key that is sortable, consistant (to deal with partial updates) and handles
 # many photos shared at once
 def getSortRanking(user, shareInstance, actions):
-	lastTimestamp = shareInstance.last_action_timestamp
+	lastTimestamp = None
+
+	if shareInstance.user_id == user.id:
+		lastTimestamp = shareInstance.shared_at_timestamp
+
 	for action in actions:
-		if (action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
-			action.user_id == user.id and
-			action.added > lastTimestamp):
-			lastTimestamp = action.added
+		if ((action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
+			action.user_id == user.id) or
+			action.action_type == constants.ACTION_TYPE_COMMENT):
+			if not lastTimestamp or action.added > lastTimestamp:
+				lastTimestamp = action.added
 
 	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
 	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
