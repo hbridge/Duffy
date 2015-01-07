@@ -16,20 +16,29 @@ from django.db.models import Q
 from peanut.settings import constants
 from common.models import Action, StrandInvite, Photo, NotificationLog, User, ShareInstance
 
-from strand import notifications_util
+from strand import notifications_util, friends_util
 
 logger = logging.getLogger(__name__)
 
 
 def sendSummaryFirestarterText(msgCount=10, testRun=True):
 	sentCount = 0
-	#url = 'http://bit.ly/swap-beta'
 	url = 'bit.ly/openswap'
 
-	# find users in the last n-days that have something in their inbox
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	start = now - datetime.timedelta(days=7)
 	end = now - datetime.timedelta(days=0)
+
+	# fetch all the users who have been sent this firestarter in the last week 
+	logEntries = NotificationLog.objects.prefetch_related('user').filter(added__gt=start).filter(msg_type=constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS)
+
+	# Convert that into a list
+	phoneNumList = list()
+	for logEntry in logEntries:
+		if logEntry.phone_number:
+			phoneNumList.append(str(logEntry.phone_number))
+		else:
+			phoneNumList.append(str(logEntry.user.phone_number))
 
 	# fetch all shareInstances from last week that were uploaded
 	shareInstances = ShareInstance.objects.prefetch_related('users').filter(shared_at_timestamp__gt=start).filter(shared_at_timestamp__lt=end).exclude(photo__full_filename__isnull=True)
@@ -59,37 +68,25 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 					for action in actionsByUser[user.id]:
 						if action.photo == si.photo:
 							siEvaluated = True
-				if not siEvaluated:
+				if not siEvaluated and str(user.phone_number) not in phoneNumList:
 					if user in incomingListByUser:
 						incomingListByUser[user].append(si)
 					else:
 						incomingListByUser[user] = [si]
 
 
-
-	# fetch all the users who have been sent an invite in the last week 
-	logEntries = NotificationLog.objects.prefetch_related('user').filter(added__gt=start).filter(msg_type=constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS)
-
-	# Convert that into a list
-	phoneNumList = list()
-	for logEntry in logEntries:
-		if logEntry.phone_number:
-			phoneNumList.append(str(logEntry.phone_number))
-		else:
-			phoneNumList.append(str(logEntry.user.phone_number))
-
 	for user, siList in incomingListByUser.items():
 		if msgCount == 0:
 			break
 
-		photoPhrase, userPhrase = listsToPhrases(siList)
+		photoPhrase, userPhrase = listsToPhrases(siList, friends_util.getFriendsIds(user.id))
 
 		if photoPhrase == '':
 			# No photos were found, skip
 			continue
 
 		# generate the message
-		msg = "You have %s from %s waiting for you in Swap" % (photoPhrase, userPhrase)
+		msg = "You have %s %s waiting for you in Swap" % (photoPhrase, userPhrase)
 		sentCount+= 1
 		msgCount -= 1		
 
@@ -119,7 +116,7 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 
 	return sentCount
 
-def listsToPhrases(siList):
+def listsToPhrases(siList, friendList):
 	photoCount = len(siList)
 	userNames = set()
 	
@@ -130,16 +127,24 @@ def listsToPhrases(siList):
 		photoPhrase = "%s photos" % (photoCount)
 
 	for si in siList:
-		userNames.add(si.user.display_name.split(' ', 1)[0])
+		if si.user.id in friendList:
+			userNames.add(si.user.display_name.split(' ', 1)[0])
+		else:
+			for user in si.users.all():
+				if user.id in friendList:
+					userNames.add(user.display_name.split(' ', 1)[0])
+
 
 	userPhrase = ""
 	userNames = list(userNames)
+	if len(userNames) == 0:
+		userPhrase = ''
 	if len(userNames) == 1:
-		userPhrase = userNames[0]
+		userPhrase = 'from ' + userNames[0]
 	elif len(userNames) == 2:
-		userPhrase = userNames[0] + " and " + userNames[1]
+		userPhrase = "from " + userNames[0] + " and " + userNames[1]
 	elif len(userNames) > 2:
-		userPhrase = ', '.join(userNames[:-1]) + ', and ' + userNames[-1]
+		userPhrase = "from " + ', '.join(userNames[:-1]) + ', and ' + userNames[-1]
 	
 	return (photoPhrase, userPhrase)
 
