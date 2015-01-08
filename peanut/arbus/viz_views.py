@@ -189,7 +189,7 @@ def userbaseSummary(request):
 
 		entry['internal'] = False
 
-		if ((len(user.display_name) == 0) or ('555555' in str(user.phone_number))):
+		if ('555555' in str(user.phone_number)):
 			entry['internal'] = True
 		else:
 			for phoneNum in constants.DEV_PHONE_NUMBERS:
