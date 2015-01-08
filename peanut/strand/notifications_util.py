@@ -8,8 +8,9 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from peanut.settings import constants
-from common.models import NotificationLog, DuffyNotification, Action, User, Strand
+from common.models import NotificationLog, DuffyNotification, Action, User, Strand, ShareInstance
 from common.api_util import DuffyJsonEncoder
+from strand import strands_util
 
 from ios_notifications.models import APNService, Device
 from twilio.rest import TwilioRestClient
@@ -153,15 +154,20 @@ def threadedSendNotifications(userIds):
 	# This might take a while since we have to hit apple's api.  Ok since we're in a new thread.
 	for user in users:
 		customPayload = dict()
+		count = 0
 
 		if user.id in actionsByUserId:
-			customPayload["badge"] = len(actionsByUserId[user.id])
+			count += len(actionsByUserId[user.id])
+			
+		#now add the suggestions from last week
+		count += len(strands_util.getRecentStrandNeighborSuggestions(user))
+
+		customPayload["badge"] = str(count)
 		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
 
 
 def getActionsByUserId(users):
 	actionsByUserId = dict()
-	#strands = Strand.objects.prefetch_related('user').filter(users__in=User.getIds(users)).filter(private=False)
 	shareInstances = ShareInstance.objects.prefetch_related('user').filter(users__in=User.getIds(users))
 
 	sisById = dict()
@@ -195,7 +201,6 @@ def sendNotificationsUponActions(sender, **kwargs):
 		users.append(action.user)
 
 	userIds = User.getIds(users)
-	
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
 
 
