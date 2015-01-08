@@ -168,7 +168,7 @@ def userbaseSummary(request):
 		if user.id in lastActionTimeById:
 			entry['lastActionTimestamp'] = lastActionTimeById[user.id]
 		else:
-			entry['lastActionTimestamp'] = user.added
+			entry['lastActionTimestamp'] = '-'
 
 		entry['lastActionTime'] = entry['lastActionTimestamp'].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 
