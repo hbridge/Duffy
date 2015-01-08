@@ -158,9 +158,12 @@ def threadedSendNotifications(userIds):
 
 		if user.id in actionsByUserId:
 			count += len(actionsByUserId[user.id])
-			
-		#now add the suggestions from last week
+
+		# now add the suggestions from last week
 		count += len(strands_util.getRecentStrandNeighborSuggestions(user))
+
+		# now add the count of photos in Incoming (meaning unread)
+		count += strands_util.getIncomingBadgeCount(user)
 
 		customPayload["badge"] = str(count)
 		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
