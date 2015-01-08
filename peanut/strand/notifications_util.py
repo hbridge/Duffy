@@ -161,18 +161,19 @@ def threadedSendNotifications(userIds):
 
 def getActionsByUserId(users):
 	actionsByUserId = dict()
-	strands = Strand.objects.prefetch_related('user').filter(users__in=User.getIds(users)).filter(private=False)
+	#strands = Strand.objects.prefetch_related('user').filter(users__in=User.getIds(users)).filter(private=False)
+	shareInstances = ShareInstance.objects.prefetch_related('user').filter(users__in=User.getIds(users))
 
-	strandsById = dict()
-	for strand in strands:
-		strandsById[strand.id] = strand
+	sisById = dict()
+	for si in shareInstances:
+		sisById[si.id] = si
 
-	actions = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(strand_id__in=Strand.getIds(strands)).order_by("-added")[:40]
+	actions = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance_id__in=ShareInstance.getIds(shareInstances)).order_by("-added")[:40]
 
 	for user in users:
 		for action in actions:
 			if (action.user_id != user.id and 
-				user in strandsById[action.strand_id].users.all() and
+				user in sisById[action.share_instance_id].users.all() and
 				action.added > user.last_actions_list_request_timestamp):
 
 				if user.id not in actionsByUserId:
