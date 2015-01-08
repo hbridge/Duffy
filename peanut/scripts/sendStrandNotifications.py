@@ -82,7 +82,7 @@ def siListToUserPhrase(siList):
 def main(argv):
 	logger.info("Starting... ")
 	notificationTimedelta = datetime.timedelta(seconds=300)
-	recencyTimedelta = datetime.timedelta(seconds=30)
+	recencyTimedelta = datetime.timedelta(seconds=60)
 	
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
