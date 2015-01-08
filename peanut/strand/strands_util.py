@@ -266,9 +266,9 @@ def getRecentStrandNeighborSuggestions(user):
 		else:
 			strandIds.append(strandNeighbor.strand_2_id)
 
-	lastWeek = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=7)
+	timeago = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=14)
 	
-	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=lastWeek ).order_by('-first_photo_time')
+	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=timeago).order_by('-first_photo_time')
 
 	# The prefetch for 'user' took a while here so just do it manually
 	for strand in strands:
