@@ -75,8 +75,8 @@ class SwapTests(unittest.TestCase):
 		return contacts
 	
 	### Functions to access specific pages
-	def getStrandInbox(self, userId):
-		return self.getResultFromURL('strand_inbox', {'user_id':userId})
+	def getSwapInbox(self, userId):
+		return self.getResultFromURL('swap_inbox', {'user_id':userId})
 
 	def getSwaps(self, userId):
 		return self.getResultFromURL('swaps', {'user_id':userId})
@@ -111,10 +111,10 @@ class SwapTests(unittest.TestCase):
 	### 1. Tests for existing users ###
 
 	# Loads Inbox page
-	def testStrandInbox(self):
+	def testSwapInbox(self):
 		realUsersList = self.getRandomUsers()
 		for userId in realUsersList:
-			result = self.getStrandInbox(userId)
+			result = self.getSwapInbox(userId)
 			self.assertTrue("objects" in result)
 
 	# Load Swaps tab
