@@ -297,10 +297,10 @@ def swaps(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		swapsObjects = swaps_util.getFeedObjectsForSwaps(user)
+		objs = swaps_util.getFeedObjectsForSwaps(user)
 		
 		stats_util.printStats("swaps-end")
-		response['objects'] = swapsObjects
+		response['objects'] = objs
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

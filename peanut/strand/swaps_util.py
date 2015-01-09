@@ -338,11 +338,13 @@ def getGroupsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = 
 
 	return groups
 
-def getPhotoCountFromResponseObjects(responseObjects):
+def getPhotoCountFromFeedObjects(feedObjects):
 	count = 0
-	for obj in responseObjects:
+	for obj in feedObjects:
 		if obj['type'] == "photo":
 			count += 1
+		else:
+			count += getPhotoCountFromFeedObjects(obj['objects'])
 
 	return count
 

@@ -161,7 +161,7 @@ def threadedSendNotifications(userIds):
 
 		# now add the suggestions from last week
 		objs = swaps_util.getFeedObjectsForSwaps(user)
-		count += swaps_util.getPhotoCountFromResponseObjects(objs)
+		count += swaps_util.getPhotoCountFromFeedObjects(objs)
 
 		# now add the count of photos in Incoming (meaning unread)
 		count += strands_util.getIncomingBadgeCount(user)
