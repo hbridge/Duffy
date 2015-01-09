@@ -18,6 +18,9 @@ def printStats(title, printQueries = False):
 	global lastCheckinTime
 	global lastCheckinQueryCount
 
+	if not lastCheckinTime:
+		startProfiling()
+
 	now = datetime.datetime.now()
 	msTime = ((now-lastCheckinTime).microseconds / 1000 + (now-lastCheckinTime).seconds * 1000)
 	lastCheckinTime = now
