@@ -155,8 +155,10 @@ def getBuildNumForUser(user):
 def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
 
-	objects = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
-	objects = sorted(objects, key=lambda x: x['time_taken'], reverse=True)
+	groups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
+	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
+
+	objects = getObjectsDataFromGroups(groups)
 
 	for suggestion in objects:
 		suggestion['suggestible'] = True
@@ -619,9 +621,6 @@ def send_notifications_test(request):
 
 	if data.has_key('id'):
 		customPayload['id'] = int(data['id'])
-
-	if data.has_key('badge'):
-		customPayload['badge'] = int(data['badge'])
 
 	notifications_util.sendNotification(user, msg, msgTypeId, customPayload)
 
