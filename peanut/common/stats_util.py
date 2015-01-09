@@ -5,11 +5,14 @@ from django.db import connection
 requestStartTime = None
 lastCheckinTime = None
 lastCheckinQueryCount = 0
+statsInited = False
 
 def startProfiling():
 	global requestStartTime
 	global lastCheckinTime
 	global lastCheckinQueryCount
+	global statsInited
+	statsInited = True
 	requestStartTime = datetime.datetime.now()
 	lastCheckinTime = requestStartTime
 	lastCheckinQueryCount = 0
@@ -17,9 +20,10 @@ def startProfiling():
 def printStats(title, printQueries = False):
 	global lastCheckinTime
 	global lastCheckinQueryCount
-
-	if not lastCheckinTime:
-		startProfiling()
+	global statsInited
+	
+	if not statsInited:
+		return
 
 	now = datetime.datetime.now()
 	msTime = ((now-lastCheckinTime).microseconds / 1000 + (now-lastCheckinTime).seconds * 1000)
