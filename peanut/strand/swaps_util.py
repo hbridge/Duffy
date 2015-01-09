@@ -174,6 +174,12 @@ def getGroupsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = 
 
 	return groups
 
+def getAllPhotosFromGroups(groups):
+	photos = list()
+	for group in groups:
+		photos.extend(group['photos'])
+
+	return photos
 
 def filterEvaluatedPhotosFromGroups(user, groups):
 	photoIds = list()
