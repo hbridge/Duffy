@@ -98,7 +98,7 @@ def getObjectsDataFromGroups(groups):
 def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
 
-	groups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
+	groups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
 	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
 
 	objects = getObjectsDataFromGroups(groups)
