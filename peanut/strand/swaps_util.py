@@ -177,6 +177,10 @@ def getGroupsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = 
 
 def filterEvaluatedPhotosFromGroups(user, groups):
 	photoIds = list()
+	groupsToReturn = list()
+
+	if len(groups) == 0:
+		return groupsToReturn
 
 	for group in groups:
 		photoIds.extend(Photo.getIds(group['photos']))
@@ -189,7 +193,7 @@ def filterEvaluatedPhotosFromGroups(user, groups):
 			actionsByPhotoIdCache[action.photo_id] = list()
 		actionsByPhotoIdCache[action.photo_id].append(action)
 
-	groupsToReturn = list()
+	
 	for group in groups:
 		# Have to make a list() of this since we need an independent copy to loop through
 		photosNotEvaluated = list(group['photos'])
