@@ -17,7 +17,7 @@ from django.db.models import Count, Sum
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import User, FriendConnection, Action, StrandInvite, Photo, StrandNeighbor, ShareInstance
+from common.models import User, FriendConnection, Action, Photo, StrandNeighbor, ShareInstance
 
 logger = logging.getLogger(__name__)
 

@@ -14,7 +14,7 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import Action, StrandInvite, Photo, NotificationLog, User, ShareInstance
+from common.models import Action, Photo, NotificationLog, User, ShareInstance
 
 from strand import notifications_util, friends_util
 

@@ -18,7 +18,7 @@ django.setup()
 from django.db.models import Count, Q
 
 from peanut.settings import constants
-from common.models import Photo, Strand, User, StrandNeighbor, StrandInvite, LocationRecord
+from common.models import Photo, Strand, User, StrandNeighbor, LocationRecord
 
 from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
@@ -34,41 +34,6 @@ def dealWithDeadStrand(strand, strandsCache):
 	strand.delete()
 
 	return strandsCache
-	
-def dealWithFirstRun(user):
-	update = False
-	if not user.first_run_sync_complete:
-		if user.first_run_sync_count:
-			# If there are no matching photos from the client, then sync is complete
-			if user.first_run_sync_count == 0:
-				update = True
-			else:
-				# If there are 
-				strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
-				if strandInvites.count() == 0:
-					update = True
-				else:
-					lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-					if lastStrandedPhotos[0].time_taken <= strandInvites[0].strand.first_photo_time:
-						update = True
-					else:
-						# This means that we have a count, but we haven't actually reached the right date
-						#   this happens if the client is really fast uploading photos, then we might be stranding
-						#   new photos and the invite was an old one.  We want to wait until we hit the age of the old one
-						#   to make sure we find any matches
-						pass
-		else:
-			# This means the client hasn't given us any information yet.
-			# if this happens, then just see if we've stranded anything, if so, then call things good to go.
-			lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-			if lastStrandedPhotos.count() > 0:
-				update = True
-
-	if update:
-		user.first_run_sync_complete = True
-		logger.info("Updated first_run_sync_complete for user %s", user)
-		user.save()
-		
 
 
 def threadedSendNotifications(userIds):
@@ -260,8 +225,6 @@ def main(argv):
 				photo.strand_evaluated = True
 			
 			Photo.bulkUpdate(photos, ["strand_evaluated", "is_dup"])
-
-			dealWithFirstRun(user)
 
 			logger.debug("Created %s new strands, now creating neighbor rows" % len(strandsCreated))
 

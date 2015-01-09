@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, Strand, StrandInvite, Action
+from common.models import Photo, User, Classification, Strand, Action
 
 from arbus.forms import ManualAddPhoto
 from strand.forms import InappropriateContentForm
@@ -59,20 +59,8 @@ def strandStats(request):
 	userCounts['b3'] = userBucket3
 	userCounts['b4'] = userBucket4
 
-
-	# stats on invites
-	invites = StrandInvite.objects.filter(added__gt='2014-09-25 00:50:19')
-	accepted = invites.filter(accepted_user_id__isnull=False)
-
-	inviteCounts = dict()
-	inviteCounts['all'] = invites.count()
-	inviteCounts['accepted'] = accepted.count()
-
-	inviteCounts['swapped'] = Action.objects.select_related().filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND).annotate(strandUsers=Count('strand__users')).filter(strandUsers__gt=1).count()
-
 	context = {	'strandCounts': strandCounts,
-				'userCounts': userCounts,
-				'inviteCounts': inviteCounts}
+				'userCounts': userCounts}
 	return render(request, 'strand/strandStats.html', context)
 
 

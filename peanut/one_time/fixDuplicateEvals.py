@@ -17,7 +17,7 @@ from django.db.models import Count, Sum
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import User, FriendConnection, Action, StrandInvite, Photo, StrandNeighbor
+from common.models import User, FriendConnection, Action, Photo, StrandNeighbor
 
 def getActionsListForUserId(userId, count=1000):
 	actionList = list(Action.objects.filter(user=userId).filter(action_type=5).order_by('added')[:count])

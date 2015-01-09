@@ -4,40 +4,13 @@ import os
 
 from django.db.models import Q
 
-from common.models import User, FriendConnection, ContactEntry, StrandInvite
+from common.models import User, FriendConnection, ContactEntry
 
 logger = logging.getLogger(__name__)
 
 
 def initNewUser(user, fromSmsAuth, buildNum):
 	logger.debug("Initing new user %s" % user.id)
-
-	# Now pre-populate friends who this user was invited by
-	invitedBy = ContactEntry.objects.filter(phone_number=user.phone_number).filter(contact_type="invited").exclude(skip=True)
-	
-	for invite in invitedBy:
-		FriendConnection.addConnection(user, invite.user)
-		
-	# Now fill in strand invites for this phone number
-	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user__isnull=True).filter(accepted_user__isnull=True)
-	seenInvitesFromUsers = list()
-	for strandInvite in strandInvites:
-		strandInvite.invited_user = user
-
-		# Temp solution for using invites to hold incoming pictures
-		if fromSmsAuth and (not buildNum or (buildNum and int(buildNum) > 4805)):
-			strandInvite.accepted_user = user
-			
-			if user not in strandInvite.strand.users.all():
-				action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-				strandInvite.strand.users.add(user)
-
-		strandInvite.save()
-		
-	if len(strandInvites) > 0:
-		user.first_run_sync_timestamp = strandInvites[0].strand.first_photo_time
-
-		logger.debug("Updated %s invites with user id %s and set first_run_sync_timestamp to %s" % (len(strandInvites), user.id, user.first_run_sync_timestamp))
 
 	contacts = ContactEntry.objects.filter(phone_number = user.phone_number).exclude(user=user).exclude(skip=True).filter(user__product_id=2)
 	friends = set([contact.user for contact in contacts])

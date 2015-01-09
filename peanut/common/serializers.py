@@ -1,7 +1,7 @@
 import logging
 
 from rest_framework import serializers
-from common.models import Photo, User, Action, ContactEntry, StrandInvite, Strand, ShareInstance
+from common.models import Photo, User, Action, ContactEntry, Strand, ShareInstance
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -48,16 +48,6 @@ class BulkUserSerializer(serializers.Serializer):
 	users = UserSerializer(many=True)
 
 	bulk_key = 'users'
-
-
-class StrandInviteSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = StrandInvite
-
-class BulkStrandInviteSerializer(serializers.Serializer):
-	invites = StrandInviteSerializer(many=True)
-
-	bulk_key = 'invites'
 
 class ShareInstanceSerializer(serializers.ModelSerializer):
 	lookup_field = 'id'

@@ -14,7 +14,7 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import Action, StrandInvite, Photo, StrandNeighbor
+from common.models import Action, Photo, StrandNeighbor
 
 from strand import notifications_util, geo_util, strands_util, friends_util
 

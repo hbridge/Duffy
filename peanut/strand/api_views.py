@@ -15,7 +15,7 @@ from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord, ShareInstance
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandNeighbor, Action, LocationRecord, ShareInstance
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util, serializers
@@ -131,7 +131,7 @@ def getStrandNeighborsCache(strands, friends, withUsers = False):
 	return (neighborStrandsByStrandId, neighborUsersByStrandId)
 
 # ------------------------
-def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None):
+def getActorsObjectData(userId, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
 		users = [users]
 
@@ -614,7 +614,7 @@ def actions_list(request):
 
 
 """
-	Returns back the invites and strands a user has
+	Returns back the suggested shares
 """
 def swaps(request):
 	startProfiling()
@@ -625,9 +625,6 @@ def swaps(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		responseObjects = list()
-
-		inviteObjectIds = list()
-		inviteObjects = list()
 
 		# Now do neighbor suggestions
 		friendsIdList = friends_util.getFriendsIds(user.id)
@@ -666,24 +663,21 @@ def swaps(request):
 			locationBasedIds.append(suggestion['id'])
 
 		for objects in locationBasedSuggestions:
-			if objects['id'] not in inviteObjectIds:
-				responseObjects.append(objects)
+			responseObjects.append(objects)
 		printStats("swaps-location-suggestions")
+		
+		# Last resort, try throwing in recent photos
+		if len(responseObjects) < 3:
+			now = datetime.datetime.utcnow()
+			lower = now - datetime.timedelta(days=7)
 
-		if len(inviteObjects) == 0:
-			# Last resort, try throwing in recent photos
-			if len(responseObjects) < 3:
-				now = datetime.datetime.utcnow()
-				lower = now - datetime.timedelta(days=7)
+			lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
+			rankNum += len(lastWeekObjects)
+		
+			for objects in lastWeekObjects:
+				responseObjects.append(objects)
 
-				lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
-				rankNum += len(lastWeekObjects)
-			
-				for objects in lastWeekObjects:
-					if objects['id'] not in inviteObjectIds:
-						responseObjects.append(objects)
-
-				printStats("swaps-recent-photos")
+			printStats("swaps-recent-photos")
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)

@@ -24,8 +24,8 @@ from rest_framework.views import APIView
 
 from peanut.settings import constants
 
-from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, ShareInstance
-from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer
+from common.models import ContactEntry, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, ShareInstance
+from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer
 from common import location_util, api_util
 
 # TODO(Derek): move this to common
@@ -518,8 +518,6 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
 
     """
         Clean up the phone number and set it.  Should only be one number per entry
-
-        TODO(Derek): Can this be combined with StrandInviteBulkAPI?
     """
     def pre_save(self, obj):
         foundMatch = False      
@@ -571,66 +569,6 @@ class UsersBulkAPI(BulkCreateAPIView):
         if created:
             users_util.initNewUser(user, False, None)
 
-"""
-   Strand invite API
-"""
-class StrandInviteBulkAPI(BulkCreateAPIView):
-    model = StrandInvite
-    lookup_field = 'id'
-    serializer_class = BulkStrandInviteSerializer
-
-    def fetchWithUniqueKeys(self, obj):
-        try:
-            return self.model.objects.get(strand_id=obj.strand_id, user_id=obj.user_id, phone_number=obj.phone_number)
-        except self.model.DoesNotExist:
-            return None
-
-    """
-        Clean up the phone number and set it.  Should only be one number per entry
-
-        TODO(Derek): Can this be combined with ContactEntryBulkAPI?
-    """
-    def pre_save(self, strandInvite):
-        logger.info("Doing a StrandInvite bulk update for user %s of strand %s and number %s" % (strandInvite.user, strandInvite.strand, strandInvite.phone_number))
-        foundMatch = False      
-        for match in phonenumbers.PhoneNumberMatcher(strandInvite.phone_number, "US"):
-            foundMatch = True
-            strandInvite.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
-
-        if not foundMatch:
-            logger.info("Parse error for Strand Invite")
-            strandInvite.skip = True
-        else:
-            # Found a valid phone number, now lets see if we can find a valid user for that
-            try:
-                user = User.objects.get(phone_number=strandInvite.phone_number, product_id=2)
-                strandInvite.invited_user = user
-                
-                # Temp solution for using invites to hold incoming pictures 
-                if (getBuildNumForUser(user)) > 4805:
-                    strandInvite.accepted_user = user
-                    if user not in strandInvite.strand.users.all():
-                        action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-                        strandInvite.strand.users.add(user)
-
-            except User.DoesNotExist:
-                logger.debug("Looked for %s but didn't find matching user" % (strandInvite.phone_number))
-
-class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
-    def post_save(self, strandInvite, created):
-        if strandInvite.accepted_user_id:
-            oldActions = list(Action.objects.filter(user=strandInvite.accepted_user, strand=strandInvite.strand).order_by("-added"))
-            action = Action(user=strandInvite.accepted_user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-            action.save()
-
-            # Run through old actions to see if we need to change the timing of the join (incase the "add"
-            #    action happened first).  Also remove if any old ones exist
-            for oldAction in oldActions:
-                # Can't join a strand more than once, just do a quick check for that
-                if oldAction.action_type == action.action_type and oldAction.user == action.user:
-                    action.delete()
-
-            FriendConnection.addNewConnections(strandInvite.accepted_user, strandInvite.strand.users.all())
 """
     REST interface for creating new Actions.
 
