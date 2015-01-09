@@ -104,7 +104,7 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 			if (logEntry[0].result == constants.IOS_NOTIFICATIONS_RESULT_ERROR):
 				# meaning couldn't send notification, so send a text
 				if (not '555555' in str(user.phone_number)):
-					notifications_util.sendSMS(str(user.phone_number), msg)
+					notifications_util.sendSMS(str(user.phone_number), msg + ' ' + url)
 					logger.debug("SMS sent to %s: %s %s" % (user, msg, url))
 					print "SMS sent"
 				else:
