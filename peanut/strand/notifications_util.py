@@ -10,7 +10,7 @@ from django.db.models.signals import post_save
 from peanut.settings import constants
 from common.models import NotificationLog, DuffyNotification, Action, User, Strand, ShareInstance
 from common.api_util import DuffyJsonEncoder
-from strand import strands_util
+from strand import strands_util, swaps_util
 
 from ios_notifications.models import APNService, Device
 from twilio.rest import TwilioRestClient
@@ -160,7 +160,8 @@ def threadedSendNotifications(userIds):
 			count += len(actionsByUserId[user.id])
 
 		# now add the suggestions from last week
-		count += len(strands_util.getRecentStrandNeighborSuggestions(user))
+		objs = swaps_util.getFeedObjectsForSwaps(user)
+		count += len(swaps_util.getPhotoCountFromResponseObjects(objs))
 
 		# now add the count of photos in Incoming (meaning unread)
 		count += strands_util.getIncomingBadgeCount(user)

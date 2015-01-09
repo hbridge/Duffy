@@ -18,7 +18,7 @@ from peanut.settings import constants
 from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandNeighbor, Action, LocationRecord, ShareInstance
 from common.serializers import UserSerializer
 
-from common import api_util, cluster_util, serializers
+from common import api_util, serializers, stats_util
 
 from strand import geo_util, notifications_util, friends_util, strands_util, users_util, swaps_util
 from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
@@ -69,104 +69,12 @@ def getFriendsObjectData(userId, users, includePhone = True):
 	return userData
 
 
-"""
-	This turns a list of list of photos into groups that contain a title and cluster.
-
-	We do all the photos at once so we can load up the sims cache once
-
-	Takes in list of dicts:
-	[
-		{
-			'photos': [photo1, photo2]
-			'metadata' : {'strand_id': 12}
-		},
-		{
-			'photos': [photo1, photo2]
-			'metadata' : {'strand_id': 17}
-		}
-	]
-
-	Returns format of:
-	[
-		{
-			'clusters': clusters
-			'metadata': {'title': blah,
-						 'subtitle': blah2,
-						 'strand_id': 12
-						}
-		},
-		{
-			'clusters': clusters
-			'metadata': {'title': blah3,
-						 'subtitle': blah4,
-						 'strand_id': 17
-						}
-		},
-	]
-"""
-def getFormattedGroups(groups, simCaches = None):
-	if len(groups) == 0:
-		return []
-
-	output = list()
-
-	photoIds = list()
-	for group in groups:
-		for photo in group['photos']:
-			photoIds.append(photo.id)
-
-	# Fetch all the similarities at once so we can process in memory
-	a = datetime.datetime.now()
-	if simCaches == None:
-		simCaches = cluster_util.getSimCaches(photoIds)
-
-	for group in groups:
-		if len(group['photos']) == 0:
-			continue
-
-		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
-
-		location = strands_util.getBestLocationForPhotos(group['photos'])
-		if not location:
-			location = "Location Unknown"
-
-		metadata = group['metadata']
-		metadata.update({'subtitle': location, 'location': location})
-		
-		output.append({'clusters': clusters, 'metadata': metadata})
-
-	return output
-
-def getObjectsDataFromGroups(groups):
-	# Pass in none for actions because there are no actions on private photos so don't use anything
-	formattedGroups = getFormattedGroups(groups)
-	
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
-
-	return objects
 
 def getBuildNumForUser(user):
 	if user.last_build_info:
 		return int(user.last_build_info.split('-')[1])
 	else:
 		return 4000
-
-def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
-	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
-
-	groups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
-	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-
-	objects = getObjectsDataFromGroups(groups)
-
-	for suggestion in objects:
-		suggestion['suggestible'] = True
-		suggestion['suggestion_type'] = "timed-%s" % (title)
-		suggestion['title'] = title
-		suggestion['suggestion_rank'] = rankNum
-		rankNum += 1
-	return objects
 
 
 # Need to create a key that is sortable, consistant (to deal with partial updates) and handles
@@ -200,46 +108,13 @@ def getSortRanking(user, shareInstance, actions):
 #####################################################################################
 
 
-requestStartTime = None
-lastCheckinTime = None
-lastCheckinQueryCount = 0
-
-def startProfiling():
-	global requestStartTime
-	global lastCheckinTime
-	global lastCheckinQueryCount
-	requestStartTime = datetime.datetime.now()
-	lastCheckinTime = requestStartTime
-	lastCheckinQueryCount = 0
-
-def printStats(title, printQueries = False):
-	global lastCheckinTime
-	global lastCheckinQueryCount
-
-	now = datetime.datetime.now()
-	msTime = ((now-lastCheckinTime).microseconds / 1000 + (now-lastCheckinTime).seconds * 1000)
-	lastCheckinTime = now
-
-	queryCount = len(connection.queries) - lastCheckinQueryCount
-	
-
-	print "%s took %s ms and did %s queries" % (title, msTime, queryCount)
-
-	if printQueries:
-		print "QUERIES for %s" % title
-		for query in connection.queries[lastCheckinQueryCount:]:
-			print query
-
-	lastCheckinQueryCount = len(connection.queries)
-
-
 # ----------------------- FEED ENDPOINTS --------------------
 
 """
 	Return the Duffy JSON for the strands a user has that are private and unshared
 """
 def private_strands(request):
-	startProfiling()
+	stats_util.startProfiling()
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
@@ -247,11 +122,11 @@ def private_strands(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		printStats("private-1")
+		stats_util.printStats("private-1")
 		
 		strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
 
-		printStats("private-2")
+		stats_util.printStats("private-2")
 
 		deletedSomething = False
 		for strand in strands:
@@ -265,16 +140,19 @@ def private_strands(request):
 
 		friends = friends_util.getFriends(user.id)
 		
+		stats_util.printStats("private-3")
+
 		groups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, locationRequired = True)
-		
-		response['objects'] = getObjectsDataFromGroups(groups)	
-		printStats("private-3")
+		stats_util.printStats("private-4")
+
+		response['objects'] = swaps_util.getObjectsDataFromGroups(groups)	
+		stats_util.printStats("private-end")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 def swap_inbox(request):
-	startProfiling()
+	stats_util.startProfiling()
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
@@ -320,7 +198,7 @@ def swap_inbox(request):
 		
 		# Now grab all the actions for these ShareInstances (comments, evals, likes)
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		printStats("swaps_inbox-1")
+		stats_util.printStats("swaps_inbox-1")
 
 		actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
 		actionsByShareInstanceId = dict()
@@ -330,7 +208,7 @@ def swap_inbox(request):
 				actionsByShareInstanceId[action.share_instance_id] = list()
 			actionsByShareInstanceId[action.share_instance_id].append(action)
 
-		printStats("swaps_inbox-2")
+		stats_util.printStats("swaps_inbox-2")
 
 		# Loop through all the share instances and create the feed data
 		for shareInstance in shareInstances:
@@ -353,7 +231,7 @@ def swap_inbox(request):
 			responseObject["debug_rank"] = count
 			count += 1
 
-		printStats("swaps_inbox-3")
+		stats_util.printStats("swaps_inbox-3")
 
 		# Add in the list of all friends at the end
 		peopleIds = friends_util.getFriendsIds(user.id)
@@ -367,7 +245,7 @@ def swap_inbox(request):
 		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'share_instance': -1, 'people': getFriendsObjectData(user.id, people, True)}		
 		responseObjects.append(peopleEntry)
 
-		printStats("swaps_inbox-end")
+		stats_util.printStats("swaps_inbox-end")
 
 		response["objects"] = responseObjects
 		response["timestamp"] = datetime.datetime.now()
@@ -376,7 +254,7 @@ def swap_inbox(request):
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 def actions_list(request):
-	startProfiling()
+	stats_util.startProfiling()
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
@@ -398,7 +276,7 @@ def actions_list(request):
 		actionsData = {'type': 'actions_list', 'actions': actionsData}
 
 		response['objects'] = [actionsData]
-		printStats("actions-end")
+		stats_util.printStats("actions-end")
 
 		user.last_actions_list_request_timestamp = datetime.datetime.utcnow()
 		user.save()
@@ -411,73 +289,18 @@ def actions_list(request):
 	Returns back the suggested shares
 """
 def swaps(request):
-	startProfiling()
+	stats_util.startProfiling()
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		responseObjects = list()
 
-		# Now do neighbor suggestions
-		friendsIdList = friends_util.getFriendsIds(user.id)
-
-		strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
-		strandIds = list()
-		for strandNeighbor in strandNeighbors:
-			if strandNeighbor.strand_1_user_id == user.id:
-				strandIds.append(strandNeighbor.strand_1_id)
-			else:
-				strandIds.append(strandNeighbor.strand_2_id)
-
-		strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
-
-		# The prefetch for 'user' took a while here so just do it manually
-		for strand in strands:
-			for photo in strand.photos.all():
-				photo.user = user
-				
-		strands = list(strands)
-		printStats("swaps-strands-fetch")
-
-		neighborStrandsByStrandId, neighborUsersByStrandId = swaps_util.getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
-		printStats("swaps-neighbors-cache")
-
-		locationBasedGroups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
-
-		printStats("swap-groups")
-	
-		locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
-		locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-		locationBasedGroups = swaps_util.filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
-		locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
-
-		rankNum = 0
-		locationBasedIds = list()
-		for suggestion in locationBasedSuggestions:
-			suggestion['suggestion_rank'] = rankNum
-			suggestion['suggestion_type'] = "friend-location"
-			rankNum += 1
-			locationBasedIds.append(suggestion['id'])
-
-		for objects in locationBasedSuggestions:
-			responseObjects.append(objects)
-		printStats("swaps-location-suggestions")
+		swapsObjects = swaps_util.getFeedObjectsForSwaps(user)
 		
-		# Last resort, try throwing in recent photos
-		if len(responseObjects) < 3:
-			now = datetime.datetime.utcnow()
-			lower = now - datetime.timedelta(days=7)
-
-			lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
-			rankNum += len(lastWeekObjects)
-		
-			for objects in lastWeekObjects:
-				responseObjects.append(objects)
-
-			printStats("swaps-recent-photos")
-		response['objects'] = responseObjects
+		stats_util.printStats("swaps-end")
+		response['objects'] = swapsObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

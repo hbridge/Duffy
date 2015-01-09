@@ -1,14 +1,178 @@
 import logging
+import datetime
 
 from django.db.models import Q
 
 from strand import geo_util, friends_util, strands_util
 from common.models import Photo, Strand, StrandNeighbor, Action, User
 
+from common import stats_util, cluster_util, api_util
+
 from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
 
+
+###
+### TODO(Derek): Reorganize this whole things
+###
+
+"""
+	This turns a list of list of photos into groups that contain a title and cluster.
+
+	We do all the photos at once so we can load up the sims cache once
+
+	Takes in list of dicts:
+	[
+		{
+			'photos': [photo1, photo2]
+			'metadata' : {'strand_id': 12}
+		},
+		{
+			'photos': [photo1, photo2]
+			'metadata' : {'strand_id': 17}
+		}
+	]
+
+	Returns format of:
+	[
+		{
+			'clusters': clusters
+			'metadata': {'title': blah,
+						 'subtitle': blah2,
+						 'strand_id': 12
+						}
+		},
+		{
+			'clusters': clusters
+			'metadata': {'title': blah3,
+						 'subtitle': blah4,
+						 'strand_id': 17
+						}
+		},
+	]
+"""
+def getFormattedGroups(groups, simCaches = None):
+	if len(groups) == 0:
+		return []
+
+	output = list()
+
+	photoIds = list()
+	for group in groups:
+		for photo in group['photos']:
+			photoIds.append(photo.id)
+
+	# Fetch all the similarities at once so we can process in memory
+	a = datetime.datetime.now()
+	if simCaches == None:
+		simCaches = cluster_util.getSimCaches(photoIds)
+
+	for group in groups:
+		if len(group['photos']) == 0:
+			continue
+
+		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
+
+		location = strands_util.getBestLocationForPhotos(group['photos'])
+		if not location:
+			location = "Location Unknown"
+
+		metadata = group['metadata']
+		metadata.update({'subtitle': location, 'location': location})
+		
+		output.append({'clusters': clusters, 'metadata': metadata})
+
+	return output
+	
+def getObjectsDataFromGroups(groups):
+	# Pass in none for actions because there are no actions on private photos so don't use anything
+	formattedGroups = getFormattedGroups(groups)
+	
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
+
+	return objects
+
+
+def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
+	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
+
+	groups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
+	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
+
+	objects = getObjectsDataFromGroups(groups)
+
+	for suggestion in objects:
+		suggestion['suggestible'] = True
+		suggestion['suggestion_type'] = "timed-%s" % (title)
+		suggestion['title'] = title
+		suggestion['suggestion_rank'] = rankNum
+		rankNum += 1
+	return objects
+
+
+def getFeedObjectsForSwaps(user):
+	responseObjects = list()
+	
+	# Do neighbor suggestions
+	friendsIdList = friends_util.getFriendsIds(user.id)
+
+	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
+	strandIds = list()
+	for strandNeighbor in strandNeighbors:
+		if strandNeighbor.strand_1_user_id == user.id:
+			strandIds.append(strandNeighbor.strand_1_id)
+		else:
+			strandIds.append(strandNeighbor.strand_2_id)
+
+	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
+
+	# The prefetch for 'user' took a while here so just do it manually
+	for strand in strands:
+		for photo in strand.photos.all():
+			photo.user = user
+			
+	strands = list(strands)
+	stats_util.printStats("swaps-strands-fetch")
+
+	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
+	stats_util.printStats("swaps-neighbors-cache")
+
+	locationBasedGroups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
+
+	stats_util.printStats("swap-groups")
+
+	locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
+	locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
+	locationBasedGroups = filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
+	locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
+
+	rankNum = 0
+	locationBasedIds = list()
+	for suggestion in locationBasedSuggestions:
+		suggestion['suggestion_rank'] = rankNum
+		suggestion['suggestion_type'] = "friend-location"
+		rankNum += 1
+		locationBasedIds.append(suggestion['id'])
+
+	for objects in locationBasedSuggestions:
+		responseObjects.append(objects)
+	stats_util.printStats("swaps-location-suggestions")
+	
+	# Last resort, try throwing in recent photos
+	if len(responseObjects) < 3:
+		now = datetime.datetime.utcnow()
+		lower = now - datetime.timedelta(days=7)
+
+		lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
+		rankNum += len(lastWeekObjects)
+	
+		for objects in lastWeekObjects:
+			responseObjects.append(objects)
+
+		stats_util.printStats("swaps-recent-photos")
+	return responseObjects
 
 
 # ------------------------
@@ -174,12 +338,13 @@ def getGroupsDataForPrivateStrands(thisUser, strands, feedObjectType, friends = 
 
 	return groups
 
-def getAllPhotosFromGroups(groups):
-	photos = list()
-	for group in groups:
-		photos.extend(group['photos'])
+def getPhotoCountFromResponseObjects(responseObjects):
+	count = 0
+	for obj in responseObjects:
+		if obj['type'] == "photo":
+			count += 1
 
-	return photos
+	return count
 
 def filterEvaluatedPhotosFromGroups(user, groups):
 	photoIds = list()
