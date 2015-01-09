@@ -823,6 +823,9 @@ def send_notifications_test(request):
 	if data.has_key('id'):
 		customPayload['id'] = int(data['id'])
 
+	if data.has_key('badge'):
+		customPayload['badge'] = int(data['badge'])
+
 	notifications_util.sendNotification(user, msg, msgTypeId, customPayload)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
