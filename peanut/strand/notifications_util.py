@@ -139,6 +139,9 @@ def getNotificationLogsForType(timeWithinCutoff, msgType):
 	notificationLogs = NotificationLog.objects.filter(msg_type=msgType).filter(added__gt=timeWithinCutoff).filter(Q(apns__in=[-2,-1,1]) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_SENT) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_ERROR))
 	return notificationLogs
 
+"""
+	Sends out push notifications for badging
+"""
 def threadedSendNotifications(userIds):
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 	logger = logging.getLogger(__name__)
@@ -190,7 +193,6 @@ def getActionsByUserId(users):
 					actionsByUserId[user.id] = list()
 				actionsByUserId[user.id].append(action)
 	return actionsByUserId
-
 
 @receiver(post_save, sender=Action)
 def sendNotificationsUponActions(sender, **kwargs):

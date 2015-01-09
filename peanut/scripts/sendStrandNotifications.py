@@ -3,6 +3,7 @@ import sys, os
 import time, datetime
 import pytz
 import logging
+from threading import Thread
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -14,7 +15,7 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import ShareInstance
+from common.models import ShareInstance, User
 
 from common import api_util
 
@@ -64,6 +65,9 @@ def sendNewPhotoNotificationBatch(user, siList):
 	logger.info("going to send '%s' to user id %s" %(msg, user.id))
 	customPayload = {'share_instance_id': siList[0].id, 'id': siList[0].photo.id}
 	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
+
+	# Kickoff separate notification for badging
+	Thread(target=notifications_util.threadedSendNotifications, args=([user.id],)).start()	
 
 
 def siListToUserPhrase(siList):

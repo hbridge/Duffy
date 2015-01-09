@@ -4,7 +4,7 @@ import datetime
 from django.db.models import Q
 
 from strand import geo_util, friends_util, strands_util
-from common.models import Photo, Strand, StrandNeighbor, Action, User
+from common.models import Photo, Strand, StrandNeighbor, Action, User, ShareInstance
 
 from common import stats_util, cluster_util, api_util
 
@@ -386,13 +386,13 @@ def filterEvaluatedPhotosFromGroups(user, groups):
 
 def getIncomingBadgeCount(user):
 	count = 0
+
 	# get a list of all shareInstances for this user that aren't started by this user
 	shareInstances = ShareInstance.objects.prefetch_related('users').filter(users__in=[user.id]).exclude(user=user).order_by("-updated", "id")[:100]
 	shareInstanceIds = ShareInstance.getIds(shareInstances)
 
 	# get a list of all photo_evaluated actions by this user for those shareInstanceIds
 	actions = Action.objects.filter(share_instance_id__in=shareInstanceIds).filter(user=user).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-
 
 	# count how many shareInstanceids don't have an associated action
 	actionsByShareInstanceId = dict()
@@ -403,7 +403,7 @@ def getIncomingBadgeCount(user):
 		actionsByShareInstanceId[action.share_instance_id].append(action)
 
 	for shareInstance in shareInstances:
-		if shareInstance.id not in actionsByShareInstanceId:
+		if shareInstance.id not in actionsByShareInstanceId and shareInstance.shared_at_timestamp > user.last_action_request_timestamp:
 			count += 1
 
 	return count
