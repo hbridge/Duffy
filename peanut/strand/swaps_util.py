@@ -165,7 +165,7 @@ def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 
 	groups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
 	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-	groups = filterEvaluatedPhotosFromGroups(groups)
+	groups = filterEvaluatedPhotosFromGroups(user, groups)
 	
 	objects = getObjectsDataFromGroups(groups)
 
