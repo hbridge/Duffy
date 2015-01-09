@@ -277,27 +277,3 @@ def getRecentStrandNeighborSuggestions(user):
 			
 	return list(strands)
 
-def getIncomingBadgeCount(user):
-	count = 0
-	# get a list of all shareInstances for this user that aren't started by this user
-	shareInstances = ShareInstance.objects.prefetch_related('users').filter(users__in=[user.id]).exclude(user=user).order_by("-updated", "id")[:50]
-	shareInstanceIds = ShareInstance.getIds(shareInstances)
-
-	# get a list of all photo_evaluated actions by this user for those shareInstanceIds
-	actions = Action.objects.filter(share_instance_id__in=shareInstanceIds).filter(user=user).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-
-
-	# count how many shareInstanceids don't have an associated action
-	actionsByShareInstanceId = dict()
-	
-	for action in actions:
-		if action.share_instance_id not in actionsByShareInstanceId:
-			actionsByShareInstanceId[action.share_instance_id] = list()
-		actionsByShareInstanceId[action.share_instance_id].append(action)
-
-	for shareInstance in shareInstances:
-		if shareInstance.id not in actionsByShareInstanceId:
-			count += 1
-
-	return count
-

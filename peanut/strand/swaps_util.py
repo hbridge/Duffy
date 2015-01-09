@@ -17,70 +17,6 @@ logger = logging.getLogger(__name__)
 ### TODO(Derek): Reorganize this whole things
 ###
 
-def getFeedObjectsForSwaps(user):
-	responseObjects = list()
-	
-	# Do neighbor suggestions
-	friendsIdList = friends_util.getFriendsIds(user.id)
-
-	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
-	strandIds = list()
-	for strandNeighbor in strandNeighbors:
-		if strandNeighbor.strand_1_user_id == user.id:
-			strandIds.append(strandNeighbor.strand_1_id)
-		else:
-			strandIds.append(strandNeighbor.strand_2_id)
-
-	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=30)
-	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')[:20]
-
-	# The prefetch for 'user' took a while here so just do it manually
-	for strand in strands:
-		for photo in strand.photos.all():
-			photo.user = user
-			
-	strands = list(strands)
-	stats_util.printStats("swaps-strands-fetch")
-
-	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
-	stats_util.printStats("swaps-neighbors-cache")
-
-	locationBasedGroups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
-
-	stats_util.printStats("swap-groups")
-
-	locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
-	locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-	locationBasedGroups = filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
-	locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
-
-	rankNum = 0
-	locationBasedIds = list()
-	for suggestion in locationBasedSuggestions:
-		suggestion['suggestion_rank'] = rankNum
-		suggestion['suggestion_type'] = "friend-location"
-		rankNum += 1
-		locationBasedIds.append(suggestion['id'])
-
-	for objects in locationBasedSuggestions:
-		responseObjects.append(objects)
-	stats_util.printStats("swaps-location-suggestions")
-	
-	# Last resort, try throwing in recent photos
-	if len(responseObjects) < 3:
-		now = datetime.datetime.utcnow()
-		lower = now - datetime.timedelta(days=7)
-
-		lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
-		rankNum += len(lastWeekObjects)
-	
-		for objects in lastWeekObjects:
-			responseObjects.append(objects)
-
-		stats_util.printStats("swaps-recent-photos")
-	return responseObjects
-
-
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -164,8 +100,7 @@ def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 
 	groups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
 	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-	groups = filterEvaluatedPhotosFromGroups(user, groups)
-	
+
 	objects = getObjectsDataFromGroups(groups)
 
 	for suggestion in objects:
@@ -177,6 +112,67 @@ def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 	return objects
 
 
+def getFeedObjectsForSwaps(user):
+	responseObjects = list()
+	
+	# Do neighbor suggestions
+	friendsIdList = friends_util.getFriendsIds(user.id)
+
+	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
+	strandIds = list()
+	for strandNeighbor in strandNeighbors:
+		if strandNeighbor.strand_1_user_id == user.id:
+			strandIds.append(strandNeighbor.strand_1_id)
+		else:
+			strandIds.append(strandNeighbor.strand_2_id)
+
+	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
+
+	# The prefetch for 'user' took a while here so just do it manually
+	for strand in strands:
+		for photo in strand.photos.all():
+			photo.user = user
+			
+	strands = list(strands)
+	stats_util.printStats("swaps-strands-fetch")
+
+	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
+	stats_util.printStats("swaps-neighbors-cache")
+
+	locationBasedGroups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
+
+	stats_util.printStats("swap-groups")
+
+	locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
+	locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
+	locationBasedGroups = filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
+	locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
+
+	rankNum = 0
+	locationBasedIds = list()
+	for suggestion in locationBasedSuggestions:
+		suggestion['suggestion_rank'] = rankNum
+		suggestion['suggestion_type'] = "friend-location"
+		rankNum += 1
+		locationBasedIds.append(suggestion['id'])
+
+	for objects in locationBasedSuggestions:
+		responseObjects.append(objects)
+	stats_util.printStats("swaps-location-suggestions")
+	
+	# Last resort, try throwing in recent photos
+	if len(responseObjects) < 3:
+		now = datetime.datetime.utcnow()
+		lower = now - datetime.timedelta(days=7)
+
+		lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
+		rankNum += len(lastWeekObjects)
+	
+		for objects in lastWeekObjects:
+			responseObjects.append(objects)
+
+		stats_util.printStats("swaps-recent-photos")
+	return responseObjects
 
 
 # ------------------------
@@ -387,3 +383,27 @@ def filterEvaluatedPhotosFromGroups(user, groups):
 			groupsToReturn.append(group)
 
 	return groupsToReturn
+
+def getIncomingBadgeCount(user):
+	count = 0
+	# get a list of all shareInstances for this user that aren't started by this user
+	shareInstances = ShareInstance.objects.prefetch_related('users').filter(users__in=[user.id]).exclude(user=user).order_by("-updated", "id")[:100]
+	shareInstanceIds = ShareInstance.getIds(shareInstances)
+
+	# get a list of all photo_evaluated actions by this user for those shareInstanceIds
+	actions = Action.objects.filter(share_instance_id__in=shareInstanceIds).filter(user=user).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+
+
+	# count how many shareInstanceids don't have an associated action
+	actionsByShareInstanceId = dict()
+	
+	for action in actions:
+		if action.share_instance_id not in actionsByShareInstanceId:
+			actionsByShareInstanceId[action.share_instance_id] = list()
+		actionsByShareInstanceId[action.share_instance_id].append(action)
+
+	for shareInstance in shareInstances:
+		if shareInstance.id not in actionsByShareInstanceId:
+			count += 1
+
+	return count
