@@ -27,7 +27,7 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	start = now - datetime.timedelta(days=7)
-	end = now - datetime.timedelta(days=0)
+	end = now - datetime.timedelta(days=1)
 
 	# fetch all the users who have been sent this firestarter in the last week 
 	logEntries = NotificationLog.objects.prefetch_related('user').filter(added__gt=start).filter(msg_type=constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS)
@@ -76,7 +76,7 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 
 
 	for user, siList in incomingListByUser.items():
-		if msgCount == 0:
+		if msgCount == 0 or user.has_sms_authed is False:
 			break
 
 		photoPhrase, userPhrase = listsToPhrases(siList, friends_util.getFriendsIds(user.id))
