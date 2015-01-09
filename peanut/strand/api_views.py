@@ -130,14 +130,6 @@ def getStrandNeighborsCache(strands, friends, withUsers = False):
 
 	return (neighborStrandsByStrandId, neighborUsersByStrandId)
 
-def userHasPostedPhotosToStrand(user, strand, actionsCache):
-	hasPostedPhotos = False
-	for action in actionsCache:
-		if action.strand == strand and action.user_id == user.id and (action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND or action.action_type == constants.ACTION_TYPE_CREATE_STRAND):
-			hasPostedPhotos = True
-	return hasPostedPhotos
-
-
 # ------------------------
 def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None):
 	if not isinstance(users, list) and not isinstance(users, set):
@@ -363,210 +355,11 @@ def getObjectsDataForPrivateStrands(thisUser, strands, feedObjectType, friends =
 
 	return objects
 
-def getPrivateStrandSuggestionsForSharedStrand(user, strand):
-	# Look above and below 10x the number of minutes to strand
-	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
-	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
-
-	# Get all the unshared strands for the given user that are close to the given strand
-	privateStrands = Strand.objects.prefetch_related('photos', 'photos__user', 'users').filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
-
-	strandsThatMatch = list()
-	for privateStrand in privateStrands:
-		if (strands_util.strandsShouldBeNeighbors(strand, privateStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = False)
-			and privateStrand not in strandsThatMatch):
-			strandsThatMatch.append(privateStrand)
-
-	return strandsThatMatch
-	
-def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
-	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user), 'actor_ids': [postAction.user.id]}
-	photos = postAction.photos.all()
-	photos = sorted(photos, key=lambda x: x.time_taken)
-
-	photos = filter(lambda x: x.full_filename, photos)
-	
-	if len(photos) > 0:
-		metadata['title'] = "added %s photos" % len(photos)
-
-		groupEntry = {'photos': photos, 'metadata': metadata}
-
-		formattedGroups = getFormattedGroups([groupEntry], simCaches = simCaches, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = False)
-		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
-		return objects
-	else:
-		return []
-
 def getBuildNumForUser(user):
 	if user.last_build_info:
 		return int(user.last_build_info.split('-')[1])
 	else:
 		return 4000
-
-def getObjectsDataForStrands(strands, user):
-	response = list()
-	strandIds = Strand.getIds(strands)
-	invitesCache =  StrandInvite.objects.prefetch_related('invited_user', 'strand').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user).filter(skip=False)
-	
-	photoIds = list()
-	for strand in strands:
-		photoIds.extend(Photo.getIds(strand.photos.all()))
-	photoIds = set(photoIds)
-	
-	# Grab all actions for any strand or photo we're looking at
-	# We use this to look for:
-	# Grabbing all the post actions for a strand
-	# Getting the likes and comments for a photo
-	# See if the user has done a post, and if not...put in suggested photos
-	actionsCache = getActionsCache(user, strandIds, photoIds)
-
-	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
-
-	simCaches = cluster_util.getSimCaches(photoIds)
-	for strand in strands:
-		entry = dict()
-
-		postActions = list()
-		for action in actionsCache:
-			if action.strand == strand:
-				postActions.append(action)
-
-		# Find the timestamp of the most recent post
-		if len(postActions) == 0:
-			logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
-			recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		else:
-			recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
-		users = strand.users.all()
-
-		# Create a list of all the invited users
-		invites = list()
-		for invite in invitesCache:
-			if invite.strand == strand:
-				invites.append(invite)	
-
-		invitedUsers = list()
-		for invite in invites:
-			if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
-				invitedUsers.append(invite.invited_user)
-			elif not invite.invited_user:
-				invitedUsers.append(User(id=0, display_name="", phone_number=invite.phone_number))
-		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(user.id, list(strand.users.all()), invitedUsers=invitedUsers), 'actor_ids': User.getIds(strand.users.all()), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
-
-		# Add the individual posts to the list
-		entry['objects'] = list()
-		for post in postActions:
-			entry['objects'].extend(getObjectsDataForPost(user, post, simCaches, actionsByPhotoIdCache))
-
-		if getBuildNumForUser(user) <= 4805:
-			# Add in the suggested private photos if the user hasn't done a post yet and has photos that match
-			if not userHasPostedPhotosToStrand(user, strand, actionsCache):
-				privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strand)
-				if len(privateStrands) > 0:
-					suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
-					suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, requireInterestedUsers = False, findInterestedUsers = False)
-					entry['objects'].append(suggestionsEntry)
-		response.append(entry)
-		
-	return response
-
-def getInviteObjectsDataForUser(user):
-	responseObjects = list()
-
-	strandInvites = StrandInvite.objects.prefetch_related('strand', 'strand__photos', 'strand__users').filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
-	friends = friends_util.getFriends(user.id)
-
-	# Temp solution for using invites to hold incoming pictures 
-	if getBuildNumForUser(user) > 4805:
-		for strandInvite in strandInvites:
-			strandInvite.accepted_user = user
-			if user not in strandInvite.strand.users.all():
-				action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-				strandInvite.strand.users.add(user)
-			strandInvite.save()
-		return responseObjects
-
-	
-	strands = [x.strand for x in strandInvites]
-
-	strandsObjectData = getObjectsDataForStrands(strands, user)
-	
-	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends, withUsers = True)
-
-	strandObjectDataById = dict()
-	for strandObjectData in strandsObjectData:
-		strandObjectDataById[strandObjectData['id']] = strandObjectData
-
-	lastStrandedPhoto = Photo.objects.filter(user=user, strand_evaluated=True).order_by("-time_taken")[:1]
-	if len(lastStrandedPhoto) > 0:
-		lastStrandedPhoto = lastStrandedPhoto[0]
-	else:
-		lastStrandedPhoto = None
-		
-	for invite in strandInvites:
-		inviteIsReady = True
-		fullsLoaded = True
-		invitePhotos = invite.strand.photos.all()
-
-		# Go through all photos and see if there's any that don't belong to this user
-		#  and don't have a thumb.  If a user just created an invite this should be fine
-		for photo in invitePhotos:
-			if photo.user_id != user.id and not photo.full_filename:
-				fullsLoaded = False
-				logger.info("Not showing invite %s for user %s because photo %s doesn't have a full" % (invite.id, user.id, photo.id))
-				
-		if fullsLoaded:
-			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
-				inviteIsReady = True
-			else:
-				inviteIsReady = False
-				logger.info("Marking invite %s for user %s not ready because I don't think we've stranded first run yet  %s  %s" % (invite.id, user.id, user.first_run_sync_count, user.first_run_sync_complete))
-
-			# If the invite's timeframe is within the last photo in the camera roll
-			#   then look at the last stranded photo
-			if user.last_photo_timestamp:
-				if (invite.strand.first_photo_time - constants.TIMEDELTA_FOR_STRANDING < user.last_photo_timestamp and
-					invite.strand.last_photo_time + constants.TIMEDELTA_FOR_STRANDING > user.last_photo_timestamp):
-					if lastStrandedPhoto and lastStrandedPhoto.time_taken < user.last_photo_timestamp:
-						inviteIsReady = False
-						logger.info("Marking invite %s for user %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, user.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
-
-			invitePhotoCount = len(invite.strand.photos.all())
-			if invitePhotoCount > 0:
-				title = "shared %s photos with you" % invitePhotoCount
-			else:
-				title = "would like your photos"
-				
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(user.id, list(invite.strand.users.all())), 'actor_ids': User.getIds(invite.strand.users.all()), 'time_stamp': invite.added}
-			entry['ready'] = inviteIsReady
-			entry['objects'] = list()
-			entry['objects'].append(strandObjectDataById[invite.strand.id])
-
-			# TODO - This can be done in one query instead of being in a loop
-			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, invite.strand)
-			newNeighborStrandsByStrandId, newNeighborUsersByStrandId = getStrandNeighborsCache(privateStrands, friends, withUsers = True)
-			neighborStrandsByStrandId.update(newNeighborStrandsByStrandId)
-			neighborUsersByStrandId.update(newNeighborUsersByStrandId)
-			
-			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
-
-			suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, friends = friends, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId)
-				
-			entry['objects'].append(suggestionsEntry)
-
-			if invitePhotoCount > 0:
-				entry['location'] = strands_util.getLocationForStrand(invite.strand)
-			elif len(suggestionsEntry['objects']) > 0:
-				entry['location'] = suggestionsEntry['objects'][0]['location']
-
-
-			responseObjects.append(entry)
-
-	responseObjects = sorted(responseObjects, key=lambda x:x['time_stamp'], reverse=True)
-
-	return responseObjects
-
 
 def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
@@ -581,6 +374,32 @@ def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 		suggestion['suggestion_rank'] = rankNum
 		rankNum += 1
 	return objects
+
+
+# Need to create a key that is sortable, consistant (to deal with partial updates) and handles
+# many photos shared at once
+def getSortRanking(user, shareInstance, actions):
+	lastTimestamp = None
+
+	if shareInstance.user_id == user.id:
+		lastTimestamp = shareInstance.shared_at_timestamp
+
+	for action in actions:
+		if ((action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
+			action.user_id == user.id) or
+			action.action_type == constants.ACTION_TYPE_COMMENT):
+			if not lastTimestamp or action.added > lastTimestamp:
+				lastTimestamp = action.added
+
+
+	if not lastTimestamp:
+		# this will happen for photos that need to be evaluated
+		return 0
+		
+	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
+	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
+
+	return -1 * (a + b)
 
 
 #####################################################################################
@@ -659,31 +478,6 @@ def private_strands(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-# Need to create a key that is sortable, consistant (to deal with partial updates) and handles
-# many photos shared at once
-def getSortRanking(user, shareInstance, actions):
-	lastTimestamp = None
-
-	if shareInstance.user_id == user.id:
-		lastTimestamp = shareInstance.shared_at_timestamp
-
-	for action in actions:
-		if ((action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
-			action.user_id == user.id) or
-			action.action_type == constants.ACTION_TYPE_COMMENT):
-			if not lastTimestamp or action.added > lastTimestamp:
-				lastTimestamp = action.added
-
-
-	if not lastTimestamp:
-		# this will happen for photos that need to be evaluated
-		return 0
-		
-	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
-	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
-
-	return -1 * (a + b)
 
 def swap_inbox(request):
 	startProfiling()
@@ -787,64 +581,6 @@ def swap_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-"""
-	Returns back the invites and strands a user has
-"""
-def strand_inbox(request):
-	startProfiling()
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		responseObjects = list()
-
-		# First throw in invite objects
-		# TODO(Derek): Take this out once new client is pushed
-		#responseObjects.extend(getInviteObjectsDataForUser(user))
-		#printStats("swaps-invites")
-		
-		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False).order_by('-added')[:50])
-		printStats("inbox-2")
-
-		strandsWithPhotos = list()
-		for strand in strands:
-			if len(strand.photos.all()) > 0:
-				strandsWithPhotos.append(strand)
-
-		responseObjects.extend(getObjectsDataForStrands(strandsWithPhotos, user))
-		printStats("inbox-3")
-
-		# sorting by last action on the strand
-		# Do this up here because the next few entries don't have time_stamps
-		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
-
-		# Add in the list of all friends at the end
-		peopleIds = friends_util.getFriendsIds(user.id)
-
-		# Also add in all of the actors they're dealing with
-		for obj in responseObjects:
-			peopleIds.extend(obj['actor_ids'])
-
-		people = set(User.objects.filter(id__in=peopleIds))
-
-		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'people': getFriendsObjectData(user.id, people, True)}		
-		responseObjects.append(peopleEntry)
-
-		# Double adding friend list for backwards compatibility
-		# (TODO) Remove after we move to the new prod build (past 4820)
-		peopleEntry = {'type': 'friends_list', 'actors': getFriendsObjectData(user.id, people, True)}
-		responseObjects.append(peopleEntry)
-
-		printStats("inbox-4")
-
-		response['objects'] = responseObjects
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
 def actions_list(request):
 	startProfiling()
 	response = dict({'result': True})
@@ -893,18 +629,6 @@ def swaps(request):
 		inviteObjectIds = list()
 		inviteObjects = list()
 
-		# First throw in invite objects
-		if not form.cleaned_data['build_number'] or (form.cleaned_data['build_number'] and int(form.cleaned_data['build_number']) <= 4805):
-			inviteObjects = getInviteObjectsDataForUser(user)
-			responseObjects.extend(inviteObjects)
-
-			for objects in inviteObjects:
-				# This grabs the id of the suggestions post object, which is the private strand id
-				suggestedStrands = objects['objects'][1]['objects']
-				for suggestedStrand in suggestedStrands:
-					inviteObjectIds.append(suggestedStrand['id'])
-			printStats("swaps-invites")
-
 		# Now do neighbor suggestions
 		friendsIdList = friends_util.getFriendsIds(user.id)
 
@@ -947,50 +671,6 @@ def swaps(request):
 		printStats("swaps-location-suggestions")
 
 		if len(inviteObjects) == 0:
-			"""
-			# Now do last night suggestions
-			now = datetime.datetime.utcnow()
-
-			if (now.hour < 5):
-				lower = now - datetime.timedelta(days=1)
-			else:
-				lower = now
-				
-			lower = lower.replace(hour=0, minute=0)
-			upper = lower + datetime.timedelta(hours=8) # So this now means 3 am
-
-			lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
-			rankNum += len(lastNightObjects)
-			
-			for objects in lastNightObjects:
-				if objects['id'] not in inviteObjectIds:
-					responseObjects.append(objects)
-
-			printStats("swaps-time-suggestions")
-			"""
-			"""
-			if len(responseObjects) < 20:
-				# repeat the last request because we might have deleted some before.
-				# TODO(Derek): find a way to avoid this
-				strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
-
-				noLocationSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=neighborStrandsByStrandId,  neighborUsersByStrandId = neighborUsersByStrandId, locationRequired=False)
-				noLocationSuggestions = filter(lambda x: x['suggestible'], noLocationSuggestions)
-				noLocationSuggestions = sorted(noLocationSuggestions, key=lambda x: x['time_taken'], reverse=True)
-
-				# Filter out the location based suggestions we got before
-				noLocationSuggestions = filter(lambda x: x['id'] not in locationBasedIds, noLocationSuggestions)
-				for suggestion in noLocationSuggestions:
-					suggestion['suggestion_rank'] = rankNum
-					suggestion['suggestion_type'] = "friend-nolocation"
-					rankNum += 1
-
-				for suggestion in noLocationSuggestions:
-					if suggestion['id'] not in inviteObjectIds:
-						responseObjects.append(suggestion)
-
-				printStats("swaps-nolocation-suggestions")
-			"""
 			# Last resort, try throwing in recent photos
 			if len(responseObjects) < 3:
 				now = datetime.datetime.utcnow()
@@ -1007,67 +687,6 @@ def swaps(request):
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-def add_photos_to_strand(request):
-	response = dict({'result': True})
-
-	form = UserIdAndStrandIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		strand = form.cleaned_data['strand']
-		
-		requestData = api_util.getRequestData(request)
-
-		photoIds = [int(x) for x in requestData["photo_ids[]"].split(',')]
-		existingPhotoIds = Photo.getIds(strand.photos.all())
-
-		entriesToCreate = list()
-		newPhotoIds = list()
-		for photoId in photoIds:
-			if photoId not in existingPhotoIds:
-				photo = Photo.objects.get(id=photoId)
-				strands_util.addPhotoToStrand(strand, photo, {strand.id: list(strand.photos.all())}, {strand.id: list(strand.users.all())})
-				newPhotoIds.append(photoId)
-
-		if len(newPhotoIds) > 0:
-			action = Action(user=user, strand=strand, photo_id=newPhotoIds[0], action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
-			action.save()
-			action.photos = newPhotoIds
-
-			privateStrands = Strand.objects.prefetch_related('photos').filter(photos__id__in=newPhotoIds, private=True, user=user)
-
-			for photoId in newPhotoIds:
-				for privateStrand in privateStrands:
-					ids = Photo.getIds(privateStrand.photos.all())
-					if photoId in ids:
-						action = Action.objects.create(user=user, strand=privateStrand, photo_id=photoId, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-						
-			for privateStrand in privateStrands:
-				strands_util.checkStrandForAllPhotosEvaluated(privateStrand)
-
-		
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-
-# ---------------------------------------------------------------
-
-# Soon to be deprecated
-def invited_strands(request):
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		response['objects'] = getInviteObjectsDataForUser(user)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 #   -------------------------  OTHER ENDPOINTS ---------------------

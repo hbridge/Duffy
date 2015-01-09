@@ -12,7 +12,6 @@ from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
 	url(r'^unshared_strands', 'strand.api_views.private_strands'),
-	url(r'^strand_inbox', 'strand.api_views.strand_inbox'),
 	url(r'^swap_inbox', 'strand.api_views.swap_inbox'),
 	url(r'^swaps', 'strand.api_views.swaps'),
 	url(r'^actions_list', 'strand.api_views.actions_list'),
@@ -23,7 +22,8 @@ urlpatterns = patterns('',
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
-	url(r'^add_photos_to_strand', 'strand.api_views.add_photos_to_strand'),
+	# decremented
+	url(r'^strand_inbox', 'strand.api_views.nothing'),
 
 	# REST
 	url(r'^photos/$', strand_rest_api_views.PhotoAPI.as_view()),
