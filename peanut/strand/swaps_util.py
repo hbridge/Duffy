@@ -17,8 +17,6 @@ logger = logging.getLogger(__name__)
 ### TODO(Derek): Reorganize this whole things
 ###
 
-
-
 def getFeedObjectsForSwaps(user):
 	responseObjects = list()
 	
@@ -33,7 +31,8 @@ def getFeedObjectsForSwaps(user):
 		else:
 			strandIds.append(strandNeighbor.strand_2_id)
 
-	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
+	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')[:20]
 
 	# The prefetch for 'user' took a while here so just do it manually
 	for strand in strands:
