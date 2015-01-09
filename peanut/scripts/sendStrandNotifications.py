@@ -45,6 +45,10 @@ def sendNewPhotoNotifications(shareInstance):
 			logger.debug("going to send %s to user id %s" % (msg, user.id))
 			customPayload = {'share_instance_id': shareInstance.id, 'id': shareInstance.photo.id}
 			notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
+
+	# Kickoff separate notification for badging
+	userIds = User.getIds(list(shareInstance.users.all()))
+	Thread(target=notifications_util.threadedSendNotifications, args=(userIds,)).start()
 	
 	return True
 
@@ -92,7 +96,8 @@ def main(argv):
 		shareInstancesPending = ShareInstance.objects.filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(photo__full_filename__isnull=False)
 
 		usersSentNotsRecently = [si.user.id for si in shareInstancesSent]
-		logger.debug("Users who sent a notification recently: %s"%(str(usersSentNotsRecently)))
+		if len(usersSentNotsRecently) > 0:
+			logger.debug("Users who sent a notification recently: %s"%(str(usersSentNotsRecently)))
 
 		siByUser = dict()
 
