@@ -165,7 +165,7 @@ def threadedSendNotifications(userIds):
 		# now add the count of photos in Incoming (meaning unread)
 		count += strands_util.getIncomingBadgeCount(user)
 
-		customPayload["badge"] = str(count)
+		customPayload["badge"] = count #don't make this a string, as that puts quotes around the number and it won't work
 		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
 
 
@@ -204,6 +204,7 @@ def sendNotificationsUponActions(sender, **kwargs):
 		users.append(action.user)
 
 	userIds = User.getIds(users)
+
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
 
 
