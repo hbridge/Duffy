@@ -151,6 +151,27 @@ def private_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+"""
+	Returns back the suggested shares
+"""
+def swaps(request):
+	stats_util.startProfiling()
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+
+		objs = swaps_util.getFeedObjectsForSwaps(user)
+		
+		stats_util.printStats("swaps-end")
+		response['objects'] = objs
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
 def swap_inbox(request):
 	stats_util.startProfiling()
 	response = dict({'result': True})
@@ -280,27 +301,6 @@ def actions_list(request):
 
 		user.last_actions_list_request_timestamp = datetime.datetime.utcnow()
 		user.save()
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-
-"""
-	Returns back the suggested shares
-"""
-def swaps(request):
-	stats_util.startProfiling()
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-
-		objs = swaps_util.getFeedObjectsForSwaps(user)
-		
-		stats_util.printStats("swaps-end")
-		response['objects'] = objs
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

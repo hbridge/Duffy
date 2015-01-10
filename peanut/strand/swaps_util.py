@@ -6,16 +6,188 @@ from django.db.models import Q
 from strand import geo_util, friends_util, strands_util
 from common.models import Photo, Strand, StrandNeighbor, Action, User, ShareInstance
 
-from common import stats_util, cluster_util, api_util
+from common import stats_util, cluster_util, api_util, serializers
 
 from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
 
 
+# Fetch strands we want to find neighbors on
+# Fetch neighbors rows that match strands and friends
+# Fetch neighbor strands and neighbor users
+# Filter out eval'd photos
+# Format private strand with interested users
+def getFeedObjectsForSwaps(user):
+	responseObjects = list()
+
+	friends = friends_util.getFriends(user.id)
+
+	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=90)
+	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(suggestible=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
+	stats_util.printStats("swaps-recent-cache")
+
+	# TODO(Derek): This should pre-fetch photos for the neighbor strands
+	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(recentStrands, friends)
+	stats_util.printStats("swaps-neighbors-cache")
+
+	strandIds = neighborStrandsByStrandId.keys()
+	strandIds.extend(neighborUsersByStrandId.keys())
+
+	strands = Strand.objects.prefetch_related('photos').filter(id__in=strandIds)
+	
+	interestedUsersByStrandId, matchReasonsByStrandId = getInterestedUsersForStrands(user, strands, True, neighborStrandsByStrandId, neighborUsersByStrandId, friends)
+	stats_util.printStats("swaps-b")
+
+	filteredStrands = list()
+	for strandId in interestedUsersByStrandId.keys():
+		for strand in strands:
+			if strand.id == strandId:
+				filteredStrands.append(strand)
+	strands = filteredStrands
+	stats_util.printStats("swaps-b2")
+	
+	actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
+	stats_util.printStats("swaps-d")
+		
+	for strand in strands:
+		strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+		responseObjects.append(strandObjectData)
+
+	if len(responseObjects) < 3:
+		timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+		mostRecentStrandIds = list()
+
+		for strand in recentStrands:
+			if strand.first_photo_time > timeCutoff:
+				mostRecentStrandIds.append(strand.id)
+
+		strands = Strand.objects.prefetch_related('photos').filter(id__in=mostRecentStrandIds)
+		actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
+
+		for strand in strands:
+			strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, "recent-last week", dict(), dict(), actionsByPhotoId)
+			responseObjects.append(strandObjectData)
+
+
+	return responseObjects
+
+def getActionsByPhotoIdForStrands(user, strands):
+	photoIds = list()
+	for strand in strands:
+		photoIds.extend(Photo.getIds(strand.photos.all()))
+
+	evalActions = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & Q(user=user) & Q(photo_id__in=photoIds))
+	actionsByPhotoId = dict()
+	for action in evalActions:
+		if action.photo_id not in actionsByPhotoId:
+			actionsByPhotoId[action.photo_id] = list()
+		actionsByPhotoId[action.photo_id].append(action)
+
+	return actionsByPhotoId
+
+
+def getInterestedUsersForStrands(user, strands, locationRequired, neighborStrandsByStrandId, neighborUsersByStrandId, friends):
+	interestedUsersByStrandId = dict()
+	matchReasonsByStrandId = dict()
+	
+	for strand in strands:
+		matchReasons = dict()
+		interestedUsers = list()
+		if strand.id in neighborStrandsByStrandId:
+			for neighborStrand in neighborStrandsByStrandId[strand.id]:
+				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
+					val, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
+					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+
+					for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+						dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
+						matchReasons[friend.id] = "location-strand %s" % reason
+
+				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
+					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+
+					for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+						matchReasons[friend.id] = "nolocation-strand"
+
+			if strand.id in neighborUsersByStrandId:
+				interestedUsers.extend(neighborUsersByStrandId[strand.id])
+				for friend in neighborUsersByStrandId[strand.id]:
+					matchReasons[friend.id] = "location-user"
+
+		
+		if len(interestedUsers) > 0:	
+			interestedUsersByStrandId[strand.id] = list(set(interestedUsers))
+			matchReasonsByStrandId[strand.id] = matchReasons
+
+	return interestedUsersByStrandId, matchReasonsByStrandId
+
 ###
 ### TODO(Derek): Reorganize this whole things
 ###
+
+def getFeedObjectsForSwapsOld(user):
+	responseObjects = list()
+	
+	# Do neighbor suggestions
+	friendsIdList = friends_util.getFriendsIds(user.id)
+
+	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
+	strandIds = list()
+	for strandNeighbor in strandNeighbors:
+		if strandNeighbor.strand_1_user_id == user.id:
+			strandIds.append(strandNeighbor.strand_1_id)
+		else:
+			strandIds.append(strandNeighbor.strand_2_id)
+
+	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')[:20]
+
+	# The prefetch for 'user' took a while here so just do it manually
+	for strand in strands:
+		for photo in strand.photos.all():
+			photo.user = user
+			
+	strands = list(strands)
+	stats_util.printStats("swaps-strands-fetch")
+
+	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
+	stats_util.printStats("swaps-neighbors-cache")
+
+	locationBasedGroups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
+
+	stats_util.printStats("swap-groups")
+
+	locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
+	locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
+	locationBasedGroups = filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
+	locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
+
+	rankNum = 0
+	locationBasedIds = list()
+	for suggestion in locationBasedSuggestions:
+		suggestion['suggestion_rank'] = rankNum
+		suggestion['suggestion_type'] = "friend-location"
+		rankNum += 1
+		locationBasedIds.append(suggestion['id'])
+
+	for objects in locationBasedSuggestions:
+		responseObjects.append(objects)
+	stats_util.printStats("swaps-location-suggestions")
+	
+	# Last resort, try throwing in recent photos
+	if len(responseObjects) < 3:
+		now = datetime.datetime.utcnow()
+		lower = now - datetime.timedelta(days=7)
+
+		lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
+		rankNum += len(lastWeekObjects)
+	
+		for objects in lastWeekObjects:
+			responseObjects.append(objects)
+
+		stats_util.printStats("swaps-recent-photos")
+	return responseObjects
 
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
@@ -205,17 +377,12 @@ def getActorsObjectData(userId, users, includePhone = True):
 
 	returns cache[strandId] = list(neighborStrand1, neighborStrand2...)
 """
-def getStrandNeighborsCache(strands, friends, withUsers = False):
+def getStrandNeighborsCache(strands, friends):
 	strandIds = Strand.getIds(strands)
 	friendIds = [x.id for x in friends]
 
 	strandNeighbors = StrandNeighbor.objects.prefetch_related('strand_1', 'strand_2').filter((Q(strand_1_id__in=strandIds) & Q(strand_2_user_id__in=friendIds)) | (Q(strand_1_user_id__in=friendIds) & Q(strand_2_id__in=strandIds)))
-
-	if withUsers:
-		strandNeighbors = strandNeighbors.prefetch_related('strand_1__users', 'strand_2__users')
-
-	strandNeighbors = list(strandNeighbors)
-
+	
 	neighborStrandsByStrandId = dict()
 	neighborUsersByStrandId = dict()
 	for strand in strands:

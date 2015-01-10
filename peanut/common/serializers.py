@@ -6,6 +6,9 @@ from common.models import Photo, User, Action, ContactEntry, Strand, ShareInstan
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
 
+from strand import strands_util
+from common import stats_util
+
 from django.db import connection
 
 from peanut.settings import constants
@@ -95,6 +98,37 @@ def objectDataForShareInstance(shareInstance, actions, user):
 
 	return shareInstanceData
 
+
+def objectDataForPrivateStrand(strand, friends, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
+	strandData = dict()
+	strandData['id'] = strand.id
+	if strand.id in interestedUsersByStrandId:
+		interestedUsers = interestedUsersByStrandId[strand.id]
+		strandData['match_reasons'] = matchReasonsByStrandId[strand.id]
+		strandData['actors'] = actorsData(friends, interestedUsers)
+		strandData['actor_ids'] = User.getIds(interestedUsers)
+
+	strandData['strand_id'] = strand.id
+	strandData['time_taken'] = strand.first_photo_time
+	strandData['suggestion_type'] = suggestionType
+	strandData['suggestible'] = True
+	strandData['location'] = strands_util.getLocationForStrand(strand)
+
+	strandData['objects'] = list()
+
+	for photo in strand.photos.all():
+		evaled = False
+		if photo.id in actionsByPhotoId:
+			for action in actionsByPhotoId[photo.id]:
+				if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
+					evaled = True
+		if not evaled:
+			strandData['objects'].append(photoDataForApiSerializer(photo))
+			
+	strandData['type'] = 'section'
+	
+	return strandData
+
 def actionDataForShareInstance(action):
 	actionData = dict()
 	actionData['id'] = action.id
@@ -148,3 +182,25 @@ def actionDataForApiSerializer(action):
 	actionData['user_phone_number'] = action.getUserPhoneNumber()
 
 	return actionData
+
+
+def actorsData(friends, users, includePhone = True):
+	if not isinstance(users, list) and not isinstance(users, set):
+		users = [users]
+
+	userData = list()
+
+	for user in users:
+		if user in friends:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
+		else:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
+		
+		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
+
+		if includePhone:
+			entry['phone_number'] = user.phone_number
+
+		userData.append(entry)
+
+	return userData
