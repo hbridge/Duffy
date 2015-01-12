@@ -280,18 +280,15 @@ static BOOL showFilters = NO;
 {
   // create arrays for last week and older
   NSMutableArray *lastWeek = [NSMutableArray new];
-  NSMutableArray *older = [feedPhotos mutableCopy];
+  NSMutableArray *older = [NSMutableArray new];
   for (DFPeanutFeedObject *photo in feedPhotos) {
-    DFPeanutAction *mostRecentAction = [photo mostRecentAction];
-    NSTimeInterval timeAgo = [[mostRecentAction time_stamp] timeIntervalSinceNow];
-    if (timeAgo < -60*60*24*7) break;
-    [lastWeek addObject:photo];
+    NSTimeInterval timeAgo = [photo.evaluated_time timeIntervalSinceNow];
+    if (timeAgo > -60*60*24*7) {
+      [lastWeek addObject:photo];
+    } else {
+      [older addObject:photo];
+    }
   }
-  
-  if (older.count >= lastWeek.count && lastWeek.count > 0) {
-    [older removeObjectsInRange:(NSRange){0, lastWeek.count}];
-  }
-  
   // create section objects for last week and older
   
   NSMutableArray *result = [NSMutableArray new];
