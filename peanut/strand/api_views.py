@@ -86,16 +86,14 @@ def getSortRanking(user, shareInstance, actions):
 		lastTimestamp = shareInstance.shared_at_timestamp
 
 	for action in actions:
-		if ((action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
-			action.user_id == user.id) or
-			action.action_type == constants.ACTION_TYPE_COMMENT):
+		if (action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
+			action.user_id == user.id):
 			if not lastTimestamp or action.added > lastTimestamp:
 				lastTimestamp = action.added
 
-
 	if not lastTimestamp:
 		# this will happen for photos that need to be evaluated
-		return 0
+		return long(shareInstance.shared_at_timestamp.strftime('%s'))
 		
 	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
 	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
@@ -178,14 +176,15 @@ def swap_inbox(request):
 		# is before the given lastTimestamp
 		# So in that case, lets search for all the actions since that timestamp and add those
 		# ShareInstances into the mix to be sorted
-		if form.cleaned_data['last_timestamp']:
-			recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(updated__gt=lastTimestamp).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
-
-			shareInstanceIds = ShareInstance.getIds(shareInstances)
-			shareInstances = list(shareInstances)
-			for action in recentlyEvaluatedActions:
-				if action.share_instance_id and action.share_instance_id not in shareInstanceIds:
-					shareInstances.append(action.share_instance)
+		recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(updated__gt=lastTimestamp).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
+		if num:
+			recentlyEvaluatedActions = recentlyEvaluatedActions[:num]
+			
+		shareInstanceIds = ShareInstance.getIds(shareInstances)
+		shareInstances = list(shareInstances)
+		for action in recentlyEvaluatedActions:
+			if action.share_instance_id and action.share_instance_id not in shareInstanceIds:
+				shareInstances.append(action.share_instance)
 			
 		# Now filter out anything that doesn't have a thumb...unless its your own photo
 		filteredShareInstances = list()
