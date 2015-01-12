@@ -35,6 +35,7 @@ NSString *const DFStrandNewInboxDataNotificationName = @"com.duffyapp.Strand.DFS
 NSString *const DFStrandNewSwapsDataNotificationName = @"com.duffyapp.Strand.DFStrandNewSwapsDataNotificationName";
 NSString *const DFStrandNewPrivatePhotosDataNotificationName = @"com.duffyapp.Strand.DFStrandNewPrivatePhotosDataNotificationName";
 NSString *const DFStrandNewActionsDataNotificationName = @"com.duffyapp.Strand.DFStrandNewActionsDataNotificationName";
+NSString *const DFStrandNewFriendsDataNotificationName = @"com.duffyapp.Strand.DFStrandNewFriendsDataNotificationName";
 
 
 NSString *const DFStrandCameraPhotoSavedNotificationName = @"com.duffyapp.Strand.DFStrandCameraPhotoSavedNotificationName";

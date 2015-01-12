@@ -22,6 +22,8 @@
 #import "DFPeanutShareInstanceAdapter.h"
 #import "DFUserPeanutAdapter.h"
 
+#define REFRESH_FEED_AFTER_SECONDS 300 //seconds between a full refresh of a feed
+
 @interface DFPeanutFeedDataManager ()
 
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *inboxFeedAdapter;
@@ -44,7 +46,9 @@
 @property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
 @property (nonatomic, retain) NSData *actionsLastResponseHash;
 
-@property (nonatomic, retain) NSString *inboxLastTimestamp;
+
+@property (nonatomic, retain) NSDate *inboxLastFullFetch;
+@property (nonatomic, retain) NSString *inboxLastFeedTimestamp;
 
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
@@ -149,9 +153,9 @@ static DFPeanutFeedDataManager *defaultManager;
   if (!self.inboxRefreshing) {
     self.inboxRefreshing = YES;
     NSMutableDictionary *parameters = [NSMutableDictionary new];
-    if (self.inboxLastTimestamp && !fullRefresh) {
-      [parameters setObject:self.inboxLastTimestamp forKey:@"last_timestamp"];
-    } else if (!self.inboxLastTimestamp && !fullRefresh) {
+    if (self.inboxLastFeedTimestamp && !fullRefresh) {
+      [parameters setObject:self.inboxLastFeedTimestamp forKey:@"last_timestamp"];
+    } else if (!self.inboxLastFeedTimestamp && !fullRefresh) {
       // If we don't have a last timestamp then we're doing a cold start.
       // This fetch, grab just 20 elements, but also kick off a full refresh after this first one comes back
       [parameters setObject:@(20) forKey:@"num"];
@@ -163,14 +167,32 @@ static DFPeanutFeedDataManager *defaultManager;
                                 NSError *error) {
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
-       if (!error && ([response.objects count] > 1 || !self.inboxLastTimestamp)) {
-         if (!self.inboxLastTimestamp && !fullRefresh) {
+       if (!error) {
+         // If we're not doing a full refresh, then check to see if we should do one.
+         // Either if we haven't done one before or its been longer than 5 minutes
+         if (!fullRefresh) {
+           if (!self.inboxLastFullFetch || [[NSDate date] timeIntervalSinceDate:self.inboxLastFullFetch] > REFRESH_FEED_AFTER_SECONDS) {
              dispatch_async(dispatch_get_main_queue(), ^{
                [self refreshInboxFromServer:completion fullRefresh:YES];
              });
+           }
          }
-         self.inboxLastTimestamp = response.timestamp;
+         
+         self.inboxLastFeedTimestamp = response.timestamp;
+         
+         if (fullRefresh) {
+           self.inboxLastFullFetch = [NSDate date];
+         }
+         
          self.inboxFeedObjects = [self processInboxFeed:self.inboxFeedObjects withNewObjects:response.objects];
+         
+         if ([response.objects count] > 1) {
+           // We always get the friends list back, so if we got more, send out notification that we have new data
+           [[NSNotificationCenter defaultCenter]
+            postNotificationName:DFStrandNewInboxDataNotificationName
+            object:self];
+           DDLogInfo(@"Got new inbox data, sending notification.");
+         }
          
          // For inbox only, we update our local cache of friends
          // If we refactor these methods to be common this will need to be pulled out
@@ -180,15 +202,21 @@ static DFPeanutFeedDataManager *defaultManager;
              
              // This grabs the local first name which we want to sort by
              NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
-             _cachedFriendsList = [NSMutableArray arrayWithArray:[peopleList sortedArrayUsingDescriptors:@[sort]]];
+             NSMutableArray *newFriendsList = [NSMutableArray arrayWithArray:[peopleList sortedArrayUsingDescriptors:@[sort]]];
+             
+             if (![newFriendsList isEqualToArray:_cachedFriendsList]) {
+               [[NSNotificationCenter defaultCenter]
+                postNotificationName:DFStrandNewFriendsDataNotificationName
+                object:self];
+               DDLogInfo(@"Got new friends data, sending notification.");
+             }
+             _cachedFriendsList = newFriendsList;
            }
          }
          
-         DDLogInfo(@"Got new inbox data, sending notification.");
+        
          
-         [[NSNotificationCenter defaultCenter]
-          postNotificationName:DFStrandNewInboxDataNotificationName
-          object:self];
+         
        }
        [self executeDeferredCompletionsForFeedType:DFInboxFeed];
        self.inboxRefreshing = NO;
@@ -288,7 +316,7 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (BOOL)hasInboxData{
-  return (self.inboxLastTimestamp != nil);
+  return (self.inboxLastFeedTimestamp != nil);
 }
 
 - (BOOL)hasPrivateStrandData
