@@ -108,9 +108,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)markActionsAsSeen
 {
   // mark the action IDs for the photo object seen
-  NSArray *actionIDs = [self.photoObject.actions arrayByMappingObjectsWithBlock:^id(DFPeanutAction *action) {
-    return action.id;
-  }];
+  NSMutableArray *actionIDs = [NSMutableArray new];
+  for (DFPeanutAction *action in self.photoObject.actions) {
+    if (action.id) [actionIDs addObject:action.id];
+    else DDLogWarn(@"%@ action with no ID, can't mark as seen: %@", self.class, action);
+  }
   [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
 }
 
