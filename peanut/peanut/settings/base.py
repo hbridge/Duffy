@@ -142,5 +142,5 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = 'AKIAJBSV42QT6SWHHGBA'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_HEADERS = {
-    'Content-type': 'image/jpg'
+    'Content-type': 'image/jpeg'
 }
