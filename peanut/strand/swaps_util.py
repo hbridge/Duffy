@@ -428,7 +428,7 @@ def getIncomingBadgeCount(user):
 		actionsByShareInstanceId[action.share_instance_id].append(action)
 
 	for shareInstance in shareInstances:
-		if shareInstance.id not in actionsByShareInstanceId and shareInstance.shared_at_timestamp > user.last_action_request_timestamp:
+		if shareInstance.id not in actionsByShareInstanceId:
 			count += 1
 
 	return count
