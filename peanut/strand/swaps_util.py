@@ -23,29 +23,12 @@ def getFeedObjectsForSwaps(user):
 
 	friends = friends_util.getFriends(user.id)
 
-	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=90)
+	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=30)
 	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(suggestible=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
 	stats_util.printStats("swaps-recent-cache")
-
-	# TODO(Derek): This should pre-fetch photos for the neighbor strands
-	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(recentStrands, friends)
-	stats_util.printStats("swaps-neighbors-cache")
-
-	strandIds = neighborStrandsByStrandId.keys()
-	strandIds.extend(neighborUsersByStrandId.keys())
-
-	strands = Strand.objects.prefetch_related('photos').filter(id__in=strandIds)
 	
-	interestedUsersByStrandId, matchReasonsByStrandId = getInterestedUsersForStrands(user, strands, True, neighborStrandsByStrandId, neighborUsersByStrandId, friends)
+	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, recentStrands, True, friends)
 	stats_util.printStats("swaps-b")
-
-	filteredStrands = list()
-	for strandId in interestedUsersByStrandId.keys():
-		for strand in strands:
-			if strand.id == strandId:
-				filteredStrands.append(strand)
-	strands = filteredStrands
-	stats_util.printStats("swaps-b2")
 	
 	actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
 	stats_util.printStats("swaps-d")
@@ -69,7 +52,6 @@ def getFeedObjectsForSwaps(user):
 			strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, "recent-last week", dict(), dict(), actionsByPhotoId)
 			responseObjects.append(strandObjectData)
 
-
 	return responseObjects
 
 def getActionsByPhotoIdForStrands(user, strands):
@@ -87,11 +69,26 @@ def getActionsByPhotoIdForStrands(user, strands):
 	return actionsByPhotoId
 
 
-def getInterestedUsersForStrands(user, strands, locationRequired, neighborStrandsByStrandId, neighborUsersByStrandId, friends):
+def getInterestedUsersForStrands(user, strands, locationRequired, friends):
 	interestedUsersByStrandId = dict()
 	matchReasonsByStrandId = dict()
+
+	# TODO(Derek): If we want to speed up this call, then we could have the neighbor row
+	# keep track of the start of the strand and only fetch neighbors 
+	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends)
+	stats_util.printStats("swaps-neighbors-cache")
+
+	strandIds = neighborStrandsByStrandId.keys()
+	strandIds.extend(neighborUsersByStrandId.keys())
+
+	strandsWithNeighbors = Strand.objects.prefetch_related('photos').filter(id__in=strandIds)
 	
-	for strand in strands:
+	# The prefetch for 'user' took a while here so just do it manually
+	for strand in strandsWithNeighbors:
+		for photo in strand.photos.all():
+			photo.user = user
+
+	for strand in strandsWithNeighbors:
 		matchReasons = dict()
 		interestedUsers = list()
 		if strand.id in neighborStrandsByStrandId:
@@ -120,74 +117,14 @@ def getInterestedUsersForStrands(user, strands, locationRequired, neighborStrand
 			interestedUsersByStrandId[strand.id] = list(set(interestedUsers))
 			matchReasonsByStrandId[strand.id] = matchReasons
 
-	return interestedUsersByStrandId, matchReasonsByStrandId
-
-###
-### TODO(Derek): Reorganize this whole things
-###
-
-def getFeedObjectsForSwapsOld(user):
-	responseObjects = list()
+	filteredStrands = list()
+	for strandId in interestedUsersByStrandId.keys():
+		for strand in strandsWithNeighbors:
+			if strand.id == strandId:
+				filteredStrands.append(strand)
 	
-	# Do neighbor suggestions
-	friendsIdList = friends_util.getFriendsIds(user.id)
+	return interestedUsersByStrandId, matchReasonsByStrandId, filteredStrands
 
-	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
-	strandIds = list()
-	for strandNeighbor in strandNeighbors:
-		if strandNeighbor.strand_1_user_id == user.id:
-			strandIds.append(strandNeighbor.strand_1_id)
-		else:
-			strandIds.append(strandNeighbor.strand_2_id)
-
-	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=30)
-	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')[:20]
-
-	# The prefetch for 'user' took a while here so just do it manually
-	for strand in strands:
-		for photo in strand.photos.all():
-			photo.user = user
-			
-	strands = list(strands)
-	stats_util.printStats("swaps-strands-fetch")
-
-	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
-	stats_util.printStats("swaps-neighbors-cache")
-
-	locationBasedGroups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
-
-	stats_util.printStats("swap-groups")
-
-	locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
-	locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-	locationBasedGroups = filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
-	locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
-
-	rankNum = 0
-	locationBasedIds = list()
-	for suggestion in locationBasedSuggestions:
-		suggestion['suggestion_rank'] = rankNum
-		suggestion['suggestion_type'] = "friend-location"
-		rankNum += 1
-		locationBasedIds.append(suggestion['id'])
-
-	for objects in locationBasedSuggestions:
-		responseObjects.append(objects)
-	stats_util.printStats("swaps-location-suggestions")
-	
-	# Last resort, try throwing in recent photos
-	if len(responseObjects) < 3:
-		now = datetime.datetime.utcnow()
-		lower = now - datetime.timedelta(days=7)
-
-		lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
-		rankNum += len(lastWeekObjects)
-	
-		for objects in lastWeekObjects:
-			responseObjects.append(objects)
-
-		stats_util.printStats("swaps-recent-photos")
-	return responseObjects
 
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
@@ -267,85 +204,6 @@ def getObjectsDataFromGroups(groups):
 	return objects
 
 
-def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
-	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
-
-	groups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=dict(), neighborUsersByStrandId=dict())
-	groups = sorted(groups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-
-	objects = getObjectsDataFromGroups(groups)
-
-	for suggestion in objects:
-		suggestion['suggestible'] = True
-		suggestion['suggestion_type'] = "timed-%s" % (title)
-		suggestion['title'] = title
-		suggestion['suggestion_rank'] = rankNum
-		rankNum += 1
-	return objects
-
-
-def getFeedObjectsForSwaps(user):
-	responseObjects = list()
-	
-	# Do neighbor suggestions
-	friendsIdList = friends_util.getFriendsIds(user.id)
-
-	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
-	strandIds = list()
-	for strandNeighbor in strandNeighbors:
-		if strandNeighbor.strand_1_user_id == user.id:
-			strandIds.append(strandNeighbor.strand_1_id)
-		else:
-			strandIds.append(strandNeighbor.strand_2_id)
-
-	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
-
-	# The prefetch for 'user' took a while here so just do it manually
-	for strand in strands:
-		for photo in strand.photos.all():
-			photo.user = user
-			
-	strands = list(strands)
-	stats_util.printStats("swaps-strands-fetch")
-
-	neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
-	stats_util.printStats("swaps-neighbors-cache")
-
-	locationBasedGroups = getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
-
-	stats_util.printStats("swap-groups")
-
-	locationBasedGroups = filter(lambda x: x['metadata']['suggestible'], locationBasedGroups)
-	locationBasedGroups = sorted(locationBasedGroups, key=lambda x: x['metadata']['time_taken'], reverse=True)
-	locationBasedGroups = filterEvaluatedPhotosFromGroups(user, locationBasedGroups)
-	locationBasedSuggestions = getObjectsDataFromGroups(locationBasedGroups)
-
-	rankNum = 0
-	locationBasedIds = list()
-	for suggestion in locationBasedSuggestions:
-		suggestion['suggestion_rank'] = rankNum
-		suggestion['suggestion_type'] = "friend-location"
-		rankNum += 1
-		locationBasedIds.append(suggestion['id'])
-
-	for objects in locationBasedSuggestions:
-		responseObjects.append(objects)
-	stats_util.printStats("swaps-location-suggestions")
-	
-	# Last resort, try throwing in recent photos
-	if len(responseObjects) < 3:
-		now = datetime.datetime.utcnow()
-		lower = now - datetime.timedelta(days=7)
-
-		lastWeekObjects = getObjectsDataForSpecificTime(user, lower, now, "Last Week", rankNum)
-		rankNum += len(lastWeekObjects)
-	
-		for objects in lastWeekObjects:
-			responseObjects.append(objects)
-
-		stats_util.printStats("swaps-recent-photos")
-	return responseObjects
-
 
 # ------------------------
 def getActorsObjectData(userId, users, includePhone = True):
@@ -381,7 +239,7 @@ def getStrandNeighborsCache(strands, friends):
 	strandIds = Strand.getIds(strands)
 	friendIds = [x.id for x in friends]
 
-	strandNeighbors = StrandNeighbor.objects.prefetch_related('strand_1', 'strand_2').filter((Q(strand_1_id__in=strandIds) & Q(strand_2_user_id__in=friendIds)) | (Q(strand_1_user_id__in=friendIds) & Q(strand_2_id__in=strandIds)))
+	strandNeighbors = StrandNeighbor.objects.prefetch_related('strand_1', 'strand_2', 'strand_1__photos', 'strand_2__photos', 'strand_1__users', 'strand_2__users').filter((Q(strand_1_id__in=strandIds) & Q(strand_2_user_id__in=friendIds)) | (Q(strand_1_user_id__in=friendIds) & Q(strand_2_id__in=strandIds)))
 	
 	neighborStrandsByStrandId = dict()
 	neighborUsersByStrandId = dict()
