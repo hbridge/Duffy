@@ -90,6 +90,7 @@ static NSArray *FeedObjectTypes;
            @"suggestion_type",
            @"full_width",
            @"full_height",
+           @"strand_id",
            @"evaluated",
            @"evaluated_time",
            ];

@@ -47,7 +47,7 @@ extern DFFeedObjectType DFFeedObjectCluster;
 @property (nonatomic, retain) NSString *suggestion_type;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;
-//@property (nonatomic, retain) NSNumber *strand_id;
+@property (nonatomic, retain) NSNumber *strand_id;
 @property (nonatomic, retain) NSNumber *evaluated;
 @property (nonatomic, retain) NSDate *evaluated_time;
 

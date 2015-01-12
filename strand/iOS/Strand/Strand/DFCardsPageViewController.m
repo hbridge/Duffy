@@ -30,7 +30,7 @@
 @property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic, readonly, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
-@property (nonatomic, retain) NSArray *lastSentContacts;
+@property (nonatomic, retain) NSMutableDictionary *sentContactsByStrandID;
 
 @property (nonatomic) NSInteger photoIndex;
 @property (retain, nonatomic) NSMutableArray *indexPaths;
@@ -62,6 +62,7 @@ const NSUInteger NumOutgoingNuxes = 3;
     _preferredType = preferredType;
     _startingPhotoID = photoID;
     _startingShareInstanceID = shareID;
+    _sentContactsByStrandID = [NSMutableDictionary new];
   }
   return self;
 }
@@ -269,9 +270,8 @@ const NSUInteger NumOutgoingNuxes = 3;
           svc.view.frame = self.view.bounds;
           
           [svc configureWithSuggestion:suggestion withPhoto:photo];
-          if (suggestion.actor_ids.count == 0 && self.lastSentContacts.count > 0) {
-            svc.selectedPeanutContacts = self.lastSentContacts;
-          }
+          NSArray *lastSentForStrand = self.sentContactsByStrandID[suggestion.strand_id];
+          if (lastSentForStrand.count > 0) svc.selectedPeanutContacts = lastSentForStrand;
           DFCardsPageViewController __weak *weakSelf = self;
 
           svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
@@ -421,7 +421,7 @@ const NSUInteger NumOutgoingNuxes = 3;
     return;
   }
   
-  self.lastSentContacts = contacts;
+  self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];
   
   NSArray *phoneNumbers = [contacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
     return contact.phone_number;
