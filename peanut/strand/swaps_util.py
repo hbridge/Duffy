@@ -202,7 +202,7 @@ def getPhotoCountFromFeedObjects(feedObjects):
 	for obj in feedObjects:
 		if obj['type'] == "photo":
 			count += 1
-		else:
+		elif 'objects' in obj:
 			count += getPhotoCountFromFeedObjects(obj['objects'])
 
 	return count
