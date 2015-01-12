@@ -57,7 +57,7 @@ public class StrandSocketServer {
         try {  
 
             // This block configure the logger with handler and formatter  
-            fh = new FileHandler("/var/log/duffy/socket-server-java.log");  
+            fh = new FileHandler("/var/log/duffy/socket-server-java.log", true);  
             ss.logger.addHandler(fh);
             formatter = new SimpleFormatter();  
             fh.setFormatter(formatter);
