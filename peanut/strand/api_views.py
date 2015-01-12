@@ -122,31 +122,10 @@ def private_strands(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		stats_util.printStats("private-1")
+		objs = swaps_util.getFeedObjectsForPrivateStrands(user)
 		
-		strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
-
-		stats_util.printStats("private-2")
-
-		deletedSomething = False
-		for strand in strands:
-			if len(strand.photos.all()) == 0:
-				logging.error("Found strand %s with no photos in private strands, deleting.  users are %s" % (strand.id, strand.users.all()))
-				strand.delete()
-				deletedSomething = True
-
-		if deletedSomething:
-			strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
-
-		friends = friends_util.getFriends(user.id)
-		
-		stats_util.printStats("private-3")
-
-		groups = swaps_util.getGroupsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, locationRequired = True)
-		stats_util.printStats("private-4")
-
-		response['objects'] = swaps_util.getObjectsDataFromGroups(groups)	
 		stats_util.printStats("private-end")
+		response['objects'] = objs
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
