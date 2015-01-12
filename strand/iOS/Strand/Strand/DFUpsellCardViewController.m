@@ -66,7 +66,18 @@
     if (self.noButtonHandler) self.noButtonHandler();
     result = @"no";
   }
-  [DFAnalytics logOtherCardType:@"NoIncomingInterstitial"
+  
+  NSString *typeString = @"unknown";
+  if (self.upsellType == DFUpsellCardViewGotoSuggestions) {
+    typeString = @"NoIncomingInterstitial";
+  } else if (self.upsellType == DFUpsellCardViewBackgroundLocation) {
+    typeString = @"BackgroundLocationUpsell";
+  } else {
+    #ifdef DEBUG
+    [NSException raise:@"not logged properly" format:@"other card not logged properly"];
+    #endif
+  }
+  [DFAnalytics logOtherCardType:typeString
             processedWithResult:result
                      actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
 }
