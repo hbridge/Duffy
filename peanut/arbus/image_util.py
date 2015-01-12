@@ -160,12 +160,11 @@ def getTimeTakenFromExtraData(photo, tryFile=False):
 
 	return None
 
-def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
-	im = Image.open(tempFilepath)
+def processUploadedPhoto(photo, origFileName, tempFile, bulk=False):
+	im = Image.open(tempFile)
 	(width, height) = im.size
-
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
-		os.system('mv %s %s' % (tempFilepath, photo.getDefaultThumbPath()))
+		os.system('mv %s %s' % (tempFile.name, photo.getDefaultThumbPath()))
 		copyFileToS3(photo.getDefaultThumbPath(), '/'.join([photo.user.getUserDataId(),photo.getDefaultThumbFilename()]))
 		photo.thumb_filename = photo.getDefaultThumbFilename()
 
@@ -176,7 +175,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		photo.orig_filename = origFileName
 		photo.full_filename = photo.getDefaultFullFilename()
 
-		os.system('mv %s %s' % (tempFilepath, photo.getDefaultFullPath()))
+		os.system('mv %s %s' % (tempFile.name, photo.getDefaultFullPath()))
 		copyFileToS3(photo.getDefaultFullPath(), '/'.join([photo.user.getUserDataId(),photo.getDefaultFullFilename()]))	
 
 		im = Image.open(photo.getDefaultFullPath())
@@ -204,10 +203,10 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 
 def handleUploadedImage(request, fileKey, photo):
 	if fileKey in request.FILES:
-		tempFilepath = tempfile.mktemp()
+		tempFile = tempfile.NamedTemporaryFile()
  
-		writeOutUploadedFile(request.FILES[fileKey], tempFilepath)
-		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFilepath)
+		writeOutUploadedFile(request.FILES[fileKey], tempFile)
+		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFile)
 	else:
 		logger.warning("File not found in request: " + fileKey)
 		logger.warning(request.FILES)
@@ -217,10 +216,10 @@ def handleUploadedImagesBulk(request, photos):
 	count = 0
 	for photo in photos:
 		if photo.file_key:
-			tempFilepath = tempfile.mktemp()
+			tempFile = tempfile.NamedTemporaryFile(delete=False)
 			if photo.file_key in request.FILES:
-				writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
-				processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
+				writeOutUploadedFile(request.FILES[photo.file_key], tempFile)
+				processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFile, bulk=True)
 				
 				logger.debug("Processed photo file, now called %s %s" % (photo.thumb_filename, photo.full_filename))
 				count += 1
@@ -229,10 +228,12 @@ def handleUploadedImagesBulk(request, photos):
 """
 	Moves an uploaded file to a new destination
 """
-def writeOutUploadedFile(uploadedFile, newFilePath):
-	with open(newFilePath, 'wb+') as destination:
-		for chunk in uploadedFile.chunks():
-			destination.write(chunk)
+def writeOutUploadedFile(uploadedFile, newFile):
+	newFile.seek(0)
+	for chunk in uploadedFile.chunks():
+		newFile.write(chunk)
+	# bringing the seek back to first bit to read it later, since we are passing around File objects.
+	newFile.seek(0)
 
 """
 	Copies a file to s3
