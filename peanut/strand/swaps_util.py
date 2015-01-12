@@ -36,7 +36,8 @@ def getFeedObjectsForSwaps(user):
 		
 	for strand in strands:
 		strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
-		responseObjects.append(strandObjectData)
+		if strandObjectData:
+			responseObjects.append(strandObjectData)
 
 	if len(responseObjects) < 3:
 		timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=7)
@@ -51,7 +52,8 @@ def getFeedObjectsForSwaps(user):
 
 		for strand in strands:
 			strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, False, "recent-last week", dict(), dict(), actionsByPhotoId)
-			responseObjects.append(strandObjectData)
+			if strandObjectData:
+				responseObjects.append(strandObjectData)
 
 	return responseObjects
 
@@ -72,7 +74,8 @@ def getFeedObjectsForPrivateStrands(user):
 		
 	for strand in allPrivateStrands:
 		strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
-		responseObjects.append(strandObjectData)
+		if strandObjectData:
+			responseObjects.append(strandObjectData)
 
 	return responseObjects
 

@@ -99,7 +99,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	return shareInstanceData
 
 
-def objectDataForPrivateStrand(strand, friends, requireNotEval, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
+def objectDataForPrivateStrand(strand, friends, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
 	strandData = dict()
 	strandData['id'] = strand.id
 	if strand.id in interestedUsersByStrandId:
@@ -113,20 +113,24 @@ def objectDataForPrivateStrand(strand, friends, requireNotEval, suggestionType, 
 	strandData['suggestion_type'] = suggestionType
 	strandData['suggestible'] = True
 	strandData['location'] = strands_util.getLocationForStrand(strand)
+	strandData['type'] = 'section'
 
 	strandData['objects'] = list()
 
+	photosIncluded = 0
 	for photo in strand.photos.all():
 		evaled = False
 		if photo.id in actionsByPhotoId:
 			for action in actionsByPhotoId[photo.id]:
 				if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
 					evaled = True
-		if not evaled or not requireNotEval:
+		if not evaled or includeAll:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
-			
-	strandData['type'] = 'section'
-	
+			photosIncluded += 1
+
+	if photosIncluded == 0:
+		return None
+
 	return strandData
 
 def actionDataForShareInstance(action):
