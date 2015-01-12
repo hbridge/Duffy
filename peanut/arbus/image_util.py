@@ -36,7 +36,8 @@ def createThumbnail(photo):
 				photo.save()
 			return photo.getDefaultThumbFilename()
 
-		if(resizeImage(fullFilePath, thumbFilePath, constants.THUMBNAIL_SIZE, True, False)):
+		s3ThumbFilePath = '/'.join([photo.user.getUserDataId(),photo.getDefaultThumbFilename()])
+		if(resizeImage(fullFilePath, thumbFilePath, s3ThumbFilePath, constants.THUMBNAIL_SIZE, True, False)):
 			photo.thumb_filename = photo.getDefaultThumbFilename()
 			photo.save()
 			logger.info("generated thumbnail: '%s" % thumbFilePath)
@@ -48,7 +49,7 @@ def createThumbnail(photo):
 """
 	Does image resizes and creates a new file (JPG) of the specified size
 """
-def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
+def resizeImage(origFilepath, newFilepath, s3FilePath, size, crop, copyExif):
 	try:
 		im = Image.open(origFilepath)
 
@@ -73,6 +74,7 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 		
 		im.load()
 		im.save(newFilepath, "JPEG")
+		copyFileToS3(newFilepath, s3FilePath)
 
 		if (copyExif):
 			# This part copies over the EXIF information to the new image
