@@ -267,12 +267,12 @@ def genHTML(emailBody):
 	time = (datetime.now() - datetime(1970,1,1)).total_seconds()
 	html = "<html><body>"
 	html += '<h2> 7-day users </h2>'
-	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image&rand=' + str(time) + '">'
-	html += '<h3>* Localytics only has 7-day actives for Mondays. No rolling 7-day actives.</h3>'
+	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image&rand=' + str(time) + '">'
+	html += '<h4>* Localytics only has 7-day actives for Mondays. No rolling 7-day actives.</h4>'
 	html += '<h2> 1-day users </h2>'
-	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=60601290&format=image&rand=' + str(time) + '">'
+	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=60601290&format=image&rand=' + str(time) + '">'
 	html += '<h2> Actions </h2>'
-	html += '<img src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=1473168963&format=image&rand='+ str(time) + '">'
+	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=1473168963&format=image&rand='+ str(time) + '">'
 	html += '<h3><a href ="https://docs.google.com/a/duffytech.co/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/edit#gid=1659973534">Raw data and stats</a></h3>'
 	html += '<pre>' + emailBody + '</pre>'	
 	html +="</body></html>"
