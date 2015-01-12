@@ -45,7 +45,6 @@
     [superView addSubview:self];
   }
   CGRect frame = superView.frame;
-  frame.size.height = frame.size.height / 2.0;
   self.frame = frame;
 }
 

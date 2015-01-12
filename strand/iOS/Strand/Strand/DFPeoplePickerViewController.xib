@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
@@ -31,7 +31,7 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h1z-eC-fV9">
                     <rect key="frame" x="0.0" y="546" width="600" height="54"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T24-ju-et9" customClass="DFActionButton">
+                        <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="999" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T24-ju-et9" customClass="DFActionButton">
                             <rect key="frame" x="150" y="8" width="300" height="38"/>
                             <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="tintColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -43,7 +43,7 @@
                     </subviews>
                     <color key="backgroundColor" red="0.9137254901960784" green="0.9137254901960784" blue="0.9137254901960784" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstAttribute="width" secondItem="T24-ju-et9" secondAttribute="width" multiplier="2" id="6cS-xw-yHH"/>
+                        <constraint firstAttribute="width" secondItem="T24-ju-et9" secondAttribute="width" multiplier="2" priority="900" id="6cS-xw-yHH"/>
                         <constraint firstAttribute="centerX" secondItem="T24-ju-et9" secondAttribute="centerX" id="CMm-iL-ekC"/>
                         <constraint firstAttribute="height" constant="54" id="tKM-wW-psa"/>
                         <constraint firstAttribute="centerY" secondItem="T24-ju-et9" secondAttribute="centerY" id="zYZ-HD-hrO"/>
