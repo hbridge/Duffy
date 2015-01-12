@@ -79,7 +79,6 @@
   NSMutableDictionary *fillColors = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *abbreviations = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *firstNames = [[NSMutableDictionary alloc] initWithCapacity:users.count];
-  NSMutableDictionary *images = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
   for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
     //fill color
@@ -104,20 +103,15 @@
     }
     abbreviations[[self.class idForUser:user]] = abbreviation;
     firstNames[[self.class idForUser:user]] = firstName;
-    
-    //image
-    UIImage *image = [user roundedThumbnailOfPointSize:CGSizeMake(self.profilePhotoWidth,
-                                                                  self.profilePhotoWidth)];
-    if (image)
-      images[[self.class idForUser:user]] = image;
-    
   }
+  
   _fillColorsById = fillColors;
   _abbreviationsById = abbreviations;
   _firstNamesById = firstNames;
-  _imagesById = images;
   
   [self sizeToFit];
+  [self reloadImages];
+  
   [self invalidateIntrinsicContentSize];
   [self setNeedsDisplay];
 }
@@ -385,6 +379,7 @@
   if (!CGRectEqualToRect(self.frame, self.lastFrame)) {
     self.lastFrame = self.frame;
     [self invalidateIntrinsicContentSize];
+    [self reloadImages];
   }
 }
 

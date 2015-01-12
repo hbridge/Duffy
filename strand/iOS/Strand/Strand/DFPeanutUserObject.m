@@ -107,9 +107,11 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size
 {
+  UIImage *thumbnail = [self thumbnail];
+  if (!thumbnail || size.width == 0 || size.height == 0) return nil;
   CGSize imageSize = CGSizeMake(size.width * [[UIScreen mainScreen] scale],
                                 size.height * [[UIScreen mainScreen] scale]);
-  UIImage *resizedImage = [[self thumbnail] resizedImage:imageSize
+  UIImage *resizedImage = [thumbnail resizedImage:imageSize
                          interpolationQuality:kCGInterpolationDefault];
   UIImage *roundedImage = [resizedImage roundedCornerImage:imageSize.width/2.0 borderSize:0];
   return roundedImage;
