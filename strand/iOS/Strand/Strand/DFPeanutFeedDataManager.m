@@ -46,11 +46,6 @@
 
 @property (nonatomic, retain) NSString *inboxLastTimestamp;
 
-@property (nonatomic, retain) NSArray *inboxFeedObjects;
-@property (nonatomic, retain) NSArray *swapsFeedObjects;
-@property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
-@property (nonatomic, retain) NSArray *actionsFeedObjects;
-
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
 
@@ -1003,6 +998,13 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_cachedFriendsList) _cachedFriendsList = [[NSArray alloc] init];
   return _cachedFriendsList;
+}
+
+- (void)resetManager
+{
+  DDLogInfo(@"%@ resetting manager.", self.class);
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  defaultManager = nil;
 }
 
 @end

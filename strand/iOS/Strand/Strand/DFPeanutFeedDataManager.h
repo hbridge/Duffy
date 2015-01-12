@@ -18,6 +18,12 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 + (DFPeanutFeedDataManager *)sharedManager;
 
+
+@property (nonatomic, retain) NSArray *inboxFeedObjects;
+@property (nonatomic, retain) NSArray *swapsFeedObjects;
+@property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
+@property (nonatomic, retain) NSArray *actionsFeedObjects;
+
 - (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion;
@@ -90,6 +96,8 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
            success:(void(^)(DFActionID actionID))success
            failure:(DFFailureBlock)failure;
 
-
+/* Clears the data manager and makes way for creating a new one.
+   Used when logging out of the app */
+- (void)resetManager;
 
 @end

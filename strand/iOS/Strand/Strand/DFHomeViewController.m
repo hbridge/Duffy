@@ -51,6 +51,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   [self configureCollectionView];
   [self configureNoResultsView];
   [self configurePopLabels];
+  [self reloadData];
 }
 
 - (void)observeNotifications
