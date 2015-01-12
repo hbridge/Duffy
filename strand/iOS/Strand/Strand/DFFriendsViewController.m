@@ -172,12 +172,13 @@
   if (self.friendPeanutUsers.count == 0) {
     if (!self.noFriendsView) {
       self.noFriendsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-      [self.noFriendsView setSuperView:self.tableView];
+      [self.noFriendsView setSuperView:self.view];
     }
     
     self.noFriendsView.hidden = NO;
     if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
-      self.noFriendsView.titleLabel.text = @"No Friends Yet";
+      self.noFriendsView.titleLabel.text = @"No Swap Friends";
+      self.noFriendsView.subtitleLabel.text = @"Tap the add friends button above to invite friends.";
       [self.noFriendsView.activityIndicator stopAnimating];
     
     } else {
