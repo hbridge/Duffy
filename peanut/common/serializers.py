@@ -150,6 +150,7 @@ def photoDataForApiSerializer(photo):
 	photoData['user_display_name'] = photo.getUserDisplayName()
 	photoData['full_width'] = photo.full_width
 	photoData['full_height'] = photo.full_height
+	photoData['type'] = 'photo'
 
 	return photoData
 
