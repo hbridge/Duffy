@@ -35,7 +35,7 @@ def getFeedObjectsForSwaps(user):
 	stats_util.printStats("swaps-d")
 		
 	for strand in strands:
-		strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+		strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
 		responseObjects.append(strandObjectData)
 
 	if len(responseObjects) < 3:
