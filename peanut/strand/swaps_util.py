@@ -39,7 +39,11 @@ def getFeedObjectsForSwaps(user):
 		if strandObjectData:
 			responseObjects.append(strandObjectData)
 
+	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
+
 	if len(responseObjects) < 3:
+		lastWeekResponseObjects = list()
+		
 		timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=7)
 		mostRecentStrandIds = list()
 
@@ -53,7 +57,11 @@ def getFeedObjectsForSwaps(user):
 		for strand in strands:
 			strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, False, "recent-last week", dict(), dict(), actionsByPhotoId)
 			if strandObjectData:
-				responseObjects.append(strandObjectData)
+				lastWeekResponseObjects.append(strandObjectData)
+
+		lastWeekResponseObjects = sorted(lastWeekResponseObjects, key=lambda x: x['time_taken'], reverse=True)
+	
+		responseObjects.extend(lastWeekResponseObjects)
 
 	return responseObjects
 
