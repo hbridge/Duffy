@@ -162,11 +162,7 @@ def threadedSendNotifications(userIds):
 		if user.id in actionsByUserId:
 			count += len(actionsByUserId[user.id])
 
-		# now add the suggestions from last week
-		objs = swaps_util.getFeedObjectsForSwaps(user)
-		count += swaps_util.getPhotoCountFromFeedObjects(objs)
-
-		# now add the count of photos in Incoming (meaning unread)
+		# now add the count of photos in Incoming (meaning unread photos)
 		count += swaps_util.getIncomingBadgeCount(user)
 
 		customPayload["badge"] = count #don't make this a string, as that puts quotes around the number and it won't work
