@@ -91,6 +91,8 @@ def objectDataForShareInstance(shareInstance, actions, user):
 		shareInstanceData['evaluated'] = True
 		if userEvalAction:
 			shareInstanceData['evaluated_time'] = userEvalAction.added
+		else:
+			shareInstanceData['evaluated_time'] = shareInstance.shared_at_timestamp
 	else:
 		shareInstanceData['evaluated'] = False
 		
