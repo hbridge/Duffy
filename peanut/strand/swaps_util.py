@@ -23,7 +23,7 @@ def getFeedObjectsForSwaps(user):
 
 	friends = friends_util.getFriends(user.id)
 
-	timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+	timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=30)
 	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(suggestible=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
 	stats_util.printStats("swaps-recent-cache")
 	
@@ -38,7 +38,7 @@ def getFeedObjectsForSwaps(user):
 		responseObjects.append(strandObjectData)
 
 	if len(responseObjects) < 3:
-		timeCutoff = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+		timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=7)
 		mostRecentStrandIds = list()
 
 		for strand in recentStrands:
