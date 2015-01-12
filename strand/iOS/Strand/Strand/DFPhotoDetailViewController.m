@@ -78,29 +78,25 @@ const NSUInteger CompressedModeMaxRows = 1;
   
   // Need to reload this because its a singlton
   _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
+  
+  [self reloadProfileWithContextData];
+  [self.tableView reloadData];
 }
 
 - (void)newDataArrived
 {
   [self reloadData];
-  [self configureDataBasedElements];
   [self markActionsAsSeen];
-  [self.tableView reloadData];
 }
 
-- (void)configureDataBasedElements
-{
-  [self configureTableView:self.tableView];
-  [self configureProfileWithContext];
-  [self configureCommentToolbar];
-}
 
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  [self configureTableView:self.tableView];
+  [self configureProfileWithContext];
+  [self configureCommentToolbar];
   [self reloadData];
-  [self configureDataBasedElements];
-  
   [self textDidChange:self.commentToolbar.textField];
   [self configureTouchTableViewGesture];
 }
@@ -187,13 +183,15 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)configureProfileWithContext
 {
-  
   for (DFProfileStackView *psv in @[self.senderProfileStackView, self.recipientsProfileStackView]) {
     psv.backgroundColor = [UIColor clearColor];
     psv.nameMode = DFProfileStackViewNameShowAlways;
   }
   self.recipientsProfileStackView.photoMargins = 5;
-  
+}
+
+- (void)reloadProfileWithContextData
+{
   if (self.nuxStep) {
     self.senderProfileStackView.maxAbbreviationLength = 2;
     [self.senderProfileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
@@ -496,7 +494,7 @@ const NSUInteger CompressedModeMaxRows = 1;
     if (oldAction)
       self.photoObject.actions = [self.photoObject.actions arrayByRemovingObject:oldAction];
   }
-  [self configureProfileWithContext];
+  [self reloadProfileWithContextData];
   [[DFPeanutFeedDataManager sharedManager]
    setLikedByUser:newLikeValue
    photo:self.photoObject.id
