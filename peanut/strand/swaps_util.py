@@ -197,12 +197,15 @@ def getStrandNeighborsCache(strands, friends):
 
 	return (neighborStrandsByStrandId, neighborUsersByStrandId)
 
+"""
+	Count the number of photos in suggestions that are of type 'friend-location'
+"""
 def getPhotoCountFromFeedObjects(feedObjects):
 	count = 0
 	for obj in feedObjects:
 		if obj['type'] == "photo":
 			count += 1
-		elif 'objects' in obj:
+		elif 'objects' in obj and 'suggestion_type' in obj and obj['suggestion_type'] == 'friend-location':
 			count += getPhotoCountFromFeedObjects(obj['objects'])
 
 	return count
