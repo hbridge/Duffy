@@ -203,7 +203,7 @@ def processUploadedPhoto(photo, origFileName, tempFile, bulk=False):
 
 def handleUploadedImage(request, fileKey, photo):
 	if fileKey in request.FILES:
-		tempFile = tempfile.NamedTemporaryFile()
+		tempFile = tempfile.NamedTemporaryFile(delete=False)
  
 		writeOutUploadedFile(request.FILES[fileKey], tempFile)
 		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFile)
