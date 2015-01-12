@@ -80,10 +80,7 @@ def getBuildNumForUser(user):
 # Need to create a key that is sortable, consistant (to deal with partial updates) and handles
 # many photos shared at once
 def getSortRanking(user, shareInstance, actions):
-	lastTimestamp = None
-
-	if shareInstance.user_id == user.id:
-		lastTimestamp = shareInstance.shared_at_timestamp
+	lastTimestamp = shareInstance.shared_at_timestamp
 
 	for action in actions:
 		if (action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
@@ -91,10 +88,6 @@ def getSortRanking(user, shareInstance, actions):
 			if not lastTimestamp or action.added > lastTimestamp:
 				lastTimestamp = action.added
 
-	if not lastTimestamp:
-		# this will happen for photos that need to be evaluated
-		return long(shareInstance.shared_at_timestamp.strftime('%s'))
-		
 	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
 	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
 
