@@ -167,8 +167,11 @@ static DFImageDownloadManager *defaultManager;
        }
        
        NSMutableDictionary *result = [NSMutableDictionary new];
-       if (requestOperation.responseData && requestOperation.responseData) {
-         result[@"image"] = [UIImage imageWithData:requestOperation.responseData];
+       if (requestOperation.responseData && !requestOperation.error) {
+         UIImage *image = [UIImage imageWithData:requestOperation.responseData];
+         if (image) {
+           result[@"image"] = image;
+         }
        }
        if (requestOperation.error) {
          result[@"error"] = requestOperation.error;
