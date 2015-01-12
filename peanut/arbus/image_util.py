@@ -203,7 +203,7 @@ def processUploadedPhoto(photo, origFileName, tempFile, bulk=False):
 
 def handleUploadedImage(request, fileKey, photo):
 	if fileKey in request.FILES:
-		tempFile = tempfile.NamedTemporaryFile(delete=False)
+		tempFile = tempfile.NamedTemporaryFile()
  
 		writeOutUploadedFile(request.FILES[fileKey], tempFile)
 		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFile)
@@ -216,7 +216,7 @@ def handleUploadedImagesBulk(request, photos):
 	count = 0
 	for photo in photos:
 		if photo.file_key:
-			tempFile = tempfile.NamedTemporaryFile(delete=False)
+			tempFile = tempfile.NamedTemporaryFile()
 			if photo.file_key in request.FILES:
 				writeOutUploadedFile(request.FILES[photo.file_key], tempFile)
 				processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFile, bulk=True)
