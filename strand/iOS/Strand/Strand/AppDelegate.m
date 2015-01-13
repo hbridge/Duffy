@@ -307,7 +307,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];
-      [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
