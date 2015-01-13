@@ -42,6 +42,7 @@
 @property (atomic) BOOL swapsRefreshing;
 @property (atomic) BOOL privateStrandsRefreshing;
 @property (atomic) BOOL actionsRefreshing;
+@property (nonatomic, retain) NSData *inboxLastResponseHash;
 @property (nonatomic, retain) NSData *swapsLastResponseHash;
 @property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
 @property (nonatomic, retain) NSData *actionsLastResponseHash;
@@ -180,18 +181,19 @@ static DFPeanutFeedDataManager *defaultManager;
          
          self.inboxLastFeedTimestamp = response.timestamp;
          
-         if (fullRefresh) {
-           self.inboxLastFullFetch = [NSDate date];
-         }
-         
          self.inboxFeedObjects = [self processInboxFeed:self.inboxFeedObjects withNewObjects:response.objects];
          
-         if ([response.objects count] > 1) {
+         if ([response.objects count] > 1 && (!fullRefresh || (fullRefresh && ![self.inboxLastResponseHash isEqualToData:responseHash]))) {
            // We always get the friends list back, so if we got more, send out notification that we have new data
            [[NSNotificationCenter defaultCenter]
             postNotificationName:DFStrandNewInboxDataNotificationName
             object:self];
            DDLogInfo(@"Got new inbox data, sending notification.");
+         }
+         
+         if (fullRefresh) {
+           self.inboxLastFullFetch = [NSDate date];
+           self.inboxLastResponseHash = responseHash;
          }
          
          // For inbox only, we update our local cache of friends
@@ -213,10 +215,6 @@ static DFPeanutFeedDataManager *defaultManager;
              _cachedFriendsList = newFriendsList;
            }
          }
-         
-        
-         
-         
        }
        [self executeDeferredCompletionsForFeedType:DFInboxFeed];
        self.inboxRefreshing = NO;
