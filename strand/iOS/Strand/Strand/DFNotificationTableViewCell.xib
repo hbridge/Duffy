@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
@@ -31,7 +31,7 @@
                         </constraints>
                     </view>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Details label" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Hut-qw-Arg">
-                        <rect key="frame" x="64" y="13" width="188" height="16"/>
+                        <rect key="frame" x="64" y="29" width="188" height="16"/>
                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -39,9 +39,10 @@
                 <constraints>
                     <constraint firstItem="Hut-qw-Arg" firstAttribute="leading" secondItem="JMd-0b-oeH" secondAttribute="trailing" constant="4" id="2Mm-fD-EBa"/>
                     <constraint firstItem="OPm-BO-0DI" firstAttribute="top" relation="greaterThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="6" id="8Qk-as-0ms"/>
-                    <constraint firstItem="Hut-qw-Arg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="5" id="9qz-Zq-zo7"/>
+                    <constraint firstItem="Hut-qw-Arg" firstAttribute="top" relation="greaterThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="5" id="9qz-Zq-zo7"/>
                     <constraint firstItem="OPm-BO-0DI" firstAttribute="leading" secondItem="Hut-qw-Arg" secondAttribute="trailing" constant="8" id="9ur-wH-Isd"/>
                     <constraint firstAttribute="centerY" secondItem="JMd-0b-oeH" secondAttribute="centerY" id="GLr-y4-PX8"/>
+                    <constraint firstItem="Hut-qw-Arg" firstAttribute="centerY" secondItem="JMd-0b-oeH" secondAttribute="centerY" priority="999" id="U4i-X4-lO3"/>
                     <constraint firstAttribute="trailing" secondItem="OPm-BO-0DI" secondAttribute="trailing" constant="15" id="aii-3e-bwf"/>
                     <constraint firstItem="JMd-0b-oeH" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="bCw-kj-aK3"/>
                     <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="OPm-BO-0DI" secondAttribute="bottom" constant="6" id="fBr-aq-P9n"/>
