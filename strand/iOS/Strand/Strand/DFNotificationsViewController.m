@@ -148,7 +148,7 @@
   } else if (action.action_type == DFPeanutActionComment) {
     actionString = @"commented: ";
   } else if (action.action_type == DFPeanutActionAddedPhotos) {
-    actionString = @"added photos.";
+    actionString = action.text;
   }
 
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:action.user];
