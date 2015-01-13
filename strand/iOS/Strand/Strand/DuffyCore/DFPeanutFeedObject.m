@@ -439,7 +439,7 @@ static NSArray *FeedObjectTypes;
   if (![[otherObject class] isSubclassOfClass:[self class]]) return NO;
   
   if (otherObject.id == self.id
-      && [otherObject.share_instance isEqual:self.share_instance]
+      && otherObject.share_instance.longLongValue == self.share_instance.longLongValue
       && [otherObject.type isEqual:self.type]) return YES;
   return NO;
 }
