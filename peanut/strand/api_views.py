@@ -81,13 +81,7 @@ def getBuildNumForUser(user):
 # many photos shared at once
 def getSortRanking(user, shareInstance, actions):
 	lastTimestamp = shareInstance.shared_at_timestamp
-
-	for action in actions:
-		if (action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and
-			action.user_id == user.id):
-			if not lastTimestamp or action.added > lastTimestamp:
-				lastTimestamp = action.added
-
+	
 	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
 	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
 
