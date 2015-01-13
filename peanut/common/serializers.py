@@ -187,7 +187,10 @@ def actionDataOfShareInstanceApiSerializer(user, shareInstance):
 	# Only return data for shares that other people do
 	if shareInstance.user_id == user.id:
 		return None
-		
+	
+	# Don't try this at home.  We need a unique id but we don't create an action for a shared instance
+	# So create a pretty unique one here
+	actionData['id'] = shareInstance.id + 1000000000000
 	actionData['user'] = shareInstance.user_id
 	actionData['time_stamp'] = shareInstance.shared_at_timestamp
 	actionData['action_type'] = constants.ACTION_TYPE_SHARED_PHOTOS
