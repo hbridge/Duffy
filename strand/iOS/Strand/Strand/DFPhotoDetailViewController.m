@@ -110,6 +110,10 @@ const NSUInteger CompressedModeMaxRows = 1;
     else DDLogWarn(@"%@ action with no ID, can't mark as seen: %@", self.class, action);
   }
   [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
+  
+  if (!self.photoObject.evaluated) {
+    [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:self.photoObject.id shareInstance:[self.photoObject.share_instance longLongValue]];
+  }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
