@@ -111,7 +111,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   }
   [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
   
-  if (!self.photoObject.evaluated) {
+  if (!self.photoObject.evaluated.boolValue) {
     [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:self.photoObject.id shareInstance:[self.photoObject.share_instance longLongValue]];
   }
 }

@@ -102,11 +102,12 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshActionsFromServer:nil];
 }
 
-
-- (NSArray *)processInboxFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects
+- (void)processInboxFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
+  BOOL updated = NO;
   if (!currentObjects) {
-    return newObjects;
+    returnBlock(YES, newObjects);
+    return;
   }
   
   NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
@@ -116,10 +117,14 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   for (DFPeanutFeedObject *object in newObjects) {
+    DFPeanutFeedObject *existingObject = [combinedObjectsById objectForKey:object.share_instance];
+    if (!existingObject || ![existingObject isEqual:object]) {
+      updated = YES;
+    }
     [combinedObjectsById setObject:object forKey:object.share_instance];
   }
   
-  return [combinedObjectsById allValues];
+  returnBlock(updated, [combinedObjectsById allValues]);
 }
 
 - (NSArray *)processPeopleList:(NSArray *)currentPeopleList withNewPeople:(NSArray *)newPeople
@@ -181,15 +186,15 @@ static DFPeanutFeedDataManager *defaultManager;
          
          self.inboxLastFeedTimestamp = response.timestamp;
          
-         self.inboxFeedObjects = [self processInboxFeed:self.inboxFeedObjects withNewObjects:response.objects];
-         
-         if ([response.objects count] > 1 && (!fullRefresh || (fullRefresh && ![self.inboxLastResponseHash isEqualToData:responseHash]))) {
-           // We always get the friends list back, so if we got more, send out notification that we have new data
-           [[NSNotificationCenter defaultCenter]
-            postNotificationName:DFStrandNewInboxDataNotificationName
-            object:self];
-           DDLogInfo(@"Got new inbox data, sending notification.");
-         }
+         [self processInboxFeed:self.inboxFeedObjects withNewObjects:response.objects returnBlock:^(BOOL updated, NSArray *newObjects) {
+           self.inboxFeedObjects = newObjects;
+           if (updated) {
+             [[NSNotificationCenter defaultCenter]
+              postNotificationName:DFStrandNewInboxDataNotificationName
+              object:self];
+             DDLogInfo(@"Got new inbox data, sending notification.");
+           }
+         }];
          
          if (fullRefresh) {
            self.inboxLastFullFetch = [NSDate date];
@@ -845,7 +850,16 @@ static DFPeanutFeedDataManager *defaultManager;
     evalAction.share_instance = @(shareInstance);
   }
   
+  // Make a call to the backend but also update our local cache.
   [self.actionAdapter addAction:evalAction success:nil failure:nil];
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID && [object.share_instance isEqual:@(shareInstance)]) {
+      object.evaluated = @(1);
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandNewInboxDataNotificationName
+       object:self];
+    }
+  }
 }
 
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
