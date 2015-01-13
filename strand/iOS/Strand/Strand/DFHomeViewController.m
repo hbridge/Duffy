@@ -89,6 +89,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
                           forControlEvents:UIControlEventTouchUpInside];
   self.notificationsBadgeButton.badgeColor = [DFStrandConstants strandRed];
   self.notificationsBadgeButton.badgeTextColor = [UIColor whiteColor];
+  self.notificationsBadgeButton.badgeEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 8);
   [self.notificationsBadgeButton sizeToFit];
   
   self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc]
