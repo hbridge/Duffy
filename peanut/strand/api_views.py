@@ -251,14 +251,14 @@ def actions_list(request):
 		actionsData = list()
 
 		# Do favorites and comments
-		actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:20]
+		actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:50]
 		for action in actions:
 			actionData = serializers.actionDataOfActionApiSerializer(user, action)
 			if actionData:
 				actionsData.append(actionData)
 
 		# Do shares to this user
-		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "id")[:20]
+		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:50]
 		lastUserId = None
 		currentActionData = None
 		count = 1
@@ -274,16 +274,22 @@ def actions_list(request):
 					abs((shareInstance.shared_at_timestamp - currentActionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
 					count += 1
 				else:
-					currentActionData['text'] = "Shared %s photos" % count
+					if count == 1:
+						currentActionData['text'] = "sent 1 photo"
+					else:
+						currentActionData['text'] = "sent %s photos" % count
 					actionsData.append(currentActionData)
 					currentActionData = None
 					count = 1
 
 		if currentActionData:
-			currentActionData['text'] = "Shared %s photos" % count
+			if count == 1:
+				currentActionData['text'] = "sent 1 photo"
+			else:
+				currentActionData['text'] = "sent %s photos" % count
 			actionsData.append(currentActionData)
 
-		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)
+		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)[:50]
 
 		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
 		stats_util.printStats("actions-end")
