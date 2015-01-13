@@ -10,8 +10,9 @@
 #import "DFFriendsViewController.h"
 #import <LKBadgeView/LKBadgeView.h>
 #import "DFImageDataSource.h"
+#import "DFNotificationsViewController.h"
 
-@interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate>
+@interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate, DFNotificationsViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *reviewButton;
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
 - (IBAction)reviewButtonPressed:(id)sender;

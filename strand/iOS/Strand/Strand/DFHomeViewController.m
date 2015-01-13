@@ -25,6 +25,8 @@
 #import "DFAnalytics.h"
 #import "DFMutliPhotoDetailPageController.h"
 #import <MMPopLabel/MMPopLabel.h>
+#import <WYPopoverController/WYPopoverController.h>
+#import "DFBadgeButton.h"
 
 const CGFloat headerHeight = 60.0;
 const NSUInteger MinPhotosToShowFilter = 20;
@@ -36,6 +38,9 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic) NSUInteger selectedFilterIndex;
 @property (nonatomic, retain) MMPopLabel *incomingPopLabel;
 @property (nonatomic, retain) MMPopLabel *outgoingPopLabel;
+@property (nonatomic, retain) DFNotificationsViewController *notificationsViewController;
+@property (nonatomic, retain) WYPopoverController *notificationsPopupController;
+@property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 
 @end
 
@@ -74,22 +79,37 @@ const NSUInteger MinPhotosToShowFilter = 20;
 - (void)configureNav
 {
   self.navigationItem.title = @"Swap";
+  
+  self.notificationsBadgeButton = [[DFBadgeButton alloc] init];
+  [self.notificationsBadgeButton setImage:[[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
+                                           imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                                 forState:UIControlStateNormal];
+  [self.notificationsBadgeButton addTarget:self
+                                    action:@selector(notificationsButtonPressed:)
+                          forControlEvents:UIControlEventTouchUpInside];
+  self.notificationsBadgeButton.badgeColor = [DFStrandConstants strandRed];
+  self.notificationsBadgeButton.badgeTextColor = [UIColor whiteColor];
+  [self.notificationsBadgeButton sizeToFit];
+  
   self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc]
+                                               initWithCustomView:self.notificationsBadgeButton],
+                                              [[UIBarButtonItem alloc]
                                                initWithImage:[UIImage imageNamed:@"Assets/Icons/AddPhotosBarButton"]
                                                style:UIBarButtonItemStylePlain
                                                target:self
                                                action:@selector(createButtonPressed:)],
-                                              [[UIBarButtonItem alloc]
-                                               initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
-                                               style:UIBarButtonItemStylePlain
-                                               target:self
-                                               action:@selector(friendsButtonPressed:)],
                                               ];
-  
-  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                                           style:UIBarButtonItemStylePlain target:self
-                                           action:@selector(settingsPressed:)];
+  self.navigationItem.leftBarButtonItems = @[
+                                             [[UIBarButtonItem alloc]
+                                              initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
+                                              style:UIBarButtonItemStylePlain
+                                              target:self
+                                              action:@selector(friendsButtonPressed:)],
+                                             [[UIBarButtonItem alloc]
+                                              initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+                                              style:UIBarButtonItemStylePlain target:self
+                                              action:@selector(settingsPressed:)],
+                                             ];
 }
 
 - (void)configureCollectionView
@@ -317,12 +337,14 @@ static BOOL showFilters = NO;
 
 - (void)configureBadges
 {
-  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
-  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
   for (LKBadgeView *badgeView in @[self.reviewBadgeView, self.sendBadgeView]) {
     badgeView.badgeColor = [DFStrandConstants strandRed];
     badgeView.textColor = [UIColor whiteColor];
   }
+  
+  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
+  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
+  NSUInteger unreadNotifications = [[[DFPeanutNotificationsManager sharedManager] unreadNotifications] count];
   
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
     numToReview++;
@@ -330,22 +352,15 @@ static BOOL showFilters = NO;
     numToSend++;
   }
   
-  [self configureButtonsWithIncomingCount:numToReview outgoingCount:numToSend];
+  [self configureButtonsWithNotificationsCount:numToReview + unreadNotifications outgoingCount:numToSend];
 }
 
-- (void)configureButtonsWithIncomingCount:(NSUInteger)numToReview outgoingCount:(NSUInteger)numToSend
+- (void)configureButtonsWithNotificationsCount:(NSUInteger)numUnreadNotifs outgoingCount:(NSUInteger)numToSend
 {
-  if (numToReview > 0) {
-    self.reviewBadgeView.text = [@(MIN(numToReview, 99)) stringValue];
-    self.reviewBadgeView.hidden = NO;
-    [self.reviewButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeInboxHighlighted"] forState:UIControlStateNormal];
-  } else {
-    self.reviewBadgeView.hidden = YES;
-    [self.reviewButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeInbox"] forState:UIControlStateNormal];
-  }
+  self.notificationsBadgeButton.badgeCount = (int)numUnreadNotifs;
   
-  self.sendBadgeView.hidden = NO;
   if (numToSend > 0) {
+    self.sendBadgeView.hidden = NO;
     self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
                                forState:UIControlStateNormal];
@@ -449,5 +464,45 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                                            inParent:self
                                 withBackButtonTitle:@"Back"];
 }
+
+- (void)notificationsButtonPressed:(DFBadgeButton *)sender
+{
+  WYPopoverBackgroundView *appearance = [WYPopoverBackgroundView appearance];
+  appearance.fillTopColor = [UIColor whiteColor];
+  if (!self.notificationsViewController) {
+    self.notificationsViewController = [[DFNotificationsViewController alloc] init];
+    self.notificationsViewController.delegate = self;
+    self.notificationsPopupController = [[WYPopoverController alloc]
+                                         initWithContentViewController:self.notificationsViewController];
+  }
+  
+  if (self.notificationsPopupController.isPopoverVisible) {
+    [self.notificationsPopupController dismissPopoverAnimated:YES];
+  } else {
+    CGRect buttonRect = [sender.superview convertRect:sender.frame toView:self.view];
+    [self.notificationsPopupController presentPopoverFromRect:buttonRect
+                                                       inView:self.view
+                                     permittedArrowDirections:WYPopoverArrowDirectionUp
+                                                     animated:YES
+                                                      options:WYPopoverAnimationOptionFadeWithScale
+                                                   completion:nil];
+  }
+}
+
+- (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
+   didSelectNotificationWithAction:(DFPeanutAction *)peanutAction
+{
+  [self.notificationsPopupController dismissPopoverAnimated:YES];
+  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
+                                     photoWithID:peanutAction.photo.longLongValue
+                                     shareInstance:peanutAction.share_instance.longLongValue];
+  DFPhotoDetailViewController *vc = [[DFPhotoDetailViewController alloc]
+                                     initWithPhotoObject:photoObject];
+  [DFDismissableModalViewController presentWithRootController:vc
+                                                     inParent:self];
+}
+
+                              
+
 
 @end

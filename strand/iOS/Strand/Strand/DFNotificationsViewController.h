@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFPeanutAction.h"
 
 @class DFNotificationsViewController;
 
@@ -14,7 +15,7 @@
 
 @required
 - (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
-  didSelectNotificationWithPhotoID:(DFPhotoIDType)photoID;
+  didSelectNotificationWithAction:(DFPeanutAction *)peanutAction;
 
 @end
 

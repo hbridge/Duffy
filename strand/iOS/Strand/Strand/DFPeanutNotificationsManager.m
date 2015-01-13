@@ -47,6 +47,7 @@ static DFPeanutNotificationsManager *defaultManager;
                                                object:nil];
     // force db to init
     self.seenActionIDs = [[self allSeenActionIDs] mutableCopy];
+    [self updateNotifications];
   }
   return self;
 }
@@ -141,7 +142,7 @@ static DFPeanutNotificationsManager *defaultManager;
 
 - (BOOL)isActionIDSeen:(DFActionID)actionID
 {
-  return YES;
+  return [self.seenActionIDs containsObject:@(actionID)];
 }
 
 - (void)markActionIDsSeen:(NSArray *)actionIDs

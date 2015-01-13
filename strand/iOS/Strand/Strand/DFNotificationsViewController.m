@@ -16,11 +16,12 @@
 #import <Slash/Slash.h>
 #import "DFPeanutFeedDataManager.h"
 #import "NSIndexPath+DFHelpers.h"
+#import "DFPhotoDetailViewController.h"
+#import "DFDismissableModalViewController.h"
+#import <WYPopoverController/WYPopoverController.h>
 
 @interface DFNotificationsViewController ()
 
-@property (nonatomic, retain) NSArray *unreadNotifications;
-@property (nonatomic, retain) NSArray *readNotifications;
 @property (nonatomic, retain) DFNotificationTableViewCell *templateCell;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 @property (nonatomic, retain) NSMutableDictionary *rowHeightCache;
@@ -75,8 +76,8 @@
    logViewController:self
    appearedWithParameters:
    @{
-     @"unreadNotifs" : [DFAnalytics bucketStringForObjectCount:self.unreadNotifications.count],
-     @"readNotifs" : [DFAnalytics bucketStringForObjectCount:self.readNotifications.count],
+     @"unreadNotifs" : [DFAnalytics bucketStringForObjectCount:[[DFPeanutNotificationsManager sharedManager] unreadNotifications].count],
+     @"readNotifs" : [DFAnalytics bucketStringForObjectCount:[[DFPeanutNotificationsManager sharedManager] readNotifications].count],
      @"badgeValue" : [DFAnalytics bucketStringForObjectCount:self.tabBarItem.badgeValue.integerValue]
      }];
   self.tabBarItem.badgeValue = nil;
@@ -110,16 +111,8 @@
 
 - (void)reloadData
 {
-  self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-  self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
   self.rowHeightCache = [NSMutableDictionary new];
   [self.tableView reloadData];
-  
-  if (self.unreadNotifications.count == 0) {
-    self.tabBarItem.badgeValue = nil;
-  } else {
-    self.tabBarItem.badgeValue = [@(self.unreadNotifications.count) stringValue];
-  }
 }
 
 - (void)refreshFromServer
@@ -139,19 +132,12 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return self.unreadNotifications.count + self.readNotifications.count;
+  return [[[DFPeanutNotificationsManager sharedManager] notifications] count];
 }
 
 - (DFPeanutAction *)peanutActionForIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutAction *peanutAction;
-  if (indexPath.row < self.unreadNotifications.count) {
-    peanutAction = self.unreadNotifications[indexPath.row];
-  } else {
-    peanutAction = self.readNotifications[indexPath.row - self.unreadNotifications.count];
-  }
-
-  return peanutAction;
+  return [[[DFPeanutNotificationsManager sharedManager] notifications] objectAtIndex:indexPath.row];
 }
 
 - (NSAttributedString *)attributedStringForAction:(DFPeanutAction *)action
@@ -212,10 +198,10 @@
   }
   
   //decide whether to highlight
-  if (indexPath.row < self.unreadNotifications.count) {
-    cell.backgroundColor = [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
-  } else {
+  if ([[DFPeanutNotificationsManager sharedManager] isActionIDSeen:action.id.longLongValue]) {
     cell.backgroundColor = [UIColor whiteColor];
+  } else {
+    cell.backgroundColor = [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
   }
   
   return cell;
@@ -243,12 +229,8 @@
   DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
   [DFAnalytics logNotificationViewItemOpened:[DFAnalytics actionStringForType:action.action_type]
                                    notifDate:action.time_stamp];
-  
-
-//  DFFeedViewController *fvc = [DFFeedViewController
-//                               presentFeedObject:strandPostsObject
-//                               modallyInViewController:self];
-//  fvc.onViewScrollToPhotoId = action.photo;
+  [self.delegate notificationViewController:self didSelectNotificationWithAction:action];
+  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end
