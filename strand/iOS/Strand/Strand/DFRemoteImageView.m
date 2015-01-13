@@ -7,6 +7,7 @@
 //
 
 #import "DFRemoteImageView.h"
+#import "DFAnalytics.h"
 
 @implementation DFRemoteImageView
 
@@ -173,6 +174,7 @@
 - (void)reloadPressed:(UIButton *)sender
 {
   [self loadImageWithID:self.photoID deliveryMode:self.deliveryMode];
+  [DFAnalytics logPhotoLoadRetried];
 }
 
 @end

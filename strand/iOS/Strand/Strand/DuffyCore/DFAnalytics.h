@@ -72,6 +72,8 @@ disappearedWithParameters:(NSDictionary *)params;
                                  result:(NSString *)result
                              actionType:(DFUIActionType)actionType
                  timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
++ (void)logPhotoLoadRetried;
+
 
 /* Notification response */
 + (void)logNotificationOpenedWithType:(DFPushNotifType)type;
@@ -105,6 +107,7 @@ disappearedWithParameters:(NSDictionary *)params;
 
 + (void)logNux:(NSString *)nuxName
 completedWithResult:(NSString *)result;
+
 
 
 #pragma mark - Utilities

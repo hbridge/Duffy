@@ -64,6 +64,7 @@ NSString* const PhotoSavedEvent = @"PhotoSaved";
 NSString* const PhotoDeletedEvent = @"PhotoDeleted";
 NSString* const PhotoLikedEvent = @"PhotoLiked";
 NSString* const PhotoActionEvent = @"PhotoAction";
+NSString* const PhotoLoadRetriedEvent = @"PhotoLoadRetriedEvent";
 
 // Notifications
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
@@ -251,6 +252,11 @@ static DFAnalytics *defaultLogger;
                                                          @"ActionType" : actionType,
                                                          PhotoAgeKey : [self bucketStringForTimeInternval:timeInterval]
                                                          }];
+}
+
++ (void)logPhotoLoadRetried
+{
+  [DFAnalytics logEvent:PhotoLoadRetriedEvent];
 }
 
 
