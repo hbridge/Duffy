@@ -54,13 +54,12 @@ UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor
 {
-  return [self strandGray];
+  return [self strandLightBlue];
 }
-
 
 + (UIColor *)defaultBarForegroundColor
 {
-  return [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
+  return [UIColor whiteColor];
 }
 
 + (UIColor *)strandOrange
@@ -86,6 +85,12 @@ UIColor *DFStrandMainColor;
 + (UIColor *)strandYellow {
   return [UIColor colorWithRed:255/255.f green:216/255.f blue:82/255.f alpha:1];
 }
+
++ (UIColor *)strandLightBlue
+{
+  return [UIColor colorWithRedByte:154 green:178 blue:208 alpha:1.0];
+}
+
 
 + (UIColor *)strandBlue
 {

@@ -11,6 +11,7 @@
 #import <LKBadgeView/LKBadgeView.h>
 #import "DFImageDataSource.h"
 #import "DFNotificationsViewController.h"
+#import <SAMGradientView/SAMGradientView.h>
 
 @interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate, DFNotificationsViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
@@ -19,6 +20,8 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic) NSUInteger numPhotosPerRow;
-@property (weak, nonatomic) IBOutlet UIView *buttonBar;
+@property (weak, nonatomic) IBOutlet SAMGradientView *buttonBar;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *buttonBarHeightConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *buttonBarLabel;
 
 @end

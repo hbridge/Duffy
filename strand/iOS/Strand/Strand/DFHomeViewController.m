@@ -41,6 +41,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFNotificationsViewController *notificationsViewController;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 @property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
+@property (nonatomic) BOOL suggestionsAreaHidden;
 
 @end
 
@@ -78,7 +79,16 @@ const NSUInteger MinPhotosToShowFilter = 20;
 
 - (void)configureNav
 {
-  self.navigationItem.title = @"Swap";
+  self.navigationController.navigationBar.backgroundColor = [UIColor clearColor];
+  self.navigationController.navigationBar.translucent = YES;
+  self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
+  self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+  
+  self.buttonBar.gradientColors = @[
+                                    [UIColor colorWithRedByte:198 green:198 blue:200 alpha:1.0],
+                                    [UIColor colorWithRedByte:154 green:178 blue:208 alpha:1.0]
+                                    ];
+  self.buttonBar.gradientDirection = SAMGradientViewDirectionHorizontal;
   
   self.notificationsBadgeButton = [[DFBadgeButton alloc] init];
   [self.notificationsBadgeButton setImage:[[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
@@ -111,6 +121,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                               style:UIBarButtonItemStylePlain target:self
                                               action:@selector(settingsPressed:)],
                                              ];
+  [self setSuggestionsAreaHidden:YES animated:NO];
 }
 
 - (void)configureCollectionView
@@ -219,7 +230,7 @@ static BOOL showFilters = NO;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self configureBadges];
+  [self reloadNavData];
   [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
 }
 
@@ -229,7 +240,7 @@ static BOOL showFilters = NO;
   if ([DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
-  [self configureBadges];
+  [self reloadNavData];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -273,7 +284,7 @@ static BOOL showFilters = NO;
     }
     
     [self configureNoResultsView];
-    [self configureBadges];
+    [self reloadNavData];
   });
 }
 
@@ -294,7 +305,7 @@ static BOOL showFilters = NO;
   
   NSMutableArray *result = [NSMutableArray new];
   if (lastWeek.count > 0) {
-    [result addObject:[DFSection sectionWithTitle:@"Recent Activity" object:nil rows:lastWeek]];
+    [result addObject:[DFSection sectionWithTitle:@"Recent Photos" object:nil rows:lastWeek]];
   }
   
   if (older.count > 0) {
@@ -333,7 +344,7 @@ static BOOL showFilters = NO;
   [self.view addSubview:self.outgoingPopLabel];
 }
 
-- (void)configureBadges
+- (void)reloadNavData
 {
   self.sendButton.layer.cornerRadius = 3;
   self.sendButton.layer.masksToBounds = YES;
@@ -341,28 +352,27 @@ static BOOL showFilters = NO;
   self.sendBadgeView.textColor = [UIColor whiteColor];
   
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
-  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
   NSUInteger unreadNotifications = [[[DFPeanutNotificationsManager sharedManager] unreadNotifications] count];
-  
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
-    numToReview++;
-  } else if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+  self.notificationsBadgeButton.badgeCount = (int)numToReview + (int)unreadNotifications;
+
+  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
     numToSend++;
   }
   
-  [self configureButtonsWithNotificationsCount:numToReview + unreadNotifications outgoingCount:numToSend];
+  [self reloadSuggestionsArea];
 }
 
-- (void)configureButtonsWithNotificationsCount:(NSUInteger)numUnreadNotifs outgoingCount:(NSUInteger)numToSend
+- (void)reloadSuggestionsArea
 {
-  self.notificationsBadgeButton.badgeCount = (int)numUnreadNotifs;
+  NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
+  
+  NSUInteger numToSend = [suggestedPhotos count];
   
   if (numToSend > 0) {
     self.sendBadgeView.hidden = NO;
     self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
-    NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-    DFPeanutFeedObject *firstPhotoToSend = [[allSuggestions.firstObject
-                                             leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+    DFPeanutFeedObject *firstPhotoToSend = [suggestedPhotos firstObject];
     [[DFImageManager sharedManager]
      imageForID:firstPhotoToSend.id
      pointSize:self.sendButton.frame.size
@@ -375,30 +385,46 @@ static BOOL showFilters = NO;
          
        });
      }];
+    [self setSuggestionsAreaHidden:NO animated:YES];
   } else {
-    self.sendBadgeView.hidden = YES;
-    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"]
-                               forState:UIControlStateNormal];
+    [self setSuggestionsAreaHidden:YES animated:YES];
   }
+}
+
+- (void)setSuggestionsAreaHidden:(BOOL)suggestionsAreaHidden
+{
+  [self setSuggestionsAreaHidden:suggestionsAreaHidden animated:NO];
+}
+
+- (void)setSuggestionsAreaHidden:(BOOL)hidden animated:(BOOL)animated
+{
+  if (hidden && !_suggestionsAreaHidden) {
+    // hide the suggestions area
+    [self.sendButton setBackgroundImage:nil
+                               forState:UIControlStateNormal];
+    self.buttonBarHeightConstraint.constant = 19 + 44;
+    [UIView animateWithDuration:animated ? 0.5 : 0.0 animations:^{
+      for (UIView *view in @[self.sendButton, self.buttonBarLabel]) {
+        view.alpha = 0.0;
+      }
+      self.sendBadgeView.hidden = YES;
+      [self.view layoutIfNeeded];
+    }];
+  } else if (!hidden && _suggestionsAreaHidden){
+    //show the suggestions area
+    self.buttonBarHeightConstraint.constant = 19 + 44 + 97;
+    [UIView animateWithDuration:animated ? 0.5 : 0.0 animations:^{
+      for (UIView *view in @[self.sendButton, self.buttonBarLabel]) {
+        view.alpha = 1.0;
+      }
+      self.sendBadgeView.hidden = NO;
+      [self.view layoutIfNeeded];
+    }];
+  }
+  _suggestionsAreaHidden = hidden;
 }
 
 #pragma mark - Actions
-
-- (IBAction)reviewButtonPressed:(id)sender {
-  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
-  if (numToReview > 0 || ![DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
-  [DFDismissableModalViewController
-   presentWithRootController:[[DFCardsPageViewController alloc]
-                              initWithPreferredType:DFIncomingViewType]
-   inParent:self];
-  } else {
-    [self.incomingPopLabel popAtView:sender animatePopLabel:YES animateTargetView:NO];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self.incomingPopLabel dismiss];
-    });
-  }
-  [self logHomeButtonPressed:sender];
-}
 
 - (IBAction)sendButtonPressed:(id)sender {
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];

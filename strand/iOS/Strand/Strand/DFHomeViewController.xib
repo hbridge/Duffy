@@ -8,6 +8,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFHomeViewController">
             <connections>
                 <outlet property="buttonBar" destination="MYj-g7-RXb" id="qNg-qC-YE9"/>
+                <outlet property="buttonBarHeightConstraint" destination="fAN-cS-318" id="3nL-IO-ssO"/>
+                <outlet property="buttonBarLabel" destination="KTE-xE-giG" id="CA7-OA-XmR"/>
                 <outlet property="collectionView" destination="kHh-uZ-vK1" id="QzN-eD-Y9P"/>
                 <outlet property="flowLayout" destination="kcj-Dt-vx5" id="xF5-Md-2po"/>
                 <outlet property="sendBadgeView" destination="Pba-eB-LD4" id="gfR-4r-0xC"/>
@@ -17,23 +19,23 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
-            <rect key="frame" x="0.0" y="0.0" width="600" height="536"/>
+            <rect key="frame" x="0.0" y="64" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYj-g7-RXb" userLabel="Button bar">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="106"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYj-g7-RXb" userLabel="Button bar" customClass="SAMGradientView">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="160"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Photos to Send" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KTE-xE-giG">
-                            <rect key="frame" x="253" y="10" width="94" height="16"/>
+                            <rect key="frame" x="256" y="64" width="88" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="UOe-4h-oTc"/>
                             </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="13"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sao-uL-Ezk" userLabel="Send">
-                            <rect key="frame" x="269" y="34" width="62" height="62"/>
+                            <rect key="frame" x="269" y="88" width="62" height="62"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="62" id="NpX-MF-4LG"/>
                                 <constraint firstAttribute="width" constant="62" id="m6O-h5-H5t"/>
@@ -48,7 +50,7 @@
                             </connections>
                         </button>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pba-eB-LD4" customClass="LKBadgeView">
-                            <rect key="frame" x="311" y="29" width="30" height="20"/>
+                            <rect key="frame" x="311" y="83" width="30" height="20"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="20" id="ZHP-sQ-xmx"/>
@@ -56,11 +58,10 @@
                             </constraints>
                         </view>
                     </subviews>
-                    <color key="backgroundColor" red="0.9137254901960784" green="0.9137254901960784" blue="0.9137254901960784" alpha="0.70000000000000007" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="0.47999999999999998" colorSpace="calibratedRGB"/>
                     <constraints>
-                        <constraint firstItem="KTE-xE-giG" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" constant="10" id="FMe-Eg-i7J"/>
                         <constraint firstItem="sao-uL-Ezk" firstAttribute="trailing" secondItem="Pba-eB-LD4" secondAttribute="trailing" constant="-10" id="XeJ-0g-ndD"/>
-                        <constraint firstAttribute="height" constant="106" id="fAN-cS-318"/>
+                        <constraint firstAttribute="height" constant="160" id="fAN-cS-318"/>
                         <constraint firstItem="sao-uL-Ezk" firstAttribute="top" secondItem="Pba-eB-LD4" secondAttribute="top" constant="5" id="k5l-C7-ckE"/>
                         <constraint firstAttribute="centerX" secondItem="KTE-xE-giG" secondAttribute="centerX" id="q1D-hC-0Rj"/>
                         <constraint firstItem="sao-uL-Ezk" firstAttribute="top" secondItem="KTE-xE-giG" secondAttribute="bottom" constant="8" id="qWz-gi-mHs"/>
@@ -69,7 +70,7 @@
                     </constraints>
                 </view>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-uZ-vK1">
-                    <rect key="frame" x="0.0" y="106" width="600" height="430"/>
+                    <rect key="frame" x="0.0" y="160" width="600" height="440"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="kcj-Dt-vx5" customClass="DFBadgingCollectionViewFlowLayout">
                         <size key="itemSize" width="50" height="50"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -89,7 +90,7 @@
                 <constraint firstItem="MYj-g7-RXb" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="m2l-2g-Hdl"/>
             </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
-            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
             <point key="canvasLocation" x="200" y="315"/>
         </view>
     </objects>
