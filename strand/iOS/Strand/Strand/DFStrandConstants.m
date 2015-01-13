@@ -149,6 +149,11 @@ UIColor *DFStrandMainColor;
 }
 
 
++ (UIStatusBarStyle)preferredStatusBarStyle
+{
+  return UIStatusBarStyleLightContent;
+}
+
 static NSArray *colors;
 
 + (NSArray *)profilePhotoStackColors

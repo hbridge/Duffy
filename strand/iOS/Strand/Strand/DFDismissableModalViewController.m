@@ -34,6 +34,11 @@
   return YES;
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+  return [DFStrandConstants preferredStatusBarStyle];
+}
+
 - (void)setContentView:(UIView *)contentView
 {
   _contentView = contentView;
