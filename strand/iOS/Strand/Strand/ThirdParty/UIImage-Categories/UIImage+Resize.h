@@ -19,6 +19,10 @@
                                   bounds:(CGSize)bounds
                     interpolationQuality:(CGInterpolationQuality)quality;
 
+- (UIImage *)croppedResizedImageWithContentMode:(UIViewContentMode)contentMode
+                                         bounds:(CGSize)bounds
+                           interpolationQuality:(CGInterpolationQuality)quality;
+
 - (UIImage *)resizedImage:(CGSize)newSize
                 transform:(CGAffineTransform)transform
            drawTransposed:(BOOL)transpose

@@ -13,6 +13,7 @@
 #import "DFCGRectHelpers.h"
 #import "DFAssetCache.h"
 #import "UIDevice+DFHelpers.h"
+#import "UIImage+Resize.h"
 
 @interface DFPHAsset()
 
@@ -301,6 +302,18 @@ static dispatch_queue_t localImageReuestQueue;
                   info);
      }
    }];
+  
+  if (result &&
+      request.deliveryMode == DFImageRequestOptionsDeliveryModeHighQualityFormat &&
+      !CGSizeEqualToSize(result.size, request.size)) {
+    UIViewContentMode contentMode = UIViewContentModeScaleAspectFill;
+    if (request.contentMode == DFImageRequestContentModeAspectFit)
+      contentMode = UIViewContentModeScaleAspectFit;
+    result = [result croppedResizedImageWithContentMode:contentMode
+                                          bounds:request.size
+                            interpolationQuality:kCGInterpolationDefault];
+    
+  }
   
   return result;
 }

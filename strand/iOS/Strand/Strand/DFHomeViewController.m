@@ -335,10 +335,10 @@ static BOOL showFilters = NO;
 
 - (void)configureBadges
 {
-  for (LKBadgeView *badgeView in @[self.reviewBadgeView, self.sendBadgeView]) {
-    badgeView.badgeColor = [DFStrandConstants strandRed];
-    badgeView.textColor = [UIColor whiteColor];
-  }
+  self.sendButton.layer.cornerRadius = 3;
+  self.sendButton.layer.masksToBounds = YES;
+  self.sendBadgeView.badgeColor = [DFStrandConstants strandRed];
+  self.sendBadgeView.textColor = [UIColor whiteColor];
   
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
@@ -360,8 +360,21 @@ static BOOL showFilters = NO;
   if (numToSend > 0) {
     self.sendBadgeView.hidden = NO;
     self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
-    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
-                               forState:UIControlStateNormal];
+    NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+    DFPeanutFeedObject *firstPhotoToSend = [[allSuggestions.firstObject
+                                             leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+    [[DFImageManager sharedManager]
+     imageForID:firstPhotoToSend.id
+     pointSize:self.sendButton.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         [self.sendButton setBackgroundImage:image
+                                    forState:UIControlStateNormal];
+         
+       });
+     }];
   } else {
     self.sendBadgeView.hidden = YES;
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"]
@@ -406,8 +419,7 @@ static BOOL showFilters = NO;
 - (void)logHomeButtonPressed:(id)button
 {
   NSString *buttonName = @"";
-  if (button == self.reviewButton) buttonName = @"incoming";
-  else if (button == self.sendButton) buttonName = @"outgoing";
+  if (button == self.sendButton) buttonName = @"outgoing";
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
   [DFAnalytics logHomeButtonTapped:buttonName

@@ -94,7 +94,17 @@
     return [self resizedImage:newSize interpolationQuality:quality];
 }
 
-
+- (UIImage *)croppedResizedImageWithContentMode:(UIViewContentMode)contentMode
+                                         bounds:(CGSize)bounds
+                           interpolationQuality:(CGInterpolationQuality)quality
+{
+  UIImage *resized = [self resizedImageWithContentMode:contentMode bounds:bounds interpolationQuality:quality];
+  if (contentMode == UIViewContentModeScaleAspectFit) return resized;
+  
+  CGFloat cropOriginX = (resized.size.width - bounds.width) / 2.0;
+  CGFloat cropOriginY = (resized.size.height - bounds.height) / 2.0;
+  return [resized croppedImage:CGRectMake(cropOriginX, cropOriginY, bounds.width, bounds.height)];
+}
 
 - (UIImage *)resizedImageWithSmallerDimensionScaledToLength:(CGFloat)length
                                        interpolationQuality:(CGInterpolationQuality)quality
