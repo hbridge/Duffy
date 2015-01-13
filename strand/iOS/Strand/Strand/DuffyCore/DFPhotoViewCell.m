@@ -37,8 +37,9 @@
         numComments:(NSUInteger)numComments
      numUnreadLikes:(NSUInteger)numUnreadLikes
   numUnreadComments:(NSUInteger)numUnreadComments
+      showUnreadDot:(BOOL)isUnread
 {
-  if (numLikes == 0 && numComments == 0) {
+  if (numLikes == 0 && numComments == 0 && !isUnread) {
     self.badgeView.badgeImages = nil;
     return;
   }
@@ -62,9 +63,15 @@
     [badgeColors addObject:[DFStrandConstants alertBackgroundColor]];
     [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(22.0, 22.0)]];
   } else if (numLikes > 0) {
-//    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/LikesReadIcon"]];
-//    [badgeColors addObject:[UIColor whiteColor]];
-//    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(13.0, 13.0)]];
+    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/LikesReadIcon"]];
+    [badgeColors addObject:[UIColor whiteColor]];
+    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(13.0, 13.0)]];
+  }
+  
+  if (isUnread) {
+    [badgeImages addObject:[UIImage imageNamed:@"Assets/Icons/PhotoUnreadIcon"]];
+    [badgeColors addObject:[NSNull new]];
+    [badgeSizes addObject:[NSValue valueWithCGSize:CGSizeMake(14.0, 14.0)]];
   }
   
   self.badgeView.badgeImages = badgeImages;

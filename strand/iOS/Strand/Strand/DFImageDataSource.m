@@ -180,26 +180,15 @@ NSUInteger const SectionSpread = 5;
   // only count likes as unread if the photo is the current user's
   if (photoObject.user == [[DFUser currentUser] userID])
     numUnreadLikes = [[photoObject unreadActionsOfType:DFPeanutActionFavorite] count];
-  NSUInteger numUnreadComments = [[photoObject unreadActionsOfType:DFPeanutActionComment] count];
   
   if (self.showActionsBadge) {
     [cell setNumLikes:0 numComments:comments.count
-       numUnreadLikes:0 numUnreadComments:0];
+       numUnreadLikes:0 numUnreadComments:0
+     showUnreadDot:!(photoObject.evaluated.boolValue)];
     cell.badgeView.hidden = NO;
-  }
-  
-  if (self.showUnreadNotifsCount) {
-    NSUInteger totalUnread = numUnreadComments + numUnreadLikes;
-    cell.countBadgeView.text =  [@(totalUnread) stringValue];
-    if (totalUnread > 0) {
-      cell.countBadgeView.hidden = NO;
-    } else {
-      cell.countBadgeView.hidden = YES;
-    }
   } else {
     cell.countBadgeView.hidden = YES;
   }
-  
   
   return cell;
 }

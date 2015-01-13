@@ -750,6 +750,12 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
+- (NSArray *)allPhotos
+{
+  return [self sortedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+                                             inArrayOfFeedObjects:self.inboxFeedObjects]];
+}
+
 - (NSArray *)photosWithAction:(DFActionID)actionType
 {
   NSMutableArray *photosWithAction = [NSMutableArray new];

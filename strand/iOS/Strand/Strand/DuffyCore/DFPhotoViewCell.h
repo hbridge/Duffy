@@ -20,6 +20,7 @@
 - (void)setNumLikes:(NSUInteger)numLikes
         numComments:(NSUInteger)numComments
      numUnreadLikes:(NSUInteger)numUnreadLikes
-  numUnreadComments:(NSUInteger)numUnreadComments;
+  numUnreadComments:(NSUInteger)numUnreadComments
+      showUnreadDot:(BOOL)isUnread;
 
 @end

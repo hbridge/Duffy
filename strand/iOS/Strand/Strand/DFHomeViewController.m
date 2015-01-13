@@ -261,12 +261,12 @@ static BOOL showFilters = NO;
         feedPhotos = [[DFPeanutFeedDataManager sharedManager] photosWithActivity];
       } else {
         feedPhotos = [[DFPeanutFeedDataManager sharedManager]
-                      allEvaluatedOrSentPhotos];
+                      allPhotos];
       }
       [self.datasource setFeedPhotos:feedPhotos];
     } else {
       NSArray *allPhotos = [[DFPeanutFeedDataManager sharedManager]
-                            allEvaluatedOrSentPhotos];
+                            allPhotos];
       NSArray *sections = [self.class sectionsFromFeedPhotos:allPhotos];
       [self.datasource setSections:sections];
     }

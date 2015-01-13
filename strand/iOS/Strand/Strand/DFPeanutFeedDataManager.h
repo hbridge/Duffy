@@ -48,6 +48,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)actionsList;
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user;
 
+- (NSArray *)allPhotos;
 - (NSArray *)unevaluatedPhotosFromOtherUsers;
 - (NSArray *)allEvaluatedOrSentPhotos;
 - (NSArray *)favoritedPhotos;
