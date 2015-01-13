@@ -514,9 +514,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   if (self.notificationsPopupController.isPopoverVisible) {
     [self.notificationsPopupController dismissPopoverAnimated:YES];
   } else {
-    CGRect buttonRect = [sender.superview convertRect:sender.frame toView:self.view];
-    [self.notificationsPopupController presentPopoverFromRect:buttonRect
-                                                       inView:self.view
+    [self.notificationsPopupController presentPopoverFromRect:sender.frame
+                                                       inView:sender.superview
                                      permittedArrowDirections:WYPopoverArrowDirectionUp
                                                      animated:YES
                                                       options:WYPopoverAnimationOptionFadeWithScale
