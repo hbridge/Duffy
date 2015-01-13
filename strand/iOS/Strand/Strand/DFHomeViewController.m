@@ -351,9 +351,8 @@ static BOOL showFilters = NO;
   self.sendBadgeView.badgeColor = [DFStrandConstants strandRed];
   self.sendBadgeView.textColor = [UIColor whiteColor];
   
-  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
   NSUInteger unreadNotifications = [[[DFPeanutNotificationsManager sharedManager] unreadNotifications] count];
-  self.notificationsBadgeButton.badgeCount = (int)numToReview + (int)unreadNotifications;
+  self.notificationsBadgeButton.badgeCount = (int)unreadNotifications;
 
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
