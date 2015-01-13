@@ -170,6 +170,8 @@ class Photo(models.Model):
 	neighbored_time = models.DateTimeField(null=True)
 	strand_evaluated = models.BooleanField(default=False, db_index=True)
 	strand_needs_reeval = models.BooleanField(default=False, db_index=True)
+	notification_evaluated = models.BooleanField(default=False, db_index=True)
+	notification_sent = models.DateTimeField(null=True)
 	taken_with_strand = models.BooleanField(default=False)
 	saved_with_swap = models.BooleanField(default=False)
 	file_key = models.CharField(max_length=100, null=True)
