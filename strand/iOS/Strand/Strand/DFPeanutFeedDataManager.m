@@ -567,8 +567,10 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutFeedObject *strand in suggestedStrands) {
     [allPhotos addObjectsFromArray:[strand leafNodesFromObjectOfType:DFFeedObjectPhoto]];
   }
-     
-  return allPhotos;
+  NSPredicate *predicate = [NSPredicate
+                            predicateWithFormat:@"evaluated == nil"];
+
+  return [allPhotos filteredArrayUsingPredicate:predicate];
 }
 
 - (NSArray *)actionsList
@@ -692,6 +694,10 @@ static DFPeanutFeedDataManager *defaultManager;
        failure(error);
      }];
 
+     for (DFPeanutFeedObject *photo in photoObjects) {
+       [self setLocalHasEvaluatedPhoto:photo.id shareInstance:0];
+     }
+     
   } failure:^(NSError *error) {
     failure(error);
   }];
@@ -852,11 +858,24 @@ static DFPeanutFeedDataManager *defaultManager;
   
   // Make a call to the backend but also update our local cache.
   [self.actionAdapter addAction:evalAction success:nil failure:nil];
+  [self setLocalHasEvaluatedPhoto:photoID shareInstance:shareInstance];
+}
+
+- (void)setLocalHasEvaluatedPhoto:(DFPhotoIDType)photoID shareInstance:(DFStrandIDType)shareInstance
+{
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID && [object.share_instance isEqual:@(shareInstance)]) {
       object.evaluated = @(1);
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandNewInboxDataNotificationName
+       object:self];
+    }
+  }
+  for (DFPeanutFeedObject *photo in [self photosFromSuggestedStrands]) {
+    if (photo.id == photoID) {
+      photo.evaluated = @(1);
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandNewSwapsDataNotificationName
        object:self];
     }
   }

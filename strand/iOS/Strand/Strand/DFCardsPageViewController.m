@@ -264,7 +264,7 @@ const NSUInteger NumOutgoingNuxes = 3;
       NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
       for (int x=0; x < photos.count; x++) {
         DFPeanutFeedObject *photo = photos[x];
-        if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+        if (![self.alreadyShownPhotoIds containsObject:@(photo.id)] && !photo.evaluated.boolValue) {
           [self.alreadyShownPhotoIds addObject:@(photo.id)];
           DFOutgoingCardViewController *svc = [[DFOutgoingCardViewController alloc] init];
           svc.view.frame = self.view.bounds;
