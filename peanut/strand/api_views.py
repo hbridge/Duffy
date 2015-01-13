@@ -264,14 +264,13 @@ def actions_list(request):
 		lastActionData = None
 		count = 1
 		for shareInstance in shareInstances:
-			if actionData:
-				lastActionData = actionData
 			actionData = serializers.actionDataOfShareInstanceApiSerializer(user, shareInstance)
 
 			# We want to group together all the photos shared around the same time
 			if actionData:
 				if not lastUserId:
 					lastUserId = shareInstance.user_id
+					lastActionData = actionData
 				elif (shareInstance.user_id == lastUserId and
 					abs((actionData['time_stamp'] - lastActionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
 					count += 1
@@ -282,8 +281,9 @@ def actions_list(request):
 						lastActionData['text'] = "sent %s photos" % count
 					actionsData.append(lastActionData)
 					lastActionData = actionData
+					lastUserId = shareInstance.user_id
 					count = 1
-
+				lastActionData = actionData
 		if lastActionData:
 			if count == 1:
 				lastActionData['text'] = "sent 1 photo"
