@@ -3,6 +3,7 @@ import datetime
 import pytz
 
 from django.db.models import Q
+from django.conf import settings
 
 from strand import geo_util, friends_util, strands_util
 from common.models import Photo, Strand, StrandNeighbor, Action, User, ShareInstance
@@ -24,7 +25,13 @@ def getFeedObjectsForSwaps(user):
 
 	friends = friends_util.getFriends(user.id)
 
-	timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=30)
+	# on dev, we want a larger window to test in simulators
+	if settings.SWAP_SUGGESTION_TIMEDELTA_DAYS:
+		days = settings.SWAP_SUGGESTION_TIMEDELTA_DAYS
+	else:
+		days = 30
+
+	timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=days)
 	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(suggestible=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
 	stats_util.printStats("swaps-recent-cache")
 	

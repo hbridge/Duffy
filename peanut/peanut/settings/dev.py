@@ -116,3 +116,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "dev.duff
 
 #S3 Dev server settings
 AWS_STORAGE_BUCKET_NAME = 'strand-dev'
+
+# This should be in constants but putting here for dev vs prod difference
+SWAP_SUGGESTION_TIMEDELTA_DAYS = 365
