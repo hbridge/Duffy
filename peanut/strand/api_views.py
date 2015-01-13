@@ -260,34 +260,35 @@ def actions_list(request):
 		# Do shares to this user
 		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:50]
 		lastUserId = None
-		currentActionData = None
+		lastActionData = None
 		count = 1
 		for shareInstance in shareInstances:
+			if actionData:
+				lastActionData = actionData
 			actionData = serializers.actionDataOfShareInstanceApiSerializer(user, shareInstance)
 
 			# We want to group together all the photos shared around the same time
 			if actionData:
-				if not currentActionData:
+				if not lastUserId:
 					lastUserId = shareInstance.user_id
-					currentActionData = actionData
 				elif (shareInstance.user_id == lastUserId and
-					abs((shareInstance.shared_at_timestamp - currentActionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
+					abs((actionData['time_stamp'] - lastActionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
 					count += 1
 				else:
 					if count == 1:
-						currentActionData['text'] = "sent 1 photo"
+						lastActionData['text'] = "sent 1 photo"
 					else:
-						currentActionData['text'] = "sent %s photos" % count
-					actionsData.append(currentActionData)
-					currentActionData = None
+						lastActionData['text'] = "sent %s photos" % count
+					actionsData.append(lastActionData)
+					lastActionData = actionData
 					count = 1
 
-		if currentActionData:
+		if lastActionData:
 			if count == 1:
-				currentActionData['text'] = "sent 1 photo"
+				lastActionData['text'] = "sent 1 photo"
 			else:
-				currentActionData['text'] = "sent %s photos" % count
-			actionsData.append(currentActionData)
+				lastActionData['text'] = "sent %s photos" % count
+			actionsData.append(lastActionData)
 
 		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)[:50]
 
