@@ -331,7 +331,7 @@ const NSUInteger CompressedModeMaxRows = 1;
                             self.view.frame.size.width - 20,
                             (self.view.frame.size.width - 20) * aspectRatio);
   if (!self.imageView) {
-    self.imageView = [[UIImageView alloc] initWithFrame:frame];
+    self.imageView = [[DFRemoteImageView alloc] initWithFrame:frame];
     self.imageView.clipsToBounds = YES;
     self.imageView.contentMode = UIViewContentModeScaleAspectFill;
   } else {
@@ -352,16 +352,8 @@ const NSUInteger CompressedModeMaxRows = 1;
   if (self.nuxStep) {
     self.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
   } else {
-    [[DFImageManager sharedManager]
-     imageForID:self.photoObject.id
-     pointSize:self.imageView.frame.size
-     contentMode:DFImageRequestContentModeAspectFill
-     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
-     completion:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         self.imageView.image = image;
-       });
-     }];
+    [self.imageView loadImageWithID:self.photoObject.id
+                       deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
   }
   [self.tableView setTableHeaderView:self.imageView];
 }

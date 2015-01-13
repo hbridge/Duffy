@@ -21,6 +21,7 @@
 		5A05AD441A127EEA003AAE1C /* DFColorPreviewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A05AD421A127EEA003AAE1C /* DFColorPreviewController.xib */; };
 		5A0BC49C19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BC49A19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.m */; };
 		5A0BC49D19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A0BC49B19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib */; };
+		5A0D5E521A64841900478D86 /* DFRemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D5E511A64841900478D86 /* DFRemoteImageView.m */; };
 		5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */; };
 		5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */; };
 		5A0E122A1974839200B6FF04 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0E12291974839200B6FF04 /* MessageUI.framework */; };
@@ -320,6 +321,8 @@
 		5A0BC49919F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoPickerHeaderReusableView.h; sourceTree = "<group>"; };
 		5A0BC49A19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoPickerHeaderReusableView.m; sourceTree = "<group>"; };
 		5A0BC49B19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoPickerHeaderReusableView.xib; sourceTree = "<group>"; };
+		5A0D5E501A64841900478D86 /* DFRemoteImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFRemoteImageView.h; sourceTree = "<group>"; };
+		5A0D5E511A64841900478D86 /* DFRemoteImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFRemoteImageView.m; sourceTree = "<group>"; };
 		5A0DC37F19C0A71000654CAD /* Strand-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strand-Bridging-Header.h"; sourceTree = "<group>"; };
 		5A0E121C1974465700B6FF04 /* Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Beta.xcconfig; sourceTree = "<group>"; };
 		5A0E122319747BD800B6FF04 /* DFPeanutInviteMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutInviteMessageResponse.h; sourceTree = "<group>"; };
@@ -1623,6 +1626,8 @@
 				5AC59EA31A39FDFB0081CCE5 /* DFPhotoDetailViewController.h */,
 				5AC59EA41A39FDFB0081CCE5 /* DFPhotoDetailViewController.m */,
 				5AC59EA51A39FDFB0081CCE5 /* DFPhotoDetailViewController.xib */,
+				5A0D5E501A64841900478D86 /* DFRemoteImageView.h */,
+				5A0D5E511A64841900478D86 /* DFRemoteImageView.m */,
 				5A05AD3F1A11603B003AAE1C /* Commenting */,
 			);
 			name = "Photo Detail Views";
@@ -2070,6 +2075,7 @@
 				652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */,
 				65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
+				5A0D5E521A64841900478D86 /* DFRemoteImageView.m in Sources */,
 				65E2416A1A3B876A0044F1CB /* DFUpsellContentView.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,
@@ -2456,6 +2462,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
