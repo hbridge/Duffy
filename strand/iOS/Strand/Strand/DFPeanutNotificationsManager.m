@@ -113,7 +113,15 @@ static DFPeanutNotificationsManager *defaultManager;
 
 - (void)markAllNotificationsAsRead
 {
-  
+  NSMutableArray *idsToMark = [NSMutableArray new];
+  for (DFPeanutAction *action in self.notifications) {
+    if (![self isActionIDSeen:action.id.longLongValue]) {
+      [idsToMark addObject:action.id];
+    }
+  }
+  if (idsToMark.count > 0) {
+    [self markActionIDsSeen:idsToMark];
+  }
 }
 
 
