@@ -101,7 +101,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	return shareInstanceData
 
 
-def objectDataForPrivateStrand(strand, friends, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
+def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
 	strandData = dict()
 	strandData['id'] = strand.id
 	if strand.id in interestedUsersByStrandId:
@@ -126,7 +126,7 @@ def objectDataForPrivateStrand(strand, friends, includeAll, suggestionType, inte
 			for action in actionsByPhotoId[photo.id]:
 				if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
 					evaled = True
-		if not evaled or includeAll:
+		if (not evaled or includeAll) and photo.install_num == user.install_num:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
 			photosIncluded += 1
 

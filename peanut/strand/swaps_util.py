@@ -62,7 +62,7 @@ def getFeedObjectsForSwaps(user):
 		actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
 
 		for strand in strands:
-			strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, False, "recent-last week", dict(), dict(), actionsByPhotoId)
+			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, False, "recent-last week", dict(), dict(), actionsByPhotoId)
 			if strandObjectData:
 				lastWeekResponseObjects.append(strandObjectData)
 
@@ -88,7 +88,7 @@ def getFeedObjectsForPrivateStrands(user):
 	stats_util.printStats("private-b")
 		
 	for strand in allPrivateStrands:
-		strandObjectData = serializers.objectDataForPrivateStrand(strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
+		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
 		if strandObjectData:
 			responseObjects.append(strandObjectData)
 
