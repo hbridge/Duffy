@@ -83,6 +83,7 @@ static DFToastNotificationManager *defaultManager;
   options[kCRToastTextKey] = title;
   if (subtitle) options[kCRToastSubtitleTextKey] = subtitle;
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/WarningIcon.png"];
+  options[kCRToastInteractionRespondersKey] = @[[self.class dismissInteractionHandler]];
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
                               }];
@@ -95,6 +96,7 @@ static DFToastNotificationManager *defaultManager;
   options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
   options[kCRToastTimeIntervalKey] = @(timeout);
   options[kCRToastTextKey] = string;
+  options[kCRToastInteractionRespondersKey] = @[[self.class dismissInteractionHandler]];
   
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
@@ -112,7 +114,8 @@ static DFToastNotificationManager *defaultManager;
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/PhotoNotificationIcon.png"];
   
   options[kCRToastInteractionRespondersKey] = @[[self.class handlerWithOpenedHandler:openedHandler
-                                                                        forPushNotif:pushNotif]];
+                                                                        forPushNotif:pushNotif],
+                                                 [self.class dismissInteractionHandler]];
   
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
@@ -126,7 +129,7 @@ static DFToastNotificationManager *defaultManager;
 {
   return
   [CRToastInteractionResponder
-   interactionResponderWithInteractionType:CRToastInteractionTypeAll
+   interactionResponderWithInteractionType:CRToastInteractionTypeTap
    automaticallyDismiss:YES
    block:^(CRToastInteractionType interactionType) {
      handler(pushNotif);
@@ -136,7 +139,7 @@ static DFToastNotificationManager *defaultManager;
 + (id)dismissInteractionHandler
 {
   return [CRToastInteractionResponder
-          interactionResponderWithInteractionType:CRToastInteractionTypeAll
+          interactionResponderWithInteractionType:CRToastInteractionTypeSwipe
           automaticallyDismiss:YES
           block:^(CRToastInteractionType interactionType) {
             DDLogVerbose(@"CRToast notification dismissed by user.");

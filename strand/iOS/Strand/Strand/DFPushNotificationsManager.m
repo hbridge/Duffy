@@ -284,19 +284,9 @@
 
 - (void)openPhotoObject:(DFPeanutFeedObject *)photoObject
 {
-  UIViewController *vc;
-  
-  if (photoObject.evaluated.boolValue) {
-    vc =  [[DFPhotoDetailViewController alloc]
+  UIViewController *vc =  [[DFPhotoDetailViewController alloc]
            initWithPhotoObject:photoObject];
-    
-  } else {
-    vc = [[DFCardsPageViewController alloc]
-          initWithPreferredType:DFIncomingViewType photoID:photoObject.id
-          shareInstance:photoObject.share_instance.longLongValue];
-  }
-
-  
+      
   UIViewController *keyViewController = [[[[UIApplication sharedApplication] delegate] window]
                                          rootViewController];
   if (keyViewController.presentedViewController){
