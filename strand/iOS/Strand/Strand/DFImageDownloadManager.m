@@ -149,6 +149,7 @@ static DFImageDownloadManager *defaultManager;
      @autoreleasepool {
        AFHTTPRequestOperation *requestOperation = nil;
        for (int retryCount = 0; retryCount <= maxDownloadRetries; retryCount++) {
+         usleep(retryCount * 2 * USEC_PER_SEC);
          DDLogVerbose(@"Getting image data at: %@", url);
          NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
                                                  initWithURL:url
