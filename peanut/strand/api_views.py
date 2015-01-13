@@ -259,7 +259,7 @@ def actions_list(request):
 
 		shareInstanceIds = ShareInstance.getIds(shareInstances)
 		
-		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance_id__in=shareInstanceIds).order_by("-added")
+		actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance_id__in=shareInstanceIds).order_by("-added")
 
 		actionsData = list()
 		for action in actions:

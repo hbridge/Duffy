@@ -167,26 +167,8 @@ def actionDataForApiSerializer(action):
 	actionData['time_stamp'] = action.added
 	actionData['action_type'] = action.action_type
 	actionData['share_instance'] = action.share_instance_id
-
-	# TODO(Derek): This fetching of photos.all() can be removed in December once we've gone through a couple weeks of writing
-	#   out the photo element for Add actions
-	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND or action.action_type == constants.ACTION_TYPE_CREATE_STRAND and not action.photo:
-		if len(action.photos.all()) == 0 and action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-			logger.error("Found action %s that is an add action with no photos.  Please delete this." % action.id)
-		else:
-			actionData['photo'] = action.photos.all()[0].id
-			# Always make the client think this is add photos action
-			actionData['action_type'] = constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND
-	else:
-		actionData['photo'] = action.photo_id
-		
+	actionData['photo'] = action.photo_id
 	actionData['text'] = action.text
-
-	# TODO(Derek): remove this once we don't need it.
-	#   That happens if we are caching this somewhere else and can add in or the client
-	#   uses some other mapping than in the action itself
-	actionData['user_display_name'] = action.getUserDisplayName()
-	actionData['user_phone_number'] = action.getUserPhoneNumber()
 
 	return actionData
 

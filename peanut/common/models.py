@@ -566,10 +566,6 @@ class Strand(models.Model):
 			return "1 photo"
 		else:
 			return "%s photos" % (photoCount)
-
-	def photo_posts_info(self):
-		postActions = self.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
-		return "%s posts" % len(postActions)
 		
 	def sharing_info(self):
 		if self.private:
@@ -627,15 +623,6 @@ class Strand(models.Model):
 		return ', '.join(links)		
 	user_neighbors_link.allow_tags = True
 	user_neighbors_link.short_description = "User Neighbors"
-	
-	def getPostPhotos(self):
-		postActions = self.action_set.filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
-		photos = list()
-		for action in postActions:
-			photos.extend(action.photos.all())
-
-		return sorted(photos, key=lambda x: x.time_taken, reverse=True)
-
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):

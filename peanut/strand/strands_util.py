@@ -148,9 +148,7 @@ def getBestLocationForPhotos(photos):
 
 def getTitleForStrand(strand):
 	photos = strand.photos.all()
-	if len(photos) == 0:
-		photos = strand.getPostPhotos()
-		
+
 	location = getBestLocationForPhotos(photos)
 
 	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
@@ -167,9 +165,7 @@ def getTitleForStrand(strand):
 
 def getLocationForStrand(strand):
 	photos = strand.photos.all()
-	if len(photos) == 0:
-		photos = strand.getPostPhotos()
-		
+
 	if len(photos) == 0:
 		location = strand.location_city
 	else:
