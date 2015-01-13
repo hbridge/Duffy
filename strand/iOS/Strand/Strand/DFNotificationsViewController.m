@@ -197,13 +197,6 @@
      }];
   }
   
-  //decide whether to highlight
-  if ([[DFPeanutNotificationsManager sharedManager] isActionIDSeen:action.id.longLongValue]) {
-    cell.backgroundColor = [UIColor whiteColor];
-  } else {
-    cell.backgroundColor = [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
-  }
-  
   return cell;
 }
 
