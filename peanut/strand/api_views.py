@@ -254,20 +254,25 @@ def actions_list(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		responseObjects = list()
-
-		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-updated", "id")[:50]
-
-		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		
-		actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance_id__in=shareInstanceIds).order_by("-added")
-
 		actionsData = list()
+
+		# Do favorites and comments
+		actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:20]
 		for action in actions:
-			actionsData.append(serializers.actionDataForApiSerializer(action))
+			actionData = serializers.actionDataOfActionApiSerializer(user, action)
+			if actionData:
+				actionsData.append(actionData)
 
-		actionsData = {'type': 'actions_list', 'actions': actionsData}
+		# Do shares to this user
+		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "id")[:20]
+		for shareInstance in shareInstances:
+			actionData = serializers.actionDataOfShareInstanceApiSerializer(user, shareInstance)
+			if actionData:
+				actionsData.append(actionData)
 
-		response['objects'] = [actionsData]
+		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)
+
+		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
 		stats_util.printStats("actions-end")
 
 		user.last_actions_list_request_timestamp = datetime.datetime.utcnow()

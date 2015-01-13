@@ -160,8 +160,15 @@ def photoDataForApiSerializer(photo):
 
 	return photoData
 
-def actionDataForApiSerializer(action):
+def actionDataOfActionApiSerializer(user, action):
+	# Assumes that the list of actions don't have any done by the current user
 	actionData = dict()
+
+	# Only show favorites if its on something the user shared
+	if (action.action_type == constants.ACTION_TYPE_FAVORITE and
+		action.share_instance.user_id != user.id):
+		return None
+		
 	actionData['id'] = action.id
 	actionData['user'] = action.user_id
 	actionData['time_stamp'] = action.added
@@ -172,6 +179,23 @@ def actionDataForApiSerializer(action):
 
 	return actionData
 
+
+def actionDataOfShareInstanceApiSerializer(user, shareInstance):
+	# Assumes that the list of actions don't have any done by the current user
+	actionData = dict()
+
+	# Only return data for shares that other people do
+	if shareInstance.user_id == user.id:
+		return None
+		
+	actionData['user'] = shareInstance.user_id
+	actionData['time_stamp'] = shareInstance.shared_at_timestamp
+	actionData['action_type'] = constants.ACTION_TYPE_SHARED_PHOTOS
+	actionData['share_instance'] = shareInstance.id
+	actionData['photo'] = shareInstance.photo_id
+	actionData['text'] = "Shared a photo"
+
+	return actionData
 
 def actorsData(friends, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
