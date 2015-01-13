@@ -528,7 +528,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 - (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
    didSelectNotificationWithAction:(DFPeanutAction *)peanutAction
 {
-  [self.notificationsPopupController dismissPopoverAnimated:YES];
+  [self.notificationsPopupController dismissPopoverAnimated:NO];
   DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                      photoWithID:peanutAction.photo.longLongValue
                                      shareInstance:peanutAction.share_instance.longLongValue];
