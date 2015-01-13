@@ -421,10 +421,10 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
       
       if (self.backgroundSyncTotalBytes > 0) {
         DDLogInfo(@"Returning NewData result for background uploader since we uploaded %lul bytes", (unsigned long)self.backgroundSyncTotalBytes);
-        _completionHandler(UIBackgroundFetchResultNewData);
+        if (_completionHandler) _completionHandler(UIBackgroundFetchResultNewData);
       } else {
         DDLogInfo(@"Returning NoData result for background uploader");
-        _completionHandler(UIBackgroundFetchResultNoData);
+        if (_completionHandler) _completionHandler(UIBackgroundFetchResultNoData);
       }
     } else if (self.backgroundSyncAndUploaderHaveFinished == YES) {
       DDLogVerbose(@"Uploader finished but we should have already returned...ignoring");
@@ -443,7 +443,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   DDLogInfo(@"Leaving background app refresh at %@", [NSDate date]);
   self.backgroundSyncInProgress = NO;
-  _completionHandler(UIBackgroundFetchResultNewData);
+  if (_completionHandler) _completionHandler(UIBackgroundFetchResultNewData);
 }
 
 /*

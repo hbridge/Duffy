@@ -148,6 +148,11 @@ static DFBackgroundLocationManager *defaultManager;
                                      success ? @"true" : @"false");
                          }];
   }
+  
+  if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
+    [[[UIApplication sharedApplication] delegate] application:[UIApplication sharedApplication]
+                                           performFetchWithCompletionHandler:nil];
+  }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
