@@ -260,6 +260,7 @@ def actions_list(request):
 		# Do shares to this user
 		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:50]
 		lastUserId = None
+		actionData = None
 		lastActionData = None
 		count = 1
 		for shareInstance in shareInstances:
