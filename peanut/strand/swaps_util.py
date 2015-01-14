@@ -26,8 +26,8 @@ def getFeedObjectsForSwaps(user):
 	friends = friends_util.getFriends(user.id)
 
 	# on dev, we want a larger window to test in simulators
-	if settings.SWAP_SUGGESTION_TIMEDELTA_DAYS:
-		days = settings.SWAP_SUGGESTION_TIMEDELTA_DAYS
+	if '555555' in str(user.phone_number):
+		days = 365
 	else:
 		days = 30
 
