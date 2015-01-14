@@ -62,6 +62,7 @@ static DFPeanutNotificationsManager *defaultManager;
 
 - (void)postNotificationsUpdatedNotif
 {
+  DDLogVerbose(@"%@ posting notifications updated.", self.class);
   [[NSNotificationCenter defaultCenter]
    postNotificationName:DFStrandNotificationsUpdatedNotification
    object:self
