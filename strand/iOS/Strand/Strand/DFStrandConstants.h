@@ -63,6 +63,7 @@ extern const CGFloat StrandGalleryHeaderHeight;
 + (UIColor *)alertForegroundColor;
 + (UIColor *)unreadNotificationBackgroundColor;
 + (UIColor *)cardPagerBackground;
++ (NSArray *)homeNavBarGradientColors;
 
 + (UIStatusBarStyle)preferredStatusBarStyle;
 

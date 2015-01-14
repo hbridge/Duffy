@@ -85,12 +85,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   self.navigationController.navigationBar.backgroundColor = [UIColor clearColor];
   self.navigationController.navigationBar.translucent = YES;
   self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
-  //self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
   
-  self.buttonBar.gradientColors = @[
-                                    [UIColor colorWithRedByte:198 green:198 blue:200 alpha:1.0],
-                                    [UIColor colorWithRedByte:154 green:178 blue:208 alpha:1.0]
-                                    ];
   self.buttonBar.gradientDirection = SAMGradientViewDirectionHorizontal;
   
   self.notificationsBadgeButton = [[DFBadgeButton alloc] init];
@@ -136,7 +131,7 @@ static BOOL use_vibrance = NO;
   [self.buttonBar insertSubview:self.navBackgroundImageView atIndex:0];
   [self.navBackgroundImageView constrainToSuperviewSize];
   self.navBackgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
-  self.navBackgroundImageView.alpha = 0.8;
+  self.navBackgroundImageView.alpha = 0.4;
   
   
   // Vibrancy Effect
@@ -431,9 +426,11 @@ static BOOL showFilters = NO;
   } else {
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
                                forState:UIControlStateNormal];
+    self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
   }
-
 }
+
+
 
 - (void)setSuggestionsAreaHidden:(BOOL)suggestionsAreaHidden
 {
@@ -455,6 +452,7 @@ static BOOL showFilters = NO;
       self.sendBadgeView.hidden = YES;
       [self.view layoutIfNeeded];
     }];
+    self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
   } else if (!hidden && _suggestionsAreaHidden){
     //show the suggestions area
     self.buttonBarHeightConstraint.constant = ExpandedNavBarHeight;
@@ -465,6 +463,8 @@ static BOOL showFilters = NO;
       self.sendBadgeView.hidden = NO;
       [self.view layoutIfNeeded];
     }];
+    self.buttonBar.gradientColors = @[[UIColor whiteColor]
+                                      ];
   }
   _suggestionsAreaHidden = hidden;
 }
@@ -503,7 +503,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DDLogVerbose(@"%@ photo id %@ tapped", self.class, @(photo.id));
+  DDLogVerbose(@"%@ photo:%@ share_instance:%@ tapped", self.class, @(photo.id), photo.share_instance);
    
   NSMutableArray *allPhotos = [NSMutableArray new];
   for (NSUInteger section = 0; section < [self.datasource numberOfSectionsInCollectionView:self.collectionView]; section++) {
@@ -553,6 +553,8 @@ static DFPeanutFeedObject *currentPhoto;
 
 - (void)friendsButtonPressed:(id)sender
 {
+  [self testCycleBackgroundArea];
+  return;
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   [DFNavigationController presentWithRootController:friendsViewController
                                            inParent:self

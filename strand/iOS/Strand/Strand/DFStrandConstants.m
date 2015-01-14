@@ -148,6 +148,13 @@ UIColor *DFStrandMainColor;
   return [UIColor colorWithRed:47.0/255.0 green:47.0/255.0 blue:47.0/255.0 alpha:1];
 }
 
++ (NSArray *)homeNavBarGradientColors
+{
+  return @[
+           [UIColor colorWithRedByte:198 green:198 blue:200 alpha:1.0],
+           [UIColor colorWithRedByte:154 green:178 blue:208 alpha:1.0]
+           ];
+}
 
 + (UIStatusBarStyle)preferredStatusBarStyle
 {
