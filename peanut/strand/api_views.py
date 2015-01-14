@@ -305,7 +305,6 @@ def actions_list(request):
 		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
 		stats_util.printStats("actions-end")
 
-		user.last_actions_list_request_timestamp = datetime.datetime.utcnow()
 		user.save()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
