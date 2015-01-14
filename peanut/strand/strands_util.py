@@ -60,7 +60,12 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 
 def userShouldBeNeighborToStrand(strand, locationRecord):
 	if strand.location_point:
-		if geo_util.getDistanceBetweenStrandAndLocationRecord(strand, locationRecord) < constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING:
+		dist = geo_util.getDistanceBetweenStrandAndLocationRecord(strand, locationRecord)
+		timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+		if (dist < constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING and
+			 locationRecord.timestamp > timeLow and
+			 locationRecord.timestamp < timeHigh):
 			return True
 			
 	return False
@@ -90,8 +95,11 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 				photo.is_dup = True
 				return False
 
-		Strand.photos.through.objects.create(strand=strand, photo=photo)
-		photosByStrandId[strand.id].append(photo)
+		try:
+			Strand.photos.through.objects.create(strand=strand, photo=photo)
+			photosByStrandId[strand.id].append(photo)
+		except IntegrityError:
+			logger.error("Got Integrity Error adding photo %s to strand %s" % (photo.id, strand.id))
 
 	# Add user to strand
 	if strand.id not in usersByStrandId:
