@@ -139,10 +139,11 @@ static BOOL use_vibrance = NO;
   [self.buttonBar insertSubview:self.navBackgroundImageView atIndex:0];
   [self.navBackgroundImageView constrainToSuperviewSize];
   self.navBackgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
+  self.navBackgroundImageView.alpha = 0.8;
   
   
   // Vibrancy Effect
-  UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+  UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
   UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
   blurEffectView.translatesAutoresizingMaskIntoConstraints = NO;
   [self.buttonBar insertSubview:blurEffectView aboveSubview:self.navBackgroundImageView];
