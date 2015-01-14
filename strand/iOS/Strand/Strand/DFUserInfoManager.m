@@ -71,47 +71,39 @@ static DFUserInfoManager *defaultManager;
 
 - (void)setLastPhotoTimestamp:(NSDate *)timestamp
 {
-  DFPeanutUserObject *currentUserPeanutObject = [DFPeanutUserObject new];
-  currentUserPeanutObject.id = [[DFUser currentUser] userID];
-  [self.userAdapter performRequest:RKRequestMethodGET
-                    withPeanutUser:currentUserPeanutObject
-                           success:^(DFPeanutUserObject *user) {
-                             user.last_photo_timestamp = timestamp;
-                             user.last_photo_update_timestamp = [[NSDate alloc] init];
-                             [self.userAdapter performRequest:RKRequestMethodPATCH
-                                               withPeanutUser:user
-                                                      success:^(DFPeanutUserObject *user) {
-                                                        DDLogVerbose(@"%@: Successfully set last_photo_timestamp to %@ for user %llu", self.class, timestamp, user.id);
-                                                      } failure:^(NSError *error) {
-                                                        DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
-                                                      }];
-                           } failure:^(NSError *error) {
-                             DDLogError(@"%@: Error in GET for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
-                           }];
-}
-
+  DFPeanutUserObject *user = [DFPeanutUserObject new];
+  user.last_photo_timestamp = timestamp;
+  user.last_photo_update_timestamp = [[NSDate alloc] init];
+  [self updateCurrentUserToUser:user];
+};
 
 - (void)setLastCheckinTimestamp:(NSDate *)timestamp
 {
-  DFPeanutUserObject *currentUserPeanutObject = [DFPeanutUserObject new];
-  currentUserPeanutObject.id = [[DFUser currentUser] userID];
-  [self.userAdapter performRequest:RKRequestMethodGET
-                    withPeanutUser:currentUserPeanutObject
-                           success:^(DFPeanutUserObject *user) {
-                             user.last_checkin_timestamp = timestamp;
-                             [self.userAdapter performRequest:RKRequestMethodPATCH
-                                               withPeanutUser:user
-                                                      success:^(DFPeanutUserObject *user) {
-                                                        DDLogVerbose(@"%@: Successfully set last_checkin_timestamp to %@ for user %llu", self.class, timestamp, user.id);
-                                                      } failure:^(NSError *error) {
-                                                        DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
-                                                      }];
-                           } failure:^(NSError *error) {
-                             DDLogError(@"%@: Error in GET for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
-                           }];
+  DFPeanutUserObject *user = [DFPeanutUserObject new];
+  user.last_checkin_timestamp = timestamp;
+  [self updateCurrentUserToUser:user];
 }
 
+- (void)setLastNotifsOpenedTimestamp:(NSDate *)date
+{
+  DFPeanutUserObject *user = [DFPeanutUserObject new];
+  user.last_actions_list_request_timestamp = date;
+  [self updateCurrentUserToUser:user];
+}
 
+- (void)updateCurrentUserToUser:(DFPeanutUserObject *)user
+{
+   user.id = [[DFUser currentUser] userID];
+  [self.userAdapter
+   performRequest:RKRequestMethodPATCH
+   withPeanutUser:user
+   success:^(DFPeanutUserObject *user) {
+     DDLogVerbose(@"%@: successfully set user to: %@", self.class, user);
+   } failure:^(NSError *error) {
+     DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, user.id, error);
+   }];
+
+}
 
 - (DFUserPeanutAdapter *)userAdapter
 {

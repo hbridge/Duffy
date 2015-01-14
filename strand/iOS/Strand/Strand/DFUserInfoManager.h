@@ -14,5 +14,5 @@
 - (void)setFirstTimeSyncCount:(NSNumber *)photoCount;
 - (void)setLastPhotoTimestamp:(NSDate *)timestamp;
 - (void)setLastCheckinTimestamp:(NSDate *)timestamp;
-
+- (void)setLastNotifsOpenedTimestamp:(NSDate *)date;
 @end

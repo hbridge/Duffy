@@ -48,6 +48,7 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
            @"added",
            @"invited",
            @"relationship",
+           @"last_actions_list_request_timestamp"
            ];
 }
 

@@ -20,6 +20,7 @@
 #import "DFDismissableModalViewController.h"
 #import <WYPopoverController/WYPopoverController.h>
 #import "DFNoTableItemsView.h"
+#import "DFUserInfoManager.h"
 
 @interface DFNotificationsViewController ()
 
@@ -88,6 +89,7 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
+  [[DFUserInfoManager sharedManager] setLastNotifsOpenedTimestamp:[NSDate date]];
   [[DFPeanutNotificationsManager sharedManager] markAllNotificationsAsRead];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }

@@ -38,6 +38,7 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSNumber *invited;
 @property (nonatomic, retain) NSString *relationship;
+@property (nonatomic, retain) NSDate *last_actions_list_request_timestamp;
 
 - (NSDictionary *)requestParameters;
 - (void)setLocation:(CLLocation *)location;
