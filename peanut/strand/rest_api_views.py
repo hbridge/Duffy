@@ -454,6 +454,7 @@ class BulkCreateModelMixin(CreateModelMixin):
                     if subSerializer.is_valid():
                         manyToManyFieldData[count] = rawData[self.many_to_many_field]
                         subSerializer.object.mtm_key = count
+                        subSerializer.object.mtm_data = rawData[self.many_to_many_field]
                         objects.append(subSerializer.object)
 
                         count += 1
@@ -467,6 +468,8 @@ class BulkCreateModelMixin(CreateModelMixin):
                 self.pre_save(obj)
                 if hasattr(obj, 'skip') and obj.skip:
                     results.append(obj)
+                elif hasattr(obj, 'do_not_create') and obj.do_not_create:
+                    continue
                 else:
                     toCreateObjects.append(obj)
             
@@ -715,6 +718,17 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
         shareInstance.shared_at_timestamp = now
         shareInstance.last_action_timestamp = now
 
+        # See if we've created something identical to this in the last few seconds
+        timeCuttoff = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        possibleMatches = ShareInstance.objects.prefetch_related('users').filter(user=shareInstance.user).filter(photo=shareInstance.photo).filter(added__gt=timeCuttoff)
+
+        userIdsA = shareInstance.mtm_data
+
+        for si in possibleMatches:
+            userIdsB = ShareInstance.getIds(si.users.all())
+            if userIdsA == userIdsB:
+                shareInstance.do_not_create = True
+                return
 
     def post_save(self, shareInstance, created):
         if created:
