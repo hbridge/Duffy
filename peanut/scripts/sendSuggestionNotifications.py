@@ -79,6 +79,7 @@ def listsToPhrases(photoCount, userNames):
 def main(argv):
 	logger.info("Starting... ")
 	photoTimedelta = datetime.timedelta(minutes=240)
+	notificationTimedelta = datetime.timedelta(seconds=3600)
 
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -98,7 +99,16 @@ def main(argv):
 			else:
 				strandsByUser[strand.user] = [strand]
 
+		# get all the suggestions sent out in the last 60 sec and don't send to those users
+		recentUsersNotified = NotificationLog.objects.filter(msg_type=constants.NOTIFICATIONS_NEW_SUGGESTION).filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).filter(added__gt=now-notificationTimedelta).values('user').distinct()
+		recentUsersNotifiedList = list()
+
+		for entry in recentUsersNotified:
+			recentUsersNotifiedList.append(entry['user'])
+
 		for user, recentStrands in strandsByUser.items():
+			if user.id in recentUsersNotified:
+				continue
 			interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, recentStrands, True, friends_util.getFriends(user.id))
 
 			if len(strands) == 0:
