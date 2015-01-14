@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Format private strand with interested users
 def getFeedObjectsForSwaps(user):
 	responseObjects = list()
+	strandIdsAlreadyIncluded = list()
 
 	friends = friends_util.getFriends(user.id)
 
@@ -44,6 +45,7 @@ def getFeedObjectsForSwaps(user):
 	for strand in strands:
 		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
 		if strandObjectData:
+			strandIdsAlreadyIncluded.add(strand.id)
 			responseObjects.append(strandObjectData)
 
 	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
@@ -54,8 +56,10 @@ def getFeedObjectsForSwaps(user):
 		timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=7)
 		mostRecentStrandIds = list()
 
+		# grab the strands that we fetched before but that are within our time cutoff
+		# and that we didn't add already
 		for strand in recentStrands:
-			if strand.first_photo_time > timeCutoff:
+			if strand.first_photo_time > timeCutoff and strand.id not in strandIdsAlreadyIncluded:
 				mostRecentStrandIds.append(strand.id)
 
 		strands = Strand.objects.prefetch_related('photos').filter(id__in=mostRecentStrandIds)
