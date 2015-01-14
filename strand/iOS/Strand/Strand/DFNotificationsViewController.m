@@ -19,12 +19,14 @@
 #import "DFPhotoDetailViewController.h"
 #import "DFDismissableModalViewController.h"
 #import <WYPopoverController/WYPopoverController.h>
+#import "DFNoTableItemsView.h"
 
 @interface DFNotificationsViewController ()
 
 @property (nonatomic, retain) DFNotificationTableViewCell *templateCell;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 @property (nonatomic, retain) NSMutableDictionary *rowHeightCache;
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
 @end
 
@@ -111,7 +113,27 @@
 - (void)reloadData
 {
   self.rowHeightCache = [NSMutableDictionary new];
-  [self.tableView reloadData];
+  if ([[[DFPeanutNotificationsManager sharedManager] notifications] count] > 0) {
+    [self.tableView reloadData];
+    [self setNoResultsViewHidden:YES];
+  } else {
+    [self setNoResultsViewHidden:NO];
+  }
+}
+
+- (void)setNoResultsViewHidden:(BOOL)hidden
+{
+  if (hidden) {
+    [self.noResultsView removeFromSuperview];
+    self.noResultsView = nil;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+  } else if (!self.noResultsView) {
+    self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    self.noResultsView.titleLabel.text = @"No Notifications";
+    self.noResultsView.subtitleLabel.text = @"New photos, comments and likes will appear here.";
+    [self.noResultsView setSuperView:self.view];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+  }
 }
 
 - (void)refreshFromServer
