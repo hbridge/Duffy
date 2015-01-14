@@ -55,4 +55,13 @@
   return self[requestedIndex];
 }
 
+- (NSArray *)objectsPassingTestBlock:(BOOL (^)(id input))testBlock
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (id object in self) {
+    if (testBlock(object)) [result addObject:object];
+  }
+  return [[NSArray alloc] initWithArray:result];
+}
+
 @end
