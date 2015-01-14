@@ -271,7 +271,7 @@ static BOOL showFilters = NO;
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if ([DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux]) {
+  if ([DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
   [self reloadNavData];
@@ -388,10 +388,7 @@ static BOOL showFilters = NO;
   NSUInteger unreadNotifications = [[[DFPeanutNotificationsManager sharedManager] unreadNotifications] count];
   self.notificationsBadgeButton.badgeCount = (int)unreadNotifications;
 
-  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands] count];
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-    numToSend++;
-  }
+  
   
   [self reloadSuggestionsArea];
 }
@@ -399,8 +396,10 @@ static BOOL showFilters = NO;
 - (void)reloadSuggestionsArea
 {
   NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
-  
   NSUInteger numToSend = [suggestedPhotos count];
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+    numToSend++;
+  }
   
   if (numToSend > 0) {
     self.sendBadgeView.hidden = NO;
@@ -415,19 +414,24 @@ static BOOL showFilters = NO;
 
 - (void)setNavAreaForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto
 {
-  [[DFImageManager sharedManager]
-   imageForID:suggestedPhoto.id
-   pointSize:self.sendButton.frame.size
-   contentMode:DFImageRequestContentModeAspectFill
-   deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
-   completion:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       [self.sendButton setBackgroundImage:image
-                                  forState:UIControlStateNormal];
-       self.navBackgroundImageView.image = image;
-       
+  if (suggestedPhoto) {
+    [[DFImageManager sharedManager]
+     imageForID:suggestedPhoto.id
+     pointSize:self.sendButton.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         [self.sendButton setBackgroundImage:image
+                                    forState:UIControlStateNormal];
+         self.navBackgroundImageView.image = image;
+         
      });
    }];
+  } else {
+    [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
+                               forState:UIControlStateNormal];
+  }
 
 }
 

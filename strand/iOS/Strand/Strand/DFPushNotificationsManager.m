@@ -43,7 +43,7 @@
         DDLogInfo(@"%@ prompting for push notifs.", self.class);
         UIAlertView *alertView = [[UIAlertView alloc]
                                   initWithTitle:@"Receive Notifications"
-                                  message:@"Would you like to get notifications when friends send you photos?"
+                                  message:@"Would you like to get notifications when friends send you photos or comment on your photos?"
                                   delegate:self
                                   cancelButtonTitle:@"Not Now"
                                   otherButtonTitles:@"Yes", nil];
