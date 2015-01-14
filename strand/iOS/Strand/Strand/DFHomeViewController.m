@@ -553,8 +553,6 @@ static DFPeanutFeedObject *currentPhoto;
 
 - (void)friendsButtonPressed:(id)sender
 {
-  [self testCycleBackgroundArea];
-  return;
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   [DFNavigationController presentWithRootController:friendsViewController
                                            inParent:self
