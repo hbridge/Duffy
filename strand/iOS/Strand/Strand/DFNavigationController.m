@@ -60,11 +60,15 @@
               withBackButtonTitle:(NSString *)backButtonTitle
 {
   DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:rootController];
-  rootController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                                     initWithTitle:backButtonTitle
-                                                     style:UIBarButtonItemStylePlain
-                                                     target:navController
-                                                     action:@selector(dismissWhenPresented)];
+  NSMutableArray *leftItems = [[NSMutableArray alloc]
+                               initWithArray:rootController.navigationItem.leftBarButtonItems];
+  [leftItems insertObject:[[UIBarButtonItem alloc]
+                           initWithTitle:backButtonTitle
+                           style:UIBarButtonItemStylePlain
+                           target:navController
+                           action:@selector(dismissWhenPresented)]
+                  atIndex:0];
+  rootController.navigationItem.leftBarButtonItems = leftItems;
   [parent presentViewController:navController animated:YES completion:nil];
 }
 

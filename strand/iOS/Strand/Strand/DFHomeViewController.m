@@ -29,7 +29,8 @@
 #import "DFBadgeButton.h"
 #import "UIView+DFExtensions.h"
 
-const CGFloat headerHeight = 60.0;
+const CGFloat ExpandedNavBarHeight = 19 + 44 + 87;
+const CGFloat CollapsedNavBarHeight = 19 + 44;
 const NSUInteger MinPhotosToShowFilter = 20;
 
 @interface DFHomeViewController ()
@@ -118,10 +119,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                               style:UIBarButtonItemStylePlain
                                               target:self
                                               action:@selector(friendsButtonPressed:)],
-                                             [[UIBarButtonItem alloc]
-                                              initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                                              style:UIBarButtonItemStylePlain target:self
-                                              action:@selector(settingsPressed:)],
                                              ];
   [self setSuggestionsAreaHidden:YES animated:NO];
   
@@ -175,7 +172,7 @@ static BOOL use_vibrance = NO;
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"labelHeader"];
-    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
+    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, CollapsedNavBarHeight);
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:@"footer"];
@@ -261,7 +258,7 @@ static BOOL showFilters = NO;
 
 - (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
 {
-  self.collectionView.contentOffset = CGPointMake(0, headerHeight);
+  self.collectionView.contentOffset = CGPointMake(0, CollapsedNavBarHeight);
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -446,7 +443,7 @@ static BOOL showFilters = NO;
     [self.sendButton setBackgroundImage:nil
                                forState:UIControlStateNormal];
     self.navBackgroundImageView.image = nil;
-    self.buttonBarHeightConstraint.constant = 19 + 44;
+    self.buttonBarHeightConstraint.constant = CollapsedNavBarHeight;
     [UIView animateWithDuration:animated ? 0.5 : 0.0 animations:^{
       for (UIView *view in @[self.sendButton, self.buttonBarLabel]) {
         view.alpha = 0.0;
@@ -456,7 +453,7 @@ static BOOL showFilters = NO;
     }];
   } else if (!hidden && _suggestionsAreaHidden){
     //show the suggestions area
-    self.buttonBarHeightConstraint.constant = 19 + 44 + 97;
+    self.buttonBarHeightConstraint.constant = ExpandedNavBarHeight;
     [UIView animateWithDuration:animated ? 0.5 : 0.0 animations:^{
       for (UIView *view in @[self.sendButton, self.buttonBarLabel]) {
         view.alpha = 1.0;
@@ -555,7 +552,7 @@ static DFPeanutFeedObject *currentPhoto;
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   [DFNavigationController presentWithRootController:friendsViewController
                                            inParent:self
-                                withBackButtonTitle:@"Back"];
+                                withBackButtonTitle:@"Close"];
 }
 
 - (void)notificationsButtonPressed:(DFBadgeButton *)sender
