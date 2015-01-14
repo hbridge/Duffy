@@ -71,7 +71,7 @@
           DDLogInfo(@"Successfully marked photo %@ as not in the system", photo.id);
         }
         // Lastly, we want to refresh our private data.
-        [[DFPeanutFeedDataManager sharedManager] refreshPrivatePhotosFromServer:^{
+        [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFPrivateFeed completion:^{
           DDLogVerbose(@"Refreshed private photos data after successful delete");
         }];
         dispatch_semaphore_signal(completionSemaphore);

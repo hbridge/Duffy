@@ -238,8 +238,7 @@ static BOOL ShowInAppNotifications = NO;
       DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID shareInstance:shareID];
       if (!photoObject) {
         [SVProgressHUD show];
-        [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:^() {
-          
+        [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:^() {
           DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                              photoWithID:photoID
                                              shareInstance:shareID];

@@ -260,7 +260,7 @@ static BOOL showFilters = NO;
 {
   [super viewWillAppear:animated];
   [self reloadNavData];
-  [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated

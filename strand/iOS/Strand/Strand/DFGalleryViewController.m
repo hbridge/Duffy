@@ -98,7 +98,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent

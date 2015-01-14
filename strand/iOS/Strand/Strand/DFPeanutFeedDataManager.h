@@ -18,16 +18,10 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 + (DFPeanutFeedDataManager *)sharedManager;
 
-
-@property (nonatomic, retain) NSArray *inboxFeedObjects;
-@property (nonatomic, retain) NSArray *swapsFeedObjects;
-@property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
-@property (nonatomic, retain) NSArray *actionsFeedObjects;
-
-- (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion;
-- (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion;
+
+- (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion;
 
 - (BOOL)hasInboxData;
 - (BOOL)hasPrivateStrandData;

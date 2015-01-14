@@ -143,7 +143,7 @@
 
 - (void)refreshFromServer
 {
-  [self.peanutDataManager refreshInboxFromServer:^{
+  [self.peanutDataManager refreshFeedFromServer:DFInboxFeed completion:^{
     [self.refreshControl endRefreshing];
     [self reloadData];
   }];

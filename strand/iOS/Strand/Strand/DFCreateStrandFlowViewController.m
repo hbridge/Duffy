@@ -87,7 +87,7 @@
 
 - (void)refreshFromServer
 {
-  [[DFPeanutFeedDataManager sharedManager] refreshPrivatePhotosFromServer:^{
+  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFPrivateFeed completion:^{
   }];
 }
 

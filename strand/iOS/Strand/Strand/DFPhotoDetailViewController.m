@@ -545,7 +545,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   
   [self.actionAdapter removeAction:comment success:^(NSArray *resultObjects) {
     DDLogInfo(@"%@ successfully removed action: %@", self.class, comment);
-    [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+    [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
   } failure:^(NSError *error) {
     DDLogError(@"%@ failed to remove action: %@", self.class, error);
     [SVProgressHUD showErrorWithStatus:@"Failed to delete comment"];

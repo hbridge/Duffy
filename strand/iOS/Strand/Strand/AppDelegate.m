@@ -242,7 +242,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
   // Start up the socket server so we can start getting real time updates for when there's new data on the server
   [[DFSocketsManager sharedManager] initNetworkCommunication];
-  [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
   [[DFImageDownloadManager sharedManager] fetchNewImages];
 }
 
