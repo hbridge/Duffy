@@ -442,6 +442,9 @@ def send_notifications_test(request):
 	if data.has_key('id'):
 		customPayload['id'] = int(data['id'])
 
+	if data.has_key('share_instance_id'):
+		customPayload['share_instance_id'] = int(data['share_instance_id'])
+
 	notifications_util.sendNotification(user, msg, msgTypeId, customPayload)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
