@@ -38,6 +38,7 @@ extern DFUserActionType DFUserActionSyncContacts;
 extern DFUserActionType DFUserActionSyncManualContacts;
 extern DFUserActionType DFUserActionViewNotifications;
 extern DFUserActionType DFUserActionLocationUpsellProcessed;
+extern DFUserActionType DFUserActionLastBackgroundReferesh;
 
 + (void)incrementCountForAction:(DFUserActionType)action;
 + (unsigned int)actionCountForAction:(DFUserActionType)action;

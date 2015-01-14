@@ -85,6 +85,8 @@ DFUserActionType DFUserActionSyncContacts = @"SyncContacts";
 DFUserActionType DFUserActionSyncManualContacts = @"SyncManualContacts";
 DFUserActionType DFUserActionViewNotifications = @"ViewNotifications";
 DFUserActionType DFUserActionLocationUpsellProcessed = @"DFUserActionLocationUpsellNotNowed";
+DFUserActionType DFUserActionLastBackgroundReferesh = @"DFUserActionLastBackgroundReferesh";
+
 
 + (void)incrementCountForAction:(DFUserActionType)action
 {

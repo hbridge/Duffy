@@ -102,9 +102,10 @@ static DFBackgroundLocationManager *defaultManager;
 {
   CLLocation *location = self.locationManager.location;
   [DFLocationStore StoreLastLocation:location];
-  DDLogInfo(@"DFBackgroundLocationManager recorded new location: [%f,%f]",
+  DDLogInfo(@"DFBackgroundLocationManager recorded new location: [%f,%f], appstate:%d",
             location.coordinate.latitude,
-            location.coordinate.longitude);
+            location.coordinate.longitude,
+            (int)[[UIApplication sharedApplication] applicationState]);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -148,6 +149,7 @@ static DFBackgroundLocationManager *defaultManager;
                                      success ? @"true" : @"false");
                          }];
   }
+  
   
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
     [[[UIApplication sharedApplication] delegate] application:[UIApplication sharedApplication]

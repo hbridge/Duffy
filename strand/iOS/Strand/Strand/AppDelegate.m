@@ -455,6 +455,20 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 {
   NSDate *startDate = [NSDate date];
   DDLogInfo(@"Strand background app refresh called at %@", startDate);
+  NSDate *lastBackgroundFetchStartDate = [DFDefaultsStore
+                                          lastDateForAction:DFUserActionLastBackgroundReferesh];
+ 
+  // this update call sometimes happens in very quick succession, particularly when
+  // it's occurring as a result of a background location update. Throttle to once every 5m
+  if (lastBackgroundFetchStartDate && [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate] < 60.0 * 5) {
+    DDLogInfo(@"time interval since last background fetch: %.02fs. Aborting.",
+              [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate]);
+    if (completionHandler) completionHandler(UIBackgroundFetchResultNoData);
+    return;
+  } else {
+    [DFDefaultsStore setLastDate:startDate forAction:DFUserActionLastBackgroundReferesh];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+  }
   self.backgroundSyncTotalBytes = 0;
 
   // Copy the completion handler for use later
