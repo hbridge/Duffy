@@ -275,10 +275,15 @@ def actions_list(request):
 					abs((actionData['time_stamp'] - lastActionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
 					count += 1
 				else:
+					# Update the text on the actionData to have the correct photo count
 					if count == 1:
 						lastActionData['text'] = "sent 1 photo"
 					else:
 						lastActionData['text'] = "sent %s photos" % count
+
+					# Also update the ID to be unique.  Multiple existing id by count to make unique
+					lastActionData['id'] = count * lastActionData['id']
+
 					actionsData.append(lastActionData)
 					lastActionData = actionData
 					lastUserId = shareInstance.user_id
