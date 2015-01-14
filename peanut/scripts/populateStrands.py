@@ -287,7 +287,7 @@ def main(argv):
 					if strand.location_point:
 						additional = Q(additional | (Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh) & Q(point__within=strand.location_point.buffer(1))))
 					else:
-						additional = Q(additional | (Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh)
+						additional = Q(additional | (Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh)))
 
 				query = query.filter(additional)
 
