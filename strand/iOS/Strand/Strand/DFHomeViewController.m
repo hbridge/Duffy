@@ -27,6 +27,7 @@
 #import <MMPopLabel/MMPopLabel.h>
 #import <WYPopoverController/WYPopoverController.h>
 #import "DFBadgeButton.h"
+#import "UIView+DFExtensions.h"
 
 const CGFloat headerHeight = 60.0;
 const NSUInteger MinPhotosToShowFilter = 20;
@@ -42,6 +43,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 @property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 @property (nonatomic) BOOL suggestionsAreaHidden;
+@property (nonatomic, retain) UIImageView *navBackgroundImageView;
 
 @end
 
@@ -82,7 +84,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   self.navigationController.navigationBar.backgroundColor = [UIColor clearColor];
   self.navigationController.navigationBar.translucent = YES;
   self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
-  self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+  //self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
   
   self.buttonBar.gradientColors = @[
                                     [UIColor colorWithRedByte:198 green:198 blue:200 alpha:1.0],
@@ -122,6 +124,40 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                               action:@selector(settingsPressed:)],
                                              ];
   [self setSuggestionsAreaHidden:YES animated:NO];
+  
+  if ([UIVisualEffectView class]) {
+    [self addNavBlur];
+  }
+}
+
+static BOOL use_vibrance = NO;
+
+- (void)addNavBlur
+{
+  self.navBackgroundImageView = [[UIImageView alloc] init];
+  self.navBackgroundImageView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self.buttonBar insertSubview:self.navBackgroundImageView atIndex:0];
+  [self.navBackgroundImageView constrainToSuperviewSize];
+  self.navBackgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
+  
+  
+  // Vibrancy Effect
+  UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+  UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+  blurEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self.buttonBar insertSubview:blurEffectView aboveSubview:self.navBackgroundImageView];
+  [blurEffectView constrainToSuperviewSize];
+  
+  if (use_vibrance) {
+    UIVibrancyEffect *vibrancyEffect = [UIVibrancyEffect effectForBlurEffect:blurEffect];
+    UIVisualEffectView *vibrancyEffectView = [[UIVisualEffectView alloc] initWithEffect:vibrancyEffect];
+    vibrancyEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [blurEffectView.contentView addSubview:vibrancyEffectView];
+    [vibrancyEffectView constrainToSuperviewSize];
+    [vibrancyEffectView.contentView addSubview:self.buttonBarLabel];
+    [vibrancyEffectView.contentView addSubview:self.navigationController.navigationBar];
+  }
 }
 
 - (void)configureCollectionView
@@ -372,22 +408,29 @@ static BOOL showFilters = NO;
     self.sendBadgeView.hidden = NO;
     self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
     DFPeanutFeedObject *firstPhotoToSend = [suggestedPhotos firstObject];
-    [[DFImageManager sharedManager]
-     imageForID:firstPhotoToSend.id
-     pointSize:self.sendButton.frame.size
-     contentMode:DFImageRequestContentModeAspectFill
-     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
-     completion:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         [self.sendButton setBackgroundImage:image
-                                    forState:UIControlStateNormal];
-         
-       });
-     }];
+    [self setNavAreaForSuggestedPhoto:firstPhotoToSend];
     [self setSuggestionsAreaHidden:NO animated:YES];
   } else {
     [self setSuggestionsAreaHidden:YES animated:YES];
   }
+}
+
+- (void)setNavAreaForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto
+{
+  [[DFImageManager sharedManager]
+   imageForID:suggestedPhoto.id
+   pointSize:self.sendButton.frame.size
+   contentMode:DFImageRequestContentModeAspectFill
+   deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
+   completion:^(UIImage *image) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       [self.sendButton setBackgroundImage:image
+                                  forState:UIControlStateNormal];
+       self.navBackgroundImageView.image = image;
+       
+     });
+   }];
+
 }
 
 - (void)setSuggestionsAreaHidden:(BOOL)suggestionsAreaHidden
@@ -401,6 +444,7 @@ static BOOL showFilters = NO;
     // hide the suggestions area
     [self.sendButton setBackgroundImage:nil
                                forState:UIControlStateNormal];
+    self.navBackgroundImageView.image = nil;
     self.buttonBarHeightConstraint.constant = 19 + 44;
     [UIView animateWithDuration:animated ? 0.5 : 0.0 animations:^{
       for (UIView *view in @[self.sendButton, self.buttonBarLabel]) {
@@ -487,9 +531,22 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   [self presentViewController:createController animated:YES completion:nil];
 }
 
+
+static DFPeanutFeedObject *currentPhoto;
 - (void)settingsPressed:(id)sender
 {
   [DFSettingsViewController presentModallyInViewController:self];
+}
+
+- (void)testCycleBackgroundArea
+{
+  NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
+  if (!currentPhoto) {
+    currentPhoto = suggestedPhotos.firstObject;
+  }
+  
+  currentPhoto = [suggestedPhotos objectAfterObject:currentPhoto wrap:YES];
+  [self setNavAreaForSuggestedPhoto:currentPhoto];
 }
 
 - (void)friendsButtonPressed:(id)sender

@@ -31,7 +31,7 @@
                                 <constraint firstAttribute="height" constant="16" id="UOe-4h-oTc"/>
                             </constraints>
                             <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="13"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sao-uL-Ezk" userLabel="Send">
@@ -89,9 +89,9 @@
                 <constraint firstAttribute="trailing" secondItem="kHh-uZ-vK1" secondAttribute="trailing" id="byz-4l-tS4"/>
                 <constraint firstItem="MYj-g7-RXb" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="m2l-2g-Hdl"/>
             </constraints>
-            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
-            <point key="canvasLocation" x="200" y="315"/>
+            <point key="canvasLocation" x="290" y="377"/>
         </view>
     </objects>
     <resources>

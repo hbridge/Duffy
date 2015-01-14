@@ -31,5 +31,21 @@
   return scaled;
 }
 
+- (void)constrainToSuperviewSize
+{
+  if (!self.superview) return;
+  
+  [self.superview addConstraints:[NSLayoutConstraint
+                                  constraintsWithVisualFormat:@"|-(0)-[self]-(0)-|"
+                                  options:0
+                                  metrics:nil
+                                  views:@{@"self" : self}]];
+  [self.superview addConstraints:[NSLayoutConstraint
+                                  constraintsWithVisualFormat:@"V:|-(0)-[self]-(0)-|"
+                                  options:0
+                                  metrics:nil
+                                  views:@{@"self" : self}]];
+}
+
 
 @end

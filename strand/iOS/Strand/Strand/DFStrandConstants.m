@@ -54,12 +54,12 @@ UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor
 {
-  return [self strandLightBlue];
+  return [self strandGray];
 }
 
 + (UIColor *)defaultBarForegroundColor
 {
-  return [UIColor whiteColor];
+  return [UIColor darkGrayColor];
 }
 
 + (UIColor *)strandOrange
@@ -69,7 +69,7 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)strandGray
 {
-  return [UIColor colorWithRedByte:235 green:235 blue:235 alpha:1.0];
+  return [UIColor colorWithRedByte:221 green:227 blue:235 alpha:1.0];
 }
 
 + (UIColor *)strandSalmon
@@ -151,7 +151,7 @@ UIColor *DFStrandMainColor;
 
 + (UIStatusBarStyle)preferredStatusBarStyle
 {
-  return UIStatusBarStyleLightContent;
+  return UIStatusBarStyleDefault;
 }
 
 static NSArray *colors;

@@ -13,6 +13,6 @@
 @property (nonatomic, readonly) CGSize pixelSize;
 
 - (UIImage *) imageRepresentation;
-
+- (void)constrainToSuperviewSize;
 
 @end
