@@ -113,9 +113,10 @@ static DFToastNotificationManager *defaultManager;
   options[kCRToastTextKey] = pushNotif.message ? pushNotif.message : @"";
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/PhotoNotificationIcon.png"];
   
-  options[kCRToastInteractionRespondersKey] = @[[self.class handlerWithOpenedHandler:openedHandler
+  options[kCRToastInteractionRespondersKey] = @[[self.class dismissInteractionHandler],
+                                                [self.class handlerWithOpenedHandler:openedHandler
                                                                         forPushNotif:pushNotif],
-                                                 [self.class dismissInteractionHandler]];
+                                                 ];
   
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
@@ -124,19 +125,19 @@ static DFToastNotificationManager *defaultManager;
 }
 
 
-+ (id)handlerWithOpenedHandler:(DFNoticationOpenedHandler)handler
++ (CRToastInteractionResponder *)handlerWithOpenedHandler:(DFNoticationOpenedHandler)handler
                     forPushNotif:(DFPeanutPushNotification *)pushNotif
 {
   return
   [CRToastInteractionResponder
-   interactionResponderWithInteractionType:CRToastInteractionTypeTap
+   interactionResponderWithInteractionType:CRToastInteractionTypeTapOnce
    automaticallyDismiss:YES
    block:^(CRToastInteractionType interactionType) {
      handler(pushNotif);
    }];
 }
 
-+ (id)dismissInteractionHandler
++ (CRToastInteractionResponder *)dismissInteractionHandler
 {
   return [CRToastInteractionResponder
           interactionResponderWithInteractionType:CRToastInteractionTypeSwipe
