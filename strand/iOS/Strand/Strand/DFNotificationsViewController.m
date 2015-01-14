@@ -81,13 +81,12 @@
      @"badgeValue" : [DFAnalytics bucketStringForObjectCount:self.tabBarItem.badgeValue.integerValue]
      }];
   self.tabBarItem.badgeValue = nil;
-  [[DFPeanutNotificationsManager sharedManager] markAllNotificationsAsRead];
-  
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
+  [[DFPeanutNotificationsManager sharedManager] markAllNotificationsAsRead];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
@@ -195,6 +194,13 @@
          cell.previewImageView.image = image;
        });
      }];
+  }
+  
+  //decide whether to highlight
+  if ([[DFPeanutNotificationsManager sharedManager] isActionIDSeen:action.id.longLongValue]) {
+    cell.backgroundColor = [UIColor whiteColor];
+  } else {
+    cell.backgroundColor = [DFStrandConstants unreadNotificationBackgroundColor];
   }
   
   return cell;
