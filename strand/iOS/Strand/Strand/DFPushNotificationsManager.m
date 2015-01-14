@@ -20,6 +20,8 @@
 #import "SVProgressHUD.h"
 #import "DFDismissableModalViewController.h"
 
+static BOOL ShowInAppNotifications = NO;
+
 @implementation DFPushNotificationsManager
 
 + (DFPushNotificationsManager *)sharedManager
@@ -210,7 +212,7 @@
       handler(pushNotif);
     }
   } else if ([application applicationState] == UIApplicationStateActive) {
-    if ([pushNotif.message isNotEmpty]) {
+    if ([pushNotif.message isNotEmpty] && ShowInAppNotifications) {
       [[DFToastNotificationManager sharedInstance]
        showNotificationForPush:pushNotif
        handler:[self openedHandlerForNotification:pushNotif]];
