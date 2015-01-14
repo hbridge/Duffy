@@ -78,13 +78,15 @@ def listsToPhrases(photoCount, userNames):
 
 def main(argv):
 	logger.info("Starting... ")
-	photoTimedelta = datetime.timedelta(minutes=240)
-	notificationTimedelta = datetime.timedelta(seconds=3600)
+	photoTimedelta = datetime.timedelta(minutes=720)
+	notificationTimedelta = datetime.timedelta(seconds=600)
 
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
 		# get all recent unevaluated photos that have already been stranded
+		# TODO: known bug. If a user is invited and doesn't join soon after, this query (F('user_added'))
+		# will suggest photos from the time the user was invited, not when he/she actually signed up.
 		photos = Photo.objects.filter(time_taken__gt=now-photoTimedelta).filter(strand_evaluated=True).filter(notification_evaluated=False).filter(time_taken__gt=F('user__added'))
 		photosToUpdate = list()
 
@@ -108,6 +110,7 @@ def main(argv):
 
 		for user, recentStrands in strandsByUser.items():
 			if user.id in recentUsersNotified:
+				logger.info("Skipping user %s because we sent suggestions recently")%(user.id)
 				continue
 			interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, recentStrands, True, friends_util.getFriends(user.id))
 
