@@ -294,6 +294,10 @@ def actions_list(request):
 				lastActionData['text'] = "sent 1 photo"
 			else:
 				lastActionData['text'] = "sent %s photos" % count
+
+			# Also update the ID to be unique.  Multiple existing id by count to make unique
+			lastActionData['id'] = count * lastActionData['id']
+			
 			actionsData.append(lastActionData)
 
 		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)[:50]
