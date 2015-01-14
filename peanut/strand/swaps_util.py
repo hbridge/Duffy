@@ -45,7 +45,7 @@ def getFeedObjectsForSwaps(user):
 	for strand in strands:
 		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
 		if strandObjectData:
-			strandIdsAlreadyIncluded.add(strand.id)
+			strandIdsAlreadyIncluded.append(strand.id)
 			responseObjects.append(strandObjectData)
 
 	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
