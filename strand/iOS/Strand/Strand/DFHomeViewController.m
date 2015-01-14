@@ -504,7 +504,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   DDLogVerbose(@"%@ photo:%@ share_instance:%@ tapped", self.class, @(photo.id), photo.share_instance);
-   
+  [self showMultiPhotoControllerWithStartingPhoto:photo];
+}
+
+- (void)showMultiPhotoControllerWithStartingPhoto:(DFPeanutFeedObject *)photo
+{
   NSMutableArray *allPhotos = [NSMutableArray new];
   for (NSUInteger section = 0; section < [self.datasource numberOfSectionsInCollectionView:self.collectionView]; section++) {
     [allPhotos addObjectsFromArray:[self.datasource photosForSection:section]];
@@ -589,10 +593,7 @@ static DFPeanutFeedObject *currentPhoto;
   DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                      photoWithID:peanutAction.photo.longLongValue
                                      shareInstance:peanutAction.share_instance.longLongValue];
-  DFPhotoDetailViewController *vc = [[DFPhotoDetailViewController alloc]
-                                     initWithPhotoObject:photoObject];
-  [DFDismissableModalViewController presentWithRootController:vc
-                                                     inParent:self];
+  [self showMultiPhotoControllerWithStartingPhoto:photoObject];
 }
 
                               
