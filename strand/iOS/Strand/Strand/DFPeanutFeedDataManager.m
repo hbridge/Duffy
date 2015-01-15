@@ -239,7 +239,7 @@ static DFPeanutFeedDataManager *defaultManager;
             [[NSNotificationCenter defaultCenter]
              postNotificationName:[self.feedNotificationName objectForKey:@(feedType)]
              object:self];
-            DDLogInfo(@"Got new data for feed %@ with %lu objects, sending notification.", @(feedType), newObjects.count);
+            DDLogInfo(@"Got new data for feed %@ with %d objects, sending notification.", @(feedType), (int)newObjects.count);
           }
         }];
         
