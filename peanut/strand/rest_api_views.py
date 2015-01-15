@@ -294,7 +294,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             existingPhotosByHash = dict()
             if user.install_num > 0 and len(request.FILES) == 0:
                 logger.info("It appears user %s has a new install, fetching existing photos" % (user.id))
-                existingPhotos = Photo.objects.filter(user = user, install_num__lt=user.install_num)
+                existingPhotos = Photo.objects.filter(user = user, install_num__lte=user.install_num)
                 for photo in existingPhotos:
                     if photo.iphone_hash not in existingPhotosByHash:
                         existingPhotosByHash[photo.iphone_hash] = list()
@@ -303,6 +303,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             for photoData in photosData:
                 photoData = self.jsonDictToSimple(photoData)
                 photoData["bulk_batch_key"] = batchKey
+                photoData["install_num"] = user.install_num
 
                 photo = self.simplePhotoSerializer(photoData)
 
