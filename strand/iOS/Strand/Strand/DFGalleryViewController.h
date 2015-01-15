@@ -18,5 +18,7 @@
 @property (nonatomic) BOOL showHeaders;
 
 - (instancetype)initWithFilterUser:(DFPeanutUserObject *)user;
+- (NSUInteger)photosInGalleryCount;
+
 
 @end

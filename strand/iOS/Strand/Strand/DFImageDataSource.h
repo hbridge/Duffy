@@ -38,6 +38,7 @@
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
                                collectionView:(UICollectionView *)collectionView;
 
+- (NSUInteger)photoCount;
 - (void)setFeedPhotos:(NSArray *)feedPhotos;
 - (void)setCollectionFeedObjects:(NSArray *)collectionFeedObjects;
 - (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath;

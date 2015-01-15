@@ -18,15 +18,20 @@
 
 @interface DFImageDataSource()
 
+@property (nonatomic, retain) NSArray *feedPhotos;
+
 @end
 
 @implementation DFImageDataSource
+
+@synthesize feedPhotos = _feedPhotos;
 
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedObjects
                         collectionView:(UICollectionView *)collectionView
 {
   DFSection *section = [DFSection sectionWithTitle:nil object:nil rows:feedObjects];
+  _feedPhotos = feedObjects;
   return [self initWithSections:@[section] collectionView:collectionView];
 }
 
@@ -34,7 +39,13 @@
 {
   DFPeanutFeedObject *dummyObject = [[DFPeanutFeedObject alloc] init];
   dummyObject.objects = feedPhotos;
+  _feedPhotos = feedPhotos;
   [self setCollectionFeedObjects:@[dummyObject]];
+}
+
+- (NSUInteger)photoCount
+{
+  return [self.feedPhotos count];
 }
 
 - (void)setCollectionFeedObjects:(NSArray *)collectionFeedObjects

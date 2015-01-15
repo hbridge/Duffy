@@ -94,6 +94,10 @@
   self.datasource.showActionsBadge = YES;
   [self configureNoResultsView];
 }
+- (NSUInteger)photosInGalleryCount
+{
+  return [self.datasource photoCount];
+}
 
 - (void)viewWillAppear:(BOOL)animated
 {

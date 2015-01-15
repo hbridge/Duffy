@@ -51,9 +51,8 @@
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
 
   self.nameLabel.text = [self.peanutUser fullName];
-  NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosSentByUser:self.peanutUser.id];
-  self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
-                             (int)photos.count];
+  self.subtitleLabel.text = [NSString stringWithFormat:@"%lu shared",
+                             (unsigned long)[self.galleryViewController photosInGalleryCount]];
   
   // add a fancy background blur if iOS8 +
   if ([UIDevice majorVersionNumber] >= 8) {
