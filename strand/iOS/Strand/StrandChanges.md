@@ -1,6 +1,6 @@
 # Swap v2
 
-## Jan 15th, 2015 (4828-4830)
+## Jan 15th, 2015 (4828-4832)
 
 - Photos sent to you appear in the gallery without needing review
 - Added a notifications button to make it easier to track new activity
