@@ -176,7 +176,7 @@
 
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:action.user];
   NSString *markup =
-  [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@ ago</gray>",
+  [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@</gray>",
    [user firstName],
    actionString,
    action.action_type == DFPeanutActionComment ? [action.text stringByEscapingCharsInString:@"<>"] : @"",
