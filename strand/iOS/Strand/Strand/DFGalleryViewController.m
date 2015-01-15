@@ -94,6 +94,7 @@
   self.datasource.showActionsBadge = YES;
   [self configureNoResultsView];
 }
+
 - (NSUInteger)photosInGalleryCount
 {
   return [self.datasource photoCount];
@@ -133,10 +134,10 @@
                      photosWithUserID:self.userToFilterTo.id
                      onlyEvaluated:NO];
   if (photos) {
-    self.datasource.sections = [NSArray new];
+    [self.datasource setFeedPhotos:photos];
     [self.collectionView reloadData];
   }
-    [self configureNoResultsView];
+  [self configureNoResultsView];
 }
 
 - (void)configureNoResultsView
@@ -173,11 +174,6 @@
 //  header.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:strandObject.time_taken];
   
   return header;
-}
-
-- (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
-{
-  [self.collectionView scrollToBottom];
 }
 
 #pragma mark - Actions

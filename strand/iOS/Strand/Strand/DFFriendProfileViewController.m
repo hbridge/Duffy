@@ -51,14 +51,13 @@
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
 
   self.nameLabel.text = [self.peanutUser fullName];
-  self.subtitleLabel.text = [NSString stringWithFormat:@"%lu shared",
-                             (unsigned long)[self.galleryViewController photosInGalleryCount]];
+  [self reloadHeaderData];
   
   // add a fancy background blur if iOS8 +
   if ([UIDevice majorVersionNumber] >= 8) {
     UIVisualEffectView *visualEffectView = [[UIVisualEffectView alloc] initWithEffect:
                                             
-                                            [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
+                                            [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]];
     CGRect frame = CGRectMake(0, 0, self.view.frame.size.width, self.headerView.frame.size.height);
     visualEffectView.frame = frame;
     [self.view insertSubview:visualEffectView belowSubview:self.headerView];
@@ -67,6 +66,22 @@
     //self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
   }
 }
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadHeaderData)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
+}
+
+- (void)reloadHeaderData
+{
+  self.subtitleLabel.text = [NSString stringWithFormat:@"%lu shared",
+                             (unsigned long)[self.galleryViewController photosInGalleryCount]];
+}
+
+
 - (void) displayContentController: (UIViewController*) contentController;
 {
   [self addChildViewController:contentController];
