@@ -12,6 +12,8 @@
 
 @implementation DFStrandConstants
 
+const NSTimeInterval kDFMaxBackgroundFetchTimeInterval = 60 * 5.0; // 5 minutes
+
 NSString *const DFStrandLastKnownLatitudeDefaultsKey = @"com.duffapp.Strand.lastKnownLatitude";
 NSString *const DFStrandLastKnownLongitudeDefaultsKey = @"com.duffapp.Strand.lastKnownLongitude";
 NSString *const DFStrandLastKnownLocationRecordedDefaultsKey = @"com.duffapp.Strand.lastKnownLocationRecordedDate";

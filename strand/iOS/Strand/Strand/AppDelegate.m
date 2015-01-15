@@ -460,7 +460,8 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
  
   // this update call sometimes happens in very quick succession, particularly when
   // it's occurring as a result of a background location update. Throttle to once every 5m
-  if (lastBackgroundFetchStartDate && [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate] < 60.0 * 5) {
+  if (lastBackgroundFetchStartDate
+      && [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate] < kDFMaxBackgroundFetchTimeInterval) {
     DDLogInfo(@"time interval since last background fetch: %.02fs. Aborting.",
               [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate]);
     if (completionHandler) completionHandler(UIBackgroundFetchResultNoData);

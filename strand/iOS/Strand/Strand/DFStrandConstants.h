@@ -10,6 +10,8 @@
 
 @interface DFStrandConstants : NSObject
 
+extern const NSTimeInterval kDFMaxBackgroundFetchTimeInterval;
+
 extern NSString *const DFStrandLastKnownLocationDefaultsKey;
 extern NSString *const DFStrandLastNewPhotosFetchDateDefaultsKey;
 extern NSString *const DFStrandUnseenCountDefaultsKey;
