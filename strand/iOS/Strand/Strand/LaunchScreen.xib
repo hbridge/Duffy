@@ -19,10 +19,10 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zG1-Dy-SMA" userLabel="Nav bar background">
-                    <rect key="frame" x="0.0" y="20" width="480" height="133"/>
+                    <rect key="frame" x="0.0" y="20" width="480" height="44"/>
                     <color key="backgroundColor" red="0.90196078431372551" green="0.90196078431372551" blue="0.90196078431372551" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="133" id="ucq-fO-Dx9"/>
+                        <constraint firstAttribute="height" constant="44" id="ucq-fO-Dx9"/>
                     </constraints>
                 </view>
                 <tabBar hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d2X-ih-8kb">
