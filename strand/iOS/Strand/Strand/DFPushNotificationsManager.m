@@ -21,7 +21,7 @@
 #import "DFDismissableModalViewController.h"
 #import "AppDelegate.h"
 
-static BOOL ShowInAppNotifications = NO;
+static BOOL ShowInAppNotifications = YES;
 
 @implementation DFPushNotificationsManager
 
