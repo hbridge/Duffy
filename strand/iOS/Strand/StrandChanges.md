@@ -1,5 +1,12 @@
 # Swap v2
 
+## Jan 15th, 2015 (4828)
+
+- Photos sent to you appear in the gallery without needing review
+- Added a notifications button to make it easier to track new activity
+- Visual refresh of home screen
+- Performance improvements
+
 ## Dec 31st, 2014 (4822-4827)
 
 - Performance improvements
