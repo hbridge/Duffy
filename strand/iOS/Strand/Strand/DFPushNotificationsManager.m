@@ -19,6 +19,7 @@
 #import "DFPhotoDetailViewController.h"
 #import "SVProgressHUD.h"
 #import "DFDismissableModalViewController.h"
+#import "AppDelegate.h"
 
 static BOOL ShowInAppNotifications = NO;
 
@@ -197,6 +198,11 @@ static BOOL ShowInAppNotifications = NO;
   if ([application applicationState] == UIApplicationStateBackground){
     if (pushNotif.contentAvailable && pushNotif.isUpdateLocationRequest)
     {
+      // force a check in with the server
+      [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+       application:[UIApplication sharedApplication]
+       performFetchWithCompletionHandler:nil
+       forceCheckin:YES];
       [[DFBackgroundLocationManager sharedManager]
        backgroundUpdateWithCompletionHandler:completionHandler];
     }

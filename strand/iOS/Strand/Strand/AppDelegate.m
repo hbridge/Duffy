@@ -446,22 +446,33 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   if (_completionHandler) _completionHandler(UIBackgroundFetchResultNewData);
 }
 
-/*
- * This is called every few minutes or so as a background process.
- * We have 30 seconds to return, so put in a timer to enforce that.
- */
 - (void)application:(UIApplication *)application
 performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
+  [self application:application
+performFetchWithCompletionHandler:completionHandler
+       forceCheckin:NO];
+}
+
+/*
+ * This is called every few minutes or so as a background process.
+ * We have 30 seconds to return, so put in a timer to enforce that.
+ * Normally throttled to kDFMaxBackgroundFetchTimeInterval unless force is YES
+ */
+- (void)application:(UIApplication *)application
+performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+       forceCheckin:(BOOL)forceCheckin
+{
   NSDate *startDate = [NSDate date];
-  DDLogInfo(@"Strand background app refresh called at %@", startDate);
+  DDLogInfo(@"Strand background app refresh called at %@ forceCheckin:%d", startDate, forceCheckin);
   NSDate *lastBackgroundFetchStartDate = [DFDefaultsStore
                                           lastDateForAction:DFUserActionLastBackgroundReferesh];
  
   // this update call sometimes happens in very quick succession, particularly when
   // it's occurring as a result of a background location update. Throttle to once every 5m
   if (lastBackgroundFetchStartDate
-      && [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate] < kDFMaxBackgroundFetchTimeInterval) {
+      && [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate] < kDFMaxBackgroundFetchTimeInterval
+      && !forceCheckin) {
     DDLogInfo(@"time interval since last background fetch: %.02fs. Aborting.",
               [startDate timeIntervalSinceDate:lastBackgroundFetchStartDate]);
     if (completionHandler) completionHandler(UIBackgroundFetchResultNoData);
@@ -505,7 +516,6 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   NSDate *now = [[NSDate alloc] init];
   DDLogVerbose(@"Setting last checkin time to %@", now);
   [[DFUserInfoManager sharedManager] setLastCheckinTimestamp:now];
-
 }
 
 - (void)resetApplication

@@ -15,6 +15,8 @@
 - (void)resetApplication;
 - (void)firstTimeSetupComplete;
 - (void)firstTimeSetupUserIdStepCompleteWithSyncTimestamp:(NSDate *)date;
-
+- (void)application:(UIApplication *)application
+performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+       forceCheckin:(BOOL)forceCheckin;
 @end
 
