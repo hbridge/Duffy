@@ -276,7 +276,7 @@ def compressActions(actionsData):
 					compressedActionsData.append(compressGroup(lastActionData, count))
 
 					count = 1
-					lastActionData = None
+					lastActionData = actionData
 		else:
 			if doingCompress:
 				compressedActionsData.append(compressGroup(lastActionData, count))
