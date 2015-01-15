@@ -239,6 +239,56 @@ def swap_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+def compressGroup(lastActionData, count):
+	if count == 1:
+		lastActionData['text'] = "sent 1 photo"
+	else:
+		lastActionData['text'] = "sent %s photos" % count
+
+	# Also update the ID to be unique.  Multiple existing id by count to make unique
+	lastActionData['id'] = count * lastActionData['id']
+
+	return lastActionData
+
+def compressActions(actionsData):
+	# We want to group together all the photos shared around the same time
+	lastActionData = None
+	count = 1
+	doingCompress = False
+	compressedActionsData = list()
+
+	for actionData in actionsData:
+		if actionData['action_type'] == constants.ACTION_TYPE_SHARED_PHOTOS:
+			if not doingCompress:
+				doingCompress = True
+				count = 1
+
+			if not lastActionData:
+				lastActionData = actionData
+			else:
+				if (lastActionData['action_type'] == constants.ACTION_TYPE_SHARED_PHOTOS and
+					actionData['action_type'] == constants.ACTION_TYPE_SHARED_PHOTOS and
+					lastActionData['user'] == actionData['user'] and 
+					abs((lastActionData['time_stamp'] - actionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
+					count += 1
+					lastActionData = actionData
+				else:
+					compressedActionsData.append(compressGroup(lastActionData, count))
+
+					count = 1
+					lastActionData = None
+		else:
+			if doingCompress:
+				compressedActionsData.append(compressGroup(lastActionData, count))
+				doingCompress = False
+				lastActionData = None
+			compressedActionsData.append(actionData)
+
+	if doingCompress:
+		compressedActionsData.append(compressGroup(lastActionData, count))
+
+	return compressedActionsData
+	
 def actions_list(request):
 	stats_util.startProfiling()
 	response = dict({'result': True})
@@ -258,49 +308,16 @@ def actions_list(request):
 				actionsData.append(actionData)
 
 		# Do shares to this user
-		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:50]
-		lastUserId = None
-		actionData = None
-		lastActionData = None
-		count = 1
+		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:100]
 		for shareInstance in shareInstances:
 			actionData = serializers.actionDataOfShareInstanceApiSerializer(user, shareInstance)
 
-			# We want to group together all the photos shared around the same time
 			if actionData:
-				if not lastUserId:
-					lastUserId = shareInstance.user_id
-					lastActionData = actionData
-				elif (shareInstance.user_id == lastUserId and
-					abs((actionData['time_stamp'] - lastActionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
-					count += 1
-				else:
-					# Update the text on the actionData to have the correct photo count
-					if count == 1:
-						lastActionData['text'] = "sent 1 photo"
-					else:
-						lastActionData['text'] = "sent %s photos" % count
+				actionsData.append(actionData)
 
-					# Also update the ID to be unique.  Multiple existing id by count to make unique
-					lastActionData['id'] = count * lastActionData['id']
+		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)
 
-					actionsData.append(lastActionData)
-					lastActionData = actionData
-					lastUserId = shareInstance.user_id
-					count = 1
-				lastActionData = actionData
-		if lastActionData:
-			if count == 1:
-				lastActionData['text'] = "sent 1 photo"
-			else:
-				lastActionData['text'] = "sent %s photos" % count
-
-			# Also update the ID to be unique.  Multiple existing id by count to make unique
-			lastActionData['id'] = count * lastActionData['id']
-			
-			actionsData.append(lastActionData)
-
-		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)[:50]
+		actionsData = compressActions(actionsData)
 
 		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
 		stats_util.printStats("actions-end")
