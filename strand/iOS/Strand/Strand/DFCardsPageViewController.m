@@ -170,11 +170,7 @@ const NSUInteger NumOutgoingNuxes = 3;
              && self.highestSeenNuxStep < NumOutgoingNuxes) {
     nextController = [self viewControllerForNuxStep:self.highestSeenNuxStep];
   } else {
-    if (self.preferredType == DFIncomingViewType) {
-      nextController = [self nextIncomingViewController];
-    } else {
-      nextController = [self nextOutgoingViewController];
-    }
+    nextController = [self nextOutgoingViewController];
   }
   
   if (!nextController) {
@@ -186,71 +182,6 @@ const NSUInteger NumOutgoingNuxes = 3;
                  direction:UIPageViewControllerNavigationDirectionForward
                   animated:YES
                 completion:nil];
-}
-
-#pragma mark - Incoming View Controllers
-
-- (UIViewController *)nextIncomingViewController
-{
-  DFPeanutFeedObject *nextPhoto = [self nextIncomingPhotoToShow];
-  if (!nextPhoto) return nil;
-  
-  DFIncomingCardViewController *ivc = [[DFIncomingCardViewController alloc]
-                                   initWithPhotoID:nextPhoto.id
-                                   shareInstance:nextPhoto.share_instance.longLongValue
-                                   fromSender:[[DFPeanutFeedDataManager sharedManager]
-                                               userWithID:nextPhoto.user]];
-  [self.alreadyShownPhotoIds addObject:@(nextPhoto.id)];
-  
-  DFCardsPageViewController __weak *weakSelf = self;
-  ivc.nextHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
-    [weakSelf photoSkipped:nextPhoto];
-  };
-  ivc.commentHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
-    [weakSelf showCommentsForPhoto:photoID shareInstance:shareInstance];
-  };
-  ivc.likeHandler = ^(DFPhotoIDType photoID, DFShareInstanceIDType shareInstance){
-    [weakSelf likePhoto:photoID shareInstance:shareInstance];
-  };
-  
-  return ivc;
-
-}
-
-- (DFPeanutFeedObject *)nextIncomingPhotoToShow
-{
-  if ([self startingPhotoID] > 0) {
-    DFPeanutFeedObject *photo = [[DFPeanutFeedDataManager sharedManager]
-                                 photoWithID:[self startingPhotoID]
-                                 shareInstance:[self startingShareInstanceID]];
-    _startingPhotoID = 0;
-    _startingShareInstanceID = 0;
-    
-    return photo;
-  }
-  
-  DFPeanutFeedObject *firstPhoto;
-  NSArray *photos = [[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers];
-  for (DFPeanutFeedObject *photo in photos) {
-    //don't return photos we've already shown
-    if ([self.alreadyShownPhotoIds containsObject:@(photo.id)]) continue;
-    // Now lets see if the image is loaded yet
-    DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
-    if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-      return photo;
-    } else if(!firstPhoto) {
-      // Keep track of the first photo incase none of our photos are loaded
-      // just use this one and show the spinner
-      firstPhoto = photo;
-    }
-  }
-  
-  if (firstPhoto) {
-    // We didn't find any images loaded but we did have an image...so show that with a spinner
-    return firstPhoto;
-  } else {
-    return nil;
-  }
 }
 
 #pragma mark - Outgoing View Controllers
@@ -320,25 +251,7 @@ const NSUInteger NumOutgoingNuxes = 3;
 - (DFCardViewController *)viewControllerForNuxStep:(NSUInteger)index
 {
   DFCardViewController *nuxController;
-  if (index == 0 && self.preferredType == DFIncomingViewType) {
-    DFIncomingCardViewController *ivc = [[DFIncomingCardViewController alloc] initWithNuxStep:1];
-    nuxController = ivc;
-    
-    NSString *incomingCompletionString = nil;
-    if ([self nextIncomingPhotoToShow]) {
-      incomingCompletionString = @"Someone else sent you photos!";
-    }
-    DFIncomingPhotoActionHandler block = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      if (incomingCompletionString) {
-        [SVProgressHUD showSuccessWithStatus:incomingCompletionString];
-      }
-      [DFDefaultsStore setSetupStepPassed:DFSetupStepIncomingNux Passed:YES];
-      [self gotoNextController];
-    };
-    
-    ivc.nextHandler = block;
-    ivc.likeHandler = block;
-  } else if (self.preferredType == DFSuggestionViewType){
+  if (self.preferredType == DFSuggestionViewType){
     DFOutgoingCardViewController *svc = [[DFOutgoingCardViewController alloc]
                                                initWithNuxStep:index + 1];
     nuxController = svc;

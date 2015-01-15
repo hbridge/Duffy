@@ -78,7 +78,7 @@
   
   NSArray *photos = [[DFPeanutFeedDataManager sharedManager]
                      photosWithUserID:self.userToFilterTo.id
-                     evaluated:YES];
+                     onlyEvaluated:NO];
   self.datasource = [[DFImageDataSource alloc]
                      initWithFeedPhotos:photos
                      collectionView:self.collectionView];
@@ -108,7 +108,6 @@
 - (void)didMoveToParentViewController:(UIViewController *)parent
 {
   [super didMoveToParentViewController:parent];
-  [self.collectionView scrollToBottom];
 }
 
 - (void)viewDidLayoutSubviews
@@ -130,8 +129,9 @@
 
 - (void)reloadData
 {
-  NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:self.userToFilterTo.id
-                                                                  evaluated:YES];
+  NSArray *photos = [[DFPeanutFeedDataManager sharedManager]
+                     photosWithUserID:self.userToFilterTo.id
+                     onlyEvaluated:NO];
   if (photos) {
     self.datasource.sections = [NSArray new];
     [self.collectionView reloadData];

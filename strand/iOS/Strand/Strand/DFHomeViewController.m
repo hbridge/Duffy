@@ -491,10 +491,9 @@ static BOOL showFilters = NO;
 {
   NSString *buttonName = @"";
   if (button == self.sendButton) buttonName = @"outgoing";
-  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
   [DFAnalytics logHomeButtonTapped:buttonName
-                incomingBadgeCount:numToReview
+                incomingBadgeCount:0
                 outgoingBadgeCount:numToSend];
 }
 

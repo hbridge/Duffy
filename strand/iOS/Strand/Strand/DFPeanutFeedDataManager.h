@@ -37,13 +37,12 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;
 - (NSArray *)photosFromSuggestedStrands;
-- (NSArray *)photosWithUserID:(DFUserIDType)userID evaluated:(BOOL)evaluated;
+- (NSArray *)photosWithUserID:(DFUserIDType)userID onlyEvaluated:(BOOL)evaluated;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)actionsList;
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user;
 
 - (NSArray *)allPhotos;
-- (NSArray *)unevaluatedPhotosFromOtherUsers;
 - (NSArray *)allEvaluatedOrSentPhotos;
 - (NSArray *)favoritedPhotos;
 - (NSArray *)photosWithActivity;

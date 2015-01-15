@@ -377,12 +377,12 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-- (NSArray *)photosWithUserID:(DFUserIDType)userID evaluated:(BOOL)evaluated
+- (NSArray *)photosWithUserID:(DFUserIDType)userID onlyEvaluated:(BOOL)onlyEvaluated
 {
   NSMutableArray *photos = [NSMutableArray new];
   
   for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
-    if (!photo.evaluated.boolValue == evaluated) continue;
+    if (onlyEvaluated && !photo.evaluated.boolValue) continue;
     if ([photo.actor_ids containsObject:@(userID)]) [photos addObject:photo];
   }
   
@@ -445,21 +445,6 @@ static DFPeanutFeedDataManager *defaultManager;
   
   return nil;
 }
-
-- (NSArray *)unevaluatedPhotosFromOtherUsers
-{
-  NSMutableOrderedSet *result = [NSMutableOrderedSet new];
-  for (DFPeanutUserObject *user in self.friendsList) {
-    NSArray *photos = [[DFPeanutFeedDataManager sharedManager] photosWithUserID:user.id evaluated:NO];
-    for (DFPeanutFeedObject *photoObject in photos) {
-      if (photoObject.evaluated.boolValue == NO && photoObject.user != [[DFUser currentUser] userID]) {
-        [result addObject:photoObject];
-      }
-    }
-  }
-  return [result array];
-}
-
 
 /* BE CAREFUL WITH THIS FUNCITON
  It does not take into account strand ID so it can leak data across strands
