@@ -410,7 +410,7 @@ static DFPeanutFeedDataManager *defaultManager;
     if ([photo.actor_ids containsObject:@(userID)]) [photos addObject:photo];
   }
   
-  return photos;
+  return [self sortedPhotos:photos];
 }
 
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user
