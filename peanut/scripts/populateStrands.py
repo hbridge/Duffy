@@ -18,7 +18,7 @@ django.setup()
 from django.db.models import Count, Q
 
 from peanut.settings import constants
-from common.models import Photo, Strand, User, StrandNeighbor, LocationRecord
+from common.models import Photo, Strand, User, StrandNeighbor, LocationRecord, FriendConnection, NotificationLog
 
 from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
@@ -113,6 +113,43 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
 
+
+def threadedPingFriendsForUpdates(userIds):
+	logging.basicConfig(filename='/var/log/duffy/stranding.log',
+						level=logging.DEBUG,
+						format='%(asctime)s %(levelname)s %(message)s')
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	logger = logging.getLogger(__name__)
+
+	# fetch all friends of these users and uniquefy them
+	friends = FriendConnection.objects.filter(Q(user_1_id__in=userIds) | Q(user_2_id__in=userIds))
+
+	friendSet = set()
+	for friend in friends:
+		friendSet.add(friend.user_1_id)
+		friendSet.add(friend.user_2_id)
+
+	for userId in userIds:
+		if userId in friendSet:
+			friendSet.remove(userId)
+
+	minTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=1) 
+	recentlyPingedUsers = NotificationLog.objects.filter(added__gt=minTime).filter(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').distinct()
+
+	logger.debug("recentlyPingedUsers: %s"%(recentlyPingedUsers))
+
+	for entry in recentlyPingedUsers:
+		if entry['user'] in friendSet:
+			friendSet.remove(entry['user'])
+
+	friendList = list(friendSet)
+	users = User.objects.filter(id__in=friendList)
+	for user in users:
+		logger.debug("going to send a Fetch_GPS_ID to user id %s" % (user.id))
+		customPayload = {}
+		notifications_util.sendNotification(user, '', constants.NOTIFICATIONS_FETCH_GPS_ID, customPayload)
+
+
 """
 	1. Put all new photos into private strands.  Keep track of new private Strands
 	2. For each new private Strand, figure out its neighbors
@@ -123,6 +160,7 @@ def main(argv):
 	timeWithinSecondsForNotification = 10 # seconds
 
 	timeWithinMinutesForNeighboring = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
+	timeTakendelta = datetime.timedelta(hours=3)	
 	
 	logger.info("Starting... ")
 	while True:
@@ -132,6 +170,16 @@ def main(argv):
 		if len(photos) == 0:
 			time.sleep(.1)
 			continue
+
+		# make a list of users whose photos are here
+		userIdList = list()
+
+		for photo in photos:
+			if photo.time_taken > datetime.datetime.utcnow().replace(tzinfo=pytz.utc)-timeTakendelta:
+				userIdList.append(photo.user_id)
+
+		if len(userIdList) > 0:
+			Thread(target=threadedPingFriendsForUpdates, args=(userIdList,)).start()
 
 		# Group photos by users, then iterate through all users one at a time, fetching the cache as we go
 		photosByUser = dict()
