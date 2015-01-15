@@ -317,7 +317,7 @@ def actions_list(request):
 
 		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)
 
-		actionsData = compressActions(actionsData)
+		actionsData = compressActions(actionsData)[:50]
 
 		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
 		stats_util.printStats("actions-end")
