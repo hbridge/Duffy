@@ -129,6 +129,7 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   BOOL updated = NO;
   if (!currentObjects) {
+    [self processPeopleListFromInboxObjects:newObjects];
     returnBlock(YES, newObjects);
     return;
   }
@@ -148,9 +149,15 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   NSArray *newCombinedObjects = [combinedObjectsById allValues];
   
+  [self processPeopleListFromInboxObjects:newCombinedObjects];
+  returnBlock(updated, newCombinedObjects);
+}
+
+- (void)processPeopleListFromInboxObjects:(NSArray *)inboxFeedObjects
+{
   // For inbox only, we update our local cache of friends
   // If we refactor these methods to be common this will need to be pulled out
-  for (DFPeanutFeedObject *object in newCombinedObjects) {
+  for (DFPeanutFeedObject *object in inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectPeopleList]) {
       NSArray *peopleList = [self processPeopleList:_cachedFriendsList withNewPeople:object.people];
       
@@ -158,17 +165,15 @@ static DFPeanutFeedDataManager *defaultManager;
       NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
       NSMutableArray *newFriendsList = [NSMutableArray arrayWithArray:[peopleList sortedArrayUsingDescriptors:@[sort]]];
       
+      _cachedFriendsList = newFriendsList;
       if (![newFriendsList isEqualToArray:_cachedFriendsList]) {
         [[NSNotificationCenter defaultCenter]
          postNotificationName:DFStrandNewFriendsDataNotificationName
          object:self];
         DDLogInfo(@"Got new friends data, sending notification.");
       }
-      _cachedFriendsList = newFriendsList;
     }
   }
-  
-  returnBlock(updated, newCombinedObjects);
 }
 
 - (NSArray *)processPeopleList:(NSArray *)currentPeopleList withNewPeople:(NSArray *)newPeople
@@ -304,36 +309,7 @@ static DFPeanutFeedDataManager *defaultManager;
      ];
   }
 }
-/*
-- (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion
-{
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFPrivateFeed];
-  
-  if (!self.privateStrandsRefreshing) {
-    self.privateStrandsRefreshing = YES;
-    [self.privateStrandsFeedAdapter
-     fetchAllPrivateStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
-                                            NSData *responseHash,
-                                            NSError *error) {
-       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-       
-       if (!error && ![responseHash isEqual:self.privateStrandsLastResponseHash]) {
-         self.privateStrandsLastResponseHash = responseHash;
-         self.privateStrandsFeedObjects = response.objects;
-         
-         DDLogVerbose(@"Got new private data, sending notification.");
-         [[NSNotificationCenter defaultCenter]
-          postNotificationName:DFStrandNewPrivatePhotosDataNotificationName
-          object:self];
-       }
-       [self executeDeferredCompletionsForFeedType:DFPrivateFeed];
-       self.privateStrandsRefreshing = NO;
-     }
-     ];
-  }
-}
-*/
+
 // TODO(Derek): Take all this common code and put into one method
 - (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion
 {
