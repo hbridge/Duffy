@@ -274,7 +274,15 @@ def main(argv):
 			
 			Photo.bulkUpdate(photos, ["strand_evaluated", "is_dup"])
 
-			logger.debug("Created %s new strands, now creating neighbor rows" % len(strandsCreated))
+			strandsToUpdate = list()
+			for strand in strandsAddedTo:
+				if not strand.cache_dirty:
+					strand.cache_dirty = True
+					strandsToUpdate.append(strand)
+	
+			Strand.bulkUpdate(strandsToUpdate, ['cache_dirty'])
+
+			logger.debug("Created %s new strands and updated %s, now creating neighbor rows" % (len(strandsCreated), len(strandsAddedTo)))
 
 
 			# Now go find all the strand neighbor rows we need to create
@@ -368,7 +376,9 @@ def main(argv):
 			#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 			
 			logger.debug("Starting sending notifications...")
-			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
+			# Turning off notifications since the caching script should do this now.
+			# If not, then turn this back on
+			#sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 
 			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(neighborRowsToCreate), (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
 
