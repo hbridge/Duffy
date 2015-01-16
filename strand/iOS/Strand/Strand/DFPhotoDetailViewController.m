@@ -80,6 +80,13 @@ const NSUInteger CompressedModeMaxRows = 1;
   _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
   
   [self reloadProfileWithContextData];
+  
+  if ([_comments count] > 0 && !self.compressedModeEnabled) {
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+  } else {
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+  }
+  
   [self.tableView reloadData];
 }
 
@@ -350,9 +357,6 @@ const NSUInteger CompressedModeMaxRows = 1;
   if (self.compressedModeEnabled) {
     [self.addPersonButton removeFromSuperview];
   }
-  self.tableView.separatorStyle = self.compressedModeEnabled ? UITableViewCellSeparatorStyleNone : UITableViewCellSeparatorStyleSingleLine;
-  [self configureToolbarHidden];
-  
   if (self.nuxStep) {
     self.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
   } else {
@@ -410,6 +414,7 @@ const NSUInteger CompressedModeMaxRows = 1;
     noResults.noResultsLabel.text = @"No Comments Yet";
     return noResults;
   }
+  
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
   [cell.profilePhotoStackView setPeanutUser:[[DFPeanutFeedDataManager sharedManager] userWithID:comment.user]];
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:comment.user];
