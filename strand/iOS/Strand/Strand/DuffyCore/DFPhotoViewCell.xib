@@ -14,9 +14,6 @@
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="2gT-dn-UU6">
                     <rect key="frame" x="0.0" y="0.0" width="120" height="123"/>
                 </imageView>
-                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="h88-b8-2wa" userLabel="Loading indicator">
-                    <rect key="frame" x="50" y="52" width="20" height="20"/>
-                </activityIndicatorView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JbE-Vh-plj" userLabel="Acitons Badge View" customClass="DFBadgeView">
                     <rect key="frame" x="74" y="6" width="40" height="22"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -33,6 +30,9 @@
                         <constraint firstAttribute="width" constant="22" id="mP3-aG-Z4F"/>
                     </constraints>
                 </view>
+                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="h88-b8-2wa" userLabel="Loading indicator">
+                    <rect key="frame" x="50" y="52" width="20" height="20"/>
+                </activityIndicatorView>
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="JbE-Vh-plj" secondAttribute="trailing" constant="6" id="8xz-2x-wHv"/>

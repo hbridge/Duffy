@@ -16,6 +16,8 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutAction.h"
 
+const NSTimeInterval CellLoadingIndicatorDelay = 0.5;
+
 @interface DFImageDataSource()
 
 @property (nonatomic, retain) NSArray *feedPhotos;
@@ -169,8 +171,8 @@ NSUInteger const SectionSpread = 5;
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-  cell.imageView.image = nil;
+  DFPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
+                                                                    forIndexPath:indexPath];
   
   DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
     DFPeanutFeedObject *photoObject;
@@ -209,6 +211,12 @@ NSUInteger const SectionSpread = 5;
                     indexPath:(NSIndexPath *)indexPath
 {
   UICollectionView *collectionView = self.collectionView;
+  cell.imageView.image = nil;
+
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CellLoadingIndicatorDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    // if the cell doesn't have an image after half a second, show a loading indicator
+    if (cell.imageView.image == nil) [cell.loadingActivityIndicator startAnimating];
+  });
   [[DFImageManager sharedManager]
    imageForID:photoObject.id
    size:[self cellPhotoSizeForIndexPath:indexPath]
@@ -219,6 +227,7 @@ NSUInteger const SectionSpread = 5;
        if ([[collectionView indexPathForCell:cell] isEqual:indexPath]) {
          // make sure we're setting the right image for the cell
          cell.imageView.image = image;
+         [cell.loadingActivityIndicator stopAnimating];
          [cell setNeedsLayout];
        }
      });
