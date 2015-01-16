@@ -239,56 +239,6 @@ def swap_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-def compressGroup(lastActionData, count):
-	if count == 1:
-		lastActionData['text'] = "sent 1 photo"
-	else:
-		lastActionData['text'] = "sent %s photos" % count
-
-	# Also update the ID to be unique.  Multiple existing id by count to make unique
-	lastActionData['id'] = count * lastActionData['id']
-
-	return lastActionData
-
-def compressActions(actionsData):
-	# We want to group together all the photos shared around the same time
-	lastActionData = None
-	count = 1
-	doingCompress = False
-	compressedActionsData = list()
-
-	for actionData in actionsData:
-		if actionData['action_type'] == constants.ACTION_TYPE_SHARED_PHOTOS:
-			if not doingCompress:
-				doingCompress = True
-				count = 1
-
-			if not lastActionData:
-				lastActionData = actionData
-			else:
-				if (lastActionData['action_type'] == constants.ACTION_TYPE_SHARED_PHOTOS and
-					actionData['action_type'] == constants.ACTION_TYPE_SHARED_PHOTOS and
-					lastActionData['user'] == actionData['user'] and 
-					abs((lastActionData['time_stamp'] - actionData['time_stamp']).total_seconds()) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 60):
-					count += 1
-					lastActionData = actionData
-				else:
-					compressedActionsData.append(compressGroup(lastActionData, count))
-
-					count = 1
-					lastActionData = actionData
-		else:
-			if doingCompress:
-				compressedActionsData.append(compressGroup(lastActionData, count))
-				doingCompress = False
-				lastActionData = None
-			compressedActionsData.append(actionData)
-
-	if doingCompress:
-		compressedActionsData.append(compressGroup(lastActionData, count))
-
-	return compressedActionsData
-	
 def actions_list(request):
 	stats_util.startProfiling()
 	response = dict({'result': True})
@@ -297,27 +247,8 @@ def actions_list(request):
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		responseObjects = list()
-		actionsData = list()
 
-		# Do favorites and comments
-		actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:50]
-		for action in actions:
-			actionData = serializers.actionDataOfActionApiSerializer(user, action)
-			if actionData:
-				actionsData.append(actionData)
-
-		# Do shares to this user
-		shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:100]
-		for shareInstance in shareInstances:
-			actionData = serializers.actionDataOfShareInstanceApiSerializer(user, shareInstance)
-
-			if actionData:
-				actionsData.append(actionData)
-
-		actionsData = sorted(actionsData, key=lambda x: x['time_stamp'], reverse=True)
-
-		actionsData = compressActions(actionsData)[:50]
+		actionsData = swaps_util.getActionsList(user)
 
 		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
 		stats_util.printStats("actions-end")
