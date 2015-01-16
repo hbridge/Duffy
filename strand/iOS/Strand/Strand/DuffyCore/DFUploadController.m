@@ -420,26 +420,6 @@ static DFUploadController *defaultUploadController;
   return operation;
 }
 
-- (void)showBackgroundUploadCompleteNotif
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    UILocalNotification *localNotif = [[UILocalNotification alloc] init];
-    if (localNotif) {
-      
-      DDLogInfo(@"Setting badge count 0.");
-      if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
-        DDLogInfo(@"Showing background notif ready to search.");
-        localNotif.alertBody = @"Ready to search your photos!";
-        localNotif.alertAction = NSLocalizedString(@"Open", nil);
-        localNotif.applicationIconBadgeNumber = 0;
-        [[UIApplication sharedApplication] presentLocalNotificationNow:localNotif];
-      }
-      
-      [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-    }
-  });
-}
-
 #pragma mark - Misc helpers
 
 - (void)postStatusUpdateWithError:(NSError *)error
@@ -516,12 +496,30 @@ static DFUploadController *defaultUploadController;
   self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
     DDLogInfo(@"Background upload task about to expire.  Canceling uploads...");
     
-    // By cancel will throw an exception on the main thread because it could block.  That's the behavior
-    // we want here so we create a semaphore an wait on it.
+    // Cancel will throw an exception on the main thread because it could block.
+    // the cancel operation ends the background task on completion
     [self cancelUploads:YES];
-    // the cancel operation ends the background task
+    
+    // Show the user an alert that some photos didn't finish uploading
+    [self showBackgroundUploadIncompleteNotif];
   }];
 }
+
+- (void)showBackgroundUploadIncompleteNotif
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    UILocalNotification *localNotif = [[UILocalNotification alloc] init];
+    if (localNotif) {
+      if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+        DDLogInfo(@"%@ upload of photos incomplete, alerting user.", self.class);
+        localNotif.alertBody = @"Some photos you shared were not uploaded. Re-open swap to continue uploading.";
+        localNotif.alertAction = NSLocalizedString(@"Open", nil);
+        [[UIApplication sharedApplication] presentLocalNotificationNow:localNotif];
+      }
+    }
+  });
+}
+
 
 - (void) endBackgroundUpdateTask
 {
