@@ -151,7 +151,7 @@ def threadedSendNotifications(userIds):
 	# This does only db writes so is fast.  This uses the socket server
 	sendRefreshFeedToUsers(users)
 
-	actionsByUserId = getActionsByUserId(users)
+	actionsCountByUserId = getUnreadActionsListCountByUserId(users)
 	
 	# Next send through push notifications
 	# This might take a while since we have to hit apple's api.  Ok since we're in a new thread.
@@ -159,35 +159,22 @@ def threadedSendNotifications(userIds):
 		customPayload = dict()
 		count = 0
 
-		if user.id in actionsByUserId:
-			count += len(actionsByUserId[user.id])
+		if user.id in actionsCountByUserId:
+			count += actionsCountByUserId[user.id]
 
-		# now add the count of photos in Incoming (meaning unread photos)
-		count += swaps_util.getIncomingBadgeCount(user)
-
-		customPayload["badge"] = count #don't make this a string, as that puts quotes around the number and it won't work
-		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
+		if count > 0:
+			customPayload["badge"] = count #don't make this a string, as that puts quotes around the number and it won't work
+			sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
 
 
-def getActionsByUserId(users):
+def getUnreadActionsListCountByUserId(users):
 	actionsByUserId = dict()
-	shareInstances = ShareInstance.objects.prefetch_related('user').filter(users__in=User.getIds(users))
-
-	sisById = dict()
-	for si in shareInstances:
-		sisById[si.id] = si
-
-	actions = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance_id__in=ShareInstance.getIds(shareInstances)).order_by("-added")[:40]
 
 	for user in users:
-		for action in actions:
-			if (action.user_id != user.id and 
-				user in sisById[action.share_instance_id].users.all() and
-				action.added > user.last_actions_list_request_timestamp):
+		actionsData = swaps_util.getActionsList(user)
+		actionCount = swaps_util.getActionsListUnreadCount(user, actionsData)
+		actionsByUserId[user.id] = actionCount
 
-				if user.id not in actionsByUserId:
-					actionsByUserId[user.id] = list()
-				actionsByUserId[user.id].append(action)
 	return actionsByUserId
 
 @receiver(post_save, sender=Action)
