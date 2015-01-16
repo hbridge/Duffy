@@ -56,10 +56,6 @@
   self.allowsMultipleSelection = YES;
   
   self.navigationItem.title = @"People";
-  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                           target:self
-                                           action:@selector(cancelButtonPressed:)];
 }
 
 - (void)viewDidLoad
