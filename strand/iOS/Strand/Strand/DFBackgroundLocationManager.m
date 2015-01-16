@@ -177,7 +177,6 @@ static DFBackgroundLocationManager *defaultManager;
 
 - (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
-  DDLogInfo(@"%@ received background update request.", [self.class description]);
   if (self.isProcessingServerUpdateLocationRequest) {
     DDLogInfo(@"%@ background update request already in progres.  Ignoring.", [self.class description]);
     return;

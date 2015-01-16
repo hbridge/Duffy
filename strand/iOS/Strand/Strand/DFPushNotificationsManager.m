@@ -21,7 +21,7 @@
 #import "DFDismissableModalViewController.h"
 #import "AppDelegate.h"
 
-static BOOL ShowInAppNotifications = YES;
+static BOOL ShowInAppNotifications = NO;
 
 @implementation DFPushNotificationsManager
 
@@ -199,6 +199,7 @@ static BOOL ShowInAppNotifications = YES;
     if (pushNotif.contentAvailable && pushNotif.isUpdateLocationRequest)
     {
       // force a check in with the server
+      DDLogInfo(@"%@ received background update request from server.", [self.class description]);
       [(AppDelegate *)[[UIApplication sharedApplication] delegate]
        application:[UIApplication sharedApplication]
        performFetchWithCompletionHandler:nil
