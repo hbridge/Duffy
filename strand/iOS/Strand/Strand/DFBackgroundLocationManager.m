@@ -133,9 +133,10 @@ static DFBackgroundLocationManager *defaultManager;
   //   or our accuracy is better than what it was before
   // Then update with new location
   if (timeDifference > 0.0 &&
-      (distance > 30.0
-      || self.isProcessingServerUpdateLocationRequest
-      || newLocation.horizontalAccuracy < lastLocation.horizontalAccuracy))
+      (timeDifference > 60 * 60 * 3
+       || distance > 30.0
+       || self.isProcessingServerUpdateLocationRequest
+       || newLocation.horizontalAccuracy < lastLocation.horizontalAccuracy))
   {
     [self recordManagerLocation];
     [self.locationAdapter updateLocation:newLocation
