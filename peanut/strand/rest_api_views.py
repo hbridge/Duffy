@@ -243,6 +243,12 @@ class PhotoBulkAPI(BasePhotoAPI):
                     photo.time_taken = localTimeTaken.astimezone(pytz.timezone("UTC"))
                 logger.info("Successfully updated timezones for %s photos" % len(photosNeedingTimezone))
 
+    def updateStrandCacheStateForPhotos(self, user, photos):
+        privateStrands = Strand.objects.filter(user=user).filter(private=True).filter(photos__in=Photo.getIds(photos))
+        for strand in privateStrands:
+            strand.cache_dirty = True
+        Strand.bulkUpdate(privateStrands, ['cache_dirty'])
+
     def post(self, request, format=None):
         response = list()
 
@@ -272,9 +278,16 @@ class PhotoBulkAPI(BasePhotoAPI):
                 objsToUpdate.append(photo)
                 
             Photo.bulkUpdate(objsToUpdate, ['install_num', 'iphone_faceboxes_topleft'])
-            objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
+            photosUpdated = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
 
-            response['patch_photos'] = [model_to_dict(photo) for photo in objsToUpdate]
+            response['patch_photos'] = [model_to_dict(photo) for photo in photosUpdated]
+
+            photosDeleted = list()
+            for photo in photosUpdated:
+                if photo.install_num == -1:
+                    photosDeleted.append(photo)
+
+            self.updateStrandCacheStateForPhotos(user, photosDeleted)
 
             logger.info("Successfully processed %s photos for user %s" % (len(objsToUpdate), user.id))
             return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json", status=201)
@@ -345,7 +358,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 
                 existingPhotos = Photo.objects.filter(user = user, iphone_hash__in=hashes)
 
-
                 for objToCreate in objsToCreate:
                     foundMatch = False
                     for photo in existingPhotos:
@@ -374,6 +386,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                 # Best to just do a fresh fetch from the db
                 objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
                 allPhotos.extend(objsToUpdate)
+                self.updateStrandCacheStateForPhotos(user, objsToUpdate)
 
 
             # Now that we've created the images in the db, we need to deal with any uploaded images
