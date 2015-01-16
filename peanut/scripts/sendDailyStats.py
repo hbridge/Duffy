@@ -51,6 +51,12 @@ def compileData(date, length):
 		Favorites:
 		Comments:
 
+		--- Totals ---
+		User Accounts:
+		Friend Connections:
+		Share Instances:
+		Photos (metadata):
+
 	'''
 
 	newUsers = getNewUsers(date, length)
@@ -130,6 +136,25 @@ def actionStatsHelper(actionTypeCounts, actionType):
 			return entry['totals']
 	return 0
 
+def getTotals(date):
+	dataDict = {}
+
+	dataDict['TotalUserAccounts'] = User.objects.filter(product_id=2).filter(added__lt=date).count()
+	dataDict['TotalFriends'] = FriendConnection.objects.filter(added__lt=date).filter(Q(user_1_id__gt=5000) & Q(user_2_id__gt=5000)).count()
+	dataDict['TotalShareInstances'] = ShareInstance.objects.filter(added__lt=date).count()
+	dataDict['TotalPhotosMetadata'] = Photo.objects.exclude(id__lt=7463).exclude(Q(install_num=-1) & Q(thumb_filename = None)).filter(added__lt=date).count() #ignores deleted photos
+
+	return dataDict
+
+def dataDictTotalsToString(dataDict):
+	msg = "\n--- TOTALS ---\n"
+	msg += "User Accounts: " + str(dataDict['TotalUserAccounts']) + "\n"
+	msg += "Friends: " + str(dataDict['TotalFriends']) + "\n"
+	msg += "Share Instances: " + str(dataDict['TotalShareInstances']) + "\n"
+	msg += "Photos (metadata): " + str(dataDict['TotalPhotosMetadata']) + "\n"	
+
+	return msg
+
 def dataDictToString(dataDict, length):
 
 	msg = "\n" + str(length) + "-day stats for " + dataDict['date'] + "\n"
@@ -163,7 +188,8 @@ def dataDictToString(dataDict, length):
 	msg += "\n--- ACTIONS (NEW USERS) ---\n"	
 	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsNewUsers']) + '\n'			
 	msg += "Favorites: " + str(dataDict['FavsNewUsers']) + '\n'
-	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'	
+	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'
+
 	return msg
 
 def getStatsFromLocalytics(date, length):
@@ -236,6 +262,9 @@ def writeToSpreadsheet(dataDict, length):
 	elif length == 1:
 		idParts = feed.entry[1].id.text.split('/')
 		worksheetId = idParts[len(idParts) - 1]
+	elif length == 0: #used for totals worksheet, where length doesn't matter
+		idParts = feed.entry[2].id.text.split('/')
+		worksheetId = idParts[len(idParts) - 1]	
 	else:
 		logger.info("...FAILED: Invalid length field. Not writing to spreadsheet!")
 		return False
@@ -301,10 +330,12 @@ def main(argv):
 	# Compile data
 	dataDict1day = compileData(date, 1)
 	dataDict7day = compileData(date, 7)
+	dataDictTotals = getTotals(date)
 
 	# compile string to publish to console and/or email
 	emailBody = dataDictToString(dataDict7day, 7)
 	emailBody += dataDictToString(dataDict1day, 1)
+	emailBody += dataDictTotalsToString(dataDictTotals)
 
 	logger.info(emailBody)
 
@@ -316,10 +347,13 @@ def main(argv):
 		logger.info("Publishing to spreadsheet...")
 		writeSeven = writeToSpreadsheet(dataDict7day, 7) # second param is length of stats like 7-day
 		writeOne = writeToSpreadsheet(dataDict1day, 1) # second param is useful for figuring out which worksheet
+		writeTotals = writeToSpreadsheet(dataDictTotals, 0)
 		if writeSeven:
 			logger.info('...Published %s-day stats' % (7))
 		if writeOne:
 			logger.info('...Published %s-day stats' % (1))
+		if writeTotals:
+			logger.info('...Published Totals stats' % (1))
 
 	# Send to email
 	if sendEmail:
