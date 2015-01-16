@@ -110,15 +110,19 @@ def private_strands(request):
 		try:
 			apiCache = ApiCache.objects.get(user=user)
 			readyResponse = apiCache.private_strands_data
+				
 		except ApiCache.DoesNotExist:
 			objs = swaps_util.getFeedObjectsForPrivateStrands(user)
-			
-			stats_util.printStats("private-end")
+
 			response['objects'] = objs
+			response['timestamp'] = datetime.datetime.utcnow()
+			
 			readyResponse = json.dumps(response, cls=api_util.DuffyJsonEncoder)
+		stats_util.printStats("private-end")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(readyResponse, content_type="application/json")
+
 
 """
 	Returns back the suggested shares
