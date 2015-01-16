@@ -1,4 +1,5 @@
 import logging
+import time
 
 from rest_framework import serializers
 from common.models import Photo, User, Action, ContactEntry, Strand, ShareInstance
@@ -111,7 +112,7 @@ def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType
 		strandData['actor_ids'] = User.getIds(interestedUsers)
 
 	strandData['strand_id'] = strand.id
-	strandData['time_taken'] = strand.first_photo_time
+	strandData['time_taken'] = int(time.mktime(strand.first_photo_time.timetuple()))
 	strandData['suggestion_type'] = suggestionType
 	strandData['suggestible'] = True
 	strandData['location'] = strands_util.getLocationForStrand(strand)
@@ -149,7 +150,7 @@ def photoDataForApiSerializer(photo):
 	photoData = dict()
 	photoData['id'] = photo.id
 	photoData['user'] = photo.user_id
-	photoData['time_taken'] = photo.time_taken
+	photoData['time_taken'] = int(time.mktime(photo.time_taken.timetuple()))
 	photoData['local_time_taken'] = None
 	photoData['full_image_path'] = photo.getFullUrlImagePath()
 	photoData['thumb_image_path'] = photo.getThumbUrlImagePath()

@@ -23,6 +23,40 @@ from ios_notifications.models import Notification
 
 logger = logging.getLogger(__name__)
 		
+
+class CompressedTextField(models.TextField):
+	"""
+	model Fields for storing text in a compressed format (bz2 by default)
+	"""
+	__metaclass__ = models.SubfieldBase
+
+	def to_python(self, value):
+		if not value:
+			return value
+
+		try:
+			return value.decode('base64').decode('bz2').decode('utf-8')
+		except Exception:
+			return value
+
+	def get_prep_value(self, value):
+		if not value:
+			return value
+
+		try:
+			value.decode('base64')
+			return value
+		except Exception:
+			try:
+				tmp = value.encode('utf-8').encode('bz2').encode('base64')
+			except Exception:
+				return value
+			else:
+				if len(tmp) > len(value):
+					return value
+
+				return tmp
+				
 # Create your models here.
 class User(models.Model):
 	uuid = UUIDField(auto=True)
@@ -550,6 +584,8 @@ class Strand(models.Model):
 	suggestible = models.BooleanField(default=True)
 
 	swap_converted = models.BooleanField(default=False)
+
+	cache_dirty = models.BooleanField(default=True)
 	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
@@ -790,7 +826,8 @@ class Action(models.Model):
 
 class ApiCache(models.Model):
 	user = models.ForeignKey(User, db_index=True, unique=True)
-	private_strands_data = models.TextField(null=True)
+	private_strands_data = CompressedTextField(null=True)
+	private_strands_data_last_timestamp = models.DateTimeField(null=True)
 
 	class Meta:
 		db_table = 'strand_api_cache'

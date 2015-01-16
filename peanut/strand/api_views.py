@@ -15,7 +15,7 @@ from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandNeighbor, Action, LocationRecord, ShareInstance
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandNeighbor, Action, LocationRecord, ShareInstance, ApiCache
 from common.serializers import UserSerializer
 
 from common import api_util, serializers, stats_util
@@ -107,13 +107,18 @@ def private_strands(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		objs = swaps_util.getFeedObjectsForPrivateStrands(user)
-		
-		stats_util.printStats("private-end")
-		response['objects'] = objs
+		try:
+			apiCache = ApiCache.objects.get(user=user)
+			readyResponse = apiCache.private_strands_data
+		except ApiCache.DoesNotExist:
+			objs = swaps_util.getFeedObjectsForPrivateStrands(user)
+			
+			stats_util.printStats("private-end")
+			response['objects'] = objs
+			readyResponse = json.dumps(response, cls=api_util.DuffyJsonEncoder)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+	return HttpResponse(readyResponse, content_type="application/json")
 
 """
 	Returns back the suggested shares

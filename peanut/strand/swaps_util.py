@@ -3,7 +3,6 @@ import datetime
 import pytz
 
 from django.db.models import Q
-from django.conf import settings
 
 from strand import geo_util, friends_util, strands_util
 from common.models import Photo, Strand, StrandNeighbor, Action, User, ShareInstance
