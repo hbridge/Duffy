@@ -110,6 +110,11 @@ def private_strands(request):
 		try:
 			apiCache = ApiCache.objects.get(user=user)
 			readyResponse = apiCache.private_strands_data
+
+			# Manually put in the timestamp into the json so we don't have to read then write the json
+			timestampStr = '"timestamp": %s,' %  int(time.time())
+			readyResponse = readyResponse[:1] + timestampStr + readyResponse[1:]
+
 				
 		except ApiCache.DoesNotExist:
 			objs = swaps_util.getFeedObjectsForPrivateStrands(user)
