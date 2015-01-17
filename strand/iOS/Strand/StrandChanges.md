@@ -1,5 +1,9 @@
 # Swap v2
 
+## Jan 16th, 2015 (4833)
+
+- Minor bug fixes
+
 ## Jan 15th, 2015 (4828-4832)
 
 - Photos sent to you appear in the gallery without needing review
