@@ -139,6 +139,7 @@ def actionStatsHelper(actionTypeCounts, actionType):
 def getTotals(date):
 	dataDict = {}
 
+	dataDict['date'] = (date-relativedelta(days=1)).strftime('%m/%d/%y')
 	dataDict['TotalUserAccounts'] = User.objects.filter(product_id=2).filter(added__lt=date).count()
 	dataDict['TotalFriends'] = FriendConnection.objects.filter(added__lt=date).filter(Q(user_1_id__gt=5000) & Q(user_2_id__gt=5000)).count()
 	dataDict['TotalShareInstances'] = ShareInstance.objects.filter(added__lt=date).count()
