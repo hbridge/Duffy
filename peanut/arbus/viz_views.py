@@ -91,7 +91,8 @@ def userbaseSummary(request):
 		else:
 			lastActionTimeById[actionData['user']] = actionData['lastActionTimestamp']
 
-
+	peopleCounts = dict()
+	peopleCounts['friends'] = 0
 	swapUserList = list()
 	to_zone = tz.gettz('America/New_York')
 	for i, user in enumerate(userStats):
