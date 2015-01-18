@@ -347,14 +347,14 @@ def main(argv):
 	if publishToSpreadSheet:
 		logger.info("Publishing to spreadsheet...")
 		writeSeven = writeToSpreadsheet(dataDict7day, 7) # second param is length of stats like 7-day
-		writeOne = writeToSpreadsheet(dataDict1day, 1) # second param is useful for figuring out which worksheet
-		writeTotals = writeToSpreadsheet(dataDictTotals, 0)
 		if writeSeven:
-			logger.info('...Published %s-day stats' % (7))
+			logger.info('...Published %s-day stats' % (7))		
+		writeOne = writeToSpreadsheet(dataDict1day, 1) # second param is useful for figuring out which worksheet
 		if writeOne:
 			logger.info('...Published %s-day stats' % (1))
+		writeTotals = writeToSpreadsheet(dataDictTotals, 0)
 		if writeTotals:
-			logger.info('...Published Totals stats' % (1))
+			logger.info('...Published Totals stats')
 
 	# Send to email
 	if sendEmail:
