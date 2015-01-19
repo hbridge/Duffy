@@ -107,7 +107,7 @@ def main(argv):
 	while True:
 		strandsProcessed = processPrivateStrands(50)
 
-		if strandsProcessed == 0:
+		if len(strandsProcessed) == 0:
 			time.sleep(.1)
 		else:
 			for strand in strandsProcessed:
