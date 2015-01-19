@@ -13,6 +13,7 @@
 
 @class RKObjectMapping;
 @class DFPhoto;
+@class DFPeanutFeedObject;
 
 @interface DFPeanutPhoto : NSObject <DFPeanutObject>
 
@@ -38,6 +39,7 @@
 
 + (RKObjectMapping *)objectMapping;
 - (id)initWithDFPhoto:(DFPhoto *)photo;
+- (id)initWithFeedObject:(DFPeanutFeedObject *)feedObject;
 - (DFPhoto *)photoInContext:(NSManagedObjectContext *)context;
 
 - (NSDictionary *)dictionary;

@@ -85,7 +85,22 @@ toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
    }];
 }
 
-
+- (void)deleteShareInstance:(DFPeanutShareInstance *)shareInstance
+                    success:(DFPeanutRestFetchSuccess)success
+                    failure:(DFPeanutRestFetchFailure)failure
+{
+  [super
+   performRequest:RKRequestMethodDELETE
+   withPath:ShareInstancedBasePath
+   objects:@[shareInstance]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     success(resultObjects);
+   } failure:^(NSError *error) {
+     failure(error);
+   }];
+}
 
 
 @end

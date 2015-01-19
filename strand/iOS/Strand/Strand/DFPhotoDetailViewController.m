@@ -21,6 +21,8 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFPeanutNotificationsManager.h"
+#import "DFPhotoStore.h"
+#import "DFPeanutPhoto.h"
 
 const NSUInteger CompressedModeMaxRows = 1;
 
@@ -219,11 +221,11 @@ const NSUInteger CompressedModeMaxRows = 1;
                                                               forUser:sender.id] firstObject];
   if (senderLikeAction && [self.unreadActions containsObject:senderLikeAction]) {
     [self.senderProfileStackView
-     setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeUnreadButtonIcon"]
+     setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeUnreadProfileBadge"]
      forUser:sender];
   } else if (senderLikeAction) {
     [self.senderProfileStackView
-     setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
+     setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnProfileBadge"]
      forUser:sender];
   }
   
@@ -240,10 +242,10 @@ const NSUInteger CompressedModeMaxRows = 1;
     DFPeanutAction *likeAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id] firstObject];
     if (likeAction) {
       if ([self.unreadActions containsObject:likeAction]) {
-        [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeUnreadButtonIcon"]
+        [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeUnreadProfileBadge"]
                                                forUser:recipient];
       } else {
-        [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
+        [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnProfileBadge"]
                                                forUser:recipient];
       }
     } else {
@@ -256,32 +258,31 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)configureCommentToolbar
 {
   if (self.nuxStep) [self.commentToolbar removeFromSuperview];
-  [self.commentToolbar.profileStackView setPeanutUser:[[DFUser currentUser] peanutUser]];
-  [self setLikeBarButtonItemOn:(self.userLikeActionID > 0)];
-  [self.commentToolbar.likeButton addTarget:self
-                                     action:@selector(likeItemPressed:)
-                           forControlEvents:UIControlEventTouchUpInside];
+  DFPhotoDetailViewController __weak *weakSelf = self;
+  
+  self.commentToolbar.tintColor = [UIColor whiteColor];
+  self.commentToolbar.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0.9];
+
+  //configure like
+  [self.commentToolbar setLikeBarButtonItemOn:(self.userLikeActionID > 0)];
+  self.commentToolbar.likeHandler = ^{
+    [weakSelf likeItemPressed:weakSelf.commentToolbar.likeButton];
+  };
+  
+  // configure commenting
   [self.commentToolbar.textField addTarget:self
                      action:@selector(editingStartedOrStopped:)
            forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
-  self.commentToolbar.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
-  
-  DFPhotoDetailViewController __weak *weakSelf = self;
   self.commentToolbar.sendBlock = ^(NSString *text) {
     [weakSelf sendComment:text];
   };
   
+  // configure more button
+  self.commentToolbar.moreHandler = ^{
+    [weakSelf showMoreActions];
+  };
+  
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.commentToolbar.frame.size.height, 0);
-  if (self.compressedModeEnabled) self.commentToolbar.likeButtonDisabled = YES;
-}
-
-- (void)setLikeBarButtonItemOn:(BOOL)on
-{
-  if (on) {
-    [self.commentToolbar.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"] forState:UIControlStateNormal];
-  } else {
-    [self.commentToolbar.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"] forState:UIControlStateNormal];
-  }
 }
 
 - (void)setCompressedModeEnabled:(BOOL)compressedModeEnabled
@@ -289,7 +290,6 @@ const NSUInteger CompressedModeMaxRows = 1;
   dispatch_async(dispatch_get_main_queue(), ^{
     _compressedModeEnabled = compressedModeEnabled;
     [self.view setNeedsLayout];
-    if (self.compressedModeEnabled) self.commentToolbar.likeButtonDisabled = YES;
     [self.tableView reloadData];
   });
 }
@@ -593,6 +593,96 @@ const NSUInteger CompressedModeMaxRows = 1;
     [weakSelf showCommentError:action];
     [weakSelf.class logController:weakSelf actionType:DFPeanutActionComment result:DFAnalyticsValueResultFailure];
   }];
+}
+
+- (void)showMoreActions
+{
+  DFPhotoDetailViewController __weak *weakSelf = self;
+  self.alertController = [DFAlertController alertControllerWithTitle:nil
+                                                             message:nil
+                                                      preferredStyle:DFAlertControllerStyleActionSheet];
+  if (self.photoObject.user == [[DFUser currentUser] userID]) {
+    [self.alertController addAction:[DFAlertAction
+                                     actionWithTitle:@"Delete"
+                                     style:DFAlertActionStyleDestructive
+                                     handler:^(DFAlertAction *action) {
+                                       [weakSelf deletePhoto];
+                                     }]];
+  }
+  [self.alertController addAction:[DFAlertAction
+                                   actionWithTitle:@"Save"
+                                   style:DFAlertActionStyleDefault
+                                   handler:^(DFAlertAction *action) {
+                                     [weakSelf savePhotoToCameraRoll];
+                                   }]];
+  
+  [self.alertController addAction:[DFAlertAction
+                                   actionWithTitle:@"Share"
+                                   style:DFAlertActionStyleDefault
+                                   handler:^(DFAlertAction *action) {
+                                     [weakSelf sharePhoto];
+                                   }]];
+    [self.alertController addAction:[DFAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:DFAlertActionStyleCancel
+                                   handler:^(DFAlertAction *action) {}]];
+  
+  [self.alertController showWithParentViewController:self animated:YES completion:nil];
+}
+
+- (void)deletePhoto
+{
+  DFPhotoDetailViewController __weak *weakSelf = self;
+  DFAlertController *confirmController = [DFAlertController
+                                          alertControllerWithTitle:@"Delete Photo?"
+                                          message:@"Other strand users will no longer be able to see this photo."
+                                          preferredStyle:DFAlertControllerStyleAlert];
+  [confirmController addAction:[DFAlertAction
+                                actionWithTitle:@"Delete"
+                                style:DFAlertActionStyleDestructive
+                                handler:^(DFAlertAction *action) {
+                                  [[DFPeanutFeedDataManager sharedManager]
+                                   deleteShareInstance:self.photoObject.share_instance.longLongValue
+                                   success:^{
+                                     [SVProgressHUD showSuccessWithStatus:@"Deleted"];
+                                     [weakSelf dismissViewControllerAnimated:YES completion:nil];
+                                   } failure:^(NSError *error) {
+                                     [SVProgressHUD
+                                      showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",
+                                      error.localizedDescription]];
+                                   }];
+                                  
+                                }]];
+  [confirmController addAction:[DFAlertAction
+                                actionWithTitle:@"Cancel"
+                                style:DFAlertActionStyleCancel
+                                handler:^(DFAlertAction *action) {}]];
+  [confirmController showWithParentViewController:self animated:YES completion:nil];
+  
+}
+
+- (void)savePhotoToCameraRoll
+{
+  DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithFeedObject:self.photoObject];
+  [[DFPhotoStore sharedStore] saveImageToCameraRoll:self.imageView.image
+                                       withMetadata:peanutPhoto.metadataDictionary
+                                         completion:^(NSURL *assetURL, NSError *error) {
+                                           dispatch_async(dispatch_get_main_queue(), ^{
+                                             if (error) {
+                                               [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+                                             } else {
+                                               [SVProgressHUD showSuccessWithStatus:@"Saved"];
+                                             }
+                                           });
+                                         }];
+}
+
+- (void)sharePhoto
+{
+  UIActivityViewController *avc = [[UIActivityViewController alloc]
+                                   initWithActivityItems:@[self.imageView.image]
+                                   applicationActivities:nil];
+  [self presentViewController:avc animated:YES completion:nil];
 }
 
 + (void)logController:(DFPhotoDetailViewController *)controller actionType:(DFPeanutActionType)actionType result:(NSString *)result

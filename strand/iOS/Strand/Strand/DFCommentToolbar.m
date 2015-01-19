@@ -13,13 +13,9 @@
 - (void)awakeFromNib
 {
   [super awakeFromNib];
-  self.profileStackView.backgroundColor = [UIColor clearColor];
-  self.sendButton = [[UIButton alloc] init];
-  [self.sendButton setTitle:@"Send" forState:UIControlStateNormal];
-  self.sendButton.translatesAutoresizingMaskIntoConstraints = NO;
-  [self.sendButton setTitleColor:[DFStrandConstants strandBlue] forState:UIControlStateNormal];
-  [self.sendButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-  [self.sendButton addTarget:self action:@selector(sendPressed:) forControlEvents:UIControlEventTouchUpInside];
+  [self configureButtonImages];
+  
+  self.textField.tintColor = [UIColor lightGrayColor];
   [self.textField addTarget:self
                      action:@selector(editingStartedStopped:)
            forControlEvents:UIControlEventEditingDidBegin | UIControlEventEditingDidEnd];
@@ -28,6 +24,14 @@
            forControlEvents:UIControlEventEditingChanged];
   [self textChanged:self.textField];
   self.textField.delegate = self;
+}
+
+- (void)configureButtonImages
+{
+  [self.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeButtonIcon"]
+                   forState:UIControlStateNormal];
+  [self.commentButton setImage:[UIImage imageNamed:@"Assets/Icons/CommentButtonIcon"]
+                   forState:UIControlStateNormal];
 }
 
 - (id)awakeAfterUsingCoder:(NSCoder *)aDecoder
@@ -88,43 +92,50 @@
   
 }
 
-- (void)dealloc
+- (NSArray *)nonCommentButtons
 {
-  self.retainedLikeButton = nil;
+  return @[self.likeButton, self.commentButton, self.moreButton];
 }
 
-- (void)setSendButtonHidden:(BOOL)sendIsHidden
+- (void)setCommentFieldHidden:(BOOL)commentFieldHidden
 {
-  if (sendIsHidden) {
-    [self.sendButton removeFromSuperview];
-    if (!self.likeButtonDisabled) {
-      [self addRightButtonToView:self.likeButton];
-      self.retainedLikeButton = nil;
-    }
-  } else {
-    self.retainedLikeButton = self.likeButton;
-    [self.likeButton removeFromSuperview];
-    [self addRightButtonToView:self.sendButton];
+  for (UIView *nonCommentView in [self nonCommentButtons]) {
+    nonCommentView.hidden = !commentFieldHidden;
   }
+  for (UIView *view in @[self.textField, self.sendButton]) {
+    view.hidden = commentFieldHidden;
+  }
+}
+
+- (void)setLikeBarButtonItemOn:(BOOL)on
+{
+  if (on) {
+    [self.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"] forState:UIControlStateNormal];
+    [self.likeButton setTitle:@"Liked" forState:UIControlStateNormal];
+  } else {
+    [self.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOffButtonIcon"] forState:UIControlStateNormal];
+    [self.likeButton setTitle:@"Like" forState:UIControlStateNormal];
+  }
+}
+
+- (IBAction)likeButtonPressed:(id)sender {
+  if (self.likeHandler) self.likeHandler();
+}
+
+- (IBAction)commentButtonPressed:(id)sender {
+  [self setCommentFieldHidden:NO];
+  [self.textField becomeFirstResponder];
 }
 
 - (void)editingStartedStopped:(UITextField *)sender
 {
   [self textChanged:sender];
+  if (!sender.isFirstResponder) [self setCommentFieldHidden:YES];
 }
 
-- (void)setLikeButtonDisabled:(BOOL)likeButtonDisabled
-{
-  if (likeButtonDisabled) [self.likeButton removeFromSuperview];
-}
-
-- (IBAction)sendPressed:(id)sender {
-  if (self.sendBlock) self.sendBlock(self.textField.text);
-  [self textChanged:self.textField];
-}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-  [self sendPressed:self.textField];
+  [self sendButtonPressed:self.textField];
   return NO;
 }
 
@@ -132,12 +143,19 @@
 {
   if (sender.text.length > 0) {
     self.sendButton.enabled = YES;
-    [self setSendButtonHidden:NO];
   } else {
     self.sendButton.enabled = NO;
-    [self setSendButtonHidden:YES];
   }
 }
 
+
+- (IBAction)sendButtonPressed:(id)sender {
+  if (self.sendBlock) self.sendBlock(self.textField.text);
+  [self textChanged:self.textField];
+}
+
+- (IBAction)moreButtonPressed:(id)sender {
+  if (self.moreHandler) self.moreHandler();
+}
 
 @end

@@ -21,6 +21,7 @@
 #import "DFAnalytics.h"
 #import "DFPeanutShareInstanceAdapter.h"
 #import "DFUserPeanutAdapter.h"
+#import "DFPeanutPhotoAdapter.h"
 
 #define REFRESH_FEED_AFTER_SECONDS 300 //seconds between a full refresh of a feed
 
@@ -59,8 +60,7 @@
 // Dict with keys of DFFeedType and value of NSString *
 @property (nonatomic, retain) NSMutableDictionary *feedLastFeedTimestamp;
 
-// Dict with keys of DFFeedType and value of NSString *
-@property (nonatomic, retain) NSMutableDictionary *feedNotificationName;
+
 
 @property (nonatomic, retain) NSData *swapsLastResponseHash;
 @property (nonatomic, retain) NSData *actionsLastResponseHash;
@@ -88,9 +88,6 @@
     self.feedLastResponseHash = [NSMutableDictionary new];
     self.feedLastFullFetchDate = [NSMutableDictionary new];
     self.feedLastFeedTimestamp = [NSMutableDictionary new];
-    self.feedNotificationName = [NSMutableDictionary new];
-    [self.feedNotificationName setObject:DFStrandNewInboxDataNotificationName forKey:@(DFInboxFeed)];
-    [self.feedNotificationName setObject:DFStrandNewPrivatePhotosDataNotificationName forKey:@(DFPrivateFeed)];
     
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     [self refreshFromServer];
@@ -241,9 +238,7 @@ static DFPeanutFeedDataManager *defaultManager;
         [self processFeedOfType:feedType currentObjects:[self.feedObjects objectForKey:@(feedType)] withNewObjects:response.objects returnBlock:^(BOOL updated, NSArray *newObjects) {
           [self.feedObjects setObject:newObjects forKey:@(feedType)];
           if (updated) {
-            [[NSNotificationCenter defaultCenter]
-             postNotificationName:[self.feedNotificationName objectForKey:@(feedType)]
-             object:self];
+            [self notifyFeedChanged:feedType];
             DDLogInfo(@"Got new data for feed %@ with %d objects, sending notification.", @(feedType), (int)newObjects.count);
           }
         }];
@@ -993,6 +988,49 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
+- (void)deleteShareInstance:(DFShareInstanceIDType)shareInstanceID
+                    success:(DFVoidBlock)success
+                    failure:(DFFailureBlock)failure;
+{
+  DFPeanutShareInstance *shareInstance = [[DFPeanutShareInstance alloc] init];
+  shareInstance.id = @(shareInstanceID);
+  [self.shareInstanceAdapter
+   deleteShareInstance:shareInstance
+   success:^(NSArray *resultObjects) {
+     self.inboxFeedObjects = [self.inboxFeedObjects
+                              objectsPassingTestBlock:^BOOL(DFPeanutFeedObject *feedObject) {
+                                if (feedObject.share_instance.longLongValue == shareInstanceID) {
+                                  return NO;
+                                }
+                                return YES;
+                              }];
+     [self notifyFeedChanged:DFInboxFeed];
+     success();
+   } failure:^(NSError *error) {
+     failure(error);
+   }];
+}
+
+#pragma mark - Notify of feed changes
+
+- (void)notifyFeedChanged:(DFFeedType)feedType
+{
+  [[NSNotificationCenter defaultCenter]
+   postNotificationName:[self notificationNameForFeed:feedType]
+   object:self];
+}
+
+static NSDictionary *nameMapping;
+- (NSString *)notificationNameForFeed:(DFFeedType)feedType
+{
+  if (!nameMapping) nameMapping = @{
+    @(DFInboxFeed) : DFStrandNewInboxDataNotificationName,
+    @(DFPrivateFeed) : DFStrandNewPrivatePhotosDataNotificationName,
+  };
+  return nameMapping[@(feedType)];
+}
+
+
 #pragma mark - Network Adapters
 
 @synthesize swapsFeedAdapter = _swapsFeedAdapter;
@@ -1014,6 +1052,10 @@ static DFPeanutFeedDataManager *defaultManager;
   return [self.feedObjects objectForKey:@(DFInboxFeed)];
 }
 
+- (void)setInboxFeedObjects:(NSArray *)inboxFeedObjects
+{
+  self.feedObjects[@(DFInboxFeed)] = inboxFeedObjects;
+}
 
 - (NSArray *)privateStrandsFeedObjects
 {

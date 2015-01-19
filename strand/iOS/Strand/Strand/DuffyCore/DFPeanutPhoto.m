@@ -13,6 +13,7 @@
 #import <RestKit/RestKit.h>
 #import "DFUser.h"
 #import "DFPeanutFaceFeature.h"
+#import "DFPeanutFeedObject.h"
 
 const int MaxUserCommentLength = 200;
 
@@ -43,6 +44,18 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
       self.file_key = photo.objectID.URIRepresentation;
       self.saved_with_swap = @((int)[photo.sourceString isEqualToString:DFPhotosSaveLocationName]);
     }
+  }
+  return self;
+}
+
+- (id)initWithFeedObject:(DFPeanutFeedObject *)feedObject
+{
+  self = [super init];
+  if (self) {
+    self.user = @(feedObject.user);
+    self.id = @(feedObject.id);
+    NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
+    self.time_taken = [djangoFormatter stringFromDate:feedObject.time_taken];
   }
   return self;
 }
@@ -96,6 +109,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 - (NSDictionary *)metadataDictionary
 {
   NSMutableDictionary *dict = [[NSDictionary dictionaryWithJSONString:self.metadata] mutableCopy];
+  if (!dict) dict = [NSMutableDictionary new];
   
   // Add in Exif info for the photo, namely the time taken if it doesn't exist
   //   We need to convert the time from the server into the exif date format

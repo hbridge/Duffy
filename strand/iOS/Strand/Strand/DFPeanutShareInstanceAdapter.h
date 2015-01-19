@@ -23,5 +23,9 @@
            success:(DFPeanutRestFetchSuccess)success
            failure:(DFPeanutRestFetchFailure)failure;
 
+- (void)deleteShareInstance:(DFPeanutShareInstance *)shareInstance
+                    success:(DFPeanutRestFetchSuccess)success
+                    failure:(DFPeanutRestFetchFailure)failure;
+
 
 @end
