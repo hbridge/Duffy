@@ -113,7 +113,7 @@ def main(argv):
 			for strand in strandsProcessed:
 				logger.info("Processed strand %s" % (strand.id))
 
-		logger.info("Finished processing %s strands" % (len(strandsProcessed)))
+			logger.info("Finished processing %s strands" % (len(strandsProcessed)))
 	# Find all interested users for those strands
 	# Fetch current api cache
 	# Update each of the strand entries
