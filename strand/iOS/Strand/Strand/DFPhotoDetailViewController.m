@@ -424,11 +424,9 @@ const NSUInteger CompressedModeMaxRows = 1;
                                                                abbreviate:YES];
   
   
-  if (comment.user == [[DFUser currentUser] userID]) {
-    [self addDeleteActionForCell:cell
-                         comment:comment
-                       indexPath:indexPath];
-  }
+  [self setCommentCell:cell
+             deletable:(comment.user == [[DFUser currentUser] userID])
+               comment:comment indexPath:indexPath];
   
   if ([self.unreadActions containsObject:comment]) {
     cell.backgroundColor = [DFStrandConstants unreadNotificationBackgroundColor];
@@ -440,42 +438,47 @@ const NSUInteger CompressedModeMaxRows = 1;
   return cell;
 }
 
-- (void)addDeleteActionForCell:(DFCommentTableViewCell *)cell
-                       comment:(DFPeanutAction *)comment
-                     indexPath:(NSIndexPath *)indexPath
+- (void)setCommentCell:(DFCommentTableViewCell *)cell
+             deletable:(BOOL)isDeletable
+               comment:(DFPeanutAction *)comment
+             indexPath:(NSIndexPath *)indexPath
 {
   if (![cell.class isSubclassOfClass:[DFCommentTableViewCell class]]) return;
-  UILabel *hideLabel = [[UILabel alloc] init];
-  hideLabel.text = @"Delete";
-  hideLabel.textColor = [UIColor whiteColor];
-  [hideLabel sizeToFit];
-  [cell
-   setSwipeGestureWithView:hideLabel
-   color:[UIColor redColor]
-   mode:MCSwipeTableViewCellModeExit
-   state:MCSwipeTableViewCellState3
-   completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-     [self.commentToolbar.textField resignFirstResponder];
-     self.alertController = [DFAlertController alertControllerWithTitle:@"Delete this comment?"
-                                                                message:nil
-                                                         preferredStyle:DFAlertControllerStyleActionSheet];
-     [self.alertController addAction:[DFAlertAction
-                                      actionWithTitle:@"Delete"
-                                      style:DFAlertActionStyleDestructive
-                                      handler:^(DFAlertAction *action) {
-                                        [self deleteComment:comment];
-                                      }]];
-     [self.alertController addAction:[DFAlertAction
-                                      actionWithTitle:@"Cancel"
-                                      style:DFAlertActionStyleCancel
-                                      handler:^(DFAlertAction *action) {
-                                        [cell swipeToOriginWithCompletion:nil];
-                                      }]];
-     [self.alertController showWithParentViewController:self animated:YES completion:nil];
-   }];
-  // the default color is the color that appears before you swipe far enough for the action
-  // we set to the group tableview background color to blend in
-  cell.defaultColor = [UIColor lightGrayColor];
+  
+
+    cell.gestureRecognizers = @[];
+  if (isDeletable) {
+    UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                                         initWithTarget:self
+                                                         action:@selector(promptToDeleteComment:)];
+    [cell addGestureRecognizer:longPressRecognizer];
+  }
+}
+
+- (void)promptToDeleteComment:(UIGestureRecognizer *)sender
+{
+  if (sender.state != UIGestureRecognizerStateBegan) return;
+  [self.commentToolbar.textField resignFirstResponder];
+  
+  NSIndexPath *commentIndexPath = [self.tableView indexPathForCell:(UITableViewCell *)sender.view];
+  DFPeanutAction *comment = self.comments[commentIndexPath.row];
+  
+  self.alertController = [DFAlertController alertControllerWithTitle:@"Delete this comment?"
+                                                             message:nil
+                                                      preferredStyle:DFAlertControllerStyleActionSheet];
+  [self.alertController addAction:[DFAlertAction
+                                   actionWithTitle:@"Delete"
+                                   style:DFAlertActionStyleDestructive
+                                   handler:^(DFAlertAction *action) {
+                                     [self deleteComment:comment];
+                                   }]];
+  [self.alertController addAction:[DFAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:DFAlertActionStyleCancel
+                                   handler:^(DFAlertAction *action) {
+                                     
+                                   }]];
+  [self.alertController showWithParentViewController:self animated:YES completion:nil];
 }
 
 #pragma mark - Actions
@@ -584,7 +587,7 @@ const NSUInteger CompressedModeMaxRows = 1;
       DFCommentTableViewCell *cell = (DFCommentTableViewCell *)[weakSelf.tableView cellForRowAtIndexPath:indexPath];
       if (cell && [cell.class isSubclassOfClass:[DFCommentTableViewCell class]]) {
         // if comments are not expanded, we might not have a comment cell showing for it
-        [weakSelf addDeleteActionForCell:cell comment:newComment indexPath:indexPath];
+        [weakSelf setCommentCell:cell deletable:YES comment:action indexPath:indexPath];
       }
     }
     [weakSelf.class logController:weakSelf actionType:DFPeanutActionComment result:DFAnalyticsValueResultSuccess];
