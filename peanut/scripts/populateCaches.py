@@ -99,7 +99,7 @@ def processPrivateStrands(num):
 
 	Thread(target=threadedSendNotifications, args=(dirtyStrandsByUserId.keys(),)).start()
 
-	return len(dirtyStrands)
+	return dirtyStrands
 
 def main(argv):
 	stats_util.startProfiling()
