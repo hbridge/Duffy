@@ -89,7 +89,7 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 {
   NSString *localName = [[DFContactDataManager sharedManager] localNameFromPhoneNumber:self.phone_number];
   
-  if (localName) {
+  if ([localName isNotEmpty]) {
     return localName;
   } else {
     return self.display_name;

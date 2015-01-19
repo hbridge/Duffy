@@ -231,7 +231,8 @@
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
   
   cell.profilePhotoStackView.peanutUsers = @[peanutUser];
-  cell.nameLabel.text = [peanutUser fullName];
+  NSString *fullName = [peanutUser fullName];
+  cell.nameLabel.text = [fullName isNotEmpty] ? fullName : peanutUser.phone_number;
   cell.nameLabel.font = [UIFont systemFontOfSize:cell.nameLabel.font.pointSize];
   cell.rightLabel.text = @"";
   cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
