@@ -364,6 +364,17 @@ const NSUInteger CompressedModeMaxRows = 1;
                        deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
   }
   [self.tableView setTableHeaderView:self.imageView];
+  
+  // photo view actions
+  UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
+                                                 initWithTarget:self
+                                                 action:@selector(photoDoubleTapped:)];
+  doubleTapRecognizer.numberOfTapsRequired = 2;
+  [self.imageView addGestureRecognizer:doubleTapRecognizer];
+  UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                                       initWithTarget:self
+                                                       action:@selector(photoLongPressed:)];
+  [self.imageView addGestureRecognizer:longPressRecognizer];
 }
 
 #pragma mark - UITableView Delegate/Datasource
@@ -455,6 +466,8 @@ const NSUInteger CompressedModeMaxRows = 1;
   }
 }
 
+#pragma mark - Actions
+
 - (void)promptToDeleteComment:(UIGestureRecognizer *)sender
 {
   if (sender.state != UIGestureRecognizerStateBegan) return;
@@ -480,8 +493,6 @@ const NSUInteger CompressedModeMaxRows = 1;
                                    }]];
   [self.alertController showWithParentViewController:self animated:YES completion:nil];
 }
-
-#pragma mark - Actions
 
 - (IBAction)likeItemPressed:(id)sender {
   BOOL newLikeValue = (self.userLikeActionID == 0);
@@ -771,6 +782,20 @@ const NSUInteger CompressedModeMaxRows = 1;
     [self.templateCell setNeedsLayout];
   }
   return self.templateCell.rowHeight;
+}
+
+#pragma mark - Photo view gesture recognizers
+
+- (void)photoDoubleTapped:(UIGestureRecognizer *)sender
+{
+  if (sender.state == UIGestureRecognizerStateEnded)
+    [self likeItemPressed:sender];
+}
+
+- (void)photoLongPressed:(UIGestureRecognizer *)sender
+{
+  if (sender.state == UIGestureRecognizerStateBegan)
+    [self showMoreActions];
 }
 
 #pragma mark - State changes
