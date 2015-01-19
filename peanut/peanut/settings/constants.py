@@ -99,8 +99,11 @@ NOTIFICATIONS_CUSTOM_DICT = {
 	NOTIFICATIONS_NEW_SUGGESTION : {'type': NOTIFICATIONS_NEW_SUGGESTION},
 }
 
-NOTIFICATIONS_APP_VIEW_CAMERA = 0
-NOTIFICATIONS_APP_VIEW_GALLERY = 1
+# All the notification-related time intervals
+NOTIFICATIONS_NEW_PHOTO_WAIT_INTERVAL_SECS = 60 # Waits this long before sending another NEW_PHOTO suggestion to same user
+NOTIFICATIONS_NEW_SUGGESTION_INTERVAL_SECS = 60 # Waits this long before sending a suggestion to same user
+NOTIFICATIONS_GPS_FROM_FRIEND_INTERVAL_MINS = 10 # Waits this long before repinging phones for new location
+
 
 TWILIO_ACCOUNT = "ACf7272766cd6e51024750c3a1395a6f2f"
 TWILIO_TOKEN = "63eb729d07ec8980d5267cb6b715e06f"

@@ -133,7 +133,7 @@ def threadedPingFriendsForUpdates(userIds):
 		if userId in friendSet:
 			friendSet.remove(userId)
 
-	minTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=1) 
+	minTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=constants.NOTIFICATIONS_GPS_FROM_FRIEND_INTERVAL_MINS) 
 	recentlyPingedUsers = NotificationLog.objects.filter(added__gt=minTime).filter(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').distinct()
 
 	logger.debug("recentlyPingedUsers: %s"%(recentlyPingedUsers))

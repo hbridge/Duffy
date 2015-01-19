@@ -90,7 +90,7 @@ def siListToUserPhrase(siList):
 def main(argv):
 	logger.info("Starting... ")
 	notificationTimedelta = datetime.timedelta(seconds=300)
-	recencyTimedelta = datetime.timedelta(seconds=60)
+	recencyTimedelta = datetime.timedelta(seconds=constants.NOTIFICATIONS_NEW_PHOTO_WAIT_INTERVAL_SECS)
 
 	locationSmallTimedelta = datetime.timedelta(hours=3)
 	locationBigTimedelta = datetime.timedelta(days=3)
