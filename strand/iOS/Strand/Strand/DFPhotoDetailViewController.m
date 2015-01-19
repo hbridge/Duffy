@@ -696,6 +696,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   UIActivityViewController *avc = [[UIActivityViewController alloc]
                                    initWithActivityItems:@[self.imageView.image]
                                    applicationActivities:nil];
+  avc.excludedActivityTypes = @[UIActivityTypeSaveToCameraRoll];
   [self presentViewController:avc animated:YES completion:nil];
 }
 
