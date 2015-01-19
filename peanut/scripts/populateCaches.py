@@ -110,8 +110,10 @@ def main(argv):
 		if strandsProcessed == 0:
 			time.sleep(.1)
 		else:
-			logger.info("Processed %s strands" % (strandsProcessed))
+			for strand in strandsProcessed:
+				logger.info("Processed strand %s" % (strand.id))
 
+		logger.info("Finished processing %s strands" % (len(strandsProcessed)))
 	# Find all interested users for those strands
 	# Fetch current api cache
 	# Update each of the strand entries
