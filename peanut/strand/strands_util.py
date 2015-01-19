@@ -37,22 +37,20 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLoca
 				return True
 	return False
 
-def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = constants.MINUTES_FOR_NOLOC_NEIGHBORING, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING, locationRequired = True):
+def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = constants.MINUTES_FOR_NOLOC_NEIGHBORING, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING, locationRequired = True, doNoLocation = False):
 	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
 		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
-
-		if len(strand.photos.all()) == 0 or len(possibleNeighbor.photos.all()) == 0:
-			return True, "0 photos"
-
+		
 		if (not locationRequired and (not strand.location_point or not possibleNeighbor.location_point)):
-			for photo1 in strand.photos.all():
-				for photo2 in possibleNeighbor.photos.all():
-					timeDiff = photo1.time_taken - photo2.time_taken
-					timeDiffMin = abs(timeDiff.total_seconds()) / 60
+			if doNoLocation:
+				for photo1 in strand.photos.all():
+					for photo2 in possibleNeighbor.photos.all():
+						timeDiff = photo1.time_taken - photo2.time_taken
+						timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
-					if timeDiffMin < noLocationTimeLimitMin and abs(timeDiff.total_seconds()) > 1:
-						return True, "noloc-%s" % timeDiff.total_seconds()
-					
+						if timeDiffMin < noLocationTimeLimitMin and abs(timeDiff.total_seconds()) > 1:
+							return True, "noloc-%s" % timeDiff.total_seconds()
+		
 		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < distanceLimit):
 			return True, "location-%s" % geo_util.getDistanceBetweenStrands(strand, possibleNeighbor)
@@ -71,7 +69,7 @@ def userShouldBeNeighborToStrand(strand, locationRecord):
 	return False
 
 	
-def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
+def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId, strandPhotosToCreate, strandUsersToCreate):
 	if photo.time_taken > strand.last_photo_time:
 		strand.last_photo_time = photo.time_taken
 		strand.save()
@@ -86,7 +84,7 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	#   Don't add in if there's a dup in it already though
 	if strand.id not in photosByStrandId:
 		# Handle case that this is a new strand
-		Strand.photos.through.objects.create(strand=strand, photo=photo)
+		strandPhotosToCreate.append(Strand.photos.through(strand=strand, photo=photo))
 		photosByStrandId[strand.id] = [photo]
 	elif photo not in photosByStrandId[strand.id]:
 		for p in photosByStrandId[strand.id]:
@@ -95,33 +93,30 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 				photo.is_dup = True
 				return False
 
-		try:
-			Strand.photos.through.objects.create(strand=strand, photo=photo)
-			photosByStrandId[strand.id].append(photo)
-		except IntegrityError:
-			logger.error("Got Integrity Error adding photo %s to strand %s" % (photo.id, strand.id))
-
+		strandPhotosToCreate.append(Strand.photos.through(strand=strand, photo=photo))
+		photosByStrandId[strand.id].append(photo)
+		
 	# Add user to strand
 	if strand.id not in usersByStrandId:
 		# Handle case that this is a new strand
 		usersByStrandId[strand.id]= [photo.user]
-		Strand.users.through.objects.create(strand=strand, user=photo.user)
+		strandUsersToCreate.append(Strand.users.through(strand=strand, user=photo.user))
 
 	elif photo.user not in usersByStrandId[strand.id]:
 		usersByStrandId[strand.id].append(photo.user)
-		Strand.users.through.objects.create(strand=strand, user=photo.user)
+		strandUsersToCreate.append(Strand.users.through(strand=strand, user=photo.user))
 	return True
 		
-def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
+def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId, strandPhotosToCreate, strandUsersToCreate):
 	photoList = photosByStrandId[strand2.id]
 	for photo in photoList:
 		if photo not in photosByStrandId[strand1.id]:
-			addPhotoToStrand(strand1, photo, photosByStrandId, usersByStrandId)
+			addPhotoToStrand(strand1, photo, photosByStrandId, usersByStrandId, strandPhotosToCreate, strandUsersToCreate)
 
 	userList = usersByStrandId[strand2.id]
 	for user in userList:
 		if user not in usersByStrandId[strand1.id]:
-			strand1.users.add(user)
+			strandUsersToCreate.append(Strand.users.through(strand=strand2, user=user))
 			usersByStrandId[strand1.id].append(user)
 
 

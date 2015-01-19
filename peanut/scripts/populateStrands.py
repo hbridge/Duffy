@@ -164,6 +164,9 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
+		strandPhotosToCreate = list()
+		strandUsersToCreate = list()
+
 		a = datetime.datetime.now()
 		photos = Photo.objects.select_related().filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')[:maxPhotosAtTime]
 		
@@ -232,7 +235,7 @@ def main(argv):
 				
 				if len(matchingStrands) == 1:
 					strand = matchingStrands[0]
-					if strands_util.addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
+					if strands_util.addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId, strandPhotosToCreate, strandUsersToCreate):
 						strandsAddedTo.append(strand)
 						photoToStrandIdDict[photo] = strand.id
 						
@@ -244,7 +247,7 @@ def main(argv):
 					# Merge strands
 					for i, strand in enumerate(matchingStrands):
 						if i > 0:
-							strands_util.mergeStrands(targetStrand, strand, photosByStrandId, usersByStrandId)
+							strands_util.mergeStrands(targetStrand, strand, photosByStrandId, usersByStrandId, strandPhotosToCreate, strandUsersToCreate)
 							logger.debug("Merged strand %s into %s users %s" % (strand.id, targetStrand.id, usersByStrandId[targetStrand.id]))
 
 					# Delete unneeded Srands
@@ -262,7 +265,7 @@ def main(argv):
 					newStrand = Strand.objects.create(user = user, first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, location_point = photo.location_point, location_city = photo.location_city, private = True)
 					newStrand.save()
 					
-					if strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId):
+					if strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId, strandPhotosToCreate, strandUsersToCreate):
 						strandsCreated.append(newStrand)
 						strandsCache.append(newStrand)
 
@@ -273,6 +276,10 @@ def main(argv):
 				photo.strand_evaluated = True
 			
 			Photo.bulkUpdate(photos, ["strand_evaluated", "is_dup"])
+			if len(strandPhotosToCreate) > 0:
+				Strand.photos.through.objects.bulk_create(strandPhotosToCreate)
+			if len(strandUsersToCreate) > 0:
+				Strand.users.through.objects.bulk_create(strandUsersToCreate)
 
 			strandsToUpdate = list()
 			for strand in strandsAddedTo:
@@ -291,11 +298,20 @@ def main(argv):
 				strandNeighborsToCreate = list()
 
 				# Doing this to prefetch the photos data...otherwise django is dumb
-				strandsCreated = Strand.objects.prefetch_related('photos').filter(id__in=Strand.getIds(strandsCreated))
+				strandsCreated = Strand.objects.prefetch_related('photos').filter(id__in=Strand.getIds(strandsCreated)).order_by('first_photo_time')
 				
-				ab = datetime.datetime.now()
+				now = datetime.datetime.now().replace(tzinfo=pytz.utc)
+				if strandsCreated[0].first_photo_time > (now - datetime.timedelta(days=30)):
+					doNoLoc = True
+				else:
+					doNoLoc = False
+				
 				#logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
-				query = Strand.objects.prefetch_related('users', 'photos').exclude(location_point__isnull=True).exclude(user=user).filter(product_id=2)
+				query = Strand.objects.exclude(location_point__isnull=True).exclude(user=user).filter(product_id=2)
+
+				if doNoLoc:
+					query = query.prefetch_related('photos')
+					
 				additional = Q()
 				for strand in strandsCreated:
 					timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
@@ -316,8 +332,8 @@ def main(argv):
 				idsCreated = list()
 				for strand in strandsCreated:
 					for possibleStrandNeighbor in possibleStrandNeighbors:
-						if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor, locationRequired = False):
-							usersByStrandId[possibleStrandNeighbor.id] = list(possibleStrandNeighbor.users.all())
+						if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor, locationRequired = False, doNoLocation = doNoLoc):
+							#usersByStrandId[possibleStrandNeighbor.id] = list(possibleStrandNeighbor.users.all())
 							strandsByStrandId[strand.id] = strand
 							strandsByStrandId[possibleStrandNeighbor.id] = possibleStrandNeighbor
 							if possibleStrandNeighbor.id < strand.id:
