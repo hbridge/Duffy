@@ -192,6 +192,32 @@ static DFPeanutFeedDataManager *defaultManager;
   return [combinedObjectsById allValues];
 }
 
+// TODO(Derek): This can be combine with Inbox processing above
+- (void)processPrivateFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
+{
+  BOOL updated = NO;
+  if (!currentObjects) {
+    returnBlock(YES, newObjects);
+    return;
+  }
+  
+  NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
+  
+  for (DFPeanutFeedObject *object in currentObjects) {
+    [combinedObjectsById setObject:object forKey:@(object.id)];
+  }
+  
+  for (DFPeanutFeedObject *object in newObjects) {
+    DFPeanutFeedObject *existingObject = [combinedObjectsById objectForKey:@(object.id)];
+    if (!existingObject || ![existingObject isEqual:object]) {
+      updated = YES;
+    }
+    [combinedObjectsById setObject:object forKey:@(object.id)];
+  }
+  NSArray *newCombinedObjects = [combinedObjectsById allValues];
+  
+  returnBlock(updated, newCombinedObjects);
+}
 /* Generic feed methods */
 - (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion
 {
@@ -271,7 +297,7 @@ static DFPeanutFeedDataManager *defaultManager;
   if (feedType == DFInboxFeed) {
     [self processInboxFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
   } else if (feedType == DFPrivateFeed) {
-    returnBlock(YES, newObjects);
+    [self processPrivateFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
   }
 }
 

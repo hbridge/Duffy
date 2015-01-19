@@ -438,6 +438,11 @@ static NSArray *FeedObjectTypes;
   DFPeanutFeedObject *otherObject = object;
   if (![[otherObject class] isSubclassOfClass:[self class]]) return NO;
   
+  
+  if ([self.type isEqual:DFFeedObjectSection] && [otherObject.type isEqual:DFFeedObjectSection]) {
+    if ([self.objects count] != [otherObject.objects count]) return NO;
+  }
+  
   if (otherObject.id == self.id
       && otherObject.share_instance.longLongValue == self.share_instance.longLongValue
       && [otherObject.type isEqual:self.type]) return YES;
