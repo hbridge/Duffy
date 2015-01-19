@@ -66,6 +66,7 @@ static dispatch_queue_t localImageReuestQueue;
 {
   if (!_asset) {
     _asset = [[DFAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
+    if (!_asset) DDLogWarn(@"%@ warning asset for localID: %@ nil", self.class, self.localIdentifier);
   }
   
   return _asset;
