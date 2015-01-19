@@ -443,6 +443,10 @@ static NSArray *FeedObjectTypes;
     if ([self.objects count] != [otherObject.objects count]) return NO;
   }
   
+  if ([self.type isEqual:DFFeedObjectPhoto] && [otherObject.type isEqual:DFFeedObjectPhoto]) {
+    if ([self.actions count] != [otherObject.actions count]) return NO;
+  }
+  
   if (otherObject.id == self.id
       && otherObject.share_instance.longLongValue == self.share_instance.longLongValue
       && [otherObject.type isEqual:self.type]) return YES;
