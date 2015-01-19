@@ -33,4 +33,8 @@ sleep 5
 sleep 1
 /sbin/initctl start duffy-strand-notifications
 
+sleep 5
 
+/sbin/initctl stop duffy-popcaches
+sleep 1
+/sbin/initctl start duffy-popcaches
