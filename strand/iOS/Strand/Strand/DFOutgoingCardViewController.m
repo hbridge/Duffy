@@ -15,6 +15,7 @@
 @interface DFOutgoingCardViewController ()
 
 @property (nonatomic ,retain) WYPopoverController *addPersonPopoverController;
+@property (nonatomic, retain) DFPeoplePickerViewController *addPersonViewController;
 
 @end
 
@@ -201,16 +202,16 @@
 }
 
 - (IBAction)addPersonButtonPressed:(UIButton *)sender {
-  DFPeoplePickerViewController *peoplePickerController = [[DFPeoplePickerViewController alloc]
+  self.addPersonViewController = [[DFPeoplePickerViewController alloc]
                                                           initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
-  peoplePickerController.doneButtonActionText = @"Select";
-  peoplePickerController.allowsMultipleSelection = YES;
-  peoplePickerController.delegate = self;
+  self.addPersonViewController.doneButtonActionText = @"Select";
+  self.addPersonViewController.allowsMultipleSelection = YES;
+  self.addPersonViewController.delegate = self;
   
   WYPopoverBackgroundView *appearance = [WYPopoverBackgroundView appearance];
   appearance.fillTopColor = [UIColor colorWithRed:201.0/255.0 green:201.0/255.0 blue:206.0/255.0 alpha:1.0];
   self.addPersonPopoverController = [[WYPopoverController alloc]
-                                     initWithContentViewController:peoplePickerController];
+                                     initWithContentViewController:self.addPersonViewController];
   
   CGRect rect = [self.view convertRect:sender.frame fromView:sender.superview];
   [self.addPersonPopoverController presentPopoverFromRect:rect
