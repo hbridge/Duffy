@@ -40,6 +40,26 @@ def threadedSendNotifications(userIds):
 	# Send update feed msg to folks who are involved in these photos
 	notifications_util.sendRefreshFeedToUsers(users)
 
+
+def threadedPerformFullPrivateStrands(userId):
+	user = User.objects.get(id=userId)
+	feedObjects = swaps_util.getFeedObjectsForPrivateStrands(user)
+
+	try:
+		apiCache = ApiCache.objects.get(user_id=user.id)
+	except ApiCache.DoesNotExist:
+		apiCache = ApiCache.objects.create(user=user)
+
+	response = dict()
+	response['objects'] = feedObjects
+	apiCache.private_strands_data = json.dumps(response, cls=api_util.DuffyJsonEncoder)
+	apiCache.private_strands_full_last_timestamp = datetime.datetime.utcnow()
+
+	apiCache.save()
+
+	logger.info("Finished full private strand refresh for user %s" % (userId))
+	Thread(target=threadedSendNotifications, args=([userId],)).start()
+
 def processPrivateStrands(num):
 	# Look for all private strands that are dirty
 	dirtyStrands = Strand.objects.prefetch_related('photos').filter(user__isnull=False).filter(cache_dirty=True).filter(private=True).order_by('-first_photo_time')[:num]
@@ -83,6 +103,9 @@ def processPrivateStrands(num):
 			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
 			if strandObjectData:
 				responseObjectsById[strandObjectData['id']] = strandObjectData
+				logger.info("Inserted strand %s for user %s" % (strandObjectData['id'], userId))
+			else:
+				logger.info("Did not insert strand %s for user %s" (strand.id, userId))
 
 			strand.cache_dirty = False
 		responseObjects = responseObjectsById.values()
@@ -96,6 +119,10 @@ def processPrivateStrands(num):
 		apiCache.save()
 
 		Strand.bulkUpdate(strandList, ['cache_dirty'])
+		
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		if (not apiCache.private_strands_full_last_timestamp or apiCache.private_strands_full_last_timestamp < now - datetime.timedelta(minutes=3600)):
+			Thread(target=threadedPerformFullPrivateStrands, args=(userId,)).start()
 
 	Thread(target=threadedSendNotifications, args=(dirtyStrandsByUserId.keys(),)).start()
 
@@ -110,9 +137,6 @@ def main(argv):
 		if len(strandsProcessed) == 0:
 			time.sleep(.1)
 		else:
-			for strand in strandsProcessed:
-				logger.info("Processed strand %s" % (strand.id))
-
 			logger.info("Finished processing %s strands" % (len(strandsProcessed)))
 	# Find all interested users for those strands
 	# Fetch current api cache

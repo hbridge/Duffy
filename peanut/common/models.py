@@ -828,7 +828,10 @@ class ApiCache(models.Model):
 	user = models.ForeignKey(User, db_index=True, unique=True)
 	private_strands_data = CompressedTextField(null=True)
 	private_strands_data_last_timestamp = models.DateTimeField(null=True)
-
+	private_strands_full_last_timestamp = models.DateTimeField(null=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+	
 	class Meta:
 		db_table = 'strand_api_cache'
 
