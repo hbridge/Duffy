@@ -106,7 +106,7 @@ def sendUnseenPhotosFS():
 
 
 def main(argv):
-	logger.info("Starting... ")
+	logger.info("Starting Periodic Notification Script... ")
 
 	msgCount = sendUnactivatedAccountFS()
 	logger.info('Sent %s msgs for Unactivated Accounts'%(msgCount))
@@ -114,7 +114,7 @@ def main(argv):
 	msgCount = sendUnseenPhotosFS()
 	logger.info('Sent %s msgs for Unseen photos'%(msgCount))
 
-	logger.info('Finished')		
+	logger.info('Finished Periodic Notification script')		
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/strand-notifications.log',
 						level=logging.DEBUG,
