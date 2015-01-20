@@ -11,13 +11,14 @@
 
 @interface DFCreateShareInstanceController : NSObject
 
-+ (void)createShareInstanceWithPhoto:(DFPeanutFeedObject *)photo
-                      fromSuggestion:(DFPeanutFeedObject *)suggestion
-                      inviteContacts:(NSArray *)contacts
-                          addCaption:(NSString *)caption
-                parentViewController:(UIViewController *)parentViewController
-                   uiCompleteHandler:(DFVoidBlock)uiCompleteHandler
-                             success:(DFSuccessBlock)success
-                             failure:(DFFailureBlock)failure;
++ (void)createShareInstanceWithPhotos:(NSArray *)photos
+                       fromSuggestion:(DFPeanutFeedObject *)suggestion
+                       inviteContacts:(NSArray *)contacts
+                           addCaption:(NSString *)caption
+                 parentViewController:(UIViewController *)parentViewController
+                 enableOptimisticSend:(BOOL)enableOptimisticSend
+                    uiCompleteHandler:(DFVoidBlock)uiCompleteHandler
+                              success:(DFSuccessBlock)success
+                              failure:(DFFailureBlock)failure;
 
 @end

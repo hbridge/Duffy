@@ -338,11 +338,12 @@ const NSUInteger NumOutgoingNuxes = 3;
   self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];
   
   [DFCreateShareInstanceController
-   createShareInstanceWithPhoto:photo
+   createShareInstanceWithPhotos:@[photo]
    fromSuggestion:suggestion
    inviteContacts:contacts
    addCaption:caption
    parentViewController:self
+   enableOptimisticSend:YES
    uiCompleteHandler:^{
      [self gotoNextController];
    }

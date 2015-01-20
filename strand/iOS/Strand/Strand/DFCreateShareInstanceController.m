@@ -15,17 +15,18 @@
 
 @implementation DFCreateShareInstanceController
 
-+ (void)createShareInstanceWithPhoto:(DFPeanutFeedObject *)photo
-                      fromSuggestion:(DFPeanutFeedObject *)suggestion
-                      inviteContacts:(NSArray *)contacts
-                          addCaption:(NSString *)caption
-                parentViewController:(UIViewController *)parentViewController
-                   uiCompleteHandler:(DFVoidBlock)uiCompleteHandler
-                             success:(DFSuccessBlock)success
-                             failure:(DFFailureBlock)failure
++ (void)createShareInstanceWithPhotos:(NSArray *)photos
+                       fromSuggestion:(DFPeanutFeedObject *)suggestion
+                       inviteContacts:(NSArray *)contacts
+                           addCaption:(NSString *)caption
+                 parentViewController:(UIViewController *)parentViewController
+                 enableOptimisticSend:(BOOL)enableOptimisticSend
+                    uiCompleteHandler:(DFVoidBlock)uiCompleteHandler
+                              success:(DFSuccessBlock)success
+                              failure:(DFFailureBlock)failure
 {
   
-  BOOL requireServerRoundtrip = NO;
+  BOOL requireServerRoundtrip = !enableOptimisticSend;
   NSMutableArray *phoneNumbers = [NSMutableArray new];
   for (DFPeanutContact *contact in contacts) {
     [phoneNumbers addObject:contact.phone_number];
@@ -36,7 +37,7 @@
   }
   
   [[DFPeanutFeedDataManager sharedManager]
-   sharePhotoObjects:@[photo]
+   sharePhotoObjects:photos
    withPhoneNumbers:phoneNumbers
    success:^(NSArray *shareInstances, NSArray *createdPhoneNumbers) {
      DFPeanutShareInstance *shareInstance = shareInstances.firstObject;
@@ -56,7 +57,7 @@
          [DFSMSInviteStrandComposeViewController
           showWithParentViewController:parentViewController
           phoneNumbers:phoneNumbers
-          fromDate:photo.time_taken
+          fromDate:((DFPeanutFeedObject *)photos.firstObject).time_taken
           completionBlock:^(MessageComposeResult result) {
             if (success) success();
             
@@ -94,6 +95,7 @@
     [SVProgressHUD showSuccessWithStatus:@"Sent!"];
   }
 }
+
 
 
 @end

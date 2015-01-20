@@ -12,6 +12,7 @@
 #import "SVProgressHUD.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFAnalytics.h"
+#import "DFCreateShareInstanceController.h"
 
 @interface DFCreateStrandFlowViewController ()
 
@@ -140,55 +141,20 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   DFCreateStrandFlowViewController __weak *weakSelf = self;
   
-  
-  [SVProgressHUD show];
-  
-  NSArray *phoneNumbers = [self.peoplePickerController.selectedPeanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
-    return contact.phone_number;
-  }];
-  
-  [[DFPeanutFeedDataManager sharedManager]
-   sharePhotoObjects:self.selectPhotosController.selectedObjects
-   withPhoneNumbers:phoneNumbers
-   success:^(NSArray *photos, NSArray *createdPhoneNumbers) {
-     if (createdPhoneNumbers.count > 0) {
-       [self sendTextToPhoneNumbers:createdPhoneNumbers];
-     } else {
-       [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
-     }
+  [DFCreateShareInstanceController
+   createShareInstanceWithPhotos:self.selectPhotosController.selectedObjects
+   fromSuggestion:nil
+   inviteContacts:self.peoplePickerController.selectedPeanutContacts
+   addCaption:nil
+   parentViewController:self
+   enableOptimisticSend:NO
+   uiCompleteHandler:nil
+   success:^{
+     [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
    } failure:^(NSError *error) {
-     [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-     DDLogError(@"%@ create failed: %@", weakSelf.class, error);
+     [weakSelf dismissWithResult:DFCreateStrandResultFailure errorString:error.localizedDescription];
    }];
 }
-
-- (void)sendTextToPhoneNumbers:(NSArray *)phoneNumbers
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    DFPeanutFeedObject *photo = self.selectPhotosController.selectPhotosController.selectedFeedObjects.firstObject;
-    DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc] initWithRecipients:phoneNumbers locationString:nil date:photo.time_taken];
-    if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
-      // Some of the invitees aren't Strand users, send them a text
-      smsvc.messageComposeDelegate = self;
-      [self presentViewController:smsvc
-                         animated:YES
-                       completion:^{
-                         [SVProgressHUD dismiss];
-                       }];
-    } else {
-      [self dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
-    }
-  });
-}
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-                 didFinishWithResult:(MessageComposeResult)result
-{
-  
-  [self dismissWithResult:DFCreateStrandResultSuccess
-              errorString:(result == MessageComposeResultSent ? nil : @"Some invites not sent")];
-}
-
 
 - (void)dismissWithResult:(DFCreateStrandResult)result errorString:(NSString *)errorString
 {
@@ -198,18 +164,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
                                      photos:self.selectPhotosController.selectedObjects
                                    contacts:self.peoplePickerController.selectedPeanutContacts];
   
-  void (^completion)(void) = ^{
-    if (result == DFCreateStrandResultSuccess) {
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (result == DFCreateStrandResultSuccess)
-          [SVProgressHUD showSuccessWithStatus:errorString ? errorString : @"Sent!"];
-        else if (result == DFCreateStrandResultFailure)
-          [SVProgressHUD showErrorWithStatus:errorString];
-      });
-    }
-  };
-  
-  [self.presentingViewController dismissViewControllerAnimated:YES completion:completion];
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)logAnalyticsForResult:(DFCreateStrandResult)result errorString:(NSString *)errorString
