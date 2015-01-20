@@ -76,7 +76,20 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 		return logEntries
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user.id)
-		logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
+		
+		# check if this msgTypeId allows texting
+		if constants.NOTIFICATIONS_SMS_DICT[msgTypeId]:
+			logger.info("Sending txt instead %s" % user.id)
+			if (not '555555' in str(user.phone_number)):
+				msg = msg + " " + constants.NOTIFICATIONS_SMS_URL_DICT[msgTypeId]
+				sendSMS(str(user.phone_number), msg)
+				logger.debug("SMS sent to %s: %s" % (user, msg))
+			else:
+				logger.debug("Nothing sent to %s: %s" % (user, msg))
+
+			logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_SMS_SENT_INSTEAD, msg_type=msgTypeId, metadata=metadata)
+		else:
+			logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
 
 		return [logEntry]
 
