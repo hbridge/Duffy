@@ -87,7 +87,7 @@
      if (failure) failure(error);
      if (requireServerRoundtrip) {
        [SVProgressHUD showErrorWithStatus:@"Failed"];
-       uiCompleteHandler();
+       if (uiCompleteHandler) uiCompleteHandler();
      }
    }];
   
