@@ -28,46 +28,12 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def getFriendsObjectData(userId, users, includePhone = True):
-	if not isinstance(users, list) and not isinstance(users, set):
-		users = [users]
-
-	friendList = friends_util.getFriendsIds(userId)
-
-	userData = list()
-	for user in users:
-		if user.id in friendList:
-			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
-		else:
-			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
-		
-		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
-
-		if includePhone:
-			entry['phone_number'] = user.phone_number
-
-		userData.append(entry)
-
-	return userData
-
-
 
 def getBuildNumForUser(user):
 	if user.last_build_info:
 		return int(user.last_build_info.split('-')[1])
 	else:
 		return 4000
-
-
-# Need to create a key that is sortable, consistant (to deal with partial updates) and handles
-# many photos shared at once
-def getSortRanking(user, shareInstance, actions):
-	lastTimestamp = shareInstance.shared_at_timestamp
-	
-	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
-	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
-
-	return -1 * (a + b)
 
 
 #####################################################################################
