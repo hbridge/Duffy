@@ -572,9 +572,11 @@ class UsersBulkAPI(BulkCreateAPIView):
         TODO(Derek): Can this be combined with ContactEntryBulkAPI?
     """
     def pre_save(self, obj):
-        foundMatch = False 
+        foundMatch = False
+
+        phoneNum = ''.join(ele for ele in str(obj.phone_number) if ele.isdigit())
         
-        for match in phonenumbers.PhoneNumberMatcher(str(obj.phone_number), "US"):
+        for match in phonenumbers.PhoneNumberMatcher(phoneNum, "US"):
             foundMatch = True
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
             
