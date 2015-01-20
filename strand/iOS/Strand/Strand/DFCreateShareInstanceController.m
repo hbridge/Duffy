@@ -56,7 +56,7 @@
        dispatch_async(dispatch_get_main_queue(), ^{
          [DFSMSInviteStrandComposeViewController
           showWithParentViewController:parentViewController
-          phoneNumbers:phoneNumbers
+          phoneNumbers:createdPhoneNumbers
           fromDate:((DFPeanutFeedObject *)photos.firstObject).time_taken
           completionBlock:^(MessageComposeResult result) {
             if (success) success();
@@ -85,7 +85,10 @@
    } failure:^(NSError *error) {
      DDLogError(@"%@ send failed: %@", self.class, error);
      if (failure) failure(error);
-     if (requireServerRoundtrip) uiCompleteHandler();
+     if (requireServerRoundtrip) {
+       [SVProgressHUD showErrorWithStatus:@"Failed"];
+       uiCompleteHandler();
+     }
    }];
   
   if (requireServerRoundtrip) {
