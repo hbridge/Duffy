@@ -69,7 +69,7 @@ def compileData(date, length):
 	return dict(dataDictDate.items() + dataDictLocalytics.items() + dataDictUsers.items() + dataDictPhotos.items() + dataDictActions.items())
 
 def getNewUsers(date, length):
-	newUsers = User.objects.filter(product_id=2).filter(added__lt=date).filter(added__gt=date-relativedelta(days=length))
+	newUsers = User.objects.filter(product_id=2).filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(has_sms_authed=True)
 	return list(newUsers)
 
 def getUserStats(date, length, newUsers):
