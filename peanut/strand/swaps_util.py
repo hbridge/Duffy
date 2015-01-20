@@ -98,6 +98,7 @@ def getFeedObjectsForSwaps(user):
 
 	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
 
+	'''
 	if len(responseObjects) < 3:
 		lastWeekResponseObjects = list()
 		
@@ -121,6 +122,7 @@ def getFeedObjectsForSwaps(user):
 		lastWeekResponseObjects = sorted(lastWeekResponseObjects, key=lambda x: x['time_taken'], reverse=True)
 	
 		responseObjects.extend(lastWeekResponseObjects)
+	'''
 
 	return responseObjects
 
