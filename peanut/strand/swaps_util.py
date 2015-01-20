@@ -13,6 +13,53 @@ from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
 
+def uniqueObjects(seq, idfun=None): 
+   # order preserving
+   if idfun is None:
+	   def idfun(x): return x.id
+   seen = {}
+   result = []
+   for item in seq:
+	   marker = idfun(item)
+	   # in old Python versions:
+	   # if seen.has_key(marker)
+	   # but in new ones:
+	   if marker in seen: continue
+	   seen[marker] = 1
+	   result.append(item)
+   return result
+
+# Need to create a key that is sortable, consistant (to deal with partial updates) and handles
+# many photos shared at once
+def getSortRanking(user, shareInstance, actions):
+	lastTimestamp = shareInstance.shared_at_timestamp
+	
+	a = (long(lastTimestamp.strftime('%s')) % 1000000000) * 10000000
+	b = long(shareInstance.photo.time_taken.strftime('%s')) % 10000000
+
+	return -1 * (a + b)
+
+def getFriendsObjectData(userId, users, includePhone = True):
+	if not isinstance(users, list) and not isinstance(users, set):
+		users = [users]
+
+	friendList = friends_util.getFriendsIds(userId)
+
+	userData = list()
+	for user in users:
+		if user.id in friendList:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
+		else:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
+		
+		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
+
+		if includePhone:
+			entry['phone_number'] = user.phone_number
+
+		userData.append(entry)
+
+	return userData
 
 # Fetch strands we want to find neighbors on
 # Fetch neighbors rows that match strands and friends
@@ -311,19 +358,43 @@ def getActionsListUnreadCount(user, actionsData):
 	else:
 		return len(actionsData)
 
+def getFeedObjectsForInbox(user, lastTimestamp, num):
 
-### Not used anymore. Remove on next clean up
-def getIncomingBadgeCount(user):
-	count = 0
+	responseObjects = list()
 
-	# get a list of all shareInstances for this user that aren't started by this user
-	shareInstances = ShareInstance.objects.prefetch_related('users').filter(users__in=[user.id]).exclude(user=user).order_by("-updated", "id")[:100]
+	# Grab all share instances we want.  Might filter by a last timestamp for speed
+	shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp).order_by("-updated", "id")
+	if num:
+		shareInstances = shareInstances[:num]
+
+	# The above search won't find photos that this user has evaluated if the last_action_timestamp
+	# is before the given lastTimestamp
+	# So in that case, lets search for all the actions since that timestamp and add those
+	# ShareInstances into the mix to be sorted
+	recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(updated__gt=lastTimestamp).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
+	if num:
+		recentlyEvaluatedActions = recentlyEvaluatedActions[:num]
+		
 	shareInstanceIds = ShareInstance.getIds(shareInstances)
+	shareInstances = list(shareInstances)
+	for action in recentlyEvaluatedActions:
+		if action.share_instance_id and action.share_instance_id not in shareInstanceIds:
+			shareInstances.append(action.share_instance)
+		
+	# Now filter out anything that doesn't have a thumb...unless its your own photo
+	filteredShareInstances = list()
+	for shareInstance in shareInstances:
+		if shareInstance.user_id == user.id:
+			filteredShareInstances.append(shareInstance)
+		elif shareInstance.photo.thumb_filename:
+			filteredShareInstances.append(shareInstance)
+	shareInstances = filteredShareInstances
+	
+	# Now grab all the actions for these ShareInstances (comments, evals, likes)
+	shareInstanceIds = ShareInstance.getIds(shareInstances)
+	stats_util.printStats("swaps_inbox-1")
 
-	# get a list of all photo_evaluated actions by this user for those shareInstanceIds
-	actions = Action.objects.filter(share_instance_id__in=shareInstanceIds).filter(user=user).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-
-	# count how many shareInstanceids don't have an associated action
+	actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
 	actionsByShareInstanceId = dict()
 	
 	for action in actions:
@@ -331,8 +402,72 @@ def getIncomingBadgeCount(user):
 			actionsByShareInstanceId[action.share_instance_id] = list()
 		actionsByShareInstanceId[action.share_instance_id].append(action)
 
+	stats_util.printStats("swaps_inbox-2")
+
+	# Loop through all the share instances and create the feed data
 	for shareInstance in shareInstances:
-		if shareInstance.id not in actionsByShareInstanceId:
+		actions = list()
+		if shareInstance.id in actionsByShareInstanceId:
+			actions = actionsByShareInstanceId[shareInstance.id]
+
+		actions = uniqueObjects(actions)
+		objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
+
+		# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
+		objectData['sort_rank'] = getSortRanking(user, shareInstance, actions)
+		objectData['suggestion_rank'] = objectData['sort_rank']
+		responseObjects.append(objectData)
+
+	responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
+	
+	count = 0
+	for responseObject in responseObjects:
+		responseObject["debug_rank"] = count
+		count += 1
+
+	stats_util.printStats("swaps_inbox-3")
+
+	# Add in the list of all friends at the end
+	peopleIds = friends_util.getFriendsIds(user.id)
+
+	# Also add in all of the actors they're dealing with
+	for obj in responseObjects:
+		peopleIds.extend(obj['actor_ids'])
+
+	people = set(User.objects.filter(id__in=peopleIds))
+
+	peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'share_instance': -1, 'people': getFriendsObjectData(user.id, people, True)}		
+	responseObjects.append(peopleEntry)
+
+	stats_util.printStats("swaps_inbox-end")
+	return responseObjects
+
+def getUnseenPhotoCount(user):
+
+	# calculate timestamp
+	# Use greater of user.last_actions_list_request_timestamp or last action taken by the user
+	lastActionTimestamp = getLastActionTimestampByUser(user)
+
+	if lastActionTimestamp > user.last_actions_list_request_timestamp:
+		timestamp = lastActionTimestamp
+	else:
+		timestamp = user.last_actions_list_request_timestamp
+
+	responseObjects = getFeedObjectsForInbox(user, timestamp, 100)
+
+	count = 0
+
+	for responseObject in responseObjects:
+		if responseObject['evaluated'] == False:
 			count += 1
 
 	return count
+
+def getLastActionTimestampByUser(user):
+	actions = Action.objects.filter(user=user).order_by('-added')
+
+	if len(actions) > 0:
+		return action[0].added
+	else:
+		return datetime.datetime.fromtimestamp(0)
+

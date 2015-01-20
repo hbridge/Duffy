@@ -28,24 +28,6 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def uniqueObjects(seq, idfun=None): 
-   # order preserving
-   if idfun is None:
-	   def idfun(x): return x.id
-   seen = {}
-   result = []
-   for item in seq:
-	   marker = idfun(item)
-	   # in old Python versions:
-	   # if seen.has_key(marker)
-	   # but in new ones:
-	   if marker in seen: continue
-	   seen[marker] = 1
-	   result.append(item)
-   return result
-
-
-
 def getFriendsObjectData(userId, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
 		users = [users]
@@ -166,88 +148,7 @@ def swap_inbox(request):
 		else:
 			lastTimestamp = datetime.datetime.fromtimestamp(0)
 
-		responseObjects = list()
-
-		# Grab all share instances we want.  Might filter by a last timestamp for speed
-		shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp).order_by("-updated", "id")
-		if num:
-			shareInstances = shareInstances[:num]
-
-		# The above search won't find photos that this user has evaluated if the last_action_timestamp
-		# is before the given lastTimestamp
-		# So in that case, lets search for all the actions since that timestamp and add those
-		# ShareInstances into the mix to be sorted
-		recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(updated__gt=lastTimestamp).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
-		if num:
-			recentlyEvaluatedActions = recentlyEvaluatedActions[:num]
-			
-		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		shareInstances = list(shareInstances)
-		for action in recentlyEvaluatedActions:
-			if action.share_instance_id and action.share_instance_id not in shareInstanceIds:
-				shareInstances.append(action.share_instance)
-			
-		# Now filter out anything that doesn't have a thumb...unless its your own photo
-		filteredShareInstances = list()
-		for shareInstance in shareInstances:
-			if shareInstance.user_id == user.id:
-				filteredShareInstances.append(shareInstance)
-			elif shareInstance.photo.thumb_filename:
-				filteredShareInstances.append(shareInstance)
-		shareInstances = filteredShareInstances
-		
-		# Now grab all the actions for these ShareInstances (comments, evals, likes)
-		shareInstanceIds = ShareInstance.getIds(shareInstances)
-		stats_util.printStats("swaps_inbox-1")
-
-		actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
-		actionsByShareInstanceId = dict()
-		
-		for action in actions:
-			if action.share_instance_id not in actionsByShareInstanceId:
-				actionsByShareInstanceId[action.share_instance_id] = list()
-			actionsByShareInstanceId[action.share_instance_id].append(action)
-
-		stats_util.printStats("swaps_inbox-2")
-
-		# Loop through all the share instances and create the feed data
-		for shareInstance in shareInstances:
-			actions = list()
-			if shareInstance.id in actionsByShareInstanceId:
-				actions = actionsByShareInstanceId[shareInstance.id]
-
-			actions = uniqueObjects(actions)
-			objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
-
-			# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
-			objectData['sort_rank'] = getSortRanking(user, shareInstance, actions)
-			objectData['suggestion_rank'] = objectData['sort_rank']
-			responseObjects.append(objectData)
-
-		responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
-		
-		count = 0
-		for responseObject in responseObjects:
-			responseObject["debug_rank"] = count
-			count += 1
-
-		stats_util.printStats("swaps_inbox-3")
-
-		# Add in the list of all friends at the end
-		peopleIds = friends_util.getFriendsIds(user.id)
-
-		# Also add in all of the actors they're dealing with
-		for obj in responseObjects:
-			peopleIds.extend(obj['actor_ids'])
-
-		people = set(User.objects.filter(id__in=peopleIds))
-
-		peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'share_instance': -1, 'people': getFriendsObjectData(user.id, people, True)}		
-		responseObjects.append(peopleEntry)
-
-		stats_util.printStats("swaps_inbox-end")
-
-		response["objects"] = responseObjects
+		response["objects"] = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
 		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
