@@ -94,6 +94,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
                     success:(DFVoidBlock)success
                     failure:(DFFailureBlock)failure;
 
+- (void)markPhotosAsNotOnSystem:(NSMutableArray *)photoIDs success:(DFSuccessBlock)success failure:(DFFailureBlock)failure;
+
+
 /* Clears the data manager and makes way for creating a new one.
    Used when logging out of the app */
 - (void)resetManager;

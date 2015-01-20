@@ -68,35 +68,6 @@ NSString *const PhotoBasePath = @"photos/";
    }];
 }
 
-- (void)markPhotosAsNotOnSystem:(NSMutableArray *)photoIDs
-                       success:(DFPeanutRestFetchSuccess)success
-                       failure:(DFPeanutRestFetchFailure)failure
-{
-  NSMutableArray *photosToRemove = [NSMutableArray new];
-  for (NSNumber *photoID in photoIDs) {
-    DFPeanutPhoto *photo = [DFPeanutPhoto new];
-    photo.id = photoID;
-    
-    // install_num is normally the install count for the user (so if they install 2 extra times, its 2
-    //  Here we set it to -1 to say that this photo doesn't exist on any install anymore
-    photo.install_num = @(-1);
-    photo.user = [NSNumber numberWithLongLong:[[DFUser currentUser] userID]];
-    [photosToRemove addObject:photo];
-  }
-  
-  [super
-   performRequest:RKRequestMethodPOST
-   withPath:PhotoBulkBasePath
-   objects:photosToRemove
-   parameters:nil
-   forceCollection:YES
-   success:^(NSArray *resultObjects) {
-     success(resultObjects);
-   } failure:^(NSError *error) {
-     failure(error);
-   }];
-}
-
 - (void)patchPhotos:(NSArray *)peanutPhotos success:(DFPeanutRestFetchSuccess)success failure:(DFPeanutRestFetchFailure)failure
 {
   [super

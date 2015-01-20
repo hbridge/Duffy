@@ -16,7 +16,9 @@
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFPeanutSharedStrandAdapter.h"
 #import "DFPeanutActionAdapter.h"
+#import "DFPeanutPhotoAdapter.h"
 #import "DFPhotoStore.h"
+#import "DFPeanutPhoto.h"
 #import "DFPhoneNumberUtils.h"
 #import "DFAnalytics.h"
 #import "DFPeanutShareInstanceAdapter.h"
@@ -40,6 +42,7 @@
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (readonly, nonatomic, retain) DFPeanutSharedStrandAdapter *sharedStrandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutShareInstanceAdapter *shareInstanceAdapter;
+@property (readonly, nonatomic, retain) DFPeanutPhotoAdapter *photoAdapter;
 @property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
 
 @property (atomic) BOOL swapsRefreshing;
@@ -125,11 +128,6 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)processInboxFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
   BOOL updated = NO;
-  if (!currentObjects) {
-    [self processPeopleListFromInboxObjects:newObjects];
-    returnBlock(YES, newObjects);
-    return;
-  }
   
   NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
   
@@ -196,33 +194,58 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)processPrivateFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
   BOOL updated = NO;
-  if (!currentObjects) {
-    returnBlock(YES, newObjects);
-    return;
-  }
   
-  NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
+  NSMutableDictionary *combinedSectionsById = [NSMutableDictionary new];
   
-  for (DFPeanutFeedObject *object in currentObjects) {
-    [combinedObjectsById setObject:object forKey:@(object.id)];
-  }
-  
-  for (DFPeanutFeedObject *object in newObjects) {
-    DFPeanutFeedObject *existingObject = [combinedObjectsById objectForKey:@(object.id)];
-    if (!existingObject || ![existingObject isEqual:object]) {
-      updated = YES;
+  for (DFPeanutFeedObject *section in currentObjects) {
+    if ([section.objects count] > 0) {
+      [combinedSectionsById setObject:section forKey:@(section.id)];
     }
-    [combinedObjectsById setObject:object forKey:@(object.id)];
   }
-  NSArray *newCombinedObjects = [combinedObjectsById allValues];
   
-  returnBlock(updated, newCombinedObjects);
+  for (DFPeanutFeedObject *section in newObjects) {
+    DFPeanutFeedObject *existingSection = [combinedSectionsById objectForKey:@(section.id)];
+    if ([section.objects count] > 0) {
+      if (!existingSection || ![existingSection isEqual:section]) {
+        updated = YES;
+      }
+      [combinedSectionsById setObject:section forKey:@(section.id)];
+    }
+  }
+  NSArray *newCombinedSections = [combinedSectionsById allValues];
+  
+  returnBlock(updated, newCombinedSections);
 }
 /* Generic feed methods */
 - (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion
 {
   [self refreshFeedFromServer:feedType completion:completion fullRefresh:NO];
 }
+
+
+- (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
+{
+  
+  if (fullRefresh) {
+    BOOL updated = (responseHash == [self.feedLastResponseHash objectForKey:@(feedType)]);
+    if (feedType == DFInboxFeed) {
+      [self processPeopleListFromInboxObjects:newObjects];
+    }
+    returnBlock(updated, newObjects);
+  }
+  
+  if (!currentObjects) {
+    returnBlock(YES, newObjects);
+    return;
+  }
+  
+  if (feedType == DFInboxFeed) {
+    [self processInboxFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
+  } else if (feedType == DFPrivateFeed) {
+    [self processPrivateFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
+  }
+}
+
 
 - (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion fullRefresh:(BOOL)fullRefresh
 {
@@ -261,7 +284,7 @@ static DFPeanutFeedDataManager *defaultManager;
           [self.feedLastFeedTimestamp setObject:response.timestamp forKey:@(feedType)];
         }
         
-        [self processFeedOfType:feedType currentObjects:[self.feedObjects objectForKey:@(feedType)] withNewObjects:response.objects returnBlock:^(BOOL updated, NSArray *newObjects) {
+        [self processFeedOfType:feedType currentObjects:[self.feedObjects objectForKey:@(feedType)] withNewObjects:response.objects fullRefresh:fullRefresh responseHash:responseHash returnBlock:^(BOOL updated, NSArray *newObjects) {
           [self.feedObjects setObject:newObjects forKey:@(feedType)];
           if (updated) {
             [self notifyFeedChanged:feedType];
@@ -289,15 +312,6 @@ static DFPeanutFeedDataManager *defaultManager;
     [self.peanutFeedAdapter fetchInboxWithCompletion:completion parameters:parameters];
   } else if (feedType == DFPrivateFeed) {
     [self.peanutFeedAdapter fetchAllPrivateStrandsWithCompletion:completion parameters:parameters];
-  }
-}
-
-- (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
-{
-  if (feedType == DFInboxFeed) {
-    [self processInboxFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
-  } else if (feedType == DFPrivateFeed) {
-    [self processPrivateFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
   }
 }
 
@@ -909,6 +923,50 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
+- (void)markPhotosAsNotOnSystem:(NSMutableArray *)photoIDs success:(DFSuccessBlock)success failure:(DFFailureBlock)failure
+{
+  NSMutableArray *photosToRemove = [NSMutableArray new];
+  for (NSNumber *photoID in photoIDs) {
+    DFPeanutPhoto *photo = [DFPeanutPhoto new];
+    photo.id = photoID;
+    
+    // install_num is normally the install count for the user (so if they install 2 extra times, its 2
+    //  Here we set it to -1 to say that this photo doesn't exist on any install anymore
+    photo.install_num = @(-1);
+    photo.user = [NSNumber numberWithLongLong:[[DFUser currentUser] userID]];
+    [photosToRemove addObject:photo];
+  }
+  
+  [self.photoAdapter patchPhotos:photosToRemove
+   success:^(NSArray *resultObjects) {
+     
+     // Run through each photo and remove from the cached private strands.
+     // We do this so if we call delete again we don't try to update the server again
+     for (DFPeanutPhoto *deletedPhoto in resultObjects) {
+       for (DFPeanutFeedObject *section in self.privateStrandsFeedObjects) {
+         NSMutableArray *filteredObjects = [NSMutableArray new];
+         for (DFPeanutFeedObject *photo in section.objects) {
+           if (![deletedPhoto.id isEqual:@(photo.id)]) {
+             [filteredObjects addObject:photo];
+           }
+         }
+         section.objects = filteredObjects;
+       }
+       
+       DDLogInfo(@"Successfully marked photo %@ as not in the system", deletedPhoto.id);
+     }
+     // Lastly, we want to refresh our private data.
+     [self refreshFeedFromServer:DFPrivateFeed completion:^{
+       DDLogVerbose(@"Refreshed private photos data after successful delete");
+     }];
+     
+     success();
+   } failure:^(NSError *error) {
+     DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
+     failure(error);
+   }];
+}
+
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
 {
   NSDate *minDateFound;
@@ -1069,6 +1127,7 @@ static NSDictionary *nameMapping;
 @synthesize sharedStrandAdapter = _sharedStrandAdapter;
 @synthesize shareInstanceAdapter = _shareInstanceAdapter;
 @synthesize userAdapter = _userAdapter;
+@synthesize photoAdapter = _photoAdapter;
 
 @synthesize inboxFeedObjects = _inboxFeedObjects;
 @synthesize privateStrandsFeedObjects = _privateStrandsFeedObjects;
@@ -1134,6 +1193,12 @@ static NSDictionary *nameMapping;
 {
   if (!_shareInstanceAdapter) _shareInstanceAdapter = [DFPeanutShareInstanceAdapter new];
   return _shareInstanceAdapter;
+}
+
+- (DFPeanutPhotoAdapter *)photoAdapter
+{
+  if (!_photoAdapter) _photoAdapter = [DFPeanutPhotoAdapter new];
+  return _photoAdapter;
 }
 
 - (DFUserPeanutAdapter *)userAdapter

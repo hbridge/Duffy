@@ -10,10 +10,6 @@
 
 @interface DFPeanutPhotoAdapter : DFPeanutRestEndpointAdapter <DFNetworkAdapter>
 
-- (void)markPhotosAsNotOnSystem:(NSArray *)peanutPhotos
-                       success:(DFPeanutRestFetchSuccess)success
-                       failure:(DFPeanutRestFetchFailure)failure;
-
 - (void)patchPhotos:(NSArray *)peanutPhotos
             success:(DFPeanutRestFetchSuccess)success
             failure:(DFPeanutRestFetchFailure)failure;

@@ -66,17 +66,9 @@
     }
     if (photoIdsToRemove.count > 0) {
       dispatch_semaphore_t completionSemaphore = dispatch_semaphore_create(0);
-      [self.photoAdapter markPhotosAsNotOnSystem:photoIdsToRemove success:^(NSArray *resultObjects){
-        for (DFPeanutPhoto *photo in resultObjects) {
-          DDLogInfo(@"Successfully marked photo %@ as not in the system", photo.id);
-        }
-        // Lastly, we want to refresh our private data.
-        [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFPrivateFeed completion:^{
-          DDLogVerbose(@"Refreshed private photos data after successful delete");
-        }];
+      [[DFPeanutFeedDataManager sharedManager] markPhotosAsNotOnSystem:photoIdsToRemove success:^(){
         dispatch_semaphore_signal(completionSemaphore);
       } failure:^(NSError *error){
-        DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
         dispatch_semaphore_signal(completionSemaphore);
       }];
       dispatch_semaphore_wait(completionSemaphore,
