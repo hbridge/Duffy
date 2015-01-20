@@ -22,7 +22,6 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFNetworkingConstants.h"
 #import "AppDelegate.h"
-#import "DFContactsViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFSMSInviteStrandComposeViewController.h"
 #import "DFNavigationController.h"
@@ -107,17 +106,7 @@
     [mapping sectionWithTitle:@"Profile"
                        footer:@"Your Display Name will be shown to other Strand users."
                    identifier:@"profile"];
-//    [mapping button:@"Invite Friend"
-//         identifier:@"inviteUser"
-//            handler:[self inviteUserHandler]
-//       accesoryType:UITableViewCellAccessoryDisclosureIndicator];
-//    [mapping button:@"Add Friends"
-//         identifier:@"addFriends"
-//            handler:^(id object) {
-//              [self.navigationController pushViewController:[[DFContactsViewController alloc] init]
-//                                                   animated:YES];
-//            }
-//       accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+
 
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];

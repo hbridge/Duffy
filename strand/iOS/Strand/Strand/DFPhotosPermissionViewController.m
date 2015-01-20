@@ -9,7 +9,6 @@
 #import "DFPhotosPermissionViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIAlertView+DFHelpers.h"
-#import "DFLocationPermissionViewController.h"
 #import "DFAnalytics.h"
 #import "AppDelegate.h"
 #import "SAMGradientView.h"

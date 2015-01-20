@@ -1,5 +1,11 @@
 # Swap v2
 
+
+## Jan 19th, 2015 (4834)
+
+- New action bar when viewing photos that includes support for saving, deleting, and sharing your swap photos!
+- Bug fixes
+
 ## Jan 16th, 2015 (4833)
 
 - Minor bug fixes

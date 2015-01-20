@@ -12,7 +12,6 @@
 #import "NSString+DFHelpers.h"
 #import "DFAnalytics.h"
 #import "SVProgressHUD.h"
-#import "DFContactsViewController.h"
 #import "DFPhotosPermissionViewController.h"
 #import "AppDelegate.h"
 
