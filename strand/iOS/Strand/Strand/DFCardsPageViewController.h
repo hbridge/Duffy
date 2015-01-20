@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutUserObject.h"
 #import "DFPeoplePickerViewController.h"
-#import <MessageUI/MessageUI.h>
 #import "DFCreateStrandFlowViewController.h"
 #import "DFCardViewController.h"
 

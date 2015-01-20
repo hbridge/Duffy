@@ -9,7 +9,6 @@
 #import "DFNavigationController.h"
 #import "DFSelectPhotosViewController.h"
 #import "DFPeoplePickerViewController.h"
-#import <MessageUI/MessageUI.h>
 
 @class DFCreateStrandFlowViewController;
 
@@ -29,7 +28,7 @@ typedef NS_ENUM(NSInteger, DFCreateStrandResult) {
 @end
 
 
-@interface DFCreateStrandFlowViewController : DFNavigationController <DFSelectPhotosViewControllerDelegate, DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
+@interface DFCreateStrandFlowViewController : DFNavigationController <DFSelectPhotosViewControllerDelegate, DFPeoplePickerDelegate>
 
 @property (nonatomic, retain) DFSelectPhotosViewController *selectPhotosController;
 @property (nonatomic, retain) DFPeoplePickerViewController *peoplePickerController;
