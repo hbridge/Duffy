@@ -105,7 +105,11 @@ def processPrivateStrands(num):
 				responseObjectsById[strandObjectData['id']] = strandObjectData
 				logger.info("Inserted strand %s for user %s" % (strandObjectData['id'], userId))
 			else:
-				logger.info("Did not insert strand %s for user %s" (strand.id, userId))
+				if strand.id in responseObjectsById:
+					del responseObjectsById[strand.id]
+					logger.info("explicitly removed strand %s from cache for user %s" % (strand.id, userId))
+				else:
+					logger.info("Did not insert strand %s for user %s" % (strand.id, userId))
 
 			strand.cache_dirty = False
 		responseObjects = responseObjectsById.values()
