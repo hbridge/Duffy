@@ -23,6 +23,12 @@ sleep 1
 
 sleep 5
 
+/sbin/initctl stop duffy-neighboring
+sleep 1
+/sbin/initctl start duffy-neighboring
+
+sleep 5
+
 /sbin/initctl stop duffy-friends
 sleep 1
 /sbin/initctl start duffy-friends
