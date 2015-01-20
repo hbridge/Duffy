@@ -843,6 +843,7 @@ class LocationRecord(models.Model):
 	point = models.PointField(db_index=True)
 	accuracy = models.IntegerField(null=True)
 	timestamp = models.DateTimeField(null=True)
+	neighbor_evaluated = models.BooleanField(default=False)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -852,7 +853,9 @@ class LocationRecord(models.Model):
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
 
-
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		doBulkUpdate(cls, objs, attributesList)
 
 def doGetIds(cls, objs):
 	ids = list()
