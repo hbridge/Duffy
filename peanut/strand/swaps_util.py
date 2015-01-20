@@ -278,14 +278,14 @@ def getActionsList(user):
 	actionsData = list()
 
 	# Do favorites and comments
-	actions = Action.objects.prefetch_related('user', 'share_instance').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:50]
+	actions = Action.objects.prefetch_related('user', 'share_instance', 'photo').filter(photo__thumb_filename__isnull=False).exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:60]
 	for action in actions:
 		actionData = serializers.actionDataOfActionApiSerializer(user, action)
 		if actionData:
 			actionsData.append(actionData)
 
 	# Do shares to this user
-	shareInstances = ShareInstance.objects.filter(users__in=[user.id]).order_by("-added", "-id")[:100]
+	shareInstances = ShareInstance.objects.filter(photo__thumb_filename__isnull=False).filter(users__in=[user.id]).order_by("-added", "-id")[:100]
 	for shareInstance in shareInstances:
 		actionData = serializers.actionDataOfShareInstanceApiSerializer(user, shareInstance)
 
