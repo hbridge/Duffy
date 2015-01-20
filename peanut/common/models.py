@@ -574,6 +574,8 @@ class Strand(models.Model):
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2, db_index=True)
 
+	neighbor_evaluated = models.BooleanField(db_index=True, default=True)
+
 	# This is the id of the private Strand that created this.  Not doing ForeignKey because
 	#   django isn't good with recusive
 	created_from_id = models.IntegerField(null=True)

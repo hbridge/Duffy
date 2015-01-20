@@ -76,8 +76,9 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId, strandPho
 
 	if photo.time_taken < strand.first_photo_time:
 		strand.first_photo_time = photo.time_taken
-		strand.location_point = photo.location_point
-		strand.location_city = photo.location_city
+		if photo.location_point:
+			strand.location_point = photo.location_point
+			strand.location_city = photo.location_city
 		strand.save()
 	
 	# Add photo to strand
@@ -234,7 +235,7 @@ def updateOrCreateStrandNeighbors(strandNeighbors):
 
 	StrandNeighbor.bulkUpdate(neighborRowsToUpdate, ["distance_in_meters"])
 
-	return
+	return neighborRowsToCreate, neighborRowsToUpdate
 
 def checkStrandForAllPhotosEvaluated(strand):
 	if strand:

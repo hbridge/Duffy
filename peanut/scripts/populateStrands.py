@@ -18,7 +18,7 @@ django.setup()
 from django.db.models import Count, Q
 
 from peanut.settings import constants
-from common.models import Photo, Strand, User, StrandNeighbor, LocationRecord, FriendConnection, NotificationLog
+from common.models import Photo, Strand, User, LocationRecord, FriendConnection, NotificationLog
 
 from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
@@ -151,15 +151,12 @@ def threadedPingFriendsForUpdates(userIds):
 
 
 """
-	1. Put all new photos into private strands.  Keep track of new private Strands
-	2. For each new private Strand, figure out its neighbors
-
+	 Put all new photos into private strands.  Keep track of new private Strands
 """
 def main(argv):
 	maxPhotosAtTime = 50
 	timeWithinSecondsForNotification = 10 # seconds
 
-	timeWithinMinutesForNeighboring = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 	timeTakendelta = datetime.timedelta(hours=3)	
 	
 	logger.info("Starting... ")
@@ -207,8 +204,8 @@ def main(argv):
 			photoToStrandIdDict = dict()
 			photos = list(photos)
 
-			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
-			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
+			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
 			strandsCache = list(Strand.objects.prefetch_related('users', 'photos').filter(user=user).filter(private=1).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2))
 
@@ -227,7 +224,6 @@ def main(argv):
 
 			for photo in photos:
 				matchingStrands = list()
-				strandNeighbors = list()
 
 				for strand in strandsCache:		
 					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
@@ -289,114 +285,21 @@ def main(argv):
 	
 			Strand.bulkUpdate(strandsToUpdate, ['cache_dirty'])
 
-			logger.debug("Created %s new strands and updated %s, now creating neighbor rows" % (len(strandsCreated), len(strandsAddedTo)))
+			# We're doing this here so we make sure everything is processed at a minimum level before neghboring starts
+			for strand in strandsCreated:
+				strand.neighbor_evaluated = False
+			Strand.bulkUpdate(strandsCreated, ['neighbor_evaluated'])
 
+			logger.debug("Created %s new strands and updated %s" % (len(strandsCreated), len(strandsAddedTo)))
 
-			# Now go find all the strand neighbor rows we need to create
-			neighborRowsToCreate = list()
-			if len(strandsCreated) > 0:
-				strandNeighborsToCreate = list()
-
-				# Doing this to prefetch the photos data...otherwise django is dumb
-				strandsCreated = Strand.objects.prefetch_related('photos').filter(id__in=Strand.getIds(strandsCreated)).order_by('first_photo_time')
-				
-				now = datetime.datetime.now().replace(tzinfo=pytz.utc)
-				if strandsCreated[0].first_photo_time > (now - datetime.timedelta(days=30)):
-					doNoLoc = True
-				else:
-					doNoLoc = False
-				
-				#logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
-				query = Strand.objects.exclude(location_point__isnull=True).exclude(user=user).filter(product_id=2)
-
-				if doNoLoc:
-					query = query.prefetch_related('photos')
-					
-				additional = Q()
-				for strand in strandsCreated:
-					timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
-					timeLow = strand.first_photo_time - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
-
-					if strand.location_point:
-						additional = Q(additional | (Q(last_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh) & Q(location_point__within=strand.location_point.buffer(1))))
-					else:
-						additional = Q(additional | (Q(last_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)))
-
-				query = query.filter(additional)
-
-				possibleStrandNeighbors = list(query)
-
-				logger.debug("Found %s possible strand neighbors" % len(possibleStrandNeighbors))
-
-				strandsByStrandId = dict()
-				idsCreated = list()
-				for strand in strandsCreated:
-					for possibleStrandNeighbor in possibleStrandNeighbors:
-						if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor, locationRequired = False, doNoLocation = doNoLoc):
-							#usersByStrandId[possibleStrandNeighbor.id] = list(possibleStrandNeighbor.users.all())
-							strandsByStrandId[strand.id] = strand
-							strandsByStrandId[possibleStrandNeighbor.id] = possibleStrandNeighbor
-							if possibleStrandNeighbor.id < strand.id:
-								s1 = possibleStrandNeighbor
-								s2 = strand
-							else:
-								s1 = strand
-								s2 = possibleStrandNeighbor
-							# This deals de-duping
-							if (s1.id, s2.id) not in idsCreated:
-								idsCreated.append((s1.id, s2.id))
-								distance = geo_util.getDistanceBetweenStrands(s1, s2)
-								strandNeighbors.append(StrandNeighbor(strand_1_id=s1.id, strand_1_private=s1.private, strand_1_user=s1.user, strand_2_id=s2.id, strand_2_private=s2.private, strand_2_user=s2.user, distance_in_meters=distance))
-
-				
-				# Now try to find all users who were around this time
-				query = LocationRecord.objects.filter(accuracy__lt=1000)
-				additional = Q()
-				for strand in strandsCreated:
-					timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
-					timeLow = strand.first_photo_time - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
-
-					if strand.location_point:
-						additional = Q(additional | (Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh) & Q(point__within=strand.location_point.buffer(1))))
-					else:
-						additional = Q(additional | (Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh)))
-
-				query = query.filter(additional)
-
-				idsCreated = list()
-				possibleLocationRecords = list(query)
-				userBasedNeighborEntries = dict()
-				logger.debug("Found %s possible user neighbors" % len(possibleLocationRecords))
-
-				for strand in strandsCreated:
-					for locationRecord in possibleLocationRecords:
-						if strands_util.userShouldBeNeighborToStrand(strand, locationRecord):
-							distance = geo_util.getDistanceBetweenStrandAndLocationRecord(strand, locationRecord) 
-
-							# If we've already found a record, then see if this new one has a shorter distance.
-							# If so, swap in the new one
-							if (strand.id, locationRecord.user_id) in idsCreated:
-								strandNeighbor = userBasedNeighborEntries[(strand.id, locationRecord.user_id)]
-								if strandNeighbor.distance_in_meters > distance:
-									userBasedNeighborEntries[(strand.id, locationRecord.user_id)] = StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user, distance_in_meters=distance)
-
-							elif strand.user_id != locationRecord.user_id:
-								idsCreated.append((strand.id, locationRecord.user_id))
-								userBasedNeighborEntries[(strand.id, locationRecord.user_id)] = StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user, distance_in_meters=distance)
-
-				strandNeighbors.extend(userBasedNeighborEntries.values())
-
-				strands_util.updateOrCreateStrandNeighbors(strandNeighbors)
-				
-			
 			#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 			
-			logger.debug("Starting sending notifications...")
+			#logger.debug("Starting sending notifications...")
 			# Turning off notifications since the caching script should do this now.
 			# If not, then turn this back on
 			#sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 
-			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(neighborRowsToCreate), (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
+			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/stranding.log',
