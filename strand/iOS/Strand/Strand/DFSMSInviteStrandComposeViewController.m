@@ -7,6 +7,7 @@
 //
 
 #import "DFSMSInviteStrandComposeViewController.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface DFSMSInviteStrandComposeViewController ()
 
@@ -67,11 +68,33 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   return formattedDateString;
 }
 
++ (void)showWithParentViewController:(UIViewController *)parentViewController
+                        phoneNumbers:(NSArray *)phoneNumbers
+                            fromDate:(NSDate *)date
+                     completionBlock:(DFSMSComposeCompletionBlock)completionBlock
+{
+  [SVProgressHUD show];
+  DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
+                                                   initWithRecipients:phoneNumbers
+                                                   locationString:nil
+                                                   date:date];
+  if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
+    smsvc.messageComposeDelegate = smsvc;
+    [parentViewController presentViewController:smsvc animated:YES completion:^{
+      [SVProgressHUD dismiss];
+    }];
+  } else {
+    [SVProgressHUD showErrorWithStatus:@"Can't send text"];
+    if (completionBlock) completionBlock(MessageComposeResultFailed);
+  }
+}
+
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
-  [self dismissViewControllerAnimated:YES completion:nil];
+  [self dismissViewControllerAnimated:YES completion:^{
+    if (self.completionBlock) self.completionBlock(result);
+  }];
 }
-
 
 @end

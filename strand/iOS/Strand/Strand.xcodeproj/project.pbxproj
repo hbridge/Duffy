@@ -54,6 +54,7 @@
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
 		5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344C196340A0003D7546 /* DFPhotoResizer.m */; };
 		5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A40344E19646BC6003D7546 /* AudioToolbox.framework */; };
+		5A4307231A6F03DE0089C790 /* DFCreateShareInstanceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4307221A6F03DE0089C790 /* DFCreateShareInstanceController.m */; };
 		5A4501F019D07FC70075E183 /* DFPHAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4501EF19D07FC70075E183 /* DFPHAsset.m */; };
 		5A4BBD2B19B7D55500359299 /* DFPeanutFeedAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2A19B7D55500359299 /* DFPeanutFeedAdapter.m */; };
 		5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */; };
@@ -377,6 +378,8 @@
 		5A40344B196340A0003D7546 /* DFPhotoResizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoResizer.h; sourceTree = "<group>"; };
 		5A40344C196340A0003D7546 /* DFPhotoResizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoResizer.m; sourceTree = "<group>"; };
 		5A40344E19646BC6003D7546 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		5A4307211A6F03DE0089C790 /* DFCreateShareInstanceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCreateShareInstanceController.h; sourceTree = "<group>"; };
+		5A4307221A6F03DE0089C790 /* DFCreateShareInstanceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCreateShareInstanceController.m; sourceTree = "<group>"; };
 		5A4501EE19D07FC70075E183 /* DFPHAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPHAsset.h; sourceTree = "<group>"; };
 		5A4501EF19D07FC70075E183 /* DFPHAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPHAsset.m; sourceTree = "<group>"; };
 		5A4BBD2919B7D55500359299 /* DFPeanutFeedAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFeedAdapter.h; sourceTree = "<group>"; };
@@ -1384,6 +1387,8 @@
 		5AAF037819AF865E00EF021C /* Create Strand */ = {
 			isa = PBXGroup;
 			children = (
+				5A4307211A6F03DE0089C790 /* DFCreateShareInstanceController.h */,
+				5A4307221A6F03DE0089C790 /* DFCreateShareInstanceController.m */,
 				5A36816119FAD41F008EE2A7 /* DFCreateStrandFlowViewController.h */,
 				5A36816219FAD41F008EE2A7 /* DFCreateStrandFlowViewController.m */,
 				5AAF037919AF86BF00EF021C /* DFSelectPhotosViewController.h */,
@@ -2051,6 +2056,7 @@
 				65D1C2DC1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m in Sources */,
 				5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */,
 				5ACE17621A1AB96C00DE998A /* DFAlertController.m in Sources */,
+				5A4307231A6F03DE0089C790 /* DFCreateShareInstanceController.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
 				5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */,
 				5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */,

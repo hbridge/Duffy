@@ -23,6 +23,7 @@
 #import "DFAnalytics.h"
 #import "DFBackgroundLocationManager.h"
 #import "DFPeanutShareInstance.h"
+#import "DFCreateShareInstanceController.h"
 
 @interface DFCardsPageViewController ()
 
@@ -336,57 +337,17 @@ const NSUInteger NumOutgoingNuxes = 3;
   
   self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];
   
-  NSArray *phoneNumbers = [contacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
-    return contact.phone_number;
-  }];
-  
-  [[DFPeanutFeedDataManager sharedManager]
-   sharePhotoObjects:@[photo]
-   withPhoneNumbers:phoneNumbers
-   success:^(NSArray *shareInstances, NSArray *createdPhoneNumbers) {
-     DFPeanutShareInstance *shareInstance = shareInstances.firstObject;
-     if ([caption isNotEmpty]) {
-       [[DFPeanutFeedDataManager sharedManager]
-        addComment:caption
-        toPhotoID:shareInstance.photo.longLongValue
-        shareInstance:shareInstance.id.longLongValue
-        success:^(DFActionID actionID) {
-          
-        } failure:^(NSError *error) {
-          
-        }];
-     }
-     if (createdPhoneNumbers.count > 0) {
-       [self sendTextToPhoneNumbers:createdPhoneNumbers forPhoto:photo];
-     }
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ send failed: %@", self.class, error);
-   }];
-  
-  [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-  [self gotoNextController];
-}
-
-- (void)sendTextToPhoneNumbers:(NSArray *)phoneNumbers forPhoto:(DFPeanutFeedObject *)photo
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc] initWithRecipients:phoneNumbers locationString:nil date:photo.time_taken];
-    if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
-      // Some of the invitees aren't Strand users, send them a text
-      smsvc.messageComposeDelegate = self;
-      [self presentViewController:smsvc
-                         animated:YES
-                       completion:^{
-                         [SVProgressHUD dismiss];
-                       }];
-    }
-  });
-}
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-                 didFinishWithResult:(MessageComposeResult)result
-{
-  [self dismissViewControllerAnimated:YES completion:nil];
+  [DFCreateShareInstanceController
+   createShareInstanceWithPhoto:photo
+   fromSuggestion:suggestion
+   inviteContacts:contacts
+   addCaption:caption
+   parentViewController:self
+   uiCompleteHandler:^{
+     [self gotoNextController];
+   }
+   success:nil
+   failure:nil];
 }
 
 - (void)photoSkipped:(DFPeanutFeedObject *)photo

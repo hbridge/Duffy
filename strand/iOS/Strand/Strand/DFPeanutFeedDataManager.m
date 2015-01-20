@@ -1065,9 +1065,10 @@ static DFPeanutFeedDataManager *defaultManager;
   [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
     DDLogError(@"%@ added comment: %@", [DFPeanutFeedDataManager class], resultObjects.firstObject);
     DFPeanutAction *newComment = [resultObjects firstObject];
-    success(newComment.id.longLongValue);
+    if (success) success(newComment.id.longLongValue);
   } failure:^(NSError *error) {
     DDLogError(@"%@ adding comment error:%@", [DFPeanutFeedDataManager class], error);
+    if (failure) failure(error);
   }];
 }
 
