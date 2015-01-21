@@ -650,8 +650,8 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (BOOL)isUserFriend:(DFUserIDType)userID
 {
-  for (DFUser *user in [self friendsList]) {
-    if (user.userID == userID) return YES;
+  for (DFPeanutUserObject *user in [self friendsList]) {
+    if (user.id == userID) return YES;
   }
   
   return NO;
