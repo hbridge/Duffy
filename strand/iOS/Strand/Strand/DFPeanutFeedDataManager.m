@@ -682,13 +682,12 @@ static DFPeanutFeedDataManager *defaultManager;
 
 
 
-- (void)usersThatFriendedUser:(DFUserIDType)user
-                      success:(void (^)(NSArray *users))success
-                      failure:(DFFailureBlock)failure
+- (NSArray *)usersThatFriendedUser:(DFUserIDType)user excludeFriends:(BOOL)excludeFriends;
 {
   #warning incomplete implementation
-  success(self.friendsList);
+  return self.friendsList;
 }
+
 - (void)setUser:(DFUserIDType)user
       isFriends:(BOOL)isFriends
     withUserIDs:(NSArray *)otherUserIDs

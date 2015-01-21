@@ -61,22 +61,20 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (NSArray *)friendsList;
 - (BOOL)isUserFriend:(DFUserIDType)userID;
-- (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
-- (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
-/* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
-- (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
-                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success
-                        failure:(DFFailureBlock)failure;
-- (void)usersThatFriendedUser:(DFUserIDType)user
-                      success:(void (^)(NSArray *users))resultBlock
-                      failure:(DFFailureBlock)failure;
+- (NSArray *)usersThatFriendedUser:(DFUserIDType)user excludeFriends:(BOOL)excludeFriends;
 - (void)setUser:(DFUserIDType)user
       isFriends:(BOOL)isFriends
     withUserIDs:(NSArray *)otherUserIDs
         success:(DFSuccessBlock)success
         failure:(DFFailureBlock)failure;
 
-
+/* User lookup */
+- (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
+- (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
+/* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
+- (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
+                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success
+                        failure:(DFFailureBlock)failure;
 /* 
  Suggestions and Photos
  */
