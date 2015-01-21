@@ -122,6 +122,8 @@ def processStrands():
 		query = query.filter(additional)
 
 		possibleLocationRecords = list(query)
+
+		logger.info("Found %s possible location records" % (len(possibleLocationRecords)))
 	
 		userStrandNeighbors = processLocationsAndStrands(possibleLocationRecords, nonNeighboredStrands)
 		strandNeighbors.extend(userStrandNeighbors)

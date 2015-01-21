@@ -72,13 +72,14 @@ def processPrivateStrands(num):
 			dirtyStrandsByUserId[strand.user_id] = list()
 		dirtyStrandsByUserId[strand.user_id].append(strand)
 
+	usersIdsToSendNotificationsTo = list()
 	for userId, strandList in dirtyStrandsByUserId.iteritems():
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
 			logger.error("Couldn't find user: %s" % userId)
 			continue
-			
+						
 		friends = friends_util.getFriends(user.id)
 
 		for strand in strandList:
@@ -99,7 +100,13 @@ def processPrivateStrands(num):
 			for responseObject in responseObjects:
 				responseObjectsById[responseObject['id']] = responseObject
 
+		strandsProcessed = list()
 		for strand in strandList:
+			# Stranding might not have added all the photos yet, so wait a bit
+			if len(strand.photos.all()) == 0:
+				logger.info("Skipped strand %s because of 0 photos" % (strand.id))
+				continue
+				
 			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
 			if strandObjectData:
 				responseObjectsById[strandObjectData['id']] = strandObjectData
@@ -112,6 +119,7 @@ def processPrivateStrands(num):
 					logger.info("Did not insert strand %s for user %s" % (strand.id, userId))
 
 			strand.cache_dirty = False
+			strandsProcessed.append(strand)
 		responseObjects = responseObjectsById.values()
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
 
@@ -122,13 +130,16 @@ def processPrivateStrands(num):
 
 		apiCache.save()
 
-		Strand.bulkUpdate(strandList, ['cache_dirty'])
+		Strand.bulkUpdate(strandsProcessed, ['cache_dirty'])
 		
+		if len(strandsProcessed) > 0:
+			usersIdsToSendNotificationsTo.append(userId)
+			
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		if (not apiCache.private_strands_full_last_timestamp or apiCache.private_strands_full_last_timestamp < now - datetime.timedelta(minutes=3600)):
 			Thread(target=threadedPerformFullPrivateStrands, args=(userId,)).start()
 
-	Thread(target=threadedSendNotifications, args=(dirtyStrandsByUserId.keys(),)).start()
+	Thread(target=threadedSendNotifications, args=(usersIdsToSendNotificationsTo,)).start()
 
 	return dirtyStrands
 
