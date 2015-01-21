@@ -10,6 +10,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "UIDevice+DFHelpers.h"
 #import "DFGalleryViewController.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface DFFriendProfileViewController ()
 
@@ -31,6 +32,7 @@
   }
   return self;
 }
+
 
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -64,7 +66,21 @@
     [self.view insertSubview:visualEffectView belowSubview:self.headerView];
     [visualEffectView.contentView addSubview:self.headerView];
     
-    //self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
+    // friend button
+    self.friendButton.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.4];
+    
+    [self configureFriendButton:[[DFPeanutFeedDataManager sharedManager] isUserFriend:self.peanutUser.id]];
+  }
+}
+
+- (void)configureFriendButton:(BOOL)isUserFriended
+{
+  if (isUserFriended) {
+    [self.friendButton setTitle:@"Friend" forState:UIControlStateNormal];
+    [self.friendButton setImage:[UIImage imageNamed:@"Assets/Icons/ToggleButtonCheck"] forState:UIControlStateNormal];
+  } else {
+    [self.friendButton setTitle:@"Add" forState:UIControlStateNormal];
+    [self.friendButton setImage:[UIImage imageNamed:@"Assets/Icons/ToggleButtonPlus"] forState:UIControlStateNormal];
   }
 }
 
@@ -140,12 +156,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self markSuggestionsSeen];
-}
-
-- (void)markSuggestionsSeen
-{
-  
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -168,6 +178,28 @@
 
 - (IBAction)backButtonPressed:(id)sender {
   [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)friendButtonPressed:(id)sender {
+  BOOL isFriends = [[DFPeanutFeedDataManager sharedManager] isUserFriend:self.peanutUser.id];
+  BOOL newFriendValue = !isFriends;
+  [SVProgressHUD show];
+  [[DFPeanutFeedDataManager sharedManager]
+   setUser:[[DFUser currentUser] userID]
+   isFriends:newFriendValue
+   withUserIDs:@[@(self.peanutUser.id)]
+   success:^{
+     if (newFriendValue) {
+       [SVProgressHUD showSuccessWithStatus:@"Added Friend!"];
+     } else {
+       [SVProgressHUD showSuccessWithStatus:@"Removed Friend"];
+     }
+     [self configureFriendButton:newFriendValue];
+   } failure:^(NSError *error) {
+     [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Error: %@",
+                                         error.localizedDescription]];
+   }];
+  
 }
 
 @end

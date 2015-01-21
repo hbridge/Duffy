@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GBFlatButton/GBFlatButton.h>
 #import "DFPeanutUserObject.h"
 #import "DFProfileStackView.h"
+
 
 @interface DFFriendProfileViewController : UIViewController
 
@@ -18,8 +20,10 @@
 @property (nonatomic, retain) DFPeanutUserObject *peanutUser;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
+@property (weak, nonatomic) IBOutlet GBFlatButton *friendButton;
 
 - (instancetype)initWithPeanutUser:(DFPeanutUserObject *)peanutUser;
+- (IBAction)friendButtonPressed:(id)sender;
 
 
 

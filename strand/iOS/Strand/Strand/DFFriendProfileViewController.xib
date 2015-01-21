@@ -8,6 +8,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFFriendProfileViewController">
             <connections>
                 <outlet property="backButton" destination="iNL-1h-xwh" id="lkP-s1-kax"/>
+                <outlet property="friendButton" destination="d9R-6B-DbB" id="S4F-bA-s1I"/>
                 <outlet property="headerView" destination="Nc7-0m-VWp" id="1r7-Pk-KJe"/>
                 <outlet property="nameLabel" destination="QmR-gx-IVb" id="fwW-HM-SAF"/>
                 <outlet property="profilePhotoStackView" destination="vRE-Zm-eLd" id="cTL-HM-6xQ"/>
@@ -53,6 +54,21 @@
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d9R-6B-DbB" userLabel="Friend toggle button" customClass="GBFlatButton">
+                            <rect key="frame" x="508" y="38" width="84" height="28"/>
+                            <color key="backgroundColor" red="0.42352941179999998" green="0.81960784310000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="contentEdgeInsets" minX="14" minY="5" maxX="15" maxY="5"/>
+                            <inset key="titleEdgeInsets" minX="0.0" minY="0.0" maxX="-4" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="-4" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" title="Friend" image="ToggleButtonCheck.png">
+                                <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="friendButtonPressed:" destination="-1" eventType="touchUpInside" id="Fk8-Jb-sNB"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="0.089999999999999997" colorSpace="calibratedWhite"/>
                     <constraints>
@@ -60,6 +76,8 @@
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="leading" secondItem="iNL-1h-xwh" secondAttribute="trailing" constant="-14" id="3EU-g5-hVt"/>
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="top" secondItem="Nc7-0m-VWp" secondAttribute="top" constant="26" id="7y4-7d-Jeb"/>
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="centerY" secondItem="iNL-1h-xwh" secondAttribute="centerY" id="8BO-l4-ZqK"/>
+                        <constraint firstItem="vRE-Zm-eLd" firstAttribute="centerY" secondItem="d9R-6B-DbB" secondAttribute="centerY" constant="-3.5" id="GC8-5n-bkX"/>
+                        <constraint firstAttribute="trailing" secondItem="d9R-6B-DbB" secondAttribute="trailing" constant="8" id="Lfj-am-jnO"/>
                         <constraint firstItem="iNL-1h-xwh" firstAttribute="leading" secondItem="Nc7-0m-VWp" secondAttribute="leading" id="OHx-hW-qvF"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="centerY" secondItem="vRE-Zm-eLd" secondAttribute="centerY" constant="-8" id="UGE-Vw-JF4"/>
                         <constraint firstAttribute="bottom" secondItem="vRE-Zm-eLd" secondAttribute="bottom" constant="13" id="YIu-BY-bSO"/>
@@ -78,9 +96,11 @@
                 <constraint firstItem="Nc7-0m-VWp" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="bW4-Be-R0R"/>
             </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <point key="canvasLocation" x="314" y="367"/>
         </view>
     </objects>
     <resources>
         <image name="Assets/Icons/BackBarButtonIcon" width="16" height="16"/>
+        <image name="ToggleButtonCheck.png" width="11" height="11"/>
     </resources>
 </document>
