@@ -80,7 +80,7 @@ def getFeedObjectsForSwaps(user):
 	responseObjects = list()
 	strandIdsAlreadyIncluded = list()
 
-	friends = friends_util.getFriends(user.id)
+	fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(user.id)
 
 	# on dev, we want a larger window to test in simulators
 	if '555555' in str(user.phone_number):
@@ -92,14 +92,14 @@ def getFeedObjectsForSwaps(user):
 	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(suggestible=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
 	stats_util.printStats("swaps-recent-cache")
 	
-	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, recentStrands, True, friends)
+	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, recentStrands, True, fullFriends)
 	stats_util.printStats("swaps-b")
 	
 	actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
 	stats_util.printStats("swaps-d")
 		
 	for strand in strands:
-		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, fullFriends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
 		if strandObjectData:
 			strandIdsAlreadyIncluded.append(strand.id)
 			# Make sure the photos appear in reverse order
