@@ -14,6 +14,7 @@ import django
 django.setup()
 
 from django.db.models import Q
+from django import db
 
 from common.models import Photo
 from common import location_util
@@ -126,6 +127,7 @@ def main(argv):
 	logger.info("Starting... ")
 	baseQuery = Photo.objects.all().filter(twofishes_data=None)
 	while True:
+		db.reset_queries()
 		# If we have the iphone metadata or we have location_point
 		photos = baseQuery.filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False))
 

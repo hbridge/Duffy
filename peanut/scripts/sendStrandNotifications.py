@@ -13,6 +13,7 @@ django.setup()
 
 from django.db.models import Count
 from django.db.models import Q
+from django import db
 
 from peanut.settings import constants
 from common.models import ShareInstance, User, LocationRecord, NotificationLog
@@ -96,6 +97,7 @@ def main(argv):
 	locationBigTimedelta = datetime.timedelta(days=3)
 	
 	while True:
+		db.reset_queries()
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		notificationsSent = list()
 

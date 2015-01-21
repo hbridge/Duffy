@@ -17,6 +17,8 @@ import django
 
 django.setup()
 
+from django import db
+
 from strand import swaps_util, friends_util
 from common.models import Strand, User, ApiCache
 
@@ -147,6 +149,7 @@ def main(argv):
 	stats_util.startProfiling()
 	
 	while True:
+		db.reset_queries()
 		strandsProcessed = processPrivateStrands(50)
 
 		if len(strandsProcessed) == 0:

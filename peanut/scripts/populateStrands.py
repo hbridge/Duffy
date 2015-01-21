@@ -15,6 +15,7 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
+from django import db
 from django.db.models import Count, Q
 
 from peanut.settings import constants
@@ -161,6 +162,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
+		db.reset_queries()
 		strandPhotosToCreate = list()
 		strandUsersToCreate = list()
 
