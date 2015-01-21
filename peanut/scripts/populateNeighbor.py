@@ -181,15 +181,15 @@ def processLocationRecords():
 	
 def main(argv):
 	logger.info("Starting... ")
-
+	gcNeeded = False
+	
 	while True:
-		gcNeeded = False
 		strandsProcessed = processStrands()
 
 		locationRecordsProcessed = processLocationRecords()
 
 		if len(strandsProcessed) > 0 or len(locationRecordsProcessed) > 0:
-			gcNeeded  = True
+			gcNeeded = True
 			
 		if len(strandsProcessed) == 0 and len(locationRecordsProcessed) == 0:
 			if gcNeeded:
