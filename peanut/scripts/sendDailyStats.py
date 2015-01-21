@@ -17,9 +17,14 @@ from django.db.models import Count, Sum
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import User, FriendConnection, Action, Photo, StrandNeighbor, ShareInstance
+from common.models import User, FriendConnection, Action, Photo, StrandNeighbor, ShareInstance, NotificationLog
 
 logger = logging.getLogger(__name__)
+
+###############################
+### Data fetching functions ###
+###############################
+
 
 def compileData(date, length):
 
@@ -147,51 +152,49 @@ def getTotals(date):
 
 	return dataDict
 
-def dataDictTotalsToString(dataDict):
-	msg = "\n--- TOTALS ---\n"
-	msg += "User Accounts: " + str(dataDict['TotalUserAccounts']) + "\n"
-	msg += "Friends: " + str(dataDict['TotalFriends']) + "\n"
-	msg += "Share Instances: " + str(dataDict['TotalShareInstances']) + "\n"
-	msg += "Photos (metadata): " + str(dataDict['TotalPhotosMetadata']) + "\n"	
+def calcNotificationData(date):
 
-	return msg
+	NOTIFICATIONS_USED_DICT = {
+		constants.NOTIFICATIONS_NEW_PHOTO_ID : True,
+		constants.NOTIFICATIONS_JOIN_STRAND_ID : False,
+		constants.NOTIFICATIONS_PHOTO_FAVORITED_ID : True,
+		constants.NOTIFICATIONS_FETCH_GPS_ID : True,
+		constants.NOTIFICATIONS_UNSEEN_PHOTOS_FS : False,
+		constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS : True,
+		constants.NOTIFICATIONS_REFRESH_FEED : True,
+		constants.NOTIFICATIONS_SOCKET_REFRESH_FEED: True,	
+		constants.NOTIFICATIONS_INVITED_TO_STRAND : False,
+		constants.NOTIFICATIONS_ACCEPTED_INVITE : False,
+		constants.NOTIFICATIONS_RETRO_FIRESTARTER : False,
+		constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS : False,
+		constants.NOTIFICATIONS_PHOTO_COMMENT : True,
+		constants.NOTIFICATIONS_NEW_SUGGESTION : True,
+	}
 
-def dataDictToString(dataDict, length):
+	dataDict = dict()
 
-	msg = "\n" + str(length) + "-day stats for " + dataDict['date'] + "\n"
+	dataDict['date'] = (date-relativedelta(days=1)).strftime('%m/%d/%y')
 
-	# users	
-	msg += "\n--- USERS ---\n"
-	msg += "Localytics Users: " + str(dataDict['LocalyticsActiveUsers']) + "\n"
-	msg += "Active Users: " + str(dataDict['ActiveUsers']) + "\n"
-	msg += "New Users: " + str(dataDict['NewUsers']) + "\n"
-	msg += "New Friends: " + str(dataDict['NewFriends']) + "\n"
-	msg += "Check-ins: " + str(dataDict['CheckIns']) + "\n"
-	msg += "Location Updates: " + str(dataDict['LocationUpdates']) + "\n"	
+	for key, item in NOTIFICATIONS_USED_DICT.items():
+		if item:
+			sent, userCount = notificationCountsHelper(key, date)
+			dataDict['NotificationID'+ str(key) +'Sent'] = sent
+			dataDict['NotificationID'+ str(key) +'Users'] = userCount	
+	return dataDict
 
-	# photos, old users
-	msg += "\n--- PHOTOS (OLD USERS) ---\n"
-	msg += "Photos Uploaded: " + format(dataDict['PhotosUploadedOldUsers'], ",d") + "\n"
-	msg += "Photos Shared: " + format(dataDict['PhotosSharedOldUsers'], ",d") + "\n"
+def notificationCountsHelper(msgTypeId, date):
 
-	# photos, new users
-	msg += "\n--- PHOTOS (NEW USERS) ---\n"
-	msg += "Photos Uploaded: " + format(dataDict['PhotosUploadedNewUsers'], ",d") + "\n"
-	msg += "Photos Shared: " + format(dataDict['PhotosSharedNewUsers'], ",d") + "\n"
+	notificationLogs = NotificationLog.objects.filter(added__lt=date).filter(added__gt=date-timedelta(days=1)).filter(msg_type=msgTypeId).filter(Q(result=constants.IOS_NOTIFICATIONS_RESULT_SENT) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_SMS_SENT_INSTEAD))
 
-	# actions, old users
-	msg += "\n--- ACTIONS (OLD USERS) ---\n"
-	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsOldUsers']) + '\n'		
-	msg += "Favorites: " + str(dataDict['FavsOldUsers']) + '\n'
-	msg += "Comments: " + str(dataDict['CommentsOldUsers']) + '\n'
+	sent = len(notificationLogs)
+	userSet = set()
+	for nLog in notificationLogs:
+		userSet.add(nLog.user)
 
-	# actions, new users
-	msg += "\n--- ACTIONS (NEW USERS) ---\n"	
-	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsNewUsers']) + '\n'			
-	msg += "Favorites: " + str(dataDict['FavsNewUsers']) + '\n'
-	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'
+	userList = list(userSet)
+	userCount = len(userList)
 
-	return msg
+	return sent, userCount
 
 def getStatsFromLocalytics(date, length):
 
@@ -248,6 +251,91 @@ def getStatsFromLocalytics(date, length):
 	logger.info("Not found!")
 	return {'LocalyticsActiveUsers': ''}
 
+###############################
+### Rendering functions     ###
+###############################
+
+def dataDictToString(dataDict, title, html=False):
+	if html:
+		string = '<p>' + title.upper() + '<\p>'
+	else:
+		string = '\n' + title.upper() + '\n'
+
+	for key,item in dataDict.items():
+		if key != 'date':
+			val = "%s: %s"%(key,item)
+			if html:
+				string += '<p>' + val + '<\p>'
+			else:
+				string += val + '\n'
+	return string
+
+
+def dataDictTotalsToString(dataDict):
+	msg = "\n--- TOTALS ---\n"
+	msg += "User Accounts: " + str(dataDict['TotalUserAccounts']) + "\n"
+	msg += "Friends: " + str(dataDict['TotalFriends']) + "\n"
+	msg += "Share Instances: " + str(dataDict['TotalShareInstances']) + "\n"
+	msg += "Photos (metadata): " + str(dataDict['TotalPhotosMetadata']) + "\n"	
+
+	return msg
+
+def dataDictToStringOld(dataDict, length):
+
+	msg = "\n" + str(length) + "-day stats for " + dataDict['date'] + "\n"
+
+	# users	
+	msg += "\n--- USERS ---\n"
+	msg += "Localytics Users: " + str(dataDict['LocalyticsActiveUsers']) + "\n"
+	msg += "Active Users: " + str(dataDict['ActiveUsers']) + "\n"
+	msg += "New Users: " + str(dataDict['NewUsers']) + "\n"
+	msg += "New Friends: " + str(dataDict['NewFriends']) + "\n"
+	msg += "Check-ins: " + str(dataDict['CheckIns']) + "\n"
+	msg += "Location Updates: " + str(dataDict['LocationUpdates']) + "\n"	
+
+	# photos, old users
+	msg += "\n--- PHOTOS (OLD USERS) ---\n"
+	msg += "Photos Uploaded: " + format(dataDict['PhotosUploadedOldUsers'], ",d") + "\n"
+	msg += "Photos Shared: " + format(dataDict['PhotosSharedOldUsers'], ",d") + "\n"
+
+	# photos, new users
+	msg += "\n--- PHOTOS (NEW USERS) ---\n"
+	msg += "Photos Uploaded: " + format(dataDict['PhotosUploadedNewUsers'], ",d") + "\n"
+	msg += "Photos Shared: " + format(dataDict['PhotosSharedNewUsers'], ",d") + "\n"
+
+	# actions, old users
+	msg += "\n--- ACTIONS (OLD USERS) ---\n"
+	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsOldUsers']) + '\n'		
+	msg += "Favorites: " + str(dataDict['FavsOldUsers']) + '\n'
+	msg += "Comments: " + str(dataDict['CommentsOldUsers']) + '\n'
+
+	# actions, new users
+	msg += "\n--- ACTIONS (NEW USERS) ---\n"	
+	msg += "Photos Eval'd: " + str(dataDict['PhotoEvalsNewUsers']) + '\n'			
+	msg += "Favorites: " + str(dataDict['FavsNewUsers']) + '\n'
+	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'
+
+	return msg
+
+def genHTML(emailBody):
+	time = (datetime.now() - datetime(1970,1,1)).total_seconds()
+	html = "<html><body>"
+	html += '<h2> 7-day users </h2>'
+	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image&rand=' + str(time) + '">'
+	html += '<h4>* Localytics only has 7-day actives for Mondays. No rolling 7-day actives.</h4>'
+	html += '<h2> 1-day users </h2>'
+	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=60601290&format=image&rand=' + str(time) + '">'
+	html += '<h2> Actions </h2>'
+	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=1473168963&format=image&rand='+ str(time) + '">'
+	html += '<h3><a href ="https://docs.google.com/a/duffytech.co/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/edit#gid=1659973534">Raw data and stats</a></h3>'
+	html += '<pre>' + emailBody + '</pre>'	
+	html +="</body></html>"
+	return html
+
+###############################
+### Publishing functions    ###
+###############################
+
 def writeToSpreadsheet(dataDict, length):
 
 	gdClient = gdata.spreadsheet.service.SpreadsheetsService()
@@ -265,13 +353,16 @@ def writeToSpreadsheet(dataDict, length):
 		worksheetId = idParts[len(idParts) - 1]
 	elif length == 0: #used for totals worksheet, where length doesn't matter
 		idParts = feed.entry[2].id.text.split('/')
-		worksheetId = idParts[len(idParts) - 1]	
+		worksheetId = idParts[len(idParts) - 1]
+	elif length == -1:
+		idParts = feed.entry[3].id.text.split('/')
+		worksheetId = idParts[len(idParts) - 1]		
 	else:
 		logger.info("...FAILED: Invalid length field. Not writing to spreadsheet!")
 		return False
 
 	# convert all keys to lowercase (Gdata requirement) and all values to string
-	cleanedUpDict = dict((k.lower(), str(v)) for k,v in dataDict.iteritems())		
+	cleanedUpDict = dict((k.lower().replace(" ", ""), str(v)) for k,v in dataDict.iteritems())		
 
 	# get the existing feed, so we can upate right entry
 	# Note: we need to updateRow, instead of InsertRow. GData graphing quirks
@@ -293,20 +384,14 @@ def writeToSpreadsheet(dataDict, length):
 
 	return False
 
-def genHTML(emailBody):
-	time = (datetime.now() - datetime(1970,1,1)).total_seconds()
-	html = "<html><body>"
-	html += '<h2> 7-day users </h2>'
-	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=865122525&format=image&rand=' + str(time) + '">'
-	html += '<h4>* Localytics only has 7-day actives for Mondays. No rolling 7-day actives.</h4>'
-	html += '<h2> 1-day users </h2>'
-	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=60601290&format=image&rand=' + str(time) + '">'
-	html += '<h2> Actions </h2>'
-	html += '<img height="288" width="465" src="https://docs.google.com/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/pubchart?oid=1473168963&format=image&rand='+ str(time) + '">'
-	html += '<h3><a href ="https://docs.google.com/a/duffytech.co/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/edit#gid=1659973534">Raw data and stats</a></h3>'
-	html += '<pre>' + emailBody + '</pre>'	
-	html +="</body></html>"
-	return html
+def sendEmailOut(txtBody, htmlBody):
+	emailTo = ['swap-stats@duffytech.co']
+	emailSubj = 'Daily Stats'
+	email = EmailMultiAlternatives(emailSubj, txtBody, 'prod@duffyapp.com',emailTo, 
+		[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
+	email.attach_alternative(htmlBody, "text/html")
+	email.send(fail_silently=False)
+	logger.info('Email Sent to: ' + ' '.join(emailTo))
 
 
 def main(argv):
@@ -328,15 +413,20 @@ def main(argv):
 
 	logger.info("Generating stats for %s " % (date-relativedelta(days=1)).strftime('%m/%d/%y'))
 
-	# Compile data
+	# Compile data for users and activity
 	dataDict1day = compileData(date, 1)
 	dataDict7day = compileData(date, 7)
 	dataDictTotals = getTotals(date)
 
+	# Compile data for notifications and resulting activity
+	dataDictNotifications = calcNotificationData(date)
+	logger.info(dataDictNotifications)
+
 	# compile string to publish to console and/or email
-	emailBody = dataDictToString(dataDict7day, 7)
-	emailBody += dataDictToString(dataDict1day, 1)
+	emailBody = dataDictToStringOld(dataDict7day, 7)
+	emailBody += dataDictToStringOld(dataDict1day, 1)
 	emailBody += dataDictTotalsToString(dataDictTotals)
+	emailBody += dataDictToString(dataDictNotifications, '--- Notifications ---', False)
 
 	logger.info(emailBody)
 
@@ -355,16 +445,13 @@ def main(argv):
 		writeTotals = writeToSpreadsheet(dataDictTotals, 0)
 		if writeTotals:
 			logger.info('...Published Totals stats')
+		writeNotifications = writeToSpreadsheet(dataDictNotifications, -1)
+		if writeNotifications:
+			logger.info('...Published Notification stats')
 
 	# Send to email
 	if sendEmail:
-		emailTo = ['swap-stats@duffytech.co']
-		emailSubj = 'Daily Stats'
-		email = EmailMultiAlternatives(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
-			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
-		email.attach_alternative(html, "text/html")
-		email.send(fail_silently=False)
-		logger.info('Email Sent to: ' + ' '.join(emailTo))
+		sendEmailOut(emailBody, html)
 
 	if not publishToSpreadSheet and not sendEmail:
 		print 'TEST RUN: Email not sent and nothing published.'
