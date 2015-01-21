@@ -70,9 +70,11 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
                       success:(void (^)(NSArray *users))resultBlock
                       failure:(DFFailureBlock)failure;
 - (void)setUser:(DFUserIDType)user
-hasFriendedUsers:(NSArray *)otherUserIDs
+      isFriends:(BOOL)isFriends
+    withUserIDs:(NSArray *)otherUserIDs
         success:(DFSuccessBlock)success
         failure:(DFFailureBlock)failure;
+
 
 /* 
  Suggestions and Photos

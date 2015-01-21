@@ -681,7 +681,8 @@ static DFPeanutFeedDataManager *defaultManager;
   success(self.friendsList);
 }
 - (void)setUser:(DFUserIDType)user
-hasFriendedUsers:(NSArray *)otherUserIDs
+      isFriends:(BOOL)isFriends
+    withUserIDs:(NSArray *)otherUserIDs
         success:(DFSuccessBlock)success
         failure:(DFFailureBlock)failure
 {
