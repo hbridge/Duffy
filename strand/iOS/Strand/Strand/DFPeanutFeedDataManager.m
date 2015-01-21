@@ -648,6 +648,15 @@ static DFPeanutFeedDataManager *defaultManager;
   return friends;
 }
 
+- (BOOL)isUserFriend:(DFUserIDType)userID
+{
+  for (DFUser *user in [self friendsList]) {
+    if (user.userID == userID) return YES;
+  }
+  
+  return NO;
+}
+
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
 {
   if (userID == [[DFUser currentUser] userID]) return [[DFUser currentUser] peanutUser];

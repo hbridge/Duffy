@@ -60,6 +60,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
  */
 
 - (NSArray *)friendsList;
+- (BOOL)isUserFriend:(DFUserIDType)userID;
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
 - (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
 /* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
