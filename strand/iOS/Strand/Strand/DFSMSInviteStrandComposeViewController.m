@@ -8,6 +8,7 @@
 
 #import "DFSMSInviteStrandComposeViewController.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFAnalytics.h"
 
 @interface DFSMSInviteStrandComposeViewController ()
 
@@ -46,6 +47,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
                  "Check out Swap app to see them. %@",
                  fromString ? fromString : @"",
                  appURL];
+    [DFAnalytics logInviteComposeInitialized];
   }
   return self;
 }
@@ -56,8 +58,28 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   if (self) {
     self.recipients = recipients;
     self.body = [NSString stringWithFormat:@"Hey! Check out Swap app for sharing pics (still in private beta). %@", appURL];
+    [DFAnalytics logInviteComposeInitialized];
   }
   return self;
+}
+
+- (instancetype)initForWarmup
+{
+  self = [super init];
+  // do NOT log init
+  return self;
+}
+
++ (void)warmUpSMSComposer
+{
+  DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc] initForWarmup];
+  [smsvc view]; //force the view controller's view to load, hopefully actually causes AB load etc
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (NSString *)getDayOfTheWeek:(NSDate *)date{
@@ -79,12 +101,17 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
                                                    locationString:nil
                                                    date:date];
   if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
+    smsvc.completionBlock = completionBlock;
     smsvc.messageComposeDelegate = smsvc;
-    [parentViewController presentViewController:smsvc animated:YES completion:^{
-      [SVProgressHUD dismiss];
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [parentViewController presentViewController:smsvc animated:YES completion:^{
+        [SVProgressHUD dismiss];
+      }];
+    });
   } else {
     [SVProgressHUD showErrorWithStatus:@"Can't send text"];
+    [DFAnalytics logInviteComposeFinishedWithResult:DFMessageComposeResultCouldntStart
+                           presentingViewController:parentViewController];
     if (completionBlock) completionBlock(MessageComposeResultFailed);
   }
 }
@@ -92,9 +119,12 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
-  [self dismissViewControllerAnimated:YES completion:^{
-    if (self.completionBlock) self.completionBlock(result);
-  }];
+  [DFAnalytics logInviteComposeFinishedWithResult:result
+                         presentingViewController:controller.presentingViewController];
+  if (self.completionBlock) self.completionBlock(result);
+  if (self.presentingViewController) {
+    [self dismissViewControllerAnimated:YES completion:nil];
+  }
 }
 
 @end

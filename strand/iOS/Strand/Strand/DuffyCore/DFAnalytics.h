@@ -20,6 +20,7 @@ extern NSString* const DFAnalyticsValueResultSuccess;
 extern NSString* const DFAnalyticsValueResultFailure;
 extern NSString* const DFAnalyticsValueResultAborted;
 extern NSString* const DFAnalyticsValueResultInvalidInput;
+extern const int DFMessageComposeResultCouldntStart;
 
 /* Stop and Start Session Helpers */
 + (void)StartAnalyticsSession;
@@ -82,6 +83,7 @@ disappearedWithParameters:(NSDictionary *)params;
 /* Inviting */
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
++ (void)logInviteComposeInitialized;
 
 /* Contacts */
 + (void)logAddContactCompletedWithResult:(NSString *)result;

@@ -746,16 +746,18 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
-                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *createdUserPhoneNumbers))success
+                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success
                         failure:(DFFailureBlock)failure
 {
   NSMutableDictionary *phoneNumbersToUserIDs = [NSMutableDictionary new];
   NSMutableArray *phoneNumbersToCreateUser = [NSMutableArray new];
+  NSMutableArray *unAuthedPhoneNumbers = [NSMutableArray new];
   for (NSString *phoneNumber in  phoneNumbers) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
                                 userWithPhoneNumber:phoneNumber];
     if (user) {
       phoneNumbersToUserIDs[phoneNumber] = @(user.id);
+      if (![user.display_name isNotEmpty]) [unAuthedPhoneNumbers addObject:phoneNumber];
     } else {
       [phoneNumbersToCreateUser addObject:phoneNumber];
     }
@@ -767,15 +769,17 @@ static DFPeanutFeedDataManager *defaultManager;
      withSuccessBlock:^(NSArray *resultObjects) {
        DDLogVerbose(@"added users %@", resultObjects);
        for (DFPeanutUserObject *user in resultObjects) {
-         if (user.id != 0)
+         if (user.id != 0) {
            phoneNumbersToUserIDs[user.phone_number] = @(user.id);
+           if (![user.display_name isNotEmpty]) [unAuthedPhoneNumbers addObject:user.phone_number];
+         }
        }
-       success(phoneNumbersToUserIDs, phoneNumbersToCreateUser);
+       success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);
     } failureBlock:^(NSError *error) {
       failure(error);
     }];
   } else {
-    success(phoneNumbersToUserIDs, nil);
+    success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);
   }
 }
 

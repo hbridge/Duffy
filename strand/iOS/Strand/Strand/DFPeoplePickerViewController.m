@@ -23,6 +23,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
 #import "DFNoTableItemsView.h"
+#import "DFSMSInviteStrandComposeViewController.h"
 
 
 @interface DFPeoplePickerViewController ()
@@ -143,6 +144,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  [DFSMSInviteStrandComposeViewController warmUpSMSComposer];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 

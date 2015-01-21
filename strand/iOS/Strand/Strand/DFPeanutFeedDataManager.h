@@ -74,7 +74,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 /* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
 - (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
-                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *createdUserPhoneNumbers))success
+                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success
                         failure:(DFFailureBlock)failure;
 
 - (void)setLikedByUser:(BOOL)liked

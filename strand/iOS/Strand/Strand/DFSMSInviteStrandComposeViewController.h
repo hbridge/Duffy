@@ -18,6 +18,7 @@ typedef void (^DFSMSComposeCompletionBlock)(MessageComposeResult result);
                         phoneNumbers:(NSArray *)phoneNumbers
                             fromDate:(NSDate *)date
                      completionBlock:(DFSMSComposeCompletionBlock)completionBlock;
++ (void)warmUpSMSComposer;
 
 
 - (instancetype)initWithRecipients:(NSArray *)recipients

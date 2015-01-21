@@ -39,7 +39,7 @@
   [[DFPeanutFeedDataManager sharedManager]
    sharePhotoObjects:photos
    withPhoneNumbers:phoneNumbers
-   success:^(NSArray *shareInstances, NSArray *createdPhoneNumbers) {
+   success:^(NSArray *shareInstances, NSArray *unAuthedPhoneNumbers) {
      DFPeanutShareInstance *shareInstance = shareInstances.firstObject;
      // add the caption if there is one, but success or failure has no bearing
      if ([caption isNotEmpty]) {
@@ -52,11 +52,11 @@
      }
      
      // send SMS if there were any users created as part of creating the share instance
-     if (createdPhoneNumbers.count > 0) {
+     if (unAuthedPhoneNumbers.count > 0) {
        dispatch_async(dispatch_get_main_queue(), ^{
          [DFSMSInviteStrandComposeViewController
           showWithParentViewController:parentViewController
-          phoneNumbers:createdPhoneNumbers
+          phoneNumbers:unAuthedPhoneNumbers
           fromDate:((DFPeanutFeedObject *)photos.firstObject).time_taken
           completionBlock:^(MessageComposeResult result) {
             if (success) success();
@@ -66,7 +66,7 @@
                 [SVProgressHUD showSuccessWithStatus:@"Sent!"];
               } else {
                 NSString *errorString;
-                if (result == MessageComposeResultCancelled) errorString = @"Cancelled";
+                if (result == MessageComposeResultCancelled) errorString = @"Invite Text Cancelled";
                 else errorString = @"Failed";
                 [SVProgressHUD showErrorWithStatus:errorString];
               }

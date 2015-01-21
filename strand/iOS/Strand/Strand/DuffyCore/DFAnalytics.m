@@ -42,6 +42,7 @@ NSString* const DFAnalyticsValueResultInvalidInput = @"invalidInput";
 NSString* const DFAnalyticsValueResultAborted = @"aborted";
 NSString* const ParentViewControllerKey = @"parentView";
 NSString* const SLatencyKey = @"SecondsLatency";
+const int DFMessageComposeResultCouldntStart = -1;
 
 
 NSString* const DFAnalyticsIsErrorKey = @"isError";
@@ -80,6 +81,7 @@ NSString* const SetupPhotosCompleted = @"SetupPhotosCompleted";
 
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
+NSString* const InviteUserInitialized = @"InviteUserInitialized";
 
 //Push notifs
 NSString* const PermissionChangedEvent = @"PermissionChanged";
@@ -361,6 +363,11 @@ static DFAnalytics *defaultLogger;
                                                            ResultKey: resultString,
                                                            ParentViewControllerKey: [DFAnalytics screenNameForControllerViewed:presentingViewController]
                                                            }];
+}
+
++ (void)logInviteComposeInitialized
+{
+  [DFAnalytics logEvent:InviteUserInitialized];
 }
 
 + (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
