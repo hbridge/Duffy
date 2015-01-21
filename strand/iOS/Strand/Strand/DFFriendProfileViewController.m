@@ -44,6 +44,7 @@
 
 - (void)configureHeader
 {
+  [self.headerView setTintColor:[DFStrandConstants defaultBarForegroundColor]];
   [self.backButton setImage:[self.backButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
                    forState:UIControlStateNormal];
   

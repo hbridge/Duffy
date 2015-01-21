@@ -24,7 +24,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="600" height="84"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vRE-Zm-eLd" customClass="DFProfileStackView">
-                            <rect key="frame" x="48" y="26" width="45" height="45"/>
+                            <rect key="frame" x="30" y="26" width="45" height="45"/>
                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="45" id="YmW-5a-rjk"/>
@@ -32,13 +32,13 @@
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Count labels" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8iR-ga-e4d">
-                            <rect key="frame" x="101" y="48" width="86" height="18"/>
+                            <rect key="frame" x="83" y="48" width="86" height="18"/>
                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iNL-1h-xwh">
-                            <rect key="frame" x="8" y="28" width="36" height="42"/>
+                            <rect key="frame" x="0.0" y="28" width="36" height="42"/>
                             <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                             <state key="normal" image="Assets/Icons/BackBarButtonIcon">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -48,7 +48,7 @@
                             </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QmR-gx-IVb">
-                            <rect key="frame" x="101" y="30" width="47" height="21"/>
+                            <rect key="frame" x="83" y="30" width="47" height="21"/>
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
@@ -57,10 +57,10 @@
                     <color key="backgroundColor" white="0.66666666666666663" alpha="0.089999999999999997" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="8iR-ga-e4d" firstAttribute="leading" secondItem="vRE-Zm-eLd" secondAttribute="trailing" constant="8" id="1Wr-lf-yEM"/>
-                        <constraint firstItem="vRE-Zm-eLd" firstAttribute="leading" secondItem="iNL-1h-xwh" secondAttribute="trailing" constant="4" id="3EU-g5-hVt"/>
+                        <constraint firstItem="vRE-Zm-eLd" firstAttribute="leading" secondItem="iNL-1h-xwh" secondAttribute="trailing" constant="-6" id="3EU-g5-hVt"/>
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="top" secondItem="Nc7-0m-VWp" secondAttribute="top" constant="26" id="7y4-7d-Jeb"/>
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="centerY" secondItem="iNL-1h-xwh" secondAttribute="centerY" id="8BO-l4-ZqK"/>
-                        <constraint firstItem="iNL-1h-xwh" firstAttribute="leading" secondItem="Nc7-0m-VWp" secondAttribute="leading" constant="8" id="OHx-hW-qvF"/>
+                        <constraint firstItem="iNL-1h-xwh" firstAttribute="leading" secondItem="Nc7-0m-VWp" secondAttribute="leading" id="OHx-hW-qvF"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="centerY" secondItem="vRE-Zm-eLd" secondAttribute="centerY" constant="-8" id="UGE-Vw-JF4"/>
                         <constraint firstAttribute="bottom" secondItem="vRE-Zm-eLd" secondAttribute="bottom" constant="13" id="YIu-BY-bSO"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="leading" secondItem="vRE-Zm-eLd" secondAttribute="trailing" constant="8" id="cz9-by-1W4"/>
