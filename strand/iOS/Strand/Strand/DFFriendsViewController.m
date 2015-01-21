@@ -232,6 +232,8 @@
   
   cell.profilePhotoStackView.peanutUsers = @[peanutUser];
   NSString *fullName = [peanutUser fullName];
+  fullName = [fullName isNotEmpty] ? fullName : peanutUser.phone_number;
+  if (!peanutUser.hasAuthedPhone) fullName = [fullName stringByAppendingString:@" (invited)"];
   cell.nameLabel.text = [fullName isNotEmpty] ? fullName : peanutUser.phone_number;
   cell.nameLabel.font = [UIFont systemFontOfSize:cell.nameLabel.font.pointSize];
   cell.rightLabel.text = @"";
