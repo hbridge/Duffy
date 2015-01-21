@@ -63,16 +63,16 @@
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/PeopleBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
-                                            style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(createButtonPressed:)];
-  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                                           style:UIBarButtonItemStylePlain target:self
-                                           action:@selector(settingsPressed:)];
+  
+  self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc]
+                                               initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+                                               style:UIBarButtonItemStylePlain
+                                               target:self
+                                               action:@selector(createButtonPressed:)],
+                                              [[UIBarButtonItem alloc]
+                                               initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+                                               style:UIBarButtonItemStylePlain target:self
+                                               action:@selector(settingsPressed:)]];
 }
 
 
