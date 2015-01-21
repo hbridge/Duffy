@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys, os
+import sys, os, gc
 import time, datetime
 import logging
 import math
@@ -181,11 +181,19 @@ def main(argv):
 	logger.info("Starting... ")
 
 	while True:
+		gcNeeded = False
 		strandsProcessed = processStrands()
 
 		locationRecordsProcessed = processLocationRecords()
 
+		if len(strandsProcessed) > 0 or len(locationRecordsProcessed) > 0:
+			gcNeeded  = True
+			
 		if len(strandsProcessed) == 0 and len(locationRecordsProcessed) == 0:
+			if gcNeeded:
+				collected = gc.collect()
+				logger.info("Garbage collector: collected %d objects." % (collected))
+				gcNeeded = False
 			time.sleep(.1)
 
 if __name__ == "__main__":
