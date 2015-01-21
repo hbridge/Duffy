@@ -11,6 +11,7 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
+from django import db
 from django.db.models import Q
 
 from peanut.settings import constants
@@ -181,21 +182,15 @@ def processLocationRecords():
 	
 def main(argv):
 	logger.info("Starting... ")
-	gcNeeded = False
 	
 	while True:
 		strandsProcessed = processStrands()
 
 		locationRecordsProcessed = processLocationRecords()
-
-		if len(strandsProcessed) > 0 or len(locationRecordsProcessed) > 0:
-			gcNeeded = True
-			
+		
+		db.reset_queries()
+		
 		if len(strandsProcessed) == 0 and len(locationRecordsProcessed) == 0:
-			if gcNeeded:
-				collected = gc.collect()
-				logger.info("Garbage collector: collected %d objects." % (collected))
-				gcNeeded = False
 			time.sleep(.1)
 
 if __name__ == "__main__":
