@@ -22,6 +22,7 @@
 #import "DFPhoneNumberUtils.h"
 #import "DFAnalytics.h"
 #import "DFPeanutShareInstanceAdapter.h"
+#import "DFPeanutFriendConnectionAdapter.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFPeanutPhotoAdapter.h"
 
@@ -42,6 +43,7 @@
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (readonly, nonatomic, retain) DFPeanutSharedStrandAdapter *sharedStrandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutShareInstanceAdapter *shareInstanceAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFriendConnectionAdapter *friendConnectionAdapter;
 @property (readonly, nonatomic, retain) DFPeanutPhotoAdapter *photoAdapter;
 @property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
 
@@ -71,12 +73,12 @@
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
 
-@property (nonatomic, retain) NSArray *cachedFriendsList;
+@property (nonatomic, retain) NSArray *cachedPeopleList;
 @end
 
 @implementation DFPeanutFeedDataManager
 
-@synthesize cachedFriendsList = _cachedFriendsList;
+@synthesize cachedPeopleList = _cachedPeopleList;
 
 @synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
 
@@ -154,14 +156,14 @@ static DFPeanutFeedDataManager *defaultManager;
   // If we refactor these methods to be common this will need to be pulled out
   for (DFPeanutFeedObject *object in inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectPeopleList]) {
-      NSArray *peopleList = [self processPeopleList:_cachedFriendsList withNewPeople:object.people];
+      NSArray *peopleList = [self processPeopleList:_cachedPeopleList withNewPeople:object.people];
       
       // This grabs the local first name which we want to sort by
       NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
       NSMutableArray *newFriendsList = [NSMutableArray arrayWithArray:[peopleList sortedArrayUsingDescriptors:@[sort]]];
       
-      _cachedFriendsList = newFriendsList;
-      if (![newFriendsList isEqualToArray:_cachedFriendsList]) {
+      _cachedPeopleList = newFriendsList;
+      if (![newFriendsList isEqualToArray:_cachedPeopleList]) {
         [[NSNotificationCenter defaultCenter]
          postNotificationName:DFStrandNewFriendsDataNotificationName
          object:self];
@@ -640,10 +642,10 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)friendsList
 {
-#warning out of date implementation
   NSMutableArray *friends = [NSMutableArray new];
-  for (DFPeanutUserObject *user in self.cachedFriendsList) {
+  for (DFPeanutUserObject *user in self.cachedPeopleList) {
     if ([user.relationship isEqual:DFPeanutUserRelationshipFriend]) [friends addObject:user];
+    if ([user.relationship isEqual:DFPeanutUserRelationshipForwardFriend]) [friends addObject:user];
   }
   return friends;
 }
@@ -660,7 +662,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
 {
   if (userID == [[DFUser currentUser] userID]) return [[DFUser currentUser] peanutUser];
-  for (DFPeanutUserObject *user in self.cachedFriendsList) {
+  for (DFPeanutUserObject *user in self.cachedPeopleList) {
     if (user.id == userID) {
       return user;
     }
@@ -671,7 +673,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber
 {
   NSString *normalizedPhoneNumber = [DFPhoneNumberUtils normalizePhoneNumber:phoneNumber];
-  for (DFPeanutUserObject *user in self.cachedFriendsList) {
+  for (DFPeanutUserObject *user in self.cachedPeopleList) {
     if ([user.phone_number isEqualToString:normalizedPhoneNumber]) {
       return user;
     }
@@ -679,23 +681,73 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-
-
-
 - (NSArray *)usersThatFriendedUser:(DFUserIDType)user excludeFriends:(BOOL)excludeFriends;
 {
-  #warning incomplete implementation
-  return self.friendsList;
+  NSMutableArray *users = [NSMutableArray new];
+  for (DFPeanutUserObject *user in self.cachedPeopleList) {
+    if (!excludeFriends && [user.relationship isEqual:DFPeanutUserRelationshipFriend]) [users addObject:user];
+    if (!excludeFriends && [user.relationship isEqual:DFPeanutUserRelationshipForwardFriend]) [users addObject:user];
+    if ([user.relationship isEqual:DFPeanutUserRelationshipReverseFriend]) [users addObject:user];
+  }
+  return users;
 }
 
-- (void)setUser:(DFUserIDType)user
+- (void)setUser:(DFUserIDType)userID
       isFriends:(BOOL)isFriends
     withUserIDs:(NSArray *)otherUserIDs
         success:(DFSuccessBlock)success
         failure:(DFFailureBlock)failure
 {
-#warning incomplete implementation
-  success();
+  DFPeanutUserObject *user = [self userWithID:userID];
+  
+  if (isFriends) {
+    NSMutableArray *toCreate = [NSMutableArray new];
+    for (NSNumber *targetUserID in otherUserIDs) {
+      DFPeanutFriendConnection *friendConnection = [DFPeanutFriendConnection new];
+      friendConnection.user_1 = @(user.id);
+      friendConnection.user_2 = targetUserID;
+      [toCreate addObject:friendConnection];
+    }
+    [self.friendConnectionAdapter createFriendConnections:toCreate success:^(NSArray *resultObjects) {
+      for (NSNumber *targetUserID in otherUserIDs) {
+        DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
+        if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipReverseFriend]) {
+          targetUser.relationship = DFPeanutUserRelationshipFriend;
+        } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipConnection]) {
+          targetUser.relationship = DFPeanutUserRelationshipForwardFriend;
+        }
+        
+        for (DFPeanutFriendConnection *resultObject in resultObjects) {
+          if ([resultObject.id isEqualToNumber:@(targetUser.id)]) {
+            targetUser.friend_connection_id = resultObject.id;
+          }
+        }
+      }
+      DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);
+      success();
+    } failure:^(NSError *error) {
+      DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
+    }];
+  } else {
+    for (NSNumber *targetUserID in otherUserIDs) {
+      DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
+      DFPeanutFriendConnection *friendConnection = [DFPeanutFriendConnection new];
+      friendConnection.id = targetUser.friend_connection_id;
+      [self.friendConnectionAdapter deleteFriendConnection:friendConnection success:^(NSArray *resultObjects) {
+        DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
+        targetUser.friend_connection_id = nil;
+        if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend]) {
+          targetUser.relationship = DFPeanutUserRelationshipReverseFriend;
+        } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipForwardFriend]) {
+          targetUser.relationship = DFPeanutUserRelationshipConnection;
+        }
+        DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);
+        success();
+      } failure:^(NSError *error) {
+        DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
+      }];
+    }
+  }
 }
 
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible
@@ -1160,6 +1212,7 @@ static NSDictionary *nameMapping;
 @synthesize actionAdapter = _actionAdapter;
 @synthesize sharedStrandAdapter = _sharedStrandAdapter;
 @synthesize shareInstanceAdapter = _shareInstanceAdapter;
+@synthesize friendConnectionAdapter = _friendConnectionAdapter;
 @synthesize userAdapter = _userAdapter;
 @synthesize photoAdapter = _photoAdapter;
 
@@ -1229,6 +1282,12 @@ static NSDictionary *nameMapping;
   return _shareInstanceAdapter;
 }
 
+- (DFPeanutFriendConnectionAdapter *)friendConnectionAdapter
+{
+  if (!_friendConnectionAdapter) _friendConnectionAdapter = [DFPeanutFriendConnectionAdapter new];
+  return _friendConnectionAdapter;
+}
+
 - (DFPeanutPhotoAdapter *)photoAdapter
 {
   if (!_photoAdapter) _photoAdapter = [DFPeanutPhotoAdapter new];
@@ -1241,10 +1300,10 @@ static NSDictionary *nameMapping;
   return _userAdapter;
 }
 
-- (NSArray *)cachedFriendsList
+- (NSArray *)cachedPeopleList
 {
-  if (!_cachedFriendsList) _cachedFriendsList = [[NSArray alloc] init];
-  return _cachedFriendsList;
+  if (!_cachedPeopleList) _cachedPeopleList = [[NSArray alloc] init];
+  return _cachedPeopleList;
 }
 
 - (void)resetManager

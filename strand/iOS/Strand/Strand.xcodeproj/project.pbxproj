@@ -265,6 +265,8 @@
 		652D9B9B1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 652D9B9A1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m */; };
 		652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */; };
 		65437DE419F810AA00D57F9D /* DFImageDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */; };
+		6580834E1A7067F200A0B8BF /* DFPeanutFriendConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 6580834D1A7067F200A0B8BF /* DFPeanutFriendConnection.m */; };
+		658083511A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 658083501A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.m */; };
 		65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */; };
 		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
 		65D1C2CD1A2D0930007E7300 /* UIBarButtonItem+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2CC1A2D0930007E7300 /* UIBarButtonItem+Badge.m */; };
@@ -760,6 +762,10 @@
 		652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutPhotoAdapter.m; sourceTree = "<group>"; };
 		65437DE219F810AA00D57F9D /* DFImageDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageDownloadManager.h; sourceTree = "<group>"; };
 		65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageDownloadManager.m; sourceTree = "<group>"; };
+		6580834C1A7067F200A0B8BF /* DFPeanutFriendConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFriendConnection.h; sourceTree = "<group>"; };
+		6580834D1A7067F200A0B8BF /* DFPeanutFriendConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFriendConnection.m; sourceTree = "<group>"; };
+		6580834F1A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFriendConnectionAdapter.h; sourceTree = "<group>"; };
+		658083501A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFriendConnectionAdapter.m; sourceTree = "<group>"; };
 		65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS7CameraRollSyncOperation.m; sourceTree = "<group>"; };
 		65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFIOS7CameraRollSyncOperation.h; sourceTree = "<group>"; };
 		65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS8CameraRollSyncOperation.m; sourceTree = "<group>"; };
@@ -1162,6 +1168,8 @@
 				65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */,
 				5AA695A21A49DFE000B20DD2 /* DFPeanutShareInstanceAdapter.h */,
 				5AA695A31A49DFE000B20DD2 /* DFPeanutShareInstanceAdapter.m */,
+				6580834F1A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.h */,
+				658083501A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -1199,6 +1207,8 @@
 				65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */,
 				5AA6959F1A49DD7C00B20DD2 /* DFPeanutShareInstance.h */,
 				5AA695A01A49DD7C00B20DD2 /* DFPeanutShareInstance.m */,
+				6580834C1A7067F200A0B8BF /* DFPeanutFriendConnection.h */,
+				6580834D1A7067F200A0B8BF /* DFPeanutFriendConnection.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -2006,6 +2016,7 @@
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
 				5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */,
+				658083511A70685600A0B8BF /* DFPeanutFriendConnectionAdapter.m in Sources */,
 				5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */,
 				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
@@ -2114,6 +2125,7 @@
 				5AA36F0219F6ED1B008B37AA /* UIColor+DFHelpers.m in Sources */,
 				5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */,
 				5AAF039119B0DBAE00EF021C /* DFCollectionViewTableViewCell.m in Sources */,
+				6580834E1A7067F200A0B8BF /* DFPeanutFriendConnection.m in Sources */,
 				5AA36F0519F704E7008B37AA /* DFStrandPeopleBarView.m in Sources */,
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
 				65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */,

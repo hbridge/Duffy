@@ -14,6 +14,8 @@
 #import "DFContactDataManager.h"
 
 DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend = @"friend";
+DFPeanutUserRelationshipType DFPeanutUserRelationshipForwardFriend = @"forward_friend";
+DFPeanutUserRelationshipType DFPeanutUserRelationshipReverseFriend = @"reverse_friend";
 DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 
 @implementation DFPeanutUserObject

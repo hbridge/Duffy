@@ -16,6 +16,8 @@
 
 typedef NSString *const DFPeanutUserRelationshipType;
 extern DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend;
+extern DFPeanutUserRelationshipType DFPeanutUserRelationshipForwardFriend;
+extern DFPeanutUserRelationshipType DFPeanutUserRelationshipReverseFriend;
 extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 
 @property (nonatomic) DFUserIDType id;
@@ -37,6 +39,7 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 @property (nonatomic, retain) NSNumber *has_sms_authed;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSNumber *invited;
+@property (nonatomic, retain) NSNumber *friend_connection_id;
 @property (nonatomic, retain) NSString *relationship;
 @property (nonatomic, retain) NSDate *last_actions_list_request_timestamp;
 
