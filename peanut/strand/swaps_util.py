@@ -139,7 +139,7 @@ def getFeedObjectsForSwaps(user):
 def getFeedObjectsForPrivateStrands(user):
 	responseObjects = list()
 
-	friends = friends_util.getFriends(user.id)
+	fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(user.id)
 
 	allPrivateStrands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).order_by('-first_photo_time')
 	for strand in allPrivateStrands:
@@ -148,11 +148,11 @@ def getFeedObjectsForPrivateStrands(user):
 	
 	stats_util.printStats("private-all-cache")
 	
-	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, allPrivateStrands, True, friends)
+	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, allPrivateStrands, True, fullFriends)
 	stats_util.printStats("private-b")
 		
 	for strand in allPrivateStrands:
-		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
+		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, fullFriends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
 		if strandObjectData:
 			responseObjects.append(strandObjectData)
 

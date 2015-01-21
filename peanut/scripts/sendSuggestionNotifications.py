@@ -112,7 +112,8 @@ def main(argv):
 			if user.id in recentUsersNotified:
 				logger.info("Skipping user %s because we sent suggestions recently")%(user.id)
 				continue
-			interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, recentStrands, True, friends_util.getFriends(user.id))
+			fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(user.id)
+			interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, recentStrands, True, fullFriends)
 
 			if len(strands) == 0:
 				# means no match found, mark all the photos in these strands as notification_evaluated

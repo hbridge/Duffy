@@ -255,25 +255,3 @@ def checkStrandForAllPhotosEvaluated(strand):
 		else:
 			logger.debug("Created action and had %s photos till not seen in the strand: %s" % (len(notSeenPhotoIds), notSeenPhotoIds))
 
-def getRecentStrandNeighborSuggestions(user):
-	friendsIdList = friends_util.getFriendsIds(user.id)
-
-	strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
-	strandIds = list()
-	for strandNeighbor in strandNeighbors:
-		if strandNeighbor.strand_1_user_id == user.id:
-			strandIds.append(strandNeighbor.strand_1_id)
-		else:
-			strandIds.append(strandNeighbor.strand_2_id)
-
-	timeago = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=14)
-	
-	strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).filter(first_photo_time__gt=timeago).order_by('-first_photo_time')
-
-	# The prefetch for 'user' took a while here so just do it manually
-	for strand in strands:
-		for photo in strand.photos.all():
-			photo.user = user
-			
-	return list(strands)
-

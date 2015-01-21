@@ -82,13 +82,13 @@ def processPrivateStrands(num):
 			logger.error("Couldn't find user: %s" % userId)
 			continue
 						
-		friends = friends_util.getFriends(user.id)
+		fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(user.id)
 
 		for strand in strandList:
 			for photo in strand.photos.all():
 				photo.user = user
 
-		interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, strandList, True, friends)
+		interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, strandList, True, fullFriends)
 
 		try:
 			apiCache = ApiCache.objects.get(user_id=user.id)
@@ -109,7 +109,7 @@ def processPrivateStrands(num):
 				logger.info("Skipped strand %s because of 0 photos" % (strand.id))
 				continue
 				
-			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
+			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, fullFriends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
 			if strandObjectData:
 				responseObjectsById[strandObjectData['id']] = strandObjectData
 				logger.info("Inserted strand %s for user %s" % (strandObjectData['id'], userId))
