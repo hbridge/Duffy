@@ -132,4 +132,9 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
   return teamSwapUser;
 }
 
+- (BOOL)hasAuthedPhone
+{
+  return [self.display_name isNotEmpty];
+}
+
 @end

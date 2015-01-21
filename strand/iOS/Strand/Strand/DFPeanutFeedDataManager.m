@@ -771,7 +771,7 @@ static DFPeanutFeedDataManager *defaultManager;
        for (DFPeanutUserObject *user in resultObjects) {
          if (user.id != 0) {
            phoneNumbersToUserIDs[user.phone_number] = @(user.id);
-           if (![user.display_name isNotEmpty]) [unAuthedPhoneNumbers addObject:user.phone_number];
+           if (![user hasAuthedPhone]) [unAuthedPhoneNumbers addObject:user.phone_number];
          }
        }
        success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);

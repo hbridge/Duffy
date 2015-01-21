@@ -46,6 +46,7 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 - (NSString *)firstName;
 - (UIImage *)thumbnail;
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
+- (BOOL)hasAuthedPhone;
 
 + (DFPeanutUserObject *)TeamSwapUser;
 
