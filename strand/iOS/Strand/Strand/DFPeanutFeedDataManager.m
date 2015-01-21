@@ -640,6 +640,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)friendsList
 {
+#warning out of date implementation
   NSMutableArray *friends = [NSMutableArray new];
   for (DFPeanutUserObject *user in self.cachedFriendsList) {
     if ([user.relationship isEqual:DFPeanutUserRelationshipFriend]) [friends addObject:user];
@@ -667,6 +668,25 @@ static DFPeanutFeedDataManager *defaultManager;
     }
   }
   return nil;
+}
+
+
+
+
+- (void)usersThatFriendedUser:(DFUserIDType)user
+                      success:(void (^)(NSArray *users))success
+                      failure:(DFFailureBlock)failure
+{
+  #warning incomplete implementation
+  success(self.friendsList);
+}
+- (void)setUser:(DFUserIDType)user
+hasFriendedUsers:(NSArray *)otherUserIDs
+        success:(DFSuccessBlock)success
+        failure:(DFFailureBlock)failure
+{
+#warning incomplete implementation
+  success();
 }
 
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible
