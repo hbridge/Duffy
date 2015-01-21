@@ -55,11 +55,28 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 // Methods used for dealing with swap page
 - (void)setHasEvaluatedPhoto:(DFPhotoIDType)photoID shareInstance:(DFShareInstanceIDType)privateStrandID;
 
-/* returns a list of PeanutUsers */
+/* 
+ User Management
+ */
+
 - (NSArray *)friendsList;
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
 - (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
+/* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
+- (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
+                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success
+                        failure:(DFFailureBlock)failure;
+- (void)usersThatFriendedUser:(DFUserIDType)user
+                      success:(void (^)(NSArray *users))resultBlock
+                      failure:(DFFailureBlock)failure;
+- (void)setUser:(DFUserIDType)user
+hasFriendedUsers:(NSArray *)otherUserIDs
+        success:(DFSuccessBlock)success
+        failure:(DFFailureBlock)failure;
 
+/* 
+ Suggestions and Photos
+ */
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
 
 - (void)sharePhotoObjects:(NSArray *)photoObjects
@@ -71,11 +88,6 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
                toShareInstanceID:(DFShareInstanceIDType)shareInstanceID
                          success:(void(^)(NSArray *numbersToText))success
                          failure:(DFFailureBlock)failure;
-
-/* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
-- (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
-                        success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success
-                        failure:(DFFailureBlock)failure;
 
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
