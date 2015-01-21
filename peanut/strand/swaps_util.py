@@ -43,15 +43,17 @@ def getFriendsObjectData(userId, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
 		users = [users]
 
-	fullFriends, forwardFriends, reverseFriends = friends_util.getFriendsIds(userId)
+	fullFriends, forwardFriends, reverseFriends, connIds = friends_util.getFriendsIds(userId)
 
 	userData = list()
 	for user in users:
 		if user.id == userId:
 			continue
-			
+		
+		connId = None
 		if user.id in fullFriends or user.id in forwardFriends:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
+			connId = connIds[user.id]
 		elif user.id in reverseFriends:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_REVERSE_FRIEND
 		else:
@@ -59,6 +61,9 @@ def getFriendsObjectData(userId, users, includePhone = True):
 		
 		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
 
+		if connId:
+			entry['friend_connection_id'] = connId
+			
 		if includePhone:
 			entry['phone_number'] = user.phone_number
 
@@ -436,7 +441,7 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 
 	# Add in the list of all friends at the end
 	peopleIds = list()
-	fullFriends, forwardFriends, reverseFriends = friends_util.getFriendsIds(user.id)
+	fullFriends, forwardFriends, reverseFriends, connIds  = friends_util.getFriendsIds(user.id)
 	peopleIds.extend(fullFriends)
 	peopleIds.extend(forwardFriends)
 	peopleIds.extend(reverseFriends)

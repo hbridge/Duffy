@@ -33,9 +33,11 @@ def getFriendsIds(userId):
 	fullFriends = list()
 	reverseFriends = list()
 	forwardFriends = list()
+	connIds = dict()
 	for friendConnection in friendConnections:
 		if (friendConnection.user_1_id == userId):
 			forwardFriends.append(friendConnection.user_2_id)
+			connIds[friendConnection.user_2_id] = friendConnection.id
 			if friendConnection.user_2_id in reverseFriends:
 				fullFriends.append(friendConnection.user_2_id)
 		else:
@@ -43,7 +45,7 @@ def getFriendsIds(userId):
 			if friendConnection.user_1_id in forwardFriends:
 				fullFriends.append(friendConnection.user_1_id)
 
-	return fullFriends, forwardFriends, reverseFriends
+	return fullFriends, forwardFriends, reverseFriends, connIds
 
 """
 	For a given userId, should they be included as a "friend"
