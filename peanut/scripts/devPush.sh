@@ -14,8 +14,7 @@ sudo start duffy-stranding
 sudo stop duffy-neighboring
 sudo start duffy-neighboring
 sudo stop duffy-popcaches
-sudo stop duffy-neighboring
-sudo start duffy-neighboring
+sudo start duffy-popcaches
 sudo stop duffy-strand-notifications
 sudo start duffy-strand-notifications
 sudo stop duffy-suggestion-notifications
