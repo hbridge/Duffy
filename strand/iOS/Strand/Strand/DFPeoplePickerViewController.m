@@ -57,6 +57,7 @@
 NSString *const UserSectionTitle = @"Swap Friends";
 NSString *const SuggestedSecitonTitle = @"Suggested";
 NSString *const ContactsSectionTitle = @"Contacts";
+NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers
 {
@@ -206,6 +207,16 @@ NSString *const ContactsSectionTitle = @"Contacts";
     [unfilteredSectionTitles addObject:UserSectionTitle];
     self.onStrandList = onStrandContacts;
     [unfilteredSections addObject:self.onStrandList];
+  }
+  
+  if (self.showUsersThatAddedYouSection) {
+    [unfilteredSectionTitles addObject:UsersThatAddedYouSectionTitle];
+    NSArray *users = [[DFPeanutFeedDataManager sharedManager]
+                      usersThatFriendedUser:[[DFUser currentUser] userID]
+                      excludeFriends:YES];
+    [unfilteredSections addObject:[users arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+      return [[DFPeanutContact alloc] initWithPeanutUser:user];
+    }]];
   }
 
   if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
@@ -514,19 +525,22 @@ NSString *const ContactsSectionTitle = @"Contacts";
   return YES;
 }
 
+- (BOOL)isUserSelectable:(DFPeanutUserObject *)user
+{
+  for (DFPeanutContact *notSelectableContact in self.notSelectableContacts) {
+    if ([notSelectableContact.user isEqual:user]) return NO;
+  }
+  return YES;
+}
+
+
 - (UITableViewCell *)cellForPeanutContact:(DFPeanutContact *)peanutContact
                                 indexPath:(NSIndexPath *)indexPath
 {
   DFPersonSelectionTableViewCell *cell;
   if (peanutContact.user) {
-    DFPersonSelectionTableViewCell *userCell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
-    [userCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser | DFPersonSelectionTableViewCellStyleRightLabel];
-    userCell.nameLabel.text = peanutContact.name;
-    DFPeanutUserObject *userObj = [[DFPeanutUserObject alloc] init];
-    userObj.display_name = peanutContact.name;
-    userObj.id = peanutContact.user.longLongValue;
-    userCell.profilePhotoStackView.peanutUsers = @[userObj];
-    cell = userCell;
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:peanutContact.user.longLongValue];
+    return [self cellForPeanutUser:user indexPath:indexPath];
   } else {
     DFPersonSelectionTableViewCell *nonUserCell = [self.tableView dequeueReusableCellWithIdentifier:@"nonUser"];
     [nonUserCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleSubtitle];
@@ -537,7 +551,27 @@ NSString *const ContactsSectionTitle = @"Contacts";
     cell = nonUserCell;
   }
   
-  if ([self isContactSelectable:peanutContact]) {
+  [self configureCell:cell isSelectable:[self isContactSelectable:peanutContact]];
+  
+  return cell;
+}
+
+- (UITableViewCell *)cellForPeanutUser:(DFPeanutUserObject *)peanutUser
+                                indexPath:(NSIndexPath *)indexPath
+{
+  DFPersonSelectionTableViewCell *userCell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
+  [userCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser | DFPersonSelectionTableViewCellStyleRightLabel];
+  userCell.nameLabel.text = peanutUser.fullName;
+  userCell.profilePhotoStackView.peanutUsers = @[peanutUser];
+
+  [self configureCell:userCell isSelectable:[self isUserSelectable:peanutUser]];
+  
+  return userCell;
+}
+
+- (void)configureCell:(DFPersonSelectionTableViewCell *)cell isSelectable:(BOOL)isSelectable
+{
+  if (isSelectable) {
     cell.userInteractionEnabled = YES;
     cell.nameLabel.textColor = [UIColor blackColor];
     cell.rightLabel.text = @"";
@@ -547,7 +581,6 @@ NSString *const ContactsSectionTitle = @"Contacts";
     cell.rightLabel.text = self.notSelectableReason;
   }
   
-  return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

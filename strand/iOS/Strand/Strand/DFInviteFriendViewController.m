@@ -29,6 +29,7 @@
     _peoplePicker.allowsMultipleSelection = YES;
     _peoplePicker.doneButtonActionText = @"Invite";
     _peoplePicker.navigationItem.title = @"Invite Friends";
+    _peoplePicker.showUsersThatAddedYouSection = YES;
   }
   return self;
 }
@@ -60,7 +61,6 @@
   [super viewDidDisappear:animated];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
-
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
 didFinishWithPickedContacts:(NSArray *)peanutContacts
