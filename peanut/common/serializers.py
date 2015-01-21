@@ -2,7 +2,7 @@ import logging
 import time
 
 from rest_framework import serializers
-from common.models import Photo, User, Action, ContactEntry, Strand, ShareInstance
+from common.models import Photo, User, Action, ContactEntry, Strand, ShareInstance, FriendConnection
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -64,6 +64,18 @@ class BulkShareInstanceSerializer(serializers.Serializer):
 
 	# key in the json that links to the list of objects
 	bulk_key = 'share_instances'
+
+class FriendConnectionSerializer(serializers.ModelSerializer):
+	lookup_field = 'id'
+	
+	class Meta:
+		model = FriendConnection
+
+class BulkFriendConnectionSerializer(serializers.Serializer):
+	friend_connections = FriendConnectionSerializer(many=True)
+
+	# key in the json that links to the list of objects
+	bulk_key = 'friend_connections'
 
 def objectDataForShareInstance(shareInstance, actions, user):
 	shareInstanceData = dict()

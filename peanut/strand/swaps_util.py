@@ -43,12 +43,17 @@ def getFriendsObjectData(userId, users, includePhone = True):
 	if not isinstance(users, list) and not isinstance(users, set):
 		users = [users]
 
-	friendList = friends_util.getFriendsIds(userId)
+	fullFriends, forwardFriends, reverseFriends = friends_util.getFriendsIds(userId)
 
 	userData = list()
 	for user in users:
-		if user.id in friendList:
+		if user.id == userId:
+			continue
+			
+		if user.id in fullFriends or user.id in forwardFriends:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
+		elif user.id in reverseFriends:
+			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_REVERSE_FRIEND
 		else:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
 		
@@ -430,8 +435,12 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 	stats_util.printStats("swaps_inbox-3")
 
 	# Add in the list of all friends at the end
-	peopleIds = friends_util.getFriendsIds(user.id)
-
+	peopleIds = list()
+	fullFriends, forwardFriends, reverseFriends = friends_util.getFriendsIds(user.id)
+	peopleIds.extend(fullFriends)
+	peopleIds.extend(forwardFriends)
+	peopleIds.extend(reverseFriends)
+	
 	# Also add in all of the actors they're dealing with
 	for obj in responseObjects:
 		peopleIds.extend(obj['actor_ids'])

@@ -8,15 +8,20 @@ from common.models import FriendConnection
 def getFriends(userId):
 	friendConnections = FriendConnection.objects.select_related().filter(Q(user_1=userId) | Q(user_2=userId))
 
-	friends = list()
+	fullFriends = list()
+	reverseFriends = list()
+	forwardFriends = list()
 	for friendConnection in friendConnections:
-		if (friendConnection.user_1.id != userId):
-			friends.append(friendConnection.user_1)
+		if (friendConnection.user_1.id == userId):
+			forwardFriends.append(friendConnection.user_2)
+			if friendConnection.user_2 in reverseFriends:
+				fullFriends.append(friendConnection.user_2)
 		else:
-			friends.append(friendConnection.user_2)
+			reverseFriends.append(friendConnection.user_1)
+			if friendConnection.user_1 in forwardFriends:
+				fullFriends.append(friendConnection.user_1)
 
-	friends = sorted(friends, key=lambda x: x.display_name)
-	return friends
+	return fullFriends, forwardFriends, reverseFriends
 
 
 """
@@ -25,14 +30,20 @@ def getFriends(userId):
 def getFriendsIds(userId):
 	friendConnections = FriendConnection.objects.filter(Q(user_1=userId) | Q(user_2=userId))
 
-	friendsIds = list()
+	fullFriends = list()
+	reverseFriends = list()
+	forwardFriends = list()
 	for friendConnection in friendConnections:
-		if (friendConnection.user_1_id != userId):
-			friendsIds.append(friendConnection.user_1_id)
+		if (friendConnection.user_1_id == userId):
+			forwardFriends.append(friendConnection.user_2_id)
+			if friendConnection.user_2_id in reverseFriends:
+				fullFriends.append(friendConnection.user_2_id)
 		else:
-			friendsIds.append(friendConnection.user_2_id)
+			reverseFriends.append(friendConnection.user_1_id)
+			if friendConnection.user_1_id in forwardFriends:
+				fullFriends.append(friendConnection.user_1_id)
 
-	return friendsIds
+	return fullFriends, forwardFriends, reverseFriends
 
 """
 	For a given userId, should they be included as a "friend"

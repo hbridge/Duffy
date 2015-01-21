@@ -25,7 +25,7 @@ from rest_framework.views import APIView
 from peanut.settings import constants
 
 from common.models import ContactEntry, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, ShareInstance
-from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer
+from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
 # TODO(Derek): move this to common
@@ -548,6 +548,12 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
 
         # This will filter out 3-byte and up unicode strings.
         obj.name = self.re_pattern.sub(u'\uFFFD', obj.name) 
+
+
+class CreateFriendConnectionAPI(BulkCreateAPIView):
+    model = FriendConnection
+    lookup_field = 'id'
+    serializer_class = BulkFriendConnectionSerializer
 
 def getBuildNumForUser(user):
     if user.last_build_info:

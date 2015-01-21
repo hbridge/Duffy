@@ -7,7 +7,7 @@ from strand import api_views as strand_api_views
 from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import User, ContactEntry, Strand, Action, ShareInstance
+from common.models import User, ContactEntry, Strand, Action, ShareInstance, FriendConnection
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
@@ -41,6 +41,8 @@ urlpatterns = patterns('',
 	url(r'^share_instance/$', strand_rest_api_views.CreateShareInstanceAPI.as_view(model=ShareInstance, lookup_field='id')),	
 	url(r'^share_instance/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=ShareInstance, lookup_field='id')),
 
+	url(r'^friend_connection/$', strand_rest_api_views.CreateFriendConnectionAPI.as_view()),	
+	url(r'^friend_connection/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=FriendConnection, lookup_field='id')),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
