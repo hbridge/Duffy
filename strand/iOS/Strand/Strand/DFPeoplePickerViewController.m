@@ -208,16 +208,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     self.onStrandList = onStrandContacts;
     [unfilteredSections addObject:self.onStrandList];
   }
-  
-  if (self.showUsersThatAddedYouSection) {
-    [unfilteredSectionTitles addObject:UsersThatAddedYouSectionTitle];
-    NSArray *users = [[DFPeanutFeedDataManager sharedManager]
-                      usersThatFriendedUser:[[DFUser currentUser] userID]
-                      excludeFriends:YES];
-    [unfilteredSections addObject:[users arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
-      return [[DFPeanutContact alloc] initWithPeanutUser:user];
-    }]];
-  }
 
   if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
     [unfilteredSectionTitles addObject:ContactsSectionTitle];

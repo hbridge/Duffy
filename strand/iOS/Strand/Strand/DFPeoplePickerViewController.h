@@ -46,7 +46,6 @@
 @property (nonatomic, retain) NSArray *notSelectableContacts;
 @property (nonatomic, retain) NSString *notSelectableReason;
 @property (nonatomic) BOOL hideFriendsSection;
-@property (nonatomic) BOOL showUsersThatAddedYouSection;
 @property (nonatomic, retain) NSString *doneButtonActionText;
 
 @property (nonatomic, retain) NSString *textNumberString;
