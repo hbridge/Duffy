@@ -34,7 +34,7 @@ LOGGING = {
 			'datefmt' : "%d/%b/%Y %H:%M:%S"
 		},
 		'simple': {
-			'format': '%(levelname)s %(message)s'
+			'format': '%(asctime)s %(levelname)s %(message)s'
 		},
 	},
 	'handlers': {
@@ -63,7 +63,7 @@ LOGGING = {
 		'celery': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': '/home/ubuntu/logs/celery.log',
+			'filename': '/var/log/duffy/celery.log',
 			'formatter': 'simple',
 			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		},
@@ -96,7 +96,7 @@ LOGGING = {
 			'propagate': True,
 			'level': 'DEBUG',
 		},
-			'celery': {
+		'celery': {
 			'handlers': ['celery'],
 			'level': 'DEBUG',
 		},
