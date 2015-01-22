@@ -22,8 +22,6 @@
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
 #import "DFSMSInviteStrandComposeViewController.h"
-#import "DFSection.h"
-
 
 @interface DFPeoplePickerViewController ()
 
@@ -33,7 +31,7 @@
 
 @property (nonatomic, retain) DFSection *selectedSection;
 @property (nonatomic) BOOL hideStatusBar;
-
+@property (nonatomic) NSMutableDictionary *secondaryActionsBySection;
 
 @end
 
@@ -452,6 +450,21 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   userCell.profilePhotoStackView.peanutUsers = @[peanutUser];
 
   [self configureCell:userCell isSelectable:[self isUserSelectable:peanutUser]];
+  DFPeoplePickerSecondaryAction *secondaryAction = self.secondaryActionsBySection[[self sectionForIndex:indexPath.section
+                                                                                            inTableView:self.tableView]];
+  if (secondaryAction) {
+    userCell.secondaryButton.hidden = NO;
+    userCell.secondaryButton.backgroundColor = secondaryAction.backgroundColor;
+    [userCell.secondaryButton setTitleColor:secondaryAction.foregroundColor forState:UIControlStateNormal];
+    [userCell.secondaryButton setTitle:secondaryAction.buttonText forState:UIControlStateNormal];
+    userCell.secondaryButtonHandler = ^{
+      secondaryAction.actionHandler([[DFPeanutContact alloc] initWithPeanutUser:peanutUser]);
+    };
+    userCell.selectionStyle = UITableViewCellSelectionStyleNone;
+  } else {
+    userCell.secondaryButton.hidden = YES;
+    userCell.selectionStyle = UITableViewCellSelectionStyleDefault;
+  }
   
   return userCell;
 }
@@ -467,7 +480,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     cell.nameLabel.textColor = [UIColor lightGrayColor];
     cell.rightLabel.text = self.notSelectableReason;
   }
-  
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -480,6 +492,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 }
 
 #pragma mark - Action Responses
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   id object = [self objectForIndexPath:indexPath tableView:tableView];
@@ -487,8 +500,12 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   BOOL contactSelected = NO;
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
-    [self contactRowSelected:object atIndexPath:indexPath];
-    contactSelected = YES;
+    if (![self.notSelectableContacts containsObject:object]) {
+      [self contactRowSelected:object atIndexPath:indexPath];
+      contactSelected = YES;
+    } else {
+      [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
+    }
   } else if ([[object class] isSubclassOfClass:[NSString class]]) {
     [self textNumberRowSelected:object];
     contactSelected = YES;
@@ -559,6 +576,14 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   [self.delegate pickerController:self
       didFinishWithPickedContacts:self.selectedContacts];
+}
+
+- (void)setSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
+                forSection:(DFSection *)section
+{
+  if (!self.secondaryActionsBySection)
+    self.secondaryActionsBySection = [NSMutableDictionary new];
+  self.secondaryActionsBySection[section] = secondaryAction;
 }
 
 #pragma mark - Contacts Permission

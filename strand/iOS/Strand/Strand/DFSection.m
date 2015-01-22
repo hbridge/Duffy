@@ -21,4 +21,23 @@
   return section;
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+  DFSection *newSection = [[DFSection allocWithZone:zone] init];
+  newSection.title = [self.title copyWithZone:zone];
+  newSection.object = self.object;
+  newSection.rows = [self.rows copyWithZone:zone];
+  return newSection;
+}
+
+- (BOOL)isEqual:(id)object
+{
+  return [self.title isEqual:[object title]];
+}
+
+- (NSUInteger)hash
+{
+  return [self.title hash];
+}
+
 @end

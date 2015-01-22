@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DFSection : NSObject
+@interface DFSection : NSObject <NSCopying>
 
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) id object;

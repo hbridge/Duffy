@@ -40,6 +40,16 @@
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J0Z-N9-YS3">
+                        <rect key="frame" x="271" y="13" width="41" height="28"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <state key="normal" title="Button">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="secondaryButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Q9o-K2-Kt3"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="ZAQ-Nx-9It" secondAttribute="bottom" constant="9" id="6gK-Ra-qsB"/>
@@ -50,9 +60,11 @@
                     <constraint firstItem="nn3-YE-wjl" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" priority="900" constant="16" id="DfA-Jh-fVt"/>
                     <constraint firstAttribute="centerY" secondItem="ZAQ-Nx-9It" secondAttribute="centerY" id="Jcr-lD-eGi"/>
                     <constraint firstItem="ZAQ-Nx-9It" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="9" id="LrO-6b-1PN"/>
+                    <constraint firstAttribute="centerY" secondItem="J0Z-N9-YS3" secondAttribute="centerY" id="Pg4-eK-9El"/>
                     <constraint firstAttribute="centerY" secondItem="W0w-a5-an4" secondAttribute="centerY" constant="-10" id="b83-Kj-uSd"/>
                     <constraint firstItem="W0w-a5-an4" firstAttribute="top" secondItem="nn3-YE-wjl" secondAttribute="bottom" id="pfN-NF-6dL"/>
                     <constraint firstAttribute="trailing" secondItem="yAu-Lz-d0S" secondAttribute="trailing" constant="8" id="r4f-OJ-QdU"/>
+                    <constraint firstAttribute="trailing" secondItem="J0Z-N9-YS3" secondAttribute="trailing" constant="8" id="sB5-Ci-8Xz"/>
                     <constraint firstItem="ZAQ-Nx-9It" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="zw2-g5-xF9"/>
                 </constraints>
             </tableViewCellContentView>
@@ -60,6 +72,7 @@
                 <outlet property="nameLabel" destination="nn3-YE-wjl" id="6Oh-8j-K4V"/>
                 <outlet property="profilePhotoStackView" destination="ZAQ-Nx-9It" id="Jeu-5B-Jvj"/>
                 <outlet property="rightLabel" destination="yAu-Lz-d0S" id="6Xo-KZ-3rY"/>
+                <outlet property="secondaryButton" destination="J0Z-N9-YS3" id="7Ij-Mq-5ka"/>
                 <outlet property="subtitleLabel" destination="W0w-a5-an4" id="rwy-0b-eOP"/>
             </connections>
             <point key="canvasLocation" x="337" y="374"/>

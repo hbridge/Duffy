@@ -29,12 +29,14 @@
   if (self) {
     _peoplePicker = [[DFPeoplePickerViewController alloc] init];
     _peoplePicker.allowsMultipleSelection = YES;
-    _peoplePicker.doneButtonActionText = @"Add";
+    _peoplePicker.doneButtonActionText = @"Invite";
     _peoplePicker.navigationItem.title = @"Add Friends";
-    [_peoplePicker setSections:[self.class contactSections]];
+    
+    [self setDataForPeoplePicker];
   }
   return self;
 }
+
 
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -47,7 +49,7 @@
                                                          action:@selector(cancelPressed:)];
 }
 
-+ (NSArray *)contactSections
+- (void)setDataForPeoplePicker
 {
   NSMutableArray *sections = [NSMutableArray new];
   
@@ -61,13 +63,18 @@
     [sections addObject:[DFSection sectionWithTitle:@"People who Added You"
                                              object:nil
                                                rows:contactsWhoAddedYou]];
+    [self.peoplePicker setSecondaryAction:[self addFriendSecondaryAction] forSection:sections[0]];
+    self.peoplePicker.notSelectableContacts = contactsWhoAddedYou;
   }
+  
   
   NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
   if (contacts.count > 0) {
     [sections addObject:[DFSection sectionWithTitle:@"Contacts" object:nil rows:contacts]];
   }
-  return sections;
+  
+  
+  [self.peoplePicker setSections:sections];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -100,18 +107,6 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     }
   }
   
-  if (existingUserIDs.count > 0) {
-    [[DFPeanutFeedDataManager sharedManager] setUser:[[DFUser currentUser] userID]
-                                           isFriends:YES
-                                         withUserIDs:existingUserIDs
-                                             success:^{
-                                               [SVProgressHUD showSuccessWithStatus:@"Added!"];
-                                             } failure:^(NSError *error) {
-                                               [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
-                                               DDLogError(@"%@ adding users failed: %@", self.class, error);
-                                             }];
-  }
-  
   if (nonUsersToText.count > 0) {
     NSArray *phoneNumbers = [nonUsersToText arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
       return contact.phone_number;
@@ -119,12 +114,35 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     self.messageComposer  = [[DFSMSInviteStrandComposeViewController alloc]
                                                                initWithRecipients:phoneNumbers];
     self.messageComposer.messageComposeDelegate = self;
-    if (self.messageComposer)
+  if (self.messageComposer)
       [self presentViewController:self.messageComposer animated:YES completion:nil];
   } else {
     [self dismissViewControllerAnimated:YES completion:nil];
   }
 }
+
+- (DFPeoplePickerSecondaryAction *)addFriendSecondaryAction
+{
+  DFPeoplePickerSecondaryAction *secondaryAction = [DFPeoplePickerSecondaryAction new];
+  secondaryAction.foregroundColor = [UIColor whiteColor];
+  secondaryAction.backgroundColor = [DFStrandConstants strandBlue];
+  secondaryAction.buttonText = @"Add Back";
+  secondaryAction.actionHandler = ^(DFPeanutContact *contact) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
+    [[DFPeanutFeedDataManager sharedManager] setUser:[[DFUser currentUser] userID]
+                                           isFriends:YES
+                                         withUserIDs:@[@(user.id)]
+                                             success:^{
+                                               [SVProgressHUD showSuccessWithStatus:@"Added!"];
+                                               [self setDataForPeoplePicker];
+                                             } failure:^(NSError *error) {
+                                               [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
+                                               DDLogError(@"%@ adding users failed: %@", self.class, error);
+                                             }];
+  };
+  return secondaryAction;
+}
+
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result

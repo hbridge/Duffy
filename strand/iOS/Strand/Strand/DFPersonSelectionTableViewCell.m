@@ -19,6 +19,9 @@ const CGFloat DFPersonSelectionTableViewCellHeight = 54;
   self.selectedBackgroundView = backgroundColorView;
   self.showsTickMarkWhenSelected = YES;
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
+  self.secondaryButton.layer.cornerRadius = 3.0;
+  self.secondaryButton.layer.masksToBounds = YES;
+  self.secondaryButton.contentEdgeInsets = UIEdgeInsetsMake(5, 10, 5, 10);
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -55,6 +58,10 @@ const CGFloat DFPersonSelectionTableViewCellHeight = 54;
   if (!(style & DFPersonSelectionTableViewCellStyleRightLabel)) {
     [self.rightLabel removeFromSuperview];
   }
+}
+
+- (IBAction)secondaryButtonPressed:(id)sender {
+  if (self.secondaryButtonHandler) self.secondaryButtonHandler();
 }
 
 @end

@@ -9,6 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutContact.h"
 #import "DFNoTableItemsView.h"
+#import "DFSection.h"
+#import "DFPeoplePickerSecondaryAction.h"
+
+
+
 
 @class DFPeoplePickerViewController;
 
@@ -52,5 +57,7 @@
 
 
 - (void)setSections:(NSArray *)sections;
+- (void)setSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
+                forSection:(DFSection *)section;
 
 @end
