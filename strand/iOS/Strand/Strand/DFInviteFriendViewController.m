@@ -13,6 +13,7 @@
 #import "DFContactDataManager.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFSection.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFInviteFriendViewController ()
 
@@ -28,8 +29,8 @@
   if (self) {
     _peoplePicker = [[DFPeoplePickerViewController alloc] init];
     _peoplePicker.allowsMultipleSelection = YES;
-    _peoplePicker.doneButtonActionText = @"Invite";
-    _peoplePicker.navigationItem.title = @"Invite Friends";
+    _peoplePicker.doneButtonActionText = @"Add";
+    _peoplePicker.navigationItem.title = @"Add Friends";
     [_peoplePicker setSections:[self.class contactSections]];
   }
   return self;
@@ -49,6 +50,19 @@
 + (NSArray *)contactSections
 {
   NSMutableArray *sections = [NSMutableArray new];
+  
+  NSArray *usersWhoAddedYou = [[DFPeanutFeedDataManager sharedManager]
+                                usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
+  NSArray *contactsWhoAddedYou = [usersWhoAddedYou arrayByMappingObjectsWithBlock:^id(id input) {
+    return [[DFPeanutContact alloc] initWithPeanutUser:input];
+  }];
+  
+  if (contactsWhoAddedYou.count > 0) {
+    [sections addObject:[DFSection sectionWithTitle:@"People who Added You"
+                                             object:nil
+                                               rows:contactsWhoAddedYou]];
+  }
+  
   NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
   if (contacts.count > 0) {
     [sections addObject:[DFSection sectionWithTitle:@"Contacts" object:nil rows:contacts]];
@@ -76,8 +90,30 @@
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
 didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
-  if (peanutContacts.count > 0) {
-    NSArray *phoneNumbers = [peanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+  NSMutableArray *nonUsersToText = [peanutContacts mutableCopy];
+  NSMutableArray *existingUserIDs = [NSMutableArray new];
+  for (DFPeanutContact *contact in peanutContacts) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
+    if (user) {
+      [existingUserIDs addObject:@(user.id)];
+      [nonUsersToText removeObject:contact];
+    }
+  }
+  
+  if (existingUserIDs.count > 0) {
+    [[DFPeanutFeedDataManager sharedManager] setUser:[[DFUser currentUser] userID]
+                                           isFriends:YES
+                                         withUserIDs:existingUserIDs
+                                             success:^{
+                                               [SVProgressHUD showSuccessWithStatus:@"Added!"];
+                                             } failure:^(NSError *error) {
+                                               [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
+                                               DDLogError(@"%@ adding users failed: %@", self.class, error);
+                                             }];
+  }
+  
+  if (nonUsersToText.count > 0) {
+    NSArray *phoneNumbers = [nonUsersToText arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
       return contact.phone_number;
     }];
     self.messageComposer  = [[DFSMSInviteStrandComposeViewController alloc]
@@ -85,6 +121,8 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     self.messageComposer.messageComposeDelegate = self;
     if (self.messageComposer)
       [self presentViewController:self.messageComposer animated:YES completion:nil];
+  } else {
+    [self dismissViewControllerAnimated:YES completion:nil];
   }
 }
 
