@@ -72,6 +72,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
 
 + (void)warmUpSMSComposer
 {
+  if (![MFMessageComposeViewController canSendText]) return;
   DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc] initForWarmup];
   [smsvc view]; //force the view controller's view to load, hopefully actually causes AB load etc
 }
