@@ -28,6 +28,8 @@ from common.models import ContactEntry, User, Photo, Action, Strand, FriendConne
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
+from async import two_fishes
+
 # TODO(Derek): move this to common
 from arbus import image_util
 
@@ -379,6 +381,9 @@ class PhotoBulkAPI(BasePhotoAPI):
             createdPhotos = list(Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt))
 
             allPhotos.extend(createdPhotos)
+
+            # Async tasks
+            two_fishes.processList(Photo.getIds(allPhotos))
             
             # Now bulk update photos that already exist, this could happen during re-install
             if len(objsToUpdate) > 0:

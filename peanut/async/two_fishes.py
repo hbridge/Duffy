@@ -7,7 +7,7 @@ import urllib
 import json
 import pytz
 
-from async.celery import app
+from peanut.celery import app
 
 from django.db.models import Q
 from django import db
