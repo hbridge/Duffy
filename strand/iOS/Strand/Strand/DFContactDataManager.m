@@ -10,6 +10,8 @@
 #import <RHAddressBook/AddressBook.h>
 #import "DFPeanutFeedDataManager.h"
 #import "DFPhoneNumberUtils.h"
+#import "DFContactSyncManager.h"
+#import "DFPeanutContact.h"
 
 @interface DFContactDataManager ()
 
@@ -87,6 +89,36 @@ static DFContactDataManager *defaultManager;
     }
   }
   return _phoneNumberToPersonCache;
+}
+
+- (NSArray *)allPeanutContacts
+{
+  return [self peanutContactSearchResultsForString:nil];
+}
+
+- (NSArray *)peanutContactSearchResultsForString:(NSString *)string
+{
+  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized) return @[];
+  
+  NSMutableArray *results = [NSMutableArray new];
+  
+  NSArray *people;
+  if ([string isNotEmpty] ) {
+    people = [self.addressBook peopleWithName:string];
+  } else {
+    people = [self.addressBook peopleOrderedByFirstName];
+  }
+  for (RHPerson *person in people) {
+    for (int i = 0; i < person.phoneNumbers.values.count; i++) {
+      DFPeanutContact *contact = [[DFPeanutContact alloc] init];
+      contact.name = person.name;
+      contact.phone_number = [person.phoneNumbers valueAtIndex:i];
+      contact.phone_type = [person.phoneNumbers localizedLabelAtIndex:i];
+      [results addObject:contact];
+    }
+  }
+  
+  return results;
 }
 
 - (RHAddressBook *)addressBook

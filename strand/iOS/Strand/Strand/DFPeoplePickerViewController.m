@@ -17,6 +17,7 @@
 #import "DFPeanutUserObject.h"
 #import "DFABResultTableViewCell.h"
 #import "DFContactSyncManager.h"
+#import "DFContactDataManager.h"
 #import "DFPersonSelectionTableViewCell.h"
 #import "UINib+DFHelpers.h"
 #import "DFStrandConstants.h"
@@ -211,7 +212,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
   if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
     [unfilteredSectionTitles addObject:ContactsSectionTitle];
-    self.ABList = [[self abSearchResultsForString:nil] mutableCopy];
+    self.ABList = [[[DFContactDataManager sharedManager] allPeanutContacts]  mutableCopy];
     [unfilteredSections addObject:self.ABList];
   }
   
@@ -358,7 +359,8 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     
     self.filteredABList = @[];
     if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
-      self.filteredABList = [self abSearchResultsForString:searchText];
+      self.filteredABList = [[DFContactDataManager sharedManager]
+                             peanutContactSearchResultsForString:searchText];
     }
     [sectionTitles addObject:@"Contacts"];
     [sections addObject:self.filteredABList];
@@ -369,30 +371,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   }
 }
 
-- (NSArray *)abSearchResultsForString:(NSString *)string
-{
-  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized) return @[];
-  
-  NSMutableArray *results = [NSMutableArray new];
 
-  NSArray *people;
-  if ([string isNotEmpty] ) {
-    people = [self.addressBook peopleWithName:string];
-  } else {
-    people = [self.addressBook peopleOrderedByFirstName];
-  }
-  for (RHPerson *person in people) {
-    for (int i = 0; i < person.phoneNumbers.values.count; i++) {
-      DFPeanutContact *contact = [[DFPeanutContact alloc] init];
-      contact.name = person.name;
-      contact.phone_number = [person.phoneNumbers valueAtIndex:i];
-      contact.phone_type = [person.phoneNumbers localizedLabelAtIndex:i];
-      [results addObject:contact];
-    }
-  }
-  
-  return results;
-}
 
 - (NSString *)textNumberStringForString:(NSString *)string
 {

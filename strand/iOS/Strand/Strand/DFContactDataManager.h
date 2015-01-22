@@ -17,4 +17,8 @@
 - (RHPerson *)personFromPhoneNumber:(NSString *)phoneNumber;
 - (void)refreshCache;
 
+/* All contacts in the phone book, returned as DFPeanutContacts */
+- (NSArray *)allPeanutContacts;
+- (NSArray *)peanutContactSearchResultsForString:(NSString *)string;
+
 @end
