@@ -79,7 +79,7 @@ def listsToPhrases(photoCount, userNames):
 def main(argv):
 	logger.info("Starting... ")
 	photoTimedelta = datetime.timedelta(minutes=720)
-	notificationTimedelta = datetime.timedelta(seconds=constants.NOTIFICATIONS_NEW_SUGGESTIONS_INTERVAL_SECS)
+	notificationTimedelta = datetime.timedelta(seconds=constants.NOTIFICATIONS_NEW_SUGGESTION_INTERVAL_SECS)
 
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
