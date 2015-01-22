@@ -102,6 +102,11 @@
                       uppercaseString];
     }
     abbreviations[[self.class idForUser:user]] = abbreviation;
+    
+    // override name here so abbreviation isn't "Y"
+    if (user.id == [[DFUser currentUser] userID]) {
+      firstName = @"You";
+    }
     firstNames[[self.class idForUser:user]] = firstName;
   }
   
@@ -203,7 +208,7 @@
 
 - (CGFloat)nameLabelHeight
 {
-  if (self.nameMode != DFProfileStackViewNameShowAlways) return 0;
+  if (!self.showNames) return 0;
   
   return self.nameLabelFont.pointSize + self.nameLabelVerticalMargin * 2;
 }
@@ -261,7 +266,7 @@
   } else {
     [image drawInRect:circleRect];
   }
-  if (self.nameMode == DFProfileStackViewNameShowAlways) {
+  if (self.showNames) {
     [self drawNameText:firstName belowCircleRect:circleRect context:context];
   }
   UIImage *badgeImage = self.badgeImagesById[userID];
@@ -315,7 +320,7 @@
 
 - (void)tapped:(UITapGestureRecognizer *)sender
 {
-  if (self.nameMode == DFProfileStackViewNameModeNone) return;
+  if (![self.delegate respondsToSelector:@selector(profileStackView:peanutUserTapped:)]) return;
   
   for (NSUInteger i = 0; i < [self maxPeanutUsersToDraw]; i++) {
     CGRect rectForName = [self rectForCircleAtIndex:i];
@@ -323,13 +328,9 @@
     if (CGRectContainsPoint(rectForName, tapPoint)) {
       if ([self shouldDrawUserAtIndex:i inRect:self.bounds]) {
         DFPeanutUserObject *user = self.peanutUsers[i];
-        if (user.fullName.length > 0) {
-          [self popLabelAtRect:rectForName withText:user.fullName];
-        } else {
-          [self popLabelAtRect:rectForName withText:[NSString stringWithFormat:@"%@ (invited)", user.phone_number]];
-        }
+        [self.delegate profileStackView:self peanutUserTapped:user];
       } else {
-        [self elipseTappedInRect:rectForName];
+        [self moreUsersCircleTappedInRect:rectForName];
       }
     }
   }
@@ -356,7 +357,7 @@
   self.popLabel.delegate = self;
 }
 
-- (void)elipseTappedInRect:(CGRect)rect
+- (void)moreUsersCircleTappedInRect:(CGRect)rect
 {
   NSUInteger numUsersThatFitInRect = [self numUsersThatFitInRect:self.bounds];
   NSRange range = (NSRange){numUsersThatFitInRect - 1, self.peanutUsers.count - numUsersThatFitInRect + 1};

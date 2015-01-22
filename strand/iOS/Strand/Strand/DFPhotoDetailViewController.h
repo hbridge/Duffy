@@ -12,7 +12,7 @@
 #import "DFPeanutFeedObject.h"
 #import "DFRemoteImageView.h"
 
-@interface DFPhotoDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface DFPhotoDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, DFProfileStackViewDelegate>
 
 @property (strong, nonatomic) DFRemoteImageView *imageView;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *recipientsProfileStackView;

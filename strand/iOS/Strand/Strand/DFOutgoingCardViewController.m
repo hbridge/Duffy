@@ -7,10 +7,12 @@
 //
 
 #import "DFOutgoingCardViewController.h"
+#import <WYPopoverController/WYPopoverController.h>
 #import "DFNavigationController.h"
 #import "DFImageManager.h"
 #import "DFAnalytics.h"
-#import <WYPopoverController/WYPopoverController.h>
+#import "DFFriendProfileViewController.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFOutgoingCardViewController ()
 
@@ -77,7 +79,8 @@
   if (!self.suggestionContentView) {
     self.suggestionContentView =
     [UINib instantiateViewWithClass:[DFOutgoingCardContentView class]];
-    self.suggestionContentView.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
+    self.suggestionContentView.profileStackView.showNames = NO;
+    self.suggestionContentView.profileStackView.delegate = self;
     self.suggestionContentView.profileStackView.backgroundColor = [UIColor clearColor];
   }
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -288,5 +291,16 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   [self.suggestionContentView.commentTextField resignFirstResponder];
 }
+
+- (void)profileStackView:(DFProfileStackView *)profileStackView peanutUserTapped:(DFPeanutUserObject *)peanutUser
+{
+  // info can be incomplete, look up to see if we have a legit user
+  DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:peanutUser.phone_number];
+  if (user) {
+    DFFriendProfileViewController *friendViewController = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
+    [DFNavigationController presentWithRootController:friendViewController inParent:self];
+  }
+}
+
 
 @end

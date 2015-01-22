@@ -11,7 +11,7 @@
 #import "DFPeoplePickerViewController.h"
 #import "DFOutgoingCardContentView.h"
 
-@interface DFOutgoingCardViewController : DFCardViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate>
+@interface DFOutgoingCardViewController : DFCardViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate, DFProfileStackViewDelegate>
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);

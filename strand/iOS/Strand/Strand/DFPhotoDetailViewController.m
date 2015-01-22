@@ -23,6 +23,8 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFPhotoStore.h"
 #import "DFPeanutPhoto.h"
+#import "DFFriendProfileViewController.h"
+#import <MMPopLabel/MMLabel.h>
 
 const NSUInteger CompressedModeMaxRows = 1;
 
@@ -34,6 +36,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFCommentTableViewCell *templateCell;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
+@property (nonatomic, retain) MMPopLabel *youPopLabel;
 
 @end
 
@@ -198,8 +201,13 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   for (DFProfileStackView *psv in @[self.senderProfileStackView, self.recipientsProfileStackView]) {
     psv.backgroundColor = [UIColor clearColor];
-    psv.nameMode = DFProfileStackViewNameShowAlways;
+    psv.showNames = YES;
+    psv.delegate = self;
   }
+  
+  self.youPopLabel = [MMPopLabel popLabelWithText:@"You sent this photo"];
+  [self.senderProfileStackView.superview addSubview:self.youPopLabel];
+  
   self.recipientsProfileStackView.photoMargins = 5;
 }
 
@@ -783,6 +791,19 @@ const NSUInteger CompressedModeMaxRows = 1;
     [self.templateCell setNeedsLayout];
   }
   return self.templateCell.rowHeight;
+}
+
+- (void)profileStackView:(DFProfileStackView *)profileStackView peanutUserTapped:(DFPeanutUserObject *)peanutUser
+{
+  if (peanutUser.id == [[DFUser currentUser] userID]) {
+    [self.youPopLabel popAtView:self.senderProfileStackView animatePopLabel:YES animateTargetView:NO];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self.youPopLabel dismiss];
+    });
+  } else {
+    DFFriendProfileViewController *friendViewController = [[DFFriendProfileViewController alloc] initWithPeanutUser:peanutUser];
+    [DFNavigationController presentWithRootController:friendViewController inParent:self];
+  }
 }
 
 #pragma mark - Photo view gesture recognizers

@@ -10,22 +10,25 @@
 #import <MMPopLabel/MMPopLabel.h>
 
 @class DFPeanutUserObject;
+@class DFProfileStackView;
+
+@protocol DFProfileStackViewDelegate <NSObject>
+
+- (void)profileStackView:(DFProfileStackView *)profileStackView
+        peanutUserTapped:(DFPeanutUserObject *)peanutUser;
+
+@end
 
 @interface DFProfileStackView : UIView <MMPopLabelDelegate>
 
-typedef NS_ENUM(NSInteger, DFProfileStackViewNameMode) {
-  DFProfileStackViewNameModeNone = 0,
-  DFProfileStackViewNameShowOnTap,
-  DFProfileStackViewNameShowAlways,
-};
-
 @property (nonatomic) NSUInteger maxProfilePhotos;
 @property (nonatomic, retain) NSArray *peanutUsers;
-@property (nonatomic) DFProfileStackViewNameMode nameMode;
+@property (nonatomic) BOOL showNames;
 @property (nonatomic) NSUInteger maxAbbreviationLength;
 @property (nonatomic, retain) UIFont *nameLabelFont;
 @property (nonatomic) CGFloat photoMargins;
 @property (nonatomic) CGFloat nameLabelVerticalMargin;
+@property (nonatomic, weak) id<DFProfileStackViewDelegate> delegate;
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user;
 - (void)setColor:(UIColor *)color forUser:(DFPeanutUserObject *)user;
