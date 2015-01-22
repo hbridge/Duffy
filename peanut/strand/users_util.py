@@ -18,7 +18,7 @@ def initNewUser(user, fromSmsAuth, buildNum):
 	reverseFriends = set()
 
 	for contact in contacts:
-		if 'invited' in contact.contact_type:
+		if contant.contact_type and 'invited' in contact.contact_type:
 			fullFriends.add(contact.user)
 		else:
 			reverseFriends.add(contact.user)
