@@ -49,21 +49,26 @@ def getFriendsObjectData(userId, users, includePhone = True):
 	for user in users:
 		if user.id == userId:
 			continue
+
+		entry = {'display_name': user.display_name, 'id': user.id}
+
 		
 		connId = None
 		if user.id in fullFriends:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
 			connId = connIds[user.id]
+			entry['forward_friend_only'] = False
 		elif user.id in forwardFriends and not user.id in fullFriends:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FORWARD_FRIEND
 			connId = connIds[user.id]
+			entry['forward_friend_only'] = True
 		elif user.id in reverseFriends:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_REVERSE_FRIEND
 		else:
 			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
 		
-		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
-
+		entry[constants.FEED_OBJECT_TYPE_RELATIONSHIP] = relationship
+		
 		if connId:
 			entry['friend_connection_id'] = connId
 			
