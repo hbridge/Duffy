@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutFeedObject.h"
-#import "DFPeoplePickerViewController.h"
 
 @interface DFStrandPeopleViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 

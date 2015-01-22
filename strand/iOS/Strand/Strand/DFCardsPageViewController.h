@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutUserObject.h"
-#import "DFPeoplePickerViewController.h"
 #import "DFCreateStrandFlowViewController.h"
 #import "DFCardViewController.h"
 
