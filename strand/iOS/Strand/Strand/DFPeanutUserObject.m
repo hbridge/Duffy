@@ -50,6 +50,7 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
            @"added",
            @"invited",
            @"relationship",
+           @"friend_connection_id",
            @"last_actions_list_request_timestamp"
            ];
 }

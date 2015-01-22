@@ -742,11 +742,12 @@ static DFPeanutFeedDataManager *defaultManager;
           targetUser.relationship = DFPeanutUserRelationshipConnection;
         }
         DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);
-        success();
       } failure:^(NSError *error) {
         DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
+        failure(error);
       }];
     }
+    success();
   }
 }
 
