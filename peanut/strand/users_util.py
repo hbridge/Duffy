@@ -17,7 +17,7 @@ def initNewUser(user, fromSmsAuth, buildNum):
 	fullFriends = set()
 	reverseFriends = set()
 
-	logger.info("contacts found: "%(len(contacts)))
+	logger.info("contacts found: %s"%(len(contacts)))
 
 	for contact in contacts:
 		if contant.contact_type and 'invited' in contact.contact_type:
