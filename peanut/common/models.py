@@ -754,21 +754,32 @@ class FriendConnection(models.Model):
 		db_table = 'strand_friends'
 
 	@classmethod
-	def friendConnectionExists(cls, user1, user2, existingFriendConnections):
+	def friendFullConnectionExists(cls, user1, user2, existingFriendConnections):
+		forward = reverse = False
+		for connection in existingFriendConnections:
+			if connection.user_1.id == user1.id and connection.user_2.id == user2.id:
+				forward = True
+			if connection.user_1.id == user2.id and connection.user_2.id == user1.id:
+				reverse = True
+			if forward and reverse:
+				return True
+		return False
+
+	@classmethod
+	def friendForwardConnectionExists(cls, user1, user2, existingFriendConnections):
 		for connection in existingFriendConnections:
 			if connection.user_1.id == user1.id and connection.user_2.id == user2.id:
 				return True
 
 	@classmethod
-	def addConnection(cls, user1, user2):
-		try:
-			if user1.id < user2.id:
-				u1 = user1
-				u2 = user2
-			else:
-				u1 = user2
-				u2 = user1
+	def friendReverseConnectionExists(cls, user1, user2, existingFriendConnections):
+		for connection in existingFriendConnections:
+			if connection.user_1.id == user2.id and connection.user_2.id == user1.id:
+				return True
 
+	@classmethod
+	def addForwardConnection(cls, u1, u2):
+		try:
 			FriendConnection.objects.create(user_1=u1, user_2=u2)
 			logger.debug("Created friend entry for user %s with user %s" % (u1.id, u2.id))
 			return True
@@ -777,7 +788,25 @@ class FriendConnection(models.Model):
 			return False
 
 	@classmethod
-	def addNewConnections(cls, userToAddTo, users):
+	def addReverseConnection(cls, u1, u2):
+		try:
+			FriendConnection.objects.create(user_1=u2, user_2=u1)
+			logger.debug("Created friend entry for user %s with user %s" % (u1.id, u2.id))
+			return True
+		except IntegrityError:
+			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (u1.id, u2.id))
+			return False
+
+	@classmethod
+	def addReverseConnections(cls, userToAddTo, users):
+		existingReverseConnectionsForUserToAddTo = FriendConnection.objects.filter(user_1__in=users).filter(user_2__in=userToAddTo)
+
+		for user in users:
+			if not cls.friendReverseConnectionExists(userToAddTo, user, existingReverseConnectionsForUserToAddTo):
+				cls.addReverseConnection(userToAddTo, user)
+
+	@classmethod
+	def addNewFullConnections(cls, userToAddTo, users):
 		allUsers = list()
 		allUsers.extend(users)
 		allUsers.append(userToAddTo)
@@ -786,8 +815,9 @@ class FriendConnection(models.Model):
 		for user in users:
 			if user.id == userToAddTo.id:
 				continue
-			if not cls.friendConnectionExists(user, userToAddTo, existingFriendConnections):
-				cls.addConnection(user, userToAddTo)
+			if not cls.friendFullConnectionExists(user, userToAddTo, existingFriendConnections):
+				cls.addForwardConnection(userToAddTo, user)
+				cls.addReverseConnection(userToAddTo, user)
 				
 		# TODO(Derek): If thie above loop gets bad, put back in the bulk calls
 		#FriendConnection.objects.bulk_create(newFriendConnections)

@@ -91,12 +91,12 @@ def main(argv):
 				
 				# If we have a user associated with a given phone number
 				if contactEntry.phone_number in usersByPhoneNumber:
-					friend = usersByPhoneNumber[contactEntry.phone_number]
+					forwardFriend = usersByPhoneNumber[contactEntry.phone_number]
 					try:
 						if contactEntry.user.id == friend.id:
 							continue
 						else:
-							if FriendConnection.addConnection(contactEntry.user, friend):
+							if FriendConnection.addForwardConnection(contactEntry.user, forwardFriend):
 								newConnectionCount += 1
 								
 					except IntegrityError:

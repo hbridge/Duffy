@@ -13,9 +13,20 @@ def initNewUser(user, fromSmsAuth, buildNum):
 	logger.debug("Initing new user %s" % user.id)
 
 	contacts = ContactEntry.objects.filter(phone_number = user.phone_number).exclude(user=user).exclude(skip=True).filter(user__product_id=2)
-	friends = set([contact.user for contact in contacts])
 
-	FriendConnection.addNewConnections(user, friends)
+	fullFriends = set()
+	reverseFriends = set()
+
+	for contact in contacts:
+		if 'invited' in contact.contact_type:
+			fullFriends.add(contact.user)
+		else:
+			reverseFriends.add(contact.user)
+
+	if len(fullFriends) > 0:
+		FriendConnection.addNewFullConnections(user, list(fullFriends))
+	if len(reverseFriends) > 0:
+		FriendConnection.addReverseConnections(user, list(reverseFriends))
 
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
