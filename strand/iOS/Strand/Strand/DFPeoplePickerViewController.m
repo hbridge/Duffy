@@ -7,8 +7,6 @@
 //
 
 #import "DFPeoplePickerViewController.h"
-#import <AddressBook/AddressBook.h>
-#import <RHAddressBook/AddressBook.h>
 #import "NSString+DFHelpers.h"
 #import "DFDefaultsStore.h"
 #import "UIAlertView+DFHelpers.h"
@@ -25,11 +23,11 @@
 #import "NSArray+DFHelpers.h"
 #import "DFNoTableItemsView.h"
 #import "DFSMSInviteStrandComposeViewController.h"
+#import "DFSection.h"
 
 
 @interface DFPeoplePickerViewController ()
 
-@property (readonly, nonatomic, retain) RHAddressBook *addressBook;
 @property (nonatomic, retain) NSMutableArray *unfilteredSectionTitles;
 @property (nonatomic, retain) NSMutableArray *unfilteredSections;
 @property (nonatomic, retain) NSArray *suggestedList;
@@ -51,7 +49,6 @@
 @end
 
 @implementation DFPeoplePickerViewController
-@synthesize addressBook = _addressBook;
 @synthesize doneButtonActionText = _doneButtonActionText;
 
 
@@ -703,14 +700,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   [UIAlertView showSimpleAlertWithTitle:@"Contacts Denied"
                           formatMessage:@"Please go to Settings > Privacy > Contacts and change Strand to on."];
 }
-
-
-- (RHAddressBook *)addressBook
-{
-  if (!_addressBook) _addressBook = [[RHAddressBook alloc] init];
-  return _addressBook;
-}
-
 
 
 
