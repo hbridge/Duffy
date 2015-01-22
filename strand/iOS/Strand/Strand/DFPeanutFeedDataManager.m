@@ -713,6 +713,7 @@ static DFPeanutFeedDataManager *defaultManager;
         DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
         if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipReverseFriend]) {
           targetUser.relationship = DFPeanutUserRelationshipFriend;
+          targetUser.forward_friend_only = @(NO);
         } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipConnection]) {
           targetUser.relationship = DFPeanutUserRelationshipFriend;
           targetUser.forward_friend_only = @(YES);
@@ -740,7 +741,8 @@ static DFPeanutFeedDataManager *defaultManager;
       [self.friendConnectionAdapter deleteFriendConnection:friendConnection success:^(NSArray *resultObjects) {
         DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
         targetUser.friend_connection_id = nil;
-        if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend]) {
+        if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
+            ![targetUser.forward_friend_only boolValue]) {
           targetUser.relationship = DFPeanutUserRelationshipReverseFriend;
         } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
                    [targetUser.forward_friend_only boolValue]) {
