@@ -13,10 +13,11 @@
 #import "DFActionButtonTableViewCell.h"
 #import "DFInviteStrandViewController.h"
 #import "DFNavigationController.h"
+#import "DFRecipientPickerViewController.h"
 
 @interface DFStrandPeopleViewController ()
 
-@property (nonatomic, retain) DFInviteStrandViewController *inviteViewController;
+@property (nonatomic, retain) DFRecipientPickerViewController *inviteViewController;
 
 @end
 
@@ -66,7 +67,7 @@
 - (void)addSelectedContactsFromInviteController
 {
   NSMutableArray *newUsers = [NSMutableArray new];
-  for (DFPeanutContact *contact in self.inviteViewController.selectedPeanutContacts) {
+  for (DFPeanutContact *contact in self.inviteViewController.selectedContacts) {
     DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
     user.display_name = contact.name;
     user.phone_number = contact.phone_number;
@@ -167,7 +168,7 @@
   NSArray *contactsArray = [self.strandPostsObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
     return [[DFPeanutContact alloc] initWithPeanutUser:user];
   }];
-  self.inviteViewController = [[DFInviteStrandViewController alloc]
+  self.inviteViewController = [[DFRecipientPickerViewController alloc]
                                       initWithSuggestedPeanutContacts:nil
                                       notSelectablePeanutContacts:contactsArray
                                       notSelectableReason:@"Already Member"];

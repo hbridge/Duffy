@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPeoplePickerViewController.h"
+#import "DFRecipientPickerViewController.h"
 #import "DFPeanutFeedObject.h"
 #import <MessageUI/MessageUI.h>
 
-@interface DFInviteStrandViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
+@interface DFInviteStrandViewController : DFRecipientPickerViewController <DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic) DFPeanutFeedObject *photoObject;
 

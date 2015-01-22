@@ -21,30 +21,19 @@
 #import "DFStrandConstants.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
-#import "DFNoTableItemsView.h"
 #import "DFSMSInviteStrandComposeViewController.h"
 #import "DFSection.h"
 
 
 @interface DFPeoplePickerViewController ()
 
-@property (nonatomic, retain) NSMutableArray *unfilteredSectionTitles;
-@property (nonatomic, retain) NSMutableArray *unfilteredSections;
-@property (nonatomic, retain) NSArray *suggestedList;
-@property (nonatomic, retain) NSMutableArray *onStrandList;
-@property (nonatomic, retain) NSMutableArray *ABList;
-
-@property (nonatomic, retain) UISearchDisplayController *sdc;
-@property (nonatomic, retain) NSArray *filteredSectionTitles;
+@property (nonatomic, retain) NSArray *unfilteredSections;
 @property (nonatomic, retain) NSArray *filteredSections;
-@property (nonatomic, retain) NSArray *filteredSuggestedList;
-@property (nonatomic, retain) NSArray *filteredOnStrandList;
-@property (nonatomic, retain) NSArray *filteredABList;
+@property (nonatomic, retain) UISearchDisplayController *sdc;
 
-@property (nonatomic, retain) NSMutableArray *selectedNonSuggestionsList;
-@property (nonatomic, retain) NSMutableArray *selectedContacts;
+@property (nonatomic, retain) DFSection *selectedSection;
 @property (nonatomic) BOOL hideStatusBar;
-@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
+
 
 @end
 
@@ -52,80 +41,49 @@
 @synthesize doneButtonActionText = _doneButtonActionText;
 
 
-NSString *const UserSectionTitle = @"Swap Friends";
-NSString *const SuggestedSecitonTitle = @"Suggested";
-NSString *const ContactsSectionTitle = @"Contacts";
 NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
-
-- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers
-{
-  NSArray *peanutContacts = [suggestedPeanutedUsers arrayByMappingObjectsWithBlock:^id(id input) {
-    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
-    return contact;
-  }];
-  self = [self initWithSuggestedPeanutContacts:peanutContacts];
-  if (self) {
-    
-  }
-  return self;
-}
-
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
-{
-  self = [self init];
-  if (self) {
-    _suggestedPeanutContacts = suggestedPeanutContacts;
-  }
-  return self;
-}
-
-- (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
-{
-  self = [self init];
-  if (self) {
-    _selectedContacts = [selectedPeanutContacts mutableCopy];
-  }
-  return self;
-}
-
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
-                    notSelectablePeanutContacts:(NSArray *)notSelectableContacts
-                            notSelectableReason:(NSString *)notSelectableReason
-{
-  self = [self init];
-  if (self) {
-    _suggestedPeanutContacts = suggestedPeanutContacts;
-    _notSelectableContacts = notSelectableContacts;
-    _notSelectableReason = notSelectableReason;
-  }
-  return self;
-}
 
 - (instancetype)init
 {
   self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
   if (self) {
+    self.disableContactsUpsell = YES;
     self.selectedContacts = [NSMutableArray new];
     [self configureNav];
   }
   return self;
 }
 
+- (instancetype)initWithSections:(NSArray *)sections
+{
+  self = [self init];
+  if (self) {
+    self.unfilteredSections = sections;
+  }
+  return self;
+}
+
+- (void)setSections:(NSArray *)sections
+{
+  self.unfilteredSections = sections;
+  [self.tableView reloadData];
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   
-  [self loadUnfilteredArrays];
   [self configureTableView];
   [self configureSearch];
-  [self selectionUpdated];
+  [self selectionUpdatedSilently:YES];
   [self configureNoResultsView];
 }
 
 - (void)configureNoResultsView
 {
   if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized
-      && self.unfilteredSections.count == 0) {
+      && self.unfilteredSections.count == 0
+      && !self.disableContactsUpsell) {
     self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
     self.noResultsView.titleLabel.text = @"Show Contacts";
     self.noResultsView.subtitleLabel.text = @"Grant contacts permission to show results from your Contacts.";
@@ -181,41 +139,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   self.tableView.allowsMultipleSelection = allowsMultipleSelection;
 }
 
-- (void)loadUnfilteredArrays
-{
-  NSMutableArray *unfilteredSectionTitles = [NSMutableArray new];
-  NSMutableArray *unfilteredSections = [NSMutableArray new];
-  
-  if (self.suggestedPeanutContacts.count > 0) {
-    [unfilteredSectionTitles addObject:SuggestedSecitonTitle];
-    self.suggestedList = self.suggestedPeanutContacts;
-    [unfilteredSections addObject:self.suggestedList];
-    [self.selectedContacts addObjectsFromArray:self.suggestedList];
-  }
-  
-  NSArray *peanutUsers = [[DFPeanutFeedDataManager sharedManager] friendsList];
-  NSMutableArray *onStrandContacts = [NSMutableArray new];
-  for (DFPeanutUserObject *user in peanutUsers) {
-    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:user];
-    if (![self.suggestedPeanutContacts containsObject:contact]) {
-      [onStrandContacts addObject:contact];
-    }
-  }
-  if (onStrandContacts.count > 0 && !self.hideFriendsSection) {
-    [unfilteredSectionTitles addObject:UserSectionTitle];
-    self.onStrandList = onStrandContacts;
-    [unfilteredSections addObject:self.onStrandList];
-  }
-
-  if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
-    [unfilteredSectionTitles addObject:ContactsSectionTitle];
-    self.ABList = [[[DFContactDataManager sharedManager] allPeanutContacts]  mutableCopy];
-    [unfilteredSections addObject:self.ABList];
-  }
-  
-  self.unfilteredSections = unfilteredSections;
-  self.unfilteredSectionTitles = unfilteredSectionTitles;
-}
 
 - (void)configureTableView
 {
@@ -254,7 +177,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (void)setDoneButtonActionText:(NSString *)doneButtonActionText
 {
   _doneButtonActionText = doneButtonActionText;
-  [self selectionUpdated];
+  [self selectionUpdatedSilently:YES];
 }
 
 - (NSString *)doneButtonActionText
@@ -263,7 +186,13 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   return _doneButtonActionText;
 }
 
-- (void)selectionUpdated
+- (void)setSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
+{
+  _selectedContacts = selectedPeanutContacts;
+  [self selectionUpdatedSilently:YES];
+}
+
+- (void)selectionUpdatedSilently:(BOOL)silently
 {
   int count = (int)self.selectedContacts.count;
   NSString *buttonTitle;
@@ -289,22 +218,36 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     self.navigationItem.rightBarButtonItem.enabled = NO;
     self.doneButton.enabled = NO;
   }
-  
   [self.doneButton setTitle:buttonTitle forState:UIControlStateNormal];
+  
+  
+  if (!self.selectedSection) {
+    self.selectedSection = [DFSection sectionWithTitle:@"Selected"
+                                                object:nil
+                                                  rows:self.selectedContacts];
+  }
+  self.selectedSection.rows = self.selectedContacts;
+  if (self.selectedContacts.count > 0 && ![self.unfilteredSections containsObject:self.selectedSection]) {
+    self.unfilteredSections = [@[self.selectedSection] arrayByAddingObjectsFromArray:self.unfilteredSections];
+  } else if (self.selectedContacts.count == 0) {
+    self.unfilteredSections = [self.unfilteredSections arrayByRemovingObject:self.selectedSection];
+  }
+  
+  if (!silently
+      && [self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+    [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+  }
+  
+  [self.tableView reloadData];
 }
 
 - (BOOL)hasUnfilteredResults
 {
-  for (NSArray *sectionArray in self.unfilteredSections) {
-    if (sectionArray.count > 0) return YES;
+  for (DFSection *section in self.unfilteredSections) {
+    if (section.rows.count > 0) return YES;
   }
   
   return NO;
-}
-
-- (NSArray *)selectedPeanutContacts
-{
-  return self.selectedContacts;
 }
 
 #pragma mark - UISearchDisplayController Delegate
@@ -332,43 +275,32 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   NSString *searchText = self.searchDisplayController.searchBar.text;
   
   if ([searchText isNotEmpty]) {
-    NSMutableArray *sectionTitles = [NSMutableArray new];
-    NSMutableArray *sections = [NSMutableArray new];
-    
+    NSMutableArray *filteredSections = [NSMutableArray new];
     self.textNumberString = [self textNumberStringForString:searchText];
     if (self.textNumberString) {
-      [sectionTitles addObject:@"Text Number"];
-      [sections addObject:@[self.textNumberString]];
+      [filteredSections addObject:[DFSection sectionWithTitle:@"Phone Number"
+                                                       object:nil
+                                                         rows:@[self.textNumberString]]];
     }
     
     NSPredicate *nameFilterPredicate = [NSPredicate predicateWithFormat:@"name BEGINSWITH[cd] %@", searchText];
-    self.filteredSuggestedList = [self.suggestedList filteredArrayUsingPredicate:nameFilterPredicate];
-    if (self.filteredSuggestedList.count > 0) {
-      [sectionTitles addObject:@"Suggestions"];
-      [sections addObject:self.filteredSuggestedList];
+    for (DFSection *section in self.unfilteredSections) {
+      NSArray *peanutContacts = section.rows;
+      NSArray *filteredContacts = [peanutContacts filteredArrayUsingPredicate:nameFilterPredicate];
+      if (filteredContacts.count > 0) {
+        [filteredSections addObject:[DFSection sectionWithTitle:section.title
+                                                         object:nil
+                                                           rows:filteredContacts]];
+      }
     }
     
-    self.filteredOnStrandList = [self.onStrandList filteredArrayUsingPredicate:nameFilterPredicate];
-    if (self.filteredOnStrandList.count > 0) {
-      [sectionTitles addObject:@"On Strand"];
-      [sections addObject:self.filteredOnStrandList];
+    if ([searchText isNotEmpty] && filteredSections.count == 0) {
+      [filteredSections addObject:[DFSection sectionWithTitle:@"No Results" object:nil rows:@[[NSNull new]]]];
     }
     
-    self.filteredABList = @[];
-    if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
-      self.filteredABList = [[DFContactDataManager sharedManager]
-                             peanutContactSearchResultsForString:searchText];
-    }
-    [sectionTitles addObject:@"Contacts"];
-    [sections addObject:self.filteredABList];
-    
-    
-    self.filteredSections = sections;
-    self.filteredSectionTitles = sectionTitles;
+    self.filteredSections = filteredSections;
   }
 }
-
-
 
 - (NSString *)textNumberStringForString:(NSString *)string
 {
@@ -403,15 +335,22 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   return result;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+- (DFSection *)sectionForIndex:(NSUInteger)sectionIndex inTableView:(UITableView *)tableView
 {
-  if (tableView == self.tableView && section < self.unfilteredSectionTitles.count) {
-    return self.unfilteredSectionTitles[section];
-  } else if (tableView == self.sdc.searchResultsTableView && section < self.filteredSectionTitles.count){
-    return self.filteredSectionTitles[section];
+  NSArray *sections;
+  if (tableView == self.tableView) {
+    sections = self.unfilteredSections;
+  } else {
+    sections = self.filteredSections;
   }
   
-  return nil;
+  DFSection *section = sections[sectionIndex];
+  return section;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)sectionIndex
+{
+  return [[self sectionForIndex:sectionIndex inTableView:tableView] title];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
@@ -419,18 +358,10 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   return 30.0;
 }
 
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
 {
-  if (tableView == self.tableView && section  < self.unfilteredSections.count) {
-    NSArray *sectionArray = self.unfilteredSections[section];
-    return sectionArray.count;
-  } else if (tableView == self.sdc.searchResultsTableView && section < self.filteredSections.count) {
-    NSArray *sectionArray = self.filteredSections[section];
-    return MAX(1, sectionArray.count);
-  }
-  
-  return 0;
+  DFSection *section = [self sectionForIndex:sectionIndex inTableView:tableView];
+  return section.rows.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -439,8 +370,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   
   id object = [self objectForIndexPath:indexPath tableView:tableView];
   
-  if (!object) {
-    if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusNotDetermined) {
+  if (!object || object == [NSNull null]) {
+    if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusNotDetermined
+        && !self.disableContactsUpsell) {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noContacts"];
     } else {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
@@ -468,19 +400,8 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (id)objectForIndexPath:(NSIndexPath *)indexPath tableView:(UITableView *)tableView
 {
-  NSArray *resultsArray;
-  if (tableView == self.tableView && indexPath.section < self.unfilteredSections.count) {
-    resultsArray = self.unfilteredSections[indexPath.section];
-  } else if (tableView == self.sdc.searchResultsTableView && indexPath.section < self.filteredSections.count) {
-    resultsArray = self.filteredSections[indexPath.section];
-  }
-  
-  id object = nil;
-  if (indexPath.row < resultsArray.count) {
-    object = resultsArray[indexPath.row];
-  }
-  
-  return object;
+  DFSection *section = [self sectionForIndex:indexPath.section inTableView:tableView];
+  return section.rows[indexPath.row];
 }
 
 - (BOOL)isContactSelectable:(DFPeanutContact *)contact
@@ -597,39 +518,14 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
       [self.sdc setActive:NO animated:NO];
     }
     
-    [self selectionUpdated];
+    [self selectionUpdatedSilently:NO];
   }
 }
 
 - (void)contactRowSelected:(DFPeanutContact *)contact atIndexPath:(NSIndexPath *)indexPath
 {
-  [self.selectedContacts addObject:contact];
-  if (![self.suggestedList containsObject:contact]
-      && ![self.selectedNonSuggestionsList containsObject:contact]) {
-    // remove the item from the old section
-    [self.onStrandList removeObject:contact];
-    [self.ABList removeObject:contact];
-    if (self.onStrandList.count == 0) {
-      [self.unfilteredSections removeObject:self.onStrandList];
-      [self.unfilteredSectionTitles removeObject:UserSectionTitle];
-    }
-    
-    [self addContactToSelectedSection:contact];
-    [self.tableView reloadData];
-  }
-}
-
-- (void)addContactToSelectedSection:(DFPeanutContact *)contact
-{
-  if (!self.selectedNonSuggestionsList) {
-    // add it to the new section
-    self.selectedNonSuggestionsList = [NSMutableArray new];
-    NSUInteger insertIndex = MIN(self.unfilteredSections.count, 0);
-    [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:insertIndex];
-    [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:insertIndex];
-  }
-  
-  [self.selectedNonSuggestionsList addObject:contact];
+  self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+  [self selectionUpdatedSilently:NO];
 }
 
 - (void)textNumberRowSelected:(NSString *)phoneNumber
@@ -638,10 +534,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   textNumberContact.phone_number = phoneNumber;
   textNumberContact.name = phoneNumber;
   textNumberContact.phone_type = @"text";
-  [self.selectedContacts addObject:textNumberContact];
-  [self addContactToSelectedSection:textNumberContact];
+  
+  self.selectedContacts = [self.selectedContacts arrayByAddingObject:textNumberContact];
   self.searchDisplayController.searchBar.text = @"";
   [self.searchDisplayController setActive:NO animated:YES];
+  [self selectionUpdatedSilently:NO];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -649,32 +546,19 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   id object = [self objectForIndexPath:indexPath tableView:tableView];
   DDLogVerbose(@"tapped object:%@", object);
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
-    [self.selectedContacts removeObject:object];
-    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
-    }
+    self.selectedContacts = [self.selectedContacts arrayByRemovingObject:object];
+    [self selectionUpdatedSilently:NO];
+    DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
   }
   
   // if this happened in the search tableview, we have to reload the regular table view in the bg
   if (tableView != self.tableView) [self.tableView reloadData];
-  [self selectionUpdated];
-  
-  DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
-}
-
-- (DFPeanutContact *)contactForName:(NSString *)name number:(NSString *)number
-{
-  DFPeanutContact *contact = [[DFPeanutContact alloc] init];
-  contact.name = name;
-  contact.phone_number = number;
-  contact.user = @([[DFUser currentUser] userID]);
-  return contact;
 }
 
 - (IBAction)doneButtonPressed:(id)sender
 {
   [self.delegate pickerController:self
-      didFinishWithPickedContacts:self.selectedPeanutContacts];
+      didFinishWithPickedContacts:self.selectedContacts];
 }
 
 #pragma mark - Contacts Permission
@@ -685,7 +569,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   [DFContactSyncManager askForContactsPermissionWithSuccess:^{
     dispatch_async(dispatch_get_main_queue(), ^{
       [weakSelf configureNoResultsView];
-      [weakSelf loadUnfilteredArrays];
       [weakSelf updateSearchResults];
       [weakSelf.tableView reloadData];
       [weakSelf.sdc.searchResultsTableView reloadData];
@@ -693,7 +576,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   } failure:^(NSError *error) {
     
   }];
-  }
+}
 
 - (void)showContactsDeniedAlert
 {

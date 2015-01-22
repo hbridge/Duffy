@@ -105,7 +105,7 @@
   }
   
   NSArray *suggestedContacts = [self suggestedContactsForFeedObjects:selectedFeedObjects];
-  self.peoplePickerController = [[DFPeoplePickerViewController alloc]
+  self.peoplePickerController = [[DFRecipientPickerViewController alloc]
                                  initWithSuggestedPeanutContacts:suggestedContacts];
   self.peoplePickerController.delegate = self;
   self.peoplePickerController.allowsMultipleSelection = YES;
@@ -144,7 +144,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   [DFCreateShareInstanceController
    createShareInstanceWithPhotos:self.selectPhotosController.selectedObjects
    fromSuggestion:nil
-   inviteContacts:self.peoplePickerController.selectedPeanutContacts
+   inviteContacts:self.peoplePickerController.selectedContacts
    addCaption:nil
    parentViewController:self
    enableOptimisticSend:NO
@@ -162,7 +162,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   [self.delegate createStrandFlowController:self
                         completedWithResult:result
                                      photos:self.selectPhotosController.selectedObjects
-                                   contacts:self.peoplePickerController.selectedPeanutContacts];
+                                   contacts:self.peoplePickerController.selectedContacts];
   
   [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
@@ -187,7 +187,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     analyticsResult = DFAnalyticsValueResultSuccess;
   }
   NSUInteger numPhotos = self.selectPhotosController.selectedObjects.count;
-  NSUInteger numPeople = self.peoplePickerController.selectedPeanutContacts.count;
+  NSUInteger numPeople = self.peoplePickerController.selectedContacts.count;
   
   [DFAnalytics logCreateStrandFlowCompletedWithResult:analyticsResult
                                     numPhotosSelected:numPhotos

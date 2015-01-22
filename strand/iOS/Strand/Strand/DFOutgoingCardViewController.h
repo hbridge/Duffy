@@ -8,7 +8,7 @@
 
 #import "DFSuggestionViewController.h"
 #import "DFSwipableButtonView.h"
-#import "DFPeoplePickerViewController.h"
+#import "DFRecipientPickerViewController.h"
 #import "DFOutgoingCardContentView.h"
 
 @interface DFOutgoingCardViewController : DFCardViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate, DFProfileStackViewDelegate>

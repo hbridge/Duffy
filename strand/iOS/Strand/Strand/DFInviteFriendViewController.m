@@ -10,7 +10,9 @@
 #import "DFAnalytics.h"
 #import "DFSMSInviteStrandComposeViewController.h"
 #import "DFContactSyncManager.h"
+#import "DFContactDataManager.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFSection.h"
 
 @interface DFInviteFriendViewController ()
 
@@ -25,10 +27,10 @@
   self = [super init];
   if (self) {
     _peoplePicker = [[DFPeoplePickerViewController alloc] init];
-    _peoplePicker.hideFriendsSection = YES;
     _peoplePicker.allowsMultipleSelection = YES;
     _peoplePicker.doneButtonActionText = @"Invite";
     _peoplePicker.navigationItem.title = @"Invite Friends";
+    [_peoplePicker setSections:[self.class contactSections]];
   }
   return self;
 }
@@ -42,6 +44,16 @@
                                                          initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                                          target:self
                                                          action:@selector(cancelPressed:)];
+}
+
++ (NSArray *)contactSections
+{
+  NSMutableArray *sections = [NSMutableArray new];
+  NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
+  if (contacts.count > 0) {
+    [sections addObject:[DFSection sectionWithTitle:@"Contacts" object:nil rows:contacts]];
+  }
+  return sections;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -81,7 +93,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   if (result == MessageComposeResultSent) {
     [[DFContactSyncManager sharedManager]
-     uploadInvitedContacts:self.peoplePicker.selectedPeanutContacts];
+     uploadInvitedContacts:self.peoplePicker.selectedContacts];
     [self.presentingViewController dismissViewControllerAnimated:YES completion:^(void) {
       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
     }];

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutContact.h"
+#import "DFNoTableItemsView.h"
 
 @class DFPeoplePickerViewController;
 
@@ -41,20 +42,15 @@
 #pragma mark - Configuration
 
 @property (nonatomic) BOOL allowsMultipleSelection;
-@property (nonatomic, retain) NSArray *suggestedPeanutContacts;
-@property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
+@property (nonatomic, retain) NSArray *selectedContacts;
 @property (nonatomic, retain) NSArray *notSelectableContacts;
 @property (nonatomic, retain) NSString *notSelectableReason;
-@property (nonatomic) BOOL hideFriendsSection;
 @property (nonatomic, retain) NSString *doneButtonActionText;
-
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
+@property (nonatomic) BOOL disableContactsUpsell;
 @property (nonatomic, retain) NSString *textNumberString;
 
-- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers;
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
-- (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts;
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
-                    notSelectablePeanutContacts:(NSArray *)notSelectableContacts
-                            notSelectableReason:(NSString *)notSelectableReason;
+
+- (void)setSections:(NSArray *)sections;
 
 @end
