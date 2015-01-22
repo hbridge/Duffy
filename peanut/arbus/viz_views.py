@@ -47,7 +47,8 @@ def userbaseSummary(request):
 	for i in range(len(userStats)):
 		entry = dict()
 		entry['contacts'] = contactCount[i].totalContacts
-		entry['friends'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
+		entry['ffriends'] = friendCount[i].totalFriends1
+		entry['rfriends'] = friendCount[i].totalFriends2
 		extras[contactCount[i].id] = entry
 
 	notificationCountById = dict()
@@ -149,7 +150,8 @@ def userbaseSummary(request):
 
 
 		entry['contactCount'] = extras[user.id]['contacts']
-		entry['friendCount'] = extras[user.id]['friends']
+		entry['ffriendCount'] = extras[user.id]['ffriends']
+		entry['rfriendCount'] = extras[user.id]['rfriends']	
 
 
 		if user.last_build_info:
@@ -172,7 +174,7 @@ def userbaseSummary(request):
 					entry['internal'] = True
 					break
 
-		peopleCounts['friends'] += entry['friendCount']
+		peopleCounts['friends'] += entry['ffriendCount'] + entry['rfriendCount']
 
 		swapUserList.append(entry)
 

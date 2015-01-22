@@ -114,7 +114,7 @@
 				<th class='before b-r' colspan='1' > Shared <br> Instances </th>
 				<th class='actions b-r' colspan='3'> Actions (7d) </th>
 				<th class='notifications b-r' colspan='2'> Notifications </th>
-				<th class='after' colspan='6' > </th>
+				<th class='after' colspan='7' > </th>
 			</tr>
 			<tr class='ui-row-header' >
 				<td class='userid b-r'> ID </td>
@@ -126,7 +126,8 @@
 				<td class='comments center b-r'> Comments </td>
 				<td class='notifications center b-r'> Sent <br> (7d)</td>
 				<td class='last-not-timestamp b-r'> Timestamp </td>
-				<td class='contacts b-r'> Friends | <br> Contacts </td> 
+				<td class='friends b-r'> fFriends | <br> rFriends</td>
+				<td class='contacts b-r'> Contacts </td> 
 				<td class='last-build b-r'> Last <br> Build </td>
 				<!--<td class='last-uploaded-timestamp b-r'> Last Upload </td>-->
 				<td class='last-action-timestamp b-r'> Last Action </td>
@@ -144,7 +145,8 @@
 				<td class='comments center b-r'> {{entry.weeklyComments }} </td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
 				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>
-				<td class='contacts b-r center'> {{ entry.friendCount}} | {{ entry.contactCount }} </td>
+				<td class='friends b-r center'> {{ entry.ffriends}} | {{ entry.rfriends}} </td>
+				<td class='contacts b-r center'> {{ entry.contactCount }} </td>
 				<td class='last-build b-r'> {{ entry.build }} </td>
 				<!--<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>-->
 				<td class='last-action-timestamp timeago b-r' title="{{ entry.lastActionTime }}"> </td>
