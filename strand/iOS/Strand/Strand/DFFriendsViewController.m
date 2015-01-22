@@ -80,11 +80,7 @@
 {
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(reloadData)
-                                               name:DFStrandNewInboxDataNotificationName
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(reloadData)
-                                               name:DFStrandNewPrivatePhotosDataNotificationName
+                                               name:DFStrandNewFriendsDataNotificationName
                                              object:nil];
 }
 
