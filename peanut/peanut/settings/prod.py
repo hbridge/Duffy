@@ -59,6 +59,20 @@ LOGGING = {
 		'mail_admins': {
 			'level': 'ERROR',
 			'class': 'django.utils.log.AdminEmailHandler',
+		},
+		'celery': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/home/derek/logs/celery.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
+		},
+		'two_fishes': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/var/log/duffy/twofishes.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		}
 	},
 	'loggers': {
@@ -80,6 +94,14 @@ LOGGING = {
 		'strand': {
 			'handlers': ['duffyfile', 'mail_admins'],
 			'propagate': True,
+			'level': 'DEBUG',
+		},
+			'celery': {
+			'handlers': ['celery'],
+			'level': 'DEBUG',
+		},
+		'async.two_fishes': {
+			'handlers': ['two_fishes'],
 			'level': 'DEBUG',
 		},
 
