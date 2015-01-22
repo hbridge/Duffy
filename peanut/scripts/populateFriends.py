@@ -93,7 +93,7 @@ def main(argv):
 				if contactEntry.phone_number in usersByPhoneNumber:
 					forwardFriend = usersByPhoneNumber[contactEntry.phone_number]
 					try:
-						if contactEntry.user.id == friend.id:
+						if contactEntry.user.id == forwardFriend.id:
 							continue
 						else:
 							if FriendConnection.addForwardConnection(contactEntry.user, forwardFriend):
