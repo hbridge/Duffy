@@ -723,6 +723,9 @@ static DFPeanutFeedDataManager *defaultManager;
           }
         }
       }
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandNewFriendsDataNotificationName
+       object:self];
       DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);
       success();
     } failure:^(NSError *error) {
@@ -747,6 +750,9 @@ static DFPeanutFeedDataManager *defaultManager;
         failure(error);
       }];
     }
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:DFStrandNewFriendsDataNotificationName
+     object:self];
     success();
   }
 }
