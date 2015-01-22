@@ -116,7 +116,7 @@ def main(argv):
 
 	logger.info('Finished Periodic Notification script')		
 if __name__ == "__main__":
-	logging.basicConfig(filename='/var/log/duffy/strand-notifications.log',
+	logging.basicConfig(filename='/var/log/duffy/periodic-notifications.log',
 						level=logging.DEBUG,
 						format='%(asctime)s %(levelname)s %(message)s')
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
