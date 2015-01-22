@@ -51,6 +51,7 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
            @"invited",
            @"relationship",
            @"friend_connection_id",
+           @"forward_friend_only",
            @"last_actions_list_request_timestamp"
            ];
 }

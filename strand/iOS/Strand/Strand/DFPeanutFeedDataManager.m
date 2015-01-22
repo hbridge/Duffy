@@ -714,7 +714,8 @@ static DFPeanutFeedDataManager *defaultManager;
         if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipReverseFriend]) {
           targetUser.relationship = DFPeanutUserRelationshipFriend;
         } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipConnection]) {
-          targetUser.relationship = DFPeanutUserRelationshipForwardFriend;
+          targetUser.relationship = DFPeanutUserRelationshipFriend;
+          targetUser.forward_friend_only = @(YES)
         }
         
         for (DFPeanutFriendConnection *resultObject in resultObjects) {
@@ -741,7 +742,8 @@ static DFPeanutFeedDataManager *defaultManager;
         targetUser.friend_connection_id = nil;
         if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend]) {
           targetUser.relationship = DFPeanutUserRelationshipReverseFriend;
-        } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipForwardFriend]) {
+        } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
+                   [targetUser.forward_friend_only boolValue]) {
           targetUser.relationship = DFPeanutUserRelationshipConnection;
         }
         DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);

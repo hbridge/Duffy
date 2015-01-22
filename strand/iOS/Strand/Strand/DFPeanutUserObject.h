@@ -40,6 +40,9 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSNumber *invited;
 @property (nonatomic, retain) NSNumber *friend_connection_id;
+
+// Temporary field for backwards compatibility
+@property (nonatomic, retain) NSNumber *forward_friend_only;
 @property (nonatomic, retain) NSString *relationship;
 @property (nonatomic, retain) NSDate *last_actions_list_request_timestamp;
 
