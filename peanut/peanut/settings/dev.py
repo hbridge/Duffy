@@ -34,7 +34,7 @@ LOGGING = {
 			'datefmt' : "%d/%b/%Y %H:%M:%S"
 		},
 		'simple': {
-			'format': '%(levelname)s %(message)s'
+			'format': '%(asctime)s %(levelname)s %(message)s'
 		},
 	},
 	'handlers': {
@@ -56,6 +56,20 @@ LOGGING = {
 			'filename': '/home/derek/logs/duffy-photos.log',
 			'formatter': 'verbose'
 		},
+		'celery': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/home/derek/logs/celery.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
+		},
+		'two_fishes': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/var/log/duffy/twofishes.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
+		}
 		#'console': {
 		#	'level': 'DEBUG',
 		#	'class': 'logging.StreamHandler',
@@ -83,7 +97,14 @@ LOGGING = {
 			'propagate': True,
 			'level': 'DEBUG',
 		},
-
+		'celery': {
+			'handlers': ['celery'],
+			'level': 'DEBUG',
+		},
+		'async.two_fishes': {
+			'handlers': ['two_fishes'],
+			'level': 'DEBUG',
+		},
 	}
 }
 

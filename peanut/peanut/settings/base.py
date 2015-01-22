@@ -39,6 +39,8 @@ INSTALLED_APPS = (
     'ios_notifications',
     'django.contrib.humanize',
     'storages',
+    'djcelery',
+    'async'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -144,3 +146,6 @@ AWS_SECRET_ACCESS_KEY = '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL'
 AWS_HEADERS = {
     'Content-type': 'image/jpeg'
 }
+
+import djcelery
+djcelery.setup_loader()
