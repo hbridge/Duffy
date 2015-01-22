@@ -715,7 +715,7 @@ static DFPeanutFeedDataManager *defaultManager;
           targetUser.relationship = DFPeanutUserRelationshipFriend;
         } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipConnection]) {
           targetUser.relationship = DFPeanutUserRelationshipFriend;
-          targetUser.forward_friend_only = @(YES)
+          targetUser.forward_friend_only = @(YES);
         }
         
         for (DFPeanutFriendConnection *resultObject in resultObjects) {
