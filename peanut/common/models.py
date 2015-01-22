@@ -799,7 +799,7 @@ class FriendConnection(models.Model):
 
 	@classmethod
 	def addReverseConnections(cls, userToAddTo, users):
-		existingReverseConnectionsForUserToAddTo = FriendConnection.objects.filter(user_1__in=users).filter(user_2__in=userToAddTo)
+		existingReverseConnectionsForUserToAddTo = FriendConnection.objects.filter(user_1__in=users).filter(user_2=userToAddTo)
 
 		for user in users:
 			if not cls.friendReverseConnectionExists(userToAddTo, user, existingReverseConnectionsForUserToAddTo):
