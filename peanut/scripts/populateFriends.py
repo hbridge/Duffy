@@ -76,7 +76,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False)[:1000]
+		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False).filter(user_id__gt=5000)[:1000]
 		newConnectionCount = 0
 
 		if len(contactEntries) > 0:
@@ -98,6 +98,9 @@ def main(argv):
 						else:
 							if FriendConnection.addForwardConnection(contactEntry.user, forwardFriend):
 								newConnectionCount += 1
+							if contactEntry.contact_type and 'invited' in contactEntry.contact_type:
+								if FriendConnection.addReverseConnection(contactEntry.user, forwardFriend):
+									newConnectionCount +=1
 								
 					except IntegrityError:
 						logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, friend.id))

@@ -746,6 +746,7 @@ class StrandNeighbor(models.Model):
 class FriendConnection(models.Model):
 	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
 	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
+	bulk_batch_key = models.IntegerField(null=True, db_index=True)	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -784,7 +785,7 @@ class FriendConnection(models.Model):
 			logger.debug("Created friend entry for user %s with user %s" % (u1.id, u2.id))
 			return True
 		except IntegrityError:
-			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (u1.id, u2.id))
+			logger.warning("Tried to create a forward friend connection between %s and %s but there was one already" % (u1.id, u2.id))
 			return False
 
 	@classmethod
@@ -794,7 +795,7 @@ class FriendConnection(models.Model):
 			logger.debug("Created friend entry for user %s with user %s" % (u1.id, u2.id))
 			return True
 		except IntegrityError:
-			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (u1.id, u2.id))
+			logger.warning("Tried to create reverse friend connection between %s and %s but there was one already" % (u1.id, u2.id))
 			return False
 
 	@classmethod
