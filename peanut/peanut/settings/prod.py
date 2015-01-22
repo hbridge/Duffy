@@ -63,7 +63,7 @@ LOGGING = {
 		'celery': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': '/home/derek/logs/celery.log',
+			'filename': '/home/ubuntu/logs/celery.log',
 			'formatter': 'simple',
 			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		},
