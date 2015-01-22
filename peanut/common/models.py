@@ -746,7 +746,11 @@ class StrandNeighbor(models.Model):
 class FriendConnection(models.Model):
 	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
 	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
+<<<<<<< HEAD
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)	
+=======
+	bulk_batch_key = models.IntegerField(null=True)
+>>>>>>> add in bulk_batch_key to friends
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
