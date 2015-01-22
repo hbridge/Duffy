@@ -97,12 +97,12 @@ LOGGING = {
 			'propagate': True,
 			'level': 'DEBUG',
 		},
-		'celery': {
-			'handlers': ['celery'],
-			'level': 'DEBUG',
-		},
 		'async.two_fishes': {
 			'handlers': ['two_fishes'],
+			'level': 'DEBUG',
+		},
+		'celery': {
+			'handlers': ['celery'],
 			'level': 'DEBUG',
 		},
 	}
