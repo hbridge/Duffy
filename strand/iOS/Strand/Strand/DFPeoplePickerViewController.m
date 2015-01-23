@@ -541,8 +541,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (void)contactRowSelected:(DFPeanutContact *)contact atIndexPath:(NSIndexPath *)indexPath
 {
-  if (self.allowsMultipleSelection)
+  if (self.allowsMultipleSelection) {
     self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+    self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
+                                               self.tableView.contentOffset.y + DFPersonSelectionTableViewCellHeight);
+  }
   else
     [self.delegate pickerController:self didFinishWithPickedContacts:@[contact]];
   [self selectionUpdatedSilently:NO];
@@ -570,6 +573,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     [self selectionUpdatedSilently:NO];
     DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
   }
+  if (self.allowsMultipleSelection) {
+    self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
+                                               self.tableView.contentOffset.y - DFPersonSelectionTableViewCellHeight);
+  }
+
   
   // if this happened in the search tableview, we have to reload the regular table view in the bg
   if (tableView != self.tableView) [self.tableView reloadData];
