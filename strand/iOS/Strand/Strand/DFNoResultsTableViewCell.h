@@ -9,7 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface DFNoResultsTableViewCell : UITableViewCell
-@property (weak, nonatomic) IBOutlet UILabel *noResultsLabel;
+@property (weak, nonatomic) IBOutlet UILabel *label;
+@property (weak, nonatomic) IBOutlet UIButton *button;
 
 + (CGFloat)desiredHeight;
 

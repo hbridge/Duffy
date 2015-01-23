@@ -22,6 +22,8 @@
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
 #import "DFSMSInviteStrandComposeViewController.h"
+#import "DFPeoplePickerNoResultsDescriptor.h"
+#import "DFNoResultsTableViewCell.h"
 
 @interface DFPeoplePickerViewController ()
 
@@ -64,10 +66,35 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (void)setSections:(NSArray *)sections
 {
   dispatch_async(dispatch_get_main_queue(), ^{
+    
     self.unfilteredSections = sections;
     [self.tableView reloadData];
+    [self updateSearchResults];
+    [self.sdc.searchResultsTableView reloadData];
     [self configureNoResultsView];
   });
+}
+
++ (DFSection *)allContactsSection
+{
+  NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
+  DFSection *contactsSection;
+  if (contacts.count > 0) {
+    contactsSection = [DFSection sectionWithTitle:@"Contacts" object:nil rows:contacts];
+  } else {
+    DFPeoplePickerNoResultsDescriptor *noResultsDescriptor =
+    [DFPeoplePickerNoResultsDescriptor
+     descriptorWithTitle:@"Grant Permission to Show Contacts" buttonTitle:@"Grant Permission"
+     buttonHandler:^{
+       [DFContactSyncManager askForContactsPermissionWithSuccess:^{
+         
+       } failure:^(NSError *error) {
+         
+       }];
+     }];
+    contactsSection = [DFSection sectionWithTitle:@"Contacts" object:nil rows:@[noResultsDescriptor]];
+  }
+  return contactsSection;
 }
 
 - (void)viewDidLoad
@@ -160,8 +187,8 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
        forCellReuseIdentifier:@"nonUser"];
   [self.tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
        forCellReuseIdentifier:@"user"];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFNoContactsTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"noContacts"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFNoResultsWithButtonTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"noResultsButton"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFNoResultsTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"noResults"];
   if (self.allowsMultipleSelection) {
@@ -293,14 +320,18 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     
     NSPredicate *nameFilterPredicate = [NSPredicate predicateWithFormat:@"name BEGINSWITH[cd] %@", searchText];
     for (DFSection *section in self.unfilteredSections) {
-      NSArray *peanutContacts = section.rows;
-      NSArray *filteredContacts = [peanutContacts filteredArrayUsingPredicate:nameFilterPredicate];
-      if (filteredContacts.count > 0) {
-        [filteredSections addObject:[DFSection sectionWithTitle:section.title
-                                                         object:nil
-                                                           rows:filteredContacts]];
+      if ([[section.rows.firstObject class] isSubclassOfClass:[DFPeoplePickerNoResultsDescriptor class]]) {
+        [filteredSections addObject:section];
+      } else {
+        NSArray *peanutContacts = section.rows;
+        NSArray *filteredContacts = [peanutContacts filteredArrayUsingPredicate:nameFilterPredicate];
+        if (filteredContacts.count > 0) {
+          [filteredSections addObject:[DFSection sectionWithTitle:section.title
+                                                           object:nil
+                                                             rows:filteredContacts]];
+        }
       }
-    }
+           }
     
     if ([searchText isNotEmpty] && filteredSections.count == 0) {
       [filteredSections addObject:[DFSection sectionWithTitle:@"No Results" object:nil rows:@[[NSNull new]]]];
@@ -374,16 +405,13 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   UITableViewCell *cell;
   
-  id object = [self objectForIndexPath:indexPath tableView:tableView];
+  NSObject *object = [self objectForIndexPath:indexPath tableView:tableView];
   
   if (!object || object == [NSNull null]) {
-    if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusNotDetermined
-        && !self.disableContactsUpsell) {
-      cell = [self.tableView dequeueReusableCellWithIdentifier:@"noContacts"];
-    } else {
-      cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
-    }
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
     return cell;
+  } else if ([object isKindOfClass:[DFPeoplePickerNoResultsDescriptor class]]) {
+    return [self noResultsCellForDescriptor:(DFPeoplePickerNoResultsDescriptor *)object];
   }
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
@@ -402,6 +430,14 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   if (!cell) [NSException raise:@"Cell is Nil" format:@"Returning nil cell for object: %@.", object];
 
   return cell;
+}
+
+- (DFNoResultsTableViewCell *)noResultsCellForDescriptor:(DFPeoplePickerNoResultsDescriptor *)descriptor
+{
+  DFNoResultsTableViewCell *noResultsCell = [self.tableView dequeueReusableCellWithIdentifier:@"noResultsButton"];
+  noResultsCell.label.text = descriptor.title;
+  [noResultsCell.button setTitle:descriptor.buttonTitle forState:UIControlStateNormal];
+  return noResultsCell;
 }
 
 - (id)objectForIndexPath:(NSIndexPath *)indexPath tableView:(UITableView *)tableView
@@ -488,8 +524,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
  
-  id object = [self objectForIndexPath:indexPath tableView:tableView];
-  if (object) return 54.0;
+  NSObject *object = [self objectForIndexPath:indexPath tableView:tableView];
+  if ([object isKindOfClass:[DFPeanutContact class]]
+      || [object isKindOfClass:[NSString class]]) return 54.0;
   
   return 105;
 }

@@ -15,6 +15,7 @@
 #import "DFContactsStore.h"
 #import "DFAnalytics.h"
 #import "UIAlertView+DFHelpers.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFContactSyncManager()
 
@@ -196,6 +197,8 @@ static DFContactSyncManager *defaultManager;
     if (granted) {
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
       [[self sharedManager] sync];
+      [[NSNotificationCenter defaultCenter] postNotificationName:DFContactPermissionChangedNotificationName
+                                                          object:self];
       success();
     } else {
       [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionContacts];

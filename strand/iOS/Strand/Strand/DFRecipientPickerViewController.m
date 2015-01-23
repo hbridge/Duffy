@@ -10,6 +10,7 @@
 #import "DFSection.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFContactDataManager.h"
+#import "DFNotificationSharedConstants.h"
 
 NSString *const UserSectionTitle = @"Swap Friends";
 NSString *const SuggestedSecitonTitle = @"Suggested";
@@ -27,9 +28,17 @@ NSString *const ContactsSectionTitle = @"Contacts";
   self = [self init];
   if (self) {
     self.selectedContacts = selectedPeanutContacts;
-    [self setSections:[self.class sectionsOfContacts]];
   }
   return self;
+}
+
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFContactPermissionChangedNotificationName
+                                             object:nil];
 }
 
 - (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers
@@ -63,26 +72,24 @@ NSString *const ContactsSectionTitle = @"Contacts";
 }
 
 
-+ (NSArray *)sectionsOfContacts
+- (void)reloadData
 {
   NSMutableArray *sections = [NSMutableArray new];
 
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSArray *friendUsers = [[DFPeanutFeedDataManager sharedManager] friendsList];
+    NSArray *friendContacts = [friendUsers arrayByMappingObjectsWithBlock:^id(id input) {
+      return [[DFPeanutContact alloc] initWithPeanutUser:input];
+    }];
+    if (friendContacts.count > 0) {
+      [sections addObject:[DFSection sectionWithTitle:UserSectionTitle
+                                               object:nil
+                                                 rows:friendContacts]];
+    }
+    [sections addObject:[DFPeoplePickerViewController allContactsSection]];
+  });
   
-  NSArray *friendUsers = [[DFPeanutFeedDataManager sharedManager] friendsList];
-  NSArray *friendContacts = [friendUsers arrayByMappingObjectsWithBlock:^id(id input) {
-    return [[DFPeanutContact alloc] initWithPeanutUser:input];
-  }];
-  if (friendContacts.count > 0) {
-    [sections addObject:[DFSection sectionWithTitle:UserSectionTitle
-                                             object:nil
-                                               rows:friendContacts]];
-  }
-  NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
-  if (contacts.count > 0) {
-    [sections addObject:[DFSection sectionWithTitle:ContactsSectionTitle object:nil rows:contacts]];
-  }
-  
-  return sections;
+  [self setSections:sections];
 }
 
 

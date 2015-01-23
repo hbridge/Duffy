@@ -61,4 +61,6 @@
 - (void)setSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
                 forSection:(DFSection *)section;
 
++ (DFSection *)allContactsSection;
+
 @end

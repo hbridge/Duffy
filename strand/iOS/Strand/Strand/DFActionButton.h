@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-IB_DESIGNABLE
 @interface DFActionButton : UIButton
 
 @property (nonatomic) IBInspectable CGFloat cornerRadius;

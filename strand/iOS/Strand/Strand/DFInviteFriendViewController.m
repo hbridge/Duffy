@@ -15,6 +15,7 @@
 #import "DFSection.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFFriendProfileViewController.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFInviteFriendViewController ()
 
@@ -31,9 +32,18 @@
     _peoplePicker = [[DFPeoplePickerViewController alloc] init];
     _peoplePicker.allowsMultipleSelection = NO;
     _peoplePicker.navigationItem.title = @"Add Friends";
-    [self setDataForPeoplePicker];
+    [self reloadData];
+    [self observeNotifications];
   }
   return self;
+}
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(contactPermissionChanged:)
+                                               name:DFContactPermissionChangedNotificationName
+                                             object:nil];
 }
 
 
@@ -48,35 +58,33 @@
                                                          action:@selector(cancelPressed:)];
 }
 
-- (void)setDataForPeoplePicker
+- (void)reloadData
 {
-  NSMutableArray *sections = [NSMutableArray new];
-  
-  
-  NSArray *usersWhoAddedYou = [[DFPeanutFeedDataManager sharedManager]
-                               usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
-  NSArray *contactsWhoAddedYou = [usersWhoAddedYou arrayByMappingObjectsWithBlock:^id(id input) {
-    return [[DFPeanutContact alloc] initWithPeanutUser:input];
-  }];
-  if (contactsWhoAddedYou.count > 0) {
-    DFSection *addedYouSection = [DFSection sectionWithTitle:@"People who Added You"
-                                                      object:nil
-                                                        rows:contactsWhoAddedYou];
-    [sections addObject:addedYouSection];
-    [self.peoplePicker setSecondaryAction:[self addFriendSecondaryAction] forSection:addedYouSection];
-    self.peoplePicker.notSelectableContacts = contactsWhoAddedYou;
-  }
-  
-  
-  NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
-  if (contacts.count > 0) {
-    DFSection *contactsSection = [DFSection sectionWithTitle:@"Contacts" object:nil rows:contacts];
-    [sections addObject:contactsSection];
-    [self.peoplePicker setSecondaryAction:[self inviteSecondaryAction] forSection:contactsSection];
-  }
-  
-  
-  [self.peoplePicker setSections:sections];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSMutableArray *sections = [NSMutableArray new];
+    
+    // People who added you
+    NSArray *usersWhoAddedYou = [[DFPeanutFeedDataManager sharedManager]
+                                 usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
+    NSArray *contactsWhoAddedYou = [usersWhoAddedYou arrayByMappingObjectsWithBlock:^id(id input) {
+      return [[DFPeanutContact alloc] initWithPeanutUser:input];
+    }];
+    if (contactsWhoAddedYou.count > 0) {
+      DFSection *addedYouSection = [DFSection sectionWithTitle:@"People who Added You"
+                                                        object:nil
+                                                          rows:contactsWhoAddedYou];
+      [sections addObject:addedYouSection];
+      [self.peoplePicker setSecondaryAction:[self addFriendSecondaryAction] forSection:addedYouSection];
+      self.peoplePicker.notSelectableContacts = contactsWhoAddedYou;
+    }
+    
+    // Contacts
+    DFSection *allContactsSection = [DFPeoplePickerViewController allContactsSection];
+    [sections addObject:allContactsSection];
+    [self.peoplePicker setSecondaryAction:[self inviteSecondaryAction] forSection:allContactsSection];
+    
+    [self.peoplePicker setSections:sections];
+  });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -127,7 +135,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
                                          withUserIDs:@[@(user.id)]
                                              success:^{
                                                [SVProgressHUD showSuccessWithStatus:@"Added!"];
-                                               [self setDataForPeoplePicker];
+                                               [self reloadData];
                                              } failure:^(NSError *error) {
                                                [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
                                                DDLogError(@"%@ adding users failed: %@", self.class, error);
@@ -163,6 +171,11 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 - (void)cancelPressed:(id)sender
 {
   [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)contactPermissionChanged:(NSNotification *)note
+{
+  [self reloadData];
 }
 
 @end

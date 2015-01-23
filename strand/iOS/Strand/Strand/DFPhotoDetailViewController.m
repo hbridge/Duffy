@@ -430,7 +430,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   
   if ([[self comments] count] == 0) {
     DFNoResultsTableViewCell *noResults = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
-    noResults.noResultsLabel.text = @"No Comments Yet";
+    noResults.label.text = @"No Comments Yet";
     return noResults;
   }
   

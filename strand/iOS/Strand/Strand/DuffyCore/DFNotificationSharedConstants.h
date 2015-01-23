@@ -31,6 +31,7 @@ extern NSString *DFUploadStatusNotificationName;
 extern NSString *DFUploadStatusUpdateSessionUserInfoKey;
 extern NSString *const DFPhotoStoreCameraRollUpdatedNotificationName;
 extern NSString *const DFCameraRollSyncCompleteNotificationName;
+extern NSString *const DFContactPermissionChangedNotificationName;
 
 // This is called when the uploader finishes a run.  This could be called multiple times during a sync
 //   though since the uploader can be called many times.
