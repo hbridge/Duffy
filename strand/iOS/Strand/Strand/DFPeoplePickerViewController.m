@@ -223,7 +223,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (void)setSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
 {
-  _selectedContacts = selectedPeanutContacts;
+  _selectedContacts = selectedPeanutContacts ? selectedPeanutContacts : @[];
   [self selectionUpdatedSilently:YES];
 }
 
@@ -459,7 +459,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (BOOL)isUserSelectable:(DFPeanutUserObject *)user
 {
   for (DFPeanutContact *notSelectableContact in self.notSelectableContacts) {
-    if ([notSelectableContact.user isEqual:user]) return NO;
+    if ([notSelectableContact.phone_number isEqual:user.phone_number]) return NO;
   }
   return YES;
 }
@@ -591,7 +591,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   if ([self.notSelectableContacts containsObject:contact]) return;
   if (self.allowsMultipleSelection) {
-    self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+    if (self.selectedContacts.count > 0) {
+      self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+    } else {
+      self.selectedContacts = @[contact];
+    }
     self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
                                                self.tableView.contentOffset.y + DFPersonSelectionTableViewCellHeight);
   }

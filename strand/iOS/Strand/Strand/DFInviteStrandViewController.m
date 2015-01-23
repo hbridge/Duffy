@@ -14,7 +14,6 @@
 
 @interface DFInviteStrandViewController ()
 
-@property (nonatomic, retain) NSArray *pickedContacts;
 @property (nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
 @end
@@ -38,17 +37,6 @@
                                     format:@"DFInviteStrandViewController must be its own peoplePickerDelegate"];
   [super setDelegate:delegate];
 }
-
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-      [self configure];
-    }
-    return self;
-}
-
 
 - (void)configure
 {
@@ -76,20 +64,12 @@
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 #pragma mark - DFPeoplePicker Delegate
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
          didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   DDLogVerbose(@"picked contacts: %@", peanutContacts);
-  self.pickedContacts = peanutContacts;
   [SVProgressHUD show];
   
   NSArray *phoneNumbers = [peanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
