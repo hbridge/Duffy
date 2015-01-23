@@ -76,6 +76,13 @@ LOGGING = {
 			'filename': '/mnt/log/stranding.log',
 			'formatter': 'simple',
 			'maxBytes': 1024 * 1024 * 100,  # 100 mb
+		},
+		'similarity': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/mnt/log/similarity.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		}
 		#'console': {
 		#	'level': 'DEBUG',
@@ -116,6 +123,11 @@ LOGGING = {
 		},
 		'async.stranding': {
 			'handlers': ['stranding'],
+			'propagate': True,
+			'level': 'DEBUG',
+		},
+		'async.similarity': {
+			'handlers': ['similarity'],
 			'propagate': True,
 			'level': 'DEBUG',
 		}

@@ -29,7 +29,12 @@ from peanut.celery import app
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
-
+def chunks(l, n):
+	""" Yield successive n-sized chunks from l.
+	"""
+	for i in xrange(0, len(l), n):
+		yield l[i:i+n]
+		
 
 def dealWithDeadStrand(strand, strandsCache):
 	logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
@@ -155,7 +160,7 @@ def threadedPingFriendsForUpdates(userIds):
 """
 	 Put all new photos into private strands.  Keep track of new private Strands
 """
-def processPhotos(photos):
+def processPhotos(photosToProcess):
 	strandPhotosToCreate = list()
 	strandUsersToCreate = list()
 
@@ -167,16 +172,16 @@ def processPhotos(photos):
 	userIdList = list()
 	a = datetime.datetime.now()
 	
-	for photo in photos:
+	for photo in photosToProcess:
 		if photo.time_taken > datetime.datetime.utcnow().replace(tzinfo=pytz.utc)-timeTakendelta:
 			userIdList.append(photo.user_id)
 
 	if len(userIdList) > 0:
-		Thread(target=threadedPingFriendsForUpdates, args=(userIdList,)).start()
+		Thread(target=threadedPingFriendsForUpdates, args=(set(userIdList),)).start()
 
 	# Group photos by users, then iterate through all users one at a time, fetching the cache as we go
 	photosByUser = dict()
-	for photo in photos:
+	for photo in photosToProcess:
 		if photo.user not in photosByUser:
 			photosByUser[photo.user] = list()
 		photosByUser[photo.user].append(photo)
@@ -294,10 +299,24 @@ def processPhotos(photos):
 
 		logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
 
+baseQuery = Photo.objects.select_related().filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')
+
 @app.task
 def processList(photoIds):
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	photos = Photo.objects.select_related().filter(id__in=photoIds).filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')
-	if len(photos) > 0:
+	count = 0
+	for photos in chunks(baseQuery.filter(id__in=photoIds), 50):
 		processPhotos(photos)
-	return True
+		count += len(photos)
+	return count
+
+
+@app.task
+def processAll():
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	count = 0
+	for photos in chunks(baseQuery, 50):
+		processPhotos(photos)
+		count += len(photos)
+	return count
+

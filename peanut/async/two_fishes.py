@@ -72,10 +72,10 @@ def getDataFromTwoFishesBulk(latLonList):
 
 	Static so it can be called in its own thread.
 """
-def populateLocationInfo(allPhotos):
+def processPhotos(photosToProcess):
 	allPhotosUpdated = list()
 	
-	for photos in chunks(allPhotos, 100):
+	for photos in chunks(photosToProcess, 100):
 		logger.info("Starting batch of %s photos" % len(photos))
 		photosToUpdate = list()
 		latLonList = list()
@@ -120,12 +120,19 @@ def populateLocationInfo(allPhotos):
 		
 	return len(allPhotosUpdated)
 
+baseQuery = Photo.objects.filter(twofishes_data=None).filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False))
 
 @app.task
 def processList(photoIds):
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	photos = Photo.objects.filter(id__in=photoIds).filter(twofishes_data=None).filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False))
-	
-	if len(photos) > 0:
-		populateLocationInfo(photos)
-	return True
+
+	newQuery = baseQuery.filter(id__in=photoIds)
+	processPhotos(newQuery)
+	return len(newQuery)
+
+
+@app.task
+def processAll():
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	processPhotos(baseQuery)
+	return len(baseQuery)

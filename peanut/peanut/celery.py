@@ -6,7 +6,8 @@ app = Celery('peanut',
 			 broker='amqp://',
 			 backend='amqp://',
 			 include=['async.two_fishes',
-					  'async.stranding'])
+					  'async.stranding',
+					  'async.similarity'])
 
 app.config_from_object('django.conf:settings')
 

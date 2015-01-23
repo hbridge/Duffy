@@ -33,7 +33,7 @@ def createSimsForPhotos(photos, threshold=100):
 	simsToUpdate = list()
 	photosToUpdate = list()
 	
-	userPhotoCache = list(Photo.objects.select_related().filter(user=photos[0].user.id).exclude(time_taken=None).exclude(thumb_filename=None).order_by('time_taken'))
+	userPhotoCache = list(Photo.objects.select_related().filter(user_id=photos[0].user_id).exclude(time_taken=None).exclude(thumb_filename=None).order_by('time_taken'))
 	
 	# Go through each photo and gather the sim rows
 	for photo in photos:
@@ -182,7 +182,7 @@ def genSimilarityRow(photo1, photo2, sim):
 	
 	simRow = Similarity(photo_1 = photo1,
 						photo_2 = photo2,
-						user = photo1.user,
+						user_id = photo1.user_id,
 						similarity = int(sim))
 
 	return simRow

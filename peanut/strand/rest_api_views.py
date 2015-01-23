@@ -28,7 +28,7 @@ from common.models import ContactEntry, User, Photo, Action, Strand, FriendConne
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
-from async import two_fishes, stranding
+from async import two_fishes, stranding, similarity
 
 # TODO(Derek): move this to common
 from arbus import image_util
@@ -391,10 +391,6 @@ class PhotoBulkAPI(BasePhotoAPI):
                 self.updateStrandCacheStateForPhotos(user, objsToUpdate)
 
 
-            # Async tasks
-            photoIds = Photo.getIds(allPhotos)
-            two_fishes.processList.delay(photoIds)
-            stranding.processList.delay(photoIds)
             
             # Now that we've created the images in the db, we need to deal with any uploaded images
             #   and fill in any EXIF data (time_taken, gps, etc)
@@ -412,6 +408,11 @@ class PhotoBulkAPI(BasePhotoAPI):
             else:
                 logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
             
+            # Async tasks
+            two_fishes.processAll.delay()
+            stranding.processAll.delay()
+            similarity.processAll.delay()
+
             response = [model_to_dict(photo) for photo in allPhotos]
 
             logger.info("Successfully processed %s photos for user %s" % (len(response), user.id))
