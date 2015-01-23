@@ -296,8 +296,6 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            DFSMSInviteStrandComposeViewController *composer = [[DFSMSInviteStrandComposeViewController alloc] initWithRecipients:@[@"1 (312)4204956"]];
-            [self presentViewController:composer animated:YES completion:nil];
             
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];

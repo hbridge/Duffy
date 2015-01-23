@@ -118,32 +118,17 @@
 - (void)sendTextToPhoneNumbers:(NSArray *)phoneNumbers
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
-                                                     initWithRecipients:phoneNumbers
-                                                     locationString:nil
-                                                     date:self.photoObject.time_taken];
-    if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
-      // Some of the invitees aren't Strand users, send them a text
-      smsvc.messageComposeDelegate = self;
-      [self presentViewController:smsvc
-                         animated:YES
-                       completion:^{
-                         [SVProgressHUD dismiss];
-                       }];
-    } else {
-      [self dismissWithErrorString:nil];
-    }
+    [DFSMSInviteStrandComposeViewController
+     showWithParentViewController:self
+     phoneNumbers:phoneNumbers
+     fromDate:self.photoObject.time_taken completionBlock:^(MessageComposeResult result) {
+       if (result == MessageComposeResultSent) {
+         [self dismissWithErrorString:nil];
+       } else {
+         [self dismissWithErrorString:@"Cancelled"];
+       }
+     }];
   });
-}
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-                 didFinishWithResult:(MessageComposeResult)result
-{
-  if (result == MessageComposeResultSent) {
-    [self dismissWithErrorString:nil];
-  } else {
-    [self dismissWithErrorString:@"Cancelled"];
-  }
 }
 
 - (void)dismissWithErrorString:(NSString *)errorString

@@ -26,14 +26,4 @@
             success:(DFPeanutRestFetchSuccess)success
             failure:(DFPeanutRestFetchFailure)failure;
 
-
-/* Helper method, creates peanut invites on the server, and opens an SMS dialog for any users
- that don't have strand yet */
-- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrandObject
-            toPeanutContacts:(NSArray *)peanutContacts
-        inviteLocationString:(NSString *)inviteLocationString
-            invitedPhotosDate:(NSDate *)invitedPhotosDate
-                     success:(void(^)(DFSMSInviteStrandComposeViewController *))success
-                     failure:(DFPeanutRestFetchFailure)failure;
-
 @end

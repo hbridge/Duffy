@@ -91,44 +91,5 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
    }];
 }
 
-- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
-            toPeanutContacts:(NSArray *)peanutContacts
-        inviteLocationString:(NSString *)inviteLocationString
-            invitedPhotosDate:(NSDate *)invitedPhotosDate
-                     success:(void(^)(DFSMSInviteStrandComposeViewController *))success
-                     failure:(DFPeanutRestFetchFailure)failure
-{
-  NSMutableArray *invites = [NSMutableArray new];
-  for (DFPeanutContact *contact in peanutContacts) {
-    DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
-    invite.user = @([[DFUser currentUser] userID]);
-    invite.strand = peanutStrand.id;
-    invite.phone_number = contact.phone_number;
-    [invites addObject:invite];
-  }
-  [self postInvites:invites success:^(NSArray *resultObjects) {
-    NSMutableArray *numbersToSMS = [NSMutableArray new];
-    for (DFPeanutStrandInvite *invite in resultObjects) {
-      if (!invite.invited_user) {
-        [numbersToSMS addObject:invite.phone_number];
-      }
-    }
-    
-    if (numbersToSMS.count > 0) {
-      DFSMSInviteStrandComposeViewController *smsInviteVC = [[DFSMSInviteStrandComposeViewController alloc]
-                                                             initWithRecipients:numbersToSMS
-                                                             locationString:inviteLocationString
-                                                             date:invitedPhotosDate];
-      success(smsInviteVC);
-    } else {
-      success(nil);
-    }
-  } failure:^(NSError *error) {
-    failure(error);
-  }];
-
-}
-
-
 
 @end
