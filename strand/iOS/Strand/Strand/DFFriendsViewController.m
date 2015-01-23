@@ -68,7 +68,7 @@
                                                initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
                                                style:UIBarButtonItemStylePlain
                                                target:self
-                                               action:@selector(createButtonPressed:)],
+                                               action:@selector(addFriendButtonPressed:)],
                                               [[UIBarButtonItem alloc]
                                                initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
                                                style:UIBarButtonItemStylePlain target:self
@@ -263,7 +263,7 @@
 }
 
 
-- (void)createButtonPressed:(id)sender
+- (void)addFriendButtonPressed:(id)sender
 {
   DFInviteFriendViewController *inviteController = [[DFInviteFriendViewController alloc] init];
   [self presentViewController:inviteController animated:YES completion:nil];

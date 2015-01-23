@@ -55,7 +55,7 @@
   
   [self pushViewController:self.peoplePicker animated:NO];
   self.peoplePicker.navigationItem.leftBarButtonItem  = [[UIBarButtonItem alloc]
-                                                         initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                         initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                                          target:self
                                                          action:@selector(cancelPressed:)];
 }
@@ -77,7 +77,6 @@
                                                           rows:self.contactsWhoAddedYou];
       [sections addObject:addedYouSection];
       [self.peoplePicker setSecondaryAction:[self addFriendSecondaryAction] forSection:addedYouSection];
-      self.peoplePicker.notSelectableContacts = self.contactsWhoAddedYou;
     }
     
     // Contacts
