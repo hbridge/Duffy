@@ -189,7 +189,10 @@ static DFPeanutFeedDataManager *defaultManager;
     [combinedObjectsById setObject:object forKey:@(object.id)];
   }
   
-  return [combinedObjectsById allValues];
+  NSArray *allPeople = [combinedObjectsById allValues];
+  NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
+  
+  return [allPeople sortedArrayUsingDescriptors:@[sort]];
 }
 
 // TODO(Derek): This can be combine with Inbox processing above
