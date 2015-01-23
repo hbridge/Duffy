@@ -20,8 +20,8 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion;
-
 - (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion;
+- (void)refreshUsersFromServerWithCompletion:(RefreshCompleteCompletionBlock)completion;
 
 - (BOOL)hasInboxData;
 - (BOOL)hasPrivateStrandData;

@@ -172,6 +172,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
       return;
     }
     
+    // we call this mapping function to force creation of a userID if none exists
     [[DFPeanutFeedDataManager sharedManager]
      userIDsFromPhoneNumbers:@[contact.phone_number]
      success:^(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers) {
@@ -179,8 +180,13 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
         showWithParentViewController:self
         phoneNumbers:@[contact.phone_number]
         completionBlock:^(MessageComposeResult result) {
-          if (result == MessageComposeResultSent) [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-          else if (result == MessageComposeResultCancelled) [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+          if (result == MessageComposeResultSent)
+            [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+          else if (result == MessageComposeResultCancelled)
+            [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+          
+          // force a refresh of users
+          [[DFPeanutFeedDataManager sharedManager] refreshUsersFromServerWithCompletion:nil];
         }];
      } failure:^(NSError *error) {
        [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",

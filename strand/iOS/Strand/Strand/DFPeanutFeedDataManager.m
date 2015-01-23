@@ -218,11 +218,18 @@ static DFPeanutFeedDataManager *defaultManager;
   
   returnBlock(updated, newCombinedSections);
 }
+
+- (void)refreshUsersFromServerWithCompletion:(RefreshCompleteCompletionBlock)completion
+{
+  [self refreshFeedFromServer:DFInboxFeed completion:completion];
+}
+
 /* Generic feed methods */
 - (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion
 {
   [self refreshFeedFromServer:feedType completion:completion fullRefresh:NO];
 }
+
 
 
 - (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
