@@ -193,12 +193,14 @@
    isFriends:newFriendValue
    withUserIDs:@[@(self.peanutUser.id)]
    success:^{
-     if (newFriendValue) {
-       [SVProgressHUD showSuccessWithStatus:@"Added Friend!"];
-     } else {
-       [SVProgressHUD showSuccessWithStatus:@"Removed Friend"];
-     }
-     [self configureFriendButton:newFriendValue];
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if (newFriendValue) {
+         [SVProgressHUD showSuccessWithStatus:@"Added Friend!"];
+       } else {
+         [SVProgressHUD showSuccessWithStatus:@"Removed Friend"];
+       }
+       [self configureFriendButton:newFriendValue];
+     });
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Error: %@",
                                          error.localizedDescription]];
