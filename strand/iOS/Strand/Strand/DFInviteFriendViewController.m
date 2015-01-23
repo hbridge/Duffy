@@ -20,6 +20,8 @@
 @interface DFInviteFriendViewController ()
 
 @property (nonatomic, retain) DFSMSInviteStrandComposeViewController *messageComposer;
+@property (nonatomic, retain) NSArray *contactsWhoAddedYou;
+@property (nonatomic, retain) NSArray *abContacts;
 
 @end
 
@@ -66,16 +68,16 @@
     // People who added you
     NSArray *usersWhoAddedYou = [[DFPeanutFeedDataManager sharedManager]
                                  usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
-    NSArray *contactsWhoAddedYou = [usersWhoAddedYou arrayByMappingObjectsWithBlock:^id(id input) {
+    self.contactsWhoAddedYou = [usersWhoAddedYou arrayByMappingObjectsWithBlock:^id(id input) {
       return [[DFPeanutContact alloc] initWithPeanutUser:input];
     }];
-    if (contactsWhoAddedYou.count > 0) {
+    if (self.contactsWhoAddedYou.count > 0) {
       DFSection *addedYouSection = [DFSection sectionWithTitle:@"People who Added You"
                                                         object:nil
-                                                          rows:contactsWhoAddedYou];
+                                                          rows:self.contactsWhoAddedYou];
       [sections addObject:addedYouSection];
       [self.peoplePicker setSecondaryAction:[self addFriendSecondaryAction] forSection:addedYouSection];
-      self.peoplePicker.notSelectableContacts = contactsWhoAddedYou;
+      self.peoplePicker.notSelectableContacts = self.contactsWhoAddedYou;
     }
     
     // Contacts
@@ -83,13 +85,13 @@
     [sections addObject:allContactsSection];
     [self.peoplePicker setSecondaryAction:[self inviteSecondaryAction] forSection:allContactsSection];
     
+    //add any actual ab contacts to this row
+    self.abContacts = [allContactsSection.rows objectsPassingTestBlock:^BOOL(id input) {
+      return [[input class] isSubclassOfClass:[DFPeanutContact class]];
+    }];
+    
     [self.peoplePicker setSections:sections];
   });
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -120,7 +122,14 @@
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
 didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
+  // only run the invite code if the contact selected is NOT in the
+  // contacts who added you or contacts section, those have buttons for each row
+  if (![self.contactsWhoAddedYou containsObject:peanutContacts.firstObject]
+      && ![self.abContacts containsObject:peanutContacts.firstObject]) {
+    DFPeoplePickerSecondaryActionHandler inviteHandler = [self inviteActionHandler];
+    inviteHandler(peanutContacts.firstObject);
   }
+}
 
 - (DFPeoplePickerSecondaryAction *)addFriendSecondaryAction
 {
@@ -150,7 +159,13 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   secondaryAction.foregroundColor = [UIColor whiteColor];
   secondaryAction.backgroundColor = [DFStrandConstants strandBlue];
   secondaryAction.buttonText = @"Invite";
-  secondaryAction.actionHandler = ^(DFPeanutContact *contact) {
+  secondaryAction.actionHandler = [self inviteActionHandler];
+  return secondaryAction;
+}
+
+- (DFPeoplePickerSecondaryActionHandler)inviteActionHandler
+{
+  return ^(DFPeanutContact *contact) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
     if ([user hasAuthedPhone]) {
       [SVProgressHUD showErrorWithStatus:@"Already user"];
@@ -165,7 +180,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
        else if (result == MessageComposeResultCancelled) [SVProgressHUD showErrorWithStatus:@"Cancelled"];
      }];
   };
-  return secondaryAction;
+
 }
 
 - (void)cancelPressed:(id)sender

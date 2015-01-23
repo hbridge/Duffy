@@ -80,9 +80,8 @@ NSString *const ContactsSectionTitle = @"Contacts";
 
 - (void)reloadData
 {
-  NSMutableArray *sections = [NSMutableArray new];
-
   dispatch_async(dispatch_get_main_queue(), ^{
+    NSMutableArray *sections = [NSMutableArray new];
     NSArray *friendUsers = [[DFPeanutFeedDataManager sharedManager] friendsList];
     NSArray *friendContacts = [friendUsers arrayByMappingObjectsWithBlock:^id(id input) {
       return [[DFPeanutContact alloc] initWithPeanutUser:input];
@@ -93,9 +92,8 @@ NSString *const ContactsSectionTitle = @"Contacts";
                                                  rows:friendContacts]];
     }
     [sections addObject:[DFPeoplePickerViewController allContactsSection]];
+    [self setSections:sections];
   });
-  
-  [self setSections:sections];
 }
 
 

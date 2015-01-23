@@ -416,8 +416,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   }
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
-    // all of these sections have cells for peanut users
-    cell = [self cellForPeanutContact:(DFPeanutContact *)object indexPath:indexPath];
+    cell = [self cellForPeanutContact:(DFPeanutContact *)object
+                            tableView:tableView
+                            indexPath:indexPath];
   } else if ([[object class] isSubclassOfClass:[NSString class]]) {
     cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
     cell.textLabel.text = [NSString stringWithFormat:@"Text %@", object];
@@ -465,12 +466,13 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 
 - (UITableViewCell *)cellForPeanutContact:(DFPeanutContact *)peanutContact
+                                tableView:(UITableView *)tableView
                                 indexPath:(NSIndexPath *)indexPath
 {
   DFPersonSelectionTableViewCell *cell;
   if (peanutContact.user) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:peanutContact.user.longLongValue];
-    return [self cellForPeanutUser:user indexPath:indexPath];
+    return [self cellForPeanutUser:user tableView:tableView indexPath:indexPath];
   } else {
     DFPersonSelectionTableViewCell *nonUserCell = [self.tableView dequeueReusableCellWithIdentifier:@"nonUser"];
     [nonUserCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleSubtitle];
@@ -485,7 +487,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   [self configureCell:cell isSelectable:[self isContactSelectable:peanutContact]];
   
   DFPeoplePickerSecondaryAction *secondaryAction = self.secondaryActionsBySection[[self sectionForIndex:indexPath.section
-                                                                                            inTableView:self.tableView]];
+                                                                                            inTableView:tableView]];
   [cell configureSecondaryAction:secondaryAction peanutContact:peanutContact];
 
   
@@ -493,6 +495,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 }
 
 - (UITableViewCell *)cellForPeanutUser:(DFPeanutUserObject *)peanutUser
+                             tableView:(UITableView *)tableView
                                 indexPath:(NSIndexPath *)indexPath
 {
   DFPersonSelectionTableViewCell *userCell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
@@ -503,7 +506,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   [self configureCell:userCell isSelectable:[self isUserSelectable:peanutUser]];
   
   DFPeoplePickerSecondaryAction *secondaryAction = self.secondaryActionsBySection[[self sectionForIndex:indexPath.section
-                                                                                            inTableView:self.tableView]];
+                                                                                            inTableView:tableView]];
   DFPeanutContact *peanutContact = [[DFPeanutContact alloc] initWithPeanutUser:peanutUser];
   [userCell configureSecondaryAction:secondaryAction peanutContact:peanutContact];
   
@@ -543,7 +546,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
     if (![self.notSelectableContacts containsObject:object]) {
-      [self contactRowSelected:object atIndexPath:indexPath];
+      [self contactSelected:object];
       contactSelected = YES;
     } else {
       [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -584,8 +587,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   }
 }
 
-- (void)contactRowSelected:(DFPeanutContact *)contact atIndexPath:(NSIndexPath *)indexPath
+- (void)contactSelected:(DFPeanutContact *)contact
 {
+  if ([self.notSelectableContacts containsObject:contact]) return;
   if (self.allowsMultipleSelection) {
     self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
     self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
@@ -603,10 +607,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   textNumberContact.name = phoneNumber;
   textNumberContact.phone_type = @"text";
   
-  self.selectedContacts = [self.selectedContacts arrayByAddingObject:textNumberContact];
   self.searchDisplayController.searchBar.text = @"";
   [self.searchDisplayController setActive:NO animated:YES];
-  [self selectionUpdatedSilently:NO];
+  [self contactSelected:textNumberContact];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
