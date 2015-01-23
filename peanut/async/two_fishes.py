@@ -14,6 +14,7 @@ from common import location_util
 
 from peanut.celery import app
 
+from async import celery_helper
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
@@ -72,7 +73,7 @@ def getDataFromTwoFishesBulk(latLonList):
 
 	Static so it can be called in its own thread.
 """
-def processPhotos(photosToProcess):
+def processBatch(photosToProcess):
 	allPhotosUpdated = list()
 	
 	for photos in chunks(photosToProcess, 100):
@@ -121,18 +122,9 @@ def processPhotos(photosToProcess):
 	return len(allPhotosUpdated)
 
 baseQuery = Photo.objects.filter(twofishes_data=None).filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False))
-
-@app.task
-def processList(photoIds):
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-
-	newQuery = baseQuery.filter(id__in=photoIds)
-	processPhotos(newQuery)
-	return len(newQuery)
-
+numToProcess = 1000
 
 @app.task
 def processAll():
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	processPhotos(baseQuery)
-	return len(baseQuery)
+	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
+

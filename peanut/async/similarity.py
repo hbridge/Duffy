@@ -16,16 +16,11 @@ from arbus import similarity_util
 
 from peanut.celery import app
 
+from async import celery_helper
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
-def chunks(l, n):
-	""" Yield successive n-sized chunks from l.
-	"""
-	for i in xrange(0, len(l), n):
-		yield l[i:i+n]
-
-def processPhotos(photosToProcess):
+def processBatch(photosToProcess):
 	photosByUserId = dict()
 	for photo in photosToProcess:
 		if photo.user_id not in photosByUserId:
@@ -43,22 +38,9 @@ def processPhotos(photosToProcess):
 	return total
 	
 baseQuery = Photo.objects.exclude(thumb_filename=None).filter(clustered_time=None).exclude(time_taken=None).order_by('time_taken')
-
-@app.task
-def processList(photoIds):
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	count = 0
-	for photos in chunks(baseQuery.filter(id__in=photoIds), 250):
-		processPhotos(photos)
-		count += len(photos)
-	return count
-
+numToProcess = 250
 
 @app.task
 def processAll():
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	count = 0
-	for photos in chunks(baseQuery, 250):
-		processPhotos(photos)
-		count += len(photos)
-	return count
+	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
+	

@@ -16,6 +16,7 @@ import django
 django.setup()
 
 from django import db
+from django.db import IntegrityError
 from django.db.models import Count, Q
 
 from peanut.settings import constants
@@ -26,15 +27,12 @@ import strand.notifications_util as notifications_util
 
 from peanut.celery import app
 
+from async import celery_helper
+from async import popcaches
+
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
-def chunks(l, n):
-	""" Yield successive n-sized chunks from l.
-	"""
-	for i in xrange(0, len(l), n):
-		yield l[i:i+n]
-		
 
 def dealWithDeadStrand(strand, strandsCache):
 	logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
@@ -47,8 +45,8 @@ def dealWithDeadStrand(strand, strandsCache):
 
 
 def threadedSendNotifications(userIds):
+	logger = get_task_logger(__name__)
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	logger = logging.getLogger(__name__)
 
 	users = User.objects.filter(id__in=userIds)
 
@@ -160,7 +158,8 @@ def threadedPingFriendsForUpdates(userIds):
 """
 	 Put all new photos into private strands.  Keep track of new private Strands
 """
-def processPhotos(photosToProcess):
+def processBatch(photosToProcess):
+	total = 0
 	strandPhotosToCreate = list()
 	strandUsersToCreate = list()
 
@@ -213,7 +212,7 @@ def processPhotos(photosToProcess):
 			allUsers.extend(strand.users.all())
 
 			if len(strand.users.all()) == 0 or len(strand.photos.all()) == 0:
-				dealWithDeadStrand(strand, strandsCache)
+				strandsCache = dealWithDeadStrand(strand, strandsCache)
 
 		allUsers = set(allUsers)
 
@@ -271,9 +270,24 @@ def processPhotos(photosToProcess):
 		
 		Photo.bulkUpdate(photos, ["strand_evaluated", "is_dup"])
 		if len(strandPhotosToCreate) > 0:
-			Strand.photos.through.objects.bulk_create(strandPhotosToCreate)
+			try:
+				Strand.photos.through.objects.bulk_create(strandPhotosToCreate)
+			except IntegrityError:
+				try:
+					for obj in strandPhotosToCreate:
+						obj.save()
+				except IntegrityError:
+					pass
+
 		if len(strandUsersToCreate) > 0:
-			Strand.users.through.objects.bulk_create(strandUsersToCreate)
+			try:
+				Strand.users.through.objects.bulk_create(strandUsersToCreate)
+			except IntegrityError:
+				try:
+					for obj in strandUsersToCreate:
+						obj.save()
+				except IntegrityError:
+					pass
 
 		strandsToUpdate = list()
 		for strand in strandsAddedTo:
@@ -282,6 +296,7 @@ def processPhotos(photosToProcess):
 				strandsToUpdate.append(strand)
 
 		Strand.bulkUpdate(strandsToUpdate, ['cache_dirty'])
+		
 
 		# We're doing this here so we make sure everything is processed at a minimum level before neghboring starts
 		for strand in strandsCreated:
@@ -289,7 +304,10 @@ def processPhotos(photosToProcess):
 		Strand.bulkUpdate(strandsCreated, ['neighbor_evaluated'])
 
 		logger.debug("Created %s new strands and updated %s" % (len(strandsCreated), len(strandsAddedTo)))
-
+		total += len(strandsCreated)
+		total += len(strandsAddedTo)
+		
+		popcaches.processAll.delay()
 		#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 		
 		#logger.debug("Starting sending notifications...")
@@ -299,24 +317,12 @@ def processPhotos(photosToProcess):
 
 		logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
 
+	return total
 baseQuery = Photo.objects.select_related().filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')
-
-@app.task
-def processList(photoIds):
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	count = 0
-	for photos in chunks(baseQuery.filter(id__in=photoIds), 50):
-		processPhotos(photos)
-		count += len(photos)
-	return count
-
+numToProcess = 50
 
 @app.task
 def processAll():
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	count = 0
-	for photos in chunks(baseQuery, 50):
-		processPhotos(photos)
-		count += len(photos)
-	return count
+	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
+
 

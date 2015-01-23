@@ -28,7 +28,7 @@ from common.models import ContactEntry, User, Photo, Action, Strand, FriendConne
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
-from async import two_fishes, stranding, similarity
+from async import two_fishes, stranding, similarity, popcaches
 
 # TODO(Derek): move this to common
 from arbus import image_util
@@ -214,42 +214,12 @@ class PhotoAPI(BasePhotoAPI):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PhotoBulkAPI(BasePhotoAPI):
-    def populateTimezonesForPhotos(self, photos):
-        timezonerBaseUrl = "http://localhost:8234/timezone?"
-        
-        params = list()
-        photosNeedingTimezone = list()
-        for photo in photos:
-            if not photo.time_taken and photo.local_time_taken and photo.location_point:
-                photosNeedingTimezone.append(photo)
-                params.append("ll=%s,%s" % (photo.location_point.y, photo.location_point.x))
-        timezonerParams = '&'.join(params)
-
-        if len(photosNeedingTimezone) > 0:
-            timezonerUrl = "%s%s" % (timezonerBaseUrl, timezonerParams)
-
-            logger.info("requesting timezones for %s photos" % len(photosNeedingTimezone))
-            timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
-            
-            if (timezonerResultJson):
-                timezonerResult = json.loads(timezonerResultJson)
-                for i, photo in enumerate(photosNeedingTimezone):
-                    timezoneName = timezonerResult[i]
-                    if not timezoneName:
-                        logger.error("got no timezone with lat:%s lon:%s, setting to Eastern" % (photo.location_point.y, photo.location_point.x))
-                        tzinfo = pytz.timezone('US/Eastern')
-                    else:   
-                        tzinfo = pytz.timezone(timezoneName)
-                            
-                    localTimeTaken = photo.local_time_taken.replace(tzinfo=tzinfo)
-                    photo.time_taken = localTimeTaken.astimezone(pytz.timezone("UTC"))
-                logger.info("Successfully updated timezones for %s photos" % len(photosNeedingTimezone))
-
     def updateStrandCacheStateForPhotos(self, user, photos):
         privateStrands = Strand.objects.filter(user=user).filter(private=True).filter(photos__in=Photo.getIds(photos))
         for strand in privateStrands:
             strand.cache_dirty = True
         Strand.bulkUpdate(privateStrands, ['cache_dirty'])
+        popcaches.processAll.delay()
 
     def post(self, request, format=None):
         response = list()

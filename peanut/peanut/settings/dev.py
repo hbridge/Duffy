@@ -83,6 +83,13 @@ LOGGING = {
 			'filename': '/mnt/log/similarity.log',
 			'formatter': 'simple',
 			'maxBytes': 1024 * 1024 * 100,  # 100 mb
+		},
+		'popcaches': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/mnt/log/popcaches.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		}
 		#'console': {
 		#	'level': 'DEBUG',
@@ -128,6 +135,11 @@ LOGGING = {
 		},
 		'async.similarity': {
 			'handlers': ['similarity'],
+			'propagate': True,
+			'level': 'DEBUG',
+		},
+		'async.popcaches': {
+			'handlers': ['popcaches'],
 			'propagate': True,
 			'level': 'DEBUG',
 		}
