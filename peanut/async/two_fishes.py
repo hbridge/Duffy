@@ -127,3 +127,4 @@ def processList(photoIds):
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 	photos = Photo.objects.filter(id__in=photoIds)
 	populateLocationInfo(photos)
+	return True
