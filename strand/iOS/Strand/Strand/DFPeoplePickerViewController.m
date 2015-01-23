@@ -75,6 +75,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   [self configureSearch];
   [self selectionUpdatedSilently:YES];
   [self configureNoResultsView];
+  self.allowsMultipleSelection = self.allowsMultipleSelection;
 }
 
 - (void)configureNoResultsView
@@ -194,20 +195,20 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   int count = (int)self.selectedContacts.count;
   NSString *buttonTitle;
-  if (count > 1) {
+  if (count > 1 && self.allowsMultipleSelection) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
     buttonTitle = [NSString stringWithFormat:@"%@ %d People", self.doneButtonActionText, count];
     self.doneButton.enabled = YES;
     self.doneButtonWrapper.hidden = NO;
-  } else if (count == 1) {
+  } else if (count == 1 && self.allowsMultipleSelection) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
     buttonTitle = [NSString stringWithFormat:@"%@ 1 Person", self.doneButtonActionText];
     self.doneButton.enabled = YES;
     self.doneButtonWrapper.hidden = NO;
   } else {
-    if ([self hasUnfilteredResults]) {
+    if ([self hasUnfilteredResults] && self.allowsMultipleSelection) {
       self.doneButtonWrapper.hidden = NO;
     } else {
       self.doneButtonWrapper.hidden = YES;
@@ -218,17 +219,18 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   }
   [self.doneButton setTitle:buttonTitle forState:UIControlStateNormal];
   
-  
-  if (!self.selectedSection) {
-    self.selectedSection = [DFSection sectionWithTitle:@"Selected"
-                                                object:nil
-                                                  rows:self.selectedContacts];
-  }
-  self.selectedSection.rows = self.selectedContacts;
-  if (self.selectedContacts.count > 0 && ![self.unfilteredSections containsObject:self.selectedSection]) {
-    self.unfilteredSections = [@[self.selectedSection] arrayByAddingObjectsFromArray:self.unfilteredSections];
-  } else if (self.selectedContacts.count == 0) {
-    self.unfilteredSections = [self.unfilteredSections arrayByRemovingObject:self.selectedSection];
+  if (self.allowsMultipleSelection) {
+    if (!self.selectedSection) {
+      self.selectedSection = [DFSection sectionWithTitle:@"Selected"
+                                                  object:nil
+                                                    rows:self.selectedContacts];
+    }
+    self.selectedSection.rows = self.selectedContacts;
+    if (self.selectedContacts.count > 0 && ![self.unfilteredSections containsObject:self.selectedSection]) {
+      self.unfilteredSections = [@[self.selectedSection] arrayByAddingObjectsFromArray:self.unfilteredSections];
+    } else if (self.selectedContacts.count == 0) {
+      self.unfilteredSections = [self.unfilteredSections arrayByRemovingObject:self.selectedSection];
+    }
   }
   
   if (!silently
@@ -438,6 +440,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   
   [self configureCell:cell isSelectable:[self isContactSelectable:peanutContact]];
   
+  DFPeoplePickerSecondaryAction *secondaryAction = self.secondaryActionsBySection[[self sectionForIndex:indexPath.section
+                                                                                            inTableView:self.tableView]];
+  [cell configureSecondaryAction:secondaryAction peanutContact:peanutContact];
+
+  
   return cell;
 }
 
@@ -450,21 +457,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   userCell.profilePhotoStackView.peanutUsers = @[peanutUser];
 
   [self configureCell:userCell isSelectable:[self isUserSelectable:peanutUser]];
+  
   DFPeoplePickerSecondaryAction *secondaryAction = self.secondaryActionsBySection[[self sectionForIndex:indexPath.section
                                                                                             inTableView:self.tableView]];
-  if (secondaryAction) {
-    userCell.secondaryButton.hidden = NO;
-    userCell.secondaryButton.backgroundColor = secondaryAction.backgroundColor;
-    [userCell.secondaryButton setTitleColor:secondaryAction.foregroundColor forState:UIControlStateNormal];
-    [userCell.secondaryButton setTitle:secondaryAction.buttonText forState:UIControlStateNormal];
-    userCell.secondaryButtonHandler = ^{
-      secondaryAction.actionHandler([[DFPeanutContact alloc] initWithPeanutUser:peanutUser]);
-    };
-    userCell.selectionStyle = UITableViewCellSelectionStyleNone;
-  } else {
-    userCell.secondaryButton.hidden = YES;
-    userCell.selectionStyle = UITableViewCellSelectionStyleDefault;
-  }
+  DFPeanutContact *peanutContact = [[DFPeanutContact alloc] initWithPeanutUser:peanutUser];
+  [userCell configureSecondaryAction:secondaryAction peanutContact:peanutContact];
   
   return userCell;
 }
@@ -506,6 +503,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     } else {
       [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
+    if ([self.delegate respondsToSelector:@selector(pickerController:contactTapped:)]) {
+      [self.delegate pickerController:self contactTapped:object];
+    }
   } else if ([[object class] isSubclassOfClass:[NSString class]]) {
     [self textNumberRowSelected:object];
     contactSelected = YES;
@@ -541,7 +541,10 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (void)contactRowSelected:(DFPeanutContact *)contact atIndexPath:(NSIndexPath *)indexPath
 {
-  self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+  if (self.allowsMultipleSelection)
+    self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+  else
+    [self.delegate pickerController:self didFinishWithPickedContacts:@[contact]];
   [self selectionUpdatedSilently:NO];
 }
 

@@ -28,6 +28,8 @@
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController textDidChange:(NSString *)text;
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
          pickedContactsDidChange:(NSArray *)peanutContacts;
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+           contactTapped:(DFPeanutContact *)contact;
 
 @end
 

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
 #import "DFProfileStackView.h"
+#import "DFPeoplePickerSecondaryAction.h"
 
 
 @interface DFPersonSelectionTableViewCell : MCSwipeTableViewCell
@@ -31,5 +32,7 @@ typedef NS_OPTIONS(NSInteger, DFPersonSelectionTableViewCellStyle) {
 
 - (void)configureWithCellStyle:(DFPersonSelectionTableViewCellStyle)style;
 - (IBAction)secondaryButtonPressed:(id)sender;
+- (void)configureSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
+                   peanutContact:(DFPeanutContact *)peanutContac;
 
 @end

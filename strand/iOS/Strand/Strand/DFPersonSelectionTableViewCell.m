@@ -60,8 +60,28 @@ const CGFloat DFPersonSelectionTableViewCellHeight = 54;
   }
 }
 
+- (void)configureSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
+                   peanutContact:(DFPeanutContact *)peanutContact
+{
+  if (secondaryAction) {
+    self.secondaryButton.hidden = NO;
+    self.secondaryButton.backgroundColor = secondaryAction.backgroundColor;
+    [self.secondaryButton setTitleColor:secondaryAction.foregroundColor forState:UIControlStateNormal];
+    [self.secondaryButton setTitle:secondaryAction.buttonText forState:UIControlStateNormal];
+    self.secondaryButtonHandler = ^{
+      secondaryAction.actionHandler(peanutContact);
+    };
+    self.showsTickMarkWhenSelected = NO;
+  } else {
+    self.secondaryButton.hidden = YES;
+    self.showsTickMarkWhenSelected = YES;
+  }
+}
+
 - (IBAction)secondaryButtonPressed:(id)sender {
   if (self.secondaryButtonHandler) self.secondaryButtonHandler();
 }
+
+
 
 @end
