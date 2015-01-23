@@ -9,8 +9,6 @@ EOF
 echo "Restarting scripts..."
 sudo stop duffy-friends
 sudo start duffy-friends
-sudo stop duffy-stranding
-sudo start duffy-stranding
 sudo stop duffy-neighboring
 sudo start duffy-neighboring
 sudo stop duffy-popcaches
@@ -26,7 +24,6 @@ source /home/ubuntu/env/bin/activate; python /home/ubuntu/dev/Duffy/peanut/tests
 
 initctl list | grep duffy-strand-notifications
 initctl list | grep duffy-friends
-initctl list | grep duffy-stranding
 initctl list | grep duffy-neighboring
 initctl list | grep duffy-popcaches
 initctl list | grep duffy-suggestion-notifications
