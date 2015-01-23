@@ -71,6 +71,12 @@ NSString *const ContactsSectionTitle = @"Contacts";
   return self;
 }
 
+- (void)viewDidLoad
+{
+  [super viewDidLoad];
+  [self reloadData];
+}
+
 
 - (void)reloadData
 {
