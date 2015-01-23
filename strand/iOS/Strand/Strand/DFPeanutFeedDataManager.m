@@ -742,6 +742,7 @@ static DFPeanutFeedDataManager *defaultManager;
       success();
     } failure:^(NSError *error) {
       DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
+      failure(error);
     }];
   } else {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
