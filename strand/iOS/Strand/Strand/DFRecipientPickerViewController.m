@@ -23,6 +23,15 @@ NSString *const ContactsSectionTitle = @"Contacts";
 
 @implementation DFRecipientPickerViewController
 
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    [self observeNotifications];
+  }
+  return self;
+}
+
 - (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
 {
   self = [self init];
