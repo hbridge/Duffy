@@ -205,7 +205,7 @@ const NSUInteger CompressedModeMaxRows = 1;
     psv.delegate = self;
   }
   
-  self.youPopLabel = [MMPopLabel popLabelWithText:@"You sent this photo"];
+  self.youPopLabel = [MMPopLabel popLabelWithText:@"You"];
   [self.senderProfileStackView.superview addSubview:self.youPopLabel];
   
   self.recipientsProfileStackView.photoMargins = 5;
