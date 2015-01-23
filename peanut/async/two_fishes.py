@@ -6,14 +6,13 @@ import urllib2
 import urllib
 import json
 import pytz
-
-from peanut.celery import app
-
 from django.db.models import Q
 from django import db
 
 from common.models import Photo
 from common import location_util
+
+from peanut.celery import app
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -125,6 +124,8 @@ def populateLocationInfo(allPhotos):
 @app.task
 def processList(photoIds):
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	photos = Photo.objects.filter(id__in=photoIds)
-	populateLocationInfo(photos)
+	photos = Photo.objects.filter(id__in=photoIds).filter(twofishes_data=None).filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False))
+	
+	if len(photos) > 0:
+		populateLocationInfo(photos)
 	return True

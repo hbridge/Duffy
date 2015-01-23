@@ -41,32 +41,39 @@ LOGGING = {
 		'djangofile': {
 			'level': 'INFO',
 			'class':'logging.handlers.RotatingFileHandler',
-			'filename': '/home/derek/logs/duffy-all.log',
+			'filename': '/mnt/log/frontend-all.log',
 			'formatter': 'verbose'
 		},
 		'djangoerror': {
 			'level': 'ERROR',
 			'class':'logging.handlers.RotatingFileHandler',
-			'filename': '/home/derek/logs/duffy-error.log',
+			'filename': '/mnt/log/frontend-error.log',
 			'formatter': 'verbose'
 		},
 		'duffyfile': {
 			'level': 'DEBUG',
 			'class':'logging.handlers.RotatingFileHandler',
-			'filename': '/home/derek/logs/duffy-photos.log',
+			'filename': '/mnt/log/frontend-main.log',
 			'formatter': 'verbose'
 		},
 		'celery': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': '/var/log/duffy/celery.log',
+			'filename': '/mnt/log/celery.log',
 			'formatter': 'simple',
 			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		},
 		'two_fishes': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': '/var/log/duffy/twofishes.log',
+			'filename': '/mnt/log/twofishes.log',
+			'formatter': 'simple',
+			'maxBytes': 1024 * 1024 * 100,  # 100 mb
+		},
+		'stranding': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.RotatingFileHandler',
+			'filename': '/mnt/log/stranding.log',
 			'formatter': 'simple',
 			'maxBytes': 1024 * 1024 * 100,  # 100 mb
 		}
@@ -104,6 +111,11 @@ LOGGING = {
 		},
 		'async.two_fishes': {
 			'handlers': ['two_fishes'],
+			'propagate': True,
+			'level': 'DEBUG',
+		},
+		'async.stranding': {
+			'handlers': ['stranding'],
 			'propagate': True,
 			'level': 'DEBUG',
 		}
