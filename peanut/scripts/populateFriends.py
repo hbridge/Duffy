@@ -76,7 +76,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False).filter(user_id__gt=5000)[:1000]
+		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False).filter(user_id__gt=600)[:1000]
 		newConnectionCount = 0
 
 		if len(contactEntries) > 0:
