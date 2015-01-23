@@ -11,13 +11,8 @@
             <rect key="frame" x="0.0" y="0.0" width="535" height="52"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <textField hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add a comment" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QMA-mD-Dv1">
-                    <rect key="frame" x="8" y="11" width="477" height="30"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="send" enablesReturnKeyAutomatically="YES"/>
-                </textField>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rua-gy-tSe" userLabel="Like Button">
-                    <rect key="frame" x="8" y="11" width="30" height="30"/>
+                    <rect key="frame" x="8" y="0.0" width="30" height="52"/>
                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                     <inset key="titleEdgeInsets" minX="3" minY="0.0" maxX="-3" maxY="0.0"/>
                     <state key="normal" title="Like">
@@ -28,7 +23,7 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o3O-kF-lYA" userLabel="Comment Button">
-                    <rect key="frame" x="54" y="11" width="68" height="30"/>
+                    <rect key="frame" x="54" y="0.0" width="68" height="52"/>
                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                     <inset key="titleEdgeInsets" minX="3" minY="0.0" maxX="-3" maxY="0.0"/>
                     <state key="normal" title="Comment">
@@ -49,7 +44,7 @@
                     </connections>
                 </button>
                 <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A8D-Vm-E5G" userLabel="Send button">
-                    <rect key="frame" x="493" y="11" width="34" height="29"/>
+                    <rect key="frame" x="493" y="0.0" width="34" height="52"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="34" id="d4W-aq-ZqV"/>
                     </constraints>
@@ -64,20 +59,28 @@
                         <action selector="sendButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="RMP-LV-t9d"/>
                     </connections>
                 </button>
+                <textField hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add a comment" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QMA-mD-Dv1">
+                    <rect key="frame" x="8" y="11" width="477" height="30"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="send" enablesReturnKeyAutomatically="YES"/>
+                </textField>
             </subviews>
             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="bottom" secondItem="Rua-gy-tSe" secondAttribute="bottom" id="2VE-Mu-R6M"/>
                 <constraint firstItem="QMA-mD-Dv1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="8UE-2E-6de"/>
                 <constraint firstAttribute="trailing" secondItem="A8D-Vm-E5G" secondAttribute="trailing" constant="8" id="8ye-vq-RtQ"/>
-                <constraint firstAttribute="centerY" secondItem="o3O-kF-lYA" secondAttribute="centerY" id="ChX-0m-G7L"/>
-                <constraint firstAttribute="centerY" secondItem="Rua-gy-tSe" secondAttribute="centerY" id="FqG-hY-D1X"/>
+                <constraint firstItem="A8D-Vm-E5G" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="DJH-UY-SUD"/>
+                <constraint firstAttribute="bottom" secondItem="A8D-Vm-E5G" secondAttribute="bottom" id="JNV-cf-E3J"/>
+                <constraint firstItem="Rua-gy-tSe" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="R9Z-Kn-Zc7"/>
+                <constraint firstAttribute="bottom" secondItem="o3O-kF-lYA" secondAttribute="bottom" id="TKD-iP-p64"/>
                 <constraint firstAttribute="centerY" secondItem="QMA-mD-Dv1" secondAttribute="centerY" id="Wg3-Mt-rif"/>
-                <constraint firstAttribute="centerY" secondItem="A8D-Vm-E5G" secondAttribute="centerY" id="Wwb-Xr-wOu"/>
                 <constraint firstAttribute="centerY" secondItem="Jgp-IN-H1j" secondAttribute="centerY" id="Yf0-z8-Kbq"/>
                 <constraint firstItem="o3O-kF-lYA" firstAttribute="leading" secondItem="Rua-gy-tSe" secondAttribute="trailing" constant="16" id="atH-ai-GrV"/>
                 <constraint firstItem="Rua-gy-tSe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="i3P-1z-6af"/>
                 <constraint firstItem="A8D-Vm-E5G" firstAttribute="leading" secondItem="QMA-mD-Dv1" secondAttribute="trailing" constant="8" id="n3V-1P-0jC"/>
                 <constraint firstAttribute="trailing" secondItem="Jgp-IN-H1j" secondAttribute="trailing" constant="8" id="tgi-un-WEE"/>
+                <constraint firstItem="o3O-kF-lYA" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="vRg-MR-640"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
