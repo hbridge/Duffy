@@ -36,7 +36,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFCommentTableViewCell *templateCell;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
-@property (nonatomic, retain) MMPopLabel *youPopLabel;
 
 @end
 
@@ -204,9 +203,6 @@ const NSUInteger CompressedModeMaxRows = 1;
     psv.showNames = YES;
     psv.delegate = self;
   }
-  
-  self.youPopLabel = [MMPopLabel popLabelWithText:@"You"];
-  [self.senderProfileStackView.superview addSubview:self.youPopLabel];
   
   self.recipientsProfileStackView.photoMargins = 5;
 }
@@ -797,12 +793,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)profileStackView:(DFProfileStackView *)profileStackView peanutUserTapped:(DFPeanutUserObject *)peanutUser
 {
-  if (peanutUser.id == [[DFUser currentUser] userID]) {
-    [self.youPopLabel popAtView:self.senderProfileStackView animatePopLabel:YES animateTargetView:NO];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self.youPopLabel dismiss];
-    });
-  } else {
+  if (peanutUser.id != [[DFUser currentUser] userID]) {
     DFFriendProfileViewController *friendViewController = [[DFFriendProfileViewController alloc] initWithPeanutUser:peanutUser];
     [DFNavigationController presentWithRootController:friendViewController inParent:self];
   }
