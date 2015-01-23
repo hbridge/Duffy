@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MMPopLabel/MMPopLabel.h>
+#import "DFUserListViewController.h"
 
 @class DFPeanutUserObject;
 @class DFProfileStackView;
@@ -19,7 +20,7 @@
 
 @end
 
-@interface DFProfileStackView : UIView <MMPopLabelDelegate>
+@interface DFProfileStackView : UIView <MMPopLabelDelegate, DFPeoplePickerDelegate>
 
 @property (nonatomic) NSUInteger maxProfilePhotos;
 @property (nonatomic, retain) NSArray *peanutUsers;

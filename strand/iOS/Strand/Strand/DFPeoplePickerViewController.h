@@ -44,7 +44,7 @@
 
 #pragma mark - Delegate
 
-@property (nonatomic, weak) NSObject<DFPeoplePickerDelegate>* delegate;
+@property (nonatomic, weak) id<DFPeoplePickerDelegate> delegate;
 
 #pragma mark - Configuration
 
@@ -60,6 +60,7 @@
 - (void)setSections:(NSArray *)sections;
 - (void)setSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
                 forSection:(DFSection *)section;
+- (void)removeSearchBar;
 
 + (DFSection *)allContactsSection;
 

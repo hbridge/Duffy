@@ -72,6 +72,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     [self updateSearchResults];
     [self.sdc.searchResultsTableView reloadData];
     [self configureNoResultsView];
+    [self selectionUpdatedSilently:YES];
   });
 }
 
@@ -474,9 +475,10 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     DFPersonSelectionTableViewCell *nonUserCell = [self.tableView dequeueReusableCellWithIdentifier:@"nonUser"];
     [nonUserCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleSubtitle];
     nonUserCell.nameLabel.text = peanutContact.name;
-    nonUserCell.subtitleLabel.text = [NSString stringWithFormat:@"%@ %@",
-                          peanutContact.phone_type,
-                          peanutContact.phone_number];
+    NSMutableString *numberLine = [NSMutableString new];
+    if (peanutContact.phone_type) [numberLine appendFormat:@"%@ ", peanutContact.phone_type];
+    [numberLine appendString:peanutContact.phone_number];
+    nonUserCell.subtitleLabel.text = numberLine;
     cell = nonUserCell;
   }
   
@@ -663,6 +665,10 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
                           formatMessage:@"Please go to Settings > Privacy > Contacts and change Strand to on."];
 }
 
+- (void)removeSearchBar
+{
+  [self.searchBar removeFromSuperview];
+}
 
 
 @end

@@ -7,9 +7,11 @@
 //
 
 #import "DFProfileStackView.h"
+#import <WYPopoverController/WYPopoverController.h>
 #import "DFPeanutUserObject.h"
 #import "UIImage+RoundedCorner.h"
 #import "UIImage+Resize.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFProfileStackView()
 
@@ -22,6 +24,7 @@
 @property (nonatomic, retain) MMPopLabel *popLabel;
 @property (nonatomic) CGFloat profilePhotoWidth;
 @property (nonatomic) CGRect lastFrame;
+@property (nonatomic, retain) WYPopoverController *morePopover;
 
 @end
 
@@ -362,10 +365,26 @@
   NSUInteger numUsersThatFitInRect = [self numUsersThatFitInRect:self.bounds];
   NSRange range = (NSRange){numUsersThatFitInRect - 1, self.peanutUsers.count - numUsersThatFitInRect + 1};
   NSArray *peanutUsers = [self.peanutUsers subarrayWithRange:range];
-  NSArray *names = [peanutUsers arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
-    return user.fullName;
-  }];
-  [self popLabelAtRect:rect withText:[names componentsJoinedByString:@",\n"]];
+  
+  DFUserListViewController *ulistController = [[DFUserListViewController alloc] initWithUsers:peanutUsers];
+  ulistController.delegate = self;
+  self.morePopover =  [[WYPopoverController alloc]
+                                   initWithContentViewController:ulistController];
+  [self.morePopover presentPopoverFromRect:rect
+                                    inView:self
+                  permittedArrowDirections:WYPopoverArrowDirectionUp
+                                  animated:YES
+                                   options:WYPopoverAnimationOptionFadeWithScale
+                                completion:nil];
+}
+
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+didFinishWithPickedContacts:(NSArray *)peanutContacts
+{
+  DFPeanutContact *contact = peanutContacts.firstObject;
+  DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
+                              userWithPhoneNumber:contact.phone_number];
+  [self.delegate profileStackView:self peanutUserTapped:user];
 }
 
 - (void)dismissedPopLabel:(MMPopLabel *)popLabel

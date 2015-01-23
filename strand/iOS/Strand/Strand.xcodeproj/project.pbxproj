@@ -73,6 +73,7 @@
 		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
 		5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */; };
 		5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */; };
+		5A5B80BE1A72BFE7005C61D2 /* DFUserListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B80BD1A72BFE7005C61D2 /* DFUserListViewController.m */; };
 		5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */; };
 		5A65181E19D62754001FE911 /* DFStrandGalleryTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A65181D19D62754001FE911 /* DFStrandGalleryTitleView.m */; };
 		5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */; };
@@ -418,6 +419,8 @@
 		5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContactAdapter.m; sourceTree = "<group>"; };
 		5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactSyncManager.h; sourceTree = "<group>"; };
 		5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactSyncManager.m; sourceTree = "<group>"; };
+		5A5B80BC1A72BFE7005C61D2 /* DFUserListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUserListViewController.h; sourceTree = "<group>"; };
+		5A5B80BD1A72BFE7005C61D2 /* DFUserListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserListViewController.m; sourceTree = "<group>"; };
 		5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNoTableItemsView.xib; sourceTree = "<group>"; };
 		5A65181C19D62754001FE911 /* DFStrandGalleryTitleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGalleryTitleView.h; sourceTree = "<group>"; };
 		5A65181D19D62754001FE911 /* DFStrandGalleryTitleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGalleryTitleView.m; sourceTree = "<group>"; };
@@ -904,6 +907,10 @@
 		5A13E08F19BF613E005357D2 /* TableViewCells */ = {
 			isa = PBXGroup;
 			children = (
+				5AA9293119A6598600032A3F /* DFNoResultsWithButtonTableViewCell.xib */,
+				5A43072D1A72B3490089C790 /* DFNoResultsTableViewCell.h */,
+				5A43072E1A72B3490089C790 /* DFNoResultsTableViewCell.m */,
+				5AA9293319A66AB700032A3F /* DFNoResultsTableViewCell.xib */,
 				5AAF038E19B0DBAE00EF021C /* DFCollectionViewTableViewCell.h */,
 				5AAF038F19B0DBAE00EF021C /* DFCollectionViewTableViewCell.m */,
 				5AAF039019B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib */,
@@ -1417,29 +1424,27 @@
 			name = "Create Strand";
 			sourceTree = "<group>";
 		};
-		5AB4CBFC1982AF2500EFB3E3 /* People Picker */ = {
+		5AB4CBFC1982AF2500EFB3E3 /* Friend Management */ = {
 			isa = PBXGroup;
 			children = (
-				5AAF03A119B4D5B200EF021C /* DFPeoplePickerViewController.h */,
-				5AAF03A219B4D5B200EF021C /* DFPeoplePickerViewController.m */,
-				5AA9292A19A6502200032A3F /* DFPeoplePickerViewController.xib */,
-				5A4307271A71B6C70089C790 /* DFPeoplePickerSecondaryAction.h */,
-				5A4307281A71B6C70089C790 /* DFPeoplePickerSecondaryAction.m */,
-				5A43072A1A72AE800089C790 /* DFPeoplePickerNoResultsDescriptor.h */,
-				5A43072B1A72AE800089C790 /* DFPeoplePickerNoResultsDescriptor.m */,
-				5A4307241A7177C30089C790 /* DFRecipientPickerViewController.h */,
-				5A4307251A7177C30089C790 /* DFRecipientPickerViewController.m */,
 				5A93B59E19B6290F00A3DBA7 /* DFABResultTableViewCell.h */,
 				5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */,
 				5AA9293719A67CC500032A3F /* DFABResultTableViewCell.xib */,
-				5AA9293119A6598600032A3F /* DFNoResultsWithButtonTableViewCell.xib */,
-				5A43072D1A72B3490089C790 /* DFNoResultsTableViewCell.h */,
-				5A43072E1A72B3490089C790 /* DFNoResultsTableViewCell.m */,
-				5AA9293319A66AB700032A3F /* DFNoResultsTableViewCell.xib */,
+				5A43072A1A72AE800089C790 /* DFPeoplePickerNoResultsDescriptor.h */,
+				5A43072B1A72AE800089C790 /* DFPeoplePickerNoResultsDescriptor.m */,
+				5A4307271A71B6C70089C790 /* DFPeoplePickerSecondaryAction.h */,
+				5A4307281A71B6C70089C790 /* DFPeoplePickerSecondaryAction.m */,
+				5AAF03A119B4D5B200EF021C /* DFPeoplePickerViewController.h */,
+				5AAF03A219B4D5B200EF021C /* DFPeoplePickerViewController.m */,
+				5AA9292A19A6502200032A3F /* DFPeoplePickerViewController.xib */,
+				5A4307241A7177C30089C790 /* DFRecipientPickerViewController.h */,
+				5A4307251A7177C30089C790 /* DFRecipientPickerViewController.m */,
+				5A5B80BC1A72BFE7005C61D2 /* DFUserListViewController.h */,
+				5A5B80BD1A72BFE7005C61D2 /* DFUserListViewController.m */,
 				5A6E8B6C19CA323500870423 /* DFSMSInviteStrandComposeViewController.h */,
 				5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */,
 			);
-			name = "People Picker";
+			name = "Friend Management";
 			sourceTree = "<group>";
 		};
 		5ABD835C1A13E31C00A4A7D6 /* All Swaps Gallery */ = {
@@ -1675,7 +1680,7 @@
 				5A883BEA1A0AAE5B00355C1D /* Image Manager */,
 				5AC4A8DC1947B61900862D9C /* Database */,
 				5AC4A95D194A257E00862D9C /* Managers */,
-				5AB4CBFC1982AF2500EFB3E3 /* People Picker */,
+				5AB4CBFC1982AF2500EFB3E3 /* Friend Management */,
 				5AC4A964194A3FBF00862D9C /* Network Adapters */,
 				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
@@ -2124,6 +2129,7 @@
 				65D1C2D01A2D095E007E7300 /* UIButton+Badge.m in Sources */,
 				5AED01DD19E34722001F075D /* DFImageDataSource.m in Sources */,
 				5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */,
+				5A5B80BE1A72BFE7005C61D2 /* DFUserListViewController.m in Sources */,
 				5A4501F019D07FC70075E183 /* DFPHAsset.m in Sources */,
 				5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */,
 				5AC4A9291947C30800862D9C /* DFPeanutPhoto.m in Sources */,
