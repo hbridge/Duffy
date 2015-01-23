@@ -8,9 +8,8 @@
 
 #import "DFNavigationController.h"
 #import "DFPeoplePickerViewController.h"
-#import <MessageUI/MessageUI.h>
 
-@interface DFInviteFriendViewController : DFNavigationController <DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
+@interface DFInviteFriendViewController : DFNavigationController <DFPeoplePickerDelegate>
 
 @property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
 

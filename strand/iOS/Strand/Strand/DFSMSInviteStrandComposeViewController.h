@@ -18,6 +18,9 @@ typedef void (^DFSMSComposeCompletionBlock)(MessageComposeResult result);
                         phoneNumbers:(NSArray *)phoneNumbers
                             fromDate:(NSDate *)date
                      completionBlock:(DFSMSComposeCompletionBlock)completionBlock;
++ (void)showWithParentViewController:(UIViewController *)parentViewController
+                        phoneNumbers:(NSArray *)phoneNumbers
+                     completionBlock:(DFSMSComposeCompletionBlock)completionBlock;
 + (void)warmUpSMSComposer;
 
 

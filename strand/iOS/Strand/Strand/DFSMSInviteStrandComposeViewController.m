@@ -96,11 +96,27 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
                             fromDate:(NSDate *)date
                      completionBlock:(DFSMSComposeCompletionBlock)completionBlock
 {
-  [SVProgressHUD show];
   DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
                                                    initWithRecipients:phoneNumbers
                                                    locationString:nil
                                                    date:date];
+  [self showSMSVc:smsvc inParentViewController:parentViewController completionBlock:completionBlock];
+}
+
++ (void)showWithParentViewController:(UIViewController *)parentViewController
+                        phoneNumbers:(NSArray *)phoneNumbers
+                     completionBlock:(DFSMSComposeCompletionBlock)completionBlock
+{
+  DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
+                                                   initWithRecipients:phoneNumbers];
+  [self showSMSVc:smsvc inParentViewController:parentViewController completionBlock:completionBlock];
+}
+
++ (void)showSMSVc:(DFSMSInviteStrandComposeViewController *)smsvc
+inParentViewController:(UIViewController *)parentViewController
+  completionBlock:(DFSMSComposeCompletionBlock)completionBlock
+{
+  [SVProgressHUD show];
   if (smsvc && [DFSMSInviteStrandComposeViewController canSendText]) {
     smsvc.completionBlock = completionBlock;
     smsvc.messageComposeDelegate = smsvc;
@@ -115,6 +131,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
                            presentingViewController:parentViewController];
     if (completionBlock) completionBlock(MessageComposeResultFailed);
   }
+
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller

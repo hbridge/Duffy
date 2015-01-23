@@ -151,29 +151,15 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
       return;
     }
     
-    self.messageComposer  = [[DFSMSInviteStrandComposeViewController alloc]
-                             initWithRecipients:@[contact.phone_number]];
-    self.messageComposer.messageComposeDelegate = self;
-    if (self.messageComposer)
-      [self presentViewController:self.messageComposer animated:YES completion:nil];
-    
+    [DFSMSInviteStrandComposeViewController
+     showWithParentViewController:self
+     phoneNumbers:@[contact.phone_number]
+     completionBlock:^(MessageComposeResult result) {
+       if (result == MessageComposeResultSent) [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+       else if (result == MessageComposeResultCancelled) [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+     }];
   };
   return secondaryAction;
-}
-
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-                 didFinishWithResult:(MessageComposeResult)result
-{
-  if (result == MessageComposeResultSent) {
-    [[DFContactSyncManager sharedManager]
-     uploadInvitedContacts:self.peoplePicker.selectedContacts];
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:^(void) {
-      [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-    }];
-  } else {
-    [self.messageComposer dismissViewControllerAnimated:YES completion:nil];
-  }
 }
 
 - (void)cancelPressed:(id)sender
