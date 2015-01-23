@@ -48,8 +48,8 @@
                                 <action selector="backButtonPressed:" destination="-1" eventType="touchUpInside" id="lwp-5m-Eoa"/>
                             </connections>
                         </button>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QmR-gx-IVb">
-                            <rect key="frame" x="75" y="30" width="47" height="21"/>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="QmR-gx-IVb">
+                            <rect key="frame" x="75" y="30" width="425" height="21"/>
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
@@ -79,6 +79,7 @@
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="centerY" secondItem="d9R-6B-DbB" secondAttribute="centerY" constant="-3.5" id="GC8-5n-bkX"/>
                         <constraint firstAttribute="trailing" secondItem="d9R-6B-DbB" secondAttribute="trailing" constant="8" id="Lfj-am-jnO"/>
                         <constraint firstItem="iNL-1h-xwh" firstAttribute="leading" secondItem="Nc7-0m-VWp" secondAttribute="leading" id="OHx-hW-qvF"/>
+                        <constraint firstItem="d9R-6B-DbB" firstAttribute="leading" secondItem="QmR-gx-IVb" secondAttribute="trailing" constant="8" id="OgR-um-kxq"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="centerY" secondItem="vRE-Zm-eLd" secondAttribute="centerY" constant="-8" id="UGE-Vw-JF4"/>
                         <constraint firstAttribute="bottom" secondItem="vRE-Zm-eLd" secondAttribute="bottom" constant="13" id="YIu-BY-bSO"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="leading" secondItem="vRE-Zm-eLd" secondAttribute="trailing" constant="8" id="cz9-by-1W4"/>
