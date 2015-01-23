@@ -393,13 +393,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  NSUInteger numRows;
-  if (self.compressedModeEnabled && !self.commentsExpanded) {
-    numRows = MIN([[self comments] count], CompressedModeMaxRows + 1);
-  } else {
-    numRows = [[self comments] count];
-  }
-  return MAX(numRows, 1);
+  return [[self comments] count];
 }
 
 - (NSArray *)comments
@@ -718,13 +712,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)addComment:(DFPeanutAction *)action
 {
   [self.tableView beginUpdates];
-  
-  if (self.comments.count == 0)
-  {
-    [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]]
-                          withRowAnimation:UITableViewRowAnimationFade];
-  }
-  
   [self.tableView
    insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.comments.count inSection:0]]
    withRowAnimation:UITableViewRowAnimationFade];
