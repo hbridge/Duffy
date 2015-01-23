@@ -15,7 +15,7 @@
 #import "DFPhotoStore.h"
 #import "DFUser.h"
 #import "DFUserPeanutAdapter.h"
-#import "DFCreateAccountViewController.h"
+#import "DFNUXFlowViewController.h"
 #import "DFStrandsManager.h"
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
@@ -175,9 +175,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 - (void)showFirstTimeSetup
 {
   [DFPhotoStore resetStore]; // make sure the photo store is clean
-  DFCreateAccountViewController *setupViewController = [[DFCreateAccountViewController alloc] init];
-  self.window.rootViewController = [[DFNavigationController alloc]
-                                    initWithRootViewController:setupViewController];
+  DFNUXFlowViewController *setupViewController = [[DFNUXFlowViewController alloc] init];
+  self.window.rootViewController = setupViewController;
 }
 
 

@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "DFNUXViewController.h"
 
-@interface DFCreateAccountViewController : UIViewController <UITextFieldDelegate, UIActionSheetDelegate>
+@interface DFCreateAccountViewController : DFNUXViewController <UITextFieldDelegate, UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UITextField *phoneNumberField;

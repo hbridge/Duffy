@@ -237,16 +237,19 @@ replacementString:(NSString *)string
 
 - (void)showNextStepWithPhoneNumber:(NSString *)phoneNumberString
 {
-  DFSMSAuthViewController *codeEntryController = [[DFSMSAuthViewController alloc] init];
-  codeEntryController.phoneNumberString = phoneNumberString;
+  NSString *name;
   if (self.nameTextField.text
       && ![self.nameTextField.text isEqualToString:@""]) {
-    codeEntryController.userName = self.nameTextField.text;
+    name = self.nameTextField.text;
   } else {
-    codeEntryController.userName = [DFUser deviceNameBasedUserName];
+    name = [DFUser deviceNameBasedUserName];
   }
-  [self.navigationController pushViewController:codeEntryController
-                                       animated:YES];
+
+  NSDictionary *newUserInfo = @{
+                                DFPhoneNumberNUXUserInfoKey : phoneNumberString,
+                                DFDisplayNameNUXUserInfoKey : name
+                                };
+  [self completedWithUserInfo:newUserInfo];
 }
 
 @end

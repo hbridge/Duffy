@@ -10,7 +10,6 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIAlertView+DFHelpers.h"
 #import "DFAnalytics.h"
-#import "AppDelegate.h"
 #import "SAMGradientView.h"
 #import "DFStrandConstants.h"
 #import "DFCameraRollSyncManager.h"
@@ -68,7 +67,7 @@
   ALAuthorizationStatus status = [ALAssetsLibrary authorizationStatus];
   if (status == ALAuthorizationStatusAuthorized) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyGranted"];
-    [self showNextStep];
+    [self completedWithUserInfo:nil];
   } else if (status == ALAuthorizationStatusDenied) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyDenied"];
     [UIAlertView showSimpleAlertWithTitle:@"Enable Access"
@@ -81,7 +80,7 @@
     ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
     [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
       [DFAnalytics logSetupPhotosCompletedWithResult:@"askedGranted"];
-      [self showNextStep];
+      [self completedWithUserInfo:nil];
       *stop = YES;
     } failureBlock:^(NSError *error) {
       if (error) {
@@ -95,14 +94,6 @@
       }
     }];
   }
-}
-
-- (void)showNextStep
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    [delegate firstTimeSetupComplete];
-  });
 }
 
 - (BOOL)prefersStatusBarHidden

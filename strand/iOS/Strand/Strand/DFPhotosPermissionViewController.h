@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "DFNUXViewController.h"
 
-@interface DFPhotosPermissionViewController : UIViewController
+@interface DFPhotosPermissionViewController : DFNUXViewController
 
 @property (weak, nonatomic) IBOutlet UIButton *learnMoreButtonPressed;
 - (IBAction)grantPhotosAccessPressed:(id)sender;

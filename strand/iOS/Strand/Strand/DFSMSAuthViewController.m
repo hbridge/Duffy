@@ -12,7 +12,6 @@
 #import "NSString+DFHelpers.h"
 #import "DFAnalytics.h"
 #import "SVProgressHUD.h"
-#import "DFPhotosPermissionViewController.h"
 #import "AppDelegate.h"
 
 const UInt16 DFCodeLength = 4;
@@ -39,6 +38,13 @@ const UInt16 DFCodeLength = 4;
   [self.codeTextField becomeFirstResponder];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  self.navigationItem.title = [NSString stringWithFormat:@"Verify %@",
+                               self.inputUserInfo[DFPhoneNumberNUXUserInfoKey]];
+  
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
@@ -57,11 +63,6 @@ const UInt16 DFCodeLength = 4;
     // Dispose of any resources that can be recreated.
 }
 
-- (void)setPhoneNumberString:(NSString *)phoneNumberString
-{
-  _phoneNumberString = phoneNumberString;
-  self.navigationItem.title = [NSString stringWithFormat:@"Verify %@", phoneNumberString];
-}
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
@@ -134,7 +135,8 @@ replacementString:(NSString *)string
     return;
   }
   NSString *authCode = [self enteredCode];
-  [self getUserIDWithPhoneNumber:self.phoneNumberString authCode:authCode];
+  [self getUserIDWithPhoneNumber:self.inputUserInfo[DFPhoneNumberNUXUserInfoKey]
+                        authCode:authCode];
   DDLogInfo(@"User entered auth code: %@", authCode);
 }
 
@@ -190,7 +192,7 @@ replacementString:(NSString *)string
   
   [userAdapter
    authDeviceID:[[DFUser currentUser] deviceID]
-   deviceName:self.userName
+   deviceName:self.inputUserInfo[DFDisplayNameNUXUserInfoKey]
    phoneNumber:phoneNumberString
    smsAuthString:authCodeString
    withSuccessBlock:^(DFPeanutUserObject *peanutUser) {
@@ -246,9 +248,7 @@ replacementString:(NSString *)string
 {
   AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
   [delegate firstTimeSetupUserIdStepCompleteWithSyncTimestamp:date];
-  
-  DFPhotosPermissionViewController *vc = [[DFPhotosPermissionViewController alloc] init];
-  [self.navigationController setViewControllers:@[vc] animated:YES];
+  [self completedWithUserInfo:nil];
 }
 
 @end
