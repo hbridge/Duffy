@@ -147,9 +147,11 @@
 
 - (void)reloadData
 {
-  _friendPeanutUsers = [self.peanutDataManager friendsList];
-  [self.tableView reloadData];
-  [self configureNoResultsView];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    _friendPeanutUsers = [self.peanutDataManager friendsList];
+    [self.tableView reloadData];
+    [self configureNoResultsView];
+  });
 }
 
 - (void)configureTabBadge

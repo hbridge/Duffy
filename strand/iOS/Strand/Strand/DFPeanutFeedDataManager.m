@@ -744,30 +744,44 @@ static DFPeanutFeedDataManager *defaultManager;
       DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
     }];
   } else {
-    for (NSNumber *targetUserID in otherUserIDs) {
-      DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
-      DFPeanutFriendConnection *friendConnection = [DFPeanutFriendConnection new];
-      friendConnection.id = targetUser.friend_connection_id;
-      [self.friendConnectionAdapter deleteFriendConnection:friendConnection success:^(NSArray *resultObjects) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      dispatch_semaphore_t deleteSemaphore = dispatch_semaphore_create(-otherUserIDs.count + 1);
+      NSMutableArray *errors = [NSMutableArray new];
+      for (NSNumber *targetUserID in otherUserIDs) {
         DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
-        targetUser.friend_connection_id = nil;
-        if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
-            ![targetUser.forward_friend_only boolValue]) {
-          targetUser.relationship = DFPeanutUserRelationshipReverseFriend;
-        } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
-                   [targetUser.forward_friend_only boolValue]) {
-          targetUser.relationship = DFPeanutUserRelationshipConnection;
-        }
-        DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);
-      } failure:^(NSError *error) {
-        DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
-        failure(error);
-      }];
-    }
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:DFStrandNewFriendsDataNotificationName
-     object:self];
-    success();
+        DFPeanutFriendConnection *friendConnection = [DFPeanutFriendConnection new];
+        friendConnection.id = targetUser.friend_connection_id;
+        [self.friendConnectionAdapter
+         deleteFriendConnection:friendConnection
+         success:^(NSArray *resultObjects) {
+           DFPeanutUserObject *targetUser = [self userWithID:[targetUserID longLongValue]];
+           targetUser.friend_connection_id = nil;
+           if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
+               ![targetUser.forward_friend_only boolValue]) {
+             targetUser.relationship = DFPeanutUserRelationshipReverseFriend;
+           } else if ([targetUser.relationship isEqualToString:DFPeanutUserRelationshipFriend] &&
+                      [targetUser.forward_friend_only boolValue]) {
+             targetUser.relationship = DFPeanutUserRelationshipConnection;
+           }
+           DDLogInfo(@"Successfully created friend connections with users: %@", otherUserIDs);
+           dispatch_semaphore_signal(deleteSemaphore);
+         } failure:^(NSError *error) {
+           DDLogInfo(@"Couldn't create friend connections with users: %@ due to %@", otherUserIDs, error);
+           [errors addObject:error];
+           dispatch_semaphore_signal(deleteSemaphore);
+         }];
+      }
+      dispatch_semaphore_wait(deleteSemaphore, DISPATCH_TIME_FOREVER);
+      
+      if (errors.count != otherUserIDs.count) {
+        success();
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:DFStrandNewFriendsDataNotificationName
+         object:self];
+      } else {
+        failure(errors.firstObject);
+      }
+    });
   }
 }
 
