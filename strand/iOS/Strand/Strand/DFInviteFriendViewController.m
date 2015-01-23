@@ -30,9 +30,7 @@
   if (self) {
     _peoplePicker = [[DFPeoplePickerViewController alloc] init];
     _peoplePicker.allowsMultipleSelection = NO;
-    _peoplePicker.doneButtonActionText = @"Invite";
     _peoplePicker.navigationItem.title = @"Add Friends";
-    
     [self setDataForPeoplePicker];
   }
   return self;

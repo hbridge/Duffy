@@ -45,7 +45,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
   if (self) {
-    self.disableContactsUpsell = YES;
+    self.disableContactsUpsell = NO;
     self.selectedContacts = [NSMutableArray new];
     [self configureNav];
   }
@@ -63,8 +63,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (void)setSections:(NSArray *)sections
 {
-  self.unfilteredSections = sections;
-  [self.tableView reloadData];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    self.unfilteredSections = sections;
+    [self.tableView reloadData];
+    [self configureNoResultsView];
+  });
 }
 
 - (void)viewDidLoad
@@ -80,17 +83,22 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (void)configureNoResultsView
 {
-  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized
-      && self.unfilteredSections.count == 0
-      && !self.disableContactsUpsell) {
+  if (self.unfilteredSections.count == 0) {
     self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-    self.noResultsView.titleLabel.text = @"Show Contacts";
-    self.noResultsView.subtitleLabel.text = @"Grant contacts permission to show results from your Contacts.";
-    [self.noResultsView.button setTitle:@"Grant Permission" forState:UIControlStateNormal];
-    DFPeoplePickerViewController __weak *weakSelf = self;
-    self.noResultsView.buttonHandler = ^{[weakSelf askForContactsPermission];};
     self.noResultsView.button.hidden = NO;
     [self.noResultsView setSuperView:self.tableView];
+    if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized
+        && !self.disableContactsUpsell) {
+      self.noResultsView.titleLabel.text = @"Show Contacts";
+      self.noResultsView.subtitleLabel.text = @"Grant contacts permission to show results from your Contacts.";
+      [self.noResultsView.button setTitle:@"Grant Permission" forState:UIControlStateNormal];
+      DFPeoplePickerViewController __weak *weakSelf = self;
+      self.noResultsView.buttonHandler = ^{[weakSelf askForContactsPermission];};
+    } else {
+      self.noResultsView.titleLabel.text = @"No Results";
+      self.noResultsView.subtitleLabel.text = @"No people to show.";
+      self.noResultsView.button.hidden = YES;
+    }
   } else {
     [self.noResultsView removeFromSuperview];
     self.noResultsView = nil;
@@ -101,7 +109,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   [super viewDidAppear:animated];
   [DFSMSInviteStrandComposeViewController warmUpSMSComposer];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -324,15 +332,13 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  NSInteger result = 1;
-  
   if (tableView == self.tableView) {
-    if (self.unfilteredSections.count > 0) result = self.unfilteredSections.count;
+    return  self.unfilteredSections.count;
   } else {
-    if (self.filteredSections.count > 0) result = self.filteredSections.count;
+    return self.filteredSections.count;
   }
   
-  return result;
+  return 0;
 }
 
 - (DFSection *)sectionForIndex:(NSUInteger)sectionIndex inTableView:(UITableView *)tableView

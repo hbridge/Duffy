@@ -57,7 +57,6 @@
 @property (nonatomic) BOOL disableContactsUpsell;
 @property (nonatomic, retain) NSString *textNumberString;
 
-
 - (void)setSections:(NSArray *)sections;
 - (void)setSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction
                 forSection:(DFSection *)section;
