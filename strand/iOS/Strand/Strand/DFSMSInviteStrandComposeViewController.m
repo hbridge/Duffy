@@ -9,6 +9,8 @@
 #import "DFSMSInviteStrandComposeViewController.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFAnalytics.h"
+#import "DFContactSyncManager.h"
+#import "DFPeanutContact.h"
 
 @interface DFSMSInviteStrandComposeViewController ()
 
@@ -100,7 +102,9 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
                                                    initWithRecipients:phoneNumbers
                                                    locationString:nil
                                                    date:date];
-  [self showSMSVc:smsvc inParentViewController:parentViewController completionBlock:completionBlock];
+  [self showSMSVc:smsvc inParentViewController:parentViewController
+     phoneNumbers:phoneNumbers
+  completionBlock:completionBlock];
 }
 
 + (void)showWithParentViewController:(UIViewController *)parentViewController
@@ -109,11 +113,15 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
 {
   DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
                                                    initWithRecipients:phoneNumbers];
-  [self showSMSVc:smsvc inParentViewController:parentViewController completionBlock:completionBlock];
+  [self showSMSVc:smsvc
+inParentViewController:parentViewController
+     phoneNumbers:phoneNumbers
+  completionBlock:completionBlock];
 }
 
 + (void)showSMSVc:(DFSMSInviteStrandComposeViewController *)smsvc
 inParentViewController:(UIViewController *)parentViewController
+     phoneNumbers:(NSArray *)phoneNumbers
   completionBlock:(DFSMSComposeCompletionBlock)completionBlock
 {
   [SVProgressHUD show];
@@ -131,7 +139,16 @@ inParentViewController:(UIViewController *)parentViewController
                            presentingViewController:parentViewController];
     if (completionBlock) completionBlock(MessageComposeResultFailed);
   }
-
+  
+  NSArray *peanutContacts = [phoneNumbers arrayByMappingObjectsWithBlock:^id(id input) {
+    DFPeanutContact *contact = [[DFPeanutContact alloc] init];
+    contact.name = input;
+    contact.phone_number = input;
+    contact.user = @([[DFUser currentUser] userID]);
+    return contact;
+  }];
+  
+  [[DFContactSyncManager sharedManager] uploadInvitedContacts:peanutContacts];
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
