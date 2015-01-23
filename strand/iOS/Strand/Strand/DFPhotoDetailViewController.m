@@ -85,7 +85,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   
   [self reloadProfileWithContextData];
   
-  if ([_comments count] > 0 && !self.compressedModeEnabled) {
+  if ([_comments count] > 0) {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
   } else {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -142,15 +142,14 @@ const NSUInteger CompressedModeMaxRows = 1;
     [self.commentToolbar.textField becomeFirstResponder];
   }
 
-  if (!self.compressedModeEnabled)
-    [DFAnalytics
-     logViewController:self
-     appearedWithParameters:
-     @{
-       @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count],
-       @"unreadLikes" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionFavorite] count]],
-       @"unreadComments" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionComment] count]],
-       }];
+  [DFAnalytics
+   logViewController:self
+   appearedWithParameters:
+   @{
+     @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count],
+     @"unreadLikes" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionFavorite] count]],
+     @"unreadComments" : [DFAnalytics bucketStringForObjectCount:[[self.photoObject unreadActionsOfType:DFPeanutActionComment] count]],
+     }];
   
   [self markActionsAsSeen];
 }
@@ -291,33 +290,6 @@ const NSUInteger CompressedModeMaxRows = 1;
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.commentToolbar.frame.size.height, 0);
 }
 
-- (void)setCompressedModeEnabled:(BOOL)compressedModeEnabled
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    _compressedModeEnabled = compressedModeEnabled;
-    [self.view setNeedsLayout];
-    [self.tableView reloadData];
-  });
-}
-
-- (void)setCommentsExpanded:(BOOL)commentsExpanded
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    _commentsExpanded = commentsExpanded;
-    [self configureToolbarHidden];
-    [self.tableView reloadData];
-  });
-}
-
-- (void)configureToolbarHidden
-{
-  if (self.compressedModeEnabled && [self tableView:self.tableView numberOfRowsInSection:0] == 2 && !self.commentsExpanded) {
-    self.commentToolbar.hidden = YES;
-  } else {
-    self.commentToolbar.hidden = NO;
-  }
-}
-
 - (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
@@ -336,9 +308,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)configurePhotoView
 {
   CGFloat aspectRatio;
-  if (self.compressedModeEnabled) {
-    aspectRatio = 1.0;
-  } else if (self.photoObject.full_height && self.photoObject.full_width) {
+  if (self.photoObject.full_height && self.photoObject.full_width) {
     aspectRatio = self.photoObject.full_height.floatValue / self.photoObject.full_width.floatValue;
   } else {
     aspectRatio = 1.0;
@@ -355,14 +325,6 @@ const NSUInteger CompressedModeMaxRows = 1;
     self.imageView.frame = frame;
   }
   
-  if (self.compressedModeEnabled) {
-    self.imageView.layer.cornerRadius = 4.0;
-    self.imageView.layer.masksToBounds = YES;
-  }
-
-  if (self.compressedModeEnabled) {
-    [self.addPersonButton removeFromSuperview];
-  }
   if (self.nuxStep) {
     self.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
   } else {
@@ -404,20 +366,8 @@ const NSUInteger CompressedModeMaxRows = 1;
   return _comments;
 }
 
-- (BOOL)isShowMoreRow:(NSIndexPath *)indexPath
-{
-  return (self.compressedModeEnabled && indexPath.row == CompressedModeMaxRows && !self.commentsExpanded);
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if  ([self isShowMoreRow:indexPath]) {
-    DFButtonTableViewCell *buttonCell = [self.tableView dequeueReusableCellWithIdentifier:@"buttonCell"];
-    NSString *title = [NSString stringWithFormat:@"Show %@ more comments",
-                       @([[self comments] count] - CompressedModeMaxRows)];
-    [buttonCell.button setTitle:title forState:UIControlStateNormal];
-    return buttonCell;
-  }
   DFCommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   
   if ([[self comments] count] == 0) {
@@ -703,7 +653,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 + (void)logController:(DFPhotoDetailViewController *)controller actionType:(DFPeanutActionType)actionType result:(NSString *)result
 {
   [DFAnalytics logPhotoActionTaken:actionType
-                fromViewController:controller.compressedModeEnabled ? controller.parentViewController : controller
+                fromViewController:controller
                             result:result
                        photoObject:controller.photoObject];
 }
@@ -737,10 +687,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if ([self isShowMoreRow:indexPath]) {
-    self.commentsExpanded = YES;
-    [self.tableView reloadData];
-  }
+
 }
 
 - (void)scrollToLast
@@ -766,8 +713,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   if ([[self comments] count] == 0) {
     return [DFNoResultsTableViewCell desiredHeight];
-  } else if ([self isShowMoreRow:indexPath]) {
-    return 44.0;
   }
 
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
@@ -805,7 +750,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)editingStartedOrStopped:(UITextField *)sender
 {
-  self.commentsExpanded = sender.isFirstResponder;
   if (sender.isFirstResponder)
     [self scrollToLast];
 }

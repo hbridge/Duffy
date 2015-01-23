@@ -22,8 +22,6 @@
 @property (weak, nonatomic) UIButton *likeButtonItem;
 @property (weak, nonatomic) IBOutlet UIButton *addPersonButton;
 @property (nonatomic) NSUInteger nuxStep;
-@property (nonatomic) BOOL compressedModeEnabled;
-@property (nonatomic) BOOL commentsExpanded;
 @property (nonatomic) BOOL openKeyboardOnAppear;
 @property (nonatomic) BOOL closeOnSend;
 @property (nonatomic) BOOL disableKeyboardHandler;
