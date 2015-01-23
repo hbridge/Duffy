@@ -5,8 +5,7 @@ from celery import Celery
 app = Celery('peanut',
 			 broker='amqp://',
 			 backend='amqp://',
-			 include=['async.tasks',
-					  'async.two_fishes'])
+			 include=['async.two_fishes'])
 
 app.config_from_object('django.conf:settings')
 
