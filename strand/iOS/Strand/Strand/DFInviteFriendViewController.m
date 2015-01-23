@@ -172,15 +172,21 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
       return;
     }
     
-    [DFSMSInviteStrandComposeViewController
-     showWithParentViewController:self
-     phoneNumbers:@[contact.phone_number]
-     completionBlock:^(MessageComposeResult result) {
-       if (result == MessageComposeResultSent) [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-       else if (result == MessageComposeResultCancelled) [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+    [[DFPeanutFeedDataManager sharedManager]
+     userIDsFromPhoneNumbers:@[contact.phone_number]
+     success:^(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers) {
+       [DFSMSInviteStrandComposeViewController
+        showWithParentViewController:self
+        phoneNumbers:@[contact.phone_number]
+        completionBlock:^(MessageComposeResult result) {
+          if (result == MessageComposeResultSent) [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+          else if (result == MessageComposeResultCancelled) [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+        }];
+     } failure:^(NSError *error) {
+       [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",
+                                            error.localizedDescription]];
      }];
   };
-
 }
 
 - (void)cancelPressed:(id)sender
