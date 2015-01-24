@@ -22,15 +22,15 @@ app.conf.update(
 		Queue('default', Exchange('default'), routing_key='default'),
 		Queue('for_two_fishes', Exchange('for_two_fishes'), routing_key='for_two_fishes'),
 		Queue('for_stranding', Exchange('for_stranding'), routing_key='for_stranding'),
-		Queue('for_popcache', Exchange('for_popcache'), routing_key='for_popcache'),
-		Queue('for_popcache_full', Exchange('for_popcache_full'), routing_key='for_popcache_full'),
+		Queue('for_popcaches', Exchange('for_popcaches'), routing_key='for_popcaches'),
+		Queue('for_popcaches_full', Exchange('for_popcaches_full'), routing_key='for_popcaches_full'),
 		Queue('for_similarity', Exchange('for_similarity'), routing_key='for_similarity'),
 	),
 	CELERY_ROUTES = {
 		'async.two_fishes.processAll': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
 		'async.stranding.processAll': {'queue': 'for_stranding', 'routing_key': 'for_stranding'},
-		'async.popcache.processAll': {'queue': 'for_popcache', 'routing_key': 'for_popcache'},
-		'async.popcache.processFull': {'queue': 'for_popcache_full', 'routing_key': 'for_popcache_full'},
+		'async.popcaches.processAll': {'queue': 'for_popcaches', 'routing_key': 'for_popcaches'},
+		'async.popcaches.processFull': {'queue': 'for_popcaches_full', 'routing_key': 'for_popcaches_full'},
 		'async.similarity.processAll': {'queue': 'for_similarity', 'routing_key': 'for_similarity'},
 	}
 )
