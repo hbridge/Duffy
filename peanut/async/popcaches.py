@@ -150,7 +150,7 @@ def processBatch(strandsToProcess):
 			usersIdsToSendNotificationsTo.append(userId)
 			
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		if (not apiCache.private_strands_full_last_timestamp or apiCache.private_strands_full_last_timestamp < now - datetime.timedelta(minutes=3600)):
+		if (not apiCache.private_strands_full_last_timestamp or apiCache.private_strands_full_last_timestamp < now - datetime.timedelta(minutes=5)):
 			processFull.delay(userId)
 		total += len(strandsProcessed)
 
