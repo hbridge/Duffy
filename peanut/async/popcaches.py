@@ -167,6 +167,10 @@ def processAll():
 	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
 
 @app.task
+def processIds(ids):
+	return celery_helper.processBatch(baseQuery.filter(id_in=ids), numToProcess, processBatch)
+
+@app.task
 def processFull(userId):
 	startTime = datetime.datetime.utcnow()
 	threadedPerformFullPrivateStrands(userId)

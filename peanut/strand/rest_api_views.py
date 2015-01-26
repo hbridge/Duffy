@@ -219,7 +219,7 @@ class PhotoBulkAPI(BasePhotoAPI):
         for strand in privateStrands:
             strand.cache_dirty = True
         Strand.bulkUpdate(privateStrands, ['cache_dirty'])
-        popcaches.processAll.delay()
+        popcaches.processIds.delay(Strand.getIds(privateStrands))
 
     def post(self, request, format=None):
         response = list()
@@ -379,9 +379,10 @@ class PhotoBulkAPI(BasePhotoAPI):
                 logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
             
             # Async tasks
-            two_fishes.processAll.delay()
-            stranding.processAll.delay()
-            similarity.processAll.delay()
+            ids = Photo.getIds(allPhotos)
+            two_fishes.processIds.delay(ids)
+            stranding.processIds.delay(ids)
+            similarity.processIds.delay(ids)
 
             response = [model_to_dict(photo) for photo in allPhotos]
 
