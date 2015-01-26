@@ -78,7 +78,7 @@ def listsToPhrases(photoCount, userNames):
 
 def main(argv):
 	logger.info("Starting... ")
-	photoTimedelta = datetime.timedelta(days=1)
+	photoTimedelta = datetime.timedelta(days=2)
 	notificationTimedelta = datetime.timedelta(seconds=constants.NOTIFICATIONS_NEW_SUGGESTION_INTERVAL_SECS)
 
 	while True:
@@ -90,39 +90,55 @@ def main(argv):
 		photos = Photo.objects.filter(time_taken__gt=now-photoTimedelta).filter(strand_evaluated=True).filter(notification_evaluated=False).filter(time_taken__gt=F('user__added'))
 		photosToUpdate = list()
 
-		# get all their strands.
-		strands = Strand.objects.prefetch_related('photos').filter(private=True).filter(photos__in=[photo.id for photo in photos]).distinct() #filter(photos__notification_sent__isnull=True).distinct()
+		if len(photos) > 0:
+			logger.info("Photo(s) found: %s"%(photos))
 
-		strandsByUser = dict()
-		for strand in strands:
-			if strand.user in strandsByUser:
-				if strand not in strandsByUser[strand.user]: # to handle duplicate strands
-					strandsByUser[strand.user].append(strand)
-			else:
-				strandsByUser[strand.user] = [strand]
-
-		# get all the suggestions sent out in the last 60 sec and don't send to those users
-		recentUsersNotified = NotificationLog.objects.filter(msg_type=constants.NOTIFICATIONS_NEW_SUGGESTION).filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).filter(added__gt=now-notificationTimedelta).values('user').distinct()
-		recentUsersNotifiedList = list()
-
-		for entry in recentUsersNotified:
-			recentUsersNotifiedList.append(entry['user'])
-
-		for user, recentStrands in strandsByUser.items():
-			if user.id in recentUsersNotified:
-				logger.info("Skipping user %s because we sent suggestions recently")%(user.id)
-				continue
-			fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(user.id)
-			interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, recentStrands, True, fullFriends)
+			# get all their strands.
+			strands = Strand.objects.prefetch_related('photos').filter(private=True).filter(photos__in=[photo.id for photo in photos]).distinct() #filter(photos__notification_sent__isnull=True).distinct()
 
 			if len(strands) == 0:
-				# means no match found, mark all the photos in these strands as notification_evaluated
-				for strand in recentStrands:
-					for photo in strand.photos.filter(notification_evaluated=False):
-						photo.notification_evaluated=True
-						photosToUpdate.append(photo)
+				# meaning these photos weren't stranded because they were dups
+				logger.info("Photos without strands found: %s"%(photos))
+				for photo in photos:
+					photo.notification_evaluated=True
+					photosToUpdate.append(photo)
 			else:
-				photosToUpdate.extend(sendSuggestionNotification(user, interestedUsersByStrandId, matchReasonsByStrandId, strands))
+				logger.info("Strand(s) found: %s"%(strands))
+
+				strandsByUser = dict()
+				for strand in strands:
+					if strand.user in strandsByUser:
+						if strand not in strandsByUser[strand.user]: # to handle duplicate strands
+							strandsByUser[strand.user].append(strand)
+					else:
+						strandsByUser[strand.user] = [strand]
+
+				# get all the suggestions sent out in the last 60 sec and don't send to those users
+				recentUsersNotified = NotificationLog.objects.filter(msg_type=constants.NOTIFICATIONS_NEW_SUGGESTION).filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).filter(added__gt=now-notificationTimedelta).values('user').distinct()
+				recentUsersNotifiedList = list()
+
+				for entry in recentUsersNotified:
+					recentUsersNotifiedList.append(entry['user'])
+
+				for user, recentStrands in strandsByUser.items():
+					if user.id in recentUsersNotified:
+						logger.info("Skipping user %s because we sent suggestions recently")%(user.id)
+						continue
+					fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(user.id)
+					interestedUsersByStrandId, matchReasonsByStrandId, strands = swaps_util.getInterestedUsersForStrands(user, recentStrands, True, fullFriends)
+
+					logger.info("interestedUsersByStrandId: %s"%(interestedUsersByStrandId))
+					logger.info("matchReasonsByStrandId: %s"%(matchReasonsByStrandId))
+					logger.info("strands: %s"%(strands))
+
+				if len(strands) == 0:
+					# means no match found, mark all the photos in these strands as notification_evaluated
+					for strand in recentStrands:
+						for photo in strand.photos.filter(notification_evaluated=False):
+							photo.notification_evaluated=True
+							photosToUpdate.append(photo)
+				else:
+					photosToUpdate.extend(sendSuggestionNotification(user, interestedUsersByStrandId, matchReasonsByStrandId, strands))
 
 		if len(photosToUpdate) > 0:
 			Photo.bulkUpdate(photosToUpdate, ['notification_evaluated', 'notification_sent'])
