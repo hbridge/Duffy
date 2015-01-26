@@ -61,11 +61,13 @@
   }
 }
 
-
-
 - (NSSet *)photoSet
 {
     return photosSet;
+}
+
+- (NSUInteger)count{
+  return self.photoSet.count;
 }
 
 - (NSArray *)photosByDateAscending:(BOOL)ascending

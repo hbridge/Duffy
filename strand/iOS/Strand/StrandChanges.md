@@ -1,5 +1,10 @@
 # Swap v2
 
+## Jan 26th, 2015 (4837)
+
+- Bug fixes
+- Removed "Recent Activity" and "Older" section headers in home gallery
+
 ## Jan 23rd, 2015 (4835-4836)
 
 - New friending model: contacts are added as friends for you, and other people can add you back.  You can also add people with a common photo without their phone number.  Tap on anyone's head to see their profile.

@@ -165,18 +165,15 @@ static int const FetchStride = 500;
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"DFPhoto" inManagedObjectContext:context];
   [fetchRequest setEntity:entity];
 
-  NSPredicate *lessThanPredicate = [NSPredicate predicateWithFormat:@"faceDetectPass < %@", faceDetectPass];
-  NSPredicate *nilPredicate = [NSPredicate predicateWithFormat:@"faceDetectPass = nil"];
-  NSPredicate *uploadLessThanPredicate = [NSPredicate predicateWithFormat:@"faceDetectPassUploaded < %@", faceDetectPass];
-  NSPredicate *uploadNilPredicate = [NSPredicate predicateWithFormat:@"faceDetectPassUploaded = nil"];
-  
-  
+  NSPredicate *lessThanPredicate = [NSPredicate predicateWithFormat:@"faceDetectPass < %@ OR faceDetectPass = nil", faceDetectPass];
   NSCompoundPredicate *predicate = [NSCompoundPredicate
-                                    orPredicateWithSubpredicates:@[lessThanPredicate,
-                                                                   nilPredicate,
-                                                                   uploadLessThanPredicate,
-                                                                   uploadNilPredicate]];
+                                    andPredicateWithSubpredicates:@[
+                                                                    lessThanPredicate,
+                                                                   ]];
   [fetchRequest setPredicate:predicate];
+  
+  NSSortDescriptor *photoDateSort = [NSSortDescriptor sortDescriptorWithKey:@"utcCreationDate" ascending:NO];
+  [fetchRequest setSortDescriptors:@[photoDateSort]];
   
   NSError *error = nil;
   NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
@@ -186,8 +183,19 @@ static int const FetchStride = 500;
   return fetchedObjects;
 }
 
++ (DFPhotoCollection *)photosWithFaceDetectPassUploadedBelow:(NSNumber *)faceDetectPassUploadedLimit
+                                         inContext:(NSManagedObjectContext *)context
+{
+  NSPredicate *uploadLessThanPredicate = [NSPredicate predicateWithFormat:@"faceDetectPassUploaded < %@", faceDetectPassUploadedLimit];
+  NSPredicate *uploadNilPredicate = [NSPredicate predicateWithFormat:@"faceDetectPassUploaded = nil"];
+  NSCompoundPredicate *compoundPredicate = [[NSCompoundPredicate alloc]
+                                            initWithType:NSOrPredicateType
+                                            subpredicates:@[uploadLessThanPredicate, uploadNilPredicate]];
+  return [self photosWithPredicate:compoundPredicate inContext:context];
+}
 
-+ (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
+
+                                    + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 {
   NSArray *photoAssets = [self photosWithValueStrings:assetURLStrings
                                forKey:@"alAssetURLString"

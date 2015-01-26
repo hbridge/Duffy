@@ -63,6 +63,8 @@ typedef enum {
 - (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID;
 + (NSArray *)photosWithFaceDetectPassBelow:(NSNumber *)faceDetectPass
                                  inContext:(NSManagedObjectContext *)context;
++ (DFPhotoCollection *)photosWithFaceDetectPassUploadedBelow:(NSNumber *)faceDetectPassUploadedLimit
+                                                   inContext:(NSManagedObjectContext *)context;
 
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;

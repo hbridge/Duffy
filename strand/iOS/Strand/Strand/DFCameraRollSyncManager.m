@@ -90,15 +90,15 @@ static DFCameraRollSyncManager *defaultSyncController;
 - (void)facesSync
 {
   #ifdef DEBUG
-//  DFFaceDetectionSyncOperation *operation = [DFFaceDetectionSyncOperation new];
-//  operation.queuePriority = NSOperationQueuePriorityVeryLow;
-//  if ([UIDevice majorVersionNumber] >= 8) {
-//    operation.qualityOfService = NSOperationQualityOfServiceBackground;
-//  } else {
-//    operation.threadPriority = 0.2; //low, 0.5 is default
-//  }
-//
-//  [self.syncOperationQueue addOperation:operation];
+  DFFaceDetectionSyncOperation *operation = [DFFaceDetectionSyncOperation new];
+  operation.queuePriority = NSOperationQueuePriorityVeryLow;
+  if ([operation respondsToSelector:@selector(qualityOfService)]) {
+    operation.qualityOfService = NSOperationQualityOfServiceBackground;
+  } else {
+    operation.threadPriority = 0.2; //low, 0.5 is default
+  }
+
+  [self.syncOperationQueue addOperation:operation];
   #endif
 }
 
