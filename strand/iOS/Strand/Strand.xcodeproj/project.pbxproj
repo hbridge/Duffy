@@ -76,6 +76,8 @@
 		5A5B80BE1A72BFE7005C61D2 /* DFUserListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B80BD1A72BFE7005C61D2 /* DFUserListViewController.m */; };
 		5A5B80C11A7303D3005C61D2 /* DFNUXFlowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B80C01A7303D3005C61D2 /* DFNUXFlowViewController.m */; };
 		5A5B80C41A730412005C61D2 /* DFNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B80C31A730412005C61D2 /* DFNUXViewController.m */; };
+		5A5B80C81A73100D005C61D2 /* DFImageNUXViewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B80C61A73100D005C61D2 /* DFImageNUXViewViewController.m */; };
+		5A5B80C91A73100D005C61D2 /* DFImageNUXViewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A5B80C71A73100D005C61D2 /* DFImageNUXViewViewController.xib */; };
 		5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */; };
 		5A65181E19D62754001FE911 /* DFStrandGalleryTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A65181D19D62754001FE911 /* DFStrandGalleryTitleView.m */; };
 		5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */; };
@@ -427,6 +429,9 @@
 		5A5B80C01A7303D3005C61D2 /* DFNUXFlowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNUXFlowViewController.m; sourceTree = "<group>"; };
 		5A5B80C21A730412005C61D2 /* DFNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNUXViewController.h; sourceTree = "<group>"; };
 		5A5B80C31A730412005C61D2 /* DFNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNUXViewController.m; sourceTree = "<group>"; };
+		5A5B80C51A73100D005C61D2 /* DFImageNUXViewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageNUXViewViewController.h; sourceTree = "<group>"; };
+		5A5B80C61A73100D005C61D2 /* DFImageNUXViewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageNUXViewViewController.m; sourceTree = "<group>"; };
+		5A5B80C71A73100D005C61D2 /* DFImageNUXViewViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFImageNUXViewViewController.xib; sourceTree = "<group>"; };
 		5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNoTableItemsView.xib; sourceTree = "<group>"; };
 		5A65181C19D62754001FE911 /* DFStrandGalleryTitleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGalleryTitleView.h; sourceTree = "<group>"; };
 		5A65181D19D62754001FE911 /* DFStrandGalleryTitleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGalleryTitleView.m; sourceTree = "<group>"; };
@@ -1574,6 +1579,9 @@
 				5A4BBD3C19BA4F9600359299 /* DFPhotosPermissionViewController.h */,
 				5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */,
 				5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */,
+				5A5B80C51A73100D005C61D2 /* DFImageNUXViewViewController.h */,
+				5A5B80C61A73100D005C61D2 /* DFImageNUXViewViewController.m */,
+				5A5B80C71A73100D005C61D2 /* DFImageNUXViewViewController.xib */,
 			);
 			name = "First Time Setup";
 			sourceTree = "<group>";
@@ -1904,6 +1912,7 @@
 				5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */,
 				5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */,
 				65E241561A3A53AF0044F1CB /* DFSuggestionViewController.xib in Resources */,
+				5A5B80C91A73100D005C61D2 /* DFImageNUXViewViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5AF4991E1A40BF5E000CF9DB /* DFDismissableModalViewController.xib in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
@@ -2028,6 +2037,7 @@
 				5AF499291A44D4A3000CF9DB /* DFMutliPhotoDetailPageController.m in Sources */,
 				5AAF03AF19B5145200EF021C /* DFPeanutStrandInviteAdapter.m in Sources */,
 				5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */,
+				5A5B80C81A73100D005C61D2 /* DFImageNUXViewViewController.m in Sources */,
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
 				5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */,
 				652D9B9B1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m in Sources */,
