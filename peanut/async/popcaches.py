@@ -168,7 +168,7 @@ def processAll():
 
 @app.task
 def processIds(ids):
-	return celery_helper.processBatch(baseQuery.filter(id_in=ids), numToProcess, processBatch)
+	return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processBatch)
 
 @app.task
 def processFull(userId):
