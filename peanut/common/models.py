@@ -80,7 +80,7 @@ class User(models.Model):
 	api_cache_private_strands_dirty = models.BooleanField(default=True)
 	last_build_info = models.CharField(max_length=100, null=True)
 	last_actions_list_request_timestamp = models.DateTimeField(null=True)
-	install_num = models.IntegerField(default=0)
+	install_num = models.IntegerField()
 	has_sms_authed = models.BooleanField(default=0)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
