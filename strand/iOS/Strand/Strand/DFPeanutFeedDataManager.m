@@ -146,29 +146,24 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   NSArray *newCombinedObjects = [combinedObjectsById allValues];
   
-  [self processPeopleListFromInboxObjects:newCombinedObjects];
   returnBlock(updated, newCombinedObjects);
 }
 
-- (void)processPeopleListFromInboxObjects:(NSArray *)inboxFeedObjects
+- (void)processPeopleListFromFeedObjects:(NSArray *)feedObjects
 {
   // For inbox only, we update our local cache of friends
   // If we refactor these methods to be common this will need to be pulled out
-  for (DFPeanutFeedObject *object in inboxFeedObjects) {
+  for (DFPeanutFeedObject *object in feedObjects) {
     if ([object.type isEqual:DFFeedObjectPeopleList]) {
       NSArray *peopleList = [self processPeopleList:_cachedPeopleList withNewPeople:object.people];
-      
-      // This grabs the local first name which we want to sort by
-      NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
-      NSMutableArray *newFriendsList = [NSMutableArray arrayWithArray:[peopleList sortedArrayUsingDescriptors:@[sort]]];
-      
-      _cachedPeopleList = newFriendsList;
-      if (![newFriendsList isEqualToArray:_cachedPeopleList]) {
+
+      if (![peopleList isEqualToArray:_cachedPeopleList]) {
         [[NSNotificationCenter defaultCenter]
          postNotificationName:DFStrandNewFriendsDataNotificationName
          object:self];
-        DDLogInfo(@"Got new friends data, sending notification.");
+        DDLogInfo(@"Got new people data, sending notification.");
       }
+      _cachedPeopleList = peopleList;
     }
   }
 }
@@ -237,12 +232,11 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
+ 
+  [self processPeopleListFromFeedObjects:newObjects];
   
   if (fullRefresh) {
     BOOL updated = (responseHash == [self.feedLastResponseHash objectForKey:@(feedType)]);
-    if (feedType == DFInboxFeed) {
-      [self processPeopleListFromInboxObjects:newObjects];
-    }
     returnBlock(updated, newObjects);
   }
   
