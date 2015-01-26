@@ -28,10 +28,14 @@ app.conf.update(
 	),
 	CELERY_ROUTES = {
 		'async.two_fishes.processAll': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
+		'async.two_fishes.processIds': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
 		'async.stranding.processAll': {'queue': 'for_stranding', 'routing_key': 'for_stranding'},
+		'async.stranding.processIds': {'queue': 'for_stranding', 'routing_key': 'for_stranding'},
 		'async.popcaches.processAll': {'queue': 'for_popcaches', 'routing_key': 'for_popcaches'},
+		'async.popcaches.processIds': {'queue': 'for_popcaches', 'routing_key': 'for_popcaches'},
 		'async.popcaches.processFull': {'queue': 'for_popcaches_full', 'routing_key': 'for_popcaches_full'},
 		'async.similarity.processAll': {'queue': 'for_similarity', 'routing_key': 'for_similarity'},
+		'async.similarity.processIds': {'queue': 'for_similarity', 'routing_key': 'for_similarity'},
 	}
 )
 
