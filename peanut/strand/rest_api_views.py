@@ -251,29 +251,31 @@ class PhotoBulkAPI(BasePhotoAPI):
             for photoData in photosData:
                 photoData = self.jsonDictToSimple(photoData)
 
-                dataByPhotoId[photoData["id"]] = photoData
+                dataByPhotoId[int(photoData["id"])] = photoData
 
             # Fetch from server because we need to get the most recent values
             photosToUpdate = Photo.objects.filter(id__in=dataByPhotoId.keys())
 
             for photo in photosToUpdate:
-                if "install_num" in dataByPhotoId[photo.id]:
-                    photo.install_num = dataByPhotoId[photo.id]["install_num"]
-                if "iphone_faceboxes_topleft" in dataByPhotoId[photo.id]:
-                    photo.iphone_faceboxes_topleft = dataByPhotoId[photo.id]["iphone_faceboxes_topleft"]
-
+                if photo.id in dataByPhotoId:
+                    if "install_num" in dataByPhotoId[photo.id]:
+                        photo.install_num = dataByPhotoId[photo.id]["install_num"]
+                    if "iphone_faceboxes_topleft" in dataByPhotoId[photo.id]:
+                        photo.iphone_faceboxes_topleft = dataByPhotoId[photo.id]["iphone_faceboxes_topleft"]
+                else:
+                    logger.error("Got id %s which isn't in the data which came in %s" % (photo.id, photosData))
             Photo.bulkUpdate(photosToUpdate, ['install_num', 'iphone_faceboxes_topleft'])
 
-            response['patch_photos'] = [model_to_dict(photo) for photo in photosUpdated]
+            response['patch_photos'] = [model_to_dict(photo) for photo in photosToUpdate]
 
             photosDeleted = list()
-            for photo in photosUpdated:
+            for photo in photosToUpdate:
                 if photo.install_num == -1:
                     photosDeleted.append(photo)
 
             self.updateStrandCacheStateForPhotos(user, photosDeleted)
 
-            logger.info("Successfully processed %s photos for user %s" % (len(objsToUpdate), user.id))
+            logger.info("Successfully processed %s photos for user %s" % (len(photosToUpdate), user.id))
             return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json", status=201)
 
 
