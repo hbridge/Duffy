@@ -68,7 +68,8 @@
 + (id<NSCopying>)idForUser:(DFPeanutUserObject *)user
 {
   if (user.id) return @(user.id);
-  else return user.phone_number;
+  else if (user.phone_number) return user.phone_number;
+  return @(0);
 }
 
 - (void)setPeanutUsers:(NSArray *)users
@@ -110,7 +111,7 @@
     if (user.id == [[DFUser currentUser] userID]) {
       firstName = @"You";
     }
-    firstNames[[self.class idForUser:user]] = firstName;
+    firstNames[[self.class idForUser:user]] = firstName ? firstName : @"?";
   }
   
   _fillColorsById = fillColors;

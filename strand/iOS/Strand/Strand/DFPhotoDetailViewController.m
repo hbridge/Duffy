@@ -236,8 +236,11 @@ const NSUInteger CompressedModeMaxRows = 1;
   NSArray *recipientIDs = [self.photoObject.actor_ids arrayByRemovingObject:@(sender.id)];
   NSArray *recipientUsers = [recipientIDs arrayByMappingObjectsWithBlock:^id(NSNumber *userID) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:userID.longLongValue];
-    if (!user) DDLogError(@"%@ got nill user for userID:%@", self.class, userID);
-    return user ? user : [NSNull null];
+    if (!user) {
+      DDLogError(@"%@ got nill user for userID:%@", self.class, userID);
+      user = [[DFPeanutUserObject alloc] init];
+    }
+    return user;
   }];
   [self.recipientsProfileStackView setPeanutUsers:recipientUsers];
   for (DFPeanutUserObject *recipient in recipientUsers) {
