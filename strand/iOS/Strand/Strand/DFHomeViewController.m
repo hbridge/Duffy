@@ -319,29 +319,7 @@ static BOOL showFilters = NO;
 
 + (NSArray *)sectionsFromFeedPhotos:(NSArray *)feedPhotos
 {
-  // create arrays for last week and older
-  NSMutableArray *lastWeek = [NSMutableArray new];
-  NSMutableArray *older = [NSMutableArray new];
-  for (DFPeanutFeedObject *photo in feedPhotos) {
-    NSTimeInterval timeAgo = [photo.evaluated_time timeIntervalSinceNow];
-    if (timeAgo > -60*60*24*7) {
-      [lastWeek addObject:photo];
-    } else {
-      [older addObject:photo];
-    }
-  }
-  // create section objects for last week and older
-  
-  NSMutableArray *result = [NSMutableArray new];
-  if (lastWeek.count > 0) {
-    [result addObject:[DFSection sectionWithTitle:@"Recent Photos" object:nil rows:lastWeek]];
-  }
-  
-  if (older.count > 0) {
-    [result addObject:[DFSection sectionWithTitle:@"Older" object:nil rows:older]];
-  }
-
-  return result;
+  return @[[DFSection sectionWithTitle:@"All Photos" object:nil rows:feedPhotos]];
 }
 
 
