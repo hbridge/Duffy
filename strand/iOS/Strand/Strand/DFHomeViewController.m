@@ -167,7 +167,6 @@ static BOOL use_vibrance = NO;
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"labelHeader"];
-    self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, CollapsedNavBarHeight);
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:@"footer"];
