@@ -230,6 +230,11 @@ class PhotoBulkAPI(BasePhotoAPI):
         objsToUpdate = list()
 
         batchKey = randint(1,10000)  
+        """
+            Right now patch photos only patches the following fields:
+            install_num
+            iphone_faceboxes_topleft
+        """
         if "patch_photos" in request.DATA:
             response = dict()
             photosData = request.DATA["patch_photos"]
@@ -242,15 +247,22 @@ class PhotoBulkAPI(BasePhotoAPI):
 
             logger.info("Got request for bulk patch update with %s photos and %s files from user %s" % (len(photosData), len(request.FILES), user.id))
 
+            dataByPhotoId = dict()
             for photoData in photosData:
                 photoData = self.jsonDictToSimple(photoData)
-                photoData["bulk_batch_key"] = batchKey
 
-                photo = self.simplePhotoSerializer(photoData)
-                objsToUpdate.append(photo)
-                
-            Photo.bulkUpdate(objsToUpdate, ['install_num', 'iphone_faceboxes_topleft'])
-            photosUpdated = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
+                dataByPhotoId[photoData["id"]] = photoData
+
+            # Fetch from server because we need to get the most recent values
+            photosToUpdate = Photo.objects.filter(id__in=dataByPhotoId.keys())
+
+            for photo in photosToUpdate:
+                if "install_num" in dataByPhotoId[photo.id]:
+                    photo.install_num = dataByPhotoId[photo.id]["install_num"]
+                if "iphone_faceboxes_topleft" in dataByPhotoId[photo.id]:
+                    photo.iphone_faceboxes_topleft = dataByPhotoId[photo.id]["iphone_faceboxes_topleft"]
+
+            Photo.bulkUpdate(photosToUpdate, ['install_num', 'iphone_faceboxes_topleft'])
 
             response['patch_photos'] = [model_to_dict(photo) for photo in photosUpdated]
 
