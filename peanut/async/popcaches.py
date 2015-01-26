@@ -117,7 +117,15 @@ def processBatch(strandsToProcess):
 					strandsToDelete.append(strand)
 				continue
 				
-			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, fullFriends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
+			strandObjectData = serializers.objectDataForPrivateStrand(user,
+																  strand,
+																  fullFriends,
+																  True, # includeNotEval
+																  True, # includeFaces
+																  True, # includeAll
+																  "", # suggestionType
+																  interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+
 			if strandObjectData:
 				responseObjectsById[strandObjectData['id']] = strandObjectData
 				logger.info("Inserted strand %s for user %s" % (strandObjectData['id'], userId))

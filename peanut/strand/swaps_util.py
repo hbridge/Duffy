@@ -97,7 +97,7 @@ def getFeedObjectsForSwaps(user):
 		days = 30
 
 	timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=days)
-	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(suggestible=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
+	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
 	stats_util.printStats("swaps-recent-cache")
 	
 	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, recentStrands, True, fullFriends)
@@ -105,16 +105,45 @@ def getFeedObjectsForSwaps(user):
 	
 	actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
 	stats_util.printStats("swaps-d")
-		
+
 	for strand in strands:
-		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, fullFriends, False, "friend-location", interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+		strandObjectData = serializers.objectDataForPrivateStrand(user,
+																  strand,
+																  fullFriends,
+																  True, # includeNotEval
+																  False, # includeFaces
+																  False, # includeAll
+																  "friend-location", # suggestionType
+																  interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
 		if strandObjectData:
 			strandIdsAlreadyIncluded.append(strand.id)
 			# Make sure the photos appear in reverse order
 			strandObjectData['objects'] = sorted(strandObjectData['objects'], key=lambda x: x['time_taken'], reverse=True)
 			responseObjects.append(strandObjectData)
 
-	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
+	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'])
+
+	# Look for strands with faces
+	actionsByPhotoId = getActionsByPhotoIdForStrands(user, recentStrands)
+	for strand in recentStrands:
+		strandObjectData = serializers.objectDataForPrivateStrand(user,
+																  strand,
+																  fullFriends,
+																  False, # includeNotEval
+																  True, # includeFaces
+																  False, # includeAll
+																  "faces", # suggestionType
+																  interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+
+		if strandObjectData and strand.id not in strandIdsAlreadyIncluded:
+			strandIdsAlreadyIncluded.append(strand.id)
+			# Make sure the photos appear in reverse order
+			strandObjectData['objects'] = sorted(strandObjectData['objects'], key=lambda x: x['time_taken'], reverse=True)
+			responseObjects.append(strandObjectData)
+
+
+
+	# 
 
 	'''
 	if len(responseObjects) < 3:
@@ -141,7 +170,6 @@ def getFeedObjectsForSwaps(user):
 	
 		responseObjects.extend(lastWeekResponseObjects)
 	'''
-
 	return responseObjects
 
 def getFeedObjectsForPrivateStrands(user):
@@ -160,7 +188,15 @@ def getFeedObjectsForPrivateStrands(user):
 	stats_util.printStats("private-b")
 		
 	for strand in allPrivateStrands:
-		strandObjectData = serializers.objectDataForPrivateStrand(user, strand, fullFriends, True, "", interestedUsersByStrandId, matchReasonsByStrandId, dict())
+		strandObjectData = serializers.objectDataForPrivateStrand(user,
+																  strand,
+																  fullFriends,
+																  True, # includeNotEval
+																  True, # includeFaces
+																  True, # includeAll
+																  "", # suggestionType
+																  interestedUsersByStrandId, matchReasonsByStrandId, dict())
+
 		if strandObjectData:
 			responseObjects.append(strandObjectData)
 

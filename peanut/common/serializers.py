@@ -114,7 +114,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	return shareInstanceData
 
 
-def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
+def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFaces, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
 	strandData = dict()
 	strandData['id'] = strand.id
 	if strand.id in interestedUsersByStrandId:
@@ -134,12 +134,30 @@ def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType
 
 	photosIncluded = 0
 	for photo in strand.photos.all():
+		# Filter out deleted photos
+		if photo.install_num != user.install_num:
+			continue
+
+		# Grab all if we're not supposed to filter
+		if includeAll:
+			strandData['objects'].append(photoDataForApiSerializer(photo))
+			photosIncluded += 1
+			continue
+
 		evaled = False
 		if photo.id in actionsByPhotoId:
 			for action in actionsByPhotoId[photo.id]:
 				if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
 					evaled = True
-		if (not evaled or includeAll) and photo.install_num == user.install_num:
+
+		if includeNotEval and not evaled:
+			strandData['objects'].append(photoDataForApiSerializer(photo))
+			photosIncluded += 1
+
+		if not includeNotEval and evaled:
+			continue
+		
+		if (includeFaces and (photo.iphone_faceboxes_topleft != None)):
 			strandData['objects'].append(photoDataForApiSerializer(photo))
 			photosIncluded += 1
 
