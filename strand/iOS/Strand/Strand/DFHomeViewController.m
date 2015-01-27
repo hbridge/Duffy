@@ -38,7 +38,6 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
-@property (nonatomic, retain) MMPopLabel *incomingPopLabel;
 @property (nonatomic, retain) MMPopLabel *outgoingPopLabel;
 @property (nonatomic, retain) DFNotificationsViewController *notificationsViewController;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
@@ -115,7 +114,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                               target:self
                                               action:@selector(friendsButtonPressed:)],
                                              ];
-  [self setSuggestionsAreaHidden:YES animated:NO];
+  [self setSuggestionsAreaHidden:YES animated:NO completion:nil];
   
   if ([UIVisualEffectView class]) {
     [self addNavBlur];
@@ -344,9 +343,9 @@ static BOOL showFilters = NO;
 
 - (void)configurePopLabels
 {
-  self.incomingPopLabel = [MMPopLabel popLabelWithText:@"No incoming photos"];
-  self.outgoingPopLabel = [MMPopLabel popLabelWithText:@"No matches"];
-  [self.view addSubview:self.incomingPopLabel];
+  self.outgoingPopLabel = [MMPopLabel
+                           popLabelWithText:@"You have photos that were taken with friends."
+                           "Tap to check them out!"];
   [self.view addSubview:self.outgoingPopLabel];
 }
 
@@ -359,8 +358,6 @@ static BOOL showFilters = NO;
   
   NSUInteger unreadNotifications = [[[DFPeanutNotificationsManager sharedManager] unreadNotifications] count];
   self.notificationsBadgeButton.badgeCount = (int)unreadNotifications;
-
-  
   
   [self reloadSuggestionsArea];
 }
@@ -369,18 +366,20 @@ static BOOL showFilters = NO;
 {
   NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
   NSUInteger numToSend = [suggestedPhotos count];
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-    numToSend++;
-  }
   
   if (numToSend > 0) {
     self.sendBadgeView.hidden = NO;
     self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
     DFPeanutFeedObject *firstPhotoToSend = [suggestedPhotos firstObject];
     [self setNavAreaForSuggestedPhoto:firstPhotoToSend];
-    [self setSuggestionsAreaHidden:NO animated:YES];
+    DFHomeViewController __weak *weakSelf = self;
+    [self setSuggestionsAreaHidden:NO animated:YES completion:^{
+      if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+        [weakSelf.outgoingPopLabel popAtView:weakSelf.sendButton animatePopLabel:YES animateTargetView:NO];
+      }
+    }];
   } else {
-    [self setSuggestionsAreaHidden:YES animated:YES];
+    [self setSuggestionsAreaHidden:YES animated:YES completion:nil];
   }
 }
 
@@ -411,10 +410,10 @@ static BOOL showFilters = NO;
 
 - (void)setSuggestionsAreaHidden:(BOOL)suggestionsAreaHidden
 {
-  [self setSuggestionsAreaHidden:suggestionsAreaHidden animated:NO];
+  [self setSuggestionsAreaHidden:suggestionsAreaHidden animated:NO completion:nil];
 }
 
-- (void)setSuggestionsAreaHidden:(BOOL)hidden animated:(BOOL)animated
+- (void)setSuggestionsAreaHidden:(BOOL)hidden animated:(BOOL)animated completion:(DFVoidBlock)completion
 {
   if (hidden && !_suggestionsAreaHidden) {
     // hide the suggestions area
@@ -428,6 +427,8 @@ static BOOL showFilters = NO;
       }
       self.sendBadgeView.hidden = YES;
       [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+      if (finished && completion) completion();
     }];
     self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
   } else if (!hidden && _suggestionsAreaHidden){
@@ -439,6 +440,8 @@ static BOOL showFilters = NO;
       }
       self.sendBadgeView.hidden = NO;
       [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+      if (finished && completion) completion();
     }];
     self.buttonBar.gradientColors = @[[UIColor whiteColor]
                                       ];
@@ -455,13 +458,12 @@ static BOOL showFilters = NO;
    presentWithRootController:[[DFCardsPageViewController alloc]
                               initWithPreferredType:DFSuggestionViewType]
    inParent:self];
-  } else {
-    [self.outgoingPopLabel popAtView:self.sendButton animatePopLabel:YES animateTargetView:NO];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self.outgoingPopLabel dismiss];
-    });
   }
   [self logHomeButtonPressed:sender];
+  
+  // handle nux
+  [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
+  [self.outgoingPopLabel dismiss];
 }
 
 - (void)logHomeButtonPressed:(id)button

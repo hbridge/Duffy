@@ -39,12 +39,8 @@
 @property (retain, nonatomic) NSMutableSet *alreadyShownPhotoIds;
 @property (nonatomic, retain) UIViewController *noSuggestionsViewController;
 @property (nonatomic, retain) DFUpsellCardViewController *noIncomingViewController;
-@property (nonatomic) NSUInteger highestSeenNuxStep;
 
 @end
-
-const NSUInteger NumIncomingNuxes = 1;
-const NSUInteger NumOutgoingNuxes = 3;
 
 @implementation DFCardsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
@@ -157,22 +153,7 @@ const NSUInteger NumOutgoingNuxes = 3;
 
 - (void)gotoNextController
 {
-  UIViewController *nextController;
-  
-  BOOL incomingNuxPassed = [DFDefaultsStore isSetupStepPassed:DFSetupStepIncomingNux];
-  BOOL outgoingNuxPassed =[DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux];
-  
-  if (! incomingNuxPassed
-      && self.preferredType == DFIncomingViewType
-      && self.highestSeenNuxStep < NumIncomingNuxes) {
-    nextController = [self viewControllerForNuxStep:self.highestSeenNuxStep];
-  } else if (!outgoingNuxPassed
-             && self.preferredType == DFSuggestionViewType
-             && self.highestSeenNuxStep < NumOutgoingNuxes) {
-    nextController = [self viewControllerForNuxStep:self.highestSeenNuxStep];
-  } else {
-    nextController = [self nextOutgoingViewController];
-  }
+  UIViewController *nextController = [self nextOutgoingViewController];
   
   if (!nextController) {
     [self dismissViewControllerAnimated:YES completion:^(){}];
@@ -245,82 +226,6 @@ const NSUInteger NumOutgoingNuxes = 3;
   }
   
   return nil;
-}
-
-#pragma mark - NUX and Special Cards
-
-- (DFCardViewController *)viewControllerForNuxStep:(NSUInteger)index
-{
-  DFCardViewController *nuxController;
-  if (self.preferredType == DFSuggestionViewType){
-    DFOutgoingCardViewController *svc = [[DFOutgoingCardViewController alloc]
-                                               initWithNuxStep:index + 1];
-    nuxController = svc;
-    if (index == 0) {
-      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption){
-        [self gotoNextController];
-      };
-    } else if (index == 1) {
-      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption){
-        [SVProgressHUD showSuccessWithStatus:@"Thanks!"];
-        [self gotoNextController];
-      };
-      svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion) {
-        [SVProgressHUD showErrorWithStatus:@"Tap Send to continue"];
-      };
-    } else if (index == 2) {
-      svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
-        [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
-        [self gotoNextController];
-        [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
-      };
-      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption){
-        [SVProgressHUD showErrorWithStatus:@"Tap Skip to continue"];
-      };
-    }
-  }
-  
-  self.highestSeenNuxStep++;
-  return nuxController;
-}
-
-- (UIViewController *)noSuggestionsViewController
-{
-  if (!_noSuggestionsViewController) {
-  _noSuggestionsViewController = [[UIViewController alloc] init];
-    DFNoTableItemsView *noSuggestionsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-    noSuggestionsView.titleLabel.textColor = [UIColor whiteColor];
-    noSuggestionsView.subtitleLabel.textColor = [UIColor whiteColor];
-
-    if (self.preferredType == DFSuggestionViewType) {
-      noSuggestionsView.titleLabel.text = @"No More Suggestions";
-      noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends.";
-    } else {
-      noSuggestionsView.titleLabel.text = @"No More Photos in Your Inbox";
-      noSuggestionsView.subtitleLabel.text = @"";
-    }
-    noSuggestionsView.superView = _noSuggestionsViewController.view;
-  }
-  return _noSuggestionsViewController;
-}
-
-- (UIViewController *)noIncomingViewController
-{
-  
-  if (!_noIncomingViewController) {
-    _noIncomingViewController = [[DFUpsellCardViewController alloc] init];
-    DFCardsPageViewController __weak *weakSelf = self;
-    
-    _noIncomingViewController.yesButtonHandler = ^() {
-      weakSelf.preferredType = DFSuggestionViewType;
-      [weakSelf gotoNextController];
-    };
-    
-    _noIncomingViewController.noButtonHandler = ^() {
-      [weakSelf dismissViewControllerAnimated:YES completion:^(){}];
-    };
-  }
-  return _noIncomingViewController;
 }
 
 #pragma mark - Action Handlers
