@@ -15,10 +15,10 @@ DEFAULT_DUP_THRESHOLD = 40
 DEFAULT_MINUTES_TO_CLUSTER = 5
 
 # links for inviting
-INVITE_LINK_ENTERPRISE = 'bit.ly/1noDnx2' # bit.ly/strand-beta also works
+INVITE_LINK_ENTERPRISE = 'bit.ly/get-swap-app' # bit.ly/strand-beta also works
 INVITE_LINK_APP_STORE = 'bit.ly/strand-appstore'
 APP_SHORTLINK_EXISTING_USER = 'bit.ly/openswap'
-APP_SHORTLINK_NEW_USER = 'bit.ly/swap-beta'
+APP_SHORTLINK_NEW_USER = 'bit.ly/get-swap-app'
 
 # iOS Notifications
 
