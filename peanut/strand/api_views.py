@@ -25,6 +25,7 @@ from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUse
 
 from ios_notifications.models import APNService, Device, Notification
 
+from async import neighboring
 
 logger = logging.getLogger(__name__)
 
@@ -165,6 +166,8 @@ def update_user_location(request):
 		if ((not lon == 0) or (not lat == 0)):
 			record = LocationRecord(user = user, point = fromstr("POINT(%s %s)" % (lon, lat)), timestamp = timestamp, accuracy = accuracy)
 			record.save()
+
+			neighboring.processLocationRecordIds.delay([record.id])
 			
 			if ((user.last_location_timestamp and timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
