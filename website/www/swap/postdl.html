@@ -108,8 +108,11 @@
 	}
 	.ui-text {
 		margin: 10px 10px;
-		text-align: center;
+		width: 280px;
 		float:left;
+	}
+	.ui-link {
+		color: blue;
 	}
 	</style>
 </head>
@@ -123,53 +126,32 @@
 	</div>
 
 	<div class="ui-top-summary" id='top-summary'> 
-		Fastest way to share photos with a group of friends!
+		Your download will begin shortly
 	</div>
 
 
-	<div class='ui-screenshots' id='screenshot'>
-		<img class='ui-image' src='/resources/photos_tab.png'>
+	<div class='ui-middle'>
+		<div class="ui-text ui-indent left">1. Tap "Install" in the dialog </div>
+		<div class="ui-text ui-indent left">2. Go to your Home screen to start using the app</div>
+
+		<div class='ui-text ui-indent left'>If nothing pops up, <span id='backup-link' class='ui-link'>download app directly</span>.</div>
 	</div>
 
-	<div class='ui-dl' id='dl-link'>
-		<span class='ui-dl-text'>Install Swap!</span>
-	</div>
 
-	<div class='ui-disclaimer'>
-		(PS: We are using Hockey to test the app. Don't be alarmed by additional warnings.)
-	</div>
-	<div class='ui-dl-appstore hidden'>
-		<img class='ui-appstore' src='/resources/appstore.svg'>
-	</div>
-	<div class="ui-footer" id='footer'> &copy; 2014 Duffy, Inc.</div>
+	<div id='home-button' class='ui-text hidden'>
+		Press Home button below to go to the app.<div class='down-arrow'>&#8595;</div>
 	</div>
 </div>
 </body>
 <script>
 	function dlClicked(){
-		if (detectiPhone()) {
-			localytics.tagEvent("DL_Swap");
-			window.location.href ='/swap/postdl.html';
-		}
-		else {
-			$('#dl-link').empty();
-			$('#dl-link').removeClass('ui-dl');
-			$('#dl-link').addClass('ui-text');
-			$('#dl-link').append('Uh oh. You need to be on an iPhone with iOS 7+ to try Swap.');
-		}
-
+		window.location.href = 'itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F1000%3F';
 	}
-
-	function detectiPhone(){
-		var ua = navigator.userAgent;
-		console.log(ua);
-		if(ua.match(/iPhone/i)){
-			return true;
-		}
-		return false;
-	}
-
 	$(document).ready(function(){
+
+		localytics.tagEvent("DL_Swap_post_install");
+		dlClicked();
+
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -178,15 +160,12 @@
 	  	ga('create', 'UA-53853203-1', 'auto');
 	  	ga('send', 'pageview');
 
-		$('div.ui-dl').click(function() {
+
+
+		$('#backup-link').click(function() {
 			dlClicked();
 		});
-		$('img.ui-appstore').click(function() {
-			dlClicked();
-		});
-		$('div.ui-screenshots').click(function(){
-			dlClicked();
-		});
+
 	});
 	
 </script>
