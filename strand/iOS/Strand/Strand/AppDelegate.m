@@ -166,7 +166,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 
 - (BOOL)isAppSetupComplete
 {
-  return NO;
   return  ([[DFUser currentUser] userID]
            && ![[DFUser currentUser] userID] == 0
            && ![[DFDefaultsStore stateForPermission:DFPermissionPhotos]
