@@ -40,6 +40,6 @@
 @property (readonly, nonatomic, retain) NSString *colorPreview;
 @property (readonly, nonatomic, retain) NSString *resetNux;
 
-
++ (void)showPermissionDeniedAlert;
 
 @end

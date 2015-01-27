@@ -85,7 +85,8 @@
                                  NSUInteger actionIndex = [[self.uiAlertController actions]
                                                            indexOfObject:completedAction];
                                  DFAlertAction *action = self.actions[actionIndex];
-                                 action.handler(action);
+                                 if (action.handler)
+                                   action.handler(action);
                                }];
     [self.uiAlertController addAction:uiAction];
   }

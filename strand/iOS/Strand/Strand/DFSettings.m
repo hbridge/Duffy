@@ -14,6 +14,8 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFPushNotificationsManager.h"
 #import "DFBackgroundLocationManager.h"
+#import "DFDefaultsStore.h"
+#import "DFAlertController.h"
 
 NSString *const AutosaveToCameraRollDefaultsKey = @"DFSettingsAutosaveToCameraRoll";
 
@@ -178,14 +180,22 @@ static DFSettings *defaultSettings;
 
 - (void)setPushNotificationsEnabled:(BOOL)pushNotifications
 {
-  if (pushNotifications) {
+  if (pushNotifications &&
+      [[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStateDenied]) {
+    [self.class showPermissionDeniedAlert];
+  } else if (pushNotifications) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
 }
 
 - (void)setLocationEnabled:(BOOL)locationEnabled
 {
-  if (locationEnabled) {
+  if ([[DFDefaultsStore stateForPermission:DFPermissionLocation] isEqual:DFPermissionStateDenied]) {
+    if (locationEnabled) {
+      [self.class showPermissionDeniedAlert];
+    }
+  }
+  else if (locationEnabled) {
     [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
   }
 }
@@ -194,5 +204,38 @@ static DFSettings *defaultSettings;
 {
   return [[DFBackgroundLocationManager sharedManager] isPermssionGranted];
 }
+
++ (void)showPermissionDeniedAlert
+{
+  DFAlertController *alert = [DFAlertController
+                              alertControllerWithTitle:@"Grant Permission"
+                              message:@"You have previously denied access.  Please grant permission in Settings."
+                              preferredStyle:DFAlertControllerStyleAlert];
+  [alert addAction:[DFAlertAction actionWithTitle:@"Cancel" style:DFAlertActionStyleCancel handler:nil]];
+  [alert addAction:[DFAlertAction
+                    actionWithTitle:@"Settings"
+                    style:DFAlertActionStyleDefault
+                    handler:^(DFAlertAction *action) {
+                      if (&UIApplicationOpenSettingsURLString != NULL) {
+                        NSURL *appSettings = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                        [[UIApplication sharedApplication] openURL:appSettings];
+    }
+  }]];
+  
+  UIViewController *vc = [self topMostController];
+  [alert showWithParentViewController:vc animated:YES completion:nil];
+}
+
++ (UIViewController*) topMostController
+{
+  UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+  
+  while (topController.presentedViewController) {
+    topController = topController.presentedViewController;
+  }
+  
+  return topController;
+}
+
 
 @end

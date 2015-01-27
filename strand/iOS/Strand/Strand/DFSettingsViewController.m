@@ -296,7 +296,7 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            
+            [DFSettings showPermissionDeniedAlert];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
