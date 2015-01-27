@@ -28,7 +28,7 @@ import strand.notifications_util as notifications_util
 from peanut.celery import app
 
 from async import celery_helper
-from async import popcaches
+from async import popcaches, neighboring
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -297,8 +297,9 @@ def processBatch(photosToProcess):
 
 		Strand.bulkUpdate(strandsToUpdate, ['cache_dirty'])
 		
-
-		# We're doing this here so we make sure everything is processed at a minimum level before neghboring starts
+		# We're doing this here instead of when the object was created
+		# so we make sure everything is processed at a minimum level before neighboring starts
+		# Note: now that we're doing async, this could go above if that is needed
 		for strand in strandsCreated:
 			strand.neighbor_evaluated = False
 		Strand.bulkUpdate(strandsCreated, ['neighbor_evaluated'])
@@ -307,9 +308,12 @@ def processBatch(photosToProcess):
 		total += len(strandsCreated)
 		total += len(strandsAddedTo)
 		
-		ids = Strand.getIds(strandsToUpdate)
+		# Theoretically this could include a strand multiple times if another thread set the dirty bit
+		ids = Strand.getIds(strandsAddedTo)
 		ids.extend(Strand.getIds(strandsCreated))
 		popcaches.processIds.delay(ids)
+
+		neighboring.processStrandIds.delay(Strand.getIds(strandsCreated))
 		#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 		
 		#logger.debug("Starting sending notifications...")
