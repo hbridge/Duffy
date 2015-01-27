@@ -268,7 +268,7 @@
 - (void)addFriendButtonPressed:(id)sender
 {
   DFInviteFriendViewController *inviteController = [[DFInviteFriendViewController alloc] init];
-  [self presentViewController:inviteController animated:YES completion:nil];
+  [DFNavigationController presentWithRootController:inviteController inParent:self withBackButtonTitle:@"Done"];
 }
 
 - (void)settingsPressed:(id)sender
