@@ -224,6 +224,13 @@ LOGGING = {
             'filename': '/mnt/log/neighboring.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+        'friending': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/mnt/log/friending.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
         }
         #'console': {
         #   'level': 'DEBUG',
@@ -279,6 +286,11 @@ LOGGING = {
         },
         'async.neighboring': {
             'handlers': ['neighboring'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'async.friending': {
+            'handlers': ['friending'],
             'propagate': True,
             'level': 'DEBUG',
         }

@@ -560,6 +560,10 @@ class ContactEntry(models.Model):
 	def bulkUpdate(cls, objs, attributesList):
 		doBulkUpdate(cls, objs, attributesList)
 
+	@classmethod
+	def getIds(cls, objs):
+		return [obj.id for obj in objs]
+
 class Strand(models.Model):
 	first_photo_time = models.DateTimeField(db_index=True, null=True)
 	last_photo_time = models.DateTimeField(db_index=True, null=True)

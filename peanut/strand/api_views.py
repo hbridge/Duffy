@@ -61,7 +61,10 @@ def private_strands(request):
 
 			# Manually put in the timestamp into the json so we don't have to read then write the json
 			timestampStr = '"timestamp": %s,' %  int(time.time())
-			readyResponse = readyResponse[:1] + timestampStr + readyResponse[1:]
+			if not readyResponse:
+				readyResponse = "{%s}" % timestampStr
+			else:
+				readyResponse = readyResponse[:1] + timestampStr + readyResponse[1:]
 
 				
 		except ApiCache.DoesNotExist:

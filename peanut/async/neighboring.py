@@ -187,7 +187,7 @@ def processAllStrands():
 
 @app.task
 def processStrandIds(ids):
-	return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processStrands)
+	return celery_helper.processBatch(strandsBaseQuery.filter(id__in=ids), numToProcess, processStrands)
 
 @app.task
 def processAllLocationRecords():

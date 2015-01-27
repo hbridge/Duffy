@@ -11,7 +11,8 @@ app = Celery('peanut',
 					  'async.stranding',
 					  'async.similarity',
 					  'async.popcaches',
-					  'async.neighboring'])
+					  'async.neighboring',
+					  'async.friending'])
 
 app.config_from_object('django.conf:settings')
 
@@ -27,6 +28,7 @@ app.conf.update(
 		Queue('for_popcaches_full', Exchange('for_popcaches_full'), routing_key='for_popcaches_full'),
 		Queue('for_similarity', Exchange('for_similarity'), routing_key='for_similarity'),
 		Queue('for_neighboring', Exchange('for_neighboring'), routing_key='for_neighboring'),
+		Queue('for_friending', Exchange('for_friending'), routing_key='for_friending'),
 	),
 	CELERY_ROUTES = {
 		'async.two_fishes.processAll': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
@@ -42,7 +44,10 @@ app.conf.update(
 		'async.neighboring.processStrandIds': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
 		'async.neighboring.processAllLocationRecords': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
 		'async.neighboring.processLocationRecordIds': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
+		'async.friending.processIds': {'queue': 'for_friending', 'routing_key': 'for_friending'},
+		'async.friending.processAll': {'queue': 'for_friending', 'routing_key': 'for_friending'},
 	}
+
 )
 
 

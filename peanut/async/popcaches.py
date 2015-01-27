@@ -124,7 +124,7 @@ def processBatch(strandsToProcess):
 																  True, # includeFaces
 																  True, # includeAll
 																  "", # suggestionType
-																  interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+																  interestedUsersByStrandId, matchReasonsByStrandId, dict())
 
 			if strandObjectData:
 				responseObjectsById[strandObjectData['id']] = strandObjectData

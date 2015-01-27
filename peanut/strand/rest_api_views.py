@@ -28,7 +28,7 @@ from common.models import ContactEntry, User, Photo, Action, Strand, FriendConne
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
-from async import two_fishes, stranding, similarity, popcaches
+from async import two_fishes, stranding, similarity, popcaches, friending
 
 # TODO(Derek): move this to common
 from arbus import image_util
@@ -505,8 +505,11 @@ class BulkCreateModelMixin(CreateModelMixin):
                                         
             serializer.object[serializer.bulk_key] = results
 
-            [self.post_save(obj, created=True) for obj in serializer.object[serializer.bulk_key]]
+            [self.post_save(obj, created=True) for obj in results]
             
+            if "post_save_bulk" in dir(self):
+                self.post_save_bulk(results)
+                
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -540,7 +543,10 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
             obj.skip = True
 
         # This will filter out 3-byte and up unicode strings.
-        obj.name = self.re_pattern.sub(u'\uFFFD', obj.name) 
+        obj.name = self.re_pattern.sub(u'\uFFFD', obj.name)
+
+    def post_save_bulk(self, objs):
+        friending.processIds.delay(ContactEntry.getIds(objs))
 
 
 class CreateFriendConnectionAPI(BulkCreateAPIView):
