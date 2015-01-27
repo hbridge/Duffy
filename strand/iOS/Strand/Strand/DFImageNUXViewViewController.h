@@ -14,6 +14,15 @@
 @property (weak, nonatomic) IBOutlet UILabel *explanationLabel;
 @property (weak, nonatomic) IBOutlet UIButton *button;
 
+@property (nonatomic, retain) NSString *titleText;
+@property (nonatomic, retain) UIImage *image;
+@property (nonatomic, retain) NSString *explanation;
+@property (nonatomic, retain) NSString *buttonTitle;
+
 - (IBAction)buttonPressed:(id)sender;
+- (instancetype)initWithTitle:(NSString *)title
+                          image:(UIImage *)image
+                explanationText:(NSString *)explanation
+                    buttonTitle:(NSString *)buttonTitle;
 
 @end

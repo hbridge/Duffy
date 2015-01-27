@@ -11,6 +11,10 @@
 #import "DFSMSAuthViewController.h"
 #import "DFPhotosPermissionViewController.h"
 #import "AppDelegate.h"
+#import "DFFindFriendsNUXViewController.h"
+#import "DFAddFriendsNUXViewController.h"
+#import "DFAlertController.h"
+#import "DFContactSyncManager.h"
 
 @interface DFNUXFlowViewController ()
 
@@ -27,9 +31,11 @@
   self.allUserInfo = [NSMutableDictionary new];
   self.allNuxViewControllers =
   @[
-    [[DFCreateAccountViewController alloc] init],
-    [[DFSMSAuthViewController alloc] init],
-    [[DFPhotosPermissionViewController alloc] init],
+    [DFCreateAccountViewController new],
+    [DFSMSAuthViewController new],
+    [DFPhotosPermissionViewController new],
+    [DFFindFriendsNUXViewController new],
+    [DFAddFriendsNUXViewController new],
     ];
   
   for (DFNUXViewController *vc in self.allNuxViewControllers) {

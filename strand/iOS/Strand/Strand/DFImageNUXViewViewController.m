@@ -14,17 +14,53 @@
 
 @implementation DFImageNUXViewViewController
 
-+ (DFImageNUXViewViewController *)nuxWithTitle:(NSString *)title
-                                         image:(UIImage *)image
-                               explanationText:(NSString *)explanation
-                                   buttonTitle:(NSString *)buttonTitle
+- (instancetype)initWithTitle:(NSString *)title
+                        image:(UIImage *)image
+              explanationText:(NSString *)explanation
+                  buttonTitle:(NSString *)buttonTitle
 {
-  DFImageNUXViewViewController *vc = [[DFImageNUXViewViewController alloc] init];
-  vc.titleLabel.text = title;
-  vc.imageView.image = image;
-  vc.explanationLabel.text = explanation;
-  [vc.button setTitle:buttonTitle forState:UIControlStateNormal];
-  return vc;
+  self = [super initWithNibName:NSStringFromClass([DFImageNUXViewViewController class])  bundle:nil];
+  if (self) {
+    self.titleText = title;
+    self.image = image;
+    self.explanation = explanation;
+    self.buttonTitle = buttonTitle;
+  }
+  return self;
+}
+
+- (void)viewDidLoad
+{
+  [super viewDidLoad];
+  
+  self.titleLabel.text = self.titleText;
+  self.imageView.image = self.image;
+  self.explanationLabel.text = self.explanation;
+  [self.button setTitle:self.buttonTitle forState:UIControlStateNormal];
+}
+
+- (void)setTitleText:(NSString *)titleText
+{
+  _titleText = titleText;
+  self.titleLabel.text = titleText;
+}
+
+- (void)setImage:(UIImage *)image
+{
+  _image = image;
+  self.imageView.image = image;
+}
+
+- (void)setExplanation:(NSString *)explanation
+{
+  _explanation = explanation;
+  self.explanationLabel.text = explanation;
+}
+
+- (void)setButtonTitle:(NSString *)buttonTitle
+{
+  _buttonTitle = buttonTitle;
+  [self.button setTitle:buttonTitle forState:UIControlStateNormal];
 }
 
 - (IBAction)buttonPressed:(id)sender {

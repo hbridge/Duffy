@@ -82,6 +82,7 @@ NSString* const SetupPhotosCompleted = @"SetupPhotosCompleted";
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
 NSString* const InviteUserInitialized = @"InviteUserInitialized";
+NSString* const InviteActionEvent = @"InviteActionTaken";
 
 //Push notifs
 NSString* const PermissionChangedEvent = @"PermissionChanged";
@@ -101,7 +102,7 @@ static DFAnalytics *defaultLogger;
 #ifdef DEBUG
   [[LocalyticsSession shared]
    LocalyticsSession:@"7790abca456e78bb24ebdbb-8e7455f6-fe36-11e3-9fb0-009c5fda0a25"];
-   [[LocalyticsSession shared] setLoggingEnabled:NO];
+   [[LocalyticsSession shared] setLoggingEnabled:YES];
 #else
   [[LocalyticsSession shared]
    LocalyticsSession:@"b9370b33afb6b68728b25b7-952efd94-8487-11e4-5060-00a426b17dd8"];
@@ -370,6 +371,13 @@ static DFAnalytics *defaultLogger;
   [DFAnalytics logEvent:InviteUserInitialized];
 }
 
++ (void)logInviteActionTaken:(NSString *)actionType userInfo:(NSDictionary *)userInfo
+{
+  NSMutableDictionary *info = [[NSMutableDictionary alloc] initWithDictionary:userInfo];
+  info[@"actionType"] = actionType;
+  [self logEvent:InviteActionEvent withParameters:info];
+}
+
 + (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
                                                   newType:(UIRemoteNotificationType)newType
 {
@@ -570,7 +578,8 @@ static DFAnalytics *defaultLogger;
 
 + (void)logNux:(NSString *)nuxName completedWithResult:(NSString *)result
 {
-  [self logEvent:@"NuxCompleted" withParameters:@{ResultKey : result}];
+  NSString *eventName = [NSString stringWithFormat:@"Setup%@Completed", nuxName];
+  [self logEvent:eventName withParameters:@{ResultKey : result}];
 }
 
 

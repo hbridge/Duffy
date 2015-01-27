@@ -16,6 +16,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFFriendProfileViewController.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFDefaultsStore.h"
 
 @interface DFInviteFriendViewController ()
 
@@ -31,9 +32,8 @@
 {
   self = [super init];
   if (self) {
-    _peoplePicker = [[DFPeoplePickerViewController alloc] init];
-    _peoplePicker.allowsMultipleSelection = NO;
-    _peoplePicker.navigationItem.title = @"Add Friends";
+    self.allowsMultipleSelection = NO;
+    self.navigationItem.title = @"Add Friends";
     [self reloadData];
     [self observeNotifications];
   }
@@ -51,14 +51,10 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  self.peoplePicker.delegate = self;
-  
-  [self pushViewController:self.peoplePicker animated:NO];
-  self.peoplePicker.navigationItem.leftBarButtonItem  = [[UIBarButtonItem alloc]
-                                                         initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                                         target:self
-                                                         action:@selector(cancelPressed:)];
+  self.delegate = self;
 }
+
+
 
 - (void)reloadData
 {
@@ -76,33 +72,43 @@
                                                         object:nil
                                                           rows:self.contactsWhoAddedYou];
       [sections addObject:addedYouSection];
-      [self.peoplePicker setSecondaryAction:[self addFriendSecondaryAction] forSection:addedYouSection];
+      [self setSecondaryAction:[self addFriendSecondaryAction] forSection:addedYouSection];
     }
     
     // Contacts
     DFSection *allContactsSection = [DFPeoplePickerViewController allContactsSection];
     [sections addObject:allContactsSection];
-    [self.peoplePicker setSecondaryAction:[self inviteSecondaryAction] forSection:allContactsSection];
+    [self setSecondaryAction:[self inviteSecondaryAction] forSection:allContactsSection];
     
     //add any actual ab contacts to this row
     self.abContacts = [allContactsSection.rows objectsPassingTestBlock:^BOOL(id input) {
       return [[input class] isSubclassOfClass:[DFPeanutContact class]];
     }];
     
-    [self.peoplePicker setSections:sections];
+    [self setSections:sections];
   });
+}
+
+- (NSDictionary *)analyticsDict
+{
+  NSArray *friendedYou = [[DFPeanutFeedDataManager sharedManager]
+                          usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
+  return @{
+           @"numAddedYou" : [DFAnalytics bucketStringForObjectCount:friendedYou.count],
+           @"contactsPerm" : [DFDefaultsStore stateForPermission:DFPermissionContacts]
+           };
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+  [DFAnalytics logViewController:self appearedWithParameters:[self analyticsDict]];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
@@ -114,7 +120,8 @@
        containsObject:user]){
     DFFriendProfileViewController *friendController = [[DFFriendProfileViewController alloc]
                                                        initWithPeanutUser:user];
-    [self pushViewController:friendController animated:YES];
+    [self.navigationController pushViewController:friendController animated:YES];
+    [DFAnalytics logInviteActionTaken:@"viewFriend" userInfo:[self analyticsDict]];
   }
 }
 
@@ -132,6 +139,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 
 - (DFPeoplePickerSecondaryAction *)addFriendSecondaryAction
 {
+  DFInviteFriendViewController __weak *weakSelf = self;
   DFPeoplePickerSecondaryAction *secondaryAction = [DFPeoplePickerSecondaryAction new];
   secondaryAction.foregroundColor = [UIColor whiteColor];
   secondaryAction.backgroundColor = [DFStrandConstants strandBlue];
@@ -148,6 +156,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
                                                [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
                                                DDLogError(@"%@ adding users failed: %@", self.class, error);
                                              }];
+    [DFAnalytics logInviteActionTaken:@"addBack" userInfo:[weakSelf analyticsDict]];
   };
   return secondaryAction;
 }
@@ -164,6 +173,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 
 - (DFPeoplePickerSecondaryActionHandler)inviteActionHandler
 {
+  DFInviteFriendViewController __weak *weakSelf = self;
   return ^(DFPeanutContact *contact) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
     if ([user hasAuthedPhone]) {
@@ -176,7 +186,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
      userIDsFromPhoneNumbers:@[contact.phone_number]
      success:^(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers) {
        [DFSMSInviteStrandComposeViewController
-        showWithParentViewController:self
+        showWithParentViewController:weakSelf
         phoneNumbers:@[contact.phone_number]
         completionBlock:^(MessageComposeResult result) {
           if (result == MessageComposeResultSent)
@@ -191,6 +201,8 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
        [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",
                                             error.localizedDescription]];
      }];
+    
+    [DFAnalytics logInviteActionTaken:@"invite" userInfo:[weakSelf analyticsDict]];
   };
 }
 

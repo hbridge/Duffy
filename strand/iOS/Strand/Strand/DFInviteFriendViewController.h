@@ -9,8 +9,6 @@
 #import "DFNavigationController.h"
 #import "DFPeoplePickerViewController.h"
 
-@interface DFInviteFriendViewController : DFNavigationController <DFPeoplePickerDelegate>
-
-@property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
+@interface DFInviteFriendViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate>
 
 @end

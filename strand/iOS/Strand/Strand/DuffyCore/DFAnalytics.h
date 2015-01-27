@@ -84,6 +84,7 @@ disappearedWithParameters:(NSDictionary *)params;
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
 + (void)logInviteComposeInitialized;
++ (void)logInviteActionTaken:(NSString *)actionType userInfo:(NSDictionary *)userInfo;
 
 /* Contacts */
 + (void)logAddContactCompletedWithResult:(NSString *)result;

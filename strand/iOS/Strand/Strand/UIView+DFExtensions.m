@@ -34,7 +34,7 @@
 - (void)constrainToSuperviewSize
 {
   if (!self.superview) return;
-  
+  self.translatesAutoresizingMaskIntoConstraints = NO;
   [self.superview addConstraints:[NSLayoutConstraint
                                   constraintsWithVisualFormat:@"|-(0)-[self]-(0)-|"
                                   options:0
