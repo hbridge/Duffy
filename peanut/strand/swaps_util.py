@@ -121,7 +121,7 @@ def getFeedObjectsForSwaps(user):
 			strandObjectData['objects'] = sorted(strandObjectData['objects'], key=lambda x: x['time_taken'], reverse=True)
 			responseObjects.append(strandObjectData)
 
-	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'])
+	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
 
 	# Look for strands with faces
 	actionsByPhotoId = getActionsByPhotoIdForStrands(user, recentStrands)
