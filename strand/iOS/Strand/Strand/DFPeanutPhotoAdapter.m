@@ -71,7 +71,7 @@ NSString *const PhotoBasePath = @"photos/";
 - (void)patchPhotos:(NSArray *)peanutPhotos success:(DFPeanutRestFetchSuccess)success failure:(DFPeanutRestFetchFailure)failure
 {
   [super
-   performRequest:RKRequestMethodPOST
+   performRequest:RKRequestMethodPOST // using POST here is intentional, as we had to hack the patch functionality on the backend
    withPath:PhotoBulkBasePath
    objects:peanutPhotos
    parameters:nil
