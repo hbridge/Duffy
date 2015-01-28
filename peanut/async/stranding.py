@@ -311,10 +311,13 @@ def processBatch(photosToProcess):
 		# Theoretically this could include a strand multiple times if another thread set the dirty bit
 		ids = Strand.getIds(strandsAddedTo)
 		ids.extend(Strand.getIds(strandsCreated))
-		popcaches.processIds.delay(ids)
+		if len(ids) > 0:
+			popcaches.processIds.delay(ids)
 
-		neighboring.processStrandIds.delay(Strand.getIds(strandsCreated))
-		suggestion_notifications.processIds.delay(Strand.getIds(strandsAddedTo))
+		if len(strandsCreated) > 0:
+			neighboring.processStrandIds.delay(Strand.getIds(strandsCreated))
+		if len(strandsAddedTo) > 0:
+			suggestion_notifications.processIds.delay(Strand.getIds(strandsAddedTo))
 
 		#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 		

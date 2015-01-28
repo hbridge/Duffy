@@ -219,7 +219,8 @@ class PhotoBulkAPI(BasePhotoAPI):
         for strand in privateStrands:
             strand.cache_dirty = True
         Strand.bulkUpdate(privateStrands, ['cache_dirty'])
-        popcaches.processIds.delay(Strand.getIds(privateStrands))
+        if len(privateStrands) > 0:
+            popcaches.processIds.delay(Strand.getIds(privateStrands))
 
     def post(self, request, format=None):
         response = list()
@@ -394,9 +395,10 @@ class PhotoBulkAPI(BasePhotoAPI):
             
             # Async tasks
             ids = Photo.getIds(allPhotos)
-            two_fishes.processIds.delay(ids)
-            stranding.processIds.delay(ids)
-            similarity.processIds.delay(ids)
+            if len(ids) > 0:
+                two_fishes.processIds.delay(ids)
+                stranding.processIds.delay(ids)
+                similarity.processIds.delay(ids)
 
             response = [model_to_dict(photo) for photo in allPhotos]
 
@@ -545,7 +547,8 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         obj.name = self.re_pattern.sub(u'\uFFFD', obj.name)
 
     def post_save_bulk(self, objs):
-        friending.processIds.delay(ContactEntry.getIds(objs))
+        if len(objs) > 0:
+            friending.processIds.delay(ContactEntry.getIds(objs))
 
 
 class CreateFriendConnectionAPI(BulkCreateAPIView):

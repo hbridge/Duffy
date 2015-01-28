@@ -146,7 +146,8 @@ def processStrands(strandsToProcess):
 			strand.neighbor_evaluated = True
 		Strand.bulkUpdate(nonNeighboredStrands, ['neighbor_evaluated'])
 
-		suggestion_notifications.processIds.delay(getStrandIds(strandNeighbors))
+		if len(strandNeighbors) > 0:
+			suggestion_notifications.processIds.delay(getStrandIds(strandNeighbors))
 		
 		logger.info("Strand: Created %s and updated %s neighbor rows for user %s" % (len(neighborRowsToCreated), len(neighborRowsToUpdated), userId))
 		
@@ -184,7 +185,8 @@ def processLocationRecords(locationRecordsToProcess):
 			record.neighbor_evaluated = True
 		LocationRecord.bulkUpdate(records, ['neighbor_evaluated'])
 
-		suggestion_notifications.processIds.delay(getStrandIds(userStrandNeighbors))
+		if len(userStrandNeighbors) > 0:
+			suggestion_notifications.processIds.delay(getStrandIds(userStrandNeighbors))
 		
 		logger.info("LocationRecord: Created %s and updated %s neighbor rows for user %s" % (len(neighborRowsToCreated), len(neighborRowsToUpdated), userId))
 		
