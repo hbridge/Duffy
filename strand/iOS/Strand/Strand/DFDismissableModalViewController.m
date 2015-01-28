@@ -69,7 +69,7 @@
   viewController.contentView = rootController.view;
   [viewController addChildViewController:rootController];
   
-  [parent presentViewController:viewController animated:NO completion:nil];
+  [parent presentViewController:viewController animated:animated completion:nil];
 }
 
 
