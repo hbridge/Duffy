@@ -18,8 +18,9 @@
 
 @interface DFNUXFlowViewController ()
 
-@property (nonatomic, retain) DFNUXViewController *currentViewController;
+@property (nonatomic, readonly, retain) UIViewController *currentViewController;
 @property (nonatomic, retain) NSArray *allNuxViewControllers;
+@property (nonatomic, retain) NSArray *backEnabledViews;
 
 @end
 
@@ -28,15 +29,27 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+
   self.allUserInfo = [NSMutableDictionary new];
+  
+  DFCreateAccountViewController *createAccount = [DFCreateAccountViewController new];
+  DFSMSAuthViewController *smsAuth = [DFSMSAuthViewController new];
+  DFPhotosPermissionViewController *photosPermission = [DFPhotosPermissionViewController new];
+  DFFindFriendsNUXViewController *findFriends = [DFFindFriendsNUXViewController new];
+  DFAddFriendsNUXViewController *addFriends = [DFAddFriendsNUXViewController new];
+  
   self.allNuxViewControllers =
   @[
-    [DFCreateAccountViewController new],
-    [DFSMSAuthViewController new],
-    [DFPhotosPermissionViewController new],
-    [DFFindFriendsNUXViewController new],
-    [DFAddFriendsNUXViewController new],
+    createAccount,
+    smsAuth,
+    photosPermission,
+    findFriends,
+    addFriends
     ];
+  
+  self.backEnabledViews = @[
+                            smsAuth
+                            ];
   
   for (DFNUXViewController *vc in self.allNuxViewControllers) {
     vc.delegate = self;
@@ -60,13 +73,22 @@
                                                                  wrap:NO];
   }
   
-  self.currentViewController = nextNuxController;
+  
   nextNuxController.inputUserInfo = self.allUserInfo;
   
   if (nextNuxController) {
-    [self setViewControllers:@[nextNuxController] animated:YES];
+    [self setActiveNUXController:nextNuxController];
   } else {
     [self flowComplete];
+  }
+}
+
+- (void)setActiveNUXController:(DFNUXViewController *)nuxController
+{
+  if ([self.backEnabledViews containsObject:nuxController]) {
+    [self pushViewController:nuxController animated:YES];
+  } else {
+    [self setViewControllers:@[nuxController] animated:YES];
   }
 }
 
@@ -82,6 +104,11 @@
     AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [delegate firstTimeSetupComplete];
   });
+}
+
+- (UIViewController *)currentViewController
+{
+  return self.viewControllers.lastObject;
 }
 
 @end

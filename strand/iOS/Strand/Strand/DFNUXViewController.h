@@ -27,5 +27,4 @@ completedWithUserInfo:(NSDictionary *)userInfo;
 @property (nonatomic, weak) id<DFNUXViewControllerDelegate> delegate;
 
 - (void)completedWithUserInfo:(NSDictionary *)userInfo;
-
 @end
