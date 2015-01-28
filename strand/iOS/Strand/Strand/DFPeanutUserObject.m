@@ -78,7 +78,9 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 {
   if (![[object class] isSubclassOfClass:self.class]) return NO;
   DFPeanutUserObject *otherUser = (DFPeanutUserObject *)object;
-  if (self.id == otherUser.id) return YES;
+  if (self.id == otherUser.id &&
+      [self.relationship isEqualToString:otherUser.relationship])
+    return YES;
   
   return NO;
 }

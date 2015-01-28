@@ -46,6 +46,10 @@
                                            selector:@selector(contactPermissionChanged:)
                                                name:DFContactPermissionChangedNotificationName
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewFriendsDataNotificationName
+                                             object:nil];
 }
 
 
