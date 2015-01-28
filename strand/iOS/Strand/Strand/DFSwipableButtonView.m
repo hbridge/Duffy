@@ -9,6 +9,7 @@
 
 #import "DFSwipableButtonView.h"
 
+const CGFloat SwipableButtonBarHeight = 40;
 const CGFloat UpGestureThreshold   = -75.0;
 const CGFloat DownGestureThreshold = 75.0;
 const CGFloat LeftGestureThreshold = -75.0;
@@ -183,7 +184,6 @@ const CGFloat RightGestureThreshold = 75.0;
 
 - (void)unhighlightAllButtons
 {
-  self.overlayImageView.alpha = 0.0;
   for (UIButton *button in [self allButtons]) {
     if (button.enabled) button.alpha = 1.0;
   }
@@ -195,7 +195,6 @@ const CGFloat RightGestureThreshold = 75.0;
     if (!button.enabled) continue;
     if (button == buttonToHighlight) {
       button.alpha = 0.2 + 0.8 * highlightAmount;
-      self.overlayImageView.alpha = 0.2 + 0.8 * highlightAmount;
       //self.overlayImageView.image  = button.imageView.image;
     } else {
       button.alpha = 0.2;
@@ -205,7 +204,7 @@ const CGFloat RightGestureThreshold = 75.0;
 
 - (void)setViewFrames:(CGRect)frame
 {
-  NSArray *views = @[self.centerView, self.overlayImageView];
+  NSArray *views = @[self.centerView];
   for (UIView *view in views) {
     view.frame = frame;
   }
@@ -283,7 +282,13 @@ const CGFloat RightGestureThreshold = 75.0;
 
 - (void)setButtonsHidden:(BOOL)hidden
 {
-  self.buttonWrapperHeightConstraint.constant = (hidden ? 0 : 65.0);
+  if (hidden) {
+    self.buttonWrapperHeightConstraint.constant = 0;
+    self.centerViewBottomDistanceConstraint.priority = 999;
+  } else {
+    self.buttonWrapperHeightConstraint.constant = SwipableButtonBarHeight;
+    self.centerViewBottomDistanceConstraint.priority = 997;
+  }
 }
 
 - (void)setButtonsHidden:(BOOL)hidden animated:(BOOL)animated

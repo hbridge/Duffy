@@ -133,13 +133,12 @@
   [self.swipableButtonView.yesButton
    setImage:[UIImage imageNamed:@"Assets/Icons/SendButtonIcon"]
    forState:UIControlStateNormal];
+  [self.swipableButtonView.yesButton setTitle:@"Send" forState:UIControlStateNormal];
   [self.swipableButtonView.noButton
-   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
+   setImage:[UIImage imageNamed:@"Assets/Icons/SkipButtonIcon"]
    forState:UIControlStateNormal];
-  for (UIButton *button in @[self.swipableButtonView.yesButton, self.swipableButtonView.noButton]) {
-    [button setTitle:nil forState:UIControlStateNormal];
-    button.backgroundColor = [UIColor clearColor];
-  }
+  [self.swipableButtonView.noButton setTitle:@"Skip" forState:UIControlStateNormal];
+  
   [self.swipableButtonView configureToUseView:self.suggestionContentView];
 }
 

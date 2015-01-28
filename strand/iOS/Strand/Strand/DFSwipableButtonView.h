@@ -43,13 +43,13 @@
 @property (weak, nonatomic) IBOutlet UIButton *otherButton;
 @property (nonatomic, weak) id<DFSwipableButtonViewDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIPanGestureRecognizer *panGestureRecognizer;
-@property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
 @property (nonatomic) BOOL yesEnabled;
 @property (nonatomic) BOOL noEnabled;
 
 @property (nonatomic, retain) UIImageView *imageView;
 @property (nonatomic, retain) UILabel *labelView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *buttonWrapperHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *centerViewBottomDistanceConstraint;
 
 - (void)configureWithShowsOther:(BOOL)showsOther;
 - (IBAction)panGestureChanged:(UIPanGestureRecognizer *)sender;

@@ -3,31 +3,27 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFSwipableButtonView">
-            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="999" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="700" translatesAutoresizingMaskIntoConstraints="NO" id="PRr-q5-rca" userLabel="CenterView">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="505"/>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                <view clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="1" verticalHuggingPriority="1" horizontalCompressionResistancePriority="1" verticalCompressionResistancePriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="PRr-q5-rca" userLabel="CenterView">
+                    <rect key="frame" x="10" y="0.0" width="300" height="468"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="reB-FQ-R71"/>
                     </connections>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
-                    <rect key="frame" x="153" y="515" width="295" height="65"/>
+                    <rect key="frame" x="52" y="488" width="217" height="40"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes">
-                            <rect key="frame" x="230" y="0.0" width="65" height="65"/>
-                            <color key="backgroundColor" red="0.42352941176470588" green="0.81960784313725488" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="V0Q-qK-RXd" secondAttribute="height" multiplier="1:1" id="Sz8-Sj-yMw"/>
-                            </constraints>
+                        <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes" customClass="GBFlatButton">
+                            <rect key="frame" x="177" y="0.0" width="40" height="40"/>
+                            <color key="backgroundColor" red="0.42352941179999998" green="0.81960784310000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <inset key="titleEdgeInsets" minX="-2" minY="0.0" maxX="-2" maxY="0.0"/>
@@ -38,12 +34,8 @@
                                 <action selector="yesButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Mex-ME-R45"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No">
-                            <rect key="frame" x="0.0" y="0.0" width="65" height="65"/>
-                            <color key="backgroundColor" red="0.88235294117647056" green="0.20000000000000001" blue="0.16078431372549021" alpha="1" colorSpace="calibratedRGB"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="lr5-fU-tFy" secondAttribute="height" multiplier="1:1" id="jOG-eW-0bP"/>
-                            </constraints>
+                        <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No" customClass="GBFlatButton">
+                            <rect key="frame" x="0.0" y="0.0" width="34" height="40"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <state key="normal" title="Skip">
@@ -53,9 +45,8 @@
                                 <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other">
-                            <rect key="frame" x="115" y="0.0" width="65" height="65"/>
-                            <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other" customClass="GBFlatButton">
+                            <rect key="frame" x="84" y="0.0" width="43" height="40"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <state key="normal" title="Other">
@@ -68,9 +59,8 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstItem="pue-vE-jXM" firstAttribute="width" secondItem="pue-vE-jXM" secondAttribute="height" multiplier="1:1" id="1Xz-pe-AGZ"/>
                         <constraint firstItem="pue-vE-jXM" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" constant="50" id="5dv-r0-BBe"/>
-                        <constraint firstAttribute="height" constant="65" id="I7C-Lj-gsK"/>
+                        <constraint firstAttribute="height" constant="40" id="I7C-Lj-gsK"/>
                         <constraint firstItem="lr5-fU-tFy" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="KKD-Zu-Unv"/>
                         <constraint firstItem="pue-vE-jXM" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="Tqh-mC-REh"/>
                         <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" priority="999" constant="50" id="UgG-Ew-fUf"/>
@@ -83,31 +73,26 @@
                         <constraint firstItem="lr5-fU-tFy" firstAttribute="leading" secondItem="l10-6U-oyL" secondAttribute="leading" id="sOw-sa-eog"/>
                     </constraints>
                 </view>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="505"/>
-                </imageView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="PRr-q5-rca" secondAttribute="leading" id="4u2-8Q-y44"/>
-                <constraint firstItem="l10-6U-oyL" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="bottom" constant="10" id="5zL-Rm-vdB"/>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="PRr-q5-rca" secondAttribute="trailing" id="7iY-Zn-Xcj"/>
-                <constraint firstAttribute="trailing" secondItem="xKd-Cz-PRo" secondAttribute="trailing" id="AId-so-J1d"/>
-                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" priority="100" constant="20" id="H8h-um-EvH"/>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="U9o-fK-LxD"/>
-                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="20" id="aBk-gS-atA"/>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="bottom" secondItem="PRr-q5-rca" secondAttribute="bottom" id="fsn-Zg-Ml8"/>
+                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="40" id="H8h-um-EvH"/>
+                <constraint firstAttribute="trailing" secondItem="PRr-q5-rca" secondAttribute="trailing" constant="10" id="X2S-CR-Mdc"/>
+                <constraint firstItem="l10-6U-oyL" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="bottom" priority="998" constant="20" id="e2E-kg-aTC"/>
+                <constraint firstAttribute="centerX" secondItem="PRr-q5-rca" secondAttribute="centerX" id="eYS-AI-zZG"/>
+                <constraint firstItem="PRr-q5-rca" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="gGV-px-Zow"/>
                 <constraint firstItem="PRr-q5-rca" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="h6L-Et-qCw"/>
-                <constraint firstItem="xKd-Cz-PRo" firstAttribute="top" secondItem="PRr-q5-rca" secondAttribute="top" id="oyN-1W-o7a"/>
+                <constraint firstAttribute="bottom" secondItem="PRr-q5-rca" secondAttribute="bottom" priority="997" constant="20" id="k6Y-0K-PSa"/>
                 <constraint firstAttribute="centerX" secondItem="l10-6U-oyL" secondAttribute="centerX" id="tje-Pw-gcZ"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>
                 <outlet property="buttonWrapperHeightConstraint" destination="I7C-Lj-gsK" id="ZRf-9b-Juc"/>
                 <outlet property="centerView" destination="PRr-q5-rca" id="ZCH-9O-P1x"/>
+                <outlet property="centerViewBottomDistanceConstraint" destination="k6Y-0K-PSa" id="MHn-af-xOA"/>
                 <outlet property="noButton" destination="lr5-fU-tFy" id="ceJ-cP-s4b"/>
                 <outlet property="otherButton" destination="pue-vE-jXM" id="baw-SH-BRr"/>
-                <outlet property="overlayImageView" destination="xKd-Cz-PRo" id="b1b-42-XCH"/>
                 <outlet property="panGestureRecognizer" destination="MM2-cw-TCR" id="cLj-Ui-G3M"/>
                 <outlet property="yesButton" destination="V0Q-qK-RXd" id="HRc-cq-96I"/>
             </connections>
