@@ -32,6 +32,7 @@ extern DFSetupStepType DFSetupStepSuggestionsNux;
 
 // whether actions have happened
 typedef NSString *const DFUserActionType;
+extern DFUserActionType DFUserActionSendSuggestion;
 extern DFUserActionType DFUserActionTakePhoto;
 extern DFUserActionType DFUserActionTakeExternalPhoto;
 extern DFUserActionType DFUserActionSyncContacts;

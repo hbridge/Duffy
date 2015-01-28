@@ -13,11 +13,13 @@
 #import "DFAnalytics.h"
 #import "DFFriendProfileViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFDefaultsStore.h"
 
 @interface DFOutgoingCardViewController ()
 
 @property (nonatomic ,retain) WYPopoverController *addPersonPopoverController;
 @property (nonatomic, retain) DFPeoplePickerViewController *addPersonViewController;
+@property (nonatomic, retain) MMPopLabel *sendPopLabel;
 
 @end
 
@@ -140,6 +142,10 @@
   [self.swipableButtonView.noButton setTitle:@"Skip" forState:UIControlStateNormal];
   
   [self.swipableButtonView configureToUseView:self.suggestionContentView];
+  
+  self.sendPopLabel = [MMPopLabel popLabelWithText:@"Tap to Send"];
+  self.sendPopLabel.forceArrowDown = YES;
+  [self.view addSubview:self.sendPopLabel];
 }
 
 - (void)configurePeopleLabel
@@ -164,6 +170,16 @@
   // Dispose of any resources that can be recreated.
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    if (self.selectedPeanutContacts.count == 0) {
+      [self.suggestionContentView showAddPeoplePopup];
+    }
+  });
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
   [self.swipableButtonView resetView];
@@ -179,12 +195,10 @@
       self.yesButtonHandler(self.suggestionFeedObject,
                             self.selectedPeanutContacts,
                             self.suggestionContentView.commentTextField.text);
+      [DFDefaultsStore incrementCountForAction:DFUserActionSendSuggestion];
     } else {
       [self.suggestionContentView showAddPeoplePopup];
       [self.swipableButtonView resetView];
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.suggestionContentView dismissAddPeoplePopup];
-      });
     }
     logResult = @"send";
   }
@@ -193,17 +207,15 @@
     logResult = @"skip";
   }
   
-  if (self.nuxStep > 0) {
-    [DFAnalytics logNux:[NSString stringWithFormat:@"MatchStep%d", (int)self.nuxStep]
-    completedWithResult:logResult];
-  } else {
-    [DFAnalytics logOutgoingCardProcessedWithSuggestion:self.suggestionFeedObject
-                                                 result:logResult
-                                             actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
-  }
+  
+  [DFAnalytics logOutgoingCardProcessedWithSuggestion:self.suggestionFeedObject
+                                               result:logResult
+                                           actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
+  
 }
 
 - (IBAction)addPersonButtonPressed:(UIButton *)sender {
+  [self.suggestionContentView dismissAddPeoplePopup];
   self.addPersonViewController = [[DFRecipientPickerViewController alloc]
                                   initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
   self.addPersonViewController.doneButtonActionText = @"Select";
@@ -232,6 +244,11 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     [self dismissViewControllerAnimated:YES completion:nil];
   } else {
     [self.addPersonPopoverController dismissPopoverAnimated:YES];
+  }
+  if ([DFDefaultsStore actionCountForAction:DFUserActionSendSuggestion] == 0) {
+    [self.sendPopLabel popAtView:self.swipableButtonView.yesButton
+                 animatePopLabel:YES
+               animateTargetView:NO];
   }
 }
 

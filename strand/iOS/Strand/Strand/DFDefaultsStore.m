@@ -80,6 +80,7 @@ NSString *const UserActionCountPrefix = @"DFUserActionCount";
 NSString *const UserActionDatePrefix = @"DFLastUserActionDate";
 
 DFUserActionType DFUserActionTakePhoto = @"TakePhoto";
+DFUserActionType DFUserActionSendSuggestion = @"SendSuggestion";
 DFUserActionType DFUserActionTakeExternalPhoto = @"TakeExternalPhoto";
 DFUserActionType DFUserActionSyncContacts = @"SyncContacts";
 DFUserActionType DFUserActionSyncManualContacts = @"SyncManualContacts";

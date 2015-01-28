@@ -35,13 +35,13 @@
 
 - (void)configurePopLabel
 {
-  self.selectPeoplePopLabel = [MMPopLabel popLabelWithText:@"Select people first"];
+  self.selectPeoplePopLabel = [MMPopLabel popLabelWithText:@"Add the people you were with"];
   [self addSubview:self.selectPeoplePopLabel];
 }
 
 - (void)showAddPeoplePopup
 {
-  [self.selectPeoplePopLabel popAtView:self.addButton animatePopLabel:YES animateTargetView:YES];
+  [self.selectPeoplePopLabel popAtView:self.addButton animatePopLabel:YES animateTargetView:NO];
 }
 
 - (void)dismissAddPeoplePopup
