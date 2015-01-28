@@ -45,7 +45,7 @@
 static unsigned int MaxConcurrentUploads = 1;
 static unsigned int MaxRetryCount = 5;
 static unsigned int MaxThumbnailsPerRequest = 100;
-static unsigned int MaxMetadataPerRequest = 500;
+static unsigned int MaxMetadataPerRequest = 100;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
