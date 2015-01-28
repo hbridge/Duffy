@@ -272,14 +272,13 @@ static BOOL showFilters = NO;
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if ([DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+  if ([DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
+      || [DFDefaultsStore isSetupStepPassed:DFSetupStepSendCameraRoll]) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
   [self reloadNavData];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
-
-
 
 - (void)viewDidLayoutSubviews
 {
@@ -325,9 +324,10 @@ static BOOL showFilters = NO;
 
 + (NSArray *)sectionsFromFeedPhotos:(NSArray *)feedPhotos
 {
-  return @[[DFSection sectionWithTitle:@"All Photos" object:nil rows:feedPhotos]];
+  if (feedPhotos.count > 0)
+    return @[[DFSection sectionWithTitle:@"All Photos" object:nil rows:feedPhotos]];
+  return @[];
 }
-
 
 - (void)configureNoResultsView
 {
