@@ -103,6 +103,9 @@
       return [[input class] isSubclassOfClass:[DFPeanutContact class]];
     }];
     
+    // make contacts not selectable so that tapping on search results doesn't return
+    self.notSelectableContacts = self.abContacts;
+    
     [self setSections:sections];
   });
 }

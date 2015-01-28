@@ -47,6 +47,11 @@
   [self completedWithUserInfo:nil];
 }
 
+- (BOOL)prefersStatusBarHidden
+{
+  return [self.inviteController prefersStatusBarHidden];
+}
+
 
 
 @end
