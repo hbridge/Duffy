@@ -90,13 +90,11 @@
   [self.swipableButtonView.yesButton
    setImage:[UIImage imageNamed:@"Assets/Icons/SwipeCheckButton"]
    forState:UIControlStateNormal];
+  [self.swipableButtonView.yesButton setTitle:@"Yes" forState:UIControlStateNormal];
   [self.swipableButtonView.noButton
    setImage:[UIImage imageNamed:@"Assets/Icons/SwipeXButton"]
    forState:UIControlStateNormal];
-  for (UIButton *button in @[self.swipableButtonView.yesButton, self.swipableButtonView.noButton]) {
-    [button setTitle:nil forState:UIControlStateNormal];
-    button.backgroundColor = [UIColor clearColor];
-  }
+  [self.swipableButtonView.noButton setTitle:@"Not Now" forState:UIControlStateNormal];
 }
 
 @end
