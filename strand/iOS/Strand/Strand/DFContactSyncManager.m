@@ -172,17 +172,18 @@ static DFContactSyncManager *defaultManager;
 
 + (ABAuthorizationStatus)contactsPermissionStatus
 {
+  ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
 #ifdef DEBUG
-  DFPermissionStateType state = [DFDefaultsStore stateForPermission:DFPermissionContacts];
-  if ([state isEqual:DFPermissionStateGranted]) {
+  DFPermissionStateType storedState = [DFDefaultsStore stateForPermission:DFPermissionContacts];
+  if ([storedState isEqual:DFPermissionStateGranted] && status == kABAuthorizationStatusAuthorized) {
     return kABAuthorizationStatusAuthorized;
-  } else if ([state isEqual:DFPermissionStateDenied]) {
+  } else if ([storedState isEqual:DFPermissionStateDenied] || status == kABAuthorizationStatusDenied) {
     return kABAuthorizationStatusDenied;
   } else {
     return kABAuthorizationStatusNotDetermined;
   }
 #else
-  return ABAddressBookGetAuthorizationStatus();
+  return status;
 #endif
 }
 
