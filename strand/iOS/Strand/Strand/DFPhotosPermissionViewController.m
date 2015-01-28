@@ -15,6 +15,7 @@
 #import "DFCameraRollSyncManager.h"
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
+#import "DFSettings.h"
 
 @interface DFPhotosPermissionViewController ()
 
@@ -67,11 +68,10 @@
   ALAuthorizationStatus status = [ALAssetsLibrary authorizationStatus];
   if (status == ALAuthorizationStatusAuthorized) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyGranted"];
-    [self completedWithUserInfo:nil];
+    [self completedWithGranted:YES];
   } else if (status == ALAuthorizationStatusDenied) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyDenied"];
-    [UIAlertView showSimpleAlertWithTitle:@"Enable Access"
-                                  message:@"Please give this app permission to access your photo library in Settings."];
+    [DFSettings showPermissionDeniedAlert];
   } else if (status == ALAuthorizationStatusRestricted) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"restricted"];
     [UIAlertView showSimpleAlertWithTitle:@"Restricted"
@@ -80,7 +80,7 @@
     ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
     [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
       [DFAnalytics logSetupPhotosCompletedWithResult:@"askedGranted"];
-      [self completedWithUserInfo:nil];
+      [self completedWithGranted:YES];
       *stop = YES;
     } failureBlock:^(NSError *error) {
       if (error) {
@@ -89,11 +89,19 @@
                                                error.localizedDescription]];
         DDLogWarn(@"Couldn't access camera roll, code: %ld", (long)error.code);
         [DFAnalytics logSetupPhotosCompletedWithResult:@"error"];
-      }else{
+      } else {
         [DFAnalytics logSetupPhotosCompletedWithResult:@"askedDenied"];
+        [DFSettings showPermissionDeniedAlert];
       }
     }];
   }
+}
+
+- (void)completedWithGranted:(BOOL)granted
+{
+  [[DFCameraRollSyncManager sharedManager] sync];
+  [[DFUploadController sharedUploadController] uploadPhotos];
+  [self completedWithUserInfo:nil];
 }
 
 - (BOOL)prefersStatusBarHidden

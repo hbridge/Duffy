@@ -206,7 +206,7 @@ replacementString:(NSString *)string
      [DFUser setCurrentUser:newUser];
      [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
      [SVProgressHUD dismiss];
-     [self showNextStepWithFirstRunSyncTimestamp: peanutUser.first_run_sync_timestamp];
+     [self completedWithUserInfo:nil];
    }
    failureBlock:^(NSError *error) {
      DDLogWarn(@"Create user failed: %@", error.localizedDescription);
@@ -216,7 +216,6 @@ replacementString:(NSString *)string
      [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultFailure];
      [SVProgressHUD dismiss];
    }];
-  
 }
 
 - (void)resetCodeField
@@ -242,13 +241,6 @@ replacementString:(NSString *)string
   [self.presentedViewController dismissViewControllerAnimated:YES completion:^{
     [self.codeTextField becomeFirstResponder];
   }];
-}
-
-- (void)showNextStepWithFirstRunSyncTimestamp:(NSDate *)date
-{
-  AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-  [delegate firstTimeSetupUserIdStepCompleteWithSyncTimestamp:date];
-  [self completedWithUserInfo:nil];
 }
 
 @end

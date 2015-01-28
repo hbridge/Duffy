@@ -10,4 +10,6 @@
 
 @interface DFFaceDetectionSyncOperation : NSOperation
 
+@property (nonatomic) BOOL uploadOnly;
+
 @end

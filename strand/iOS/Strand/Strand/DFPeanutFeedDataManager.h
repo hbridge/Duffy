@@ -22,6 +22,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshUsersFromServerWithCompletion:(RefreshCompleteCompletionBlock)completion;
+- (void)refreshAllFeedsFromServer;
 
 - (BOOL)hasInboxData;
 - (BOOL)hasPrivateStrandData;

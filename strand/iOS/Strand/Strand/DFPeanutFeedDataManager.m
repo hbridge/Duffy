@@ -228,6 +228,15 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshFeedFromServer:feedType completion:completion fullRefresh:NO];
 }
 
+- (void)refreshAllFeedsFromServer
+{
+  DFFeedType allFeedTypes[4] = {DFInboxFeed, DFSwapsFeed, DFPrivateFeed, DFActionsFeed};
+  for (int i = 0; i < 4; i++) {
+    DFFeedType feedType = allFeedTypes[i];
+    [self refreshFeedFromServer:feedType completion:nil];
+  }
+}
+
 
 
 - (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock

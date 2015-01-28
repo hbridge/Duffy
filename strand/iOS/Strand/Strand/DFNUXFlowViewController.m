@@ -15,12 +15,17 @@
 #import "DFAddFriendsNUXViewController.h"
 #import "DFAlertController.h"
 #import "DFContactSyncManager.h"
+#import "DFSocketsManager.h"
+#import "DFPeanutFeedDataManager.h"
+#import "DFImageDownloadManager.h"
+
 
 @interface DFNUXFlowViewController ()
 
 @property (nonatomic, readonly, retain) UIViewController *currentViewController;
 @property (nonatomic, retain) NSArray *allNuxViewControllers;
 @property (nonatomic, retain) NSArray *backEnabledViews;
+@property (nonatomic) BOOL uidTasksRun;
 
 @end
 
@@ -96,6 +101,9 @@
 {
   [self.allUserInfo addEntriesFromDictionary:userInfo];
   [self gotoNextStep];
+  if ([[DFUser currentUser] userID]) {
+    [self userIDStepComplete];
+  }
 }
 
 - (void)flowComplete
@@ -110,5 +118,18 @@
 {
   return self.viewControllers.lastObject;
 }
+
+- (void)userIDStepComplete
+{
+  if (!self.uidTasksRun) {
+    DDLogInfo(@"%@ userID detected. Performing UID tasks.", self.class);
+    [[DFSocketsManager sharedManager] initNetworkCommunication];
+    [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
+    [[DFImageDownloadManager sharedManager] fetchNewImages];
+    
+    self.uidTasksRun = YES;
+  }
+}
+
 
 @end

@@ -16,6 +16,8 @@
 #import "DFDeletedPhotosSyncOperation.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFFaceDetectionSyncOperation.h"
+#import "DFUploadController.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFCameraRollSyncManager()
 
@@ -64,6 +66,10 @@ static DFCameraRollSyncManager *defaultSyncController;
                                            selector:@selector(sync)
                                                name:DFStrandCameraPhotoSavedNotificationName
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(uploadStatusChanged:)
+                                               name:DFUploadStatusNotificationName
+                                             object:nil];
 }
 
 /*
@@ -87,7 +93,7 @@ static DFCameraRollSyncManager *defaultSyncController;
   }
 }
 
-- (void)facesSync
+- (void)facesSyncWithDetect:(BOOL)withDetect
 {
   #ifdef DEBUG
   DFFaceDetectionSyncOperation *operation = [DFFaceDetectionSyncOperation new];
@@ -98,6 +104,8 @@ static DFCameraRollSyncManager *defaultSyncController;
     operation.threadPriority = 0.2; //low, 0.5 is default
   }
 
+  if (!withDetect)
+    operation.uploadOnly = YES;
   [self.syncOperationQueue addOperation:operation];
   #endif
 }
@@ -105,7 +113,7 @@ static DFCameraRollSyncManager *defaultSyncController;
 - (void)sync
 {
   [self syncAroundDate:nil withCompletionBlock:nil];
-  [self facesSync];
+  [self facesSyncWithDetect:YES];
 }
 
 - (void)syncAroundDate:(NSDate *)date withCompletionBlock:(DFCameraRollSyncCompletionBlock)completionBlock
@@ -149,6 +157,11 @@ static DFCameraRollSyncManager *defaultSyncController;
 {
   DDLogInfo(@"Canceling all camera roll sync operations");
   [self.syncOperationQueue cancelAllOperations];
+}
+
+- (void)uploadStatusChanged:(NSNotification *)note
+{
+  [self facesSyncWithDetect:NO];
 }
 
 

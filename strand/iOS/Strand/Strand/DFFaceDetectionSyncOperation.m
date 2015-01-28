@@ -40,7 +40,8 @@ const NSUInteger PhotosToScanPerOperation = 20;
 {
   @autoreleasepool {
     NSDate *startDate = [NSDate date];
-    DDLogInfo(@"%@ main beginning.", self.class);
+    NSUInteger photosScanned = 0;
+    DDLogInfo(@"%@ main beginning. Upload only:%@", self.class, @(self.uploadOnly));
     if (self.isCancelled) {
       [self cancelled];
       return;
@@ -48,21 +49,23 @@ const NSUInteger PhotosToScanPerOperation = 20;
     
     [self setupContext];
     
-    NSArray *photosToScan = [DFPhotoStore photosWithFaceDetectPassBelow:@(1) inContext:self.context];
-    DDLogInfo(@"%@ found %@ photos needingFaceDetection", self.class, @(photosToScan.count));
-    
-    NSUInteger photosScanned = 0;
-    CIDetector *detector = [self.class faceDetectorWithHighQuality:NO];
-    for (DFPhoto *photo in photosToScan) {
-      [self generateFaceFeaturesWithDetector:detector photo:photo];
-      photo.faceDetectPass = @(CurrentPassValue);
-      photosScanned++;
-      if (photosScanned >= PhotosToDetectPerSave) [self saveContext];
-      if (photosScanned >= PhotosToScanPerOperation) break;
-      if (self.isCancelled) {
-        [self cancelled];
-        [self saveContext];
-        return;
+    if (!self.uploadOnly) {
+      NSArray *photosToScan = [DFPhotoStore photosWithFaceDetectPassBelow:@(1) inContext:self.context];
+      DDLogInfo(@"%@ found %@ photos needingFaceDetection", self.class, @(photosToScan.count));
+      
+     
+      CIDetector *detector = [self.class faceDetectorWithHighQuality:NO];
+      for (DFPhoto *photo in photosToScan) {
+        [self generateFaceFeaturesWithDetector:detector photo:photo];
+        photo.faceDetectPass = @(CurrentPassValue);
+        photosScanned++;
+        if (photosScanned >= PhotosToDetectPerSave) [self saveContext];
+        if (photosScanned >= PhotosToScanPerOperation) break;
+        if (self.isCancelled) {
+          [self cancelled];
+          [self saveContext];
+          return;
+        }
       }
     }
     
@@ -176,13 +179,18 @@ const NSUInteger PhotosToScanPerOperation = 20;
   NSMutableArray *processedPhotos = [NSMutableArray new];
   NSMutableArray *peanutPhotos = [NSMutableArray new];
   for (DFPhoto *photo in photosNotUploaded.photoSet.allObjects) {
-    if (photo.photoID == 0) {
-      continue; // if we don't have a photo ID, we can't process the photo
-    }
     [processedPhotos addObject:photo];
     if (photo.faceFeatures.count == 0) continue;
     if (photo.faceDetectPass.intValue != CurrentPassValue) continue;
-    
+        
+    // refresh the object in case there were backgorund changed, then ensure we have an ID so we
+    // can upload the data to the server
+    [self.context refreshObject:photo mergeChanges:YES];
+    if (photo.photoID == 0) {
+      DDLogInfo(@"%@ no ID so skipping photo: %@", self.class, photo.asset.canonicalURL);
+      continue;
+    }
+
     DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] init];
     peanutPhoto.id = @(photo.photoID);
     peanutPhoto.user = @(photo.userID);

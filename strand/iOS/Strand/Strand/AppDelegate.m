@@ -179,7 +179,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   self.window.rootViewController = setupViewController;
 }
 
-
 /*
  This gets called as soon as the last of the first time setup steps area complete.
  Right now, that is after the location permission is done.  This is called directly from the
@@ -187,62 +186,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
  */
 - (void)firstTimeSetupComplete
 {
-  // If we got a timestamp to sync to, then lets sync to that first
-  if (self.firstRunSyncTimestamp) {
-    
-    // If we already have a sync going, cancel and do the one with the timestamp.
-    // If we don't, just do the sync to a timestamp
-    if ([[DFCameraRollSyncManager sharedManager] isSyncInProgress]) {
-      DDLogInfo(@"First run complete with sync in progress for targeted search");
-      [[DFCameraRollSyncManager sharedManager] cancelSyncOperations];
-      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^(NSDictionary *objectIDsToChanges){
-        [self firstRunSyncComplete:objectIDsToChanges];
-      }];
-      [[DFCameraRollSyncManager sharedManager] sync];
-    } else {
-      DDLogInfo(@"First run complete with no sync in progress for targeted search");
-      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^(NSDictionary *objectIDsToChanges){
-        
-        [self firstRunSyncComplete:objectIDsToChanges];
-      }];
-    }
-  } else {
-     DDLogInfo(@"First run complete with no first run sync timestamp.");
-  }
-  
   [self showMainView];
-  [self performForegroundOperations];
-  
-  // Show suggestions
-  self.tabBarController.selectedIndex = 0;
-}
-
-/*
- * This should be called after we have synced the initial set of photos (if there's an invite, upload photos around
- * that date and time first).
- * This then tells the server that we're good to go.
- */
-- (void)firstRunSyncComplete:(NSDictionary *)objectsIds
-{
-  DDLogInfo(@"Setting first_run_sync_count with %@ assets", @(objectsIds.allKeys.count));
-  [[DFUserInfoManager sharedManager] setFirstTimeSyncCount:[NSNumber numberWithInteger:objectsIds.allKeys.count]];
-}
-/*
-  Put things here that should be kicked off as soon as we have a user ID.
-  This is called directly from the SMSAuth controller.
- 
-  This is only called on first time setup, so all these calls should also exist in other areas like
-    performForegroundOperations and all the calls should be idempotent.
- */
-- (void)firstTimeSetupUserIdStepCompleteWithSyncTimestamp:(NSDate *)date
-{
-  self.firstRunSyncTimestamp = date;
-  DDLogVerbose(@"Setting firstRunSyncTimestamp to: %@", self.firstRunSyncTimestamp);
-  
-  // Start up the socket server so we can start getting real time updates for when there's new data on the server
-  [[DFSocketsManager sharedManager] initNetworkCommunication];
-  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
-  [[DFImageDownloadManager sharedManager] fetchNewImages];
 }
 
 - (void)createRootViewController

@@ -9,6 +9,7 @@
 #import "DFFindFriendsNUXViewController.h"
 #import "DFAlertController.h"
 #import "DFContactSyncManager.h"
+#import "DFContactDataManager.h"
 #import "DFAnalytics.h"
 
 @interface DFFindFriendsNUXViewController ()
@@ -56,6 +57,7 @@
                                      dispatch_async(dispatch_get_main_queue(), ^{
                                        [self completedWithUserInfo:nil];
                                        [DFAnalytics logNux:@"Contacts" completedWithResult:@"Yes-Granted"];
+                                       [[DFContactDataManager sharedManager] refreshCache];
                                      });
                                    } failure:^(NSError *error) {
                                      dispatch_async(dispatch_get_main_queue(), ^{
