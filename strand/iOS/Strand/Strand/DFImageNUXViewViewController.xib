@@ -32,7 +32,7 @@
                         <constraint firstAttribute="height" constant="180" id="ozs-nO-U0G"/>
                     </constraints>
                 </imageView>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Explanation" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="285" translatesAutoresizingMaskIntoConstraints="NO" id="sp5-ig-Qxp">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Explanation" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" preferredMaxLayoutWidth="285" translatesAutoresizingMaskIntoConstraints="NO" id="sp5-ig-Qxp">
                     <rect key="frame" x="106" y="287" width="108" height="26"/>
                     <fontDescription key="fontDescription" type="system" pointSize="21"/>
                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
@@ -64,7 +64,8 @@
                 <constraint firstItem="sp5-ig-Qxp" firstAttribute="top" secondItem="QZI-9n-LYd" secondAttribute="bottom" constant="20" id="b16-2v-Ml2"/>
                 <constraint firstAttribute="centerX" secondItem="sp5-ig-Qxp" secondAttribute="centerX" id="g7R-e5-RFV"/>
                 <constraint firstAttribute="centerX" secondItem="QZI-9n-LYd" secondAttribute="centerX" id="g7d-0a-HEK"/>
-                <constraint firstAttribute="centerX" secondItem="xNI-dk-U9n" secondAttribute="centerX" id="lFX-ms-yA6"/>
+                <constraint firstAttribute="trailing" secondItem="xNI-dk-U9n" secondAttribute="trailing" constant="60" id="lZC-6p-8E9"/>
+                <constraint firstItem="xNI-dk-U9n" firstAttribute="top" relation="greaterThanOrEqual" secondItem="sp5-ig-Qxp" secondAttribute="bottom" constant="20" id="uFV-tl-yDX"/>
                 <constraint firstItem="QZI-9n-LYd" firstAttribute="top" secondItem="Bfu-tE-uGi" secondAttribute="bottom" constant="20" id="uH7-Re-p4q"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
