@@ -41,6 +41,7 @@ const NSUInteger PhotosToScanPerOperation = 20;
   @autoreleasepool {
     NSDate *startDate = [NSDate date];
     NSUInteger photosScanned = 0;
+    NSUInteger photosWithFacesFound = 0;
     DDLogInfo(@"%@ main beginning. Upload only:%@", self.class, @(self.uploadOnly));
     if (self.isCancelled) {
       [self cancelled];
@@ -56,7 +57,8 @@ const NSUInteger PhotosToScanPerOperation = 20;
      
       CIDetector *detector = [self.class faceDetectorWithHighQuality:NO];
       for (DFPhoto *photo in photosToScan) {
-        [self generateFaceFeaturesWithDetector:detector photo:photo];
+        BOOL foundFaces = [self generateFaceFeaturesWithDetector:detector photo:photo];
+        if (foundFaces) photosWithFacesFound++;
         photo.faceDetectPass = @(CurrentPassValue);
         photosScanned++;
         if (photosScanned >= PhotosToDetectPerSave) [self saveContext];
@@ -77,8 +79,9 @@ const NSUInteger PhotosToScanPerOperation = 20;
       return;
     }
     [self saveContext];
-    DDLogInfo(@"%@ main exit after scanning %@ photos in %.02fs.",
+    DDLogInfo(@"%@ main exit found %@ photos with faces out of %@ photos scanned in %.02fs.",
               self.class,
+              @(photosWithFacesFound),
               @(photosScanned),
               [scanEnd timeIntervalSinceDate:startDate]);
   }
@@ -127,7 +130,8 @@ const NSUInteger PhotosToScanPerOperation = 20;
                             options:detectorOpts];
 }
 
-- (void)generateFaceFeaturesWithDetector:(CIDetector *)detector
+/* returns YES if any face features were found */
+- (BOOL)generateFaceFeaturesWithDetector:(CIDetector *)detector
                                    photo:(DFPhoto *)photo
 {
   @autoreleasepool {
@@ -142,7 +146,7 @@ const NSUInteger PhotosToScanPerOperation = 20;
     }];
     dispatch_semaphore_wait(loadSemaphore, DISPATCH_TIME_FOREVER);
     
-    if (!image) return;
+    if (!image) return NO;
     CIImage *ciImage = [[CIImage alloc] initWithCGImage:[image CGImage]];
     
     NSMutableDictionary *operationOptions = [[NSMutableDictionary alloc] init];
@@ -157,13 +161,15 @@ const NSUInteger PhotosToScanPerOperation = 20;
                                                  }];
     
     NSArray *CIFaceFeatures = [detector featuresInImage:ciImage options:operationOptions];
-    DDLogVerbose(@"Found %@ faceFeatures for photo: %@.", @(CIFaceFeatures.count), @(photo.photoID));
+    //DDLogVerbose(@"Found %@ faceFeatures for photo: %@.", @(CIFaceFeatures.count), @(photo.photoID));
     for (CIFaceFeature *ciFaceFeature in CIFaceFeatures) {
       DFFaceFeature *faceFeature = [DFFaceFeature createWithCIFaceFeature:ciFaceFeature
                                                                 inContext:self.context];
       faceFeature.photo = photo;
-      DDLogVerbose(@"created DFaceFeature: %@", faceFeature);
+      //DDLogVerbose(@"created DFaceFeature: %@", faceFeature);
     }
+    
+    return (CIFaceFeatures.count > 0);
   }
 }
 

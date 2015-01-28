@@ -168,10 +168,10 @@ static dispatch_queue_t localImageReuestQueue;
        options:[DFPHAsset defaultImageRequestOptions]
        resultHandler:^(UIImage *result, NSDictionary *info) {
          if (result) {
-           DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
-                        @(contentMode),
-                        NSStringFromCGSize(size),
-                        NSStringFromCGSize(result.size));
+//           DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
+//                        @(contentMode),
+//                        NSStringFromCGSize(size),
+//                        NSStringFromCGSize(result.size));
            successBlock(result);
          } else {
            DDLogError(@"%@: Error in getting image from PHImageManager. Creation date: %@, targetWidth: %f, targetHeight: %f, contentMode: %d,  info: %@ ",
