@@ -246,6 +246,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFBackgroundLocationManager sharedManager] startUpdatingOnSignificantLocationChange];
       // Clearing out our phone number to name cache incase the contact list changed
       [[DFContactDataManager sharedManager] refreshCache];
+      [DFPushNotificationsManager refreshPushToken];
       
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
@@ -283,7 +284,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 - (void)applicationDidBecomeActive:(UIApplication *)application {
   [DFAnalytics StartAnalyticsSession];
   [self performForegroundOperations];
-  [DFPushNotificationsManager refreshPushToken];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
