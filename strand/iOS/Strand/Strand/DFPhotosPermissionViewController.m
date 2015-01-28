@@ -23,27 +23,18 @@
 
 @implementation DFPhotosPermissionViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (instancetype)init
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
-- (void)viewDidLoad
-{
-  [super viewDidLoad];
-  
-  SAMGradientView *gradientView = (SAMGradientView *)self.view;
-  gradientView.gradientColors = @[[UIColor colorWithWhite:1.0 alpha:1.0], [UIColor colorWithWhite:0.9 alpha:1.0]];
-  [self.navigationController setNavigationBarHidden:YES];
-  [self setNeedsStatusBarAppearanceUpdate];
-  
-  self.imageView.alpha = 0.9;
-  self.imageView.layer.cornerRadius = 6.0;
-  self.imageView.layer.masksToBounds = YES;
+  self = [super initWithTitle:@"Photos Access"
+                        image:[UIImage imageNamed:@"Assets/Nux/PhotosAccessGraphic"]
+              explanationText:@"Swap looks at your photo library to find the best photos for you to share."
+          " Please grant photos access to continue."
+                  buttonTitle:@"Grant Access"
+          ];
+  if (self) {
+    
+  }
+  return self;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -58,13 +49,7 @@
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (IBAction)grantPhotosAccessPressed:(id)sender {
+- (void)buttonPressed:(id)sender {
   ALAuthorizationStatus status = [ALAssetsLibrary authorizationStatus];
   if (status == ALAuthorizationStatusAuthorized) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyGranted"];

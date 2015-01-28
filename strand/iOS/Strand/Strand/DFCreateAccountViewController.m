@@ -54,6 +54,18 @@ UInt16 const DFPhoneNumberLength = 10;
   }
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [self.navigationController setNavigationBarHidden:NO animated:YES];
+  [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return NO;
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];

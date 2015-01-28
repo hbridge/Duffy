@@ -7,6 +7,7 @@
 //
 
 #import "DFImageNUXViewViewController.h"
+#import <SAMGradientView/SAMGradientView.h>
 
 @interface DFImageNUXViewViewController ()
 
@@ -33,10 +34,20 @@
 {
   [super viewDidLoad];
   
+  SAMGradientView *gradientView = (SAMGradientView *)self.view;
+  gradientView.gradientColors = @[[UIColor colorWithWhite:1.0 alpha:1.0],
+                                  [UIColor colorWithWhite:0.9 alpha:1.0]];
   self.titleLabel.text = self.titleText;
   self.imageView.image = self.image;
   self.explanationLabel.text = self.explanation;
   [self.button setTitle:self.buttonTitle forState:UIControlStateNormal];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [self.navigationController setNavigationBarHidden:YES];
+  [self setNeedsStatusBarAppearanceUpdate];
 }
 
 - (void)setTitleText:(NSString *)titleText
@@ -65,5 +76,10 @@
 
 - (IBAction)buttonPressed:(id)sender {
   [self completedWithUserInfo:nil];
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return YES;
 }
 @end

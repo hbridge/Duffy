@@ -18,6 +18,7 @@
 #import "DFSocketsManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFImageDownloadManager.h"
+#import "DFWelcomeNUXViewController.h"
 
 
 @interface DFNUXFlowViewController ()
@@ -37,6 +38,7 @@
 
   self.allUserInfo = [NSMutableDictionary new];
   
+  DFWelcomeNUXViewController *welcome = [DFWelcomeNUXViewController new];
   DFCreateAccountViewController *createAccount = [DFCreateAccountViewController new];
   DFSMSAuthViewController *smsAuth = [DFSMSAuthViewController new];
   DFPhotosPermissionViewController *photosPermission = [DFPhotosPermissionViewController new];
@@ -45,6 +47,7 @@
   
   self.allNuxViewControllers =
   @[
+    welcome,
     createAccount,
     smsAuth,
     photosPermission,

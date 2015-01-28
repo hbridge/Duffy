@@ -37,6 +37,7 @@
 		5A28652F19DF4EC300638B94 /* DFOutlineSubviewsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */; };
 		5A2E9F291A78340F0097EB6B /* DFAddFriendsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F281A78340F0097EB6B /* DFAddFriendsNUXViewController.m */; };
 		5A2E9F2C1A78412D0097EB6B /* DFFindFriendsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F2B1A78412D0097EB6B /* DFFindFriendsNUXViewController.m */; };
+		5A2E9F2F1A7983020097EB6B /* DFWelcomeNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F2E1A7983020097EB6B /* DFWelcomeNUXViewController.m */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
 		5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */; };
 		5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */; };
@@ -357,6 +358,8 @@
 		5A2E9F281A78340F0097EB6B /* DFAddFriendsNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAddFriendsNUXViewController.m; sourceTree = "<group>"; };
 		5A2E9F2A1A78412D0097EB6B /* DFFindFriendsNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFindFriendsNUXViewController.h; sourceTree = "<group>"; };
 		5A2E9F2B1A78412D0097EB6B /* DFFindFriendsNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFindFriendsNUXViewController.m; sourceTree = "<group>"; };
+		5A2E9F2D1A7983020097EB6B /* DFWelcomeNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFWelcomeNUXViewController.h; sourceTree = "<group>"; };
+		5A2E9F2E1A7983020097EB6B /* DFWelcomeNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFWelcomeNUXViewController.m; sourceTree = "<group>"; };
 		5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSVerificationAdapter.h; sourceTree = "<group>"; };
 		5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSVerificationAdapter.m; sourceTree = "<group>"; };
 		5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSAuthViewController.h; sourceTree = "<group>"; };
@@ -1579,6 +1582,8 @@
 				5A5B80C51A73100D005C61D2 /* DFImageNUXViewViewController.h */,
 				5A5B80C61A73100D005C61D2 /* DFImageNUXViewViewController.m */,
 				5A5B80C71A73100D005C61D2 /* DFImageNUXViewViewController.xib */,
+				5A2E9F2D1A7983020097EB6B /* DFWelcomeNUXViewController.h */,
+				5A2E9F2E1A7983020097EB6B /* DFWelcomeNUXViewController.m */,
 				5AC4A9511947C77300862D9C /* DFCreateAccountViewController.h */,
 				5AC4A9521947C77300862D9C /* DFCreateAccountViewController.m */,
 				5AC4A9531947C77300862D9C /* DFCreateAccountViewController.xib */,
@@ -2025,6 +2030,7 @@
 				5AAF03A619B509B400EF021C /* DFInviteStrandViewController.m in Sources */,
 				5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */,
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
+				5A2E9F2F1A7983020097EB6B /* DFWelcomeNUXViewController.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonView.m in Sources */,
 				5A2E9F291A78340F0097EB6B /* DFAddFriendsNUXViewController.m in Sources */,
