@@ -501,7 +501,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   DFPersonSelectionTableViewCell *userCell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
   [userCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser | DFPersonSelectionTableViewCellStyleRightLabel];
-  userCell.nameLabel.text = peanutUser.fullName;
+  NSString *fullName = [peanutUser fullName];
+  fullName = [fullName isNotEmpty] ? fullName : peanutUser.phone_number;
+  userCell.nameLabel.text = fullName;
   userCell.profilePhotoStackView.peanutUsers = @[peanutUser];
 
   [self configureCell:userCell isSelectable:[self isUserSelectable:peanutUser]];
