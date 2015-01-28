@@ -16,5 +16,8 @@
 
 + (void)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent;
++ (void)presentWithRootController:(UIViewController *)rootController
+                         inParent:(UIViewController *)parent
+                         animated:(BOOL)animated;
 
 @end

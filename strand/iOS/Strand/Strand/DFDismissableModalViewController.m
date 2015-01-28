@@ -58,12 +58,18 @@
 + (void)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent
 {
+  [self presentWithRootController:rootController inParent:parent animated:YES];
+}
+
++ (void)presentWithRootController:(UIViewController *)rootController
+                         inParent:(UIViewController *)parent
+                         animated:(BOOL)animated
+{
   DFDismissableModalViewController *viewController = [[DFDismissableModalViewController alloc] init];
   viewController.contentView = rootController.view;
   [viewController addChildViewController:rootController];
   
-  
-  [parent presentViewController:viewController animated:YES completion:nil];
+  [parent presentViewController:viewController animated:NO completion:nil];
 }
 
 
