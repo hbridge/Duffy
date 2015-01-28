@@ -346,8 +346,8 @@ static DFPeanutFeedDataManager *defaultManager;
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
        if (!error && ![responseHash isEqual:self.swapsLastResponseHash]) {
-         self.swapsLastResponseHash = responseHash;
          self.swapsFeedObjects = response.objects;
+         self.swapsLastResponseHash = responseHash;
          
          DDLogInfo(@"Got new swaps data for %@ objects, sending notification.", @(response.objects.count));
          
