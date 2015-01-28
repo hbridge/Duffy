@@ -111,9 +111,11 @@
 {
   NSArray *friendedYou = [[DFPeanutFeedDataManager sharedManager]
                           usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
+  DFPermissionStateType contactsPermission = [DFDefaultsStore stateForPermission:DFPermissionContacts];
+  
   return @{
            @"numAddedYou" : [DFAnalytics bucketStringForObjectCount:friendedYou.count],
-           @"contactsPerm" : [DFDefaultsStore stateForPermission:DFPermissionContacts]
+           @"contactsPerm" : contactsPermission ? contactsPermission : DFPermissionStateNotRequested
            };
 }
 
