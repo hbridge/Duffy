@@ -109,6 +109,7 @@
   }
   
   _managedObjectContext = [DFPhotoStore createBackgroundManagedObjectContext];
+  _managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
   return _managedObjectContext;
 }
 
