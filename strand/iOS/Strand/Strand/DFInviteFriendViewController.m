@@ -65,6 +65,20 @@
   dispatch_async(dispatch_get_main_queue(), ^{
     NSMutableArray *sections = [NSMutableArray new];
     
+    // Existing friends
+    if (self.showExistingFriendsSection) {
+      NSArray *existingFriendUsers = [[DFPeanutFeedDataManager sharedManager] friendsList];
+      NSArray *existingFriendContacts = [existingFriendUsers arrayByMappingObjectsWithBlock:^id(id input) {
+        return [[DFPeanutContact alloc] initWithPeanutUser:input];
+      }];
+      if (existingFriendContacts.count > 0) {
+        DFSection *friendsSection = [DFSection sectionWithTitle:@"Friends"
+                                                         object:nil
+                                                           rows:existingFriendContacts];
+        [sections addObject:friendsSection];
+      }
+    }
+    
     // People who added you
     NSArray *usersWhoAddedYou = [[DFPeanutFeedDataManager sharedManager]
                                  usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES];
@@ -120,7 +134,7 @@
 {
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
   if ([[[DFPeanutFeedDataManager sharedManager]
-        usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:YES]
+        usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:NO]
        containsObject:user]){
     DFFriendProfileViewController *friendController = [[DFFriendProfileViewController alloc]
                                                        initWithPeanutUser:user];
@@ -132,13 +146,7 @@
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
 didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
-  // only run the invite code if the contact selected is NOT in the
-  // contacts who added you or contacts section, those have buttons for each row
-  if (![self.contactsWhoAddedYou containsObject:peanutContacts.firstObject]
-      && ![self.abContacts containsObject:peanutContacts.firstObject]) {
-    DFPeoplePickerSecondaryActionHandler inviteHandler = [self inviteActionHandler];
-    inviteHandler(peanutContacts.firstObject);
-  }
+
 }
 
 - (DFPeoplePickerSecondaryAction *)addFriendSecondaryAction

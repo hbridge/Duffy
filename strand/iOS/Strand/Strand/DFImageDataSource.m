@@ -32,9 +32,13 @@ const NSTimeInterval CellLoadingIndicatorDelay = 0.5;
 - (instancetype)initWithFeedPhotos:(NSArray *)feedObjects
                         collectionView:(UICollectionView *)collectionView
 {
-  DFSection *section = [DFSection sectionWithTitle:nil object:nil rows:feedObjects];
+  NSArray *sections = @[];
+  if (feedObjects.count > 0) {
+    DFSection *section = [DFSection sectionWithTitle:nil object:nil rows:feedObjects];
+    sections = @[section];
+  }
   _feedPhotos = feedObjects;
-  return [self initWithSections:@[section] collectionView:collectionView];
+  return [self initWithSections:sections collectionView:collectionView];
 }
 
 - (void)setFeedPhotos:(NSArray *)feedPhotos

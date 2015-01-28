@@ -80,7 +80,7 @@
                      photosWithUserID:self.userToFilterTo.id
                      onlyEvaluated:NO];
   self.datasource = [[DFImageDataSource alloc]
-                     initWithFeedPhotos:photos
+                     initWithFeedPhotos:photos.count > 0 ? photos : nil
                      collectionView:self.collectionView];
   
   self.datasource.imageDataSourceDelegate = self;
@@ -133,10 +133,15 @@
   NSArray *photos = [[DFPeanutFeedDataManager sharedManager]
                      photosWithUserID:self.userToFilterTo.id
                      onlyEvaluated:NO];
-  if (photos) {
+  if (photos.count > 0) {
     [self.datasource setFeedPhotos:photos];
     [self.collectionView reloadData];
   }
+  [self configureNoResultsView];
+}
+
+- (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
+{
   [self configureNoResultsView];
 }
 

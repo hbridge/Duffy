@@ -345,7 +345,7 @@ static BOOL showFilters = NO;
 {
   self.outgoingPopLabel = [MMPopLabel
                            popLabelWithText:@"You have photos that were taken with friends."
-                           "Tap to check them out!"];
+                           " Tap to check them out!"];
   [self.view addSubview:self.outgoingPopLabel];
 }
 

@@ -11,4 +11,6 @@
 
 @interface DFInviteFriendViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate>
 
+@property (nonatomic) BOOL showExistingFriendsSection;
+
 @end

@@ -21,6 +21,7 @@
   [self configureNav];
   
   self.inviteController = [[DFInviteFriendViewController alloc] init];
+  self.inviteController.showExistingFriendsSection = YES;
   [self.view addSubview:self.inviteController.view];
   [self.inviteController.view constrainToSuperviewSize];
   [self addChildViewController:self.inviteController];
