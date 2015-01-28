@@ -54,3 +54,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "dev.duff
 AWS_STORAGE_BUCKET_NAME = 'strand-dev'
 
 CELERYD_HIJACK_ROOT_LOGGER = False
+
+class CELERY_CONFIG(BASE_CELERY_CONFIG):
+	BROKER_URL = "amqp://duffy:du44y@dev.duffyapp.com:5672/swap"

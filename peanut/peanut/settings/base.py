@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+from kombu import Exchange, Queue
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -308,3 +309,38 @@ LOGGING = {
         },
     }
 }
+
+class BASE_CELERY_CONFIG:
+    CELERY_TASK_RESULT_EXPIRES=3600
+    CELERYD_CONCURRENCY=4
+    CELERY_QUEUES = (
+        Queue('default', Exchange('default'), routing_key='default'),
+        Queue('for_two_fishes', Exchange('for_two_fishes'), routing_key='for_two_fishes'),
+        Queue('for_stranding', Exchange('for_stranding'), routing_key='for_stranding'),
+        Queue('for_popcaches', Exchange('for_popcaches'), routing_key='for_popcaches'),
+        Queue('for_popcaches_full', Exchange('for_popcaches_full'), routing_key='for_popcaches_full'),
+        Queue('for_similarity', Exchange('for_similarity'), routing_key='for_similarity'),
+        Queue('for_neighboring', Exchange('for_neighboring'), routing_key='for_neighboring'),
+        Queue('for_friending', Exchange('for_friending'), routing_key='for_friending'),
+        Queue('for_suggestion_notifications', Exchange('for_suggestion_notifications'), routing_key='for_suggestion_notifications'),
+    )
+    CELERY_ROUTES = {
+        'async.two_fishes.processAll': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
+        'async.two_fishes.processIds': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
+        'async.stranding.processAll': {'queue': 'for_stranding', 'routing_key': 'for_stranding'},
+        'async.stranding.processIds': {'queue': 'for_stranding', 'routing_key': 'for_stranding'},
+        'async.popcaches.processAll': {'queue': 'for_popcaches', 'routing_key': 'for_popcaches'},
+        'async.popcaches.processIds': {'queue': 'for_popcaches', 'routing_key': 'for_popcaches'},
+        'async.popcaches.processFull': {'queue': 'for_popcaches_full', 'routing_key': 'for_popcaches_full'},
+        'async.similarity.processAll': {'queue': 'for_similarity', 'routing_key': 'for_similarity'},
+        'async.similarity.processIds': {'queue': 'for_similarity', 'routing_key': 'for_similarity'},
+        'async.neighboring.processAllStrands': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
+        'async.neighboring.processStrandIds': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
+        'async.neighboring.processAllLocationRecords': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
+        'async.neighboring.processLocationRecordIds': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
+        'async.friending.processIds': {'queue': 'for_friending', 'routing_key': 'for_friending'},
+        'async.friending.processAll': {'queue': 'for_friending', 'routing_key': 'for_friending'},
+        'async.suggestion_notifications.processIds': {'queue': 'for_suggestion_notifications', 'routing_key': 'for_suggestion_notifications'},
+        'async.suggestion_notifications.processUserId': {'queue': 'for_suggestion_notifications', 'routing_key': 'for_suggestion_notifications'},
+
+    }
