@@ -95,7 +95,7 @@
     self.feedLastFeedTimestamp = [NSMutableDictionary new];
     
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
-    [self refreshFromServer];
+    [self refreshAllFeedsFromServer];
   }
   return self;
 }
@@ -111,20 +111,22 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)observeNotifications
 {
   [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(refreshFromServer)
+                                           selector:@selector(refreshAllFeedsFromServer)
                                                name:DFStrandReloadRemoteUIRequestedNotificationName
                                              object:nil];
 }
 
 #pragma mark - Data Fetch
 
-- (void)refreshFromServer
+- (void)refreshAllFeedsFromServer
 {
   DDLogVerbose(@"Refreshing all my feeds...");
-  [self refreshFeedFromServer:DFInboxFeed completion:nil];
-  [self refreshFeedFromServer:DFPrivateFeed completion:nil];
-  [self refreshSwapsFromServer:nil];
-  [self refreshActionsFromServer:nil];
+  const int NumDFFeedTypes = 4;
+  const DFFeedType allFeedTypes[NumDFFeedTypes] = {DFInboxFeed, DFSwapsFeed, DFPrivateFeed, DFActionsFeed};
+  for (int i = 0; i < NumDFFeedTypes; i++) {
+    DFFeedType feedType = allFeedTypes[i];
+    [self refreshFeedFromServer:feedType completion:nil];
+  }
 }
 
 - (void)processInboxFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
@@ -228,17 +230,6 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshFeedFromServer:feedType completion:completion fullRefresh:NO];
 }
 
-- (void)refreshAllFeedsFromServer
-{
-  DFFeedType allFeedTypes[4] = {DFInboxFeed, DFSwapsFeed, DFPrivateFeed, DFActionsFeed};
-  for (int i = 0; i < 4; i++) {
-    DFFeedType feedType = allFeedTypes[i];
-    [self refreshFeedFromServer:feedType completion:nil];
-  }
-}
-
-
-
 - (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
  
@@ -262,8 +253,19 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-- (void)refreshFeedFromServer:(DFFeedType)feedType completion:(RefreshCompleteCompletionBlock)completion fullRefresh:(BOOL)fullRefresh
+- (void)refreshFeedFromServer:(DFFeedType)feedType
+                   completion:(RefreshCompleteCompletionBlock)completion
+                  fullRefresh:(BOOL)fullRefresh
 {
+  // TODO(Derek) remove these special cases
+  if (feedType == DFSwapsFeed) {
+    [self refreshSwapsFromServer:completion];
+    return;
+  } else if (feedType == DFActionsFeed) {
+    [self refreshActionsFromServer:completion];
+    return;
+  }
+  
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   if (completion) [self scheduleDeferredCompletion:completion forFeedType:feedType];
   
