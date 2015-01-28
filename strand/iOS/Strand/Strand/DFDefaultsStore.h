@@ -25,7 +25,7 @@
 // whether setup steps have been passed
 typedef NSString *const DFSetupStepType;
 extern DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll;
-extern DFSetupStepType DFSetupStepIncomingNux;
+extern DFSetupStepType DFSetupStepSendCameraRoll;
 extern DFSetupStepType DFSetupStepSuggestionsNux;
 + (void)setSetupStepPassed:(DFSetupStepType)step Passed:(BOOL)passed;
 + (BOOL)isSetupStepPassed:(DFSetupStepType)step;

@@ -120,7 +120,7 @@ DFUserActionType DFUserActionLastBackgroundReferesh = @"DFUserActionLastBackgrou
 // whether setup steps have been passed
 DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll = @"DFSetupStepAskToAutoSaveToCameraRoll";
 DFSetupStepType DFSetupStepSuggestionsNux = @"DFSetupStepSuggestionNux";
-DFSetupStepType DFSetupStepIncomingNux = @"DFSetupStepIncomingNux";
+DFSetupStepType DFSetupStepSendCameraRoll = @"DFSetupStepSendCameraRoll";
 
 + (void)setSetupStepPassed:(DFSetupStepType)step Passed:(BOOL)passed
 {

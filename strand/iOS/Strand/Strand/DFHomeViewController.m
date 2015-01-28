@@ -39,11 +39,13 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
 @property (nonatomic, retain) MMPopLabel *outgoingPopLabel;
+@property (nonatomic, retain) MMPopLabel *cameraRollNuxPopLabel;
 @property (nonatomic, retain) DFNotificationsViewController *notificationsViewController;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 @property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 @property (nonatomic) BOOL suggestionsAreaHidden;
 @property (nonatomic, retain) UIImageView *navBackgroundImageView;
+@property (nonatomic, retain) UIButton *createButton;
 
 @end
 
@@ -58,7 +60,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
   [self configureNav];
   [self configureCollectionView];
   [self configureNoResultsView];
-  [self configurePopLabels];
+  [self configureNUXPopLabels];
   [self reloadData];
 }
 
@@ -99,13 +101,19 @@ const NSUInteger MinPhotosToShowFilter = 20;
   self.notificationsBadgeButton.badgeEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 8);
   [self.notificationsBadgeButton sizeToFit];
   
+  self.createButton = [[UIButton alloc] init];
+  [self.createButton setImage:[[UIImage imageNamed:@"Assets/Icons/AddPhotosBarButton"]
+                               imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                     forState:UIControlStateNormal];
+  [self.createButton addTarget:self
+                        action:@selector(createButtonPressed:)
+              forControlEvents:UIControlEventTouchUpInside];
+  [self.createButton sizeToFit];
+  
   self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc]
                                                initWithCustomView:self.notificationsBadgeButton],
                                               [[UIBarButtonItem alloc]
-                                               initWithImage:[UIImage imageNamed:@"Assets/Icons/AddPhotosBarButton"]
-                                               style:UIBarButtonItemStylePlain
-                                               target:self
-                                               action:@selector(createButtonPressed:)],
+                                               initWithCustomView:self.createButton],
                                               ];
   self.navigationItem.leftBarButtonItems = @[
                                              [[UIBarButtonItem alloc]
@@ -341,12 +349,14 @@ static BOOL showFilters = NO;
   });
 }
 
-- (void)configurePopLabels
+- (void)configureNUXPopLabels
 {
   self.outgoingPopLabel = [MMPopLabel
                            popLabelWithText:@"You have photos that were taken with friends."
                            " Tap to check them out!"];
   [self.view addSubview:self.outgoingPopLabel];
+  self.cameraRollNuxPopLabel = [MMPopLabel popLabelWithText:@"Send a photo to a friend."];
+  [self.view addSubview:self.cameraRollNuxPopLabel];
 }
 
 - (void)reloadNavData
@@ -375,11 +385,23 @@ static BOOL showFilters = NO;
     DFHomeViewController __weak *weakSelf = self;
     [self setSuggestionsAreaHidden:NO animated:YES completion:^{
       if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-        [weakSelf.outgoingPopLabel popAtView:weakSelf.sendButton animatePopLabel:YES animateTargetView:NO];
+        [weakSelf.outgoingPopLabel
+         popAtView:weakSelf.sendButton
+         animatePopLabel:YES
+         animateTargetView:NO];
       }
+      [weakSelf.cameraRollNuxPopLabel dismiss];
     }];
   } else {
     [self setSuggestionsAreaHidden:YES animated:YES completion:nil];
+    if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSendCameraRoll]
+        && [[DFPeanutFeedDataManager sharedManager] hasSwapsData]
+        && !CGRectEqualToRect(self.cameraRollNuxPopLabel.frame, CGRectZero)) {
+      [self.cameraRollNuxPopLabel
+       popAtView:self.createButton
+       animatePopLabel:YES animateTargetView:NO];
+      [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:YES];
+    }
   }
 }
 
