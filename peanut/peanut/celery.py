@@ -12,7 +12,8 @@ app = Celery('peanut',
 					  'async.similarity',
 					  'async.popcaches',
 					  'async.neighboring',
-					  'async.friending'])
+					  'async.friending',
+					  'async.suggestion_notifications'])
 
 app.config_from_object('django.conf:settings')
 
@@ -29,6 +30,7 @@ app.conf.update(
 		Queue('for_similarity', Exchange('for_similarity'), routing_key='for_similarity'),
 		Queue('for_neighboring', Exchange('for_neighboring'), routing_key='for_neighboring'),
 		Queue('for_friending', Exchange('for_friending'), routing_key='for_friending'),
+		Queue('for_suggestion_notifications', Exchange('for_suggestion_notifications'), routing_key='for_suggestion_notifications'),
 	),
 	CELERY_ROUTES = {
 		'async.two_fishes.processAll': {'queue': 'for_two_fishes', 'routing_key': 'for_two_fishes'},
@@ -46,6 +48,9 @@ app.conf.update(
 		'async.neighboring.processLocationRecordIds': {'queue': 'for_neighboring', 'routing_key': 'for_neighboring'},
 		'async.friending.processIds': {'queue': 'for_friending', 'routing_key': 'for_friending'},
 		'async.friending.processAll': {'queue': 'for_friending', 'routing_key': 'for_friending'},
+		'async.suggestion_notifications.processIds': {'queue': 'for_suggestion_notifications', 'routing_key': 'for_suggestion_notifications'},
+		'async.suggestion_notifications.processUserId': {'queue': 'for_suggestion_notifications', 'routing_key': 'for_suggestion_notifications'},
+
 	}
 
 )

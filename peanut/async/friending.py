@@ -21,6 +21,7 @@ from strand import notifications_util
 from peanut.celery import app
 
 from async import celery_helper
+from async import suggestion_notifications
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
@@ -112,6 +113,9 @@ def processBatch(contactEntries):
 
 		usersIdsToUpdate = [contactEntry.user_id for contactEntry in contactEntries]
 		usersIdsToUpdate = set(usersIdsToUpdate)
+
+		for userId in usersIdsToUpdate:
+			suggestion_notifications.processUserId.delay(userId)
 
 		Thread(target=threadedSendNotifications, args=(usersIdsToUpdate,)).start()
 

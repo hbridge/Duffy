@@ -22,6 +22,7 @@ from strand import strands_util, geo_util
 from peanut.celery import app
 
 from async import celery_helper
+from async import suggestion_notifications
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
@@ -48,6 +49,16 @@ def processLocationsAndStrands(recordLocations, strands):
 
 	return userBasedNeighborEntries.values()
 
+def getStrandIds(neighbors):
+	strandIds = set()
+
+	for neighbor in neighbors:
+		strandIds.add(neighbor.strand_1_id)
+		if neighbor.strand_2_id:
+			strandIds.add(neighbor.strand_2_id)
+
+	return strandIds
+	
 def processStrands(strandsToProcess):
 	# Group strands by users, then iterate through all users one at a time, fetching the cache as we go
 	strandsByUser = dict()
@@ -134,6 +145,8 @@ def processStrands(strandsToProcess):
 		for strand in nonNeighboredStrands:
 			strand.neighbor_evaluated = True
 		Strand.bulkUpdate(nonNeighboredStrands, ['neighbor_evaluated'])
+
+		suggestion_notifications.processIds.delay(getStrandIds(strandNeighbors))
 		
 		logger.info("Strand: Created %s and updated %s neighbor rows for user %s" % (len(neighborRowsToCreated), len(neighborRowsToUpdated), userId))
 		
@@ -170,6 +183,8 @@ def processLocationRecords(locationRecordsToProcess):
 		for record in records:
 			record.neighbor_evaluated = True
 		LocationRecord.bulkUpdate(records, ['neighbor_evaluated'])
+
+		suggestion_notifications.processIds.delay(getStrandIds(userStrandNeighbors))
 		
 		logger.info("LocationRecord: Created %s and updated %s neighbor rows for user %s" % (len(neighborRowsToCreated), len(neighborRowsToUpdated), userId))
 		
@@ -191,9 +206,9 @@ def processStrandIds(ids):
 
 @app.task
 def processAllLocationRecords():
-	return celery_helper.processBatch(locationRecordsBaseQuery, numToProcess, locationRecordsToProcess)
+	return celery_helper.processBatch(locationRecordsBaseQuery, numToProcess, processLocationRecords)
 
 @app.task
 def processLocationRecordIds(ids):
-	return celery_helper.processBatch(locationRecordsBaseQuery.filter(id__in=ids), numToProcess, locationRecordsToProcess)
+	return celery_helper.processBatch(locationRecordsBaseQuery.filter(id__in=ids), numToProcess, processLocationRecords)
 

@@ -67,6 +67,10 @@ class BulkShareInstanceSerializer(serializers.Serializer):
 
 class FriendConnectionSerializer(serializers.ModelSerializer):
 	lookup_field = 'id'
+
+	def get_validation_exclusions(self):
+		exclusions = super(FriendConnectionSerializer, self).get_validation_exclusions()
+		return exclusions + [ 'user_1', 'user_2' ]
 	
 	class Meta:
 		model = FriendConnection

@@ -28,7 +28,7 @@ import strand.notifications_util as notifications_util
 from peanut.celery import app
 
 from async import celery_helper
-from async import popcaches, neighboring
+from async import popcaches, neighboring, suggestion_notifications
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -314,6 +314,8 @@ def processBatch(photosToProcess):
 		popcaches.processIds.delay(ids)
 
 		neighboring.processStrandIds.delay(Strand.getIds(strandsCreated))
+		suggestion_notifications.processIds.delay(Strand.getIds(strandsAddedTo))
+
 		#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 		
 		#logger.debug("Starting sending notifications...")

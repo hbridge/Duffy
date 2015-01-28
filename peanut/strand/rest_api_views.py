@@ -28,7 +28,7 @@ from common.models import ContactEntry, User, Photo, Action, Strand, FriendConne
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
-from async import two_fishes, stranding, similarity, popcaches, friending
+from async import two_fishes, stranding, similarity, popcaches, friending, suggestion_notifications
 
 # TODO(Derek): move this to common
 from arbus import image_util
@@ -511,7 +511,6 @@ class BulkCreateModelMixin(CreateModelMixin):
                 self.post_save_bulk(results)
                 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 """
@@ -553,6 +552,21 @@ class CreateFriendConnectionAPI(BulkCreateAPIView):
     model = FriendConnection
     lookup_field = 'id'
     serializer_class = BulkFriendConnectionSerializer
+
+    def fetchWithUniqueKeys(self, obj):
+        try:
+            return self.model.objects.get(user_1_id=obj.user_1_id, user_2_id=obj.user_2_id)
+        except self.model.DoesNotExist:
+            return None
+
+    def post_save_bulk(self, objs):
+        userIds = set()
+        for obj in objs:
+            userIds.add(obj.user_1_id)
+            userIds.add(obj.user_2_id)
+
+        for userId in userIds:
+            suggestion_notifications.processUserId.delay(userId)
 
 def getBuildNumForUser(user):
     if user.last_build_info:

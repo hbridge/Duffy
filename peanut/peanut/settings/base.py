@@ -231,6 +231,13 @@ LOGGING = {
             'filename': '/mnt/log/friending.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+        'suggestion-notifications': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/mnt/log/suggestion-notifications.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
         }
         #'console': {
         #   'level': 'DEBUG',
@@ -293,6 +300,11 @@ LOGGING = {
             'handlers': ['friending'],
             'propagate': True,
             'level': 'DEBUG',
-        }
+        },
+        'async.suggestion_notifications': {
+            'handlers': ['suggestion-notifications'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
     }
 }
