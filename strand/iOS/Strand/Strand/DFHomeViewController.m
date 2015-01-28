@@ -400,7 +400,6 @@ static BOOL showFilters = NO;
       [self.cameraRollNuxPopLabel
        popAtView:self.createButton
        animatePopLabel:YES animateTargetView:NO];
-      [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:YES];
     }
   }
 }
@@ -535,6 +534,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFCreateStrandFlowViewController *createController = [[DFCreateStrandFlowViewController alloc] init];
   [self presentViewController:createController animated:YES completion:nil];
+  [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:YES];
+  [self.cameraRollNuxPopLabel dismiss];
 }
 
 
