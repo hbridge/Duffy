@@ -24,6 +24,7 @@
 #import "DFSMSInviteStrandComposeViewController.h"
 #import "DFPeoplePickerNoResultsDescriptor.h"
 #import "DFNoResultsTableViewCell.h"
+#import "DFSettings.h"
 
 @interface DFPeoplePickerViewController ()
 
@@ -668,8 +669,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (void)showContactsDeniedAlert
 {
-  [UIAlertView showSimpleAlertWithTitle:@"Contacts Denied"
-                          formatMessage:@"Please go to Settings > Privacy > Contacts and change Strand to on."];
+  [DFSettings showPermissionDeniedAlert];
 }
 
 - (void)removeSearchBar
