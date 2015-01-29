@@ -1,5 +1,11 @@
 # Swap v2
 
+## Jan 29th, 2015 (4838)
+
+- New new user experience
+- New transitions for viewing photos and suggestions
+- New buttons for evaluating suggestions
+
 ## Jan 26th, 2015 (4837)
 
 - Bug fixes
