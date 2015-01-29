@@ -80,7 +80,7 @@
 {
   
   UIView *backgroundView = parent.view;
-  UIGraphicsBeginImageContextWithOptions(backgroundView.bounds.size, NULL, 0);
+  UIGraphicsBeginImageContextWithOptions(backgroundView.bounds.size, NO, 0);
   [backgroundView drawViewHierarchyInRect:backgroundView.bounds afterScreenUpdates:NO];
   UIImage* backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
