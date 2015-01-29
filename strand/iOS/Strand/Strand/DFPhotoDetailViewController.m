@@ -346,17 +346,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   [self.tableView setTableHeaderView:self.imageView];
   
   // photo view actions
-  [self.imageView addGestureRecognizer:[self photoTapGestureRecognizer]];
-  
-  UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
-                                                 initWithTarget:self
-                                                 action:@selector(photoDoubleTapped:)];
-  doubleTapRecognizer.numberOfTapsRequired = 2;
-  [self.imageView addGestureRecognizer:doubleTapRecognizer];
-  UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                                       initWithTarget:self
-                                                       action:@selector(photoLongPressed:)];
-  [self.imageView addGestureRecognizer:longPressRecognizer];
+  [self addGestureRecognizersToImageView:self.imageView];
 }
 
 - (void)configureTheatreModeView
@@ -367,7 +357,7 @@ const NSUInteger CompressedModeMaxRows = 1;
     self.theatreModeImageView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.theatreModeImageView];
     [self.theatreModeImageView constrainToSuperviewSize];
-    [self.theatreModeImageView addGestureRecognizer:[self photoTapGestureRecognizer]];
+    [self addGestureRecognizersToImageView:self.theatreModeImageView];
     self.theatreModeImageView.userInteractionEnabled = YES;
     self.theatreModeImageView.hidden = !_theatreModeEnabled;
   }
@@ -375,13 +365,26 @@ const NSUInteger CompressedModeMaxRows = 1;
                                 deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
 }
 
-- (UITapGestureRecognizer *)photoTapGestureRecognizer
+- (void)addGestureRecognizersToImageView:(UIImageView *)imageView
 {
   UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc]
                                                  initWithTarget:self
                                                  action:@selector(photoSingleTapped:)];
   singleTapRecognizer.numberOfTapsRequired = 1;
-  return singleTapRecognizer;
+  [imageView addGestureRecognizer:singleTapRecognizer];
+
+  UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
+                                                 initWithTarget:self
+                                                 action:@selector(photoDoubleTapped:)];
+  doubleTapRecognizer.numberOfTapsRequired = 2;
+  [singleTapRecognizer requireGestureRecognizerToFail:doubleTapRecognizer];
+  [imageView addGestureRecognizer:doubleTapRecognizer];
+  
+  
+  UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                                       initWithTarget:self
+                                                       action:@selector(photoLongPressed:)];
+  [imageView addGestureRecognizer:longPressRecognizer];
 }
 
 #pragma mark - UITableView Delegate/Datasource
@@ -507,10 +510,10 @@ const NSUInteger CompressedModeMaxRows = 1;
    success:^(DFActionID actionID) {
      self.userLikeActionID = actionID;
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultSuccess];
+     [SVProgressHUD showSuccessWithStatus:newLikeValue ? @"Liked" : @"Unliked"];
    } failure:^(NSError *error) {
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultFailure];
    }];
-
 }
 
 - (IBAction)addPersonPressed:(id)sender {
