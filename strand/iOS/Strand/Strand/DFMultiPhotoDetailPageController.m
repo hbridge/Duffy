@@ -6,15 +6,15 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFMutliPhotoDetailPageController.h"
+#import "DFMultiPhotoDetailPageController.h"
 #import "DFPhotoDetailViewController.h"
 #import "DFPeanutFeedDataManager.h"
 
-@interface DFMutliPhotoDetailPageController ()
+@interface DFMultiPhotoDetailPageController ()
 
 @end
 
-@implementation DFMutliPhotoDetailPageController
+@implementation DFMultiPhotoDetailPageController
 
 - (instancetype)initWithCurrentPhoto:(DFPeanutFeedObject *)photo inPhotos:(NSArray *)photos
 {

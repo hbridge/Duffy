@@ -264,7 +264,7 @@
 		5AF499211A40FA3F000CF9DB /* DFBadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF499201A40FA3F000CF9DB /* DFBadgeView.m */; };
 		5AF499241A4210CE000CF9DB /* DFOutgoingCardContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF499231A4210CE000CF9DB /* DFOutgoingCardContentView.m */; };
 		5AF499261A4210E0000CF9DB /* DFOutgoingCardContentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AF499251A4210E0000CF9DB /* DFOutgoingCardContentView.xib */; };
-		5AF499291A44D4A3000CF9DB /* DFMutliPhotoDetailPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF499281A44D4A2000CF9DB /* DFMutliPhotoDetailPageController.m */; };
+		5AF499291A44D4A3000CF9DB /* DFMultiPhotoDetailPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF499281A44D4A2000CF9DB /* DFMultiPhotoDetailPageController.m */; };
 		5AF64D0519EC61AA00EE1473 /* DFFriendsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF64D0319EC61AA00EE1473 /* DFFriendsViewController.m */; };
 		5AF64D0619EC61AA00EE1473 /* DFFriendsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AF64D0419EC61AA00EE1473 /* DFFriendsViewController.xib */; };
 		5AF9FC6E1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9FC6D1A54748E00200A87 /* UIViewController+DFKeyboardObserving.m */; };
@@ -770,8 +770,8 @@
 		5AF499221A4210CE000CF9DB /* DFOutgoingCardContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOutgoingCardContentView.h; sourceTree = "<group>"; };
 		5AF499231A4210CE000CF9DB /* DFOutgoingCardContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOutgoingCardContentView.m; sourceTree = "<group>"; };
 		5AF499251A4210E0000CF9DB /* DFOutgoingCardContentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFOutgoingCardContentView.xib; sourceTree = "<group>"; };
-		5AF499271A44D4A2000CF9DB /* DFMutliPhotoDetailPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFMutliPhotoDetailPageController.h; sourceTree = "<group>"; };
-		5AF499281A44D4A2000CF9DB /* DFMutliPhotoDetailPageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFMutliPhotoDetailPageController.m; sourceTree = "<group>"; };
+		5AF499271A44D4A2000CF9DB /* DFMultiPhotoDetailPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFMultiPhotoDetailPageController.h; sourceTree = "<group>"; };
+		5AF499281A44D4A2000CF9DB /* DFMultiPhotoDetailPageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFMultiPhotoDetailPageController.m; sourceTree = "<group>"; };
 		5AF64D0219EC61AA00EE1473 /* DFFriendsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFriendsViewController.h; sourceTree = "<group>"; };
 		5AF64D0319EC61AA00EE1473 /* DFFriendsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFriendsViewController.m; sourceTree = "<group>"; };
 		5AF64D0419EC61AA00EE1473 /* DFFriendsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFriendsViewController.xib; sourceTree = "<group>"; };
@@ -1655,8 +1655,8 @@
 		5AC59E9C1A39FCD20081CCE5 /* Photo Detail Views */ = {
 			isa = PBXGroup;
 			children = (
-				5AF499271A44D4A2000CF9DB /* DFMutliPhotoDetailPageController.h */,
-				5AF499281A44D4A2000CF9DB /* DFMutliPhotoDetailPageController.m */,
+				5AF499271A44D4A2000CF9DB /* DFMultiPhotoDetailPageController.h */,
+				5AF499281A44D4A2000CF9DB /* DFMultiPhotoDetailPageController.m */,
 				5AC59EA31A39FDFB0081CCE5 /* DFPhotoDetailViewController.h */,
 				5AC59EA41A39FDFB0081CCE5 /* DFPhotoDetailViewController.m */,
 				5AC59EA51A39FDFB0081CCE5 /* DFPhotoDetailViewController.xib */,
@@ -2056,7 +2056,7 @@
 				5A113B1719C24E0F004CA85B /* DFGalleryCollectionViewFlowLayout.m in Sources */,
 				5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */,
 				5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */,
-				5AF499291A44D4A3000CF9DB /* DFMutliPhotoDetailPageController.m in Sources */,
+				5AF499291A44D4A3000CF9DB /* DFMultiPhotoDetailPageController.m in Sources */,
 				5AAF03AF19B5145200EF021C /* DFPeanutStrandInviteAdapter.m in Sources */,
 				5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */,
 				5A5B80C81A73100D005C61D2 /* DFImageNUXViewViewController.m in Sources */,

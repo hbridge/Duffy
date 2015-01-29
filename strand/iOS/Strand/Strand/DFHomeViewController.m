@@ -23,7 +23,7 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFDismissableModalViewController.h"
 #import "DFAnalytics.h"
-#import "DFMutliPhotoDetailPageController.h"
+#import "DFMultiPhotoDetailPageController.h"
 #import <MMPopLabel/MMPopLabel.h>
 #import <WYPopoverController/WYPopoverController.h>
 #import "DFBadgeButton.h"
@@ -494,7 +494,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   for (NSUInteger section = 0; section < [self.datasource numberOfSectionsInCollectionView:self.collectionView]; section++) {
     [allPhotos addObjectsFromArray:[self.datasource photosForSection:section]];
   }
-  DFMutliPhotoDetailPageController *mpvc = [[DFMutliPhotoDetailPageController alloc]
+  DFMultiPhotoDetailPageController *mpvc = [[DFMultiPhotoDetailPageController alloc]
                                             initWithCurrentPhoto:photo inPhotos:allPhotos];
   
   [DFDismissableModalViewController presentWithRootController:mpvc inParent:self];
