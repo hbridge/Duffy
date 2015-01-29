@@ -52,7 +52,12 @@
 }
 
 - (IBAction)closeButtonPressed:(id)sender {
-  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+  CATransition* transition = [CATransition animation];
+  transition.duration = 0.3;
+  transition.type = kCATransitionFade;
+  [self.view.window.layer addAnimation:transition forKey:kCATransition];
+  
+  [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
 }
 
 + (void)presentWithRootController:(UIViewController *)rootController
@@ -69,7 +74,13 @@
   viewController.contentView = rootController.view;
   [viewController addChildViewController:rootController];
   
-  [parent presentViewController:viewController animated:animated completion:nil];
+  if (animated) {
+    CATransition* transition = [CATransition animation];
+    transition.duration = 0.3;
+    transition.type = kCATransitionFade;
+    [parent.view.window.layer addAnimation:transition forKey:kCATransition];
+  }
+  [parent presentViewController:viewController animated:NO completion:nil];
 }
 
 

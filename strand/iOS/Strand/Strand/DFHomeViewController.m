@@ -28,6 +28,7 @@
 #import <WYPopoverController/WYPopoverController.h>
 #import "DFBadgeButton.h"
 #import "UIView+DFExtensions.h"
+#import "UIImageEffects.h"
 
 const CGFloat ExpandedNavBarHeight = 19 + 44 + 87;
 const CGFloat CollapsedNavBarHeight = 19 + 44;
@@ -124,12 +125,8 @@ const NSUInteger MinPhotosToShowFilter = 20;
                                              ];
   [self setSuggestionsAreaHidden:YES animated:NO completion:nil];
   
-  if ([UIVisualEffectView class]) {
-    [self addNavBlur];
-  }
+  [self addNavBlur];
 }
-
-static BOOL use_vibrance = NO;
 
 - (void)addNavBlur
 {
@@ -138,26 +135,6 @@ static BOOL use_vibrance = NO;
   [self.buttonBar insertSubview:self.navBackgroundImageView atIndex:0];
   [self.navBackgroundImageView constrainToSuperviewSize];
   self.navBackgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
-  self.navBackgroundImageView.alpha = 0.4;
-  
-  
-  // Vibrancy Effect
-  UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
-  UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-  blurEffectView.translatesAutoresizingMaskIntoConstraints = NO;
-  [self.buttonBar insertSubview:blurEffectView aboveSubview:self.navBackgroundImageView];
-  [blurEffectView constrainToSuperviewSize];
-  
-  if (use_vibrance) {
-    UIVibrancyEffect *vibrancyEffect = [UIVibrancyEffect effectForBlurEffect:blurEffect];
-    UIVisualEffectView *vibrancyEffectView = [[UIVisualEffectView alloc] initWithEffect:vibrancyEffect];
-    vibrancyEffectView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [blurEffectView.contentView addSubview:vibrancyEffectView];
-    [vibrancyEffectView constrainToSuperviewSize];
-    [vibrancyEffectView.contentView addSubview:self.buttonBarLabel];
-    [vibrancyEffectView.contentView addSubview:self.navigationController.navigationBar];
-  }
 }
 
 - (void)configureCollectionView
@@ -416,7 +393,12 @@ static BOOL showFilters = NO;
        dispatch_async(dispatch_get_main_queue(), ^{
          [self.sendButton setBackgroundImage:image
                                     forState:UIControlStateNormal];
-         self.navBackgroundImageView.image = image;
+         UIColor *tintColor = [UIColor colorWithWhite:0.97 alpha:0.7];
+         self.navBackgroundImageView.image = [UIImageEffects imageByApplyingBlurToImage:image
+                                                                             withRadius:60
+                                                                              tintColor:tintColor
+                                                                  saturationDeltaFactor:2.0
+                                                                              maskImage:nil];
          
      });
    }];

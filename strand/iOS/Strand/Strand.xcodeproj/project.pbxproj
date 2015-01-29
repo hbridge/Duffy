@@ -38,6 +38,7 @@
 		5A2E9F291A78340F0097EB6B /* DFAddFriendsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F281A78340F0097EB6B /* DFAddFriendsNUXViewController.m */; };
 		5A2E9F2C1A78412D0097EB6B /* DFFindFriendsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F2B1A78412D0097EB6B /* DFFindFriendsNUXViewController.m */; };
 		5A2E9F2F1A7983020097EB6B /* DFWelcomeNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F2E1A7983020097EB6B /* DFWelcomeNUXViewController.m */; };
+		5A2E9F321A79B09C0097EB6B /* UIImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F311A79B09C0097EB6B /* UIImageEffects.m */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
 		5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */; };
 		5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */; };
@@ -360,6 +361,8 @@
 		5A2E9F2B1A78412D0097EB6B /* DFFindFriendsNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFindFriendsNUXViewController.m; sourceTree = "<group>"; };
 		5A2E9F2D1A7983020097EB6B /* DFWelcomeNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFWelcomeNUXViewController.h; sourceTree = "<group>"; };
 		5A2E9F2E1A7983020097EB6B /* DFWelcomeNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFWelcomeNUXViewController.m; sourceTree = "<group>"; };
+		5A2E9F301A79B09C0097EB6B /* UIImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageEffects.h; sourceTree = "<group>"; };
+		5A2E9F311A79B09C0097EB6B /* UIImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageEffects.m; sourceTree = "<group>"; };
 		5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSVerificationAdapter.h; sourceTree = "<group>"; };
 		5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSVerificationAdapter.m; sourceTree = "<group>"; };
 		5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSAuthViewController.h; sourceTree = "<group>"; };
@@ -1558,6 +1561,8 @@
 		5AC4A9411947C38C00862D9C /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				5A2E9F301A79B09C0097EB6B /* UIImageEffects.h */,
+				5A2E9F311A79B09C0097EB6B /* UIImageEffects.m */,
 				5AC4A9421947C3A700862D9C /* UIImage+Alpha.h */,
 				5AC4A9431947C3A700862D9C /* UIImage+Alpha.m */,
 				5AC4A9441947C3A700862D9C /* UIImage+Resize.h */,
@@ -2225,6 +2230,7 @@
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,
 				5A4307291A71B6C70089C790 /* DFPeoplePickerSecondaryAction.m in Sources */,
 				5AEFA25A19D607150027BC5E /* DFStrandGallerySectionHeaderView.m in Sources */,
+				5A2E9F321A79B09C0097EB6B /* UIImageEffects.m in Sources */,
 				5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */,
 				5A7233B71A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
