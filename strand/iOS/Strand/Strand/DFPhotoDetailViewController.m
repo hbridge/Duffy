@@ -518,7 +518,12 @@ const NSUInteger CompressedModeMaxRows = 1;
    success:^(DFActionID actionID) {
      self.userLikeActionID = actionID;
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultSuccess];
-     [SVProgressHUD showSuccessWithStatus:newLikeValue ? @"Liked" : @"Unliked"];
+     if (newLikeValue) {
+       [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"] status:@"Liked"];
+     } else {
+       [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"] status:@"Unliked"];
+     }
+     
    } failure:^(NSError *error) {
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultFailure];
    }];
