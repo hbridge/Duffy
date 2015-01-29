@@ -12,8 +12,10 @@
 #import "DFImageDataSource.h"
 #import "DFNotificationsViewController.h"
 #import <SAMGradientView/SAMGradientView.h>
+#import <MMPopLabel/MMPopLabel.h>
 
-@interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate, DFNotificationsViewControllerDelegate>
+
+@interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate, DFNotificationsViewControllerDelegate, MMPopLabelDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
 - (IBAction)sendButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet LKBadgeView *sendBadgeView;

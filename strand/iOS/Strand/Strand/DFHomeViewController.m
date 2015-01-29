@@ -24,7 +24,6 @@
 #import "DFDismissableModalViewController.h"
 #import "DFAnalytics.h"
 #import "DFMultiPhotoDetailPageController.h"
-#import <MMPopLabel/MMPopLabel.h>
 #import <WYPopoverController/WYPopoverController.h>
 #import "DFBadgeButton.h"
 #import "UIView+DFExtensions.h"
@@ -332,7 +331,8 @@ static BOOL showFilters = NO;
                            popLabelWithText:@"You have photos that were taken with friends."
                            " Tap to check them out!"];
   [self.view addSubview:self.outgoingPopLabel];
-  self.cameraRollNuxPopLabel = [MMPopLabel popLabelWithText:@"Send a photo to a friend."];
+  self.cameraRollNuxPopLabel = [MMPopLabel popLabelWithText:@"Send a photo to a friend"];
+  self.cameraRollNuxPopLabel.delegate = self;
   [self.view addSubview:self.cameraRollNuxPopLabel];
 }
 
@@ -374,9 +374,15 @@ static BOOL showFilters = NO;
     if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSendCameraRoll]
         && [[DFPeanutFeedDataManager sharedManager] hasSwapsData]
         && !CGRectEqualToRect(self.cameraRollNuxPopLabel.frame, CGRectZero)) {
-      [self.cameraRollNuxPopLabel
-       popAtView:self.createButton
-       animatePopLabel:YES animateTargetView:NO];
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
+        //double check to make sure this hasn't changed
+        if (suggestedPhotos.count == 0)
+          [self.cameraRollNuxPopLabel
+           popAtView:self.createButton
+           animatePopLabel:YES
+           animateTargetView:NO];
+      });
     }
   }
 }
@@ -579,6 +585,13 @@ static DFPeanutFeedObject *currentPhoto;
   [self showMultiPhotoControllerWithStartingPhoto:photoObject];
 }
 
+- (void)dismissedPopLabel:(MMPopLabel *)popLabel
+{
+  if (popLabel == self.cameraRollNuxPopLabel
+      && self.outgoingPopLabel.hidden) {
+    [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:YES];
+  }
+}
                               
 
 
