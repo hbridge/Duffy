@@ -27,6 +27,7 @@
 @property (nonatomic) BOOL disableKeyboardHandler;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
 @property (nonatomic, retain) DFPeanutFeedObject *photoObject;
+@property (nonatomic) BOOL theatreModeEnabled;
 
 - (instancetype)initWithNuxStep:(NSUInteger)nuxStep;
 

@@ -23,7 +23,8 @@
                                 options:@{UIPageViewControllerOptionInterPageSpacingKey :@(20)}];
   if (self) {
     _photos = photos;
-    DFPhotoDetailViewController *pdvc = [self detailViewControllerForPhotoObject:photo];
+    DFPhotoDetailViewController *pdvc = [self detailViewControllerForPhotoObject:photo
+                                                              theatreModeEnabled:NO];
     if (pdvc)
       [self setViewControllers:@[pdvc]
                      direction:UIPageViewControllerNavigationDirectionForward
@@ -41,9 +42,11 @@
 }
 
 - (DFPhotoDetailViewController *)detailViewControllerForPhotoObject:(DFPeanutFeedObject *)photoObject
+                                                 theatreModeEnabled:(BOOL)theatreModeEnabled
 {
   DFPhotoDetailViewController *pdvc = [[DFPhotoDetailViewController alloc]
                                        initWithPhotoObject:photoObject];
+  pdvc.theatreModeEnabled = theatreModeEnabled;
   return pdvc;
 }
 
@@ -59,7 +62,8 @@
   DFPeanutFeedObject *photoObject = detailViewController.photoObject;
   DFPeanutFeedObject *afterPhoto = [self.photos objectAfterObject:photoObject wrap:NO];
   if (!afterPhoto) return nil;
-  return [self detailViewControllerForPhotoObject:afterPhoto];
+  return [self detailViewControllerForPhotoObject:afterPhoto
+                               theatreModeEnabled:detailViewController.theatreModeEnabled];
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
@@ -68,17 +72,8 @@
   DFPeanutFeedObject *photoObject = detailViewController.photoObject;
   DFPeanutFeedObject *beforePhoto = [self.photos objectBeforeObject:photoObject wrap:NO];
   if (!beforePhoto) return nil;
-  return [self detailViewControllerForPhotoObject:beforePhoto];
+  return [self detailViewControllerForPhotoObject:beforePhoto
+          theatreModeEnabled:detailViewController.theatreModeEnabled];
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

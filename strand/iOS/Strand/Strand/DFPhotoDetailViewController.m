@@ -25,6 +25,7 @@
 #import "DFPeanutPhoto.h"
 #import "DFFriendProfileViewController.h"
 #import <MMPopLabel/MMLabel.h>
+#import "UIView+DFExtensions.h"
 
 const NSUInteger CompressedModeMaxRows = 1;
 
@@ -36,6 +37,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFCommentTableViewCell *templateCell;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
+@property (nonatomic, retain) DFRemoteImageView *theatreModeImageView;
 
 @end
 
@@ -297,8 +299,9 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   [super viewDidLayoutSubviews];
   [self configurePhotoView];
+  [self configureTheatreModeView];
   [self configureTemplateCell];
- }
+}
 
 - (void)configureTemplateCell
 {
@@ -308,7 +311,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   [self.templateCell setNeedsLayout];
 }
 
-- (void)configurePhotoView
+- (CGRect)photoTableHeaderFrame
 {
   CGFloat aspectRatio;
   if (self.photoObject.full_height && self.photoObject.full_width) {
@@ -320,6 +323,12 @@ const NSUInteger CompressedModeMaxRows = 1;
                             0,
                             self.view.frame.size.width - 20,
                             (self.view.frame.size.width - 20) * aspectRatio);
+  return frame;
+}
+
+- (void)configurePhotoView
+{
+  CGRect frame = [self photoTableHeaderFrame];
   if (!self.imageView) {
     self.imageView = [[DFRemoteImageView alloc] initWithFrame:frame];
     self.imageView.clipsToBounds = YES;
@@ -337,6 +346,8 @@ const NSUInteger CompressedModeMaxRows = 1;
   [self.tableView setTableHeaderView:self.imageView];
   
   // photo view actions
+  [self.imageView addGestureRecognizer:[self photoTapGestureRecognizer]];
+  
   UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
                                                  initWithTarget:self
                                                  action:@selector(photoDoubleTapped:)];
@@ -346,6 +357,31 @@ const NSUInteger CompressedModeMaxRows = 1;
                                                        initWithTarget:self
                                                        action:@selector(photoLongPressed:)];
   [self.imageView addGestureRecognizer:longPressRecognizer];
+}
+
+- (void)configureTheatreModeView
+{
+  if (!self.theatreModeImageView) {
+    self.theatreModeImageView = [[DFRemoteImageView alloc] initWithFrame:self.view.frame];
+    self.theatreModeImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.theatreModeImageView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:self.theatreModeImageView];
+    [self.theatreModeImageView constrainToSuperviewSize];
+    [self.theatreModeImageView addGestureRecognizer:[self photoTapGestureRecognizer]];
+    self.theatreModeImageView.userInteractionEnabled = YES;
+    self.theatreModeImageView.hidden = !_theatreModeEnabled;
+  }
+  [self.theatreModeImageView loadImageWithID:self.photoObject.id
+                                deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
+}
+
+- (UITapGestureRecognizer *)photoTapGestureRecognizer
+{
+  UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc]
+                                                 initWithTarget:self
+                                                 action:@selector(photoSingleTapped:)];
+  singleTapRecognizer.numberOfTapsRequired = 1;
+  return singleTapRecognizer;
 }
 
 #pragma mark - UITableView Delegate/Datasource
@@ -736,6 +772,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 #pragma mark - Photo view gesture recognizers
 
+- (void)photoSingleTapped:(UIGestureRecognizer *)sender
+{
+  [self toggleTheatreMode];
+}
+
 - (void)photoDoubleTapped:(UIGestureRecognizer *)sender
 {
   if (sender.state == UIGestureRecognizerStateEnded)
@@ -798,6 +839,23 @@ const NSUInteger CompressedModeMaxRows = 1;
    } completion:^(BOOL finished) {
      
    }];
+}
+
+#pragma mark - Theatre mode
+
+- (void)toggleTheatreMode
+{
+  self.theatreModeEnabled = !self.theatreModeEnabled;
+}
+
+- (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled
+{
+  _theatreModeEnabled = theatreModeEnabled;
+  if (theatreModeEnabled && self.theatreModeImageView) {
+    self.theatreModeImageView.hidden = NO;
+  } else if (self.theatreModeImageView){
+    self.theatreModeImageView.hidden = YES;
+  }
 }
 
 #pragma mark - Adapters
