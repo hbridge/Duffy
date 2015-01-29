@@ -170,10 +170,16 @@
 
 - (UIViewController *)nextOutgoingViewController
 {
+  NSUInteger numShown = self.alreadyShownPhotoIds.count;
+  const NSUInteger UpsellCardFrequency = 5;
+  if (numShown > 0 && numShown % (UpsellCardFrequency - 1) == 0) {
+    UIViewController *nextUpsell = [self nextOutgoingUpsell];
+    if (nextUpsell) return nextUpsell;
+  }
+  
   NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
   for (DFPeanutFeedObject *suggestion in allSuggestions) {
     if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
-      
       NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
       for (int x=0; x < photos.count; x++) {
         DFPeanutFeedObject *photo = photos[x];
