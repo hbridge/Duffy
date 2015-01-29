@@ -10,8 +10,10 @@
 
 @interface DFDismissableModalViewController : UIViewController
 - (IBAction)closeButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIImageView *backgroundImageView;
 @property (weak, nonatomic) IBOutlet UIButton *closeButton;
 @property (nonatomic, retain) UIView *contentView;
+@property (nonatomic, retain) UIImage *backgroundImage;
 
 
 + (void)presentWithRootController:(UIViewController *)rootController

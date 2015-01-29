@@ -7,6 +7,7 @@
 //
 
 #import "DFDismissableModalViewController.h"
+#import "UIImageEffects.h"
 
 @interface DFDismissableModalViewController ()
 
@@ -17,6 +18,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+  self.backgroundImageView.image = self.backgroundImage;
+}
+
+- (void)setBackgroundImage:(UIImage *)backgroundImage
+{
+  _backgroundImage = backgroundImage;
+  self.backgroundImageView.image = backgroundImage;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -70,9 +78,17 @@
                          inParent:(UIViewController *)parent
                          animated:(BOOL)animated
 {
+  
+  UIView *backgroundView = parent.view;
+  UIGraphicsBeginImageContextWithOptions(backgroundView.bounds.size, NULL, 0);
+  [backgroundView drawViewHierarchyInRect:backgroundView.bounds afterScreenUpdates:NO];
+  UIImage* backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
   DFDismissableModalViewController *viewController = [[DFDismissableModalViewController alloc] init];
   viewController.contentView = rootController.view;
   [viewController addChildViewController:rootController];
+  viewController.backgroundImage = [UIImageEffects imageByApplyingDarkEffectToImage:backgroundImage];
   
   if (animated) {
     CATransition* transition = [CATransition animation];
@@ -82,6 +98,5 @@
   }
   [parent presentViewController:viewController animated:NO completion:nil];
 }
-
 
 @end

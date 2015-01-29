@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFDismissableModalViewController">
             <connections>
+                <outlet property="backgroundImageView" destination="gP7-b0-NGO" id="VNd-3a-jmE"/>
                 <outlet property="closeButton" destination="USo-13-dva" id="kJX-hC-gQs"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -16,6 +17,9 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gP7-b0-NGO">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="USo-13-dva">
                     <rect key="frame" x="564" y="0.0" width="36" height="42"/>
                     <inset key="contentEdgeInsets" minX="15" minY="5" maxX="5" maxY="15"/>
@@ -29,8 +33,12 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstItem="gP7-b0-NGO" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="5pm-YH-3RO"/>
                 <constraint firstAttribute="trailing" secondItem="USo-13-dva" secondAttribute="trailing" id="856-LW-mAh"/>
+                <constraint firstAttribute="trailing" secondItem="gP7-b0-NGO" secondAttribute="trailing" id="GJr-lW-I9f"/>
                 <constraint firstItem="USo-13-dva" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="baW-se-JuQ"/>
+                <constraint firstAttribute="bottom" secondItem="gP7-b0-NGO" secondAttribute="bottom" id="hDN-Ms-8ZC"/>
+                <constraint firstItem="gP7-b0-NGO" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="sVe-aN-qgi"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <point key="canvasLocation" x="360" y="532"/>
