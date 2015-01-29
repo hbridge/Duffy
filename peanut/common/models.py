@@ -571,6 +571,7 @@ class Strand(models.Model):
 	# These should come from the first photo
 	location_city =  models.CharField(max_length=1000, null=True)
 	location_point = models.PointField(null=True, db_index=True)
+	location_accuracy = models.IntegerField(null=True)
 	
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
