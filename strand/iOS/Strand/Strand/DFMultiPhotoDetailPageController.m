@@ -40,6 +40,7 @@
   
   self.dataSource = self;
   self.delegate = self;
+  self.view.backgroundColor = [UIColor whiteColor];
 }
 
 - (DFPhotoDetailViewController *)detailViewControllerForPhotoObject:(DFPeanutFeedObject *)photoObject
