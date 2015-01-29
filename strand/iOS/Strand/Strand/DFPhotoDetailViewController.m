@@ -38,6 +38,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
 @property (nonatomic, retain) DFRemoteImageView *theatreModeImageView;
+@property (nonatomic, retain) UIView *theatreModeBackgroundView;
 
 @end
 
@@ -352,9 +353,16 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)configureTheatreModeView
 {
   if (!self.theatreModeImageView) {
+    // background
+    self.theatreModeBackgroundView = [UIView new];
+    self.theatreModeBackgroundView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:self.theatreModeBackgroundView];
+    [self.theatreModeBackgroundView constrainToSuperviewSize];
+    self.theatreModeBackgroundView.hidden = !_theatreModeEnabled;
+    
+    // image view
     self.theatreModeImageView = [[DFRemoteImageView alloc] initWithFrame:self.view.frame];
     self.theatreModeImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.theatreModeImageView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.theatreModeImageView];
     [self.theatreModeImageView constrainToSuperviewSize];
     [self addGestureRecognizersToImageView:self.theatreModeImageView];
@@ -855,9 +863,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   _theatreModeEnabled = theatreModeEnabled;
   if (theatreModeEnabled && self.theatreModeImageView) {
+    self.theatreModeBackgroundView.hidden = NO;
     self.theatreModeImageView.hidden = NO;
   } else if (self.theatreModeImageView){
     self.theatreModeImageView.hidden = YES;
+    self.theatreModeBackgroundView.hidden = YES;
   }
 }
 

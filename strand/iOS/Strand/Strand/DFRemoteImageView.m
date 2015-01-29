@@ -175,7 +175,7 @@
    completion:^(UIImage *image) {
      if (!CGSizeEqualToSize(requestSize, self.lastRequestedImageSize)) return;
      dispatch_async(dispatch_get_main_queue(), ^{
-       if (!self.image) {
+       if (!self.image && image) {
          self.alpha = 0.0;
          [UIView animateWithDuration:0.2 animations:^{
            self.alpha = 1.0;

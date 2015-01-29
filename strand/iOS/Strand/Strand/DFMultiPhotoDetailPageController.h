@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutFeedObject.h"
 
-@interface DFMultiPhotoDetailPageController : UIPageViewController <UIPageViewControllerDataSource>
+@interface DFMultiPhotoDetailPageController : UIPageViewController <UIPageViewControllerDataSource, UIPageViewControllerDelegate>
 
 @property (nonatomic, retain) NSArray *photos;
 

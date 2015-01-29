@@ -36,9 +36,10 @@
 }
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
+  [super viewDidLoad];
   
   self.dataSource = self;
+  self.delegate = self;
 }
 
 - (DFPhotoDetailViewController *)detailViewControllerForPhotoObject:(DFPeanutFeedObject *)photoObject
@@ -66,7 +67,8 @@
                                theatreModeEnabled:detailViewController.theatreModeEnabled];
 }
 
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+      viewControllerBeforeViewController:(UIViewController *)viewController
 {
   DFPhotoDetailViewController *detailViewController = (DFPhotoDetailViewController *)viewController;
   DFPeanutFeedObject *photoObject = detailViewController.photoObject;
@@ -74,6 +76,19 @@
   if (!beforePhoto) return nil;
   return [self detailViewControllerForPhotoObject:beforePhoto
           theatreModeEnabled:detailViewController.theatreModeEnabled];
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+willTransitionToViewControllers:(NSArray *)pendingViewControllers
+{
+  BOOL theatreModeEnabled = ((DFPhotoDetailViewController*)self.viewControllers.firstObject).theatreModeEnabled;
+  for (DFPhotoDetailViewController *detailPVC in pendingViewControllers) {
+    //sometimes the PVC caches view controllers, so make sure we set the value before it transitions
+    detailPVC.theatreModeEnabled = theatreModeEnabled;
+  }
+  
+  if (theatreModeEnabled) self.view.backgroundColor = [UIColor blackColor];
+  else self.view.backgroundColor = [UIColor whiteColor];
 }
 
 @end
