@@ -190,7 +190,7 @@ def processLocationRecords(locationRecordsToProcess):
 		
 		logger.info("LocationRecord: Created %s and updated %s neighbor rows for user %s" % (len(neighborRowsToCreated), len(neighborRowsToUpdated), userId))
 		
-
+		updatedStrandIds = set()
 		for record in records:
 			timeHigh = record.timestamp - datetime.timedelta(minutes=30)
 
@@ -201,9 +201,11 @@ def processLocationRecords(locationRecordsToProcess):
 					strand.location_accuracy = record.accuracy
 					strand.neighbor_evaluated = False
 					strand.save()
-					processStrandIds.delay([strand.id])
+					updatedStrandIds.add(strand.id)
 					logger.info("LocationRecord: Just updated strand %s's location with accuracy to %s" % (strand.id, record.accuracy))
-
+		if len(updatedStrandIds) > 0:
+			processStrandIds.delay(updatedStrandIds)
+			
 	return len(locationRecordsToProcess)
 	
 
