@@ -581,7 +581,7 @@ static DFPeanutFeedObject *currentPhoto;
 - (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
    didSelectNotificationWithAction:(DFPeanutAction *)peanutAction
 {
-  [self.notificationsPopupController dismissPopoverAnimated:NO];
+  [self.notificationsPopupController dismissPopoverAnimated:YES];
   DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                      photoWithID:peanutAction.photo.longLongValue
                                      shareInstance:peanutAction.share_instance.longLongValue];
