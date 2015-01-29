@@ -440,6 +440,7 @@ static BOOL showFilters = NO;
       if (finished && completion) completion();
     }];
     self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
+    self.navigationItem.title = @"Swap";
   } else if (!hidden && _suggestionsAreaHidden){
     //show the suggestions area
     self.buttonBarHeightConstraint.constant = ExpandedNavBarHeight;
@@ -452,8 +453,10 @@ static BOOL showFilters = NO;
     } completion:^(BOOL finished) {
       if (finished && completion) completion();
     }];
-    self.buttonBar.gradientColors = @[[UIColor whiteColor]
+    self.buttonBar.gradientColors = @[
+                                      [UIColor whiteColor]
                                       ];
+    self.navigationItem.title = nil;
   }
   _suggestionsAreaHidden = hidden;
 }

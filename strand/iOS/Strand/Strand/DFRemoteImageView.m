@@ -9,6 +9,13 @@
 #import "DFRemoteImageView.h"
 #import "DFAnalytics.h"
 
+@interface DFRemoteImageView()
+
+@property (nonatomic) CGSize lastRequestedImageSize;
+
+@end
+
+
 @implementation DFRemoteImageView
 
 - (instancetype)init
@@ -158,13 +165,22 @@
   if (self.contentMode == UIViewContentModeScaleAspectFit)
     contentMode = DFImageRequestContentModeAspectFit;
   
+  CGSize requestSize = self.frame.size;
+  self.lastRequestedImageSize = requestSize;
   [[DFImageManager sharedManager]
    imageForID:photoID
    pointSize:self.frame.size
    contentMode:DFImageRequestContentModeAspectFill
    deliveryMode:deliveryMode
    completion:^(UIImage *image) {
+     if (!CGSizeEqualToSize(requestSize, self.lastRequestedImageSize)) return;
      dispatch_async(dispatch_get_main_queue(), ^{
+       if (!self.image) {
+         self.alpha = 0.0;
+         [UIView animateWithDuration:0.2 animations:^{
+           self.alpha = 1.0;
+         }];
+       }
        self.image = image;
        [self setIsLoading:NO error:image ? NO : YES];
      });
