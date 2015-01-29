@@ -97,13 +97,13 @@ def getPhotoStats(date, length, newUsers):
 
 	# Old users
 	newPhotosUploadedOldUsers = Photo.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).count()
-	newPhotosSharedOldUsers = ShareInstance.objects.exclude(user__in=newUsers).exclude(shared_at_timestamp__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(totalPhotos=Count('user')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
+	newPhotosSharedOldUsers = ShareInstance.objects.exclude(user__in=newUsers).filter(shared_at_timestamp__gt=(date-relativedelta(days=length))).filter(shared_at_timestamp__lt=date).values('user').annotate(totalPhotos=Count('user')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
 	if newPhotosSharedOldUsers == None:
 		newPhotosSharedOldUsers = 0
 
 	# new users
 	newPhotosUploadedNewUsers = Photo.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).count()
-	newPhotosSharedNewUsers = ShareInstance.objects.filter(user__in=newUsers).exclude(shared_at_timestamp__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(totalPhotos=Count('user')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
+	newPhotosSharedNewUsers = ShareInstance.objects.filter(user__in=newUsers).filter(shared_at_timestamp__lt=(date-relativedelta(days=length))).filter(shared_at_timestamp__lt=date).values('user').annotate(totalPhotos=Count('user')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
 	if newPhotosSharedNewUsers == None:
 		newPhotosSharedNewUsers = 0
 
