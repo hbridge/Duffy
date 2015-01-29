@@ -2,10 +2,14 @@ body {
 	font-family: sans-serif;
 }
 .ui-header {
-	font-size: 20px;
-	font-weight: bold;
+	font-size: 18px;
+	font-weight: normal;
 	padding-bottom: 10px;
+	color: black;
+	background-color: #EDEDED;
+	border-bottom: 0px solid gray;
 }
+
 .ui-top-summary {
 	padding: 0px 0px 20px 0px;
 }
@@ -25,7 +29,6 @@ body {
 .center {
 	text-align: center;
 }
-
 .left {
 	text-align: left;
 }

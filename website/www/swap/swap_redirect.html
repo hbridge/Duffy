@@ -24,7 +24,6 @@
 		height: 60px;
 		padding: 0px;
 		border-bottom: 1px solid gray;
-		/*background-color: rgba(242,138,95,1);*/
 	}
 	.ui-top-summary {
 		float: left;
@@ -40,7 +39,7 @@
 		height: 40px;
 		width: 40px;
 		margin: 10px;
-		border: 1px solid #000000;
+		border: 0px solid #000000;
 		border-radius: 6px;
 	}
 	.ui-screenshots {
@@ -62,8 +61,9 @@
 		color: #202020;
 	}
 	.ui-strand-text-beta {
-		font-style: italic;
 		font-size: 16px;
+		font-weight: normal;
+		color: #888888;
 	}
 	.ui-dl {
 		float: left;
@@ -108,7 +108,7 @@
 <div class='ui-content'>
 
 <div class='ui-header'> 
-	<img class='ui-icon' src='/resources/swap_icon.png'> <div class='ui-strand-text'> Swap <span class='ui-strand-text-beta'> (Private Beta) </span> </div>
+	<img class='ui-icon' src='/resources/swap_icon.png'> <div class='ui-strand-text'> Swap Beta </div>
 </div>
 
 <div class="ui-top-summary"> 
@@ -116,12 +116,7 @@
 </div>
 
 <div class='ui-screenshots'>
-	<img class='ui-image' src='/resources/photos_tab.png'>
-</div>
-
-
-<div class='ui-disclaimer'>
-	(PS: We are using Hockey to test the app. Don't be alarmed by additional warnings.)
+	<img class='ui-image' src='/resources/screenshot_photos.jpg'>
 </div>
 
 <div class="ui-footer"> &copy; 2014 Duffy, Inc.</div>
@@ -142,7 +137,7 @@
 		setTimeout(function () {
     		if (new Date().valueOf() - now > 100) return;
     		localytics.tagEvent("DL_Swap_Redirect");
-    		window.location = "http://bit.ly/swap-beta";
+    		window.location = "http://bit.ly/get-swap-app";
 		}, 25);
 		window.location = "duffyswap://open";
 	}

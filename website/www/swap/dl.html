@@ -20,27 +20,42 @@
 		overflow: auto;
 	}
 	.ui-header {
+		position: fixed;
 		overflow: auto;
-		height: 60px;
+		height: 76px;
 		padding: 0px;
-		border-bottom: 1px solid gray;
+		width: 100%;
+		box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
 	}
-	.ui-top-summary {
-		float: left;
-		height: 38px;
-		margin-top: 10px;
-		padding: 0px 25px 0px 25px;
-		text-align: center;
-		font-size: 18px;
-		line-height: 19px;
+	.ui-header-lhs {
+		float:left;
+	}
+	.ui-header-rhs {
+		float:right;
+		margin-right: 10px;
+		margin-top: 25px;
+	}
+	.ui-header-top-text {
+		font-size: 16px;
+		color: #000000;
+		line-height: 20px;
+		padding-top: 19px;
+	}
+	.ui-header-bottom-text {
+		font-size: 14px;
+		color: #4A4A4A;
+		line-height: 17px;
 	}
 	img.ui-icon {
 		float:left;
-		height: 40px;
-		width: 40px;
+		height: 49px;
+		width: 49px;
 		margin: 10px;
-		border: 1px solid #000000;
 		border-radius: 6px;
+	}	
+	.ui-body {
+		margin-top: 89px;
+		overflow: auto;
 	}
 	.ui-screenshots {
 		float:left;
@@ -52,6 +67,30 @@
 		margin-left: auto;
 		height: 290px;
 	}
+	.ui-install-button{
+		background: #50A1FF;
+		font-family: HelveticaNeue;
+		font-size: 16px;
+		color: #FFFFFF;
+		line-height: 19px;
+		border-radius: 12px;
+		border: 0px solid white;
+		padding: 3px 19px;			
+	}
+	.ui-install-button-clicked {
+		background: #979797;
+	}
+	.ui-bottom {
+		float: left;
+		height: 30px;
+		padding: 0px 25px 0px 25px;
+		text-align: center;
+		font-size: 17px;
+		line-height: 20px;
+		margin-bottom:15px;
+	}
+
+/*
 	.ui-strand-text {
 		padding-top: 16px;
 		padding-left: 2px;
@@ -61,8 +100,9 @@
 		color: #202020;
 	}
 	.ui-strand-text-beta {
-		font-style: italic;
 		font-size: 16px;
+		color: #888888;
+		font-weight: normal;
 	}
 	.ui-dl {
 		float: left;
@@ -71,13 +111,12 @@
 		text-align: center;
 	}
 	.ui-dl-text {
-		background: #4A90E2;
-		box-shadow: 0px 4px 0px 0px #A0A0A0;
+		background: #50A1FF;
 		font-size: 20px;
 		color: #FFFFFF;
 		line-height: 24px;
 		border-radius: 15px;
-		border: 1px solid white;
+		border: 0px solid white;
 		padding: 3px 16px;	
 	}
 	.ui-dl-appstore {
@@ -111,53 +150,79 @@
 		text-align: center;
 		float:left;
 	}
+	*/
 	</style>
 </head>
 <body>
 
 <div class='ui-content'>
 
-	<div class='ui-header'> 
+	<div class='ui-header'>
 		<img class='ui-icon' src='/resources/swap_icon.png'> 
-		<div class='ui-strand-text'> Swap <span class='ui-strand-text-beta'> (Private Beta) </span> </div>
+		<div class='ui-header-lhs'>
+			<div class='ui-header-top-text'> Swap Beta </div>
+			<div class='ui-header-bottom-text'> Duffy, Inc. </div>
+		</div>
+		<div class='ui-header-rhs'>
+			<div class='ui-install-button' id='install-text'> Install </div>
+		</div>
 	</div>
 
-	<div class="ui-top-summary" id='top-summary'> 
-		Fastest way to share photos with a group of friends!
+	<div class='ui-body'>
+
+		<div class='ui-screenshots' id='screenshot'>
+			<img class='ui-image' src='/resources/screenshot_photos.jpg'>
+		</div>
+
+		<div class="ui-bottom pre-install"> 
+			A fast and fun way to share photos with friends!
+		</div>
+
+		<div class="ui-bottom post-install hidden"> 
+			Swap is now installing. Please press your iPhone's home button.
+		</div>		
+
+		<div class='ui-dl-appstore hidden'>
+			<img class='ui-appstore' src='/resources/appstore.svg'>
+		</div>
+
 	</div>
 
-
-	<div class='ui-screenshots' id='screenshot'>
-		<img class='ui-image' src='/resources/screenshot_photos.jpg'>
-	</div>
-
-	<div class='ui-dl' id='dl-link'>
-		<span class='ui-dl-text'>Install Swap!</span>
-	</div>
-
-	<div class='ui-disclaimer'>
-		(PS: We are using Hockey to test the app. Don't be alarmed by additional warnings.)
-	</div>
-	<div class='ui-dl-appstore hidden'>
-		<img class='ui-appstore' src='/resources/appstore.svg'>
-	</div>
-	<div class="ui-footer" id='footer'> &copy; 2014 Duffy, Inc.</div>
-	</div>
 </div>
+
 </body>
 <script>
 	function dlClicked(){
 		if (detectiPhone()) {
+			window.location.href = 'itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F1000%3F';			
+			$('#install-text').empty();
+			$('#install-text').append("Installing...");
+			$('#install-text').addClass('ui-install-button-clicked');
+			$('div.pre-install').addClass('hidden');
+			$('div.post-install').fadeIn(200);
+			$('img.ui-image').fadeOut(200, function() {
+				$('img.ui-image').attr('src','/resources/screenshot_installing.png');
+			}).fadeIn(200);
 			localytics.tagEvent("DL_Swap");
-			window.location.href ='/swap/postdl.html';
 		}
 		else {
-			$('#dl-link').empty();
-			$('#dl-link').removeClass('ui-dl');
-			$('#dl-link').addClass('ui-text');
-			$('#dl-link').append('Uh oh. You need to be on an iPhone with iOS 7+ to try Swap.');
+			$('#install-text').empty();
+			$('#install-text').append("iPhone required");
 		}
+	}
 
+	function flashHomeButton() {
+    var img = $("img.home_button");
+
+	    doFadeIn();
+
+	    function doFadeIn() {
+	        div.fadeIn("slow", doFadeOut);
+	    }
+
+	    function doFadeOut() {
+	        div.fadeOut("slow", doFadeIn);
+	    }
 	}
 
 	function detectiPhone(){
@@ -178,13 +243,7 @@
 	  	ga('create', 'UA-53853203-1', 'auto');
 	  	ga('send', 'pageview');
 
-		$('div.ui-dl').click(function() {
-			dlClicked();
-		});
-		$('img.ui-appstore').click(function() {
-			dlClicked();
-		});
-		$('div.ui-screenshots').click(function(){
+		$('div.ui-install-button').click(function() {
 			dlClicked();
 		});
 	});
