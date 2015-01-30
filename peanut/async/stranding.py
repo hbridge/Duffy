@@ -124,7 +124,7 @@ def processUserIdsForFriendGPSInfo(userIds):
 	friendSet = set()
 
 	for userId in userIds:
-		fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(userId)
+		fullFriends, forwardFriends, reverseFriends, connIds = friends_util.getFriendsIds(userId)
 		for friend in fullFriends:
 			friendSet.add(friend)
 
