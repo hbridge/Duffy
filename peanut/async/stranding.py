@@ -120,6 +120,11 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 
 
 def processUserIdsForFriendGPSInfo(userIds):
+
+	totalIn = len(userIds)
+	processedOut = 0
+	startTime = datetime.datetime.utcnow()
+	
 	logger.debug("Asked to get GPS info for friends of %s"%(userIds))
 	friendSet = set()
 
@@ -146,9 +151,14 @@ def processUserIdsForFriendGPSInfo(userIds):
 	friendList = list(friendSet)
 	users = User.objects.filter(id__in=friendList)
 	for user in users:
+		processedOut += 1
 		logger.debug("going to send a Fetch_GPS_ID to user id %s" % (user.id))
 		customPayload = {}
 		notifications_util.sendNotification(user, '', constants.NOTIFICATIONS_FETCH_GPS_ID, customPayload)
+
+	endTime = datetime.datetime.utcnow()
+	msTime = ((endTime-startTime).microseconds / 1000 + (endTime-startTime).seconds * 1000)
+	return (totalIn, processedOut, "%s ms" % msTime)
 
 
 """
