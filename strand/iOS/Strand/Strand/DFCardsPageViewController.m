@@ -331,7 +331,9 @@
    parentViewController:self
    enableOptimisticSend:YES
    uiCompleteHandler:^{
-     [self gotoNextController];
+     dispatch_async(dispatch_get_main_queue(), ^{
+       [self gotoNextController];
+     });
    }
    success:nil
    failure:nil];

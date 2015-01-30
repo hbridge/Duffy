@@ -37,7 +37,8 @@ static NSMutableSet *textedPhoneNumberStrings;
   NSMutableArray *phoneNumbers = [NSMutableArray new];
   for (DFPeanutContact *contact in contacts) {
     [phoneNumbers addObject:contact.phone_number];
-    if (![[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number]) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
+    if (!user || ![user hasAuthedPhone]) {
       requireServerRoundtrip = YES;
       break;
     }
@@ -65,6 +66,9 @@ static NSMutableSet *textedPhoneNumberStrings;
          NSMutableSet *numbersToText = [[NSMutableSet alloc] initWithArray:unAuthedPhoneNumbers];
          [numbersToText minusSet:textedPhoneNumberStrings];
          if (numbersToText.count == 0) {
+           if (requireServerRoundtrip) {
+             [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+           }
            if (uiCompleteHandler) uiCompleteHandler();
            return;
          }
@@ -89,9 +93,8 @@ static NSMutableSet *textedPhoneNumberStrings;
                 else errorString = @"Failed";
                 [SVProgressHUD showErrorWithStatus:errorString];
               }
-              
-              if (uiCompleteHandler) uiCompleteHandler();
             }
+            if (uiCompleteHandler) uiCompleteHandler();
           }];
        });
      } else {
