@@ -176,10 +176,21 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
+  DFOutgoingCardViewController *currentController = pageViewController.viewControllers.firstObject;
+  
+  NSUInteger numShown = self.alreadyShownPhotoIds.count;
+  const NSUInteger UpsellCardFrequency = 5;
+  if (numShown > 0 && numShown % (UpsellCardFrequency - 1) == 0) {
+    UIViewController *nextUpsell = [self nextOutgoingUpsellWithStoredSuggestion:currentController.suggestionFeedObject
+                                                                    storedPhoto:currentController.photoFeedObject];
+    if (nextUpsell) return nextUpsell;
+  }
+  
   DFOutgoingCardViewController *vc = [self nextViewControllerAscending:YES
-                                                    fromViewController:pageViewController.viewControllers.firstObject];
+                                                    fromViewController:currentController];
   if (vc) return vc;
-  return [self nextOutgoingUpsell];
+  return [self nextOutgoingUpsellWithStoredSuggestion:currentController.suggestionFeedObject
+                                          storedPhoto:currentController.photoFeedObject];
 }
 
 
@@ -247,8 +258,8 @@
     DFCardsPageViewController __weak *weakSelf = self;
     
     nextVC.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
-                             NSArray *contacts,
-                             NSString *caption){
+                                NSArray *contacts,
+                                NSString *caption){
       [weakSelf suggestionSelected:suggestion contacts:contacts photo:nextPhotoToShow caption:caption];
     };
     nextVC.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
@@ -259,19 +270,27 @@
   return nil;
 }
 
-- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed
+- (void)pageViewController:(UIPageViewController *)pageViewController
+        didFinishAnimating:(BOOL)finished
+   previousViewControllers:(NSArray *)previousViewControllers
+       transitionCompleted:(BOOL)completed
 {
-  //[self.alreadyShownPhotoIds addObject:@(photo.id)];
+  if (completed) {
+    DFOutgoingCardViewController *ovc = self.viewControllers.firstObject;
+    [self.alreadyShownPhotoIds addObject:@(ovc.photoFeedObject.id)];
+  }
 }
 
-
-- (UIViewController *)nextOutgoingUpsell
+- (UIViewController *)nextOutgoingUpsellWithStoredSuggestion:(DFPeanutFeedObject *)suggestion
+                                                 storedPhoto:(DFPeanutFeedObject *)photo
 {
   DFCardsPageViewController __weak *weakSelf = self;
   if (![[DFBackgroundLocationManager sharedManager] isPermssionGranted]
       && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
     DFUpsellCardViewController *locationUpsellController = [[DFUpsellCardViewController alloc]
                                                             initWithType:DFUpsellCardViewBackgroundLocation];
+    locationUpsellController.suggestionFeedObject = suggestion;
+    locationUpsellController.photoFeedObject = photo;
     locationUpsellController.yesButtonHandler = ^{
       [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
       [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
@@ -300,6 +319,7 @@
     return;
   }
   
+  [self.alreadyShownPhotoIds addObject:@(photo.id)];
   self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];
   
   [DFCreateShareInstanceController
@@ -319,6 +339,7 @@
 - (void)photoSkipped:(DFPeanutFeedObject *)photo
 {
   if (photo)
+    [self.alreadyShownPhotoIds addObject:@(photo.id)];
     [[DFPeanutFeedDataManager sharedManager]
      setHasEvaluatedPhoto:photo.id
      shareInstance:photo.share_instance.longLongValue];

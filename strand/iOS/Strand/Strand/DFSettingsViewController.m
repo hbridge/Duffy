@@ -287,6 +287,7 @@
           handler:^(id object) {
             [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:NO];
             [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:NO];
+            [DFDefaultsStore setLastDate:nil forAction:DFUserActionLocationUpsellProcessed];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [SVProgressHUD showSuccessWithStatus:@"Reset"];
           }

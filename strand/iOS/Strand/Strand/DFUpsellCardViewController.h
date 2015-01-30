@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "DFSwipableButtonView.h"
 #import "DFUpsellContentView.h"
+#import "DFPeanutFeedObject.h"
 
 
 @interface DFUpsellCardViewController : UIViewController <DFSwipableButtonViewDelegate>
@@ -22,6 +23,8 @@ typedef NS_ENUM(NSInteger, DFUpsellCardViewType) {
 @property (nonatomic, retain) DFUpsellContentView *upsellContentView;
 @property (nonatomic, copy) DFVoidBlock yesButtonHandler;
 @property (nonatomic, copy) DFVoidBlock noButtonHandler;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
+@property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
 
 @property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
 
