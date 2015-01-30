@@ -119,20 +119,14 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
 
 
-def threadedPingFriendsForUpdates(userIds):
-	logging.basicConfig(filename='/var/log/duffy/stranding.log',
-						level=logging.DEBUG,
-						format='%(asctime)s %(levelname)s %(message)s')
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	logger = logging.getLogger(__name__)
-
-	# fetch all friends of these users and uniquefy them
-	friends = FriendConnection.objects.filter(Q(user_1_id__in=userIds) | Q(user_2_id__in=userIds))
-
+def processUserIdsForFriendGPSInfo(userIds):
+	logger.debug("Asked to get GPS info for friends of %s"%(userIds))
 	friendSet = set()
-	for friend in friends:
-		friendSet.add(friend.user_1_id)
-		friendSet.add(friend.user_2_id)
+
+	for userId in userIds:
+		fullFriends, forwardFriends, reverseFriends = friends_util.getFriends(userId)
+		for friend in fullFriends:
+			friendSet.add(friend)
 
 	for userId in userIds:
 		if userId in friendSet:
@@ -176,7 +170,7 @@ def processBatch(photosToProcess):
 			userIdList.append(photo.user_id)
 
 	if len(userIdList) > 0:
-		Thread(target=threadedPingFriendsForUpdates, args=(set(userIdList),)).start()
+		processUserIdsForFriendGPSInfoAppTask.delay(userIdList)
 
 	# Group photos by users, then iterate through all users one at a time, fetching the cache as we go
 	photosByUser = dict()
@@ -339,5 +333,9 @@ def processAll():
 @app.task
 def processIds(ids):
 	return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processBatch)
+
+@app.task
+def processUserIdsForFriendGPSInfoAppTask(userIds):
+	return processUserIdsForFriendGPSInfo(userIds)
 
 

@@ -326,6 +326,7 @@ class BASE_CELERY_CONFIG:
         'async.two_fishes.processIds': {'queue': 'independent', 'routing_key': 'independent'},
         'async.stranding.processAll': {'queue': 'stranding', 'routing_key': 'stranding'},
         'async.stranding.processIds': {'queue': 'stranding', 'routing_key': 'stranding'},
+        'async.stranding.processUserIdsForFriendGPSInfoAppTask': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},   
         'async.popcaches.processAll': {'queue': 'popcaches', 'routing_key': 'popcaches'},
         'async.popcaches.processIds': {'queue': 'popcaches', 'routing_key': 'popcaches'},
         'async.popcaches.processFull': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
