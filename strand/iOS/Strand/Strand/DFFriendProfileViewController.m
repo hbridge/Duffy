@@ -53,7 +53,10 @@
   self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
 
-  self.nameLabel.text = [self.peanutUser fullName];
+  NSString *fullName = [self.peanutUser fullName];
+  if (![fullName isNotEmpty]) fullName = self.peanutUser.phone_number;
+  if (!self.peanutUser.hasAuthedPhone) fullName = [fullName stringByAppendingString:@" (invited)"];
+  self.nameLabel.text = fullName;
   [self reloadHeaderData];
   
   // add a fancy background blur if iOS8 +

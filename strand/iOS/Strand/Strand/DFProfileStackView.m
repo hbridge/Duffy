@@ -98,7 +98,7 @@
     fillColors[[self.class idForUser:user]] = color;
     
     //name
-    NSString *abbreviation = @"";
+    NSString *abbreviation = @"?";
     NSString *firstName = [user firstName];
     if (firstName.length > 0) {
       abbreviation = [[firstName
@@ -111,7 +111,7 @@
     if (user.id == [[DFUser currentUser] userID]) {
       firstName = @"You";
     }
-    firstNames[[self.class idForUser:user]] = firstName ? firstName : @"?";
+    firstNames[[self.class idForUser:user]] = [firstName isNotEmpty] ? firstName : user.phone_number;
   }
   
   _fillColorsById = fillColors;
