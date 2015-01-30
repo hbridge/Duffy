@@ -55,19 +55,19 @@ def sendUnactivatedAccountFS():
 	# generate a list of non-authed users
 	nonAuthedUsers = list(User.objects.filter(product_id=2).filter(has_sms_authed=False).filter(added__lt=now-gracePeriodTimedeltaDays)).filter(added_gt=now-intervalTimedeltaDays)
 	
-	print "Non-authed users: %s"% nonAuthedUsers
+	logger.info("Non-authed users: %s"% nonAuthedUsers)
 
 	# generate a list of pinged users (as a dict - because of distinct() clause) in the interval for this notification
 	recentlyPingedUsers = NotificationLog.objects.filter(added__gt=now-intervalTimedeltaDays).filter(msg_type=constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS).filter(user__in=nonAuthedUsers).values('user').distinct()
 
-	print "recentlyPingedUsers %s"% recentlyPingedUsers
+	logger.info("recentlyPingedUsers %s"% recentlyPingedUsers)
 
 	recentUserIds = [entry['user'] for entry in recentlyPingedUsers]
 	
 	# remove those users
 	usersToNotify = [user for user in nonAuthedUsers if not (user.id in recentUserIds)]
 
-	print "usersToNotify %s"% usersToNotify
+	logger.info("usersToNotify %s"% usersToNotify)
 
 	# remove those users who don't have any photos to see in the app
 	shareInstances = ShareInstance.objects.filter(users__in=usersToNotify)
@@ -84,7 +84,7 @@ def sendUnactivatedAccountFS():
 				else:
 					shareInstancesByUserId[user.id] = [si]
 
-	print "usersWithPhotos %s" % usersWithPhotos
+	logger.info("usersWithPhotos %s" % usersWithPhotos)
 
 	msgCount = 0
 	for user in list(usersWithPhotos):
