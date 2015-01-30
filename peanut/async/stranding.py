@@ -162,11 +162,11 @@ def processUserIdsForFriendGPSInfo(userIds):
 
 
 # Look at strands that don't have location data and see if there's any location records which we could fill in for
-def fillInLocationRecordData(userId, strandsToProcess):
+def fillInLocationRecordData(user, strandsToProcess):
 	strandsToProcess = sorted(strandsToProcess, key=lambda x: x.first_photo_time)
 	timeLow = strandsToProcess[0].first_photo_time - datetime.timedelta(minutes=30)
 	timeHigh =  strandsToProcess[-1].last_photo_time + datetime.timedelta(minutes=30)
-	allLocationRecords = LocationRecord.objects.filter(Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh)).filter(user_id=userId)
+	allLocationRecords = LocationRecord.objects.filter(Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh)).filter(user_id=user.id)
 
 	updatedStrands = list()
 	for strand in strandsToProcess:
@@ -342,7 +342,7 @@ def processBatch(photosToProcess):
 			strand.neighbor_evaluated = False
 
 		# This looks at all the Location Records to see if one has a hint for location for a strand
-		fillInLocationRecordData(strandsCreated)
+		fillInLocationRecordData(user, strandsCreated)
 		
 		Strand.bulkUpdate(strandsCreated, ['neighbor_evaluated', 'location_point'])
 
