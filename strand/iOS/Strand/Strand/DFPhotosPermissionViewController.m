@@ -50,6 +50,7 @@
 }
 
 - (void)buttonPressed:(id)sender {
+  self.button.enabled = NO;
   ALAuthorizationStatus status = [ALAssetsLibrary authorizationStatus];
   if (status == ALAuthorizationStatusAuthorized) {
     [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyGranted"];

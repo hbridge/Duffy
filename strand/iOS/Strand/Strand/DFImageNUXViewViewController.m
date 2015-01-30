@@ -75,6 +75,7 @@
 }
 
 - (IBAction)buttonPressed:(id)sender {
+  self.button.enabled = NO;
   [self completedWithUserInfo:nil];
 }
 
