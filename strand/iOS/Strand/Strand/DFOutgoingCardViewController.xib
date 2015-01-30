@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFOutgoingCardViewController">
             <connections>
+                <outlet property="cardBottomConstraint" destination="063-gO-REY" id="RzI-bB-iHW"/>
                 <outlet property="cardView" destination="wM8-qn-rxH" id="oTf-RE-Pc8"/>
                 <outlet property="noButton" destination="tyk-9A-zHn" id="4mB-8Y-Fpd"/>
                 <outlet property="suggestionContentView" destination="1S3-KY-HEu" id="Mbp-2s-4YT"/>
@@ -77,8 +78,9 @@
             </subviews>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="bottom" secondItem="wM8-qn-rxH" secondAttribute="bottom" priority="997" constant="10" id="063-gO-REY"/>
                 <constraint firstItem="wM8-qn-rxH" firstAttribute="top" secondItem="AUp-5O-Ctk" secondAttribute="top" constant="40" id="1HX-DC-Z3T"/>
-                <constraint firstItem="wff-mU-r3l" firstAttribute="top" secondItem="wM8-qn-rxH" secondAttribute="bottom" constant="20" id="FPk-8o-4Em"/>
+                <constraint firstItem="wff-mU-r3l" firstAttribute="top" secondItem="wM8-qn-rxH" secondAttribute="bottom" priority="998" constant="20" id="FPk-8o-4Em"/>
                 <constraint firstItem="wM8-qn-rxH" firstAttribute="leading" secondItem="AUp-5O-Ctk" secondAttribute="leading" constant="10" id="I0g-lm-HNU"/>
                 <constraint firstAttribute="centerX" secondItem="wff-mU-r3l" secondAttribute="centerX" id="WEF-l4-Uch"/>
                 <constraint firstAttribute="bottom" secondItem="wff-mU-r3l" secondAttribute="bottom" constant="60" id="ZFS-3p-Ldd"/>

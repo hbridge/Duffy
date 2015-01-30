@@ -268,6 +268,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 - (void)keyboardWillShow:(NSNotification *)notification {
   self.yesButton.hidden = YES;
   self.noButton.hidden = YES;
+  self.cardBottomConstraint.priority = 999;
   [self updateFrameFromKeyboardNotif:notification otherAnimationsBlock:^{
     [self.suggestionContentView setNeedsLayout];
   }];
@@ -276,6 +277,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 - (void)keyboardWillHide:(NSNotification *)notification {
   self.yesButton.hidden = NO;
   self.noButton.hidden = NO;
+  self.cardBottomConstraint.priority = 997;
   [self updateFrameFromKeyboardNotif:notification otherAnimationsBlock:^{
     [self.suggestionContentView setNeedsLayout];
   }];
