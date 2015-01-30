@@ -361,13 +361,15 @@ static BOOL showFilters = NO;
     [self setNavAreaForSuggestedPhoto:firstPhotoToSend];
     DFHomeViewController __weak *weakSelf = self;
     [self setSuggestionsAreaHidden:NO animated:YES completion:^{
-      if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-        [weakSelf.outgoingPopLabel
-         popAtView:weakSelf.sendButton
-         animatePopLabel:YES
-         animateTargetView:NO];
-      }
-      [weakSelf.cameraRollNuxPopLabel dismiss];
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+          [weakSelf.outgoingPopLabel
+           popAtView:weakSelf.sendButton
+           animatePopLabel:YES
+           animateTargetView:NO];
+        }
+        [weakSelf.cameraRollNuxPopLabel dismiss];
+      });
     }];
   } else {
     [self setSuggestionsAreaHidden:YES animated:YES completion:nil];
