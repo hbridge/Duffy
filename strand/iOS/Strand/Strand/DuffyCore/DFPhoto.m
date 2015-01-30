@@ -15,7 +15,6 @@
 #import "DFAnalytics.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "ALAsset+DFExtensions.h"
-#import "DFStrandPhotoAsset.h"
 
 @implementation DFPhoto
 
@@ -33,7 +32,7 @@
 @dynamic sourceString;
 
 // Create a new DFPhoto in a context
-+ (DFPhoto *)createWithAsset:(DFPhotoAsset *)asset
++ (DFPhoto *)createWithAsset:(DFPhotoAsset<DFPhotoAsset> *)asset
                       userID:(DFUserIDType)userID
                savedFromSwap:(BOOL)savedFromSwap
                    inContext:(NSManagedObjectContext *)context

@@ -11,7 +11,7 @@
 #import "DFPhotoAsset.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 
-@interface DFCameraRollPhotoAsset : DFPhotoAsset
+@interface DFCameraRollPhotoAsset : DFPhotoAsset <DFPhotoAsset>
 
 @property (nonatomic, retain) NSString * alAssetURLString;
 

@@ -464,8 +464,7 @@ static DFUploadController *defaultUploadController;
 {
   NSError *error = nil;
   if(![self.managedObjectContext save:&error]) {
-    DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
-    [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
+    DDLogError(@"%@ saving progress error %@, %@", self.class, error, [error userInfo]);
   }
 }
 

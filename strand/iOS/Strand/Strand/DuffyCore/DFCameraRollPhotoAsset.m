@@ -201,16 +201,9 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 - (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  if (self.asset) {
-    @autoreleasepool {
-      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
-      UIImage *image = [resizer aspectImageWithMaxPixelSize:2048];
-      successBlock(image);
-    }
-  } else {
-    failureBlock([NSError errorWithDomain:@"" code:-1
-                                 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
-  }
+  [self loadImageResizedToLength:2048.0
+                         success:successBlock
+                         failure:failureBlock];
 }
 
 - (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
@@ -228,7 +221,21 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   }
 }
 
-
+- (void)loadImageResizedToLength:(CGFloat)length
+                         success:(DFPhotoAssetLoadSuccessBlock)success
+                         failure:(DFPhotoAssetLoadFailureBlock)failure
+{
+  if (self.asset) {
+    @autoreleasepool {
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
+      UIImage *image = [resizer aspectImageWithMaxPixelSize:length];
+      success(image);
+    }
+  } else {
+    failure([NSError errorWithDomain:@"" code:-1
+                            userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
+  }
+}
 
 #pragma mark - JPEGData Access
 

@@ -54,7 +54,6 @@
 		5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */; };
 		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
 		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
-		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
 		5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344C196340A0003D7546 /* DFPhotoResizer.m */; };
 		5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A40344E19646BC6003D7546 /* AudioToolbox.framework */; };
 		5A4307231A6F03DE0089C790 /* DFCreateShareInstanceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4307221A6F03DE0089C790 /* DFCreateShareInstanceController.m */; };
@@ -392,8 +391,6 @@
 		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
 		5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFCameraRollPhotoAsset.m; path = DuffyCore/DFCameraRollPhotoAsset.m; sourceTree = "<group>"; };
 		5A40344119609163003D7546 /* DFPhotoAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoAsset.m; path = DuffyCore/DFPhotoAsset.m; sourceTree = "<group>"; };
-		5A4034481961F721003D7546 /* DFStrandPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandPhotoAsset.h; sourceTree = "<group>"; };
-		5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandPhotoAsset.m; sourceTree = "<group>"; };
 		5A40344B196340A0003D7546 /* DFPhotoResizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoResizer.h; sourceTree = "<group>"; };
 		5A40344C196340A0003D7546 /* DFPhotoResizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoResizer.m; sourceTree = "<group>"; };
 		5A40344E19646BC6003D7546 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -999,8 +996,6 @@
 				5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */,
 				5AC4A8E11947C30800862D9C /* ALAsset+DFExtensions.h */,
 				5AC4A8E21947C30800862D9C /* ALAsset+DFExtensions.m */,
-				5A4034481961F721003D7546 /* DFStrandPhotoAsset.h */,
-				5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */,
 			);
 			name = PhotoAsset;
 			sourceTree = "<group>";
@@ -2226,7 +2221,6 @@
 				65E2414E1A364EA90044F1CB /* DFCardViewController.m in Sources */,
 				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFCreateAccountViewController.m in Sources */,
-				5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */,
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,
 				5A4307291A71B6C70089C790 /* DFPeoplePickerSecondaryAction.m in Sources */,
 				5AEFA25A19D607150027BC5E /* DFStrandGallerySectionHeaderView.m in Sources */,

@@ -12,7 +12,6 @@
 #import "DFPhoto.h"
 #import "DFNotificationSharedConstants.h"
 #import "UIImage+DFHelpers.h"
-#import "DFStrandPhotoAsset.h"
 #import "DFCameraRollPhotoAsset.h"
 #import "DFSettings.h"
 #import "DFUploadController.h"

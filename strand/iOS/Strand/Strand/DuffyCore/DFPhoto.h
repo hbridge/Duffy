@@ -16,7 +16,7 @@
 // stored properties
 @property (nonatomic) DFUserIDType userID;
 @property (nonatomic) DFPhotoIDType photoID;
-@property (nonatomic, retain) DFPhotoAsset *asset;
+@property (nonatomic, retain) DFPhotoAsset<DFPhotoAsset> *asset;
 
 @property (nonatomic, retain) NSNumber *faceDetectPass;
 @property (nonatomic, retain) NSNumber *faceDetectPassUploaded;

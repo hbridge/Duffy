@@ -11,7 +11,7 @@
 
 @class PHAsset;
 
-@interface DFPHAsset : DFPhotoAsset
+@interface DFPHAsset : DFPhotoAsset <DFPhotoAsset>
 
 @property (nonatomic, retain) NSString * localIdentifier;
 @property (nonatomic, retain) PHAsset *asset;
