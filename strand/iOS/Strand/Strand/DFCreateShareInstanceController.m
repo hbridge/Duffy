@@ -13,7 +13,14 @@
 #import "DFPeanutShareInstance.h"
 #import "DFSMSInviteStrandComposeViewController.h"
 
+static NSMutableSet *textedPhoneNumberStrings;
+
 @implementation DFCreateShareInstanceController
+
++ (void)initialize
+{
+  textedPhoneNumberStrings = [[NSMutableSet alloc] init];
+}
 
 + (void)createShareInstanceWithPhotos:(NSArray *)photos
                        fromSuggestion:(DFPeanutFeedObject *)suggestion
@@ -54,9 +61,17 @@
      // send SMS if there were any users created as part of creating the share instance
      if (unAuthedPhoneNumbers.count > 0) {
        dispatch_async(dispatch_get_main_queue(), ^{
+         // make sure we haven't texted the numbers yet this session
+         NSMutableSet *numbersToText = [[NSMutableSet alloc] initWithArray:unAuthedPhoneNumbers];
+         [numbersToText minusSet:textedPhoneNumberStrings];
+         if (numbersToText.count == 0) {
+           if (uiCompleteHandler) uiCompleteHandler();
+           return;
+         }
+         
          [DFSMSInviteStrandComposeViewController
           showWithParentViewController:parentViewController
-          phoneNumbers:unAuthedPhoneNumbers
+          phoneNumbers:numbersToText.allObjects
           fromDate:((DFPeanutFeedObject *)photos.firstObject).time_taken
           completionBlock:^(MessageComposeResult result) {
             if (success) success();
@@ -64,6 +79,10 @@
             if (requireServerRoundtrip) {
               if (result == MessageComposeResultSent) {
                 [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                  // keep track of the fact that these numbers have been sent to
+                  [textedPhoneNumberStrings unionSet:numbersToText];
+                });
               } else {
                 NSString *errorString;
                 if (result == MessageComposeResultCancelled) errorString = @"Invite Text Cancelled";
