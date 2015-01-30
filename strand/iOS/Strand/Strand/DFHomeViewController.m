@@ -235,7 +235,7 @@ static BOOL showFilters = NO;
 
 - (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
 {
-  self.collectionView.contentOffset = CGPointMake(0, CollapsedNavBarHeight);
+  
 }
 
 - (void)viewWillAppear:(BOOL)animated
