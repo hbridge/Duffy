@@ -13,7 +13,6 @@
 #import "DFPushNotificationsManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNoTableItemsView.h"
-#import "DFIncomingCardViewController.h"
 #import "DFSettingsViewController.h"
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"

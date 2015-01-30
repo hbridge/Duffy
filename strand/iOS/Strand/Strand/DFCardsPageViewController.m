@@ -8,7 +8,6 @@
 
 #import "DFCardsPageViewController.h"
 #import "DFOutgoingCardViewController.h"
-#import "DFIncomingCardViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNavigationController.h"
 #import "DFPeanutStrandInviteAdapter.h"
@@ -24,6 +23,7 @@
 #import "DFBackgroundLocationManager.h"
 #import "DFPeanutShareInstance.h"
 #import "DFCreateShareInstanceController.h"
+#import "DFPhotoDetailViewController.h"
 
 @interface DFCardsPageViewController ()
 
