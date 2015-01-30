@@ -7,18 +7,15 @@
 //
 
 #import "DFSuggestionViewController.h"
-#import "DFSwipableButtonView.h"
 #import "DFRecipientPickerViewController.h"
 #import "DFOutgoingCardContentView.h"
 
-@interface DFOutgoingCardViewController : DFCardViewController <DFSwipableButtonViewDelegate, DFPeoplePickerDelegate, DFProfileStackViewDelegate>
+@interface DFOutgoingCardViewController : DFCardViewController <DFPeoplePickerDelegate, DFProfileStackViewDelegate>
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts, NSString *caption);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 
-
-@property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
-@property (nonatomic, strong) DFOutgoingCardContentView *suggestionContentView;
+@property (nonatomic, strong) IBOutlet DFOutgoingCardContentView *suggestionContentView;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
@@ -26,6 +23,9 @@ typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 
 @property (nonatomic, copy) DFSuggestionYesHandler yesButtonHandler;
 @property (nonatomic, copy) DFSuggestionNoHandler noButtonHandler;
+@property (weak, nonatomic) IBOutlet UIButton *noButton;
+@property (weak, nonatomic) IBOutlet UIButton *yesButton;
+@property (weak, nonatomic) IBOutlet UIView *cardView;
 
 - (instancetype)initWithNuxStep:(NSUInteger)step;
 

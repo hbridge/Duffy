@@ -52,7 +52,9 @@
   return [self initWithPreferredType:preferredType photoID:0 shareInstance:0];
 }
 
-- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType photoID:(DFPhotoIDType)photoID shareInstance:(DFShareInstanceIDType)shareID
+- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
+                              photoID:(DFPhotoIDType)photoID
+                        shareInstance:(DFShareInstanceIDType)shareID
 {
   self = [self init];
   if (self) {
@@ -67,9 +69,10 @@
 - (instancetype)init
 {
   self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
-                  navigationOrientation:UIPageViewControllerNavigationOrientationVertical
+                  navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
                                 options:nil];
   if (self) {
+    self.dataSource = self;
     self.delegate = self;
     [self observeNotifications];
     [self configureNavAndTab];
@@ -153,63 +156,114 @@
 
 - (void)gotoNextController
 {
-  UIViewController *nextController = [self nextOutgoingViewController];
-  
-  if (!nextController) {
-    [self dismissViewControllerAnimated:YES completion:^(){}];
-    return;
-  } 
-  
-  [self setViewControllers:@[nextController]
-                 direction:UIPageViewControllerNavigationDirectionForward
-                  animated:YES
-                completion:nil];
+  UIViewController *nextController;
+  nextController = [self pageViewController:self
+                            viewControllerAfterViewController:self.viewControllers.firstObject];
+  if (!nextController) nextController = [self pageViewController:self
+                              viewControllerBeforeViewController:self.viewControllers.firstObject];
+  if (nextController) {
+    [self setViewControllers:@[nextController]
+                   direction:UIPageViewControllerNavigationDirectionForward
+                    animated:YES
+                  completion:nil];
+  } else {
+    [self dismissViewControllerAnimated:YES completion:nil];
+  }
 }
 
 #pragma mark - Outgoing View Controllers
 
-- (UIViewController *)nextOutgoingViewController
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+       viewControllerAfterViewController:(UIViewController *)viewController
 {
-  NSUInteger numShown = self.alreadyShownPhotoIds.count;
-  const NSUInteger UpsellCardFrequency = 5;
-  if (numShown > 0 && numShown % (UpsellCardFrequency - 1) == 0) {
-    UIViewController *nextUpsell = [self nextOutgoingUpsell];
-    if (nextUpsell) return nextUpsell;
+  DFOutgoingCardViewController *vc = [self nextViewControllerAscending:YES
+                                                    fromViewController:pageViewController.viewControllers.firstObject];
+  if (vc) return vc;
+  return [self nextOutgoingUpsell];
+}
+
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+      viewControllerBeforeViewController:(UIViewController *)viewController
+{
+  DFOutgoingCardViewController *vc = [self nextViewControllerAscending:NO
+                                                    fromViewController:pageViewController.viewControllers.firstObject];
+  if (vc) return vc;
+  return nil;
+}
+
+- (DFOutgoingCardViewController *)nextViewControllerAscending:(BOOL)ascending
+                                         fromViewController:(DFOutgoingCardViewController *)svc
+{
+  // figure out which suggestion/photo we were on
+  DFPeanutFeedObject *suggestion = svc.suggestionFeedObject;
+  NSArray *suggestionPhotos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  DFPeanutFeedObject *photo = svc.photoFeedObject;
+  
+  // figure out the next suggestion/photo to show
+  DFPeanutFeedObject *nextSuggestionToShow;
+  DFPeanutFeedObject *nextPhotoToShow;
+  
+  // if there is a current suggestion and photo, look at the suggestion first
+  if (suggestion && photo) {
+    // see if there are other photos in the current suggestion
+    DFPeanutFeedObject *nextPhotoInSuggestion = [suggestionPhotos
+                                                 objectWithDistance:ascending ? 1 : -1
+                                                 fromObject:photo
+                                                 wrap:NO];
+    if (nextPhotoInSuggestion) {
+      nextPhotoToShow = nextPhotoInSuggestion;
+      nextSuggestionToShow = suggestion;
+    }
+  } else {
+    // otherwise, set the next photo and suggestion to the first
+    NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+    nextSuggestionToShow = [allSuggestions firstObject];
+    nextPhotoToShow = [[nextSuggestionToShow leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   }
   
-  NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-  for (DFPeanutFeedObject *suggestion in allSuggestions) {
-    if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
-      NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-      for (int x=0; x < photos.count; x++) {
-        DFPeanutFeedObject *photo = photos[x];
-        if (![self.alreadyShownPhotoIds containsObject:@(photo.id)] && !photo.evaluated.boolValue) {
-          [self.alreadyShownPhotoIds addObject:@(photo.id)];
-          DFOutgoingCardViewController *svc = [[DFOutgoingCardViewController alloc] init];
-          svc.view.frame = self.view.bounds;
-          
-          [svc configureWithSuggestion:suggestion withPhoto:photo];
-          NSArray *lastSentForStrand = self.sentContactsByStrandID[suggestion.strand_id];
-          if (lastSentForStrand.count > 0) svc.selectedPeanutContacts = lastSentForStrand;
-          DFCardsPageViewController __weak *weakSelf = self;
-
-          svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
-                                   NSArray *contacts,
-                                   NSString *caption){
-            [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo caption:caption];
-          };
-          svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
-            [weakSelf photoSkipped:photo];
-          };
-          return svc;
-        }
-      }
+  // if we haven't picked a next photo to show, look at the next suggestion
+  if (!nextPhotoToShow) {
+    NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+    DFPeanutFeedObject *nextSuggestionInAllSuggestions = [allSuggestions
+                                                          objectWithDistance:ascending ? 1 : -1
+                                                          fromObject:suggestion
+                                                          wrap:NO
+                                                          ];
+    if (nextSuggestionInAllSuggestions) {
+      nextPhotoToShow = [[nextSuggestionInAllSuggestions leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+      nextSuggestionToShow = nextSuggestionInAllSuggestions;
     }
   }
   
-  // we didn't find an outgoing, return an upsell if there's valid one
-  return [self nextOutgoingUpsell];
+  // if we found a next photo and suggestion, return a VC for it
+  if (nextPhotoToShow && nextSuggestionToShow) {
+    DFOutgoingCardViewController *nextVC = [[DFOutgoingCardViewController alloc] init];
+    nextVC.view.frame = self.view.bounds;
+    
+    [nextVC configureWithSuggestion:nextSuggestionToShow withPhoto:nextPhotoToShow];
+    NSArray *lastSentForStrand = self.sentContactsByStrandID[nextSuggestionToShow.strand_id];
+    if (lastSentForStrand.count > 0) nextVC.selectedPeanutContacts = lastSentForStrand;
+    DFCardsPageViewController __weak *weakSelf = self;
+    
+    nextVC.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
+                             NSArray *contacts,
+                             NSString *caption){
+      [weakSelf suggestionSelected:suggestion contacts:contacts photo:nextPhotoToShow caption:caption];
+    };
+    nextVC.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
+      [weakSelf photoSkipped:nextPhotoToShow];
+    };
+    return nextVC;
+  }
+  return nil;
 }
+
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed
+{
+  //[self.alreadyShownPhotoIds addObject:@(photo.id)];
+}
+
 
 - (UIViewController *)nextOutgoingUpsell
 {

@@ -13,7 +13,7 @@
 
 
 
-@interface DFCardsPageViewController : UIPageViewController <UIPageViewControllerDelegate>
+@interface DFCardsPageViewController : UIPageViewController <UIPageViewControllerDataSource, UIPageViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutUserObject *userToFilter;
 @property (nonatomic) DFHomeSubViewType preferredType;

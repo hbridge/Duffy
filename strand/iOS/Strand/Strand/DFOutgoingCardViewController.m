@@ -60,12 +60,8 @@
   if (self.suggestionFeedObject)
     [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
   
-  [self configureSwipableButtonView];
-  
-  if (self.nuxStep > 0) {
-    [self configureNuxStep:self.nuxStep];
-  }
-  
+  [self configureButtons];
+
   [self configurePeopleLabel];
   [self observeNotifications];
 }
@@ -92,31 +88,6 @@
   };
 }
 
-- (void)configureNuxStep:(NSUInteger)nuxStep
-{
-  self.suggestionContentView.addButton.hidden = YES;
-  self.suggestionContentView.profileStackView.maxAbbreviationLength = 2;
-  [self.suggestionContentView.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
-  [self.suggestionContentView.commentTextField removeFromSuperview];
-  
-  UIImage *nuxImage;
-  if (self.nuxStep == 1) {
-    nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxMatchImage"];
-    [self.suggestionContentView.topLabel removeFromSuperview];
-    [self.suggestionContentView.profileStackView removeFromSuperview];
-    [self.swipableButtonView.yesButton setImage:[UIImage imageNamed:@"Assets/Icons/SwipeRightButton"]
-                                       forState:UIControlStateNormal];
-    self.swipableButtonView.noButton.hidden = YES;
-    self.swipableButtonView.noEnabled = NO;
-  } else if (self.nuxStep == 2) {
-    nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
-    self.swipableButtonView.noEnabled = NO;
-  } else {
-    nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
-    self.swipableButtonView.yesEnabled = NO;
-  }
-  self.suggestionContentView.imageView.image = nuxImage;
-}
 
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
 {
@@ -127,25 +98,27 @@
   }
 }
 
-- (void)configureSwipableButtonView
+- (void)configureButtons
 {
-  [self.swipableButtonView configureToUseImage];
-  [self.swipableButtonView configureWithShowsOther:NO];
-  self.swipableButtonView.delegate = self;
-  [self.swipableButtonView.yesButton
+  [self.yesButton
    setImage:[UIImage imageNamed:@"Assets/Icons/SendButtonIcon"]
    forState:UIControlStateNormal];
-  [self.swipableButtonView.yesButton setTitle:@"Send" forState:UIControlStateNormal];
-  [self.swipableButtonView.noButton
-   setImage:[UIImage imageNamed:@"Assets/Icons/SkipButtonIcon"]
+  [self.yesButton setTitle:@"Send" forState:UIControlStateNormal];
+  [self.yesButton addTarget:self
+                    action:@selector(buttonPressed:)
+          forControlEvents:UIControlEventTouchUpInside];
+  [self.noButton
+   setImage:[UIImage imageNamed:@"Assets/Icons/SwipeXButton"]
    forState:UIControlStateNormal];
-  [self.swipableButtonView.noButton setTitle:@"Skip" forState:UIControlStateNormal];
-  
-  [self.swipableButtonView configureToUseView:self.suggestionContentView];
+  [self.noButton setTitle:@"Hide" forState:UIControlStateNormal];
+  [self.noButton addTarget:self
+                    action:@selector(buttonPressed:)
+          forControlEvents:UIControlEventTouchUpInside];
   
   self.sendPopLabel = [MMPopLabel popLabelWithText:@"Tap to Send"];
   self.sendPopLabel.forceArrowDown = YES;
   [self.view addSubview:self.sendPopLabel];
+  
 }
 
 - (void)configurePeopleLabel
@@ -180,38 +153,41 @@
   });
 }
 
-- (void)viewDidDisappear:(BOOL)animated
-{
-  [self.swipableButtonView resetView];
-}
-
-- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView
-        buttonSelected:(UIButton *)button
-                   isSwipe:(BOOL)isSwipe
+- (void)buttonPressed:(id)sender
 {
   NSString *logResult;
-  if (button == self.swipableButtonView.yesButton && self.yesButtonHandler) {
+  if (sender == self.yesButton && self.yesButtonHandler) {
     if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
-      self.yesButtonHandler(self.suggestionFeedObject,
-                            self.selectedPeanutContacts,
-                            self.suggestionContentView.commentTextField.text);
-      [DFDefaultsStore incrementCountForAction:DFUserActionSendSuggestion];
+      [UIView animateWithDuration:0.3 delay:0.2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.view.center = CGPointMake(self.cardView.center.x,
+                                       0 - self.view.frame.size.height / 2.0);
+      } completion:^(BOOL finished) {
+        self.view.hidden = YES;
+        self.yesButtonHandler(self.suggestionFeedObject,
+                              self.selectedPeanutContacts,
+                              self.suggestionContentView.commentTextField.text);
+        [DFDefaultsStore incrementCountForAction:DFUserActionSendSuggestion];
+      }];
     } else {
       [self.suggestionContentView showAddPeoplePopup];
-      [self.swipableButtonView resetView];
     }
+    
     logResult = @"send";
   }
-  else if (button == self.swipableButtonView.noButton && self.noButtonHandler) {
-    self.noButtonHandler(self.suggestionFeedObject);
+  else if (sender == self.noButton && self.noButtonHandler) {
+    [UIView animateWithDuration:0.3 delay:0.2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+      self.view.alpha = 0.0;
+    } completion:^(BOOL finished) {
+      self.view.hidden = YES;
+      self.noButtonHandler(self.suggestionFeedObject);
+    }];
+    
     logResult = @"skip";
   }
   
-  
   [DFAnalytics logOutgoingCardProcessedWithSuggestion:self.suggestionFeedObject
                                                result:logResult
-                                           actionType:isSwipe ? DFAnalyticsActionTypeSwipe : DFAnalyticsActionTypeTap];
-  
+                                           actionType:DFAnalyticsActionTypeTap];
 }
 
 - (IBAction)addPersonButtonPressed:(UIButton *)sender {
@@ -246,7 +222,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     [self.addPersonPopoverController dismissPopoverAnimated:YES];
   }
   if ([DFDefaultsStore actionCountForAction:DFUserActionSendSuggestion] == 0) {
-    [self.sendPopLabel popAtView:self.swipableButtonView.yesButton
+    [self.sendPopLabel popAtView:self.yesButton
                  animatePopLabel:YES
                animateTargetView:NO];
   }
@@ -290,23 +266,21 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
-  [self.swipableButtonView setButtonsHidden:YES];
+  self.yesButton.hidden = YES;
+  self.noButton.hidden = YES;
   [self updateFrameFromKeyboardNotif:notification otherAnimationsBlock:^{
-    [self.swipableButtonView setNeedsLayout];
+    [self.suggestionContentView setNeedsLayout];
   }];
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
-  [self.swipableButtonView setButtonsHidden:NO];
+  self.yesButton.hidden = NO;
+  self.noButton.hidden = NO;
   [self updateFrameFromKeyboardNotif:notification otherAnimationsBlock:^{
-    [self.swipableButtonView setNeedsLayout];
+    [self.suggestionContentView setNeedsLayout];
   }];
 }
 
-- (void)swipableButtonView:(DFSwipableButtonView *)swipableButtonView didBeginPan:(UIPanGestureRecognizer *)panGesture translation:(CGPoint)translation
-{
-  [self.suggestionContentView.commentTextField resignFirstResponder];
-}
 
 - (void)profileStackView:(DFProfileStackView *)profileStackView peanutUserTapped:(DFPeanutUserObject *)peanutUser
 {
