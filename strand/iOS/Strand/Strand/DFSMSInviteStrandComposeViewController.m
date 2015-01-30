@@ -156,6 +156,7 @@ inParentViewController:(UIViewController *)parentViewController
 {
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:controller.presentingViewController];
+  DDLogInfo(@"%@ didFinishWithResult: %@", self.class, @(result));
   if (self.completionBlock) self.completionBlock(result);
   if (self.presentingViewController) {
     [self dismissViewControllerAnimated:YES completion:nil];
