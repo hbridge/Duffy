@@ -110,7 +110,7 @@
   [self.noButton
    setImage:[UIImage imageNamed:@"Assets/Icons/SwipeXButton"]
    forState:UIControlStateNormal];
-  [self.noButton setTitle:@"Hide" forState:UIControlStateNormal];
+  [self.noButton setTitle:@"Skip" forState:UIControlStateNormal];
   [self.noButton addTarget:self
                     action:@selector(buttonPressed:)
           forControlEvents:UIControlEventTouchUpInside];
