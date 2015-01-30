@@ -14,4 +14,9 @@ then
 	/home/ubuntu/env/bin/python manage.py celeryd_multi start independent stranding popcaches ordered_low -B --logfile=/mnt/log/celery-%N.log --pidfile=/mnt/run/celery-%N.pid -c 1 -c:independent 10 -Q:independent independent -Q:stranding stranding -Q:popcaches popcaches -Q:ordered_low ordered_low
 else
 	/home/ubuntu/env/bin/python manage.py celeryd_multi stop independent stranding popcaches ordered_low -B --logfile=/mnt/log/celery-%N.log --pidfile=/mnt/run/celery-%N.pid
-fi	
+fi
+
+if [ "$1" == "killall" ]
+then
+	ps auxww | grep "celery worker" | awk '{print $2}' | xargs sudo kill -9
+fi

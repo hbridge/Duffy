@@ -104,7 +104,7 @@ def processBatch(strandsToProcess):
 			responseObjects = json.loads(apiCache.private_strands_data)['objects']
 
 			for responseObject in responseObjects:
-				responseObjectsById[responseObject['id']] = responseObject
+				responseObjectsById[int(responseObject['id'])] = responseObject
 
 		strandsProcessed = list()
 		strandsToDelete = list()

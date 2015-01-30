@@ -219,6 +219,7 @@ class PhotoBulkAPI(BasePhotoAPI):
         for strand in privateStrands:
             strand.cache_dirty = True
         Strand.bulkUpdate(privateStrands, ['cache_dirty'])
+
         if len(privateStrands) > 0:
             popcaches.processIds.delay(Strand.getIds(privateStrands))
 
@@ -260,7 +261,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             for photo in photosToUpdate:
                 if photo.id in dataByPhotoId:
                     if "install_num" in dataByPhotoId[photo.id]:
-                        photo.install_num = dataByPhotoId[photo.id]["install_num"]
+                        photo.install_num = int(dataByPhotoId[photo.id]["install_num"])
                     if "iphone_faceboxes_topleft" in dataByPhotoId[photo.id]:
                         photo.iphone_faceboxes_topleft = dataByPhotoId[photo.id]["iphone_faceboxes_topleft"]
                 else:
@@ -271,7 +272,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 
             photosDeleted = list()
             for photo in photosToUpdate:
-                if photo.install_num == -1:
+                if int(photo.install_num) == -1:
                     photosDeleted.append(photo)
 
             self.updateStrandCacheStateForPhotos(user, photosDeleted)
