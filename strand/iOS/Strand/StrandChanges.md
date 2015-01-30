@@ -1,5 +1,9 @@
 # Swap v2
 
+## Jan 30th, 2015 (4840)
+
+- No more swipe left to skip, right to send, you can now swipe between suggestions instead of having to evaluate them one at a time.
+
 ## Jan 29th, 2015 (4838-4839)
 
 - New new user experience
