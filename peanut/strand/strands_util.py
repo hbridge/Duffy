@@ -80,6 +80,11 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId, strandPho
 			strand.location_point = photo.location_point
 			strand.location_city = photo.location_city
 		strand.save()
+
+	if not strand.location_point and photo.location_point:
+		strand.location_point = photo.location_point
+		strand.location_city = photo.location_city	
+		strand.save()
 	
 	# Add photo to strand
 	#   Don't add in if there's a dup in it already though

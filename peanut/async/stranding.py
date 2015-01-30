@@ -161,6 +161,38 @@ def processUserIdsForFriendGPSInfo(userIds):
 	return (totalIn, processedOut, "%s ms" % msTime)
 
 
+# Look at strands that don't have location data and see if there's any location records which we could fill in for
+def fillInLocationRecordData(userId, strandsToProcess):
+	strandsToProcess = sorted(strandsToProcess, key=lambda x: x.first_photo_time)
+	timeLow = strandsToProcess[0].first_photo_time - datetime.timedelta(minutes=30)
+	timeHigh =  strandsToProcess[-1].last_photo_time + datetime.timedelta(minutes=30)
+	allLocationRecords = LocationRecord.objects.filter(Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh)).filter(user_id=userId)
+
+	updatedStrands = list()
+	for strand in strandsToProcess:
+		if strand.location_point:
+			continue
+
+		timeLow = strand.first_photo_time - datetime.timedelta(minutes=30)
+		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=30)
+
+		bestLocationRecord = None
+		for locationRecord in allLocationRecords:
+			if locationRecord.timestamp > timeLow and locationRecord.timestamp < timeHigh:
+				if not bestLocationRecord:
+					bestLocationRecord = locationRecord
+				elif locationRecord.accuracy < bestLocationRecord.accuracy:
+					bestLocationRecord = locationRecord
+		if bestLocationRecord:
+			logger.debug("Found location record %s with accuracy %s for strand %s" % (bestLocationRecord.id, bestLocationRecord.accuracy, strand.id))
+
+			strand.location_point = bestLocationRecord.point
+			updatedStrands.append(strand)
+
+	# Don't need to do neighboring code here 
+	logger.debug("Filled in location for %s strands" % (len(updatedStrands)))
+	return len(updatedStrands)
+
 """
 	 Put all new photos into private strands.  Keep track of new private Strands
 """
@@ -308,7 +340,11 @@ def processBatch(photosToProcess):
 		# Note: now that we're doing async, this could go above if that is needed
 		for strand in strandsCreated:
 			strand.neighbor_evaluated = False
-		Strand.bulkUpdate(strandsCreated, ['neighbor_evaluated'])
+
+		# This looks at all the Location Records to see if one has a hint for location for a strand
+		fillInLocationRecordData(strandsCreated)
+		
+		Strand.bulkUpdate(strandsCreated, ['neighbor_evaluated', 'location_point'])
 
 		logger.debug("Created %s new strands and updated %s" % (len(strandsCreated), len(strandsAddedTo)))
 		total += len(strandsCreated)
