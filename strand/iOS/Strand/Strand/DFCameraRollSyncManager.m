@@ -95,7 +95,6 @@ static DFCameraRollSyncManager *defaultSyncController;
 
 - (void)facesSyncWithDetect:(BOOL)withDetect
 {
-  #ifdef DEBUG
   DFFaceDetectionSyncOperation *operation = [DFFaceDetectionSyncOperation new];
   operation.queuePriority = NSOperationQueuePriorityVeryLow;
   if ([operation respondsToSelector:@selector(qualityOfService)]) {
@@ -107,7 +106,6 @@ static DFCameraRollSyncManager *defaultSyncController;
   if (!withDetect)
     operation.uploadOnly = YES;
   [self.syncOperationQueue addOperation:operation];
-  #endif
 }
 
 - (void)sync
