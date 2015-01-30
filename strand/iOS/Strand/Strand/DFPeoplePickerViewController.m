@@ -184,6 +184,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   insets.bottom = self.doneButtonWrapper.frame.size.height;
   self.tableView.contentInset = insets;
   
+  self.tableView.sectionHeaderHeight = 30.0;
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
   [self.tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
        forCellReuseIdentifier:@"nonUser"];
@@ -392,11 +393,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   return [[self sectionForIndex:sectionIndex inTableView:tableView] title];
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-  return 30.0;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
 {
   DFSection *section = [self sectionForIndex:sectionIndex inTableView:tableView];
@@ -594,13 +590,19 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 {
   if ([self.notSelectableContacts containsObject:contact]) return;
   if (self.allowsMultipleSelection) {
+    CGFloat yOffset;
     if (self.selectedContacts.count > 0) {
       self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+      yOffset = DFPersonSelectionTableViewCellHeight;
     } else {
       self.selectedContacts = @[contact];
+      yOffset = DFPersonSelectionTableViewCellHeight +
+      self.tableView.sectionHeaderHeight +
+      self.tableView.sectionFooterHeight
+      + 8; // not sure why the 8 is necessary
     }
     self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
-                                               self.tableView.contentOffset.y + DFPersonSelectionTableViewCellHeight);
+                                               self.tableView.contentOffset.y + yOffset);
   }
   else
     [self.delegate pickerController:self didFinishWithPickedContacts:@[contact]];
@@ -629,8 +631,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
   }
   if (self.allowsMultipleSelection) {
+    CGFloat yOffset = DFPersonSelectionTableViewCellHeight;
+    if (self.selectedContacts.count == 0)
+      yOffset += (self.tableView.sectionHeaderHeight + self.tableView.sectionFooterHeight + 8);
     self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
-                                               self.tableView.contentOffset.y - DFPersonSelectionTableViewCellHeight);
+                                               self.tableView.contentOffset.y - yOffset);
   }
 
   
