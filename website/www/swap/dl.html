@@ -60,12 +60,20 @@
 	.ui-screenshots {
 		float:left;
 		width:100%;
+		position:relative;
 	}
 	img.ui-image {
 		display:block;
 		margin-right: auto;
 		margin-left: auto;
 		height: 290px;
+	}
+	img.ui-home-button {
+		position: absolute;
+		top: 239px;
+		left: 146px;
+		height: 25px;
+		width: 25px;
 	}
 	.ui-install-button{
 		background: #50A1FF;
@@ -172,6 +180,7 @@
 
 		<div class='ui-screenshots' id='screenshot'>
 			<img class='ui-image' src='/resources/screenshot_photos.jpg'>
+			<img class='ui-home-button hidden' src='/resources/flashing_oval.png'>
 		</div>
 
 		<div class="ui-bottom pre-install"> 
@@ -203,6 +212,7 @@
 			$('img.ui-image').fadeOut(200, function() {
 				$('img.ui-image').attr('src','/resources/screenshot_installing.png');
 			}).fadeIn(200);
+			window.setTimeout(flashHomeButton, 5000);
 			localytics.tagEvent("DL_Swap");
 		}
 		else {
@@ -212,16 +222,16 @@
 	}
 
 	function flashHomeButton() {
-    var img = $("img.home_button");
+    var img = $("img.ui-home-button");
 
 	    doFadeIn();
 
 	    function doFadeIn() {
-	        div.fadeIn("slow", doFadeOut);
+	        img.fadeIn("slow", doFadeOut);
 	    }
 
 	    function doFadeOut() {
-	        div.fadeOut("slow", doFadeIn);
+	        img.fadeOut("slow", doFadeIn);
 	    }
 	}
 
