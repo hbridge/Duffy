@@ -284,6 +284,7 @@
 - (UIViewController *)nextOutgoingUpsellWithStoredSuggestion:(DFPeanutFeedObject *)suggestion
                                                  storedPhoto:(DFPeanutFeedObject *)photo
 {
+  return nil;
   DFCardsPageViewController __weak *weakSelf = self;
   if (![[DFBackgroundLocationManager sharedManager] isPermssionGranted]
       && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
