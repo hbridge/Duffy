@@ -31,6 +31,7 @@
 #import "DFColorPreviewController.h"
 #import "DFDefaultsStore.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFAlertController.h"
 
 @interface DFSettingsViewController ()
 
@@ -296,7 +297,20 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            [DFSettings showPermissionDeniedAlert];
+            DFAlertController *ac = [DFAlertController alertControllerWithTitle:@"Test"
+                                                                        message:@"Test message"
+                                                                 preferredStyle:DFAlertControllerStyleAlert];
+            [ac addAction:[DFAlertAction actionWithTitle:@"OK"
+                                                   style:DFAlertActionStyleDefault
+                                                 handler:^(DFAlertAction *action) {
+                                                   [SVProgressHUD showSuccessWithStatus:@"OK"];
+                                                 }]];
+            [ac addAction:[DFAlertAction actionWithTitle:@"Cancel"
+                                                   style:DFAlertActionStyleCancel
+                                                 handler:^(DFAlertAction *action) {
+                                                   
+                                                 }]];
+            [ac showWithParentViewController:self animated:YES completion:nil];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   

@@ -22,7 +22,7 @@ typedef enum DFAlertActionStyle: NSInteger  {
 
 + (DFAlertAction *)actionWithTitle:(NSString *)title
                              style:(DFAlertActionStyle)style
-                           handler:(void (^)(DFAlertAction *))handler;
+                           handler:(void (^)(DFAlertAction *action))handler;
 - (UIAlertActionStyle)uiAlertActionStyle;
 
 @end

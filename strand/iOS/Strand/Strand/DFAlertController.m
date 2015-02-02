@@ -17,15 +17,18 @@
 
 @end
 
+static DFAlertController *CurrentAlertController = nil;
+
 @implementation DFAlertController
 
 + (DFAlertController *)alertControllerWithTitle:(NSString *)title
                                         message:(NSString *)message
                                  preferredStyle:(DFAlertControllerStyle)preferredStyle
 {
-  return [[DFAlertController alloc] initWithTitle:title
-                                          message:message
-                                   preferredStyle:preferredStyle];
+  CurrentAlertController = [[DFAlertController alloc] initWithTitle:title
+                                                            message:message
+                                                     preferredStyle:preferredStyle];
+  return CurrentAlertController;
 }
 
 
@@ -133,10 +136,10 @@
   return alertView;
 }
 
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
   DFAlertAction *action = self.actions[buttonIndex];
-  action.handler(action);
+  if (action.handler) action.handler(action);
 }
 
 - (NSArray *)titlesForActionsOfStyle:(DFAlertActionStyle)style

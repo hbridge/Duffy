@@ -12,7 +12,7 @@
 
 + (DFAlertAction *)actionWithTitle:(NSString *)title
                              style:(DFAlertActionStyle)style
-                           handler:(void (^)(DFAlertAction *))handler
+                           handler:(void (^)(DFAlertAction *action))handler
 {
   DFAlertAction *action = [[DFAlertAction alloc] init];
   action.title = title;
