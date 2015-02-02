@@ -368,6 +368,10 @@ const NSUInteger CompressedModeMaxRows = 1;
     [self addGestureRecognizersToImageView:self.theatreModeImageView];
     self.theatreModeImageView.userInteractionEnabled = YES;
     self.theatreModeImageView.hidden = !_theatreModeEnabled;
+    
+    // we need to call layoutSubviews here or the system gets cranky on iOS7
+    // because another layout pass is required and this is called from viewDidLayoutSubviews
+    [self.view layoutSubviews];
   }
   [self.theatreModeImageView loadImageWithID:self.photoObject.id
                                 deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
