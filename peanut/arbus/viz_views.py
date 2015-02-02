@@ -40,8 +40,14 @@ def userbaseSummary(request):
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=2).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
-	# Exclude type GPS fetch since it happens so frequently
-	notificationDataRaw = list(NotificationLog.objects.filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(msg_type=constants.NOTIFICATIONS_REFRESH_FEED).exclude(added__lt=(newNow-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added')))
+	# Exclude type GPS fetch and socket refresh feeds since it happens so frequently
+	notificationDataRaw = list(NotificationLog.objects.exclude(
+		result=constants.IOS_NOTIFICATIONS_RESULT_ERROR).exclude(
+		msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(
+		msg_type=constants.NOTIFICATIONS_REFRESH_FEED).exclude(
+		msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED).exclude(
+		added__lt=newNow-timedelta(hours=168)).exclude(
+		user_id__lt=600).values('user', 'msg_type').order_by('user').annotate(totalNotifs=Count('user'), lastSent=Max('added')))
 
 	extras = dict() #store additional information per user
 	for i in range(len(userStats)):
@@ -53,10 +59,26 @@ def userbaseSummary(request):
 
 	notificationCountById = dict()
 	notificationLastById = dict()
+	notificationSuggestionsById = dict()
 
 	for notificationData in notificationDataRaw:
-		notificationCountById[notificationData['user']] = notificationData['totalNotifs']
-		notificationLastById[notificationData['user']] = notificationData['lastSent']	
+		# if haven't seen this user_id, create entry in all dicts and set to 0
+		if not notificationData['user'] in notificationCountById:
+			notificationCountById[notificationData['user']] = 0
+			notificationLastById[notificationData['user']] = notificationData['lastSent'] #setting it something older than a week
+			notificationSuggestionsById[notificationData['user']] = 0
+
+		# add current notification count to the total count for this user
+		notificationCountById[notificationData['user']] += notificationData['totalNotifs']
+
+		# if lastSent for this notification type is greater than previous tracked one, update it
+		if notificationData['lastSent'] > notificationLastById[notificationData['user']]:
+			notificationLastById[notificationData['user']] = notificationData['lastSent']
+
+		# if it's a new_suggestion, track that separately
+		if notificationData['msg_type'] == constants.NOTIFICATIONS_NEW_SUGGESTION:
+			notificationSuggestionsById[notificationData['user']] = notificationData['totalNotifs']
+
 
 	weeklyPhotosById = dict()
 	PhotosDataById = dict()
@@ -118,6 +140,7 @@ def userbaseSummary(request):
 		if user.id in notificationCountById:
 			entry['notifications'] = notificationCountById[user.id]
 			entry['lastNotifSent'] = notificationLastById[user.id].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+			entry['suggestionNotifications'] = notificationSuggestionsById[user.id]
 		else:
 			entry['notifications'] = '-'
 
