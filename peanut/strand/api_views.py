@@ -130,6 +130,9 @@ def swap_inbox(request):
 		user = form.cleaned_data['user']
 		num = form.cleaned_data['num']
 
+		if num:
+			num = 50
+
 		# Add in buffer for the last timestamp, or if not sent in, use long ago date
 		if form.cleaned_data['last_timestamp']:
 			lastTimestamp = form.cleaned_data['last_timestamp'] - datetime.timedelta(seconds=10)
