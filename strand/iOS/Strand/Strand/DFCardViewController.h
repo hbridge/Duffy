@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPeanutFeedObject.h"
 
 @interface DFCardViewController : UIViewController
 
-@property (nonatomic) NSUInteger index;
-@property (nonatomic) NSUInteger nuxStep;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
+@property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
 
 typedef UInt64 DFHomeSubViewType;
 extern DFHomeSubViewType DFSuggestionViewType;

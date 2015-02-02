@@ -28,8 +28,6 @@ typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 @property (weak, nonatomic) IBOutlet UIView *cardView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *cardBottomConstraint;
 
-- (instancetype)initWithNuxStep:(NSUInteger)step;
-
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo;
 
 
