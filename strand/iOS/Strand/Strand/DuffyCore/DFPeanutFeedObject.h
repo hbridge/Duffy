@@ -23,6 +23,7 @@ extern DFFeedObjectType DFFeedObjectPeopleList;
 extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
 extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 extern DFFeedObjectType DFFeedObjectCluster;
+extern DFFeedObjectType DFFeedObjectActionsList;
 
 
 // Simple attribures
@@ -60,6 +61,7 @@ extern DFFeedObjectType DFFeedObjectCluster;
 // converted from actorIDs
 @property (readonly, nonatomic, retain) NSArray *actors;
 
+- (NSNumber *)getUniqueId;
 
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;

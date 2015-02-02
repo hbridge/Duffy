@@ -13,8 +13,8 @@
 // Used
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters;
 - (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters;
-- (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
-- (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters;
+- (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters;
 
 // Deprecated
 - (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;

@@ -119,7 +119,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
+  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFSwapsFeed completion:nil];
 
   [self configureLoadingView];
 }

@@ -141,7 +141,7 @@
 
 - (void)refreshFromServer
 {
-  [[DFPeanutFeedDataManager sharedManager] refreshActionsFromServer:^{
+  [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFActionsFeed completion:^{
     [self.refreshControl endRefreshing];
   }];
 }

@@ -47,9 +47,6 @@
 @property (readonly, nonatomic, retain) DFPeanutPhotoAdapter *photoAdapter;
 @property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
 
-@property (atomic) BOOL swapsRefreshing;
-@property (atomic) BOOL actionsRefreshing;
-
 // Dict with keys of DFFeedType and value of NSArray * or DFPeanutFeedObjects *'s
 @property (atomic, retain) NSMutableDictionary *feedObjects;
 
@@ -64,11 +61,6 @@
 
 // Dict with keys of DFFeedType and value of NSString *
 @property (nonatomic, retain) NSMutableDictionary *feedLastFeedTimestamp;
-
-
-
-@property (nonatomic, retain) NSData *swapsLastResponseHash;
-@property (nonatomic, retain) NSData *actionsLastResponseHash;
 
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
@@ -129,27 +121,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
-- (void)processInboxFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
-{
-  BOOL updated = NO;
-  
-  NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
-  
-  for (DFPeanutFeedObject *object in currentObjects) {
-    [combinedObjectsById setObject:object forKey:object.share_instance];
-  }
-  
-  for (DFPeanutFeedObject *object in newObjects) {
-    DFPeanutFeedObject *existingObject = [combinedObjectsById objectForKey:object.share_instance];
-    if (!existingObject || ![existingObject isEqual:object]) {
-      updated = YES;
-    }
-    [combinedObjectsById setObject:object forKey:object.share_instance];
-  }
-  NSArray *newCombinedObjects = [combinedObjectsById allValues];
-  
-  returnBlock(updated, newCombinedObjects);
-}
 
 - (void)processPeopleListFromFeedObjects:(NSArray *)feedObjects
 {
@@ -192,32 +163,29 @@ static DFPeanutFeedDataManager *defaultManager;
   return [allPeople sortedArrayUsingDescriptors:@[sort]];
 }
 
-// TODO(Derek): This can be combine with Inbox processing above
-- (void)processPrivateFeed:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
+
+- (void)processFeedWithCurrentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
   BOOL updated = NO;
   
-  NSMutableDictionary *combinedSectionsById = [NSMutableDictionary new];
+  NSMutableDictionary *combinedObjectsById = [NSMutableDictionary new];
   
-  for (DFPeanutFeedObject *section in currentObjects) {
-    if ([section.objects count] > 0) {
-      [combinedSectionsById setObject:section forKey:@(section.id)];
-    }
+  for (DFPeanutFeedObject *object in currentObjects) {
+    [combinedObjectsById setObject:object forKey:[object getUniqueId]];
   }
   
-  for (DFPeanutFeedObject *section in newObjects) {
-    DFPeanutFeedObject *existingSection = [combinedSectionsById objectForKey:@(section.id)];
-    if ([section.objects count] > 0) {
-      if (!existingSection || ![existingSection isEqual:section]) {
-        updated = YES;
-      }
-      [combinedSectionsById setObject:section forKey:@(section.id)];
+  for (DFPeanutFeedObject *object in newObjects) {
+    DFPeanutFeedObject *existingObject = [combinedObjectsById objectForKey:[object getUniqueId]];
+    if (!existingObject || ![existingObject isEqual:object]) {
+      updated = YES;
     }
+    [combinedObjectsById setObject:object forKey:[object getUniqueId]];
   }
-  NSArray *newCombinedSections = [combinedSectionsById allValues];
+  NSArray *newCombinedObjects = [combinedObjectsById allValues];
   
-  returnBlock(updated, newCombinedSections);
+  returnBlock(updated, newCombinedObjects);
 }
+
 
 - (void)refreshUsersFromServerWithCompletion:(RefreshCompleteCompletionBlock)completion
 {
@@ -234,22 +202,20 @@ static DFPeanutFeedDataManager *defaultManager;
 {
  
   [self processPeopleListFromFeedObjects:newObjects];
-  
-  if (fullRefresh) {
-    BOOL updated = (responseHash == [self.feedLastResponseHash objectForKey:@(feedType)]);
-    returnBlock(updated, newObjects);
-  }
-  
+
   if (!currentObjects) {
     returnBlock(YES, newObjects);
     return;
   }
   
-  if (feedType == DFInboxFeed) {
-    [self processInboxFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
-  } else if (feedType == DFPrivateFeed) {
-    [self processPrivateFeed:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
+  if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
+    BOOL updated = (responseHash == [self.feedLastResponseHash objectForKey:@(feedType)]);
+    returnBlock(updated, newObjects);
+    return;
   }
+
+  
+  [self processFeedWithCurrentObjects:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
 }
 
 
@@ -257,15 +223,6 @@ static DFPeanutFeedDataManager *defaultManager;
                    completion:(RefreshCompleteCompletionBlock)completion
                   fullRefresh:(BOOL)fullRefresh
 {
-  // TODO(Derek) remove these special cases
-  if (feedType == DFSwapsFeed) {
-    [self refreshSwapsFromServer:completion];
-    return;
-  } else if (feedType == DFActionsFeed) {
-    [self refreshActionsFromServer:completion];
-    return;
-  }
-  
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   if (completion) [self scheduleDeferredCompletion:completion forFeedType:feedType];
   
@@ -289,7 +246,7 @@ static DFPeanutFeedDataManager *defaultManager;
       if (!error) {
         // If we're not doing a full refresh, then check to see if we should do one.
         // Either if we haven't done one before or its been longer than 5 minutes
-        if (!fullRefresh) {
+        if (!fullRefresh && !(feedType == DFActionsFeed || feedType == DFSwapsFeed)) {
           if (![self.feedLastFullFetchDate objectForKey:@(feedType)] || [[NSDate date] timeIntervalSinceDate:[self.feedLastFullFetchDate objectForKey:@(feedType)]] > REFRESH_FEED_AFTER_SECONDS) {
             dispatch_async(dispatch_get_main_queue(), ^{
               [self refreshFeedFromServer:feedType completion:completion fullRefresh:YES];
@@ -329,66 +286,10 @@ static DFPeanutFeedDataManager *defaultManager;
     [self.peanutFeedAdapter fetchInboxWithCompletion:completion parameters:parameters];
   } else if (feedType == DFPrivateFeed) {
     [self.peanutFeedAdapter fetchAllPrivateStrandsWithCompletion:completion parameters:parameters];
-  }
-}
-
-- (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion
-{
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFSwapsFeed];
-  
-  if (!self.swapsRefreshing) {
-    self.swapsRefreshing = YES;
-    [self.swapsFeedAdapter
-     fetchSwapsWithCompletion:^(DFPeanutObjectsResponse *response,
-                                NSData *responseHash,
-                                NSError *error) {
-       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-       
-       if (!error && ![responseHash isEqual:self.swapsLastResponseHash]) {
-         self.swapsFeedObjects = response.objects;
-         self.swapsLastResponseHash = responseHash;
-         
-         DDLogInfo(@"Got new swaps data for %@ objects, sending notification.", @(response.objects.count));
-         
-         [[NSNotificationCenter defaultCenter]
-          postNotificationName:DFStrandNewSwapsDataNotificationName
-          object:self];
-       }
-       [self executeDeferredCompletionsForFeedType:DFSwapsFeed];
-       self.swapsRefreshing = NO;
-     }
-     ];
-  }
-}
-
-// TODO(Derek): Take all this common code and put into one method
-- (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion
-{
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFActionsFeed];
-  
-  if (!self.actionsRefreshing) {
-    self.actionsRefreshing = YES;
-    [self.actionsFeedAdapter
-     fetchActionsListWithCompletion:^(DFPeanutObjectsResponse *response,
-                                            NSData *responseHash,
-                                            NSError *error) {
-       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-       
-       if (!error && ![responseHash isEqual:self.actionsLastResponseHash]) {
-         self.actionsLastResponseHash = responseHash;
-         self.actionsFeedObjects = response.objects;
-         
-         DDLogVerbose(@"Got new actions data, sending notification.");
-         [[NSNotificationCenter defaultCenter]
-          postNotificationName:DFStrandNewActionsDataNotificationName
-          object:self];
-       }
-       [self executeDeferredCompletionsForFeedType:DFActionsFeed];
-       self.actionsRefreshing = NO;
-     }
-     ];
+  } else if (feedType == DFSwapsFeed) {
+    [self.peanutFeedAdapter fetchSwapsWithCompletion:completion parameters:parameters];
+  } else if (feedType == DFActionsFeed) {
+    [self.peanutFeedAdapter fetchActionsListWithCompletion:completion parameters:parameters];
   }
 }
 
@@ -403,7 +304,12 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (BOOL)hasSwapsData
 {
-  return (self.swapsLastResponseHash != nil);
+  return ([self.feedLastFeedTimestamp objectForKey:@(DFSwapsFeed)] != nil);
+}
+
+- (BOOL)hasActionsData
+{
+  return (self.feedLastResponseHash[@(DFActionsFeed)] != nil);
 }
 
 - (BOOL)areSuggestionsReady
@@ -422,12 +328,6 @@ static DFPeanutFeedDataManager *defaultManager;
                @(result), @(allPhotos.photoSet.count), @(photosWithoutIDs.count), @(self.hasSwapsData), @(self.suggestedStrands.count));
   return result;
 }
-
-- (BOOL)hasActionsData
-{
-  return (self.actionsLastResponseHash != nil);
-}
-
 
 - (NSArray *)photosWithUserID:(DFUserIDType)userID onlyEvaluated:(BOOL)onlyEvaluated
 {
@@ -639,10 +539,9 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user
 {
-  DFPeanutFeedObject *actionsList = [self.actionsFeedObjects firstObject];
   NSMutableArray *actions = [NSMutableArray new];
   
-  for (DFPeanutAction *action in actionsList.actions) {
+  for (DFPeanutAction *action in self.actionsFeedObjects) {
     if (action.user == user.id) continue;
     [actions addObject:action];
   }
@@ -1237,6 +1136,8 @@ static NSDictionary *nameMapping;
   if (!nameMapping) nameMapping = @{
     @(DFInboxFeed) : DFStrandNewInboxDataNotificationName,
     @(DFPrivateFeed) : DFStrandNewPrivatePhotosDataNotificationName,
+    @(DFActionsFeed) : DFStrandNewActionsDataNotificationName,
+    @(DFSwapsFeed) : DFStrandNewSwapsDataNotificationName,
   };
   return nameMapping[@(feedType)];
 }
@@ -1258,7 +1159,9 @@ static NSDictionary *nameMapping;
 @synthesize photoAdapter = _photoAdapter;
 
 @synthesize inboxFeedObjects = _inboxFeedObjects;
+@synthesize actionsFeedObjects = _actionsFeedObjects;
 @synthesize privateStrandsFeedObjects = _privateStrandsFeedObjects;
+@synthesize swapsFeedObjects = _swapsFeedObjects;
 
 - (NSArray *)inboxFeedObjects
 {
@@ -1274,6 +1177,38 @@ static NSDictionary *nameMapping;
 {
   return [self.feedObjects objectForKey:@(DFPrivateFeed)];
 }
+
+- (void)setPrivateStrandsFeedObjects:(NSArray *)privateStrandsFeedObjects
+{
+   self.feedObjects[@(DFPrivateFeed)] = privateStrandsFeedObjects;
+}
+
+- (NSArray *)actionsFeedObjects
+{
+  for (DFPeanutFeedObject *object in [self.feedObjects objectForKey:@(DFActionsFeed)]) {
+    if ([object.type isEqualToString:DFFeedObjectActionsList]) {
+      return object.actions;
+    }
+  }
+  return nil;
+}
+
+- (void)setActionsFeedObjects:(NSArray *)actionsFeedObjects
+{
+  self.feedObjects[@(DFActionsFeed)] = actionsFeedObjects;
+}
+
+
+- (NSArray *)swapsFeedObjects
+{
+  return [self.feedObjects objectForKey:@(DFSwapsFeed)];
+}
+
+- (void)setSwapsFeedObjects:(NSArray *)swapsFeedObjects
+{
+  self.feedObjects[@(DFSwapsFeed)] = swapsFeedObjects;
+}
+
 
 - (DFPeanutFeedAdapter *)peanutFeedAdapter
 {

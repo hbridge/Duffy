@@ -62,14 +62,14 @@ NSString *const ActivityPath = @"strand_activity";
   [super fetchObjectsAtPath:PrivateStrandsPath withCompletionBlock:completionBlock parameters:parameters];
 }
 
-- (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+- (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters
 {
-  [super fetchObjectsAtPath:SwapsPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:SwapsPath withCompletionBlock:completionBlock parameters:parameters];
 }
 
-- (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+- (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock parameters:(NSDictionary *)parameters
 {
-  [super fetchObjectsAtPath:ActionsListPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:ActionsListPath withCompletionBlock:completionBlock parameters:parameters];
 }
 
 

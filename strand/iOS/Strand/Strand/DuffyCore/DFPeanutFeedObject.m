@@ -453,6 +453,15 @@ static NSArray *FeedObjectTypes;
   return NO;
 }
 
+- (NSNumber *)getUniqueId
+{
+  if ([self.type isEqualToString:@"photo"]) {
+    return self.share_instance;
+  } else {
+    return @(self.id);
+  }
+}
+
 - (NSUInteger)hash
 {
   return (NSUInteger)self.id;
