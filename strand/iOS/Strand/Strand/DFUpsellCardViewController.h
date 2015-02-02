@@ -6,13 +6,12 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "DFSwipableButtonView.h"
+#import "DFCardViewController.h"
 #import "DFUpsellContentView.h"
 #import "DFPeanutFeedObject.h"
 
 
-@interface DFUpsellCardViewController : UIViewController <DFSwipableButtonViewDelegate>
+@interface DFUpsellCardViewController : DFCardViewController
 
 typedef NS_ENUM(NSInteger, DFUpsellCardViewType) {
   DFUpsellCardViewGotoSuggestions,
@@ -20,13 +19,12 @@ typedef NS_ENUM(NSInteger, DFUpsellCardViewType) {
 };
 
 @property (nonatomic) DFUpsellCardViewType upsellType;
-@property (nonatomic, retain) DFUpsellContentView *upsellContentView;
+@property (nonatomic, weak) IBOutlet DFUpsellContentView *upsellContentView;
 @property (nonatomic, copy) DFVoidBlock yesButtonHandler;
 @property (nonatomic, copy) DFVoidBlock noButtonHandler;
-@property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
-@property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
 
-@property (weak, nonatomic) IBOutlet DFSwipableButtonView *swipableButtonView;
+@property (weak, nonatomic) IBOutlet UIButton *noButton;
+@property (weak, nonatomic) IBOutlet UIButton *yesButton;
 
 - (instancetype)initWithType:(DFUpsellCardViewType)upsellType;
 

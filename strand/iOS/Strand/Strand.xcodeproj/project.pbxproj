@@ -86,6 +86,7 @@
 		5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */; };
 		5A683A1C1A39110A00308BF1 /* DFSegmentedControlReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */; };
 		5A683A1D1A39110A00308BF1 /* DFSegmentedControlReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */; };
+		5A6E332C1A7FF63B00228D46 /* DFNibInstantiableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E332B1A7FF63B00228D46 /* DFNibInstantiableView.m */; };
 		5A6E4D7B19D20A51002CB0A2 /* NSArray+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */; };
 		5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */; };
 		5A7233B71A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 5A7233B61A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel */; };
@@ -446,6 +447,8 @@
 		5A683A191A39110A00308BF1 /* DFSegmentedControlReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSegmentedControlReusableView.h; sourceTree = "<group>"; };
 		5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSegmentedControlReusableView.m; sourceTree = "<group>"; };
 		5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSegmentedControlReusableView.xib; sourceTree = "<group>"; };
+		5A6E332A1A7FF63B00228D46 /* DFNibInstantiableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNibInstantiableView.h; sourceTree = "<group>"; };
+		5A6E332B1A7FF63B00228D46 /* DFNibInstantiableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNibInstantiableView.m; sourceTree = "<group>"; };
 		5A6E4D7919D20A51002CB0A2 /* NSArray+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+DFHelpers.h"; sourceTree = "<group>"; };
 		5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DFHelpers.m"; sourceTree = "<group>"; };
 		5A6E8B6C19CA323500870423 /* DFSMSInviteStrandComposeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSInviteStrandComposeViewController.h; sourceTree = "<group>"; };
@@ -902,6 +905,8 @@
 				5AF4991A1A40BF5E000CF9DB /* DFDismissableModalViewController.h */,
 				5AF4991B1A40BF5E000CF9DB /* DFDismissableModalViewController.m */,
 				5AF4991C1A40BF5E000CF9DB /* DFDismissableModalViewController.xib */,
+				5A6E332A1A7FF63B00228D46 /* DFNibInstantiableView.h */,
+				5A6E332B1A7FF63B00228D46 /* DFNibInstantiableView.m */,
 			);
 			name = "Common Views";
 			sourceTree = "<group>";
@@ -2205,6 +2210,7 @@
 				5A7B185319707DE300E5A1D1 /* DFPeanutAction.m in Sources */,
 				5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */,
 				5AB7BEC91A042A41000BEB67 /* DFActionButtonTableViewCell.m in Sources */,
+				5A6E332C1A7FF63B00228D46 /* DFNibInstantiableView.m in Sources */,
 				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,

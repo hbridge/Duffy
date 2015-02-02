@@ -1,33 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFUpsellCardViewController">
             <connections>
-                <outlet property="swipableButtonView" destination="C3p-V0-JPw" id="c1f-0m-zay"/>
-                <outlet property="view" destination="iN0-l3-epB" id="qjg-ZO-CFj"/>
+                <outlet property="noButton" destination="dDM-B3-7Xh" id="7Zq-bv-9mE"/>
+                <outlet property="upsellContentView" destination="LPK-Or-gTW" id="sKL-md-yfA"/>
+                <outlet property="view" destination="qxL-cS-x6R" id="MUm-W6-wtj"/>
+                <outlet property="yesButton" destination="DGs-4r-bcz" id="jhd-my-xHi"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="iN0-l3-epB">
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="qxL-cS-x6R">
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C3p-V0-JPw" customClass="DFSwipableButtonView">
-                    <rect key="frame" x="8" y="60" width="584" height="540"/>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5im-Pb-HT2" userLabel="Card view">
+                    <rect key="frame" x="10" y="40" width="580" height="440"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LPK-Or-gTW" customClass="DFUpsellContentView">
+                            <rect key="frame" x="4" y="0.0" width="572" height="420"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </view>
+                    </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="LPK-Or-gTW" secondAttribute="trailing" constant="4" id="OSV-Ny-xGA"/>
+                        <constraint firstAttribute="bottom" secondItem="LPK-Or-gTW" secondAttribute="bottom" constant="20" id="iI3-gN-xwV"/>
+                        <constraint firstItem="LPK-Or-gTW" firstAttribute="leading" secondItem="5im-Pb-HT2" secondAttribute="leading" constant="4" id="pzj-YB-DCR"/>
+                        <constraint firstItem="LPK-Or-gTW" firstAttribute="top" secondItem="5im-Pb-HT2" secondAttribute="top" id="s4u-MC-UsK"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gT3-mc-OnC" userLabel="Button Wrapper">
+                    <rect key="frame" x="217" y="500" width="167" height="40"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dDM-B3-7Xh" customClass="GBFlatButton">
+                            <rect key="frame" x="8" y="0.0" width="61" height="40"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <inset key="titleEdgeInsets" minX="-2" minY="0.0" maxX="-2" maxY="0.0"/>
+                            <state key="normal" title="Not Now">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DGs-4r-bcz" customClass="GBFlatButton">
+                            <rect key="frame" x="129" y="0.0" width="30" height="40"/>
+                            <color key="backgroundColor" red="0.42352941179999998" green="0.81960784310000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <inset key="titleEdgeInsets" minX="-2" minY="0.0" maxX="-2" maxY="0.0"/>
+                            <state key="normal" title="Yes">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="DGs-4r-bcz" secondAttribute="trailing" constant="8" id="1m4-0h-0t7"/>
+                        <constraint firstItem="DGs-4r-bcz" firstAttribute="leading" secondItem="dDM-B3-7Xh" secondAttribute="trailing" constant="60" id="Iu3-wP-UAw"/>
+                        <constraint firstItem="dDM-B3-7Xh" firstAttribute="leading" secondItem="gT3-mc-OnC" secondAttribute="leading" constant="8" id="Vrw-BQ-S9Y"/>
+                        <constraint firstItem="dDM-B3-7Xh" firstAttribute="top" secondItem="gT3-mc-OnC" secondAttribute="top" id="Ym6-uc-jsq"/>
+                        <constraint firstItem="DGs-4r-bcz" firstAttribute="top" secondItem="gT3-mc-OnC" secondAttribute="top" id="ZVp-kY-rpN"/>
+                        <constraint firstAttribute="height" constant="40" id="dLL-mY-yYR"/>
+                        <constraint firstAttribute="bottom" secondItem="DGs-4r-bcz" secondAttribute="bottom" id="iDW-Df-1GZ"/>
+                        <constraint firstAttribute="bottom" secondItem="dDM-B3-7Xh" secondAttribute="bottom" id="lt1-If-oi0"/>
+                    </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="C3p-V0-JPw" secondAttribute="trailing" constant="8" id="4Fv-0J-Ulu"/>
-                <constraint firstItem="C3p-V0-JPw" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="60" id="PYa-Wt-oSv"/>
-                <constraint firstItem="C3p-V0-JPw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="bKl-jq-8VR"/>
-                <constraint firstAttribute="bottom" secondItem="C3p-V0-JPw" secondAttribute="bottom" id="e1E-ZJ-TdG"/>
+                <constraint firstAttribute="trailing" secondItem="5im-Pb-HT2" secondAttribute="trailing" constant="10" id="9Fj-P8-IhM"/>
+                <constraint firstItem="gT3-mc-OnC" firstAttribute="top" secondItem="5im-Pb-HT2" secondAttribute="bottom" priority="998" constant="20" id="L88-U4-zzJ"/>
+                <constraint firstAttribute="bottom" secondItem="5im-Pb-HT2" secondAttribute="bottom" priority="997" constant="10" id="Qdv-fW-c9x"/>
+                <constraint firstItem="5im-Pb-HT2" firstAttribute="top" secondItem="qxL-cS-x6R" secondAttribute="top" constant="40" id="cB1-5U-Fe6"/>
+                <constraint firstAttribute="centerX" secondItem="gT3-mc-OnC" secondAttribute="centerX" id="fX7-sc-gjR"/>
+                <constraint firstAttribute="bottom" secondItem="gT3-mc-OnC" secondAttribute="bottom" constant="60" id="jtH-Ec-9Bb"/>
+                <constraint firstItem="5im-Pb-HT2" firstAttribute="leading" secondItem="qxL-cS-x6R" secondAttribute="leading" constant="10" id="p9A-QJ-mbf"/>
             </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <point key="canvasLocation" x="624" y="371"/>
         </view>
     </objects>
 </document>

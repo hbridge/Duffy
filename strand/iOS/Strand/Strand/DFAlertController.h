@@ -27,4 +27,9 @@ typedef NS_ENUM(NSInteger, DFAlertControllerStyle) {
                             animated:(BOOL)animated
                           completion:(DFVoidBlock)completion;
 
+- (void)showWithParentViewController:(UIViewController *)parentViewController
+              overridePresentingView:(UIView *)view
+                            animated:(BOOL)animated
+                          completion:(DFVoidBlock)completion;
+
 @end

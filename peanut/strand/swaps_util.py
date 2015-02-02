@@ -79,6 +79,18 @@ def getFriendsObjectData(userId, users, includePhone = True):
 
 	return userData
 
+def getPeopleListEntry(user, peopleIds):
+	fullFriendsIds, forwardFriendsIds, reverseFriendsIds, connIds  = friends_util.getFriendsIds(user.id)
+	peopleIds.extend(fullFriendsIds)
+	peopleIds.extend(forwardFriendsIds)
+	peopleIds.extend(reverseFriendsIds)
+
+	people = list(User.objects.filter(id__in=set(peopleIds)))
+
+	peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'share_instance': -1, 'people': getFriendsObjectData(user.id, people, True)}		
+	return peopleEntry
+
+
 # Fetch strands we want to find neighbors on
 # Fetch neighbors rows that match strands and friends
 # Fetch neighbor strands and neighbor users
@@ -415,7 +427,6 @@ def getActionsListUnreadCount(user, actionsData):
 		return len(actionsData)
 
 def getFeedObjectsForInbox(user, lastTimestamp, num):
-
 	responseObjects = list()
 
 	# Grab all share instances we want.  Might filter by a last timestamp for speed
@@ -482,24 +493,6 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 		count += 1
 
 	stats_util.printStats("swaps_inbox-3")
-
-	# Add in the list of all friends at the end
-	peopleIds = list()
-	fullFriends, forwardFriends, reverseFriends, connIds  = friends_util.getFriendsIds(user.id)
-	peopleIds.extend(fullFriends)
-	peopleIds.extend(forwardFriends)
-	peopleIds.extend(reverseFriends)
-	
-	# Also add in all of the actors they're dealing with
-	for obj in responseObjects:
-		peopleIds.extend(obj['actor_ids'])
-
-	people = set(User.objects.filter(id__in=peopleIds))
-
-	peopleEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'share_instance': -1, 'people': getFriendsObjectData(user.id, people, True)}		
-	responseObjects.append(peopleEntry)
-
-	stats_util.printStats("swaps_inbox-end")
 	return responseObjects
 
 def getUnseenPhotoCount(user):

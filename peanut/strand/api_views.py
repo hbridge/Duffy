@@ -36,6 +36,17 @@ def getBuildNumForUser(user):
 	else:
 		return 4000
 
+def getAllIdsInFeedObjects(feedObjects):
+	peopleIds = set()
+	for obj in feedObjects:
+		if "actor_ids" in obj:
+			peopleIds.update(obj["actor_ids"])
+		if "user" in obj:
+			peopleIds.add(obj["user"])
+		if "objects" in obj:
+			peopleIds.update(getAllIdsInFeedObjects(obj["objects"]))
+	return list(peopleIds)
+
 
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
@@ -80,7 +91,6 @@ def private_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(readyResponse, content_type="application/json")
 
-
 """
 	Returns back the suggested shares
 """
@@ -91,12 +101,19 @@ def swaps(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
+		responseObjects = list()
 		user = form.cleaned_data['user']
 
-		objs = swaps_util.getFeedObjectsForSwaps(user)
-		
+		swapsObjects = swaps_util.getFeedObjectsForSwaps(user)
+		responseObjects.extend(swapsObjects)
+
+		stats_util.printStats("swaps-objects")		
+
+		responseObjects.append(swaps_util.getPeopleListEntry(user, getAllIdsInFeedObjects(swapsObjects)))
+		stats_util.printStats("swaps-actors")
 		stats_util.printStats("swaps-end")
-		response['objects'] = objs
+		response['objects'] = responseObjects
+		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -109,6 +126,7 @@ def swap_inbox(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
+		responseObjects = list()
 		user = form.cleaned_data['user']
 		num = form.cleaned_data['num']
 
@@ -118,7 +136,13 @@ def swap_inbox(request):
 		else:
 			lastTimestamp = datetime.datetime.fromtimestamp(0)
 
-		response["objects"] = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
+		inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
+		responseObjects.extend(inboxObjects)
+
+		responseObjects.append(swaps_util.getPeopleListEntry(user, getAllIdsInFeedObjects(inboxObjects)))
+
+		stats_util.printStats("swaps_inbox-end")
+		response["objects"] = responseObjects
 		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
@@ -131,14 +155,17 @@ def actions_list(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
+		responseObjects = list()
 		user = form.cleaned_data['user']
 
-		actionsData = swaps_util.getActionsList(user)
+		actionsObjects = swaps_util.getActionsList(user)
 
-		response['objects'] = [{'type': 'actions_list', 'actions': actionsData}]
+		responseObjects.append({'type': 'actions_list', 'actions': actionsObjects})
 		stats_util.printStats("actions-end")
 
-		user.save()
+		responseObjects.append(swaps_util.getPeopleListEntry(user, getAllIdsInFeedObjects(actionsObjects)))
+		response['objects'] = responseObjects
+		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

@@ -29,27 +29,17 @@
 
 @synthesize suggestionFeedObject = _suggestionFeedObject;
 
-- (instancetype)initWithNuxStep:(NSUInteger)step
-{
-  self = [super init];
-  if (self) {
-    self.nuxStep = step;
-  }
-  return self;
-}
-
 - (void)viewDidLayoutSubviews
 {
-  if (self.nuxStep == 0) {
-    [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
-                                     pointSize:self.suggestionContentView.imageView.frame.size
-                                   contentMode:DFImageRequestContentModeAspectFill
-                                  deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                      self.suggestionContentView.imageView.image = image;
-                                    });
-                                  }];
-  }
+  [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
+                                   pointSize:self.suggestionContentView.imageView.frame.size
+                                 contentMode:DFImageRequestContentModeAspectFill
+                                deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                    self.suggestionContentView.imageView.image = image;
+                                  });
+                                }];
+  
 }
 
 - (void)viewDidLoad {
@@ -92,10 +82,8 @@
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
 {
   _suggestionFeedObject = suggestionFeedObject;
-  if (self.nuxStep == 0) {
-    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
-    self.selectedPeanutContacts = self.suggestionFeedObject.actorPeanutContacts;
-  }
+  self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+  self.selectedPeanutContacts = self.suggestionFeedObject.actorPeanutContacts;
 }
 
 - (void)configureButtons
@@ -123,18 +111,14 @@
 
 - (void)configurePeopleLabel
 {
-  if (self.nuxStep == 0) {
-    if (self.selectedPeanutContacts.count > 0) {
-      NSArray *contactNames = [self.selectedPeanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
-        return [contact firstName];
-      }];
-      NSString *commaList = [contactNames componentsJoinedByString:@", "];
-      self.suggestionContentView.topLabel.text = [NSString stringWithFormat:@"Send to %@",commaList];
-    } else {
-      self.suggestionContentView.topLabel.text = @"Pick Recipients";
-    }
+  if (self.selectedPeanutContacts.count > 0) {
+    NSArray *contactNames = [self.selectedPeanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+      return [contact firstName];
+    }];
+    NSString *commaList = [contactNames componentsJoinedByString:@", "];
+    self.suggestionContentView.topLabel.text = [NSString stringWithFormat:@"Send to %@",commaList];
   } else {
-    self.suggestionContentView.topLabel.text = @"Send to Team Swap";
+    self.suggestionContentView.topLabel.text = @"Pick Recipients";
   }
 }
 
@@ -157,7 +141,7 @@
 {
   NSString *logResult;
   if (sender == self.yesButton && self.yesButtonHandler) {
-    if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
+    if (self.selectedPeanutContacts.count > 0) {
       [UIView animateWithDuration:0.3 delay:0.2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.view.center = CGPointMake(self.cardView.center.x,
                                        0 - self.view.frame.size.height / 2.0);

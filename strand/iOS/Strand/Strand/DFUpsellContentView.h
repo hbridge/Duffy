@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "DFNibInstantiableView.h"
 
-@interface DFUpsellContentView : UIView
+@interface DFUpsellContentView : DFNibInstantiableView
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
