@@ -11,7 +11,8 @@ app = Celery('peanut',
 					  'async.popcaches',
 					  'async.neighboring',
 					  'async.friending',
-					  'async.suggestion_notifications'])
+					  'async.suggestion_notifications',
+					  'async.notifications'])
 
 app.config_from_object(settings.CELERY_CONFIG)
 

@@ -239,6 +239,13 @@ LOGGING = {
             'filename': '/mnt/log/suggestion-notifications.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+        'notifications': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/mnt/log/notifications.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
         }
         #'console': {
         #   'level': 'DEBUG',
@@ -307,6 +314,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'async.notifications': {
+            'handlers': ['notifications'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
     }
 }
 class BASE_CELERY_CONFIG:
@@ -340,5 +352,6 @@ class BASE_CELERY_CONFIG:
         'async.friending.processAll': {'queue': 'independent', 'routing_key': 'independent'},
         'async.suggestion_notifications.processIds': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'async.suggestion_notifications.processUserId': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
+        'async.notifications.sendRefreshFeedToUserIds': {'queue': 'independent', 'routing_key': 'independent'},
     }
 
