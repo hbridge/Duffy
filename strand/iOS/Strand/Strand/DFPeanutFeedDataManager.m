@@ -53,9 +53,6 @@
 // Dict with keys of DFFeedType and value of BOOL
 @property (atomic, retain) NSMutableDictionary *feedRefreshing;
 
-// Dict with keys of DFFeedType and value of NSData *
-@property (nonatomic, retain) NSMutableDictionary *feedLastResponseHash;
-
 // Dict with keys of DFFeedType and value of NSDate *
 @property (nonatomic, retain) NSMutableDictionary *feedLastFullFetchDate;
 
@@ -82,7 +79,6 @@
     _deferredCompletionBlocks = [NSMutableDictionary new];
     self.feedRefreshing = [NSMutableDictionary new];
     self.feedObjects = [NSMutableDictionary new];
-    self.feedLastResponseHash = [NSMutableDictionary new];
     self.feedLastFullFetchDate = [NSMutableDictionary new];
     self.feedLastFeedTimestamp = [NSMutableDictionary new];
     
@@ -209,7 +205,7 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
-    BOOL updated = (responseHash == [self.feedLastResponseHash objectForKey:@(feedType)]);
+    BOOL updated = ![self.feedObjects[@(feedType)] isEqualToArray:newObjects];
     returnBlock(updated, newObjects);
     return;
   }
@@ -266,9 +262,8 @@ static DFPeanutFeedDataManager *defaultManager;
           }
         }];
         
-        if (fullRefresh) {
+        if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
           [self.feedLastFullFetchDate setObject:[NSDate date] forKey:@(feedType)];
-          [self.feedLastResponseHash setObject:responseHash forKey:@(feedType)];
         }
       }
       
@@ -309,7 +304,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (BOOL)hasActionsData
 {
-  return (self.feedLastResponseHash[@(DFActionsFeed)] != nil);
+  return ([self.feedLastFeedTimestamp objectForKey:@(DFActionsFeed)] != nil);
 }
 
 - (BOOL)areSuggestionsReady

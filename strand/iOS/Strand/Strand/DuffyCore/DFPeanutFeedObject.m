@@ -447,6 +447,10 @@ static NSArray *FeedObjectTypes;
     if ([self.actions count] != [otherObject.actions count]) return NO;
   }
   
+  if ([self.type isEqual:DFFeedObjectActionsList] && [otherObject.type isEqual:DFFeedObjectActionsList]) {
+    if (![self.actions isEqualToArray:otherObject.actions]) return NO;
+  }
+  
   if (otherObject.id == self.id
       && otherObject.share_instance.longLongValue == self.share_instance.longLongValue
       && [otherObject.type isEqual:self.type]) return YES;
