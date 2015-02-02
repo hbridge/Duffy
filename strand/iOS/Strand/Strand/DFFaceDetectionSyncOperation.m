@@ -117,7 +117,13 @@ const NSUInteger PhotosToScanPerOperation = 20;
 
 + (CIDetector *)faceDetectorWithHighQuality:(BOOL)highQuality
 {
-  CIContext *context = [CIContext contextWithOptions:nil];
+  CIContext *context = nil;
+  @try {
+    context = [CIContext contextWithOptions:nil];
+  }
+  @catch (NSException *exception) {
+    DDLogError(@"%@ could not create correct CIContext", self);
+  }
   
   NSDictionary *detectorOpts;
   if (highQuality) {
@@ -137,7 +143,7 @@ const NSUInteger PhotosToScanPerOperation = 20;
   @autoreleasepool {
     dispatch_semaphore_t loadSemaphore = dispatch_semaphore_create(0);
     UIImage __block *image = nil;
-    [photo.asset loadImageResizedToLength:2048 success:^(UIImage *loadedImage) {
+    [photo.asset loadImageResizedToLength:1024 success:^(UIImage *loadedImage) {
       image = loadedImage;
       dispatch_semaphore_signal(loadSemaphore);
     } failure:^(NSError *error) {
