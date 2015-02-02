@@ -113,6 +113,7 @@ def swaps(request):
 		stats_util.printStats("swaps-actors")
 		stats_util.printStats("swaps-end")
 		response['objects'] = responseObjects
+		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -164,6 +165,7 @@ def actions_list(request):
 
 		responseObjects.append(swaps_util.getPeopleListEntry(user, getAllIdsInFeedObjects(actionsObjects)))
 		response['objects'] = responseObjects
+		response["timestamp"] = datetime.datetime.now()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
