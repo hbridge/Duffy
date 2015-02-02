@@ -131,7 +131,7 @@ def swap_inbox(request):
 		num = form.cleaned_data['num']
 
 		if num:
-			num = 50
+			num = 25
 
 		# Add in buffer for the last timestamp, or if not sent in, use long ago date
 		if form.cleaned_data['last_timestamp']:
