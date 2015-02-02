@@ -35,10 +35,12 @@ def userbaseSummary(request):
 	userStats = list(User.objects.filter(product_id=2))
 	actionDataRaw = list(Action.objects.exclude(added__lt=(newNow-timedelta(hours=168))).filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) | Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).values('user', 'action_type').annotate(weeklyActions=Count('user'), lastActionTimestamp=Max('added')))
 	siDataForWeeklyPhotos = list(ShareInstance.objects.exclude(shared_at_timestamp__lt=(newNow-timedelta(hours=168))).values('user').annotate(weeklyPhotosShared=Count('user')))
-	siDataForAllPhotos = list(ShareInstance.objects.values('user').annotate(allPhotosShared=Count('user')))
+	siDataForAllPhotos = list(ShareInstance.objects.values('users').annotate(allPhotosShared=Count('user')))
 	locationData = list(LocationRecord.objects.values('user').annotate(lastUpdated=Max('updated')))
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=2).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
+
+	print siDataForAllPhotos
 
 	# Exclude type GPS fetch and socket refresh feeds since it happens so frequently
 	notificationDataRaw = list(NotificationLog.objects.exclude(
@@ -89,7 +91,7 @@ def userbaseSummary(request):
 		weeklyPhotosById[actionData['user']] = actionData['weeklyPhotosShared']
 
 	for siData in siDataForAllPhotos:
-		allSiById[siData['user']] = siData['allPhotosShared']
+		allSiById[siData['users']] = siData['allPhotosShared']
 
 	for loc in locationData:
 		locationById[loc['user']] = loc['lastUpdated']
