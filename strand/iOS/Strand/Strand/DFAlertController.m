@@ -56,6 +56,17 @@ static DFAlertController *CurrentAlertController = nil;
                             animated:(BOOL)animated
                           completion:(DFVoidBlock)completion
 {
+  [self showWithParentViewController:parentViewController
+              overridePresentingView:nil
+                            animated:animated
+                          completion:completion];
+ }
+
+- (void)showWithParentViewController:(UIViewController *)parentViewController
+              overridePresentingView:(UIView *)view
+                            animated:(BOOL)animated
+                          completion:(DFVoidBlock)completion
+{
   if ([UIAlertController class]) {
     UIAlertController *alertController = [self alertController];
     [parentViewController presentViewController:alertController
@@ -64,7 +75,8 @@ static DFAlertController *CurrentAlertController = nil;
   } else {
     if (self.style == DFAlertControllerStyleActionSheet) {
       UIActionSheet *actionSheet = [self actionSheet];
-      [actionSheet showInView:parentViewController.view];
+      UIView *presentingView = view ? view : parentViewController.view;
+      [actionSheet showInView:presentingView];
     } else {
       UIAlertView *alertView = [self alertView];
       [alertView show];

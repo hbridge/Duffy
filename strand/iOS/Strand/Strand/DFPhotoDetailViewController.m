@@ -650,7 +650,10 @@ const NSUInteger CompressedModeMaxRows = 1;
                                    style:DFAlertActionStyleCancel
                                    handler:^(DFAlertAction *action) {}]];
   
-  [self.alertController showWithParentViewController:self animated:YES completion:nil];
+  [self.alertController showWithParentViewController:self
+                              overridePresentingView:self.imageView
+                                            animated:YES
+                                          completion:nil];
 }
 
 - (void)deletePhoto
