@@ -100,7 +100,10 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)newDataArrived
 {
   [self reloadData];
-  [self markActionsAsSeen];
+  
+  // Temporarily disable marking actions as seen until can be reworked.
+  // Issue is that the server doesn't know that the action is read so the badge on the homescreen is different from the app
+  //[self markActionsAsSeen];
 }
 
 
