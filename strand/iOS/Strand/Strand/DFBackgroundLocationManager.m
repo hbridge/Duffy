@@ -11,6 +11,7 @@
 #import "DFPeanutLocationAdapter.h"
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
+#import "DFSettings.h"
 
 @interface DFBackgroundLocationManager()
 
@@ -249,6 +250,8 @@ static DFBackgroundLocationManager *defaultManager;
   if (status != kCLAuthorizationStatusNotDetermined) {
     DDLogInfo(@"%@ promprtForAuth but authStatus = %@", self.class,
               [self permissionStateForCLAuthStatus:status]);
+    
+    if (status == kCLAuthorizationStatusDenied) [DFSettings showPermissionDeniedAlert];
     return;
   }
   
