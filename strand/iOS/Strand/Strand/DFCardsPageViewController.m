@@ -247,7 +247,8 @@ const NSUInteger UpsellCardFrequency = 5;
           return [self outgoingCardViewControllerForPhoto:photo];
         }
       } else {
-        return [self nextOutgoingUpsellWithSentinalValue:object];
+        DFCardViewController *upsell = [self nextOutgoingUpsellWithSentinalValue:object];
+        if (upsell) return upsell;
       }
     }
   }
