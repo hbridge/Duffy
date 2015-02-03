@@ -403,12 +403,12 @@ static BOOL logRouting = NO;
   
   // figure out if there are similar requests ahead in the queue,
   // if there are none, we'll need to call the loadBlock at the end
-  NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
-  NSArray *similarRequests = [self.class requestsLike:request inArray:requestsForID.allObjects];
+  NSArray *similarRequests = [self requestsLike:request];
   if (similarRequests.count == 0) callLoadBlock = YES;
   //DDLogVerbose(@"%@ request: %@ has %d similarRequests ahead in queue.", self.class, request, (int)similarRequests.count);
   
   // keep track of this request in photoIDstoDeferredRequests
+  NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
   if (!requestsForID) requestsForID = [NSMutableSet new];
   [requestsForID addObject:request];
   self.photoIDsToDeferredRequests[@(request.photoID)] = requestsForID;
@@ -431,6 +431,14 @@ static BOOL logRouting = NO;
     }
     dispatch_async(queue, ^{
       UIImage *image = loadBlock();
+      
+      if (!image
+          && request.imageType == DFImageFull
+          && request.deliveryMode == DFImageRequestOptionsDeliveryModeOpportunistic) {
+        [self cancelDeferredCompletionsForRequestsLike:request
+                                          deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
+      }
+      
       //DDLogVerbose(@"loadBlock for request:%@ image:%@", request, image);
       [self cacheImage:image forRequest:request];
       [self executeDeferredCompletionsWithImage:image forRequestsLike:request];
@@ -445,7 +453,7 @@ static BOOL logRouting = NO;
   NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
   NSMutableSet *executedRequests = [NSMutableSet new];
   //DDLogVerbose(@"executeDeferred begin requestsFor:%d photoIDsToDeferredRequests:%@ requestsForID:%@", (int)request.photoID, self.photoIDsToDeferredRequests, requestsForID);
-  NSArray *similarRequests = [self.class requestsLike:request inArray:requestsForID.allObjects];
+  NSArray *similarRequests = [self requestsLike:request];
   for (DFImageManagerRequest *similarRequest in similarRequests) {
     NSMutableArray *deferredHandlers = self.deferredCompletionBlocks[similarRequest];
     NSMutableArray *executedHandlers = [NSMutableArray new];
@@ -463,15 +471,35 @@ static BOOL logRouting = NO;
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
-+ (NSArray *)requestsLike:(DFImageManagerRequest *)request inArray:(NSArray *)array
+- (NSArray *)requestsLike:(DFImageManagerRequest *)request
 {
+  NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
   NSMutableArray *result = [NSMutableArray new];
-  for (DFImageManagerRequest *otherRequest in array) {
+  for (DFImageManagerRequest *otherRequest in requestsForID) {
     if (CGSizeEqualToSize(otherRequest.size, request.size)) {
       [result addObject:otherRequest];
     }
   }
   return result;
+}
+
+- (void)cancelDeferredCompletionsForRequestsLike:(DFImageManagerRequest *)request
+                                    deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
+{
+  dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
+  
+  NSArray *similarRequests = [self requestsLike:request];
+  NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
+  for (DFImageManagerRequest *similarRequest in similarRequests) {
+    // make sure the delivery mode of the request matches
+    if (similarRequest.deliveryMode != deliveryMode) continue;
+    
+    NSMutableArray *deferredHandlers = self.deferredCompletionBlocks[similarRequest];
+    [deferredHandlers removeAllObjects];
+    [requestsForID removeObject:similarRequest];
+  }
+  
+  dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
 
