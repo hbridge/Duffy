@@ -213,7 +213,8 @@ static BOOL ShowInAppNotifications = NO;
         || pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER
         || pushNotif.type == NOTIFICATIONS_PHOTO_FAVORITED_ID
         || pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT
-        || pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID)
+        || pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID
+        || pushNotif.type == NOTIFICATIONS_NEW_SUGGESTION)
     {
       DFNoticationOpenedHandler handler = [self openedHandlerForNotification:pushNotif];
       handler(pushNotif);
@@ -284,6 +285,13 @@ static BOOL ShowInAppNotifications = NO;
       
       [DFCreateStrandFlowViewController presentFeedObject:foundObject modallyInViewController:rootController];
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
+    } else if (pushNotif.type == NOTIFICATIONS_NEW_SUGGESTION) {
+      UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
+                                          rootViewController];
+      [DFDismissableModalViewController
+       presentWithRootController:[[DFCardsPageViewController alloc]
+                                  initWithPreferredType:DFSuggestionViewType]
+       inParent:rootController];
     }
     
   };
