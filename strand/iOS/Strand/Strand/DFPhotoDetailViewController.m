@@ -791,7 +791,9 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)photoSingleTapped:(UIGestureRecognizer *)sender
 {
-  [self toggleTheatreMode];
+  if (!self.commentToolbar.textField.isFirstResponder)
+    [self toggleTheatreMode];
+  else ([self.commentToolbar.textField resignFirstResponder]);
 }
 
 - (void)photoDoubleTapped:(UIGestureRecognizer *)sender
