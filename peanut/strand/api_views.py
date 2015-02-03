@@ -61,35 +61,42 @@ def getAllIdsInFeedObjects(feedObjects):
 def private_strands(request):
 	stats_util.startProfiling()
 	response = dict({'result': True})
+	responseStr = ""
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
+		num = form.cleaned_data['num']
 
 		try:
 			apiCache = ApiCache.objects.get(user=user)
-			readyResponse = apiCache.private_strands_data
+			responseStr = apiCache.private_strands_data
 
-			# Manually put in the timestamp into the json so we don't have to read then write the json
-			timestampStr = '"timestamp": %s,' %  int(time.time())
-			if not readyResponse:
-				readyResponse = "{%s}" % timestampStr
+			if num:
+				responseObjects = json.loads(responseStr)
+				responseObjects["timestamp"] = int(time.time())
+
+				responseObjects["objects"] = responseObjects["objects"][:50]
+				responseStr = json.dumps(responseObjects)
 			else:
-				readyResponse = readyResponse[:1] + timestampStr + readyResponse[1:]
-
-				
+				# Manually put in the timestamp into the json so we don't have to read then write the json
+				timestampStr = '"timestamp": %s,' %  int(time.time())
+				if not responseStr:
+					responseStr = "{%s}" % timestampStr
+				else:
+					responseStr = responseStr[:1] + timestampStr + responseStr[1:]
 		except ApiCache.DoesNotExist:
 			objs = swaps_util.getFeedObjectsForPrivateStrands(user)
 
 			response['objects'] = objs
 			response['timestamp'] = datetime.datetime.utcnow()
 			
-			readyResponse = json.dumps(response, cls=api_util.DuffyJsonEncoder)
+			responseStr = json.dumps(response, cls=api_util.DuffyJsonEncoder)
 		stats_util.printStats("private-end")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(readyResponse, content_type="application/json")
+	return HttpResponse(responseStr, content_type="application/json")
 
 """
 	Returns back the suggested shares
