@@ -25,5 +25,6 @@
 @property (weak, nonatomic) IBOutlet SAMGradientView *buttonBar;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *buttonBarHeightConstraint;
 @property (weak, nonatomic) IBOutlet UILabel *buttonBarLabel;
+@property (nonatomic) BOOL hasShownSuggestionsNux;
 
 @end

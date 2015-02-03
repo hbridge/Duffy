@@ -38,6 +38,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (DFPeanutFeedObject *)suggestedStrandForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto;
 - (NSArray *)suggestedPhotosIncludeEvaled:(BOOL)includeEvaled;
 - (NSArray *)photosWithUserID:(DFUserIDType)userID onlyEvaluated:(BOOL)evaluated;
+- (NSArray *)photosWithEvaluated:(BOOL)evaluated;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)actionsList;
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user;

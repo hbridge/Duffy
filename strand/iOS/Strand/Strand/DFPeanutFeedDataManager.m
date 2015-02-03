@@ -336,6 +336,18 @@ static DFPeanutFeedDataManager *defaultManager;
   return [self sortedPhotos:photos];
 }
 
+- (NSArray *)photosWithEvaluated:(BOOL)evaluated
+{
+  NSMutableArray *photos = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *photo in self.inboxFeedObjects) {
+    if (![photo.type isEqual:DFFeedObjectPhoto]) continue;
+    if (photo.evaluated.boolValue == evaluated) [photos addObject:photo];
+  }
+  
+  return [self sortedPhotos:photos];
+}
+
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user
 {
   NSMutableArray *strands = [NSMutableArray new];

@@ -37,7 +37,7 @@ const NSUInteger MinPhotosToShowFilter = 20;
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) NSUInteger selectedFilterIndex;
-@property (nonatomic, retain) MMPopLabel *outgoingPopLabel;
+@property (nonatomic, retain) MMPopLabel *suggestionsNuxPopLabel;
 @property (nonatomic, retain) MMPopLabel *cameraRollNuxPopLabel;
 @property (nonatomic, retain) DFNotificationsViewController *notificationsViewController;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
@@ -255,6 +255,13 @@ static BOOL showFilters = NO;
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+  [super viewWillDisappear:animated];
+  [self.suggestionsNuxPopLabel dismiss];
+  [self.cameraRollNuxPopLabel dismiss];
+}
+
 - (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
@@ -326,10 +333,10 @@ static BOOL showFilters = NO;
 
 - (void)configureNUXPopLabels
 {
-  self.outgoingPopLabel = [MMPopLabel
+  self.suggestionsNuxPopLabel = [MMPopLabel
                            popLabelWithText:@"You have photos that were taken with friends."
                            " Tap to check them out!"];
-  [self.view addSubview:self.outgoingPopLabel];
+  [self.view addSubview:self.suggestionsNuxPopLabel];
   self.cameraRollNuxPopLabel = [MMPopLabel popLabelWithText:@"Send a photo to a friend"];
   self.cameraRollNuxPopLabel.delegate = self;
   [self.view addSubview:self.cameraRollNuxPopLabel];
@@ -362,11 +369,15 @@ static BOOL showFilters = NO;
     [self setSuggestionsAreaHidden:NO animated:YES completion:^{
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
-            && [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO] > 0) {
-          [weakSelf.outgoingPopLabel
+            && [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO] > 0
+            && (!weakSelf.hasShownSuggestionsNux
+                || [[[DFPeanutFeedDataManager sharedManager] photosWithEvaluated:NO] count] == 0)
+            && weakSelf.view.window){
+          [weakSelf.suggestionsNuxPopLabel
            popAtView:weakSelf.sendButton
            animatePopLabel:YES
            animateTargetView:NO];
+          weakSelf.hasShownSuggestionsNux = YES;
         }
         [weakSelf.cameraRollNuxPopLabel dismiss];
       });
@@ -379,7 +390,8 @@ static BOOL showFilters = NO;
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO];
         //double check to make sure this hasn't changed
-        if (suggestedPhotos.count == 0)
+        if (suggestedPhotos.count == 0
+            && self.view.window)
           [self.cameraRollNuxPopLabel
            popAtView:self.createButton
            animatePopLabel:YES
@@ -443,7 +455,7 @@ static BOOL showFilters = NO;
     }];
     self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
     self.navigationItem.title = @"Swap";
-    [self.outgoingPopLabel dismiss];
+    [self.suggestionsNuxPopLabel dismiss];
   } else if (!hidden && _suggestionsAreaHidden){
     //show the suggestions area
     self.buttonBarHeightConstraint.constant = ExpandedNavBarHeight;
@@ -460,6 +472,8 @@ static BOOL showFilters = NO;
                                       [UIColor whiteColor]
                                       ];
     self.navigationItem.title = nil;
+  } else {
+    if (completion) completion();
   }
   _suggestionsAreaHidden = hidden;
 }
@@ -478,7 +492,7 @@ static BOOL showFilters = NO;
   
   // handle nux
   [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
-  [self.outgoingPopLabel dismiss];
+  [self.suggestionsNuxPopLabel dismiss];
 }
 
 - (void)logHomeButtonPressed:(id)button
@@ -594,7 +608,7 @@ static DFPeanutFeedObject *currentPhoto;
 - (void)dismissedPopLabel:(MMPopLabel *)popLabel
 {
   if (popLabel == self.cameraRollNuxPopLabel
-      && self.outgoingPopLabel.hidden) {
+      && self.suggestionsNuxPopLabel.hidden) {
     [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:YES];
   }
 }
