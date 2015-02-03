@@ -509,6 +509,12 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (IBAction)likeItemPressed:(id)sender {
   self.likedByUser = !self.likedByUser;
+  
+  if (self.likedByUser) {
+    [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"] status:@"Liked"];
+  } else {
+    [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"] status:@"Unliked"];
+  }
 
   [[DFPeanutFeedDataManager sharedManager]
    setLikedByUser:self.likedByUser
@@ -516,11 +522,6 @@ const NSUInteger CompressedModeMaxRows = 1;
    shareInstance:self.photoObject.share_instance.longLongValue
    success:^(DFActionID actionID) {
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultSuccess];
-     if (self.likedByUser) {
-       [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"] status:@"Liked"];
-     } else {
-       [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"] status:@"Unliked"];
-     }
    } failure:^(NSError *error) {
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultFailure];
    }];
