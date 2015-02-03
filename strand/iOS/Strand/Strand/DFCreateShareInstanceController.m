@@ -12,6 +12,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutShareInstance.h"
 #import "DFSMSInviteStrandComposeViewController.h"
+#import "DFAlertController.h"
 
 static NSMutableSet *textedPhoneNumberStrings;
 
@@ -48,6 +49,9 @@ static NSMutableSet *textedPhoneNumberStrings;
    sharePhotoObjects:photos
    withPhoneNumbers:phoneNumbers
    success:^(NSArray *shareInstances, NSArray *unAuthedPhoneNumbers) {
+     // the share instance has been successfully created, call success block
+     if (success) success();
+     
      DFPeanutShareInstance *shareInstance = shareInstances.firstObject;
      // add the caption if there is one, but success or failure has no bearing
      if ([caption isNotEmpty]) {
@@ -58,6 +62,7 @@ static NSMutableSet *textedPhoneNumberStrings;
         success:nil
         failure:nil];
      }
+     
      
      // send SMS if there were any users created as part of creating the share instance
      if (unAuthedPhoneNumbers.count > 0) {
@@ -73,32 +78,30 @@ static NSMutableSet *textedPhoneNumberStrings;
            return;
          }
          
+         NSDate *fromDate = ((DFPeanutFeedObject *)photos.firstObject).time_taken;
          [DFSMSInviteStrandComposeViewController
           showWithParentViewController:parentViewController
           phoneNumbers:numbersToText.allObjects
-          fromDate:((DFPeanutFeedObject *)photos.firstObject).time_taken
+          fromDate:fromDate
           completionBlock:^(MessageComposeResult result) {
-            if (success) success();
-            
             if (requireServerRoundtrip) {
               if (result == MessageComposeResultSent) {
                 [SVProgressHUD showSuccessWithStatus:@"Sent!"];
                 dispatch_async(dispatch_get_main_queue(), ^{
                   // keep track of the fact that these numbers have been sent to
                   [textedPhoneNumberStrings unionSet:numbersToText];
+                  if (uiCompleteHandler) uiCompleteHandler();
                 });
               } else {
-                NSString *errorString;
-                if (result == MessageComposeResultCancelled) errorString = @"Invite Text Cancelled";
-                else errorString = @"Failed";
-                [SVProgressHUD showErrorWithStatus:errorString];
+                [self showTextCancelledWithParent:parentViewController
+                                     phoneNumbers:numbersToText.allObjects
+                                         fromDate:fromDate
+                                uiCompleteHandler:uiCompleteHandler];
               }
             }
-            if (uiCompleteHandler) uiCompleteHandler();
           }];
        });
      } else {
-       if (success) success();
        if (requireServerRoundtrip) {
          [SVProgressHUD showSuccessWithStatus:@"Sent!"];
          if (uiCompleteHandler) uiCompleteHandler();
@@ -121,6 +124,43 @@ static NSMutableSet *textedPhoneNumberStrings;
   }
 }
 
-
++ (void)showTextCancelledWithParent:(UIViewController *)parentViewController
+                       phoneNumbers:(NSArray *)phoneNumbers
+                           fromDate:(NSDate *)fromDate
+                  uiCompleteHandler:(DFVoidBlock)uiCompleteHandler
+{
+  DFAlertController *alert = [DFAlertController
+                              alertControllerWithTitle:@"Not Sent"
+                              message:@"Some recipients are not yet Swap members and won't be notified unless you send them a text. Send a text now?"
+                              preferredStyle:DFAlertControllerStyleAlert];
+  [alert
+   addAction:[DFAlertAction
+              actionWithTitle:@"Send Text"
+              style:DFAlertActionStyleDefault
+              handler:^(DFAlertAction *action) {
+                [DFSMSInviteStrandComposeViewController
+                 showWithParentViewController:parentViewController
+                 phoneNumbers:phoneNumbers
+                 fromDate:fromDate
+                 completionBlock:^(MessageComposeResult result) {
+                   if (result == MessageComposeResultSent) {
+                     [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+                     dispatch_async(dispatch_get_main_queue(), ^{
+                       // keep track of the fact that these numbers have been sent to
+                       [textedPhoneNumberStrings addObjectsFromArray:phoneNumbers];
+                     });
+                   }
+                   if (uiCompleteHandler) uiCompleteHandler();
+                 }];
+              }]];
+  [alert
+   addAction:[DFAlertAction
+              actionWithTitle:@"Cancel"
+              style:DFAlertActionStyleCancel
+              handler:^(DFAlertAction *action) {
+                if (uiCompleteHandler) uiCompleteHandler();
+              }]];
+  [alert showWithParentViewController:parentViewController animated:YES completion:nil];
+}
 
 @end
