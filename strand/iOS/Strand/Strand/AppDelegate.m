@@ -233,6 +233,11 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       // Tell the server that the app was woken up and register timestamp
       NSDate *now = [[NSDate alloc] init];
       DDLogVerbose(@"Setting last checkin time to %@", now);
+      
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+       object:self];
+      
       [[DFUserInfoManager sharedManager] setLastCheckinTimestamp:now];
       
       [[DFCameraRollSyncManager sharedManager] sync];
@@ -247,10 +252,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       // Clearing out our phone number to name cache incase the contact list changed
       [[DFContactDataManager sharedManager] refreshCache];
       [DFPushNotificationsManager refreshPushToken];
-      
-      [[NSNotificationCenter defaultCenter]
-       postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-       object:self];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
