@@ -350,7 +350,7 @@ static BOOL showFilters = NO;
 
 - (void)reloadSuggestionsArea
 {
-  NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
+  NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO];
   NSUInteger numToSend = [suggestedPhotos count];
   
   if (numToSend > 0) {
@@ -376,7 +376,7 @@ static BOOL showFilters = NO;
         && [[DFPeanutFeedDataManager sharedManager] hasSwapsData]
         && !CGRectEqualToRect(self.cameraRollNuxPopLabel.frame, CGRectZero)) {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
+        NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO];
         //double check to make sure this hasn't changed
         if (suggestedPhotos.count == 0)
           [self.cameraRollNuxPopLabel
@@ -539,7 +539,7 @@ static DFPeanutFeedObject *currentPhoto;
 
 - (void)testCycleBackgroundArea
 {
-  NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] photosFromSuggestedStrands];
+  NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO];
   if (!currentPhoto) {
     currentPhoto = suggestedPhotos.firstObject;
   }

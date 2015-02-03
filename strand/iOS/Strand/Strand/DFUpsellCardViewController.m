@@ -58,17 +58,7 @@
     result = @"no";
   }
   
-  NSString *typeString = @"unknown";
-  if (self.upsellType == DFUpsellCardViewGotoSuggestions) {
-    typeString = @"NoIncomingInterstitial";
-  } else if (self.upsellType == DFUpsellCardViewBackgroundLocation) {
-    typeString = @"BackgroundLocationUpsell";
-  } else {
-    #ifdef DEBUG
-    [NSException raise:@"not logged properly" format:@"other card not logged properly"];
-    #endif
-  }
-  [DFAnalytics logOtherCardType:typeString
+  [DFAnalytics logOtherCardType:[self typeString]
             processedWithResult:result
                      actionType:DFAnalyticsActionTypeTap];
 }
@@ -90,6 +80,21 @@
   [self.noButton addTarget:self
                     action:@selector(buttonSelected:)
           forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (NSString *)typeString
+{
+  NSString *typeString = @"unknown";
+  if (self.upsellType == DFUpsellCardViewGotoSuggestions) {
+    typeString = @"NoIncomingInterstitial";
+  } else if (self.upsellType == DFUpsellCardViewBackgroundLocation) {
+    typeString = @"BackgroundLocationUpsell";
+  } else {
+#ifdef DEBUG
+    [NSException raise:@"not logged properly" format:@"other card not logged properly"];
+#endif
+  }
+  return typeString;
 }
 
 @end

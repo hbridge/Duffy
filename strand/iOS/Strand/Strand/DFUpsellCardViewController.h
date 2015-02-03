@@ -19,9 +19,11 @@ typedef NS_ENUM(NSInteger, DFUpsellCardViewType) {
 };
 
 @property (nonatomic) DFUpsellCardViewType upsellType;
+@property (readonly, nonatomic, retain) NSString *typeString;
 @property (nonatomic, weak) IBOutlet DFUpsellContentView *upsellContentView;
 @property (nonatomic, copy) DFVoidBlock yesButtonHandler;
 @property (nonatomic, copy) DFVoidBlock noButtonHandler;
+@property (nonatomic, retain) id<NSCopying, NSObject> sentinalValue;
 
 @property (weak, nonatomic) IBOutlet UIButton *noButton;
 @property (weak, nonatomic) IBOutlet UIButton *yesButton;

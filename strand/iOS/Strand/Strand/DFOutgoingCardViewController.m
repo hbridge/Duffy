@@ -78,6 +78,11 @@
   };
 }
 
+- (id<NSCopying, NSObject>)sentinalValue
+{
+  return self.photoFeedObject;
+}
+
 
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
 {

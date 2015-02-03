@@ -512,8 +512,17 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
+- (DFPeanutFeedObject *)suggestedStrandForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto
+{
+  for (DFPeanutFeedObject *suggestedStrand in [self suggestedStrands]) {
+    NSArray *photos = [suggestedStrand leafNodesFromObjectOfType:DFFeedObjectPhoto];
+    if ([photos containsObject:suggestedPhoto]) return suggestedStrand;
+  }
+  return nil;
+}
 
-- (NSArray *)photosFromSuggestedStrands
+
+- (NSArray *)suggestedPhotosIncludeEvaled:(BOOL)includeEvaled
 {
   NSArray *suggestedStrands = [self suggestedStrands];
   NSMutableArray *allPhotos = [NSMutableArray new];
@@ -521,6 +530,9 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutFeedObject *strand in suggestedStrands) {
     [allPhotos addObjectsFromArray:[strand leafNodesFromObjectOfType:DFFeedObjectPhoto]];
   }
+  
+  if (includeEvaled) return allPhotos;
+  
   NSPredicate *predicate = [NSPredicate
                             predicateWithFormat:@"evaluated == nil"];
 
@@ -732,7 +744,6 @@ static DFPeanutFeedDataManager *defaultManager;
       shareInstance.user = @([[DFUser currentUser] userID]);
       [shareInstances addObject:shareInstance];
     }
-    
     [self.shareInstanceAdapter
      createShareInstances:shareInstances
      success:^(NSArray *resultObjects) {
@@ -751,14 +762,14 @@ static DFPeanutFeedDataManager *defaultManager;
      } failure:^(NSError *error) {
        failure(error);
      }];
-
-     for (DFPeanutFeedObject *photo in photoObjects) {
-       [self setLocalHasEvaluatedPhoto:photo.id shareInstance:0];
-     }
-     
   } failure:^(NSError *error) {
     failure(error);
   }];
+  
+  // Immediately mark all the photo objects as evaluated to update local UI
+  for (DFPeanutFeedObject *photo in photoObjects) {
+    [self setLocalHasEvaluatedPhoto:photo.id shareInstance:0];
+  }
 }
 
 - (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
@@ -933,7 +944,7 @@ static DFPeanutFeedDataManager *defaultManager;
        object:self];
     }
   }
-  for (DFPeanutFeedObject *photo in [self photosFromSuggestedStrands]) {
+  for (DFPeanutFeedObject *photo in [self suggestedPhotosIncludeEvaled:NO]) {
     if (photo.id == photoID) {
       photo.evaluated = @(1);
       [[NSNotificationCenter defaultCenter]

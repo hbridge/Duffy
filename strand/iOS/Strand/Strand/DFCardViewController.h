@@ -11,8 +11,8 @@
 
 @interface DFCardViewController : UIViewController
 
-@property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
-@property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
+@property (nonatomic, retain) id<NSCopying, NSObject> sentinalValue;
+
 
 typedef UInt64 DFHomeSubViewType;
 extern DFHomeSubViewType DFSuggestionViewType;

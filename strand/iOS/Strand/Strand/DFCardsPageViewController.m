@@ -30,26 +30,16 @@ const NSUInteger UpsellCardFrequency = 5;
 
 @interface DFCardsPageViewController ()
 
-@property (nonatomic, retain) DFPeanutFeedObject *pickedSuggestion;
-@property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
-@property (nonatomic, readonly, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (nonatomic, retain) NSMutableDictionary *sentContactsByStrandID;
 
-@property (nonatomic) NSInteger photoIndex;
-@property (retain, nonatomic) NSMutableArray *indexPaths;
-
-@property (retain, nonatomic) NSMutableSet *alreadyShownPhotoIds;
-@property (nonatomic, retain) UIViewController *noSuggestionsViewController;
-@property (nonatomic, retain) DFUpsellCardViewController *noIncomingViewController;
-@property (readonly, nonatomic, retain) NSArray *allSuggestions;
+@property (retain, nonatomic) NSMutableSet *alreadyProcessedPhotoIDs;
+@property (nonatomic, retain) NSMutableArray *allSuggestedItems;
+@property (nonatomic, retain) NSArray *suggestedPhotos;
 
 @end
 
 @implementation DFCardsPageViewController
-@synthesize inviteAdapter = _inviteAdapter;
-@synthesize noSuggestionsViewController = _noSuggestionsViewController;
-@synthesize noIncomingViewController = _noIncomingViewController;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
 {
@@ -66,6 +56,7 @@ const NSUInteger UpsellCardFrequency = 5;
     _startingPhotoID = photoID;
     _startingShareInstanceID = shareID;
     _sentContactsByStrandID = [NSMutableDictionary new];
+    _allSuggestedItems = [NSMutableArray new];
   }
   return self;
 }
@@ -81,7 +72,7 @@ const NSUInteger UpsellCardFrequency = 5;
     [self observeNotifications];
     [self configureNavAndTab];
 
-    self.alreadyShownPhotoIds = [NSMutableSet new];
+    self.alreadyProcessedPhotoIDs = [NSMutableSet new];
   }
   return self;
 }
@@ -130,17 +121,42 @@ const NSUInteger UpsellCardFrequency = 5;
 
 - (void)reloadData
 {
-  UIViewController *currentViewController = self.viewControllers.firstObject;
-  if (!currentViewController || currentViewController == self.noSuggestionsViewController) {
-    [self gotoNextController];
-  }
-  [self configureLoadingView];
-}
-
-- (NSArray *)allSuggestions
-{
-  NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-  return allSuggestions;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSUInteger beforeCount = self.allSuggestedItems.count;
+    
+    // replace old photo objects with their new version from the feed,
+    // or add them to the end if they didn't exist before
+    NSMutableDictionary *previousPhotoIDsToItemIndices = [NSMutableDictionary new];
+    for (NSUInteger i = 0; i < self.allSuggestedItems.count; i++) {
+      if (![self.allSuggestedItems[i] isKindOfClass:[DFPeanutFeedObject class]]) continue;
+      DFPeanutFeedObject *photo = self.allSuggestedItems[i];
+      previousPhotoIDsToItemIndices[@(photo.id)] = @(i);
+    }
+    NSArray *newSuggestedPhotos = [[DFPeanutFeedDataManager sharedManager]
+                                   suggestedPhotosIncludeEvaled:YES];
+    for (DFPeanutFeedObject *newSuggestedPhoto in newSuggestedPhotos) {
+      NSNumber *previousIndex = previousPhotoIDsToItemIndices[@(newSuggestedPhoto.id)];
+      if (previousIndex) {
+        self.allSuggestedItems[previousIndex.unsignedIntegerValue] = newSuggestedPhoto;
+      } else {
+        [self.allSuggestedItems addObject:newSuggestedPhoto];
+      }
+    }
+    
+    NSUInteger afterCount = self.allSuggestedItems.count;
+    
+    // if we didn't have any items before, insert a sentinal number where the upsell should go
+    if (beforeCount == 0 && afterCount > 0) {
+      NSUInteger insertIndex = MIN(UpsellCardFrequency - 1, afterCount - 1);
+      [self.allSuggestedItems insertObject:@(insertIndex) atIndex:insertIndex];
+    }
+    
+    if (!self.viewControllers.firstObject) {
+      [self gotoNextController];
+    }
+    [self configureLoadingView];
+    
+  });
 }
 
 - (void)configureLoadingView
@@ -167,13 +183,17 @@ const NSUInteger UpsellCardFrequency = 5;
 - (void)gotoNextController
 {
   UIViewController *nextController;
+  UIPageViewControllerNavigationDirection direction = UIPageViewControllerNavigationDirectionForward;
   nextController = [self pageViewController:self
                             viewControllerAfterViewController:self.viewControllers.firstObject];
-  if (!nextController) nextController = [self pageViewController:self
-                              viewControllerBeforeViewController:self.viewControllers.firstObject];
+  if (!nextController) {
+    nextController = [self pageViewController:self
+           viewControllerBeforeViewController:self.viewControllers.firstObject];
+    direction = UIPageViewControllerNavigationDirectionReverse;
+  }
   if (nextController) {
     [self setViewControllers:@[nextController]
-                   direction:UIPageViewControllerNavigationDirectionForward
+                   direction:direction
                     animated:YES
                   completion:nil];
   } else {
@@ -187,15 +207,9 @@ const NSUInteger UpsellCardFrequency = 5;
        viewControllerAfterViewController:(UIViewController *)viewController
 {
   DFCardViewController *cardViewController = (DFCardViewController *)viewController;
-
-  
   DFCardViewController *vc = [self nextViewControllerAscending:YES
                                                     fromViewController:cardViewController];
-  
-  if (vc) return vc;
-  
-  return [self nextOutgoingUpsellWithStoredSuggestion:cardViewController.suggestionFeedObject
-                                          storedPhoto:cardViewController.photoFeedObject];
+  return vc;
 }
 
 
@@ -205,104 +219,63 @@ const NSUInteger UpsellCardFrequency = 5;
   DFCardViewController *cardViewController = (DFCardViewController *)viewController;
   DFCardViewController *vc = [self nextViewControllerAscending:NO
                                                     fromViewController:cardViewController];
-  if (vc) return vc;
-  return nil;
+  return vc;
 }
 
 - (DFCardViewController *)nextViewControllerAscending:(BOOL)ascending
-                                         fromViewController:(DFCardViewController *)cvc
+                                   fromViewController:(DFCardViewController *)cvc
 {
-  // figure out which suggestion/photo we were on
-  DFPeanutFeedObject *suggestion = cvc.suggestionFeedObject;
-  NSArray *suggestionPhotos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-  DFPeanutFeedObject *photo = cvc.photoFeedObject;
+  if (!cvc) {
+    return [self outgoingCardViewControllerForPhoto:self.allSuggestedItems.firstObject];
+  }
   
-  // determine if we should show an upsell here
-  if (cvc && ![cvc isKindOfClass:[DFUpsellCardViewController class]]) {
-    // don't show two upsells in a row
-    NSInteger currentIndex = [self indexOfPhoto:photo
-                                   inSuggestion:suggestion];
-    NSUInteger indexRequested = ascending ? currentIndex + 1 : currentIndex - 1;
-    // if the requested index is at our upsell card frequency, return an upsell if appropriate
-    if (indexRequested > 0 && indexRequested % (UpsellCardFrequency - 1) == 0) {
-      DFCardViewController *nextUpsell = [self nextOutgoingUpsellWithStoredSuggestion:suggestion
-                                                                      storedPhoto:photo];
-      if (nextUpsell) return nextUpsell;
+  // figure out which object we were on
+  id<NSCopying, NSObject> fromSentinalValue = cvc.sentinalValue;
+  
+  // if there is a object photo, look at the next suggested photo
+  if (fromSentinalValue) {
+    NSInteger fromIndex = [self.allSuggestedItems indexOfObject:fromSentinalValue];
+    if (fromIndex == NSNotFound) {
+      DDLogWarn(@"%@ sentinal disappeared", self.class);
+      return nil;
+    }
+    for (NSUInteger i = fromIndex + (ascending ? 1 : -1); i < self.allSuggestedItems.count; (ascending ? i++ : i--)) {
+      id<NSObject, NSCopying> object = [self.allSuggestedItems objectAtIndex:i];
+      if ([[object class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
+        DFPeanutFeedObject *photo = (DFPeanutFeedObject *)object;
+        if (!photo.evaluated.boolValue) {
+          return [self outgoingCardViewControllerForPhoto:photo];
+        }
+      } else {
+        return [self nextOutgoingUpsellWithSentinalValue:object];
+      }
     }
   }
-  
-  // figure out the next suggestion/photo to show
-  DFPeanutFeedObject *nextSuggestionToShow;
-  DFPeanutFeedObject *nextPhotoToShow;
-  
-  // if there is a current suggestion and photo, look at the suggestion first
-  if (suggestion && photo) {
-    // see if there are other photos in the current suggestion
-    DFPeanutFeedObject *nextPhotoInSuggestion = [suggestionPhotos
-                                                 objectWithDistance:ascending ? 1 : -1
-                                                 fromObject:photo
-                                                 wrap:NO];
-    if (nextPhotoInSuggestion) {
-      nextPhotoToShow = nextPhotoInSuggestion;
-      nextSuggestionToShow = suggestion;
-    }
-  } else {
-    // otherwise, set the next photo and suggestion to the first
-    nextSuggestionToShow = [self.allSuggestions firstObject];
-    nextPhotoToShow = [[nextSuggestionToShow leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  }
-  
-  // if we haven't picked a next photo to show, look at the next suggestion
-  if (!nextPhotoToShow) {
-    DFPeanutFeedObject *nextSuggestionInAllSuggestions = [self.allSuggestions
-                                                          objectWithDistance:ascending ? 1 : -1
-                                                          fromObject:suggestion
-                                                          wrap:NO
-                                                          ];
-    if (nextSuggestionInAllSuggestions) {
-      nextPhotoToShow = [[nextSuggestionInAllSuggestions leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-      nextSuggestionToShow = nextSuggestionInAllSuggestions;
-    }
-  }
-  
-  // if we found a next photo and suggestion, return a VC for it
-  if (nextPhotoToShow && nextSuggestionToShow) {
-    DFOutgoingCardViewController *nextVC = [[DFOutgoingCardViewController alloc] init];
-    nextVC.view.frame = self.view.bounds;
-    
-    [nextVC configureWithSuggestion:nextSuggestionToShow withPhoto:nextPhotoToShow];
-    NSArray *lastSentForStrand = self.sentContactsByStrandID[nextSuggestionToShow.strand_id];
-    if (lastSentForStrand.count > 0) nextVC.selectedPeanutContacts = lastSentForStrand;
-    DFCardsPageViewController __weak *weakSelf = self;
-    
-    nextVC.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
-                                NSArray *contacts,
-                                NSString *caption){
-      [weakSelf suggestionSelected:suggestion contacts:contacts photo:nextPhotoToShow caption:caption];
-    };
-    nextVC.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
-      [weakSelf photoSkipped:nextPhotoToShow];
-    };
-    return nextVC;
-  }
+
   return nil;
 }
 
-- (NSInteger)indexOfPhoto:(DFPeanutFeedObject *)photoToFind
-             inSuggestion:(DFPeanutFeedObject *)suggestionToFind
+- (DFOutgoingCardViewController *)outgoingCardViewControllerForPhoto:(DFPeanutFeedObject *)photo
 {
-  NSInteger photosSeen = 0;
-  for (DFPeanutFeedObject *suggestion in self.allSuggestions) {
-    NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-    if ([suggestion isEqual:suggestionToFind]) {
-      NSInteger photoIndex = [photos indexOfObject:photoToFind];
-      if (photoIndex == NSNotFound) return NSNotFound;
-      return photosSeen + photoIndex;
-    }
-    photosSeen += photos.count;
-  }
+  DFOutgoingCardViewController *ovc = [[DFOutgoingCardViewController alloc] init];
+  ovc.view.frame = self.view.bounds;
   
-  return NSNotFound;
+  DFPeanutFeedObject *nextSuggestionToShow =
+  [[DFPeanutFeedDataManager sharedManager] suggestedStrandForSuggestedPhoto:photo];
+  [ovc configureWithSuggestion:nextSuggestionToShow withPhoto:photo];
+  NSArray *lastSentForStrand = self.sentContactsByStrandID[nextSuggestionToShow.strand_id];
+  if (lastSentForStrand.count > 0) ovc.selectedPeanutContacts = lastSentForStrand;
+  DFCardsPageViewController __weak *weakSelf = self;
+  
+  ovc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion,
+                              NSArray *contacts,
+                              NSString *caption){
+    [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo caption:caption];
+  };
+  ovc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
+    [weakSelf photoSkipped:photo];
+  };
+  return ovc;
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController
@@ -311,21 +284,27 @@ const NSUInteger UpsellCardFrequency = 5;
        transitionCompleted:(BOOL)completed
 {
   if (completed) {
-    DFOutgoingCardViewController *ovc = self.viewControllers.firstObject;
-    [self.alreadyShownPhotoIds addObject:@(ovc.photoFeedObject.id)];
+    DFCardViewController *cvc = self.viewControllers.firstObject;
+    if ([cvc isKindOfClass:[DFOutgoingCardViewController class]]) {
+      [DFAnalytics logOutgoingCardProcessedWithSuggestion:((DFOutgoingCardViewController *)cvc).suggestionFeedObject
+                                                   result:@"scroll"
+                                               actionType:DFAnalyticsActionTypeSwipe];
+    } else {
+      [DFAnalytics logOtherCardType:((DFUpsellCardViewController *)cvc).typeString
+                processedWithResult:@"scroll"
+                         actionType:DFAnalyticsActionTypeSwipe];
+    }
   }
 }
 
-- (DFCardViewController *)nextOutgoingUpsellWithStoredSuggestion:(DFPeanutFeedObject *)suggestion
-                                                 storedPhoto:(DFPeanutFeedObject *)photo
+- (DFCardViewController *)nextOutgoingUpsellWithSentinalValue:(id)sentinalValue
 {
   DFCardsPageViewController __weak *weakSelf = self;
   if (![[DFBackgroundLocationManager sharedManager] isPermssionGranted]
       && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
     DFUpsellCardViewController *locationUpsellController = [[DFUpsellCardViewController alloc]
                                                             initWithType:DFUpsellCardViewBackgroundLocation];
-    locationUpsellController.suggestionFeedObject = suggestion;
-    locationUpsellController.photoFeedObject = photo;
+    locationUpsellController.sentinalValue = sentinalValue;
     locationUpsellController.yesButtonHandler = ^{
       [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
       [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
@@ -354,7 +333,7 @@ const NSUInteger UpsellCardFrequency = 5;
     return;
   }
   
-  [self.alreadyShownPhotoIds addObject:@(photo.id)];
+  [self.alreadyProcessedPhotoIDs addObject:@(photo.id)];
   self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];
   
   [DFCreateShareInstanceController
@@ -376,7 +355,7 @@ const NSUInteger UpsellCardFrequency = 5;
 - (void)photoSkipped:(DFPeanutFeedObject *)photo
 {
   if (photo)
-    [self.alreadyShownPhotoIds addObject:@(photo.id)];
+    [self.alreadyProcessedPhotoIDs addObject:@(photo.id)];
     [[DFPeanutFeedDataManager sharedManager]
      setHasEvaluatedPhoto:photo.id
      shareInstance:photo.share_instance.longLongValue];
@@ -411,11 +390,6 @@ const NSUInteger UpsellCardFrequency = 5;
   [self gotoNextController];
 }
 
-- (DFPeanutStrandInviteAdapter *)inviteAdapter
-{
-  if (!_inviteAdapter) _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
-  return _inviteAdapter;
-}
 
 
 @end
