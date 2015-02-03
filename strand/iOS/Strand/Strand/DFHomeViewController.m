@@ -361,7 +361,8 @@ static BOOL showFilters = NO;
     DFHomeViewController __weak *weakSelf = self;
     [self setSuggestionsAreaHidden:NO animated:YES completion:^{
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+        if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
+            && [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO] > 0) {
           [weakSelf.outgoingPopLabel
            popAtView:weakSelf.sendButton
            animatePopLabel:YES
@@ -442,6 +443,7 @@ static BOOL showFilters = NO;
     }];
     self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
     self.navigationItem.title = @"Swap";
+    [self.outgoingPopLabel dismiss];
   } else if (!hidden && _suggestionsAreaHidden){
     //show the suggestions area
     self.buttonBarHeightConstraint.constant = ExpandedNavBarHeight;
