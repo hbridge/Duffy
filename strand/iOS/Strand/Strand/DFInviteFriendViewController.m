@@ -94,7 +94,7 @@
     }
     
     // Contacts
-    DFSection *allContactsSection = [DFPeoplePickerViewController allContactsSection];
+    DFSection *allContactsSection = [DFPeoplePickerViewController allContactsSectionExcludingFriends:YES];
     [sections addObject:allContactsSection];
     [self setSecondaryAction:[self inviteSecondaryAction] forSection:allContactsSection];
     
@@ -102,9 +102,6 @@
     self.abContacts = [allContactsSection.rows objectsPassingTestBlock:^BOOL(id input) {
       return [[input class] isSubclassOfClass:[DFPeanutContact class]];
     }];
-    
-    // make contacts not selectable so that tapping on search results doesn't return
-    self.notSelectableContacts = self.abContacts;
     
     [self setSections:sections];
   });
@@ -146,6 +143,12 @@
     [self.navigationController pushViewController:friendController animated:YES];
     [DFAnalytics logInviteActionTaken:@"viewFriend" userInfo:[self analyticsDict]];
   }
+}
+
+- (BOOL)pickerController:(DFPeoplePickerViewController *)pickerController
+       shouldPickContact:(DFPeanutContact *)contact
+{
+  return NO;
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
@@ -194,7 +197,17 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   return ^(DFPeanutContact *contact) {
     DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
     if ([user hasAuthedPhone]) {
-      [SVProgressHUD showErrorWithStatus:@"Already user"];
+      [[DFPeanutFeedDataManager sharedManager] setUser:[[DFUser currentUser] userID]
+                                             isFriends:YES
+                                           withUserIDs:@[@(user.id)]
+                                               success:^{
+                                                 [SVProgressHUD showSuccessWithStatus:@"Added!"];
+                                                 [self reloadData];
+                                               } failure:^(NSError *error) {
+                                                 [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
+                                                 DDLogError(@"%@ adding users failed: %@", self.class, error);
+                                               }];
+      [DFAnalytics logInviteActionTaken:@"add" userInfo:[weakSelf analyticsDict]];
       return;
     }
     

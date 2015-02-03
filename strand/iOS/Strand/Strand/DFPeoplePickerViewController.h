@@ -30,6 +30,8 @@
          pickedContactsDidChange:(NSArray *)peanutContacts;
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
            contactTapped:(DFPeanutContact *)contact;
+- (BOOL)pickerController:(DFPeoplePickerViewController *)pickerController
+       shouldPickContact:(DFPeanutContact *)contact;
 
 @end
 
@@ -62,6 +64,6 @@
                 forSection:(DFSection *)section;
 - (void)removeSearchBar;
 
-+ (DFSection *)allContactsSection;
++ (DFSection *)allContactsSectionExcludingFriends:(BOOL)excludeFriends;
 
 @end

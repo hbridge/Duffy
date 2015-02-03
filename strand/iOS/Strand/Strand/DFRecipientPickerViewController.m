@@ -100,7 +100,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
                                                object:nil
                                                  rows:friendContacts]];
     }
-    [sections addObject:[DFPeoplePickerViewController allContactsSection]];
+    [sections addObject:[DFPeoplePickerViewController allContactsSectionExcludingFriends:YES]];
     [self setSections:sections];
   });
 }

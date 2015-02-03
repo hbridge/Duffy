@@ -77,9 +77,16 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   });
 }
 
-+ (DFSection *)allContactsSection
++ (DFSection *)allContactsSectionExcludingFriends:(BOOL)excludeFriends
 {
   NSArray *contacts = [[DFContactDataManager sharedManager] allPeanutContacts];
+  if (excludeFriends) {
+    contacts = [contacts objectsPassingTestBlock:^BOOL(DFPeanutContact *input) {
+      DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
+                                  userWithPhoneNumber:input.phone_number];
+      return ![user.relationship isEqual:DFPeanutUserRelationshipFriend];
+    }];
+  }
   DFSection *contactsSection;
   if (contacts.count > 0) {
     contactsSection = [DFSection sectionWithTitle:@"Contacts" object:nil rows:contacts];
@@ -544,7 +551,12 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   BOOL contactSelected = NO;
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
-    if (![self.notSelectableContacts containsObject:object]) {
+    BOOL select = ![self.notSelectableContacts containsObject:object];
+    if ([self.delegate respondsToSelector:@selector(pickerController:shouldPickContact:)]) {
+      select = [self.delegate pickerController:self shouldPickContact:object];
+    }
+    
+    if (select) {
       [self contactSelected:object];
       contactSelected = YES;
     } else {
