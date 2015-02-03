@@ -404,7 +404,9 @@ class PhotoBulkAPI(BasePhotoAPI):
             if len(ids) > 0:
                 two_fishes.processIds.delay(ids)
                 stranding.processIds.delay(ids)
-                similarity.processIds.delay(ids)
+
+                # Temporarily remove until we can get it working
+                #similarity.processIds.delay(ids)
 
             response = [model_to_dict(photo) for photo in allPhotos]
 
