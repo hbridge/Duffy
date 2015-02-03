@@ -190,12 +190,7 @@ static DFSettings *defaultSettings;
 
 - (void)setLocationEnabled:(BOOL)locationEnabled
 {
-  if ([[DFDefaultsStore stateForPermission:DFPermissionLocation] isEqual:DFPermissionStateDenied]) {
-    if (locationEnabled) {
-      [self.class showPermissionDeniedAlert];
-    }
-  }
-  else if (locationEnabled) {
+  if (locationEnabled) {
     [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
   }
 }
