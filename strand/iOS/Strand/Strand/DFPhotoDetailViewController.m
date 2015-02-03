@@ -31,7 +31,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 @interface DFPhotoDetailViewController ()
 
-@property (nonatomic) DFActionID userLikeActionID;
+@property (nonatomic) BOOL likedByUser;
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (nonatomic, retain) NSMutableArray *comments;
 @property (nonatomic, retain) DFCommentTableViewCell *templateCell;
@@ -45,7 +45,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 @implementation DFPhotoDetailViewController
 
 @synthesize actionAdapter = _actionAdapter;
-@synthesize userLikeActionID = _userLikeActionID;
+@synthesize likedByUser = _likedByUser;
 
 
 - (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject
@@ -55,7 +55,11 @@ const NSUInteger CompressedModeMaxRows = 1;
     _openKeyboardOnAppear = NO;
     _photoObject = photoObject;
     _templateCell = [DFCommentTableViewCell templateCell];
-    _userLikeActionID = [[[self.photoObject userFavoriteAction] id] longLongValue];
+    if ([self.photoObject userFavoriteAction]) {
+      _likedByUser = YES;
+    } else {
+      _likedByUser = NO;
+    }
     [self observeNotifications];
   }
   return self;
@@ -280,7 +284,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   self.commentToolbar.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0.9];
 
   //configure like
-  [self.commentToolbar setLikeBarButtonItemOn:(self.userLikeActionID > 0)];
+  [self.commentToolbar setLikeBarButtonItemOn:self.likedByUser];
   self.commentToolbar.likeHandler = ^{
     [weakSelf likeItemPressed:weakSelf.commentToolbar.likeButton];
   };
@@ -504,38 +508,23 @@ const NSUInteger CompressedModeMaxRows = 1;
 }
 
 - (IBAction)likeItemPressed:(id)sender {
-  BOOL newLikeValue = (self.userLikeActionID == 0);
-  DFActionID oldID = self.userLikeActionID;
-  self.userLikeActionID = newLikeValue;
-  if (newLikeValue) {
-    DFPeanutAction *fakeAction = [[DFPeanutAction alloc] init];
-    fakeAction.action_type = DFPeanutActionFavorite;
-    fakeAction.user = [[DFUser currentUser] userID];
-    self.photoObject.actions = [self.photoObject.actions arrayByAddingObject:fakeAction];
-  } else {
-    DFPeanutAction *oldAction = [[self.photoObject actionsOfType:DFPeanutActionFavorite
-                                                        forUser:[[DFUser currentUser] userID]] firstObject];
-    if (oldAction)
-      self.photoObject.actions = [self.photoObject.actions arrayByRemovingObject:oldAction];
-  }
-  [self reloadProfileWithContextData];
+  self.likedByUser = !self.likedByUser;
+
   [[DFPeanutFeedDataManager sharedManager]
-   setLikedByUser:newLikeValue
+   setLikedByUser:self.likedByUser
    photo:self.photoObject.id
    shareInstance:self.photoObject.share_instance.longLongValue
-   oldActionID:oldID
    success:^(DFActionID actionID) {
-     self.userLikeActionID = actionID;
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultSuccess];
-     if (newLikeValue) {
+     if (self.likedByUser) {
        [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"] status:@"Liked"];
      } else {
        [SVProgressHUD showImage:[UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"] status:@"Unliked"];
      }
-     
    } failure:^(NSError *error) {
      [self.class logController:self actionType:DFPeanutActionFavorite result:DFAnalyticsValueResultFailure];
    }];
+  [self reloadProfileWithContextData];
 }
 
 - (IBAction)addPersonPressed:(id)sender {
@@ -550,9 +539,9 @@ const NSUInteger CompressedModeMaxRows = 1;
                                 withBackButtonTitle:@"Cancel"];
 }
 
-- (void)setUserLikeActionID:(DFActionID)userLikeActionID
+- (void)setLikedByUser:(BOOL)likedByUser
 {
-  _userLikeActionID = userLikeActionID;
+  _likedByUser = likedByUser;
   [self configureCommentToolbar];
 }
 

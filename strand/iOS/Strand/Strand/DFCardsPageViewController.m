@@ -380,9 +380,7 @@ const NSUInteger UpsellCardFrequency = 5;
    setLikedByUser:YES
    photo:photo
    shareInstance:shareInstance
-   oldActionID:0
    success:^(DFActionID actionID) {
-    
   } failure:^(NSError *error) {
     
   }];

@@ -1044,25 +1044,34 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
               shareInstance:(DFStrandIDType)shareInstance
-           oldActionID:(DFActionID)oldActionID
               success:(void(^)(DFActionID actionID))success
                failure:(DFFailureBlock)failure
 {
   DDLogVerbose(@"Like button pressed");
-  if (!liked && !oldActionID) {
-    [NSException raise:@"must provide old action ID" format:@"oldActionID required when setting photo liked to false"];
-  } else if (liked && oldActionID) {
-    success(oldActionID);
-  }
+  
+  DFPeanutFeedObject *photo = [self photoWithID:photoID shareInstance:shareInstance];
   
   DFPeanutAction *action = [[DFPeanutAction alloc] init];
   action.user = [[DFUser currentUser] userID];
   action.action_type = DFPeanutActionFavorite;
   action.photo = @(photoID);
   action.share_instance = @(shareInstance);
-  if (oldActionID) action.id = @(oldActionID);
+  
+  DFPeanutAction *oldLikeAction = [photo userFavoriteAction];
+  
+  if (oldLikeAction) action.id = oldLikeAction.id;
 
   RKRequestMethod method = liked ? RKRequestMethodPOST : RKRequestMethodDELETE;
+  
+  // Now update our local cache
+  if (liked) {
+    photo.actions = [photo.actions arrayByAddingObject:action];
+  } else {
+    if (oldLikeAction)
+      photo.actions = [photo.actions arrayByRemovingObject:oldLikeAction];
+  }
+  
+  [self notifyFeedChanged:DFInboxFeed];
   
   [self.actionAdapter
    performRequest:method

@@ -93,7 +93,6 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (void)setLikedByUser:(BOOL)liked
                  photo:(DFPhotoIDType)photoID
          shareInstance:(DFShareInstanceIDType)shareInstance
-           oldActionID:(DFActionID)oldActionID
                success:(void(^)(DFActionID actionID))success
                failure:(DFFailureBlock)failure;
 
