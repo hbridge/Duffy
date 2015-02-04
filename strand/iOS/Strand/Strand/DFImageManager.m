@@ -32,7 +32,7 @@
 
 @end
 
-static BOOL logRouting = NO;
+static BOOL logRouting = YES;
 
 @implementation DFImageManager
 

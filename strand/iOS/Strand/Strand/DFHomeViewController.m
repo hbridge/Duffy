@@ -408,11 +408,13 @@ static BOOL showFilters = NO;
      imageForID:suggestedPhoto.id
      pointSize:self.sendButton.frame.size
      contentMode:DFImageRequestContentModeAspectFill
-     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
+     deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
-         [self.sendButton setBackgroundImage:image
-                                    forState:UIControlStateNormal];
+         self.sendButton.imageView.contentMode = UIViewContentModeScaleAspectFill;
+         self.sendButton.backgroundColor = [UIColor clearColor];
+         [self.sendButton setImage:image
+                          forState:UIControlStateNormal];
          UIColor *tintColor = [UIColor colorWithWhite:0.97 alpha:0.7];
          self.navBackgroundImageView.image = [UIImageEffects imageByApplyingBlurToImage:image
                                                                              withRadius:60

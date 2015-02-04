@@ -322,7 +322,8 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 - (UIImage *)imageForRequest:(DFImageManagerRequest *)request
 {
   UIImage *result;
-  if (request.isDefaultThumbnail) {
+  if (request.isDefaultThumbnail
+      || request.deliveryMode == DFImageRequestOptionsDeliveryModeFastFormat) {
     result = [UIImage imageWithCGImage:self.asset.thumbnail];
   } else if (request.contentMode == DFImageRequestContentModeAspectFit) {
     DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
