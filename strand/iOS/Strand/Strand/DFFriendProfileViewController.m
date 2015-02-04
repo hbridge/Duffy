@@ -59,6 +59,12 @@
   self.nameLabel.text = fullName;
   [self reloadHeaderData];
   
+  // friend button
+  self.friendButton.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.4];
+  
+  [self configureFriendButton:[[DFPeanutFeedDataManager sharedManager] isUserFriend:self.peanutUser.id]];
+  
+  
   // add a fancy background blur if iOS8 +
   if ([UIDevice majorVersionNumber] >= 8) {
     UIVisualEffectView *visualEffectView = [[UIVisualEffectView alloc] initWithEffect:
@@ -69,10 +75,6 @@
     [self.view insertSubview:visualEffectView belowSubview:self.headerView];
     [visualEffectView.contentView addSubview:self.headerView];
     
-    // friend button
-    self.friendButton.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.4];
-    
-    [self configureFriendButton:[[DFPeanutFeedDataManager sharedManager] isUserFriend:self.peanutUser.id]];
   }
 }
 
