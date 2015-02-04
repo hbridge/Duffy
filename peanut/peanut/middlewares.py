@@ -65,7 +65,7 @@ class StatsMiddleware(object):
         return response
 
 class SqlLogMiddleware(object):
-    logging.basicConfig(filename='/var/log/duffy/requests.log',
+    logging.basicConfig(filename='/mnt/log/requests.log',
                         level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s %(message)s')
     logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
