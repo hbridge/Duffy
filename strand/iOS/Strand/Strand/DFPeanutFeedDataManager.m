@@ -63,6 +63,10 @@
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
 
 @property (nonatomic, retain) NSArray *cachedPeopleList;
+
+// set for keeping track of which photos have been evaluated this session
+@property (nonatomic, retain) NSMutableSet *localEvalutedPhotos;
+
 @end
 
 @implementation DFPeanutFeedDataManager
@@ -83,6 +87,7 @@
     self.feedLastFeedTimestamp = [NSMutableDictionary new];
     
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
+    self.localEvalutedPhotos = [NSMutableSet new];
     [self refreshAllFeedsFromServer];
   }
   return self;
@@ -196,8 +201,8 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
- 
   [self processPeopleListFromFeedObjects:newObjects];
+  [self setEvaluatedStateFromLocalCacheForObjects:newObjects];
 
   if (!currentObjects) {
     returnBlock(YES, newObjects);
@@ -214,6 +219,19 @@ static DFPeanutFeedDataManager *defaultManager;
   [self processFeedWithCurrentObjects:currentObjects withNewObjects:newObjects returnBlock:returnBlock];
 }
 
+
+- (void)setEvaluatedStateFromLocalCacheForObjects:(NSArray *)feedObjects
+{
+  NSArray *photos = [DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto inArrayOfFeedObjects:feedObjects];
+  for (DFPeanutFeedObject *photo in photos) {
+    for (DFPeanutFeedObject *evaledPhoto in self.localEvalutedPhotos) {
+      if (evaledPhoto.id == photo.id
+          && evaledPhoto.share_instance.longLongValue == photo.share_instance.longLongValue) {
+        photo.evaluated = @(YES);
+      }
+    }
+  }
+}
 
 - (void)refreshFeedFromServer:(DFFeedType)feedType
                    completion:(RefreshCompleteCompletionBlock)completion
@@ -925,6 +943,7 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID && [object.share_instance isEqual:@(shareInstance)]) {
       object.evaluated = @(1);
+      [self.localEvalutedPhotos addObject:object];
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandNewInboxDataNotificationName
        object:self];
@@ -933,6 +952,7 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutFeedObject *photo in [self suggestedPhotosIncludeEvaled:NO]) {
     if (photo.id == photoID) {
       photo.evaluated = @(1);
+      [self.localEvalutedPhotos addObject:photo];
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandNewSwapsDataNotificationName
        object:self];
