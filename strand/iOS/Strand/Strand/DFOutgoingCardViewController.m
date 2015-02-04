@@ -67,13 +67,8 @@
 
 - (void)configureSuggestionContentView
 {
-  if (!self.suggestionContentView) {
-    self.suggestionContentView =
-    [UINib instantiateViewWithClass:[DFOutgoingCardContentView class]];
-    self.suggestionContentView.profileStackView.showNames = NO;
-    self.suggestionContentView.profileStackView.delegate = self;
-    self.suggestionContentView.profileStackView.backgroundColor = [UIColor clearColor];
-  }
+  self.suggestionContentView.profileStackView.showNames = NO;
+  self.suggestionContentView.profileStackView.delegate = self;
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
   DFOutgoingCardViewController __weak *weakSelf = self;
   self.suggestionContentView.addHandler = ^{
