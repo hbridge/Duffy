@@ -31,6 +31,10 @@
 
 - (void)viewDidLayoutSubviews
 {
+  [super viewDidLayoutSubviews];
+  // call layout if needed first here so the imageview has the right size and we don't wind up
+  // having to generate an image again
+  [self.suggestionContentView layoutIfNeeded];
   [[DFImageManager sharedManager] imageForID:self.photoFeedObject.id
                                    pointSize:self.suggestionContentView.imageView.frame.size
                                  contentMode:DFImageRequestContentModeAspectFill
@@ -39,7 +43,6 @@
                                     self.suggestionContentView.imageView.image = image;
                                   });
                                 }];
-  
 }
 
 - (void)viewDidLoad {
