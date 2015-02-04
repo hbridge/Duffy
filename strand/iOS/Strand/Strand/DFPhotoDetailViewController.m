@@ -852,7 +852,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   CGRect keyboardEndFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
   CGFloat keyboardEndBottomDistance = self.view.frame.size.height - CGRectGetMinY(keyboardEndFrame);
 
-  self.contentBottomConstraint.constant = keyboardEndBottomDistance;
+  self.actionBarBottomConstraint.constant = keyboardEndBottomDistance;
   [self.view setNeedsUpdateConstraints];
   
   NSNumber *duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey];

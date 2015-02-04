@@ -25,7 +25,7 @@
 @property (nonatomic) BOOL openKeyboardOnAppear;
 @property (nonatomic) BOOL closeOnSend;
 @property (nonatomic) BOOL disableKeyboardHandler;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *actionBarBottomConstraint;
 @property (nonatomic, retain) DFPeanutFeedObject *photoObject;
 @property (nonatomic) BOOL theatreModeEnabled;
 

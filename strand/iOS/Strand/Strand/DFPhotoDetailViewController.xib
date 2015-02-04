@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPhotoDetailViewController">
             <connections>
+                <outlet property="actionBarBottomConstraint" destination="PPK-FG-q4r" id="ANa-Aa-BfQ"/>
                 <outlet property="addPersonButton" destination="BV6-BM-Whi" id="dXy-XZ-RHF"/>
                 <outlet property="commentToolbar" destination="opa-QM-Zd8" id="jXy-O2-nma"/>
                 <outlet property="recipientsProfileStackView" destination="ibH-dU-jON" id="i2l-b0-cYa"/>
@@ -67,9 +68,9 @@
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BV6-BM-Whi" secondAttribute="trailing" constant="8" id="5yi-yO-taK"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" constant="8" id="9JY-vK-N88"/>
                 <constraint firstAttribute="trailing" secondItem="opa-QM-Zd8" secondAttribute="trailing" id="Cht-pI-f4J"/>
+                <constraint firstItem="gGV-RF-dqd" firstAttribute="bottom" secondItem="opa-QM-Zd8" secondAttribute="bottom" id="DZq-ro-Yjo"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="top" secondItem="mpa-i4-xv8" secondAttribute="top" constant="8" id="Ed5-1o-YVi"/>
                 <constraint firstItem="ibH-dU-jON" firstAttribute="top" secondItem="BV6-BM-Whi" secondAttribute="top" id="KZ2-ND-fAY"/>
-                <constraint firstAttribute="bottom" secondItem="gGV-RF-dqd" secondAttribute="bottom" id="M26-Yf-BkK"/>
                 <constraint firstAttribute="bottom" secondItem="opa-QM-Zd8" secondAttribute="bottom" id="PPK-FG-q4r"/>
                 <constraint firstItem="opa-QM-Zd8" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" id="SPk-Of-ByB"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ibH-dU-jON" secondAttribute="trailing" constant="8" id="VCH-Ty-l1A"/>
