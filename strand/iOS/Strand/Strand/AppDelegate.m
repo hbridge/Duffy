@@ -114,8 +114,12 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [DDLog addLogger:self.fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
 
 #ifdef DEBUG
-  //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  /* 
+   Object Mapping log levels
+   To debug object mapping issues, use RKLogLevelTrace
+   To debug object mapping latency, use RKLogLevelInfo
+   */
+  RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelError);
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
 #else
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
