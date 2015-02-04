@@ -325,23 +325,6 @@ static DFPeanutFeedDataManager *defaultManager;
   return ([self.feedLastFeedTimestamp objectForKey:@(DFActionsFeed)] != nil);
 }
 
-- (BOOL)areSuggestionsReady
-{
-  NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-  DFPhotoCollection *allPhotos = [DFPhotoStore allPhotosCollectionUsingContext:context];
-  NSArray *photosWithoutIDs =
-   [DFPhotoStore photosWithoutPhotoIDInContext:[DFPhotoStore createBackgroundManagedObjectContext]];
-  BOOL result =
-  // if there are no photos to upload and we have swaps data, or there are suggestions, suggestions should be ready
-  ((allPhotos.photoSet.count > 0 && photosWithoutIDs.count == 0 && self.hasSwapsData)
-   || self.suggestedStrands.count > 0);
-
-  
-  DDLogVerbose(@"areSuggestionsReady: %@, allPhotos:%@ photosWithoutIDs:%@ hasSwapsData:%@ suggestedStrands:%@",
-               @(result), @(allPhotos.photoSet.count), @(photosWithoutIDs.count), @(self.hasSwapsData), @(self.suggestedStrands.count));
-  return result;
-}
-
 - (NSArray *)photosWithUserID:(DFUserIDType)userID onlyEvaluated:(BOOL)onlyEvaluated
 {
   NSMutableArray *photos = [NSMutableArray new];

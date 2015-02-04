@@ -166,7 +166,7 @@ const NSUInteger UpsellCardFrequency = 5;
       self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
     }
     [self.noResultsView setSuperView:self.view];
-    if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
+    if (self.allSuggestedItems.count > 0) {
       self.noResultsView.titleLabel.text = @"";
       [self.noResultsView.activityIndicator stopAnimating];
     } else {
