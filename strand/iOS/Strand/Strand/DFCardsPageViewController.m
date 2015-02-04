@@ -147,7 +147,7 @@ const NSUInteger UpsellCardFrequency = 5;
     
     // if we didn't have any items before, insert a sentinal number where the upsell should go
     if (beforeCount == 0 && afterCount > 0) {
-      NSUInteger insertIndex = MIN(UpsellCardFrequency - 1, afterCount - 1);
+      NSUInteger insertIndex = MIN(UpsellCardFrequency - 1, afterCount);
       [self.allSuggestedItems insertObject:@(insertIndex) atIndex:insertIndex];
     }
     
@@ -226,20 +226,23 @@ const NSUInteger UpsellCardFrequency = 5;
                                    fromViewController:(DFCardViewController *)cvc
 {
   if (!cvc) {
-    return [self outgoingCardViewControllerForPhoto:self.allSuggestedItems.firstObject];
+    return [self cardViewForItem:self.allSuggestedItems.firstObject];
   }
   
   // figure out which object we were on
   id<NSCopying, NSObject> fromSentinalValue = cvc.sentinalValue;
   
-  // if there is a object photo, look at the next suggested photo
   if (fromSentinalValue) {
     NSInteger fromIndex = [self.allSuggestedItems indexOfObject:fromSentinalValue];
     if (fromIndex == NSNotFound) {
       DDLogWarn(@"%@ sentinal disappeared", self.class);
       return nil;
     }
-    for (NSUInteger i = fromIndex + (ascending ? 1 : -1); i < self.allSuggestedItems.count; (ascending ? i++ : i--)) {
+    
+    // look through neighboring objects until we find one that's valid to show
+    for (NSInteger i = fromIndex + (ascending ? 1 : -1);
+         (i < self.allSuggestedItems.count && i >= 0);
+         (ascending ? i++ : i--)) {
       id<NSObject, NSCopying> object = [self.allSuggestedItems objectAtIndex:i];
       if ([[object class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
         DFPeanutFeedObject *photo = (DFPeanutFeedObject *)object;
@@ -247,12 +250,23 @@ const NSUInteger UpsellCardFrequency = 5;
           return [self outgoingCardViewControllerForPhoto:photo];
         }
       } else {
-        DFCardViewController *upsell = [self nextOutgoingUpsellWithSentinalValue:object];
-        if (upsell) return upsell;
+        DFCardViewController *cardView = [self cardViewForItem:object];
+        if (cardView) return cardView;
       }
     }
   }
 
+  return nil;
+}
+
+- (DFCardViewController *)cardViewForItem:(id<NSObject,NSCopying>)item
+{
+  if ([[item class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
+      return [self outgoingCardViewControllerForPhoto:(DFPeanutFeedObject *)item];
+  } else {
+    DFCardViewController *upsell = [self nextOutgoingUpsellWithSentinalValue:item];
+    return upsell;
+  }
   return nil;
 }
 
