@@ -30,22 +30,9 @@ from peanut.settings import constants
 
 from peanut.celery import app
 
-from async import celery_helper
+from async import celery_helper, notifications
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
-
-def threadedSendNotifications(userIds):
-	time.sleep(1)
-	logging.basicConfig(filename='/var/log/duffy/stranding.log',
-						level=logging.DEBUG,
-						format='%(asctime)s %(levelname)s %(message)s')
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	logger = logging.getLogger(__name__)
-
-	users = User.objects.filter(id__in=userIds)
-
-	# Send update feed msg to folks who are involved in these photos
-	notifications_util.sendRefreshFeedToUsers(users)
 
 
 def threadedPerformFullPrivateStrands(userId):
@@ -66,7 +53,7 @@ def threadedPerformFullPrivateStrands(userId):
 	apiCache.save()
 
 	logger.info("Finished full private strand refresh for user %s" % (userId))
-	Thread(target=threadedSendNotifications, args=([userId],)).start()
+	notifications.sendRefreshFeedToUserIds.delay([userId])
 
 def processBatch(strandsToProcess):
 	# Group by user
@@ -162,7 +149,7 @@ def processBatch(strandsToProcess):
 			processFull.delay(userId)
 		total += len(strandsProcessed)
 
-	Thread(target=threadedSendNotifications, args=(set(usersIdsToSendNotificationsTo),)).start()
+	notifications.sendRefreshFeedToUserIds.delay(set(usersIdsToSendNotificationsTo))
 
 	return total
 

@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 from threading import Thread
+import urllib2
 
 from django.db.models import Q
 from django.dispatch import receiver
@@ -95,9 +96,18 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 
 def sendRefreshFeedToUsers(users):
 	# First send to sockets
+	logEntryIdList = list()
 	for user in users:
 		logger.debug("Sending refresh feed to user %s" % (user.id))
 		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
+		logEntryIdList.append(logEntry.id)
+
+	param = 'ids=' + ','.join(str(x) for x in logEntryIdList)
+	httpRefreshFeedServerUrl = constants.HTTP_SOCKET_SERVER + "?" + param
+
+	logger.debug("Requesting URL:  %s" % httpRefreshFeedServerUrl)
+	result = urllib2.urlopen(httpRefreshFeedServerUrl).read()
+
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
@@ -189,23 +199,4 @@ def getUnreadActionsListCountByUserId(users):
 		actionsByUserId[user.id] = actionCount
 
 	return actionsByUserId
-
-@receiver(post_save, sender=Action)
-def sendNotificationsUponActions(sender, **kwargs):
-	action = kwargs.get('instance')
-
-	users = list()
-
-	if action.share_instance:
-		users = list(action.share_instance.users.all())
-		
-	if action.user and action.user not in users:
-		users.append(action.user)
-
-	userIds = User.getIds(users)
-
-	Thread(target=threadedSendNotifications, args=(userIds,)).start()
-
-
-
 

@@ -146,7 +146,7 @@ class PhotoAPI(BasePhotoAPI):
         if serializer.is_valid():
             serializer.save()
 
-            Thread(target=threadedSendNotifications, args=(userIds,)).start()
+            notifications.sendRefreshFeedToUserIds.delay(userIds)
             return Response(serializer.data)
         else:
             logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))

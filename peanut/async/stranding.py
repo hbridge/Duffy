@@ -28,7 +28,7 @@ import strand.notifications_util as notifications_util
 from peanut.celery import app
 
 from async import celery_helper
-from async import popcaches, neighboring, suggestion_notifications
+from async import popcaches, neighboring, suggestion_notifications, notifications
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -43,15 +43,6 @@ def dealWithDeadStrand(strand, strandsCache):
 
 	return strandsCache
 
-
-def threadedSendNotifications(userIds):
-	logger = get_task_logger(__name__)
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-
-	users = User.objects.filter(id__in=userIds)
-
-	# Send update feed msg to folks who are involved in these photos
-	notifications_util.sendRefreshFeedToUsers(users)
 
 """
 	Takes in:
@@ -116,7 +107,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 
 	userIds = set(User.getIds(usersWithoutRecentNot))
 
-	Thread(target=threadedSendNotifications, args=(userIds,)).start()
+	notifications.sendRefreshFeedToUserIds.delay(userIds)
 
 
 def processUserIdsForFriendGPSInfo(userIds):

@@ -21,7 +21,7 @@ from strand import notifications_util
 from peanut.celery import app
 
 from async import celery_helper
-from async import suggestion_notifications
+from async import suggestion_notifications, notifications
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
@@ -57,20 +57,6 @@ def getContactsByUser(contactEntries):
 
 
 	return contactsByUser
-
-
-
-def threadedSendNotifications(userIds):
-	logging.basicConfig(filename='/var/log/duffy/friends.log',
-						level=logging.DEBUG,
-						format='%(asctime)s %(levelname)s %(message)s')
-	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
-	logger = logging.getLogger(__name__)
-
-	users = User.objects.filter(id__in=userIds)
-
-	# Send update feed msg to folks who are involved in these photos
-	notifications_util.sendRefreshFeedToUsers(users)
 	
 """
 	Populate the Friends table.  This creates a link between two users
@@ -117,7 +103,7 @@ def processBatch(contactEntries):
 		for userId in usersIdsToUpdate:
 			suggestion_notifications.processUserId.delay(userId)
 
-		Thread(target=threadedSendNotifications, args=(usersIdsToUpdate,)).start()
+		notifications.sendRefreshFeedToUserIds.delay(usersIdsToUpdate)
 
 		return len(contactEntries)
 	return 0

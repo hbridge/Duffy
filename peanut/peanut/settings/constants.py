@@ -4,6 +4,9 @@ PIPELINE_LOCAL_BASE_PATH = "/mnt/user_data/"
 PIPELINE_REMOTE_HOST = 'duffy@titanblack.duffyapp.com'
 PIPELINE_REMOTE_PATH = '/home/duffy/pipeline/staging'
 
+# HttpSocketServer info
+HTTP_SOCKET_SERVER = 'http://0.0.0.0:7999/'
+
 THUMBNAIL_SIZE = 156
 
 STATE_NEW = 0
