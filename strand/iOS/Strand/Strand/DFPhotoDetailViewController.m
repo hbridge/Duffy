@@ -329,39 +329,41 @@ const NSUInteger CompressedModeMaxRows = 1;
   } else {
     aspectRatio = 1.0;
   }
-  CGRect frame = CGRectMake(10,
+  [self.tableView layoutIfNeeded];
+  CGRect frame = CGRectMake(0,
                             0,
-                            self.view.frame.size.width - 20,
-                            (self.view.frame.size.width - 20) * aspectRatio);
+                            self.tableView.frame.size.width,
+                            (self.tableView.frame.size.width) * aspectRatio);
   return frame;
 }
 
 - (void)configurePhotoView
 {
   CGRect frame = [self photoTableHeaderFrame];
+  BOOL loadImage = NO;
   if (!self.imageView) {
     self.imageView = [[DFRemoteImageView alloc] initWithFrame:frame];
+    [self.tableView setTableHeaderView:self.imageView];
     self.imageView.clipsToBounds = YES;
     self.imageView.contentMode = UIViewContentModeScaleAspectFill;
-  } else {
-    self.imageView.frame = frame;
+    [self addGestureRecognizersToImageView:self.imageView];
+    loadImage = YES;
+  } else if (!CGSizeEqualToSize(frame.size, self.imageView.frame.size)) {
+    loadImage = YES;
   }
   
-  if (self.nuxStep) {
-    self.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
-  } else {
+  self.imageView.frame = frame;
+  if (loadImage) {
     [self.imageView loadImageWithID:self.photoObject.id
                        deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
   }
-  [self.tableView setTableHeaderView:self.imageView];
-  
-  // photo view actions
-  [self addGestureRecognizersToImageView:self.imageView];
 }
 
 - (void)configureTheatreModeView
 {
+  BOOL loadImage = NO;
   if (!self.theatreModeImageView) {
+    loadImage = YES;
     // background
     self.theatreModeBackgroundView = [UIView new];
     self.theatreModeBackgroundView.backgroundColor = [UIColor blackColor];
@@ -378,12 +380,19 @@ const NSUInteger CompressedModeMaxRows = 1;
     self.theatreModeImageView.userInteractionEnabled = YES;
     self.theatreModeImageView.hidden = !_theatreModeEnabled;
     
-    // we need to call layoutSubviews here or the system gets cranky on iOS7
+    // we need to call layoutIfNeeded here or the system gets cranky on iOS7
     // because another layout pass is required and this is called from viewDidLayoutSubviews
-    [self.view layoutSubviews];
+    [self.view layoutIfNeeded];
+  } else if (!CGRectEqualToRect(self.theatreModeImageView.frame, self.view.bounds)) {
+    loadImage = YES;
   }
-  [self.theatreModeImageView loadImageWithID:self.photoObject.id
-                                deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
+  
+  if (loadImage) {
+    [self.theatreModeImageView loadImageWithID:self.photoObject.id
+                                  deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
+  }
+  
+  
 }
 
 - (void)addGestureRecognizersToImageView:(UIImageView *)imageView
