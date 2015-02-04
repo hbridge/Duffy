@@ -35,6 +35,7 @@ const NSUInteger PhotosToDetectPerSave = 20;
 // max number of photos to scan per pass.  the more photos processed in one pass,
 // the longer the queue is blocked to other scanning operations
 const NSUInteger PhotosToScanPerOperation = 20;
+const NSUInteger PhotosToScanPerBackgroundOperation = 5;
 
 - (void)main
 {
@@ -54,19 +55,23 @@ const NSUInteger PhotosToScanPerOperation = 20;
       NSArray *photosToScan = [DFPhotoStore photosWithFaceDetectPassBelow:@(1) inContext:self.context];
       DDLogInfo(@"%@ found %@ photos needingFaceDetection", self.class, @(photosToScan.count));
       
-     
+      
       CIDetector *detector = [self.class faceDetectorWithHighQuality:NO];
-      for (DFPhoto *photo in photosToScan) {
-        BOOL foundFaces = [self generateFaceFeaturesWithDetector:detector photo:photo];
-        if (foundFaces) photosWithFacesFound++;
-        photo.faceDetectPass = @(CurrentPassValue);
-        photosScanned++;
-        if (photosScanned >= PhotosToDetectPerSave) [self saveContext];
-        if (photosScanned >= PhotosToScanPerOperation) break;
-        if (self.isCancelled) {
-          [self cancelled];
-          [self saveContext];
-          return;
+      if (detector) {
+        NSUInteger numToScan = ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) ?
+          PhotosToScanPerOperation : PhotosToScanPerBackgroundOperation;
+        for (DFPhoto *photo in photosToScan) {
+          BOOL foundFaces = [self generateFaceFeaturesWithDetector:detector photo:photo];
+          if (foundFaces) photosWithFacesFound++;
+          photo.faceDetectPass = @(CurrentPassValue);
+          photosScanned++;
+          if (photosScanned >= PhotosToDetectPerSave) [self saveContext];
+          if (photosScanned >= numToScan) break;
+          if (self.isCancelled) {
+            [self cancelled];
+            [self saveContext];
+            return;
+          }
         }
       }
     }
@@ -117,13 +122,15 @@ const NSUInteger PhotosToScanPerOperation = 20;
 
 + (CIDetector *)faceDetectorWithHighQuality:(BOOL)highQuality
 {
-  CIContext *context = nil;
-  @try {
-    context = [CIContext contextWithOptions:nil];
+  // if we're running in the background, we need to use SW rendering
+  // using OpenGL causes crashes if the app is in the background
+  // see https://developer.apple.com/library/ios/qa/qa1766/_index.html
+  NSDictionary *options = nil;
+  if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+    DDLogInfo(@"%@ app state background. Using SW rendering for face detect.", self);
+    options = @{kCIContextUseSoftwareRenderer : @(YES)};
   }
-  @catch (NSException *exception) {
-    DDLogError(@"%@ could not create correct CIContext", self);
-  }
+  CIContext *context = [CIContext contextWithOptions:options];
   
   NSDictionary *detectorOpts;
   if (highQuality) {
