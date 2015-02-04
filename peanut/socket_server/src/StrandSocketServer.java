@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 import java.sql.*;
+
+import org.eclipse.jetty.server.Server;
  
 public class StrandSocketServer {
 
@@ -57,7 +59,7 @@ public class StrandSocketServer {
         try {  
 
             // This block configure the logger with handler and formatter  
-            fh = new FileHandler("/var/log/duffy/socket-server-java.log", true);  
+            fh = new FileHandler("/mnt/log/socket-server-java.log", true);  
             ss.logger.addHandler(fh);
             formatter = new SimpleFormatter();  
             fh.setFormatter(formatter);
@@ -69,11 +71,17 @@ public class StrandSocketServer {
         } 
 
 	    ss.logger.info("Starting StrandSocketServer...");  
-        // Start the message processor to query database
-        MessageProcessor mp = new MessageProcessor(ss.clients, dbURL);
-        mp.start();
 
-        // Start monitoring port
+        // start the http server to listen to incoming NotificationLog Ids
+        Server server = new Server(7999);
+        server.setHandler(new HttpServer(ss.clients, dbURL));
+        try {
+            server.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Start monitoring port for mobile client connections
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
             while (listening) {
                 new MobileClient(serverSocket.accept(), ss.clients).start();

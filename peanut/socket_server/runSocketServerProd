@@ -1,3 +1,3 @@
 rm bin/*.class
-javac -cp . src/* -d bin/
-java -cp $CLASSPATH:/usr/share/java/mysql-connector-java.jar:bin:. StrandSocketServer 8005 mysql://db.private.strand.duffyapp.com:3306/duffy
+javac -cp /usr/share/java/*:/opt/jetty/lib/*:/opt/spring/libs/*:. src/* -d bin/
+java -cp $CLASSPATH:/usr/share/java/mysql-connector-java.jar:/usr/share/java/*:/opt/jetty/lib/*:/opt/spring/libs/*:/opt/commons-logging/*:bin:. StrandSocketServer 8005 mysql://db.private.strand.duffyapp.com:3306/duffy

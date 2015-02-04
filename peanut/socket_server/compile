@@ -1,2 +1,2 @@
 rm bin/*.class
-javac -cp . src/* -d bin/
+javac -cp /usr/share/java/*:/opt/jetty/lib/*:/opt/spring/libs/*:. src/* -d bin/
