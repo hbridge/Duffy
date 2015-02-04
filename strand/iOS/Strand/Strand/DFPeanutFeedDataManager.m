@@ -709,32 +709,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
-- (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible
-{
-  DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
-  privateStrand.id = @(suggestedSection.id);
-  
-  [self.strandAdapter
-   performRequest:RKRequestMethodGET
-   withPeanutStrand:privateStrand
-   success:^(DFPeanutStrand *peanutStrand) {
-     peanutStrand.suggestible = @(NO);
-     
-     // Patch the peanut strand
-     [self.strandAdapter
-      performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
-      success:^(DFPeanutStrand *peanutStrand) {
-        DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
-      } failure:^(NSError *error) {
-        DDLogError(@"%@ failed to patch private strand: %@, error: %@",
-                   self.class, peanutStrand, error);
-      }];
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ failed to get private strand: %@, error: %@",
-                self.class, privateStrand, error);
-   }];
-}
-
 - (void)sharePhotoObjects:(NSArray *)photoObjects
               withPhoneNumbers:(NSArray *)phoneNumbers
                   success:(void(^)(NSArray *shareInstances, NSArray *createdPhoneNumbers))success

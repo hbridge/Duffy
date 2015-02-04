@@ -372,11 +372,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)removeSuggestionPressedForHeaderView:(DFPhotoPickerHeaderReusableView *)headerView
                                            section:(NSUInteger)section
 {
-  DFSection *sectionObject = (DFSection *)self.selectPhotosController.sections[section];
-  DFPeanutFeedObject *suggestion = (DFPeanutFeedObject *)sectionObject.object;
-  [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
-  suggestion.suggestible = @NO;
-  [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:section]];
+  DDLogInfo(@"removeSuggetion not implemented");
 }
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController

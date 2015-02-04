@@ -79,8 +79,6 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 /* 
  Suggestions and Photos
  */
-- (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
-
 - (void)sharePhotoObjects:(NSArray *)photoObjects
      withPhoneNumbers:(NSArray *)phoneNumbers
               success:(void(^)(NSArray *shareInstances, NSArray *createdPhoneNumbers))success
