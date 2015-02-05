@@ -22,14 +22,14 @@ NSString *const NotificationsGetPath = @"get_notifications/";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *restSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutNotification objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutNotification rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:NotificationsGetPath
                                               keyPath:@"notifications"
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
 
   RKResponseDescriptor *restErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:NotificationsGetPath
                                               keyPath:nil
@@ -40,7 +40,7 @@ NSString *const NotificationsGetPath = @"get_notifications/";
 
 + (NSArray *)requestDescriptors
 {
-  RKObjectMapping *mapping = [[DFPeanutNotification objectMapping] inverseMapping];
+  RKObjectMapping *mapping = [[DFPeanutNotification rkObjectMapping] inverseMapping];
   RKRequestDescriptor *restRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:[DFPeanutNotification class]

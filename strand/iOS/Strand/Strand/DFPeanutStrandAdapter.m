@@ -31,31 +31,31 @@ NSString *const AddPhotosPath = @"add_photos_to_strand";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *restSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutStrand objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutStrand rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:RestStrandPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   RKResponseDescriptor *restErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:RestStrandPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
   RKResponseDescriptor *createSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutStrand objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutStrand rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:CreateStrandPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   RKResponseDescriptor *createErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:CreateStrandPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
   RKResponseDescriptor *addPhotosSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:AddPhotosPath
                                               keyPath:nil
@@ -66,7 +66,7 @@ NSString *const AddPhotosPath = @"add_photos_to_strand";
 
 + (NSArray *)requestDescriptors
 {
-  RKObjectMapping *mapping = [[DFPeanutStrand objectMapping] inverseMapping];
+  RKObjectMapping *mapping = [[DFPeanutStrand rkObjectMapping] inverseMapping];
   RKRequestDescriptor *restRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:[DFPeanutStrand class]

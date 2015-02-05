@@ -14,8 +14,10 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutContact.h"
+#import "EKMappingBlocks+DFMappingBlocks.h"
 
 @implementation DFPeanutFeedObject
+
 
 DFFeedObjectType DFFeedObjectSection = @"section";
 DFFeedObjectType DFFeedObjectPhoto = @"photo";
@@ -57,17 +59,42 @@ static NSArray *FeedObjectTypes;
   return self;
 }
 
-+ (RKObjectMapping *)objectMapping
++ (RKObjectMapping *)rkObjectMapping
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
+  [objectMapping addAttributeMappingsFromArray:[self dateAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects" mapping:objectMapping];
-  [objectMapping addRelationshipMappingWithSourceKeyPath:@"actions" mapping:[DFPeanutAction objectMapping]];
-  [objectMapping addRelationshipMappingWithSourceKeyPath:@"people" mapping:[DFPeanutUserObject objectMapping]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"actions" mapping:[DFPeanutAction rkObjectMapping]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"people" mapping:[DFPeanutUserObject rkObjectMapping]];
   
   return objectMapping;
 }
 
++ (EKObjectMapping *)objectMapping {
+  return [EKObjectMapping mappingForClass:self withBlock:^(EKObjectMapping *mapping) {
+    [mapping mapPropertiesFromArray:[self simpleAttributeKeys]];
+    
+    for (NSString *key in [self dateAttributeKeys]) {
+      [mapping mapKeyPath:key toProperty:key
+           withValueBlock:[EKMappingBlocks dateMappingBlock]
+             reverseBlock:[EKMappingBlocks dateReverseMappingBlock]];
+    }
+    
+    [mapping hasMany:[DFPeanutFeedObject class] forKeyPath:@"objects"];
+    [mapping hasMany:[DFPeanutAction class] forKeyPath:@"actions"];
+    [mapping hasMany:[DFPeanutUserObject class] forKeyPath:@"people"];
+  }];
+}
+
++ (NSArray *)dateAttributeKeys
+{
+  return @[@"time_stamp",
+           @"time_taken",
+           @"shared_at_timestamp",
+           @"last_action_timestamp",
+           @"evaluated_time"];
+}
 
 + (NSArray *)simpleAttributeKeys
 {
@@ -75,14 +102,10 @@ static NSArray *FeedObjectTypes;
            @"type",
            @"user",
            @"share_instance",
-           @"shared_at_timestamp",
            @"title",
            @"location",
            @"thumb_image_path",
            @"full_image_path",
-           @"time_taken",
-           @"time_stamp",
-           @"last_action_timestamp",
            @"ready",
            @"actor_ids",
            @"suggestible",
@@ -92,7 +115,6 @@ static NSArray *FeedObjectTypes;
            @"full_height",
            @"strand_id",
            @"evaluated",
-           @"evaluated_time",
            ];
 }
 

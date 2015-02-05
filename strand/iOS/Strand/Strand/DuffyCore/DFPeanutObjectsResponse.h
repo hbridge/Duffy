@@ -9,8 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "DFPeanutObject.h"
 #import "DFPeanutFeedObject.h"
+#import <EKObjectMapping.h>
+#import <EKMappingProtocol.h>
 
-@interface DFPeanutObjectsResponse : NSObject <DFPeanutObject>
+@interface DFPeanutObjectsResponse : NSObject <EKMappingProtocol>
 
 @property (nonatomic) BOOL result;
 @property (nonatomic, retain) NSString *timestamp;
@@ -18,5 +20,7 @@
 
 - (NSArray *)topLevelSectionObjects;
 - (NSArray *)topLevelObjectsOfType:(DFFeedObjectType)type;
++ (EKObjectMapping *)objectMapping;
++ (RKObjectMapping *)rkObjectMapping;
 
 @end

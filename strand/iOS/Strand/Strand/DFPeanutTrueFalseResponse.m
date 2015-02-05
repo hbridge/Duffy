@@ -12,11 +12,11 @@
 
 @implementation DFPeanutTrueFalseResponse
 
-+ (RKObjectMapping *)objectMapping {
++ (RKObjectMapping *)rkObjectMapping {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"invalid_fields"
-                                                 mapping:[DFPeanutError objectMapping]];
+                                                 mapping:[DFPeanutError rkObjectMapping]];
   return objectMapping;
 }
 

@@ -11,7 +11,7 @@
 
 @implementation DFPeanutInvalidField
 
-+ (RKObjectMapping *)objectMapping {
++ (RKObjectMapping *)rkObjectMapping {
   RKObjectMapping *mapping = [RKObjectMapping mappingForClass:[self class]];
   mapping.forceCollectionMapping = YES;
   [mapping addAttributeMappingFromKeyOfRepresentationToAttribute:@"field_name"];

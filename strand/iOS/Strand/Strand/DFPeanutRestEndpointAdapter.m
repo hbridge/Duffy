@@ -20,13 +20,13 @@
   NSString *pathWithID = [pathString stringByAppendingString:@":id/"];
   
   RKResponseDescriptor *restSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:pathWithID
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   RKResponseDescriptor *restErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:pathWithID
                                               keyPath:nil
@@ -34,14 +34,14 @@
   RKResponseDescriptor *createSuccessResponse;
   if (bulkKeyPath) {
     createSuccessResponse =
-    [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
+    [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass rkObjectMapping]
                                                  method:RKRequestMethodAny
                                             pathPattern:pathString
                                                 keyPath:bulkKeyPath
                                             statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   } else {
     createSuccessResponse =
-    [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
+    [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass rkObjectMapping]
                                                  method:RKRequestMethodAny
                                             pathPattern:pathString
                                                 keyPath:nil
@@ -49,7 +49,7 @@
   }
   
   RKResponseDescriptor *createErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:pathString
                                               keyPath:nil
@@ -61,7 +61,7 @@
 + (NSArray *)requestDescriptorsForPeanutObjectClass:(Class<DFPeanutObject>)peanutObjectClass
                                         bulkPostKeyPath:(NSString *)bulkPostKeyPath
 {
-  RKObjectMapping *mapping = [[peanutObjectClass objectMapping] inverseMapping];
+  RKObjectMapping *mapping = [[peanutObjectClass rkObjectMapping] inverseMapping];
   RKRequestDescriptor *bulkPostRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:peanutObjectClass

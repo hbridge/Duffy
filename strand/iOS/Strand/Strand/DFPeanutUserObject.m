@@ -7,11 +7,12 @@
 //
 
 #import "DFPeanutUserObject.h"
-#import "RestKit/Restkit.h"
 #import <CoreLocation/CoreLocation.h>
 #import "UIImage+Resize.h"
+#import <RestKit/RestKit.h>
 #import "UIImage+RoundedCorner.h"
 #import "DFContactDataManager.h"
+#import "EKMappingBlocks+DFMappingBlocks.h"
 
 DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend = @"friend";
 DFPeanutUserRelationshipType DFPeanutUserRelationshipForwardFriend = @"forward_friend";
@@ -20,13 +21,36 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 
 @implementation DFPeanutUserObject
 
-+ (RKObjectMapping *)objectMapping
++ (RKObjectMapping *)rkObjectMapping
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
+  [objectMapping addAttributeMappingsFromArray:[self dateAttributeKeys]];
   
   return objectMapping;
 }
+
++ (EKObjectMapping *)objectMapping {
+  return [EKObjectMapping mappingForClass:self withBlock:^(EKObjectMapping *mapping) {
+    [mapping mapPropertiesFromArray:[self simpleAttributeKeys]];
+    for (NSString *key in [self dateAttributeKeys]) {
+      [mapping mapKeyPath:key toProperty:key
+           withValueBlock:[EKMappingBlocks dateMappingBlock]
+             reverseBlock:[EKMappingBlocks dateReverseMappingBlock]];
+    }
+  }];
+}
+
+
++ (NSArray *)dateAttributeKeys
+{
+  return @[@"last_checkin_timestamp",
+           @"first_run_sync_timestamp",
+           @"last_photo_timestamp",
+           @"last_photo_update_timestamp",
+           @"last_actions_list_request_timestamp"];
+}
+
 
 + (NSArray *)simpleAttributeKeys
 {
@@ -38,10 +62,6 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
            @"device_token",
            @"last_location_point",
            @"last_location_accuracy",
-           @"last_checkin_timestamp",
-           @"last_photo_timestamp",
-           @"last_photo_update_timestamp",
-           @"first_run_sync_timestamp",
            @"first_run_sync_count",
            @"invites_remaining",
            @"invites_sent",
@@ -52,7 +72,6 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
            @"relationship",
            @"friend_connection_id",
            @"forward_friend_only",
-           @"last_actions_list_request_timestamp"
            ];
 }
 

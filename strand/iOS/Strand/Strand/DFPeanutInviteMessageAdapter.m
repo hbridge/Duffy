@@ -23,14 +23,14 @@ NSString *const InviteMessagePath = @"get_invite_message";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *successReponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInviteMessageResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInviteMessageResponse rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:InviteMessagePath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   
   RKResponseDescriptor *errorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:InviteMessagePath
                                               keyPath:nil

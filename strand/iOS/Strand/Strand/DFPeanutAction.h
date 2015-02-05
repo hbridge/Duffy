@@ -11,7 +11,8 @@
 #import "DFUser.h"
 #import "DFPhoto.h"
 #import "DFPeanutUserObject.h"
-
+#import <EKObjectMapping.h>
+#import <EKMappingProtocol.h>
 /*
 {
  "id": 324,
@@ -34,7 +35,7 @@
 
 typedef UInt64 DFActionID;
 
-@interface DFPeanutAction : NSObject <DFPeanutObject>
+@interface DFPeanutAction : NSObject <DFPeanutObject, EKMappingProtocol>
 
 @property (nonatomic, retain) NSNumber *id;
 @property (nonatomic) DFPeanutActionType action_type;
@@ -45,5 +46,6 @@ typedef UInt64 DFActionID;
 @property (nonatomic, retain) NSDate *time_stamp;
 
 + (NSArray *)simpleAttributeKeys;
++ (EKObjectMapping *)objectMapping;
 
 @end

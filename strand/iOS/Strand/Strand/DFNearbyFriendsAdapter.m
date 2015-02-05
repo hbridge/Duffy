@@ -25,7 +25,7 @@ NSString *const AccuracyKey = @"accuracy";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *responseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutMessageResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutMessageResponse rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:NearbyFriendsPath
                                               keyPath:nil

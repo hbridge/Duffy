@@ -37,7 +37,7 @@
 @property (readonly, nonatomic, retain) NSString *filename;
 - (NSDictionary *)metadataDictionary;
 
-+ (RKObjectMapping *)objectMapping;
++ (RKObjectMapping *)rkObjectMapping;
 - (id)initWithDFPhoto:(DFPhoto *)photo;
 - (id)initWithFeedObject:(DFPeanutFeedObject *)feedObject;
 - (DFPhoto *)photoInContext:(NSManagedObjectContext *)context;

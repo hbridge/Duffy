@@ -35,7 +35,7 @@
   RKObjectMapping *bulkPhotosMapping = [RKObjectMapping mappingForClass:[DFPeanutBulkPhotos class]];
   
   [bulkPhotosMapping addRelationshipMappingWithSourceKeyPath:@"bulk_photos"
-                                                     mapping:[DFPeanutPhoto objectMapping]];
+                                                     mapping:[DFPeanutPhoto rkObjectMapping]];
   bulkPhotosMapping.forceCollectionMapping = YES;
   
   return bulkPhotosMapping;
@@ -102,7 +102,7 @@
 + (NSArray *)requestDescriptors
 {
   RKRequestDescriptor *photoDescriptor =
-  [RKRequestDescriptor requestDescriptorWithMapping:[[DFPeanutPhoto objectMapping] inverseMapping]
+  [RKRequestDescriptor requestDescriptorWithMapping:[[DFPeanutPhoto rkObjectMapping] inverseMapping]
                                         objectClass:[DFPeanutPhoto class]
                                         rootKeyPath:nil
                                              method:RKRequestMethodPUT];
@@ -119,14 +119,14 @@
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *bulkPhotoResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:@"photos/bulk/"
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   
   RKResponseDescriptor *photoResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:@"photos/:id/"
                                               keyPath:nil

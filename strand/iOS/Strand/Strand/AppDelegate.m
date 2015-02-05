@@ -16,7 +16,6 @@
 #import "DFUser.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFNUXFlowViewController.h"
-#import "DFStrandsManager.h"
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
 #import "DFNotificationSharedConstants.h"
@@ -248,7 +247,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFCameraRollSyncManager sharedManager] deletedPhotoSync];
       [[DFContactSyncManager sharedManager] sync];
       [[DFUploadController sharedUploadController] uploadPhotos];
-      [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
       [[DFImageDownloadManager sharedManager] fetchNewImages];
       [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];

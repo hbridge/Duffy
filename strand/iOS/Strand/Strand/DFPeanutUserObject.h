@@ -7,12 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <EKObjectMapping.h>
+#import <EKMappingProtocol.h>
 #import "DFPeanutObject.h"
 #import "DFUser.h"
 
 @class CLLocation;
 
-@interface DFPeanutUserObject : NSObject <DFPeanutObject>
+@interface DFPeanutUserObject : NSObject <DFPeanutObject, EKMappingProtocol>
 
 typedef NSString *const DFPeanutUserRelationshipType;
 extern DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend;
@@ -55,6 +57,7 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 - (BOOL)hasAuthedPhone;
 
 + (DFPeanutUserObject *)TeamSwapUser;
++ (EKObjectMapping *)objectMapping;
 
 
 @end

@@ -13,11 +13,13 @@
 #ifdef DEBUG
 NSString const *DFServerBaseHost = @"dev.strand.duffyapp.com";
 NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com";
+NSString const *DFServerScheme = @"http";
 NSString const *DFImageServerBaseURL = @"http://strand-dev.s3-website-us-east-1.amazonaws.com";
 int DFSocketPort = 8005;
 #else
 NSString const *DFServerBaseHost = @"prod.strand.duffyapp.com";
 NSString const *DFServerBaseURL = @"https://prod.strand.duffyapp.com";
+NSString const *DFServerScheme = @"https";
 NSString const *DFImageServerBaseURL = @"http://strand-prod.s3-website-us-east-1.amazonaws.com";
 int DFSocketPort = 8005;
 #endif
@@ -29,6 +31,9 @@ NSString const *DFUserIDParameterKey = @"user_id";
 NSString const *DFDeviceIDParameterKey = @"phone_id";
 NSString const *DFAuthTokenParameterKey = @"auth_token";
 
+NSString const *BuildOSKey = @"build_os";
+NSString const *BuildNumberKey = @"build_number";
+NSString const *BuildIDKey = @"build_id";
 
 // Upload quality constants
 CGFloat const IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;

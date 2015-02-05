@@ -24,7 +24,7 @@ static NSString *const DeviceTokenKey = @"device_token";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *trueFalseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:RegisterTokenPath
                                               keyPath:nil

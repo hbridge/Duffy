@@ -18,10 +18,6 @@ static NSMutableSet *registeredAdapters;
 
 @implementation DFObjectManager
 
-NSString *const BuildOSKey = @"build_os";
-NSString *const BuildNumberKey = @"build_number";
-NSString *const BuildIDKey = @"build_id";
-
 + (void)initialize
 {
   RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:[[DFUser currentUser] apiURL]];

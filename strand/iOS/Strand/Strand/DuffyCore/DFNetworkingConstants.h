@@ -13,6 +13,7 @@
 extern NSString *DFServerBaseURL;
 extern NSString *DFImageServerBaseURL;
 extern NSString *DFServerBaseHost;
+extern NSString *DFServerScheme;
 extern NSString *DFServerAPIPath;
 
 extern int DFSocketPort;
@@ -44,4 +45,7 @@ extern NSString *const DFTermsPageURLString;
 extern NSString *const DFPrivacyPageURLString;
 extern NSString *const DFAcknowledgementsPageURLString;
 
+extern NSString const *BuildOSKey;
+extern NSString const *BuildNumberKey;
+extern NSString const *BuildIDKey;
 @end

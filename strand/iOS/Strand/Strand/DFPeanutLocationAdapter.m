@@ -29,7 +29,7 @@ static NSString *const AccuracyKey = @"accuracy";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *trueFalseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:UpdateLocationPath
                                               keyPath:nil

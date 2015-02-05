@@ -22,7 +22,7 @@ NSString *const PhoneNumberKey = @"phone_number";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *searchResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:SendSMSPath
                                               keyPath:nil

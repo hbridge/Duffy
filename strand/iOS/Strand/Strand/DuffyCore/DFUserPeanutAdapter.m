@@ -37,12 +37,12 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
                                       bulkKeyPath:@"users"] mutableCopy];
   [responseDescriptors
    addObjectsFromArray:@[
-                         [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutUserObject objectMapping]
+                         [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutUserObject rkObjectMapping]
                                                                       method:RKRequestMethodPOST
                                                                  pathPattern:AuthPhonePath
                                                                      keyPath:@"user"
                                                                  statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)],
-                         [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+                         [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                                       method:RKRequestMethodAny
                                                                  pathPattern:AuthPhonePath
                                                                      keyPath:nil

@@ -7,7 +7,6 @@
 //
 
 #import "DFPeanutObjectsResponse.h"
-#import <RestKit/RestKit.h>
 #import "DFPeanutSuggestion.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
@@ -15,18 +14,33 @@
 
 @implementation DFPeanutObjectsResponse
 
-+ (RKObjectMapping *)objectMapping
++ (RKObjectMapping *)rkObjectMapping
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
+  [objectMapping addAttributeMappingsFromArray:[self dateAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects"
-                                                 mapping:[DFPeanutFeedObject objectMapping]];
+                                                 mapping:[DFPeanutFeedObject rkObjectMapping]];
   
   return objectMapping;
 }
 
++ (EKObjectMapping *)objectMapping {
+  return [EKObjectMapping mappingForClass:self withBlock:^(EKObjectMapping *mapping) {
+    [mapping mapPropertiesFromArray:[self simpleAttributeKeys]];
+    
+    [mapping hasMany:[DFPeanutFeedObject class] forKeyPath:@"objects"];
+  }];
+}
+
+
++ (NSArray *)dateAttributeKeys
+{
+  return @[@"timestamp"];
+}
+
 + (NSArray *)simpleAttributeKeys {
-  return @[@"result", @"timestamp"];
+  return @[@"result"];
 }
 
 

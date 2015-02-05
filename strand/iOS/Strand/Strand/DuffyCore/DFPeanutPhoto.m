@@ -158,7 +158,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
   return [JSONSafeDict JSONString];
 }
 
-+ (RKObjectMapping *)objectMapping
++ (RKObjectMapping *)rkObjectMapping
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[DFPeanutPhoto class]];
   [objectMapping addAttributeMappingsFromArray:[DFPeanutPhoto attributes]];

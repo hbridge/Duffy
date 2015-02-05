@@ -12,7 +12,7 @@
 
 @protocol DFPeanutObject <NSObject>
 
-+ (RKObjectMapping *)objectMapping;
++ (RKObjectMapping *)rkObjectMapping;
 
 @optional
 - (NSNumber *)id;

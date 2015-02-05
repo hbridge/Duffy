@@ -11,7 +11,7 @@
 
 @implementation DFPeanutStrand
 
-+ (RKObjectMapping *)objectMapping {
++ (RKObjectMapping *)rkObjectMapping {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   

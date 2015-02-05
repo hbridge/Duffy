@@ -25,25 +25,25 @@ NSString *const RestPostPath = @"contacts/";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *restSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutContact objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutContact rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:RestContactPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   RKResponseDescriptor *restPostSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutContact objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutContact rkObjectMapping]
                                                method:RKRequestMethodPOST
                                           pathPattern:RestPostPath
                                               keyPath:@"contacts"
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   RKResponseDescriptor *restErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:RestContactPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
   RKResponseDescriptor *restPostErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField rkObjectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:RestPostPath
                                               keyPath:nil
@@ -54,7 +54,7 @@ NSString *const RestPostPath = @"contacts/";
 
 + (NSArray *)requestDescriptors
 {
-  RKObjectMapping *mapping = [[DFPeanutContact objectMapping] inverseMapping];
+  RKObjectMapping *mapping = [[DFPeanutContact rkObjectMapping] inverseMapping];
   mapping.forceCollectionMapping = YES;
   RKRequestDescriptor *restRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping

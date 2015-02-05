@@ -34,7 +34,7 @@ NSString *const ActivityPath = @"strand_activity";
   
   NSMutableArray *responseDescriptors = [NSMutableArray new];
   for (NSString *path in paths) {
-    RKResponseDescriptor *descriptor = [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
+    RKResponseDescriptor *descriptor = [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse rkObjectMapping]
                                                                                     method:RKRequestMethodAny
                                                                                pathPattern:path
                                                                                    keyPath:nil

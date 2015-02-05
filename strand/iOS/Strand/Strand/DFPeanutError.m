@@ -12,7 +12,7 @@
 
 @implementation DFPeanutError
 
-+ (RKObjectMapping *)objectMapping
++ (RKObjectMapping *)rkObjectMapping
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromDictionary:@{

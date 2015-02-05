@@ -12,8 +12,10 @@
 #import "DFPhoto.h"
 #import "DFPeanutAction.h"
 #import "DFPeanutUserObject.h"
+#import <EKObjectMapping.h>
+#import <EKMappingProtocol.h>
 
-@interface DFPeanutFeedObject : NSObject<DFPeanutObject, DFJSONConvertible, NSCopying>
+@interface DFPeanutFeedObject : NSObject<DFPeanutObject, DFJSONConvertible, NSCopying, EKMappingProtocol>
 
 typedef NSString *const DFFeedObjectType;
 
@@ -98,6 +100,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 + (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects;
 - (DFPeanutUserObject *)actorWithID:(DFUserIDType)userID;
 
++ (EKObjectMapping *)objectMapping;
 
 #pragma mark - Analytics helpers
 - (NSDictionary *)suggestionAnalyticsSummary;
