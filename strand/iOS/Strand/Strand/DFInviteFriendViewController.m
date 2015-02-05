@@ -132,8 +132,9 @@
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
-           contactTapped:(DFPeanutContact *)contact
+didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
+  DFPeanutContact *contact = [peanutContacts firstObject];
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
   if ([[[DFPeanutFeedDataManager sharedManager]
         usersThatFriendedUser:[[DFUser currentUser] userID] excludeFriends:NO]
@@ -142,19 +143,10 @@
                                                        initWithPeanutUser:user];
     [self.navigationController pushViewController:friendController animated:YES];
     [DFAnalytics logInviteActionTaken:@"viewFriend" userInfo:[self analyticsDict]];
+  } else {
+    DFPeoplePickerSecondaryActionHandler inviteAction = [self inviteActionHandler];
+    inviteAction(contact);
   }
-}
-
-- (BOOL)pickerController:(DFPeoplePickerViewController *)pickerController
-       shouldPickContact:(DFPeanutContact *)contact
-{
-  return NO;
-}
-
-- (void)pickerController:(DFPeoplePickerViewController *)pickerController
-didFinishWithPickedContacts:(NSArray *)peanutContacts
-{
-
 }
 
 - (DFPeoplePickerSecondaryAction *)addFriendSecondaryAction
