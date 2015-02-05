@@ -11,6 +11,7 @@
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFPeanutPhoto.h"
+#import "EKMappingBlocks+DFMappingBlocks.h"
 
 @implementation DFPeanutObjectsResponse
 
@@ -18,7 +19,6 @@
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
-  [objectMapping addAttributeMappingsFromArray:[self dateAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects"
                                                  mapping:[DFPeanutFeedObject rkObjectMapping]];
   
@@ -28,19 +28,16 @@
 + (EKObjectMapping *)objectMapping {
   return [EKObjectMapping mappingForClass:self withBlock:^(EKObjectMapping *mapping) {
     [mapping mapPropertiesFromArray:[self simpleAttributeKeys]];
-    
+
     [mapping hasMany:[DFPeanutFeedObject class] forKeyPath:@"objects"];
   }];
 }
 
 
-+ (NSArray *)dateAttributeKeys
-{
-  return @[@"timestamp"];
-}
-
 + (NSArray *)simpleAttributeKeys {
-  return @[@"result"];
+  // Normally timestamp would be a date element, but in this case we consider it a string
+  // since the client never looks at it, it simply passes it back to the server as is.
+  return @[@"result", @"timestamp"];
 }
 
 
