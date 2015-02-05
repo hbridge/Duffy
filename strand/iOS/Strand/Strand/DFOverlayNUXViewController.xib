@@ -91,10 +91,12 @@
             </subviews>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="trailing" secondItem="3EZ-9O-T1A" secondAttribute="trailing" constant="40" id="69B-2I-hoL"/>
                 <constraint firstAttribute="centerY" secondItem="3EZ-9O-T1A" secondAttribute="centerY" id="Ngn-g8-dp5"/>
-                <constraint firstAttribute="centerX" secondItem="3EZ-9O-T1A" secondAttribute="centerX" id="fWl-Yu-cF9"/>
+                <constraint firstItem="3EZ-9O-T1A" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="40" id="VM9-0S-BV8"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="287" y="218"/>
         </view>
     </objects>
 </document>
