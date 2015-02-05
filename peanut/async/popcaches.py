@@ -21,7 +21,7 @@ django.setup()
 from django import db
 
 from strand import swaps_util, friends_util
-from common.models import Strand, User, ApiCache
+from common.models import Strand, User, ApiCache, ShareInstance, Action
 
 from common import stats_util, serializers, api_util
 import strand.notifications_util as notifications_util
@@ -55,7 +55,7 @@ def threadedPerformFullPrivateStrands(userId):
 	logger.info("Finished full private strand refresh for user %s" % (userId))
 	notifications.sendRefreshFeedToUserIds.delay([userId])
 
-def processBatch(strandsToProcess):
+def processPrivateStrandsBatch(strandsToProcess):
 	# Group by user
 	dirtyStrandsByUserId = dict()
 	total = 0
@@ -146,7 +146,7 @@ def processBatch(strandsToProcess):
 			
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		if (not apiCache.private_strands_full_last_timestamp or apiCache.private_strands_full_last_timestamp < now - datetime.timedelta(minutes=5)):
-			processFull.delay(userId)
+			processPrivateStrandFull.delay(userId)
 		total += len(strandsProcessed)
 
 	notifications.sendRefreshFeedToUserIds.delay(set(usersIdsToSendNotificationsTo))
@@ -154,16 +154,16 @@ def processBatch(strandsToProcess):
 	return total
 
 
-baseQuery = Strand.objects.prefetch_related('photos').filter(user__isnull=False).filter(cache_dirty=True).filter(private=True).order_by('-first_photo_time')
-numToProcess = 50
+privateStrandsBaseQuery = Strand.objects.prefetch_related('photos').filter(user__isnull=False).filter(cache_dirty=True).filter(private=True).order_by('-first_photo_time')
+privateStrandsNumToProcess = 50
 
 @app.task
 def processPrivateStrandsAll():
-	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
+	return celery_helper.processBatch(privateStrandsBaseQuery, privateStrandsNumToProcess, processPrivateStrandsBatch)
 
 @app.task
-def processPrivateStrandIds(ids):
-	return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processBatch)
+def processPrivateStrandIds(strandIds):
+	return celery_helper.processBatch(privateStrandsBaseQuery.filter(id__in=strandIds), privateStrandsNumToProcess, processPrivateStrandsBatch)
 
 @app.task
 def processPrivateStrandFull(userId):
@@ -172,5 +172,137 @@ def processPrivateStrandFull(userId):
 	endTime = datetime.datetime.utcnow()
 	msTime = ((endTime-startTime).microseconds / 1000 + (endTime-startTime).seconds * 1000)
 	return (userId, "%s ms" % msTime)
+
+
+
+###################################################################
+#########################      Inbox       ########################
+###################################################################
+
+
+def processInboxBatch(shareInstancesToProcess):
+	# Group by user
+	dirtyShareInstancesByUserId = dict()
+	total = 0
+
+	for shareInstance in shareInstancesToProcess:
+		for user in shareInstance.users.all():
+			if user.id not in dirtyShareInstancesByUserId:
+				dirtyShareInstancesByUserId[user.id] = list()
+			dirtyShareInstancesByUserId[user.id].append(shareInstance)
+
+	# Now grab all the actions for these ShareInstances (comments, evals, likes)
+	shareInstanceIds = ShareInstance.getIds(shareInstancesToProcess)
+
+	actions = Action.objects.filter(share_instance_id__in=shareInstanceIds)
+	actionsByShareInstanceId = dict()
 	
+	for action in actions:
+		if action.share_instance_id not in actionsByShareInstanceId:
+			actionsByShareInstanceId[action.share_instance_id] = list()
+		actionsByShareInstanceId[action.share_instance_id].append(action)
+
+	usersIdsToSendNotificationsTo = list()
+	shareInstancesProcessed = list()
+	for userId, shareInstanceList in dirtyShareInstancesByUserId.iteritems():
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			logger.error("Couldn't find user: %s" % userId)
+			continue
+
+		try:
+			apiCache = ApiCache.objects.get(user_id=user.id)
+		except ApiCache.DoesNotExist:
+			apiCache = ApiCache.objects.create(user=user)
+
+		responseObjectsById = dict()
+		if apiCache.inbox_data:
+			responseObjects = json.loads(apiCache.inbox_data)['objects']
+
+			for responseObject in responseObjects:
+				responseObjectsById[int(responseObject['share_instance'])] = responseObject
+
+
+		for shareInstance in shareInstanceList:
+			actions = list()
+			if shareInstance.id in actionsByShareInstanceId:
+				actions = actionsByShareInstanceId[shareInstance.id]
+
+			objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
+
+			if objectData:
+				# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
+				objectData['sort_rank'] = swaps_util.getSortRanking(user, shareInstance, actions)
+				objectData['suggestion_rank'] = objectData['sort_rank']
+
+				responseObjectsById[objectData['share_instance']] = objectData
+				logger.info("Inserted share instance %s for user %s" % (objectData['share_instance'], userId))
+			else:
+				if shareInstance.id in responseObjectsById:
+					del responseObjectsById[shareInstance.id]
+					logger.info("explicitly removed strand %s from cache for user %s" % (strand.id, userId))
+				else:
+					logger.info("Did not insert strand %s for user %s" % (strand.id, userId))
+
+
+		responseObjects = responseObjectsById.values()
+		responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
+
+		response = dict()
+		response['objects'] = responseObjects
+		apiCache.inbox_data = json.dumps(response, cls=api_util.DuffyJsonEncoder)
+		apiCache.inbox_data_last_timestamp = datetime.datetime.utcnow()
+
+		apiCache.save()
+
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		if (not apiCache.inbox_full_last_timestamp or apiCache.inbox_full_last_timestamp < now - datetime.timedelta(minutes=5)):
+			processInboxFull.delay(userId)
+
+	for shareInstance in shareInstancesToProcess:
+		shareInstance.cache_dirty = False
+
+	ShareInstance.bulkUpdate(shareInstancesToProcess, ['cache_dirty'])
+
+	return len(shareInstancesToProcess)
+
+inboxBaseQuery = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(cache_dirty=True).order_by("-updated", "id")
+inboxNumToProcess = 50
+
+
+@app.task
+def processInboxAll():
+	return celery_helper.processBatch(inboxBaseQuery, inboxNumToProcess, processInboxBatch)
+
+@app.task
+def processInboxIds(shareInstanceIds):
+	return celery_helper.processBatch(inboxBaseQuery.filter(id__in=shareInstanceIds), inboxNumToProcess, processInboxBatch)
+
+@app.task
+def processInboxFull(userId):
+	startTime = datetime.datetime.utcnow()
 	
+	logger = get_task_logger(__name__)
+	user = User.objects.get(id=userId)
+	feedObjects = swaps_util.getFeedObjectsForInbox(user, None, None)
+
+	try:
+		apiCache = ApiCache.objects.get(user_id=user.id)
+	except ApiCache.DoesNotExist:
+		apiCache = ApiCache.objects.create(user=user)
+
+	response = dict()
+	response['objects'] = feedObjects
+	apiCache.inbox_data = json.dumps(response, cls=api_util.DuffyJsonEncoder)
+	apiCache.inbox_full_last_timestamp = datetime.datetime.utcnow()
+
+	apiCache.save()
+
+	logger.info("Finished full inbox refresh for user %s" % (userId))
+	notifications.sendRefreshFeedToUserIds.delay([userId])
+
+	endTime = datetime.datetime.utcnow()
+	msTime = ((endTime-startTime).microseconds / 1000 + (endTime-startTime).seconds * 1000)
+	return (userId, "%s ms" % msTime)
+
