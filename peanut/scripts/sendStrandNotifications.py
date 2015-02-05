@@ -106,22 +106,22 @@ def main(argv):
 		############################################
 
 		# get all pending shareInstances that users haven't been notified about 
-		shareInstancesPending = ShareInstance.objects.filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(photo__full_filename__isnull=False)
+		shareInstancesPending = ShareInstance.objects.prefetch_related('users').filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(photo__full_filename__isnull=False)
 
 		# Process pending shareInstances
 		if len(shareInstancesPending) > 0:
-			shareInstancesSent = ShareInstance.objects.exclude(notification_sent__isnull=True).filter(added__gt=now-recencyTimedelta)
+			shareInstancesSent = ShareInstance.objects.prefetch_related('user').exclude(notification_sent__isnull=True).filter(notification_sent__gt=now-recencyTimedelta)
 			logger.debug("shareInstancesSent found: %s"%(len(shareInstancesSent)))
-			usersSentNotsRecently = [si.user.id for si in shareInstancesSent]
+			usersSentNotsRecently = [si.user_id for si in shareInstancesSent]
 			if len(usersSentNotsRecently) > 0:
 				logger.debug("Users who sent a notification recently: %s"%(str(usersSentNotsRecently)))
 
 			siByUser = dict()
 
 			for si in shareInstancesPending:
-				if si.user.id in usersSentNotsRecently:
+				if si.user_id in usersSentNotsRecently:
 					# skip if this user has sent a shareInstance (that we notified someone of) recently
-					logger.info("skipping userId %s"%(si.user.id))
+					logger.info("skipping userId %s"%(si.user_id))
 					continue
 				else:
 					notificationsSent.append(si)
