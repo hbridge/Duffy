@@ -334,8 +334,7 @@ static BOOL showFilters = NO;
 - (void)configureNUXPopLabels
 {
   self.suggestionsNuxPopLabel = [MMPopLabel
-                           popLabelWithText:@"You have photos that were taken with friends."
-                           " Tap to check them out!"];
+                           popLabelWithText:@"Share photos fast with Swapomatic"];
   [self.view addSubview:self.suggestionsNuxPopLabel];
   self.cameraRollNuxPopLabel = [MMPopLabel popLabelWithText:@"Send a photo to a friend"];
   self.cameraRollNuxPopLabel.delegate = self;
@@ -493,7 +492,7 @@ static BOOL showFilters = NO;
   [self logHomeButtonPressed:sender];
   
   // handle nux
-  [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
+  // don't mark the NUX as passed here, the card view controller will do it
   [self.suggestionsNuxPopLabel dismiss];
 }
 

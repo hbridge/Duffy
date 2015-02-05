@@ -24,6 +24,8 @@
 #import "DFPeanutShareInstance.h"
 #import "DFCreateShareInstanceController.h"
 #import "DFPhotoDetailViewController.h"
+#import "DFOverlayNUXViewController.h"
+#import "DFDismissableModalViewController.h"
 
 
 const NSUInteger UpsellCardFrequency = 5;
@@ -117,6 +119,21 @@ const NSUInteger UpsellCardFrequency = 5;
   [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFSwapsFeed completion:nil];
 
   [self configureLoadingView];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+    DFOverlayNUXViewController *suggestionNux = [[DFOverlayNUXViewController alloc]
+                                                 initWithOverlayNUXType:DFoverlayNUXTypeSuggestions];
+    [DFDismissableModalViewController presentWithRootController:suggestionNux
+                                                       inParent:self
+                                                backgroundStyle:DFDismissableModalViewControllerBackgroundStyleTranslucentBlack
+                                                       animated:YES];
+    [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
+  }
 }
 
 - (void)reloadData

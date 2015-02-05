@@ -86,6 +86,8 @@
 		5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */; };
 		5A683A1C1A39110A00308BF1 /* DFSegmentedControlReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */; };
 		5A683A1D1A39110A00308BF1 /* DFSegmentedControlReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */; };
+		5A6C268E1A83F98600782EA9 /* DFOverlayNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6C268C1A83F98600782EA9 /* DFOverlayNUXViewController.m */; };
+		5A6C268F1A83F98600782EA9 /* DFOverlayNUXViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A6C268D1A83F98600782EA9 /* DFOverlayNUXViewController.xib */; };
 		5A6E332C1A7FF63B00228D46 /* DFNibInstantiableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E332B1A7FF63B00228D46 /* DFNibInstantiableView.m */; };
 		5A6E4D7B19D20A51002CB0A2 /* NSArray+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */; };
 		5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */; };
@@ -445,6 +447,9 @@
 		5A683A191A39110A00308BF1 /* DFSegmentedControlReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSegmentedControlReusableView.h; sourceTree = "<group>"; };
 		5A683A1A1A39110A00308BF1 /* DFSegmentedControlReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSegmentedControlReusableView.m; sourceTree = "<group>"; };
 		5A683A1B1A39110A00308BF1 /* DFSegmentedControlReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSegmentedControlReusableView.xib; sourceTree = "<group>"; };
+		5A6C268B1A83F98600782EA9 /* DFOverlayNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOverlayNUXViewController.h; sourceTree = "<group>"; };
+		5A6C268C1A83F98600782EA9 /* DFOverlayNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayNUXViewController.m; sourceTree = "<group>"; };
+		5A6C268D1A83F98600782EA9 /* DFOverlayNUXViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFOverlayNUXViewController.xib; sourceTree = "<group>"; };
 		5A6E332A1A7FF63B00228D46 /* DFNibInstantiableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNibInstantiableView.h; sourceTree = "<group>"; };
 		5A6E332B1A7FF63B00228D46 /* DFNibInstantiableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNibInstantiableView.m; sourceTree = "<group>"; };
 		5A6E4D7919D20A51002CB0A2 /* NSArray+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+DFHelpers.h"; sourceTree = "<group>"; };
@@ -1586,6 +1591,9 @@
 				5A2E9F2B1A78412D0097EB6B /* DFFindFriendsNUXViewController.m */,
 				5A2E9F271A78340F0097EB6B /* DFAddFriendsNUXViewController.h */,
 				5A2E9F281A78340F0097EB6B /* DFAddFriendsNUXViewController.m */,
+				5A6C268B1A83F98600782EA9 /* DFOverlayNUXViewController.h */,
+				5A6C268C1A83F98600782EA9 /* DFOverlayNUXViewController.m */,
+				5A6C268D1A83F98600782EA9 /* DFOverlayNUXViewController.xib */,
 			);
 			name = "First Time Setup";
 			sourceTree = "<group>";
@@ -1883,6 +1891,7 @@
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
 				5A113B1419C2472D004CA85B /* DFGallerySectionFooter.xib in Resources */,
 				65E2415B1A3B64A10044F1CB /* DFUpsellCardViewController.xib in Resources */,
+				5A6C268F1A83F98600782EA9 /* DFOverlayNUXViewController.xib in Resources */,
 				5A883BE31A09653900355C1D /* DFStrandPeopleViewController.xib in Resources */,
 				5AF499261A4210E0000CF9DB /* DFOutgoingCardContentView.xib in Resources */,
 				5A83A3DB19F019CE0068F08B /* DFFriendProfileViewController.xib in Resources */,
@@ -2218,6 +2227,7 @@
 				5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */,
 				5AF64D0519EC61AA00EE1473 /* DFFriendsViewController.m in Sources */,
 				5AC8B1E819D0D9AC00BAC55F /* DFAssetCache.m in Sources */,
+				5A6C268E1A83F98600782EA9 /* DFOverlayNUXViewController.m in Sources */,
 				5AAF039A19B112F700EF021C /* DFPeanutStrand.m in Sources */,
 				5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */,
 			);

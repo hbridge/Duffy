@@ -8,6 +8,7 @@
 
 #import "DFDismissableModalViewController.h"
 #import "UIImageEffects.h"
+#import "UIView+DFExtensions.h"
 
 @interface DFDismissableModalViewController ()
 
@@ -19,6 +20,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
   self.backgroundImageView.image = self.backgroundImage;
+  [self.closeButton setImage:[[UIImage imageNamed:@"Assets/Icons/XIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                              forState:UIControlStateNormal];
 }
 
 - (void)setBackgroundImage:(UIImage *)backgroundImage
@@ -78,17 +81,38 @@
                          inParent:(UIViewController *)parent
                          animated:(BOOL)animated
 {
-  
-  UIView *backgroundView = parent.view;
-  UIGraphicsBeginImageContextWithOptions(backgroundView.bounds.size, NO, 0);
-  [backgroundView drawViewHierarchyInRect:backgroundView.bounds afterScreenUpdates:NO];
-  UIImage* backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
-  
+  [self presentWithRootController:rootController
+                         inParent:parent
+                  backgroundStyle:DFDismissableModalViewControllerBackgroundStyleBlur animated:animated];
+}
+
++ (void)presentWithRootController:(UIViewController *)rootController
+                         inParent:(UIViewController *)parent
+                  backgroundStyle:(DFDismissableModalViewControllerBackgroundStyle)backgroundStyle
+                         animated:(BOOL)animated
+{
   DFDismissableModalViewController *viewController = [[DFDismissableModalViewController alloc] init];
   viewController.contentView = rootController.view;
   [viewController addChildViewController:rootController];
-  viewController.backgroundImage = [UIImageEffects imageByApplyingDarkEffectToImage:backgroundImage];
+  
+  UIView *backgroundView = parent.view;
+  UIGraphicsBeginImageContextWithOptions(backgroundView.bounds.size, NO, 0);
+  BOOL snapshotSuccess = [backgroundView drawViewHierarchyInRect:backgroundView.bounds afterScreenUpdates:NO];
+  UIImage* backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+
+  if (backgroundStyle == DFDismissableModalViewControllerBackgroundStyleBlur
+      && snapshotSuccess) {
+    viewController.backgroundImage = [UIImageEffects imageByApplyingDarkEffectToImage:backgroundImage];
+    viewController.closeButton.tintColor = [UIColor lightGrayColor];
+  } else if (backgroundStyle == DFDismissableModalViewControllerBackgroundStyleTranslucentBlack
+             && snapshotSuccess) {
+    viewController.backgroundImage = backgroundImage;
+    viewController.contentView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+    viewController.closeButton.tintColor = [UIColor whiteColor];
+  } else {
+    viewController.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+  }
   
   if (animated) {
     CATransition* transition = [CATransition animation];

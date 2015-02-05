@@ -228,6 +228,15 @@ static NSArray *colors;
       }
       defaultStyle[@"gray"] = @{NSForegroundColorAttributeName : [UIColor lightGrayColor]};
       defaultStyle[@"feedText"] = @{NSParagraphStyleAttributeName : feedParagraphStyle};
+
+      
+      NSMutableParagraphStyle *nuxTextStyle = [NSMutableParagraphStyle new];
+      nuxTextStyle.alignment = NSTextAlignmentCenter;
+      defaultStyle[@"nuxText"] = @{NSParagraphStyleAttributeName : nuxTextStyle};
+      NSMutableParagraphStyle *nuxHeaderTextStyle = [NSMutableParagraphStyle new];
+      nuxHeaderTextStyle.alignment = NSTextAlignmentCenter;
+      nuxHeaderTextStyle.lineSpacing = 4;
+      defaultStyle[@"nuxHeaderText"] = @{NSParagraphStyleAttributeName : nuxHeaderTextStyle};
     });
   }
   
