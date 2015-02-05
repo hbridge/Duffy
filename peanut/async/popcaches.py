@@ -265,6 +265,8 @@ def processInboxBatch(shareInstancesToProcess):
 
 	ShareInstance.bulkUpdate(shareInstancesToProcess, ['cache_dirty'])
 
+	notifications.sendRefreshFeedToUserIds.delay(dirtyShareInstancesByUserId.keys())
+
 	return len(shareInstancesToProcess)
 
 inboxBaseQuery = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(cache_dirty=True).order_by("-updated", "id")

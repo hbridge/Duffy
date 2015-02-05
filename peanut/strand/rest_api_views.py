@@ -678,6 +678,7 @@ class CreateActionAPI(CreateAPIView):
             if action.share_instance and action.action_type == constants.ACTION_TYPE_COMMENT:
                 action.share_instance.last_action_timestamp = action.added
                 action.share_instance.save()
+                popcaches.processInboxIds.delay([action.share_instance.id])
 
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def pre_save(self, user):
@@ -779,4 +780,8 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
     def post_save(self, shareInstance, created):
         if created:
             action = Action.objects.create(user=shareInstance.user, photo_id=shareInstance.photo_id, share_instance=shareInstance, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+
+class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
+    def post_save(self, shareInstance):
+        popcaches.processInboxIds.delay(shareInstance.id)
 

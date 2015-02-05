@@ -39,7 +39,7 @@ urlpatterns = patterns('',
 	url(r'^contacts/$', strand_rest_api_views.ContactEntryBulkAPI.as_view()),
 
 	url(r'^share_instance/$', strand_rest_api_views.CreateShareInstanceAPI.as_view(model=ShareInstance, lookup_field='id')),	
-	url(r'^share_instance/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=ShareInstance, lookup_field='id')),
+	url(r'^share_instance/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyShareInstanceAPIView.as_view(model=ShareInstance, lookup_field='id')),
 
 	url(r'^friend_connection/$', strand_rest_api_views.CreateFriendConnectionAPI.as_view()),	
 	url(r'^friend_connection/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=FriendConnection, lookup_field='id')),
