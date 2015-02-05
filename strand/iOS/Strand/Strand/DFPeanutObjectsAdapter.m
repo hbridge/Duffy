@@ -98,13 +98,13 @@
               DDLogError(@"Error parsing JSON: %@", jsonError);
               completionBlock(nil, nil, error);
             } else {
-              DFPeanutObjectsResponse *response = [EKMapper objectFromExternalRepresentation:jsonArray withMapping:[DFPeanutObjectsResponse objectMapping]];
+              DFPeanutObjectsResponse *peanutObjects = [EKMapper objectFromExternalRepresentation:jsonArray withMapping:[DFPeanutObjectsResponse objectMapping]];
               
               NSData *responseHash = [DFDataHasher
                                       hashDataForData:data
                                       maxLength:data.length];
               
-              completionBlock(response, responseHash, error);
+              completionBlock(peanutObjects, responseHash, error);
             }
           }] resume];
 }
