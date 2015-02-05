@@ -18,8 +18,19 @@
 
 @implementation DFPeanutObjectsAdapter
 
-#ifndef DEBUG
+
 - (void)fetchObjectsAtPath:(NSString *)path
+       withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+                parameters:(NSDictionary *)parameters
+{
+  if ([[DFUser currentUser] isUserDeveloper]) {
+    [self fetchObjectsWithEMAtPath:path withCompletionBlock:completionBlock parameters:parameters];
+  } else {
+    [self fetchObjectsWithRKAtPath:path withCompletionBlock:completionBlock parameters:parameters];
+  }
+}
+
+- (void)fetchObjectsWithRKAtPath:(NSString *)path
        withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
                 parameters:(NSDictionary *)parameters
 {
@@ -61,9 +72,8 @@
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
 }
 
-#else
 
-- (void)fetchObjectsAtPath:(NSString *)path
+- (void)fetchObjectsWithEMAtPath:(NSString *)path
        withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
                 parameters:(NSDictionary *)parameters
 {
@@ -106,7 +116,6 @@
             }
           }] resume];
 }
-#endif
 
 - (NSMutableDictionary *)cumulativeParameters
 {
