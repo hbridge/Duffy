@@ -19,7 +19,7 @@
 {
   self = [super initWithTitle:@"Welcome to Swap"
                         image:[UIImage imageNamed:@"Assets/Nux/WelcomeGraphic"]
-              explanationText:@"Swap is a fast and fun way to share photos with groups of friends."
+              explanationText:@"A fast and fun way to share photos with groups of friends"
                   buttonTitle:@"Get Started"];
   if (self) {
     

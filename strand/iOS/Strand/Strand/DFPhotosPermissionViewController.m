@@ -27,8 +27,7 @@
 {
   self = [super initWithTitle:@"Photos Access"
                         image:[UIImage imageNamed:@"Assets/Nux/PhotosAccessGraphic"]
-              explanationText:@"Swap looks at your photo library to find the best photos for you to share."
-          " Please grant photos access to continue."
+              explanationText:@"Get suggestions for best photos to share from your photo library"
                   buttonTitle:@"Grant Access"
           ];
   if (self) {

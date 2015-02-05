@@ -22,7 +22,7 @@
 {
   self = [super initWithTitle:@"Find Friends"
                         image:[UIImage imageNamed:@"Assets/Nux/FriendsGraphic"]
-              explanationText:@"Swap can automatically suggest photos to share with friends, but first you’ll need friends on Swap."
+              explanationText:@"Get suggestions on who to share a photo with, but first you’ll need to find some friends on Swap."
                   buttonTitle:@"Find Friends"];
   if (self) {
     
