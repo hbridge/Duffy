@@ -233,15 +233,23 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
+/* Generates a key unique to feedtype and full refresh.  Need this so we don't block a full refresh while doing a partial */
+- (NSString *)refreshKey:(DFFeedType)feedType fullRefresh:(BOOL)fullRefresh
+{
+  return [NSString stringWithFormat:@"%u%@", feedType, [NSNumber numberWithBool:fullRefresh]];
+}
+
 - (void)refreshFeedFromServer:(DFFeedType)feedType
                    completion:(RefreshCompleteCompletionBlock)completion
                   fullRefresh:(BOOL)fullRefresh
 {
+  NSString *refreshKey = [self refreshKey:feedType fullRefresh:fullRefresh];
+  
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   if (completion) [self scheduleDeferredCompletion:completion forFeedType:feedType];
   
-  if (![[self.feedRefreshing objectForKey:@(feedType)] boolValue]) {
-    [self.feedRefreshing setObject:[NSNumber numberWithBool:YES] forKey:@(feedType)];
+  if (![[self.feedRefreshing objectForKey:refreshKey] boolValue]) {
+    [self.feedRefreshing setObject:[NSNumber numberWithBool:YES] forKey:refreshKey];
     
     NSMutableDictionary *parameters = [NSMutableDictionary new];
     if ([self.feedLastFeedTimestamp objectForKey:@(feedType)] && !fullRefresh) {
@@ -278,15 +286,14 @@ static DFPeanutFeedDataManager *defaultManager;
             [self notifyFeedChanged:feedType];
             DDLogInfo(@"Got new data for feed %@ with %d objects, sending notification.", @(feedType), (int)newObjects.count);
           }
+          if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
+            [self.feedLastFullFetchDate setObject:[NSDate date] forKey:@(feedType)];
+          }
         }];
-        
-        if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
-          [self.feedLastFullFetchDate setObject:[NSDate date] forKey:@(feedType)];
-        }
       }
       
       [self executeDeferredCompletionsForFeedType:feedType];
-      [self.feedRefreshing setObject:[NSNumber numberWithBool:NO] forKey:@(feedType)];
+      [self.feedRefreshing setObject:[NSNumber numberWithBool:NO] forKey:refreshKey];
     }
                parameters:parameters
      ];
@@ -567,11 +574,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   return actions;
-}
-
-- (BOOL)isRefreshingInbox
-{
-  return [[self.feedRefreshing objectForKey:@(DFInboxFeed)] boolValue];
 }
 
 - (NSArray *)friendsList

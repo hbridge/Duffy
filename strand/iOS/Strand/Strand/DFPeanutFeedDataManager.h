@@ -27,8 +27,6 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (BOOL)hasSwapsData;
 - (BOOL)hasActionsData;
 
-- (BOOL)isRefreshingInbox;
-
 - (NSArray *)privateStrands;
 - (NSArray *)privatePhotos;
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
