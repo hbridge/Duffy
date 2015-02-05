@@ -1,3 +1,4 @@
+133
 //
 //  DFFaceDetectionSyncOperation.m
 //  Strand
@@ -126,7 +127,7 @@ const NSUInteger PhotosToScanPerBackgroundOperation = 5;
   // using OpenGL causes crashes if the app is in the background
   // see https://developer.apple.com/library/ios/qa/qa1766/_index.html
   NSDictionary *options = nil;
-  if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+  if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
     DDLogInfo(@"%@ app state background. Using SW rendering for face detect.", self);
     options = @{kCIContextUseSoftwareRenderer : @(YES)};
   }
