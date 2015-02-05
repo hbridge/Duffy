@@ -14,6 +14,7 @@
 #import "DFNetworkingConstants.h"
 #import "DFUser.h"
 #import "DFAppInfo.h"
+#import <RequestUtils.h>
 
 
 @implementation DFPeanutObjectsAdapter
@@ -77,25 +78,16 @@
        withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
                 parameters:(NSDictionary *)parameters
 {
-  NSURLComponents *components = [[NSURLComponents alloc] init];
-  components.scheme = DFServerScheme;
-  components.host = DFServerBaseHost;
-  components.path = [DFServerAPIPath stringByAppendingString:path];
-  
   NSMutableDictionary *allParameters = [self cumulativeParameters];
   [allParameters addEntriesFromDictionary:parameters];
+
+  NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",[[DFUser currentUser] apiURL], path]];
+  NSURLRequest *request = [NSURLRequest GETRequestWithURL:url parameters:allParameters];
   
-  NSMutableArray *queryItems = [NSMutableArray new];
-  for (NSString *key in allParameters) {
-    NSURLQueryItem *item = [NSURLQueryItem queryItemWithName:key value:[NSString stringWithFormat:@"%@",allParameters[key]]];
-    [queryItems addObject:item];
-  }
-  components.queryItems = queryItems;
-  
-  DDLogVerbose(@"Fetching url: %@", components.URL);
+  DDLogVerbose(@"Fetching url: %@", request.URL);
   
   NSURLSession *session = [NSURLSession sharedSession];
-  [[session dataTaskWithURL:components.URL
+  [[session dataTaskWithRequest:request
           completionHandler:^(NSData *data,
                               NSURLResponse *response,
                               NSError *error) {
