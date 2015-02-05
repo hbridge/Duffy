@@ -158,15 +158,15 @@ baseQuery = Strand.objects.prefetch_related('photos').filter(user__isnull=False)
 numToProcess = 50
 
 @app.task
-def processAll():
+def processPrivateStrandsAll():
 	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
 
 @app.task
-def processIds(ids):
+def processPrivateStrandIds(ids):
 	return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processBatch)
 
 @app.task
-def processFull(userId):
+def processPrivateStrandFull(userId):
 	startTime = datetime.datetime.utcnow()
 	threadedPerformFullPrivateStrands(userId)
 	endTime = datetime.datetime.utcnow()

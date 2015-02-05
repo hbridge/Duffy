@@ -221,7 +221,7 @@ class PhotoBulkAPI(BasePhotoAPI):
         Strand.bulkUpdate(privateStrands, ['cache_dirty'])
 
         if len(privateStrands) > 0:
-            popcaches.processIds.delay(Strand.getIds(privateStrands))
+            popcaches.processPrivateStrandIds.delay(Strand.getIds(privateStrands))
 
     def post(self, request, format=None):
         response = list()

@@ -345,7 +345,7 @@ def processBatch(photosToProcess):
 		ids = Strand.getIds(strandsAddedTo)
 		ids.extend(Strand.getIds(strandsCreated))
 		if len(ids) > 0:
-			popcaches.processIds.delay(ids)
+			popcaches.processPrivateStrandIds.delay(ids)
 
 		if len(strandsCreated) > 0:
 			neighboring.processStrandIds.delay(Strand.getIds(strandsCreated))
