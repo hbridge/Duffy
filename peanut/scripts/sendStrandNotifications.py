@@ -110,7 +110,8 @@ def main(argv):
 
 		# Process pending shareInstances
 		if len(shareInstancesPending) > 0:
-			shareInstancesSent = ShareInstance.objects.filter(notification_sent__isnull=False).filter(added__gt=now-recencyTimedelta)
+			shareInstancesSent = ShareInstance.objects.exclude(notification_sent__isnull=True).filter(added__gt=now-recencyTimedelta)
+			logger.debug("shareInstancesSent found: %s"%(len(shareInstancesSent)))
 			usersSentNotsRecently = [si.user.id for si in shareInstancesSent]
 			if len(usersSentNotsRecently) > 0:
 				logger.debug("Users who sent a notification recently: %s"%(str(usersSentNotsRecently)))
