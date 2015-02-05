@@ -56,6 +56,39 @@ def getAllIdsInFeedObjects(feedObjects):
 # ----------------------- FEED ENDPOINTS --------------------
 
 """
+	Returns a string of json
+"""
+def runCachedFeed(cacheName, user, num):
+	useCache = True
+	try:
+		apiCache = ApiCache.objects.get(user=user)
+
+		if not getattr(apiCache, cacheName):
+			useCache = False
+	except ApiCache.DoesNotExist:
+		useCache = False
+
+	if useCache:
+		responseStr = getattr(apiCache, cacheName)
+
+		if num:
+			responseObjects = json.loads(responseStr)
+			responseObjects["timestamp"] = int(time.time())
+
+			responseObjects["objects"] = responseObjects["objects"][:num]
+			responseStr = json.dumps(responseObjects)
+		else:
+			# Manually put in the timestamp into the json so we don't have to read then write the json
+			timestampStr = '"timestamp": %s,' %  int(time.time())
+			if not responseStr:
+				responseStr = "{%s}" % timestampStr
+			else:
+				responseStr = responseStr[:1] + timestampStr + responseStr[1:]
+		return responseStr
+	else:
+		return None
+
+"""
 	Return the Duffy JSON for the strands a user has that are private and unshared
 """
 def private_strands(request):
@@ -69,30 +102,19 @@ def private_strands(request):
 		user = form.cleaned_data['user']
 		num = form.cleaned_data['num']
 
-		try:
-			apiCache = ApiCache.objects.get(user=user)
-			responseStr = apiCache.private_strands_data
-
-			if num:
-				responseObjects = json.loads(responseStr)
-				responseObjects["timestamp"] = int(time.time())
-
-				responseObjects["objects"] = responseObjects["objects"][:50]
-				responseStr = json.dumps(responseObjects)
-			else:
-				# Manually put in the timestamp into the json so we don't have to read then write the json
-				timestampStr = '"timestamp": %s,' %  int(time.time())
-				if not responseStr:
-					responseStr = "{%s}" % timestampStr
-				else:
-					responseStr = responseStr[:1] + timestampStr + responseStr[1:]
-		except ApiCache.DoesNotExist:
+		if num:
+			num = 50
+		
+		result = runCachedFeed("private_strands_data", user, num)
+		if result == None:
 			objs = swaps_util.getFeedObjectsForPrivateStrands(user)
 
 			response['objects'] = objs
 			response['timestamp'] = datetime.datetime.utcnow()
 			
 			responseStr = json.dumps(response, cls=api_util.DuffyJsonEncoder)
+		else:
+			responseStr = result
 		stats_util.printStats("private-end")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
@@ -143,11 +165,16 @@ def swap_inbox(request):
 		# Add in buffer for the last timestamp, or if not sent in, use long ago date
 		if form.cleaned_data['last_timestamp']:
 			lastTimestamp = form.cleaned_data['last_timestamp'] - datetime.timedelta(seconds=10)
+			inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
+			responseObjects.extend(inboxObjects)
 		else:
-			lastTimestamp = datetime.datetime.fromtimestamp(0)
-
-		inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
-		responseObjects.extend(inboxObjects)
+			result = runCachedFeed("inbox_data", user, num)
+			if result == None:
+				lastTimestamp = datetime.datetime.fromtimestamp(0)
+				inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
+			else:
+				inboxObjects = json.loads(result)["objects"]
+			responseObjects.extend(inboxObjects)
 
 		responseObjects.append(swaps_util.getPeopleListEntry(user, getAllIdsInFeedObjects(inboxObjects)))
 

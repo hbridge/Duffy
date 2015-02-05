@@ -430,7 +430,10 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 	responseObjects = list()
 
 	# Grab all share instances we want.  Might filter by a last timestamp for speed
-	shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).filter(updated__gt=lastTimestamp).order_by("-updated", "id")
+	shareInstances = ShareInstance.objects.prefetch_related('photo', 'users', 'photo__user').filter(users__in=[user.id]).order_by("-updated", "id")
+
+	if lastTimestamp:
+		shareInstances = shareInstances.filter(updated__gt=lastTimestamp)
 	if num:
 		shareInstances = shareInstances[:num]
 
@@ -438,7 +441,9 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 	# is before the given lastTimestamp
 	# So in that case, lets search for all the actions since that timestamp and add those
 	# ShareInstances into the mix to be sorted
-	recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(updated__gt=lastTimestamp).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
+	recentlyEvaluatedActions = Action.objects.prefetch_related('share_instance', 'share_instance__photo', 'share_instance__users', 'share_instance__photo__user').filter(user=user).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED).order_by('-added')
+	if lastTimestamp:
+		recentlyEvaluatedActions = recentlyEvaluatedActions.filter(updated__gt=lastTimestamp)
 	if num:
 		recentlyEvaluatedActions = recentlyEvaluatedActions[:num]
 		

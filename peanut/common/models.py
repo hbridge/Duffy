@@ -178,26 +178,27 @@ def delete_empty_strands(sender, instance, using, **kwargs):
 		if strand.users.count() == 1 and strand.users.all()[0].id == user.id:
 			strand.delete()
 
+
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
 	thumb_filename = models.CharField(max_length=100, null=True, db_index=True)
-	metadata = models.CharField(max_length=10000, null=True)
+	
 	full_width = models.IntegerField(null=True)
 	full_height = models.IntegerField(null=True)
-	location_data = models.TextField(null=True)
+	
 	location_city =  models.CharField(max_length=1000, null=True)
 	location_point = models.PointField(null=True, db_index=True)
 	location_accuracy_meters = models.IntegerField(null=True)
-	twofishes_data = models.TextField(null=True)
-	iphone_faceboxes_topleft = models.TextField(null=True)
+	
+	
 	iphone_hash = models.CharField(max_length=100, null=True)
 	is_local = models.BooleanField(default=1)
 	classification_data = models.TextField(null=True)
 	overfeat_data = models.TextField(null=True)
-	faces_data = models.TextField(null=True)
+	
 	time_taken = models.DateTimeField(null=True, db_index=True)
 	local_time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
@@ -215,6 +216,13 @@ class Photo(models.Model):
 	is_dup = models.BooleanField(default=False)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
+
+	# TODO(Derek): To move
+	metadata = models.CharField(max_length=10000, null=True)
+	twofishes_data = models.TextField(null=True)
+	iphone_faceboxes_topleft = models.TextField(null=True)
+	faces_data = models.TextField(null=True)
+	location_data = models.TextField(null=True)
 
 	 # You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
@@ -705,6 +713,9 @@ class ShareInstance(models.Model):
 	bulk_batch_key = models.IntegerField(null=True)
 	mtm_key = models.IntegerField(null=True)
 	notification_sent = models.DateTimeField(null=True)
+
+	cache_dirty = models.BooleanField(default=True)
+	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -867,6 +878,11 @@ class ApiCache(models.Model):
 	private_strands_data = CompressedTextField(null=True)
 	private_strands_data_last_timestamp = models.DateTimeField(null=True)
 	private_strands_full_last_timestamp = models.DateTimeField(null=True)
+
+	inbox_data = CompressedTextField(null=True)
+	inbox_data_last_timestamp = models.DateTimeField(null=True)
+	inbox_full_last_timestamp = models.DateTimeField(null=True)
+	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 	
