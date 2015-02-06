@@ -48,7 +48,7 @@
 
 - (void)configureContent
 {
-  self.titleLabel.text = @"Swapomatic";
+  self.titleLabel.text = @"Quick Share";
   self.subtitleLabel.text = @"A fast, easy way to share";
   self.topImageView.image = [UIImage imageNamed:@"Assets/Nux/NuxMatchImage"];
   

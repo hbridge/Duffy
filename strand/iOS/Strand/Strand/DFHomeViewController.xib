@@ -25,8 +25,8 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYj-g7-RXb" userLabel="Button bar" customClass="SAMGradientView">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="160"/>
                     <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Swapomatic" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KTE-xE-giG">
-                            <rect key="frame" x="265" y="64" width="70" height="16"/>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quick Share" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KTE-xE-giG">
+                            <rect key="frame" x="265" y="64" width="69" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="UOe-4h-oTc"/>
                             </constraints>
