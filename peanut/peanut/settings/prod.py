@@ -44,4 +44,5 @@ AWS_STORAGE_BUCKET_NAME = 'strand-prod'
 
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	CELERY_SEND_TASK_ERROR_EMAILS = True
+	ADMINS = [('Admins', 'server-errors@duffytech.co')]
 	BROKER_URL = "amqp://duffy:du44y@172.31.21.173:5672/swap"
