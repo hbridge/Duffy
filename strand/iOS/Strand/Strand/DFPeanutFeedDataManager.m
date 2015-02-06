@@ -280,16 +280,22 @@ static DFPeanutFeedDataManager *defaultManager;
           [self.feedLastFeedTimestamp setObject:response.timestamp forKey:@(feedType)];
         }
         
-        [self processFeedOfType:feedType currentObjects:[self.feedObjects objectForKey:@(feedType)] withNewObjects:response.objects fullRefresh:fullRefresh responseHash:responseHash returnBlock:^(BOOL updated, NSArray *newObjects) {
-          [self.feedObjects setObject:newObjects forKey:@(feedType)];
-          if (updated) {
-            [self notifyFeedChanged:feedType];
-            DDLogInfo(@"Got new data for feed %@ with %d objects, sending notification.", @(feedType), (int)newObjects.count);
-          }
-          if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
-            [self.feedLastFullFetchDate setObject:[NSDate date] forKey:@(feedType)];
-          }
-        }];
+        [self
+         processFeedOfType:feedType
+         currentObjects:[self.feedObjects objectForKey:@(feedType)]
+         withNewObjects:response.objects
+         fullRefresh:fullRefresh
+         responseHash:responseHash
+         returnBlock:^(BOOL updated, NSArray *newObjects) {
+           [self.feedObjects setObject:newObjects ? newObjects : @[] forKey:@(feedType)];
+           if (updated) {
+             [self notifyFeedChanged:feedType];
+             DDLogInfo(@"Got new data for feed %@ with %d objects, sending notification.", @(feedType), (int)newObjects.count);
+           }
+           if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
+             [self.feedLastFullFetchDate setObject:[NSDate date] forKey:@(feedType)];
+           }
+         }];
       }
       
       [self executeDeferredCompletionsForFeedType:feedType];
