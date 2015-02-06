@@ -782,6 +782,7 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
         if created:
             action = Action.objects.create(user=shareInstance.user, photo_id=shareInstance.photo_id, share_instance=shareInstance, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
             popcaches.processInboxIds.delay([shareInstance.id])
+            
 class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
     def pre_save(self, shareInstance):
         shareInstance.cache_dirty = True

@@ -25,7 +25,7 @@ from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUse
 
 from ios_notifications.models import APNService, Device, Notification
 
-from async import neighboring
+from async import neighboring, popcaches
 
 logger = logging.getLogger(__name__)
 
@@ -167,11 +167,13 @@ def swap_inbox(request):
 			lastTimestamp = form.cleaned_data['last_timestamp'] - datetime.timedelta(seconds=10)
 			inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
 			responseObjects.extend(inboxObjects)
+			popcaches.processInboxFull.delay(user.id)
 		else:
 			result = runCachedFeed("inbox_data", user, num)
 			if result == None:
 				lastTimestamp = datetime.datetime.fromtimestamp(0)
 				inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
+				popcaches.processInboxFull.delay(user.id)
 			else:
 				inboxObjects = json.loads(result)["objects"]
 			responseObjects.extend(inboxObjects)
