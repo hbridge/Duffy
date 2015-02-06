@@ -167,7 +167,6 @@ def swap_inbox(request):
 			lastTimestamp = form.cleaned_data['last_timestamp'] - datetime.timedelta(seconds=10)
 			inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
 			responseObjects.extend(inboxObjects)
-			popcaches.processInboxFull.delay(user.id)
 		else:
 			result = runCachedFeed("inbox_data", user, num)
 			if result == None:
