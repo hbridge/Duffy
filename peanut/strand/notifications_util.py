@@ -62,6 +62,8 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			# Its a visual notification if we don't put this in.  If we put it in, then its silent
 			if not constants.NOTIFICATIONS_VIZ_DICT[msgTypeId]:
 				notification.message = ""
+
+			if constants.NOTIFICATIONS_WAKE_APP_DICT[msgTypeId]:
 				notification.content_available = 1
 
 			if "badge" in customPayload:
