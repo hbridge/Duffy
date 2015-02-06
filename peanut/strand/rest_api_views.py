@@ -677,6 +677,7 @@ class CreateActionAPI(CreateAPIView):
         if created:
             if action.share_instance and action.action_type == constants.ACTION_TYPE_COMMENT:
                 action.share_instance.last_action_timestamp = action.added
+                action.share_instance.cache_dirty = True
                 action.share_instance.save()
                 popcaches.processInboxIds.delay([action.share_instance.id])
 
@@ -780,8 +781,20 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
     def post_save(self, shareInstance, created):
         if created:
             action = Action.objects.create(user=shareInstance.user, photo_id=shareInstance.photo_id, share_instance=shareInstance, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-
+            popcaches.processInboxIds.delay([shareInstance.id])
 class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
-    def post_save(self, shareInstance):
-        popcaches.processInboxIds.delay(shareInstance.id)
+    def pre_save(self, shareInstance):
+        shareInstance.cache_dirty = True
+        
+    def post_save(self, shareInstance, created):
+        popcaches.processInboxIds.delay([shareInstance.id])
+
+    def delete(self, *args, **kwargs):
+        try:
+            shareInstance = ShareInstance.objects.get(id=kwargs.get('id', None))
+            popcaches.processInboxFull.delay(shareInstance.user_id)
+        except ShareInstance.DoesNotExist:
+            pass
+        
+        return super(RetrieveUpdateDestroyShareInstanceAPIView, self).delete(*args, **kwargs)
 
