@@ -58,9 +58,11 @@
 		overflow: auto;
 	}
 	.ui-screenshots {
-		float:left;
-		width:100%;
+		margin-right: auto;
+		margin-left: auto;
 		position:relative;
+		text-align: center;
+		width: 161px;
 	}
 	img.ui-image {
 		display:block;
@@ -71,9 +73,9 @@
 	img.ui-home-button {
 		position: absolute;
 		top: 239px;
-		left: 146px;
+		left: 67px;
 		height: 25px;
-		width: 25px;
+		width: 24px;
 	}
 	.ui-install-button{
 		background: #50A1FF;
@@ -97,68 +99,6 @@
 		line-height: 20px;
 		margin-bottom:15px;
 	}
-
-/*
-	.ui-strand-text {
-		padding-top: 16px;
-		padding-left: 2px;
-		float: left;
-		text-align: left;
-		font-size: 20px;
-		color: #202020;
-	}
-	.ui-strand-text-beta {
-		font-size: 16px;
-		color: #888888;
-		font-weight: normal;
-	}
-	.ui-dl {
-		float: left;
-		width: 100%;
-		height: 33px;
-		text-align: center;
-	}
-	.ui-dl-text {
-		background: #50A1FF;
-		font-size: 20px;
-		color: #FFFFFF;
-		line-height: 24px;
-		border-radius: 15px;
-		border: 0px solid white;
-		padding: 3px 16px;	
-	}
-	.ui-dl-appstore {
-		float:left;
-		width: 100%;
-	}
-	img.ui-appstore {
-		display: block;
-		margin-right: auto;
-		margin-left: auto;
-	}
-	.ui-footer {
-		float:left;
-		width:100%;
-		text-align: center;
-	}
-	.ui-disclaimer {
-		font-size: 14px;
-		text-align: center;
-		margin: 10px 30px;
-		float:left;
-	}
-	#installing {
-		margin-top: 20px;
-	}
-	.down-arrow {
-		font-size: 90px;
-	}
-	.ui-text {
-		margin: 10px 10px;
-		text-align: center;
-		float:left;
-	}
-	*/
 	</style>
 </head>
 <body>
@@ -212,7 +152,7 @@
 			$('img.ui-image').fadeOut(200, function() {
 				$('img.ui-image').attr('src','/resources/screenshot_installing.png');
 			}).fadeIn(200);
-			window.setTimeout(flashHomeButton, 5000);
+			window.setTimeout(flashHomeButton, 3000);
 			localytics.tagEvent("DL_Swap");
 		}
 		else {
