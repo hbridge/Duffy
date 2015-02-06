@@ -452,15 +452,7 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 	for action in recentlyEvaluatedActions:
 		if action.share_instance_id and action.share_instance_id not in shareInstanceIds:
 			shareInstances.append(action.share_instance)
-		
-	# Now filter out anything that doesn't have a thumb...unless its your own photo
-	filteredShareInstances = list()
-	for shareInstance in shareInstances:
-		if shareInstance.user_id == user.id:
-			filteredShareInstances.append(shareInstance)
-		elif shareInstance.photo.thumb_filename:
-			filteredShareInstances.append(shareInstance)
-	shareInstances = filteredShareInstances
+	
 	
 	# Now grab all the actions for these ShareInstances (comments, evals, likes)
 	shareInstanceIds = ShareInstance.getIds(shareInstances)
@@ -485,10 +477,12 @@ def getFeedObjectsForInbox(user, lastTimestamp, num):
 		actions = uniqueObjects(actions)
 		objectData = serializers.objectDataForShareInstance(shareInstance, actions, user)
 
-		# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
-		objectData['sort_rank'] = getSortRanking(user, shareInstance, actions)
-		objectData['suggestion_rank'] = objectData['sort_rank']
-		responseObjects.append(objectData)
+		# Might be filtered out due to missing thumb
+		if objectData:
+			# suggestion_rank here for backwards compatibility, remove upon next mandatory updatae after Jan 2
+			objectData['sort_rank'] = getSortRanking(user, shareInstance, actions)
+			objectData['suggestion_rank'] = objectData['sort_rank']
+			responseObjects.append(objectData)
 
 	responseObjects = sorted(responseObjects, key=lambda x: x['sort_rank'])
 	
