@@ -247,9 +247,9 @@ def processInboxBatch(shareInstancesToProcess):
 			else:
 				if shareInstance.id in responseObjectsById:
 					del responseObjectsById[shareInstance.id]
-					logger.info("explicitly removed strand %s from cache for user %s" % (strand.id, userId))
+					logger.info("explicitly removed share instance %s from cache for user %s" % (shareInstance.id, userId))
 				else:
-					logger.info("Did not insert strand %s for user %s" % (strand.id, userId))
+					logger.info("Did not insert share instance %s for user %s" % (shareInstance.id, userId))
 
 
 		responseObjects = responseObjectsById.values()
