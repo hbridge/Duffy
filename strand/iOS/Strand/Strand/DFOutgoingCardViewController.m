@@ -185,18 +185,36 @@
   self.addPersonViewController.allowsMultipleSelection = YES;
   self.addPersonViewController.delegate = self;
   
-  WYPopoverBackgroundView *appearance = [WYPopoverBackgroundView appearance];
-  appearance.fillTopColor = [UIColor colorWithRed:201.0/255.0 green:201.0/255.0 blue:206.0/255.0 alpha:1.0];
+  [self.class configurePopoverTheme];
+
+  
+  
   self.addPersonPopoverController = [[WYPopoverController alloc]
                                      initWithContentViewController:self.addPersonViewController];
   
+  self.addPersonPopoverController.passthroughViews = @[
+                                                       self.suggestionContentView.profileStackView,
+                                                       ];
+
   CGRect rect = [self.view convertRect:sender.frame fromView:sender.superview];
-  [self.addPersonPopoverController presentPopoverFromRect:rect
-                                                   inView:self.view
-                                 permittedArrowDirections:WYPopoverArrowDirectionUp
-                                                 animated:YES
-                                                  options:WYPopoverAnimationOptionFadeWithScale
-                                               completion:nil];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.addPersonPopoverController presentPopoverFromRect:rect
+                                                     inView:self.view
+                                   permittedArrowDirections:WYPopoverArrowDirectionUp
+                                                   animated:YES
+                                                    options:WYPopoverAnimationOptionFadeWithScale
+                                                 completion:nil];
+
+  });
+
+}
+
++ (void)configurePopoverTheme
+{
+  WYPopoverTheme *theme = [WYPopoverController defaultTheme];
+  theme.fillTopColor = [UIColor colorWithRed:201.0/255.0 green:201.0/255.0 blue:206.0/255.0 alpha:1.0];
+  theme.overlayColor = [UIColor clearColor];
+  [WYPopoverController setDefaultTheme:theme];
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
