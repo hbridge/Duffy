@@ -28,6 +28,9 @@
 
 @end
 
+static CGFloat deleteButtonSize = 15;
+static CGFloat deleteButtonMargin = 4;
+
 @implementation DFProfileStackView
 
 - (void)awakeFromNib
@@ -185,6 +188,7 @@
   NSUInteger numSpaces = MAX(self.peanutUsers.count - 1, 0);
   newSize.width = (CGFloat)numProfiles * self.profilePhotoWidth
   + numSpaces * self.photoMargins;
+  newSize.width += self.deleteButtonsVisible ? deleteButtonMargin : 0;
   return newSize;
 }
 
@@ -195,13 +199,13 @@
 
 - (CGFloat)profilePhotoWidth
 {
-  return self.frame.size.height - [self nameLabelHeight];
+  return self.frame.size.height - [self otherContentHeight];
 }
 
 - (CGRect)rectForCircleAtIndex:(NSUInteger)index
 {
   CGRect rect = CGRectMake((CGFloat)index * self.profilePhotoWidth,
-                           0,
+                           self.deleteButtonsVisible ? deleteButtonMargin : 0,
                            self.profilePhotoWidth,
                            self.profilePhotoWidth);
   if (index > 0) {
@@ -210,11 +214,20 @@
   return rect;
 }
 
-- (CGFloat)nameLabelHeight
+- (CGFloat)otherContentHeight
 {
-  if (!self.showNames) return 0;
+  if (!self.showNames && !self.deleteButtonsVisible) return 0;
   
-  return self.nameLabelFont.pointSize + self.nameLabelVerticalMargin * 2;
+  CGFloat height = 0.0;
+  if (self.showNames) {
+    height += self.nameLabelFont.pointSize + self.nameLabelVerticalMargin * 2;
+  }
+  
+  if (self.deleteButtonsVisible) {
+    height += deleteButtonMargin;
+  }
+  
+  return height;
 }
 
 - (BOOL)shouldDrawUserAtIndex:(NSUInteger)i inRect:(CGRect)rect
@@ -243,6 +256,7 @@
       // if this is the last user or the next circle fits entirely in the bounds, draw a user
       DFPeanutUserObject *user = self.peanutUsers[i];
       [self drawProfileForPeanutUser:user inCircleRect:circleRect];
+      if (self.deleteButtonsVisible) [self drawDeleteButtonInCircleRect:circleRect];
     } else {
       [self drawElipsisInCircleRect:circleRect];
     }
@@ -278,6 +292,27 @@
     [self drawBadgeImage:badgeImage onCircleRect:circleRect context:context];
   }
 }
+- (void)drawDeleteButtonInCircleRect:(CGRect)circleRect
+{
+  CGRect deleteRect = [DFProfileStackView rectForDeleteButtonInCircle:circleRect];
+  CGContextRef context = UIGraphicsGetCurrentContext();
+  CGContextSetFillColorWithColor(context, [[[DFStrandConstants strandBlue] colorWithAlphaComponent:1.0] CGColor]);
+  CGContextFillEllipseInRect(context, deleteRect);
+  CGContextDrawImage(context, deleteRect, [[[UIImage imageNamed:@"Assets/Icons/DeletePersonX"]
+                                            imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                                           CGImage]);
+
+}
+
++ (CGRect)rectForDeleteButtonInCircle:(CGRect)circleRect
+{
+  CGRect deleteRect = CGRectMake(CGRectGetMaxX(circleRect) - deleteButtonSize + deleteButtonMargin,
+                                 0,
+                                 deleteButtonSize,
+                                 deleteButtonSize);
+  return deleteRect;
+}
+
 
 - (void)drawElipsisInCircleRect:(CGRect)circleRect
 {
@@ -325,10 +360,21 @@
 - (void)tapped:(UITapGestureRecognizer *)sender
 {
   if (![self.delegate respondsToSelector:@selector(profileStackView:peanutUserTapped:)]) return;
-  
   for (NSUInteger i = 0; i < [self maxPeanutUsersToDraw]; i++) {
-    CGRect rectForName = [self rectForCircleAtIndex:i];
     CGPoint tapPoint = [sender locationInView:self];
+
+    CGRect rectForName = [self rectForCircleAtIndex:i];
+    if (self.deleteButtonsVisible) {
+      CGRect rectForDeleteButton = [DFProfileStackView rectForDeleteButtonInCircle:rectForName];
+      if (CGRectContainsPoint(rectForDeleteButton, tapPoint)
+          && [self shouldDrawUserAtIndex:i inRect:self.bounds]) {
+        if ([self.delegate respondsToSelector:@selector(profileStackView:peanutUserDeleted:)]) {
+          [self.delegate profileStackView:self peanutUserDeleted:self.peanutUsers[i]];
+          return;
+        }
+      }
+    }
+    
     if (CGRectContainsPoint(rectForName, tapPoint)) {
       if ([self shouldDrawUserAtIndex:i inRect:self.bounds]) {
         DFPeanutUserObject *user = self.peanutUsers[i];
@@ -402,6 +448,14 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     [self invalidateIntrinsicContentSize];
     [self reloadImages];
   }
+}
+
+- (void)setDeleteButtonsVisible:(BOOL)deleteButtonsVisible
+{
+  if (deleteButtonsVisible == _deleteButtonsVisible) return;
+  
+  _deleteButtonsVisible = deleteButtonsVisible;
+  [self setNeedsDisplay];
 }
 
 

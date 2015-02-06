@@ -17,6 +17,9 @@
 
 - (void)profileStackView:(DFProfileStackView *)profileStackView
         peanutUserTapped:(DFPeanutUserObject *)peanutUser;
+@optional
+- (void)profileStackView:(DFProfileStackView *)profileStackView
+       peanutUserDeleted:(DFPeanutUserObject *)peanutUser;
 
 @end
 
@@ -30,6 +33,7 @@
 @property (nonatomic) CGFloat photoMargins;
 @property (nonatomic) CGFloat nameLabelVerticalMargin;
 @property (nonatomic, weak) id<DFProfileStackViewDelegate> delegate;
+@property (nonatomic) BOOL deleteButtonsVisible;
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user;
 - (void)setColor:(UIColor *)color forUser:(DFPeanutUserObject *)user;

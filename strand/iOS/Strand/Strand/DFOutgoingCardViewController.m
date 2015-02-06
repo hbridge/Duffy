@@ -234,11 +234,13 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   [self configurePeopleLabel];
   if (selectedPeanutContacts.count > 0) {
     [self.suggestionContentView.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
+    self.suggestionContentView.profileStackView.deleteButtonsVisible = NO;
   } else {
     DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
     dummyUser.display_name = @"?";
     dummyUser.phone_number = @"?";
     self.suggestionContentView.profileStackView.peanutUsers = @[dummyUser];
+    self.suggestionContentView.profileStackView.deleteButtonsVisible = NO;
   }
   [self.view setNeedsLayout];
 }
@@ -250,6 +252,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
     user.phone_number = contact.phone_number;
     user.display_name = contact.name;
+    user.id = contact.user.longLongValue;
     [result addObject:user];
   }
   return result;
@@ -283,7 +286,6 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   }];
 }
 
-
 - (void)profileStackView:(DFProfileStackView *)profileStackView peanutUserTapped:(DFPeanutUserObject *)peanutUser
 {
   // info can be incomplete, look up to see if we have a legit user
@@ -292,6 +294,12 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
     DFFriendProfileViewController *friendViewController = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
     [DFNavigationController presentWithRootController:friendViewController inParent:self];
   }
+}
+
+- (void)profileStackView:(DFProfileStackView *)profileStackView peanutUserDeleted:(DFPeanutUserObject *)peanutUser
+{
+  DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:peanutUser];
+  [self setSelectedPeanutContacts:[self.selectedPeanutContacts arrayByRemovingObject:contact]];
 }
 
 
