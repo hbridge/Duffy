@@ -37,6 +37,8 @@ logger = get_task_logger(__name__)
 
 def threadedPerformFullPrivateStrands(userId):
 	logger = get_task_logger(__name__)
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	
 	user = User.objects.get(id=userId)
 	feedObjects = swaps_util.getFeedObjectsForPrivateStrands(user)
 
@@ -290,6 +292,8 @@ def processInboxFull(userId):
 	startTime = datetime.datetime.utcnow()
 	
 	logger = get_task_logger(__name__)
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+
 	user = User.objects.get(id=userId)
 	feedObjects = swaps_util.getFeedObjectsForInbox(user, None, None)
 

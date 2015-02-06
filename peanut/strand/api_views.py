@@ -172,6 +172,7 @@ def swap_inbox(request):
 			if result == None:
 				lastTimestamp = datetime.datetime.fromtimestamp(0)
 				inboxObjects = swaps_util.getFeedObjectsForInbox(user, lastTimestamp, num)
+				# temporarily turn off
 				#popcaches.processInboxFull.delay(user.id)
 			else:
 				inboxObjects = json.loads(result)["objects"]
