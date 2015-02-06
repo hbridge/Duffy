@@ -144,7 +144,7 @@ NOTIFICATIONS_SMS_URL_DICT = {
 
 # All notification-related time intervals
 NOTIFICATIONS_NEW_PHOTO_WAIT_INTERVAL_SECS = 60 # Waits this long before sending another NEW_PHOTO suggestion to same user
-NOTIFICATIONS_NEW_SUGGESTION_INTERVAL_SECS = 60 # Waits this long before sending a suggestion to same user
+NOTIFICATIONS_NEW_SUGGESTION_INTERVAL_SECS = 600 # Waits this long before sending a suggestion to same user
 NOTIFICATIONS_GPS_FROM_FRIEND_INTERVAL_MINS = 10 # Waits this long before repinging phones for new location
 NOTIFICATIONS_ACTIVATE_ACCOUNT_FS_INTERVAL_DAYS= 7 # Waits this long before resending this notifications
 NOTIFICATIONS_UNSEEN_PHOTOS_FS_INTERVAL_DAYS= 7 
