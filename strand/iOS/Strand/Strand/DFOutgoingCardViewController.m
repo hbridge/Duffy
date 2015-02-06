@@ -186,12 +186,8 @@
   self.addPersonViewController.delegate = self;
   
   [self.class configurePopoverTheme];
-
-  
-  
   self.addPersonPopoverController = [[WYPopoverController alloc]
                                      initWithContentViewController:self.addPersonViewController];
-  
   self.addPersonPopoverController.passthroughViews = @[
                                                        self.suggestionContentView.profileStackView,
                                                        ];
@@ -204,7 +200,6 @@
                                                    animated:YES
                                                     options:WYPopoverAnimationOptionFadeWithScale
                                                  completion:nil];
-
   });
 
 }
