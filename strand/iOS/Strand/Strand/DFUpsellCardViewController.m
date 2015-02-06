@@ -39,8 +39,7 @@
     self.upsellContentView.bottomLabel.text = @"Review Suggestions?";
   } else if (self.upsellType == DFUpsellCardViewBackgroundLocation) {
     self.upsellContentView.topLabel.text = @"Get More Photos";
-    self.upsellContentView.bottomLabel.text = @"Grant location permission to get suggested to "
-    "friends even when you didn't take a photo";
+    self.upsellContentView.bottomLabel.text = @"Grant location permission to get more photos from friends";
     self.upsellContentView.imageView.image = [UIImage imageNamed:@"Assets/Nux/LocationAccessGraphic"];
   }
 }
