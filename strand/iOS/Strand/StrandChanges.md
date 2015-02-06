@@ -1,5 +1,9 @@
 # Swap v2
 
+## Feb 6th, 2015 (4850)
+
+- New screen explaining Quick Share/Suggestions
+
 ## Feb 4th, 2015 (4844-4849)
 
 - Bug fixes and performance improvements
