@@ -664,8 +664,12 @@ class CreateActionAPI(CreateAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return super(CreateActionAPI, self).post(request)
-            elif (obj.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and obj.strand):
-                strands_util.checkStrandForAllPhotosEvaluated(obj.strand)
+            elif (obj.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED):
+                if obj.strand:
+                    strands_util.checkStrandForAllPhotosEvaluated(obj.strand)
+                if obj.user_id == obj.photo.user_id:
+                    obj.photo.owner_evaluated = True
+                    obj.photo.save()
                 return super(CreateActionAPI, self).post(request)
             else:
                 return super(CreateActionAPI, self).post(request)
@@ -781,6 +785,9 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
     def post_save(self, shareInstance, created):
         if created:
             action = Action.objects.create(user=shareInstance.user, photo_id=shareInstance.photo_id, share_instance=shareInstance, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+            shareInstance.photo.owner_evaluated = True
+            shareInstance.photo.save()
+
             popcaches.processInboxIds.delay([shareInstance.id])
             
 class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):

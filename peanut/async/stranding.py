@@ -154,6 +154,8 @@ def processUserIdsForFriendGPSInfo(userIds):
 
 # Look at strands that don't have location data and see if there's any location records which we could fill in for
 def fillInLocationRecordData(user, strandsToProcess):
+	if len(strandsToProcess) == 0:
+		return 0
 	strandsToProcess = sorted(strandsToProcess, key=lambda x: x.first_photo_time)
 	timeLow = strandsToProcess[0].first_photo_time - datetime.timedelta(minutes=30)
 	timeHigh =  strandsToProcess[-1].last_photo_time + datetime.timedelta(minutes=30)
