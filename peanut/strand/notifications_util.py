@@ -187,7 +187,7 @@ def threadedSendNotifications(userIds):
 
 		if count > 0:
 			customPayload["badge"] = count #don't make this a string, as that puts quotes around the number and it won't work
-			sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
+			sendNotification(user, "", constants.NOTIFICATIONS_UPDATE_BADGE, customPayload)
 
 
 def getUnreadActionsListCountByUserId(users):

@@ -46,7 +46,7 @@ def userbaseSummary(request):
 	notificationDataRaw = list(NotificationLog.objects.exclude(
 		result=constants.IOS_NOTIFICATIONS_RESULT_ERROR).exclude(
 		msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(
-		msg_type=constants.NOTIFICATIONS_REFRESH_FEED).exclude(
+		msg_type=constants.NOTIFICATIONS_UPDATE_BADGE).exclude(
 		msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED).exclude(
 		added__lt=newNow-timedelta(hours=168)).exclude(
 		user_id__lt=600).values('user', 'msg_type').order_by('user').annotate(totalNotifs=Count('user'), lastSent=Max('added')))

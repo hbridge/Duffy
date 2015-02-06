@@ -161,7 +161,7 @@ def calcNotificationData(date):
 		constants.NOTIFICATIONS_FETCH_GPS_ID : True,
 		constants.NOTIFICATIONS_UNSEEN_PHOTOS_FS : False,
 		constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS : True,
-		constants.NOTIFICATIONS_REFRESH_FEED : True,
+		constants.NOTIFICATIONS_UPDATE_BADGE : True,
 		constants.NOTIFICATIONS_SOCKET_REFRESH_FEED: True,	
 		constants.NOTIFICATIONS_INVITED_TO_STRAND : False,
 		constants.NOTIFICATIONS_ACCEPTED_INVITE : False,
