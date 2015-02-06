@@ -63,6 +63,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			if not constants.NOTIFICATIONS_VIZ_DICT[msgTypeId]:
 				notification.message = ""
 
+			# If wake app bit is true, wake up the app
 			if constants.NOTIFICATIONS_WAKE_APP_DICT[msgTypeId]:
 				notification.content_available = 1
 
