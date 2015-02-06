@@ -665,7 +665,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   DFPhotoDetailViewController __weak *weakSelf = self;
   DFAlertController *confirmController = [DFAlertController
                                           alertControllerWithTitle:@"Delete Photo?"
-                                          message:@"Other strand users will no longer be able to see this photo."
+                                          message:@"Other Swap users will no longer be able to see this photo."
                                           preferredStyle:DFAlertControllerStyleAlert];
   [confirmController addAction:[DFAlertAction
                                 actionWithTitle:@"Delete"

@@ -105,7 +105,7 @@
     
     // User profile
     [mapping sectionWithTitle:@"Profile"
-                       footer:@"Your Display Name will be shown to other Strand users."
+                       footer:@"Your Display Name will be shown to other Swap users."
                    identifier:@"profile"];
 
 
