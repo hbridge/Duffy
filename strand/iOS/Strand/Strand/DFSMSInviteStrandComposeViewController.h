@@ -17,6 +17,7 @@ typedef void (^DFSMSComposeCompletionBlock)(MessageComposeResult result);
 + (void)showWithParentViewController:(UIViewController *)parentViewController
                         phoneNumbers:(NSArray *)phoneNumbers
                             fromDate:(NSDate *)date
+                        warnOnCancel:(BOOL)warnOnCancel
                      completionBlock:(DFSMSComposeCompletionBlock)completionBlock;
 + (void)showWithParentViewController:(UIViewController *)parentViewController
                         phoneNumbers:(NSArray *)phoneNumbers

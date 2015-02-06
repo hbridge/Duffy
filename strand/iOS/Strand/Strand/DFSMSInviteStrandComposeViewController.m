@@ -11,8 +11,13 @@
 #import "DFAnalytics.h"
 #import "DFContactSyncManager.h"
 #import "DFPeanutContact.h"
+#import "DFAlertController.h"
 
 @interface DFSMSInviteStrandComposeViewController ()
+
+@property (nonatomic) BOOL warnOnCancel;
+@property (readonly, nonatomic, retain) NSString *originalBody;
+@property (readonly, nonatomic, retain) NSArray *originalRecipients;
 
 @end
 
@@ -49,6 +54,9 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
                  "Check out Swap app to see them. %@",
                  fromString ? fromString : @"",
                  appURL];
+    _originalRecipients = self.recipients;
+    _originalBody = self.body;
+    
     [DFAnalytics logInviteComposeInitialized];
   }
   return self;
@@ -60,6 +68,8 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   if (self) {
     self.recipients = recipients;
     self.body = [NSString stringWithFormat:@"Hey! Check out Swap app for sharing pics (still in private beta). %@", appURL];
+    _originalRecipients = self.recipients;
+    _originalBody = self.body;
     [DFAnalytics logInviteComposeInitialized];
   }
   return self;
@@ -96,14 +106,18 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
 + (void)showWithParentViewController:(UIViewController *)parentViewController
                         phoneNumbers:(NSArray *)phoneNumbers
                             fromDate:(NSDate *)date
-                     completionBlock:(DFSMSComposeCompletionBlock)completionBlock
+                        warnOnCancel:(BOOL)warnOnCancel
+                     completionBlock:(DFSMSComposeCompletionBlock)completionBlock;
 {
   DFSMSInviteStrandComposeViewController *smsvc = [[DFSMSInviteStrandComposeViewController alloc]
                                                    initWithRecipients:phoneNumbers
                                                    locationString:nil
                                                    date:date];
-  [self showSMSVc:smsvc inParentViewController:parentViewController
-     phoneNumbers:phoneNumbers
+  smsvc.warnOnCancel = warnOnCancel;
+  [self showSMSVc:smsvc
+inParentViewController:parentViewController
+   phoneNumbers:phoneNumbers
+     warnOnCancel:warnOnCancel
   completionBlock:completionBlock];
 }
 
@@ -116,12 +130,14 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   [self showSMSVc:smsvc
 inParentViewController:parentViewController
      phoneNumbers:phoneNumbers
+     warnOnCancel:NO
   completionBlock:completionBlock];
 }
 
 + (void)showSMSVc:(DFSMSInviteStrandComposeViewController *)smsvc
 inParentViewController:(UIViewController *)parentViewController
      phoneNumbers:(NSArray *)phoneNumbers
+     warnOnCancel:(BOOL)warnOnCancel
   completionBlock:(DFSMSComposeCompletionBlock)completionBlock
 {
   [SVProgressHUD show];
@@ -157,10 +173,56 @@ inParentViewController:(UIViewController *)parentViewController
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:controller.presentingViewController];
   DDLogInfo(@"%@ didFinishWithResult: %@", self.class, @(result));
-  if (self.completionBlock) self.completionBlock(result);
-  if (self.presentingViewController) {
-    [self dismissViewControllerAnimated:YES completion:nil];
+  
+  if (result == MessageComposeResultCancelled && self.warnOnCancel) {
+    [self showTextCancelledAlert];
+  } else {
+    if (self.completionBlock) self.completionBlock(result);
+    if (self.presentingViewController) {
+      [self dismissViewControllerAnimated:YES completion:nil];
+    }
   }
+}
+
+- (void)showTextCancelledAlert
+{
+  UIViewController *presentingViewController = self.presentingViewController;
+  
+    DFSMSInviteStrandComposeViewController *newSMSVC = [[DFSMSInviteStrandComposeViewController alloc]
+                                                      initWithRecipients:self.originalRecipients];
+  newSMSVC.body = self.originalBody;
+  newSMSVC.completionBlock = self.completionBlock;
+  newSMSVC.messageComposeDelegate = newSMSVC;
+  newSMSVC.warnOnCancel = NO;
+  
+  DFAlertController *alert = [DFAlertController
+                              alertControllerWithTitle:@"Not Sent"
+                              message:@"Some recipients are not yet Swap members and won't be notified "
+                              "unless you send them a text. Write a text?"
+                              preferredStyle:DFAlertControllerStyleAlert];
+
+  [alert
+   addAction:[DFAlertAction
+              actionWithTitle:@"Write Text"
+              style:DFAlertActionStyleDefault
+              handler:^(DFAlertAction *action) {
+                [presentingViewController presentViewController:newSMSVC animated:NO completion:nil];
+              }]];
+  
+  //copy the completion block because we're about to be released
+  DFSMSComposeCompletionBlock completionBlock = self.completionBlock;
+  [alert
+   addAction:[DFAlertAction
+              actionWithTitle:@"Cancel"
+              style:DFAlertActionStyleCancel
+              handler:^(DFAlertAction *action) {
+                // The user cancelled the alert that some user won't be notified without a text
+                if (completionBlock) completionBlock(MessageComposeResultCancelled);
+              }]];
+  
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+    [alert showWithParentViewController:presentingViewController animated:YES completion:nil];
+  }];
 }
 
 @end

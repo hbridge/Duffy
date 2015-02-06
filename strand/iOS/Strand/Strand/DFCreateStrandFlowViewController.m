@@ -148,11 +148,13 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
    addCaption:nil
    parentViewController:self
    enableOptimisticSend:NO
-   uiCompleteHandler:nil
-   success:^{
-     [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
-   } failure:^(NSError *error) {
-     [weakSelf dismissWithResult:DFCreateStrandResultFailure errorString:error.localizedDescription];
+   completionHandler:^(BOOL allInvitesSent, NSError *error) {
+     if (error) {
+       NSString *errorString = [NSString stringWithFormat:@"Failed: %@", error.localizedDescription];
+       [SVProgressHUD showErrorWithStatus:errorString];
+     } else {
+       [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
+     }
    }];
 }
 

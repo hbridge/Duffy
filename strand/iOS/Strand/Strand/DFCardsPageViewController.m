@@ -375,13 +375,15 @@ const NSUInteger UpsellCardFrequency = 5;
    addCaption:caption
    parentViewController:self
    enableOptimisticSend:YES
-   uiCompleteHandler:^{
+   completionHandler:^(BOOL allInvitesSent, NSError *error) {
+     if (error) {
+       NSString *errorString = [NSString stringWithFormat:@"Failed: %@", error.localizedDescription];
+       [SVProgressHUD showErrorWithStatus:errorString];
+     }
      dispatch_async(dispatch_get_main_queue(), ^{
        [self gotoNextController];
      });
-   }
-   success:nil
-   failure:nil];
+   }];
 }
 
 - (void)photoSkipped:(DFPeanutFeedObject *)photo

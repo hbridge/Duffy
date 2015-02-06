@@ -101,7 +101,9 @@
     [DFSMSInviteStrandComposeViewController
      showWithParentViewController:self
      phoneNumbers:phoneNumbers
-     fromDate:self.photoObject.time_taken completionBlock:^(MessageComposeResult result) {
+     fromDate:self.photoObject.time_taken
+     warnOnCancel:YES
+     completionBlock:^(MessageComposeResult result) {
        if (result == MessageComposeResultSent) {
          [self dismissWithErrorString:nil];
        } else {
