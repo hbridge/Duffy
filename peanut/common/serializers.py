@@ -97,7 +97,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	shareInstanceData['full_height'] = shareInstance.photo.full_height
 
 	# Now filter out anything that doesn't have a thumb...unless its your own photo
-	if not hareInstance.photo.thumb_filename and shareInstance.user_id != user.id:
+	if not shareInstance.photo.thumb_filename and shareInstance.user_id != user.id:
 		return None
 
 	publicActions = list()
