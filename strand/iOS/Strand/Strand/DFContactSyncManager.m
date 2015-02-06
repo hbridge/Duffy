@@ -8,6 +8,7 @@
 
 #import "DFContactSyncManager.h"
 #import <AddressBook/AddressBook.h>
+#import <RHAddressBook/RHAddressBook.h>
 #import "DFDefaultsStore.h"
 #import "DFPeanutContactAdapter.h"
 #import "DFPeanutContact.h"
@@ -191,10 +192,12 @@ static DFContactSyncManager *defaultManager;
                                     failure:(void (^)(NSError *))failure
 {
   DDLogInfo(@"%@ asking for contacts permission", self.class);
-  CFErrorRef error;
-  ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
   
-  ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
+  RHAddressBook *ab = [RHAddressBook new];
+  BOOL __block callbackProcessed = NO;
+  [ab requestAuthorizationWithCompletion:^(bool granted, NSError *error) {
+    if (callbackProcessed) return;
+    callbackProcessed = YES;
     if (granted) {
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
       [[self sharedManager] sync];
@@ -203,9 +206,9 @@ static DFContactSyncManager *defaultManager;
       success();
     } else {
       [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionContacts];
-      failure((__bridge NSError *)error);
+      failure(error);
     }
-  });
+  }];
 }
 
 + (void)showContactsDeniedAlert

@@ -19,6 +19,8 @@
 
 @interface DFPhotosPermissionViewController ()
 
+@property (nonatomic) BOOL calledCompleted;
+
 @end
 
 @implementation DFPhotosPermissionViewController
@@ -84,9 +86,12 @@
 
 - (void)completedWithGranted:(BOOL)granted
 {
-  [[DFCameraRollSyncManager sharedManager] sync];
-  [[DFUploadController sharedUploadController] uploadPhotos];
-  [self completedWithUserInfo:nil];
+  if (!self.calledCompleted && granted) {
+    self.calledCompleted = YES;
+    [[DFCameraRollSyncManager sharedManager] sync];
+    [[DFUploadController sharedUploadController] uploadPhotos];
+    [self completedWithUserInfo:nil];
+  }
 }
 
 - (BOOL)prefersStatusBarHidden

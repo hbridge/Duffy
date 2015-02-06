@@ -103,9 +103,14 @@
 - (void)NUXController:(DFNUXViewController *)nuxController completedWithUserInfo:(NSDictionary *)userInfo
 {
   [self.allUserInfo addEntriesFromDictionary:userInfo];
-  [self gotoNextStep];
   if ([[DFUser currentUser] userID]) {
     [self userIDStepComplete];
+  }
+  
+  if (nuxController == self.currentViewController) {
+    [self gotoNextStep];
+  } else {
+    DDLogWarn(@"%@ warning: %@ called completed when not currentVC.", self.class, [nuxController class]);
   }
 }
 
