@@ -153,35 +153,6 @@ def getFeedObjectsForSwaps(user):
 			strandObjectData['objects'] = sorted(strandObjectData['objects'], key=lambda x: x['time_taken'], reverse=True)
 			responseObjects.append(strandObjectData)
 
-
-
-	# 
-
-	'''
-	if len(responseObjects) < 3:
-		lastWeekResponseObjects = list()
-		
-		timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=7)
-		mostRecentStrandIds = list()
-
-		# grab the strands that we fetched before but that are within our time cutoff
-		# and that we didn't add already
-		for strand in recentStrands:
-			if strand.first_photo_time > timeCutoff and strand.id not in strandIdsAlreadyIncluded:
-				mostRecentStrandIds.append(strand.id)
-
-		strands = Strand.objects.prefetch_related('photos').filter(id__in=mostRecentStrandIds)
-		actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
-
-		for strand in strands:
-			strandObjectData = serializers.objectDataForPrivateStrand(user, strand, friends, False, "recent-last week", dict(), dict(), actionsByPhotoId)
-			if strandObjectData:
-				lastWeekResponseObjects.append(strandObjectData)
-
-		lastWeekResponseObjects = sorted(lastWeekResponseObjects, key=lambda x: x['time_taken'], reverse=True)
-	
-		responseObjects.extend(lastWeekResponseObjects)
-	'''
 	return responseObjects
 
 def getFeedObjectsForPrivateStrands(user):

@@ -216,6 +216,10 @@ def processInboxBatch(shareInstancesToProcess):
 		except ApiCache.DoesNotExist:
 			apiCache = ApiCache.objects.create(user=user)
 
+		# skip users who don't have any inbox data, require a full first
+		if not apiCache.inbox_full_last_timestamp:
+			continue
+
 		responseObjectsById = dict()
 		if apiCache.inbox_data:
 			responseObjects = json.loads(apiCache.inbox_data)['objects']

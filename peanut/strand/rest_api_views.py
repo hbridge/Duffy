@@ -791,11 +791,15 @@ class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
         popcaches.processInboxIds.delay([shareInstance.id])
 
     def delete(self, *args, **kwargs):
+        shareInstance = None
         try:
             shareInstance = ShareInstance.objects.get(id=kwargs.get('id', None))
-            popcaches.processInboxFull.delay(shareInstance.user_id)
         except ShareInstance.DoesNotExist:
             pass
+
+        ret = super(RetrieveUpdateDestroyShareInstanceAPIView, self).delete(*args, **kwargs)
+        if shareInstance:
+            popcaches.processInboxFull.delay(shareInstance.user_id)
         
-        return super(RetrieveUpdateDestroyShareInstanceAPIView, self).delete(*args, **kwargs)
+        return ret
 
