@@ -151,6 +151,7 @@ const NSUInteger UpsellCardFrequency = 5;
     }
     NSArray *newSuggestedPhotos = [[DFPeanutFeedDataManager sharedManager]
                                    suggestedPhotosIncludeEvaled:YES];
+  
     for (DFPeanutFeedObject *newSuggestedPhoto in newSuggestedPhotos) {
       NSNumber *previousIndex = previousPhotoIDsToItemIndices[@(newSuggestedPhoto.id)];
       if (previousIndex) {
@@ -174,6 +175,20 @@ const NSUInteger UpsellCardFrequency = 5;
     [self configureLoadingView];
     
   });
+}
+
++ (NSString *)stringForItems:(NSArray *)items
+{
+  NSMutableArray *array = [NSMutableArray new];
+  for (id object in items) {
+    if ([object isKindOfClass:[DFPeanutFeedObject class]]) {
+      DFPeanutFeedObject *feedObject = object;
+      [array addObject:@([feedObject id])];
+    } else {
+      [array addObject:object];
+    }
+  }
+  return [array componentsJoinedByString:@", "];
 }
 
 - (void)configureLoadingView
@@ -247,10 +262,10 @@ const NSUInteger UpsellCardFrequency = 5;
   }
   
   // figure out which object we were on
-  id<NSCopying, NSObject> fromSentinalValue = cvc.sentinalValue;
+  id<NSCopying, NSObject> currentItem = cvc.cardItem;
   
-  if (fromSentinalValue) {
-    NSInteger fromIndex = [self.allSuggestedItems indexOfObject:fromSentinalValue];
+  if (currentItem) {
+    NSInteger fromIndex = [self indexOfSuggestedItem:currentItem];
     if (fromIndex == NSNotFound) {
       DDLogWarn(@"%@ sentinal disappeared", self.class);
       return nil;
@@ -274,6 +289,22 @@ const NSUInteger UpsellCardFrequency = 5;
   }
 
   return nil;
+}
+
+- (NSInteger)indexOfSuggestedItem:(id<NSCopying, NSObject>)item
+{
+  for (NSUInteger i = 0; i < self.allSuggestedItems.count; i++) {
+    id otherItem = self.allSuggestedItems[i];
+    if ([item isKindOfClass:[DFPeanutFeedObject class]]
+        && [otherItem isKindOfClass:[DFPeanutFeedObject class]]) {
+      DFPeanutFeedObject *photo = (DFPeanutFeedObject *)item;
+      DFPeanutFeedObject *otherPhoto = (DFPeanutFeedObject *)otherItem;
+      if (photo.id == otherPhoto.id) return i;
+    } else if (IsEqual(item, self.allSuggestedItems[i])) {
+        return i;
+    }
+  }
+  return NSNotFound;
 }
 
 - (DFCardViewController *)cardViewForItem:(id<NSObject,NSCopying>)item
@@ -336,7 +367,7 @@ const NSUInteger UpsellCardFrequency = 5;
       && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
     DFUpsellCardViewController *locationUpsellController = [[DFUpsellCardViewController alloc]
                                                             initWithType:DFUpsellCardViewBackgroundLocation];
-    locationUpsellController.sentinalValue = sentinalValue;
+    locationUpsellController.cardItem = sentinalValue;
     locationUpsellController.yesButtonHandler = ^{
       [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
       [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];

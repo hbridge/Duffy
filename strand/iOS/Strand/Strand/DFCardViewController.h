@@ -11,7 +11,7 @@
 
 @interface DFCardViewController : UIViewController
 
-@property (nonatomic, retain) id<NSCopying, NSObject> sentinalValue;
+@property (nonatomic, retain) id<NSCopying, NSObject> cardItem;
 
 
 typedef UInt64 DFHomeSubViewType;

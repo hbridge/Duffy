@@ -82,7 +82,7 @@
   };
 }
 
-- (id<NSCopying, NSObject>)sentinalValue
+- (id<NSCopying, NSObject>)cardItem
 {
   return self.photoFeedObject;
 }
