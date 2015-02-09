@@ -715,7 +715,7 @@ class ShareInstance(models.Model):
 	mtm_key = models.IntegerField(null=True)
 	notification_sent = models.DateTimeField(null=True)
 
-	cache_dirty = models.BooleanField(default=True)
+	cache_dirty = models.BooleanField(default=True, db_index=True)
 	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)

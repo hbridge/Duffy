@@ -214,14 +214,22 @@ class PhotoAPI(BasePhotoAPI):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PhotoBulkAPI(BasePhotoAPI):
-    def updateStrandCacheStateForPhotos(self, user, photos):
+    def updateCacheStateForPhotos(self, user, photos):
         privateStrands = Strand.objects.filter(user=user).filter(private=True).filter(photos__in=Photo.getIds(photos))
         for strand in privateStrands:
             strand.cache_dirty = True
         Strand.bulkUpdate(privateStrands, ['cache_dirty'])
 
+        shareInstances = ShareInstance.objects.filter(photo_id__in=Photo.getIds(photos))
+        for shareInstance in shareInstances:
+            shareInstance.cache_dirty = True
+        ShareInstance.bulkUpdate(shareInstances, ['cache_dirty'])
+
         if len(privateStrands) > 0:
             popcaches.processPrivateStrandIds.delay(Strand.getIds(privateStrands))
+
+        if len(shareInstances) > 0:
+            popcaches.processInboxIds.delay(ShareInstance.getIds(shareInstances))
 
     def post(self, request, format=None):
         response = list()
@@ -277,7 +285,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                 if int(photo.install_num) == -1:
                     photosDeleted.append(photo)
 
-            self.updateStrandCacheStateForPhotos(user, photosDeleted)
+            self.updateCacheStateForPhotos(user, photosDeleted)
 
             if requireClientRefresh:
                 notifications.sendRefreshFeedToUserIds.delay([user.id])
@@ -379,7 +387,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                 # Best to just do a fresh fetch from the db
                 objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
                 allPhotos.extend(objsToUpdate)
-                self.updateStrandCacheStateForPhotos(user, objsToUpdate)
+                self.updateCacheStateForPhotos(user, objsToUpdate)
 
 
             
