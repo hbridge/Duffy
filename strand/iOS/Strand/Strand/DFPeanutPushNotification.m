@@ -116,5 +116,14 @@ static NSArray *typeStrings = nil;
 }
 
 
+- (BOOL)isEqual:(id)object
+{
+  if (![object isKindOfClass:[self class]]) return NO;
+  NSArray *attributes = @[@"type", @"id", @"shareInstanceID"];
+  NSDictionary *selfDict = [self dictionaryWithValuesForKeys:attributes];
+  NSDictionary *objectDict = [object dictionaryWithValuesForKeys:attributes];
+  return [selfDict isEqualToDictionary:objectDict];
+}
+
 
 @end

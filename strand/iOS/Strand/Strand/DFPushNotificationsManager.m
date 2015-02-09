@@ -23,6 +23,12 @@
 
 static BOOL ShowInAppNotifications = NO;
 
+@interface DFPushNotificationsManager()
+
+@property (nonatomic, retain) NSMutableArray *openedNotifs;
+
+@end
+
 @implementation DFPushNotificationsManager
 
 + (DFPushNotificationsManager *)sharedManager
@@ -35,6 +41,15 @@ static BOOL ShowInAppNotifications = NO;
 + (id)allocWithZone:(struct _NSZone *)zone
 {
   return [self sharedManager];
+}
+
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    self.openedNotifs = [NSMutableArray new];
+  }
+  return self;
 }
 
 - (void)promptForPushNotifsIfNecessary
@@ -216,6 +231,7 @@ static BOOL ShowInAppNotifications = NO;
         || pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID
         || pushNotif.type == NOTIFICATIONS_NEW_SUGGESTION)
     {
+      DDLogInfo(@"%@ handling notif with appState = Inactive.", [self.class description]);
       DFNoticationOpenedHandler handler = [self openedHandlerForNotification:pushNotif];
       handler(pushNotif);
     }
@@ -236,6 +252,10 @@ static BOOL ShowInAppNotifications = NO;
 - (DFNoticationOpenedHandler)openedHandlerForNotification:(DFPeanutPushNotification *)pushNotif
 {
   DFNoticationOpenedHandler handler = ^(DFPeanutPushNotification *openedNotif) {
+    // we sometimes get multiple messages to open a notif and they can really only be opened once
+    // so enforce that they only open once
+    if ([self.openedNotifs containsObject:openedNotif]) return;
+    [self.openedNotifs addObject:openedNotif];
     if (pushNotif.type == NOTIFICATIONS_NEW_PHOTO_ID ||
         pushNotif.type == NOTIFICATIONS_PHOTO_COMMENT ||
         pushNotif.type == NOTIFICATIONS_PHOTO_FAVORITED_ID) {
@@ -244,18 +264,22 @@ static BOOL ShowInAppNotifications = NO;
       DFPhotoIDType photoID = openedNotif.id.longLongValue;
       
       DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photoID shareInstance:shareID];
+      DDLogInfo(@"open handler running for %@, \n photoObject loaded: %@", pushNotif, photoObject ? @"Yes" : @"No");
       if (!photoObject) {
         [SVProgressHUD show];
         [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:^() {
           DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                              photoWithID:photoID
                                              shareInstance:shareID];
-          if (photoObject) {
-            [self openPhotoObject:photoObject];
-            [SVProgressHUD dismiss];
-          } else {
-            [SVProgressHUD showErrorWithStatus:@"Failed"];
-          }
+          DDLogInfo(@"open handler feed refresh complete for %@, \n photoObject loaded: %@", pushNotif, photoObject ? @"Yes" : @"No");
+          dispatch_async(dispatch_get_main_queue(), ^{
+            if (photoObject) {
+              [self openPhotoObject:photoObject];
+              [SVProgressHUD dismiss];
+            } else {
+              [SVProgressHUD showErrorWithStatus:@"Failed"];
+            }
+          });
         }];
       } else {
         [self openPhotoObject:photoObject];
