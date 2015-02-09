@@ -23,15 +23,6 @@ NSString *const ContactsSectionTitle = @"Contacts";
 
 @implementation DFRecipientPickerViewController
 
-- (instancetype)init
-{
-  self = [super init];
-  if (self) {
-    [self observeNotifications];
-  }
-  return self;
-}
-
 - (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
 {
   self = [self init];
@@ -39,6 +30,18 @@ NSString *const ContactsSectionTitle = @"Contacts";
     self.selectedContacts = selectedPeanutContacts;
   }
   return self;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [self observeNotifications];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -79,8 +82,16 @@ NSString *const ContactsSectionTitle = @"Contacts";
                                                object:nil
                                                  rows:friendContacts]];
     }
-    [sections addObject:[DFPeoplePickerViewController allContactsSectionExcludingFriends:YES]];
     [self setSections:sections];
+    
+    NSMutableArray *sectionsWithContacts = [sections mutableCopy];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+      DFSection *contactsSection = [DFPeoplePickerViewController allContactsSectionExcludingFriends:YES];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [sectionsWithContacts addObject:contactsSection];
+        [self setSections:sectionsWithContacts];
+      });
+    });
   });
 }
 

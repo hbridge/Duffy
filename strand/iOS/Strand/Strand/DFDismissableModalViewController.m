@@ -114,15 +114,36 @@
     viewController.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
   }
   
+  [self presentDismissableViewController:viewController inParent:parent animated:animated];
+  
+  return viewController;
+}
+
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
+                                                       inParent:(UIViewController *)parent
+                                            withBackgroundImage:(UIImage *)backgroundImage
+                                                       animated:(BOOL)animated
+{
+  DFDismissableModalViewController *viewController = [[DFDismissableModalViewController alloc] init];
+  viewController.contentView = rootController.view;
+  [viewController addChildViewController:rootController];
+  viewController.backgroundImage = backgroundImage;
+  viewController.closeButton.tintColor = [UIColor lightGrayColor];
+  [self presentDismissableViewController:viewController inParent:parent animated:animated];
+  return viewController;
+}
+
++ (void)presentDismissableViewController:(DFDismissableModalViewController *)dismissableViewController
+                                inParent:(UIViewController *)parent
+                                animated:(BOOL)animated
+{
   if (animated) {
     CATransition* transition = [CATransition animation];
     transition.duration = 0.3;
     transition.type = kCATransitionFade;
     [parent.view.window.layer addAnimation:transition forKey:kCATransition];
   }
-  [parent presentViewController:viewController animated:NO completion:nil];
-  
-  return viewController;
+  [parent presentViewController:dismissableViewController animated:NO completion:nil];
 }
 
 @end

@@ -187,11 +187,6 @@
   self.addPersonViewController.allowsMultipleSelection = YES;
   self.addPersonViewController.delegate = self;
   
-  DFDismissableModalViewController *dmvc = [DFDismissableModalViewController
-                                            presentWithRootController:self.addPersonViewController
-                                                     inParent:self
-                                                     animated:YES];
-  
   // try to grab the background blur from our parent to carry over
   UIViewController *parent = self.parentViewController;
   UIImage *backgroundImage = nil;
@@ -202,8 +197,22 @@
     }
     parent = parent.parentViewController;
   }
-  if (backgroundImage)
-    dmvc.backgroundImage = backgroundImage;
+  if (backgroundImage) {
+    [DFDismissableModalViewController
+     presentWithRootController:self.addPersonViewController
+     inParent:self
+     withBackgroundImage:backgroundImage
+     animated:YES];
+  } else {
+    [DFDismissableModalViewController
+     presentWithRootController:self.addPersonViewController
+     inParent:self
+     backgroundStyle:DFDismissableModalViewControllerBackgroundStyleTranslucentBlack
+     animated:YES];
+    
+  }
+  
+  
 }
 
 + (void)configurePopoverTheme

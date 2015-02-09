@@ -31,5 +31,11 @@ typedef enum {
                          inParent:(UIViewController *)parent
                   backgroundStyle:(DFDismissableModalViewControllerBackgroundStyle)backgroundStyle
                          animated:(BOOL)animated;
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
+                                                       inParent:(UIViewController *)parent
+                                            withBackgroundImage:(UIImage *)backgroundImage
+                                                       animated:(BOOL)animated;
+
+
 
 @end

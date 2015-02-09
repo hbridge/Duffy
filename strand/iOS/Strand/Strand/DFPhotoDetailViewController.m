@@ -546,7 +546,11 @@ const NSUInteger CompressedModeMaxRows = 1;
   inviteStrandController.notSelectableContacts = peanutContacts;
   inviteStrandController.notSelectableReason = @"Already Member";
   inviteStrandController.photoObject = self.photoObject;
-  [DFDismissableModalViewController presentWithRootController:inviteStrandController inParent:self animated:YES];
+  [DFDismissableModalViewController
+   presentWithRootController:inviteStrandController
+   inParent:self
+   backgroundStyle:DFDismissableModalViewControllerBackgroundStyleTranslucentBlack
+   animated:YES];
 }
 
 - (void)setLikedByUser:(BOOL)likedByUser
