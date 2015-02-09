@@ -549,7 +549,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   [DFDismissableModalViewController
    presentWithRootController:inviteStrandController
    inParent:self
-   backgroundStyle:DFDismissableModalViewControllerBackgroundStyleTranslucentBlack
+   backgroundStyle:DFDismissableModalViewControllerBackgroundStyleBlur
    animated:YES];
 }
 
