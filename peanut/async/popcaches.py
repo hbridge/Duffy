@@ -113,7 +113,7 @@ def processPrivateStrandsBatch(strandsToProcess):
 																  True, # includeFaces
 																  True, # includeAll
 																  "", # suggestionType
-																  interestedUsersByStrandId, matchReasonsByStrandId, dict())
+																  interestedUsersByStrandId, matchReasonsByStrandId)
 
 			if strandObjectData:
 				responseObjectsById[strandObjectData['id']] = strandObjectData
