@@ -6,9 +6,9 @@ def processBatch(baseQuery, numToProcess, processBatchFunc):
 	total = 0
 	processedCount = 1
 	startTime = datetime.datetime.utcnow()
-	nextBatch = baseQuery[:numToProcess]
+	nextBatch = list(set(baseQuery[:numToProcess]))
 	while processedCount > 0:
-		nextBatch = baseQuery[:numToProcess]
+		nextBatch = list(set(baseQuery[:numToProcess]))
 		processedCount = processBatchFunc(nextBatch)
 		total += processedCount
 

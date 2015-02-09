@@ -377,6 +377,6 @@ def processIds(ids):
 
 @app.task
 def processUserIdsForFriendGPSInfoAppTask(userIds):
-	return processUserIdsForFriendGPSInfo(userIds)
+	return processUserIdsForFriendGPSInfo(list(set(userIds)))
 
 
