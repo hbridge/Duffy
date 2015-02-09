@@ -94,7 +94,7 @@ def main(argv):
 	recencyTimedelta = datetime.timedelta(seconds=constants.NOTIFICATIONS_NEW_PHOTO_WAIT_INTERVAL_SECS)
 
 	locationSmallTimedelta = datetime.timedelta(hours=3)
-	locationBigTimedelta = datetime.timedelta(days=3)
+	locationBigTimedelta = datetime.timedelta(days=7)
 	
 	while True:
 		db.reset_queries()
