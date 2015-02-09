@@ -405,7 +405,11 @@ static CGFloat deleteButtonMargin = 4;
     if (CGRectContainsPoint(rectForName, tapPoint)) {
       if ([self shouldDrawUserAtIndex:i inRect:self.bounds]) {
         DFPeanutUserObject *user = self.peanutUsers[i];
-        [self.delegate profileStackView:self peanutUserTapped:user];
+        if (self.deleteButtonsVisible) {
+          [self.delegate profileStackView:self peanutUserDeleted:self.peanutUsers[i]];
+        } else {
+          [self.delegate profileStackView:self peanutUserTapped:user];
+        }
       } else {
         [self moreUsersCircleTappedInRect:rectForName];
       }
