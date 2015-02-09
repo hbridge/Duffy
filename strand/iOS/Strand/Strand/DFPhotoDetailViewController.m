@@ -85,21 +85,23 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)reloadData
 {
-  self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-  _photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoObject.id shareInstance:self.photoObject.share_instance.longLongValue];
-  
-  // Need to reload this because its a singlton
-  _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
-  
-  [self reloadProfileWithContextData];
-  
-  if ([_comments count] > 0) {
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-  } else {
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-  }
-  
-  [self.tableView reloadData];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+    _photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoObject.id shareInstance:self.photoObject.share_instance.longLongValue];
+    
+    // Need to reload this because its a singlton
+    _comments = [[self.photoObject actionsOfType:DFPeanutActionComment forUser:0] mutableCopy];
+    
+    [self reloadProfileWithContextData];
+    
+    if ([_comments count] > 0) {
+      self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    } else {
+      self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    }
+    
+    [self.tableView reloadData];
+  });
 }
 
 - (void)newDataArrived

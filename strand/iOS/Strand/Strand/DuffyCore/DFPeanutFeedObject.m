@@ -466,7 +466,11 @@ static NSArray *FeedObjectTypes;
   }
   
   if ([self.type isEqual:DFFeedObjectPhoto] && [otherObject.type isEqual:DFFeedObjectPhoto]) {
-    if ([self.actions count] != [otherObject.actions count]) return NO;
+    if ([self.actions count] != [otherObject.actions count]
+        || !IsEqual(self.actor_ids, otherObject.actor_ids)
+        || !IsEqual(self.thumb_image_path, otherObject.thumb_image_path)
+        || !IsEqual(self.full_image_path, otherObject.full_image_path)
+        || (self.evaluated.boolValue != otherObject.evaluated.boolValue)) return NO;
   }
   
   if ([self.type isEqual:DFFeedObjectActionsList] && [otherObject.type isEqual:DFFeedObjectActionsList]) {

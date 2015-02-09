@@ -33,6 +33,7 @@
 #import "DFStrandConstants.h"
 #import "UINib+DFHelpers.h"
 #import "NSIndexPath+DFHelpers.h"
+#import "DFMacros.h"
 #endif
 
 

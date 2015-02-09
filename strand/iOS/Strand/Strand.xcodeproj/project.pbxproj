@@ -353,6 +353,7 @@
 		5A1C69A31A89394900C8D9DE /* DFHeadPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFHeadPickerViewController.h; sourceTree = "<group>"; };
 		5A1C69A41A89394900C8D9DE /* DFHeadPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFHeadPickerViewController.m; sourceTree = "<group>"; };
 		5A1C69A51A89394900C8D9DE /* DFHeadPickerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFHeadPickerViewController.xib; sourceTree = "<group>"; };
+		5A1C69A81A894D5800C8D9DE /* DFMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFMacros.h; sourceTree = "<group>"; };
 		5A28652D19DF4EC300638B94 /* DFOutlineSubviewsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOutlineSubviewsView.h; sourceTree = "<group>"; };
 		5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOutlineSubviewsView.m; sourceTree = "<group>"; };
 		5A2E9F271A78340F0097EB6B /* DFAddFriendsNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAddFriendsNUXViewController.h; sourceTree = "<group>"; };
@@ -1033,6 +1034,7 @@
 				5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */,
 				5AB7E41E1A48E9D800D0FA53 /* DFSection.h */,
 				5AB7E41F1A48E9D800D0FA53 /* DFSection.m */,
+				5A1C69A81A894D5800C8D9DE /* DFMacros.h */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
