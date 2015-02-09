@@ -44,36 +44,40 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			return [logEntry]
 		
 		logEntries = list()	
+
 		for device in devices:
-			notification = DuffyNotification()
-			notification.message = (msg[:100] + '...') if len(msg) > 100 else msg
-			notification.service = device.service
+			try:
+				notification = DuffyNotification()
+				notification.message = (msg[:100] + '...') if len(msg) > 100 else msg
+				notification.service = device.service
 
-			payload = constants.NOTIFICATIONS_CUSTOM_DICT[msgTypeId]
+				payload = constants.NOTIFICATIONS_CUSTOM_DICT[msgTypeId]
 
-			if customPayload:
-				payload.update(customPayload)
-				
-			notification.custom_payload = json.dumps(payload, cls=DuffyJsonEncoder)
+				if customPayload:
+					payload.update(customPayload)
+					
+				notification.custom_payload = json.dumps(payload, cls=DuffyJsonEncoder)
 
-			if constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]:
-				notification.sound = constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]
+				if constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]:
+					notification.sound = constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]
 
-			# Its a visual notification if we don't put this in.  If we put it in, then its silent
-			if not constants.NOTIFICATIONS_VIZ_DICT[msgTypeId]:
-				notification.message = ""
+				# Its a visual notification if we don't put this in.  If we put it in, then its silent
+				if not constants.NOTIFICATIONS_VIZ_DICT[msgTypeId]:
+					notification.message = ""
 
-			# If wake app bit is true, wake up the app
-			if constants.NOTIFICATIONS_WAKE_APP_DICT[msgTypeId]:
-				notification.content_available = 1
+				# If wake app bit is true, wake up the app
+				if constants.NOTIFICATIONS_WAKE_APP_DICT[msgTypeId]:
+					notification.content_available = 1
 
-			if "badge" in customPayload:
-				notification.badge = customPayload["badge"]
+				if "badge" in customPayload:
+					notification.badge = customPayload["badge"]
 
-			apns = APNService.objects.get(id=device.service_id)
+				apns = APNService.objects.get(id=device.service_id)
 
-			# This sends
-			apns.push_notification_to_devices(notification, [device])
+				# This sends
+				apns.push_notification_to_devices(notification, [device])
+			except:
+				logger.error("Barfed on sending %s to %s with device service_id: %s and full device object: %s" % (msg, user.id, device.service_id, device))
 
 		# This is for logging
 		logEntries.append(NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_SENT, msg_type=msgTypeId, metadata=metadata))
