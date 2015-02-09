@@ -98,6 +98,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 
 	# Now filter out anything that doesn't have a thumb...unless its your own photo
 	if not shareInstance.photo.thumb_filename and shareInstance.user_id != user.id:
+		logger.debug("Couldn't serialize share instance %s for user %s because thumb was: %s" % (shareInstance.id, user.id, shareInstance.photo.thumb_filename))
 		return None
 
 	publicActions = list()

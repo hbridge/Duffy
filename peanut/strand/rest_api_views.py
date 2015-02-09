@@ -216,14 +216,18 @@ class PhotoAPI(BasePhotoAPI):
 class PhotoBulkAPI(BasePhotoAPI):
     def updateCacheStateForPhotos(self, user, photos):
         privateStrands = Strand.objects.filter(user=user).filter(private=True).filter(photos__in=Photo.getIds(photos))
-        for strand in privateStrands:
-            strand.cache_dirty = True
-        Strand.bulkUpdate(privateStrands, ['cache_dirty'])
+        if len(privateStrands) > 0:
+            for strand in privateStrands:
+                strand.cache_dirty = True
+            Strand.bulkUpdate(privateStrands, ['cache_dirty'])
+            logger.debug("Set strands %s to cache_dirty" % privateStrands)
 
         shareInstances = ShareInstance.objects.filter(photo_id__in=Photo.getIds(photos))
-        for shareInstance in shareInstances:
-            shareInstance.cache_dirty = True
-        ShareInstance.bulkUpdate(shareInstances, ['cache_dirty'])
+        if len(shareInstances) > 0:
+            for shareInstance in shareInstances:
+                shareInstance.cache_dirty = True
+            ShareInstance.bulkUpdate(shareInstances, ['cache_dirty'])
+            logger.debug("Setting share instances %s to cache_dirty" % shareInstances)
 
         if len(privateStrands) > 0:
             popcaches.processPrivateStrandIds.delay(Strand.getIds(privateStrands))
