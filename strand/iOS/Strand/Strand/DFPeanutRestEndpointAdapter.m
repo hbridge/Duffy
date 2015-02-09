@@ -119,7 +119,7 @@
    objectRequestOperationWithRequest:request
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
-     DDLogInfo(@"%@ response received: %@", [self.class description], mappingResult);
+     DDLogVerbose(@"%@ response received: %@", [self.class description], mappingResult);
      success(mappingResult.array);
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
