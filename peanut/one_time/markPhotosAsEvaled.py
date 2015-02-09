@@ -27,7 +27,7 @@ def main(argv):
     actions = Action.objects.prefetch_related('photo').all()
 
     for action in actions:
-        if action.user_id == action.photo.user_id and action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
+        if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and action.user_id == action.photo.user_id:
             action.photo.owner_evaluated = True
             action.photo.save()
 
