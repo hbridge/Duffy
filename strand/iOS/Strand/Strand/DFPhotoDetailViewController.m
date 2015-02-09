@@ -214,6 +214,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   for (DFProfileStackView *psv in @[self.senderProfileStackView, self.recipientsProfileStackView]) {
     psv.backgroundColor = [UIColor clearColor];
+    psv.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Thin" size:11.0];
     psv.showNames = YES;
     psv.delegate = self;
   }
