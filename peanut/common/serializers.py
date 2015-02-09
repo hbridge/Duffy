@@ -137,7 +137,6 @@ def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFac
 	strandData['suggestible'] = True
 	strandData['location'] = strands_util.getLocationForStrand(strand)
 	strandData['type'] = 'section'
-
 	strandData['objects'] = list()
 
 	photosIncluded = 0
@@ -152,11 +151,15 @@ def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFac
 			photosIncluded += 1
 			continue
 
+		# TODO(Derek): This code can be removed once we run the script to update owner_evaluated for all photos
 		evaled = False
 		if photo.id in actionsByPhotoId:
 			for action in actionsByPhotoId[photo.id]:
 				if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
 					evaled = True
+
+		if photo.owner_evaluated:
+			evaled = True
 
 		if includeNotEval and not evaled:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
