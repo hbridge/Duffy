@@ -73,6 +73,7 @@
   self.suggestionContentView.profileStackView.nameLabelColor = [UIColor whiteColor];
   self.suggestionContentView.profileStackView.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Thin" size:11.0];
   self.suggestionContentView.profileStackView.delegate = self;
+  self.suggestionContentView.profileStackView.photoMargins = 4.0;
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
   [self.suggestionContentView invalidateIntrinsicContentSize];
   DFOutgoingCardViewController __weak *weakSelf = self;

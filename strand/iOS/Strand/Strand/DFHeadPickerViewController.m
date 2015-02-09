@@ -35,6 +35,7 @@
   self.profileStackView = [[DFProfileStackView alloc] initWithFrame:self.headScrollView.bounds];
   self.profileStackView.deleteButtonsVisible = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
+  self.profileStackView.photoMargins = 4.0;
   self.profileStackView.showNames = YES;
   self.profileStackView.nameLabelColor = [UIColor whiteColor];
   self.profileStackView.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Thin" size:11.0];
