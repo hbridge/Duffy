@@ -23,10 +23,19 @@
 {
   [super awakeFromNib];
   [self configurePopLabel];
+  self.layer.cornerRadius = 4.0;
+  self.layer.masksToBounds = YES;
   self.imageView.layer.cornerRadius = 4.0;
   self.imageView.layer.masksToBounds = YES;
+  self.commentTextField.layer.cornerRadius = 4.0;
+  self.commentTextField.layer.masksToBounds = YES;
   self.commentTextField.delegate = self;
   self.profileStackView.backgroundColor = [UIColor clearColor];
+  self.backgroundColor = [UIColor clearColor];
+  
+  UIColor *color = [UIColor colorWithWhite:0.8 alpha:1.0];
+  self.commentTextField.attributedPlaceholder = [[NSAttributedString alloc]
+                                                 initWithString:self.commentTextField.placeholder attributes:@{NSForegroundColorAttributeName: color}];
 }
 
 - (IBAction)addButtonPressed:(id)sender {

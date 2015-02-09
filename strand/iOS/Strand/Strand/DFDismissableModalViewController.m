@@ -71,22 +71,22 @@
   [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
 }
 
-+ (void)presentWithRootController:(UIViewController *)rootController
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent
 {
-  [self presentWithRootController:rootController inParent:parent animated:YES];
+  return [self presentWithRootController:rootController inParent:parent animated:YES];
 }
 
-+ (void)presentWithRootController:(UIViewController *)rootController
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent
                          animated:(BOOL)animated
 {
-  [self presentWithRootController:rootController
+  return [self presentWithRootController:rootController
                          inParent:parent
                   backgroundStyle:DFDismissableModalViewControllerBackgroundStyleBlur animated:animated];
 }
 
-+ (void)presentWithRootController:(UIViewController *)rootController
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent
                   backgroundStyle:(DFDismissableModalViewControllerBackgroundStyle)backgroundStyle
                          animated:(BOOL)animated
@@ -121,6 +121,8 @@
     [parent.view.window.layer addAnimation:transition forKey:kCATransition];
   }
   [parent presentViewController:viewController animated:NO completion:nil];
+  
+  return viewController;
 }
 
 @end

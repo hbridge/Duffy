@@ -33,17 +33,43 @@ static CGFloat deleteButtonMargin = 4;
 
 @implementation DFProfileStackView
 
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    [self configure];
+  }
+  return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+  self = [super initWithFrame:frame];
+  if (self) {
+    [self configure];
+  }
+  return self;
+}
+
 - (void)awakeFromNib
 {
   [super awakeFromNib];
-  
+  [self configure];
+}
+
+
+- (void)configure
+{
   if (self.profilePhotoWidth == 0.0)
     self.profilePhotoWidth = 35.0;
   if (self.maxAbbreviationLength == 0)
     self.maxAbbreviationLength = 1;
   if (!self.nameLabelFont) {
     self.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
-  } 
+  }
+  if (!self.nameLabelColor) {
+    self.nameLabelColor = [UIColor blackColor];
+  }
   if (self.photoMargins == 0.0) {
     self.photoMargins = 2.0;
   }
@@ -55,6 +81,7 @@ static CGFloat deleteButtonMargin = 4;
                                            initWithTarget:self
                                            action:@selector(tapped:)];
   [self addGestureRecognizer:tapRecognizer];
+
 }
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user
@@ -183,7 +210,7 @@ static CGFloat deleteButtonMargin = 4;
 {
   if (self.peanutUsers.count == 0) return CGSizeZero;
   CGSize newSize = size;
-  newSize.height = size.height;
+  newSize.height = self.frame.size.height;
   NSUInteger numProfiles = [self maxPeanutUsersToDraw];
   NSUInteger numSpaces = MAX(self.peanutUsers.count - 1, 0);
   newSize.width = (CGFloat)numProfiles * self.profilePhotoWidth
@@ -339,7 +366,7 @@ static CGFloat deleteButtonMargin = 4;
   nameRect.size.height = self.nameLabelFont.pointSize;
   
   UILabel *label = [[UILabel alloc] initWithFrame:nameRect];
-  label.textColor = [UIColor blackColor];
+  label.textColor = self.nameLabelColor;
   label.textAlignment = NSTextAlignmentCenter;
   label.text = text;
   label.font = self.nameLabelFont;

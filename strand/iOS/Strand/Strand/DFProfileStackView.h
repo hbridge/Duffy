@@ -30,6 +30,7 @@
 @property (nonatomic) BOOL showNames;
 @property (nonatomic) NSUInteger maxAbbreviationLength;
 @property (nonatomic, retain) UIFont *nameLabelFont;
+@property (nonatomic, retain) UIColor *nameLabelColor;
 @property (nonatomic) CGFloat photoMargins;
 @property (nonatomic) CGFloat nameLabelVerticalMargin;
 @property (nonatomic, weak) id<DFProfileStackViewDelegate> delegate;

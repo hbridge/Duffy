@@ -25,7 +25,6 @@ typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestedPhoto);
 @property (nonatomic, copy) DFSuggestionNoHandler noButtonHandler;
 @property (weak, nonatomic) IBOutlet UIButton *noButton;
 @property (weak, nonatomic) IBOutlet UIButton *yesButton;
-@property (weak, nonatomic) IBOutlet UIView *cardView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *cardBottomConstraint;
 
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo;

@@ -13,6 +13,7 @@
 #import "DFUser.h"
 
 @class CLLocation;
+@class DFPeanutContact;
 
 @interface DFPeanutUserObject : NSObject <DFPeanutObject, EKMappingProtocol>
 
@@ -55,6 +56,7 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 - (UIImage *)thumbnail;
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
 - (BOOL)hasAuthedPhone;
+- (instancetype)initWithPeanutContact:(DFPeanutContact *)peanutContact;
 
 + (DFPeanutUserObject *)TeamSwapUser;
 + (EKObjectMapping *)objectMapping;

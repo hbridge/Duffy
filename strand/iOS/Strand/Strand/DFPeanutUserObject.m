@@ -13,6 +13,7 @@
 #import "UIImage+RoundedCorner.h"
 #import "DFContactDataManager.h"
 #import "EKMappingBlocks+DFMappingBlocks.h"
+#import "DFPeanutContact.h"
 
 DFPeanutUserRelationshipType DFPeanutUserRelationshipFriend = @"friend";
 DFPeanutUserRelationshipType DFPeanutUserRelationshipForwardFriend = @"forward_friend";
@@ -73,6 +74,17 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
            @"friend_connection_id",
            @"forward_friend_only",
            ];
+}
+
+- (instancetype)initWithPeanutContact:(DFPeanutContact *)peanutContact
+{
+  self = [self init];
+  if (self) {
+    self.display_name = peanutContact.name;
+    self.phone_number = peanutContact.phone_number;
+    self.id = peanutContact.user.longLongValue;
+  }
+  return self;
 }
 
 - (NSString *)description

@@ -22,12 +22,12 @@ typedef enum {
 } DFDismissableModalViewControllerBackgroundStyle;
 
 
-+ (void)presentWithRootController:(UIViewController *)rootController
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent;
-+ (void)presentWithRootController:(UIViewController *)rootController
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent
                          animated:(BOOL)animated;
-+ (void)presentWithRootController:(UIViewController *)rootController
++ (DFDismissableModalViewController *)presentWithRootController:(UIViewController *)rootController
                          inParent:(UIViewController *)parent
                   backgroundStyle:(DFDismissableModalViewControllerBackgroundStyle)backgroundStyle
                          animated:(BOOL)animated;

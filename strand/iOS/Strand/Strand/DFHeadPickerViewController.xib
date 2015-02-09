@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFHeadPickerViewController">
+            <connections>
+                <outlet property="doneButton" destination="tDI-pc-kll" id="D7M-F0-4iN"/>
+                <outlet property="doneButtonWrapper" destination="wES-X9-VEJ" id="ph9-b6-vac"/>
+                <outlet property="headScrollView" destination="TGi-bf-oic" id="4oQ-NS-JIw"/>
+                <outlet property="searchBar" destination="xDk-xr-w0N" id="2Az-No-ywl"/>
+                <outlet property="tableView" destination="cHf-k9-IF9" id="ZbQ-4W-KN1"/>
+                <outlet property="view" destination="zw1-qB-cts" id="dMT-eE-VpX"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="zw1-qB-cts">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="cHf-k9-IF9">
+                    <rect key="frame" x="0.0" y="148" width="600" height="452"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="cfV-y9-yhC"/>
+                        <outlet property="delegate" destination="-1" id="sjX-xR-cbC"/>
+                    </connections>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wES-X9-VEJ">
+                    <rect key="frame" x="0.0" y="546" width="600" height="54"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="999" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tDI-pc-kll" customClass="DFActionButton">
+                            <rect key="frame" x="150" y="12" width="300" height="30"/>
+                            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="tintColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <state key="normal" title="Done"/>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" red="0.91372549020000005" green="0.91372549020000005" blue="0.91372549020000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="centerX" secondItem="tDI-pc-kll" secondAttribute="centerX" id="4hT-HI-2eR"/>
+                        <constraint firstAttribute="height" constant="54" id="7j6-JE-uto"/>
+                        <constraint firstAttribute="centerY" secondItem="tDI-pc-kll" secondAttribute="centerY" id="RQF-Aa-2SJ"/>
+                        <constraint firstAttribute="width" secondItem="tDI-pc-kll" secondAttribute="width" multiplier="2" priority="900" id="xMx-DV-1QQ"/>
+                    </constraints>
+                </view>
+                <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="xDk-xr-w0N">
+                    <rect key="frame" x="0.0" y="104" width="600" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="9r1-19-RA2"/>
+                    </constraints>
+                    <textInputTraits key="textInputTraits"/>
+                </searchBar>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceHorizontal="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TGi-bf-oic">
+                    <rect key="frame" x="0.0" y="30" width="600" height="64"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="64" id="7Zi-b4-zi5"/>
+                    </constraints>
+                </scrollView>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="TGi-bf-oic" secondAttribute="trailing" id="3JM-HR-Nvd"/>
+                <constraint firstItem="xDk-xr-w0N" firstAttribute="leading" secondItem="zw1-qB-cts" secondAttribute="leading" id="4O5-tV-Y4P"/>
+                <constraint firstItem="xDk-xr-w0N" firstAttribute="top" secondItem="TGi-bf-oic" secondAttribute="bottom" constant="10" id="LXT-5G-lCb"/>
+                <constraint firstItem="cHf-k9-IF9" firstAttribute="top" secondItem="zw1-qB-cts" secondAttribute="top" priority="900" id="NMX-Sf-QTI"/>
+                <constraint firstAttribute="bottom" secondItem="wES-X9-VEJ" secondAttribute="bottom" id="Nzt-7M-HZh"/>
+                <constraint firstAttribute="bottom" secondItem="cHf-k9-IF9" secondAttribute="bottom" id="QOP-nC-qGz"/>
+                <constraint firstItem="TGi-bf-oic" firstAttribute="top" secondItem="zw1-qB-cts" secondAttribute="top" constant="30" id="Rhy-lb-3t3"/>
+                <constraint firstItem="TGi-bf-oic" firstAttribute="leading" secondItem="zw1-qB-cts" secondAttribute="leading" id="WJk-FO-azU"/>
+                <constraint firstItem="cHf-k9-IF9" firstAttribute="top" secondItem="xDk-xr-w0N" secondAttribute="bottom" id="WmQ-j4-XPi"/>
+                <constraint firstItem="wES-X9-VEJ" firstAttribute="leading" secondItem="zw1-qB-cts" secondAttribute="leading" id="X9T-3b-DBh"/>
+                <constraint firstAttribute="trailing" secondItem="cHf-k9-IF9" secondAttribute="trailing" id="ibj-s5-nVq"/>
+                <constraint firstAttribute="trailing" secondItem="xDk-xr-w0N" secondAttribute="trailing" id="mGi-7o-5eO"/>
+                <constraint firstAttribute="trailing" secondItem="wES-X9-VEJ" secondAttribute="trailing" id="nkN-Nf-s0E"/>
+                <constraint firstItem="cHf-k9-IF9" firstAttribute="leading" secondItem="zw1-qB-cts" secondAttribute="leading" id="yfb-k1-zzD"/>
+            </constraints>
+            <point key="canvasLocation" x="462" y="294"/>
+        </view>
+    </objects>
+</document>

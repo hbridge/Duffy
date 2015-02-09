@@ -46,7 +46,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 
 - (instancetype)init
 {
-  self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
+  if ([[NSBundle mainBundle] pathForResource:NSStringFromClass([self class]) ofType:@"nib"] != nil) {
+    self = [super init];
+  } else {
+    self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
+  }
   if (self) {
     self.disableContactsUpsell = NO;
     self.selectedContacts = [NSMutableArray new];
@@ -114,6 +118,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   [self configureSearch];
   [self selectionUpdatedSilently:YES];
   [self configureNoResultsView];
+  [self configureDoneButton];
   self.allowsMultipleSelection = self.allowsMultipleSelection;
 }
 
@@ -139,6 +144,12 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     [self.noResultsView removeFromSuperview];
     self.noResultsView = nil;
   }
+}
+
+- (void)configureDoneButton
+{
+  [self.doneButton addTarget:self action:@selector(doneButtonPressed:)
+            forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -230,7 +241,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   return _doneButtonActionText;
 }
 
-- (void)setSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
+- (void)setSelectedContacts:(NSArray *)selectedPeanutContacts
 {
   _selectedContacts = selectedPeanutContacts ? selectedPeanutContacts : @[];
   [self selectionUpdatedSilently:YES];
@@ -271,7 +282,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
                                                     rows:self.selectedContacts];
     }
     self.selectedSection.rows = self.selectedContacts;
-    if (self.selectedContacts.count > 0 && ![self.unfilteredSections containsObject:self.selectedSection]) {
+    if (self.selectedContacts.count > 0
+        && ![self.unfilteredSections containsObject:self.selectedSection]
+        && !self.hideSelectedSection) {
       self.unfilteredSections = [@[self.selectedSection] arrayByAddingObjectsFromArray:self.unfilteredSections];
     } else if (self.selectedContacts.count == 0) {
       self.unfilteredSections = [self.unfilteredSections arrayByRemovingObject:self.selectedSection];
@@ -374,7 +387,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
   if (tableView == self.tableView) {
-    return  self.unfilteredSections.count;
+    return self.unfilteredSections.count;
   } else {
     return self.filteredSections.count;
   }
@@ -614,6 +627,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
       self.tableView.sectionFooterHeight
       + 8; // not sure why the 8 is necessary
     }
+    if (self.hideSelectedSection) yOffset = 0.0;
     self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
                                                self.tableView.contentOffset.y + yOffset);
   }
@@ -647,6 +661,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     CGFloat yOffset = DFPersonSelectionTableViewCellHeight;
     if (self.selectedContacts.count == 0)
       yOffset += (self.tableView.sectionHeaderHeight + self.tableView.sectionFooterHeight + 8);
+    if (self.hideSelectedSection) yOffset = 0.0;
     self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
                                                self.tableView.contentOffset.y - yOffset);
   }
@@ -656,7 +671,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   if (tableView != self.tableView) [self.tableView reloadData];
 }
 
-- (IBAction)doneButtonPressed:(id)sender
+- (void)doneButtonPressed:(id)sender
 {
   [self.delegate pickerController:self
       didFinishWithPickedContacts:self.selectedContacts];

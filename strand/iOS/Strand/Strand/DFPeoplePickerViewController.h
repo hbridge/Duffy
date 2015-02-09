@@ -12,9 +12,6 @@
 #import "DFSection.h"
 #import "DFPeoplePickerSecondaryAction.h"
 
-
-
-
 @class DFPeoplePickerViewController;
 
 @protocol DFPeoplePickerDelegate <NSObject>
@@ -58,6 +55,7 @@
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic) BOOL disableContactsUpsell;
 @property (nonatomic, retain) NSString *textNumberString;
+@property (nonatomic) BOOL hideSelectedSection;
 
 - (void)setSections:(NSArray *)sections;
 - (void)setSecondaryAction:(DFPeoplePickerSecondaryAction *)secondaryAction

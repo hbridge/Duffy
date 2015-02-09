@@ -34,6 +34,8 @@
 		5A188D6219802F87009D3244 /* FeedViewNuxPlaceholder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6119802F87009D3244 /* FeedViewNuxPlaceholder.xib */; };
 		5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6319803523009D3244 /* DFErrorScreen.xib */; };
 		5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A188D661980366C009D3244 /* DFErrorScreen.m */; };
+		5A1C69A61A89394900C8D9DE /* DFHeadPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C69A41A89394900C8D9DE /* DFHeadPickerViewController.m */; };
+		5A1C69A71A89394900C8D9DE /* DFHeadPickerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A1C69A51A89394900C8D9DE /* DFHeadPickerViewController.xib */; };
 		5A28652F19DF4EC300638B94 /* DFOutlineSubviewsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */; };
 		5A2E9F291A78340F0097EB6B /* DFAddFriendsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F281A78340F0097EB6B /* DFAddFriendsNUXViewController.m */; };
 		5A2E9F2C1A78412D0097EB6B /* DFFindFriendsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A2E9F2B1A78412D0097EB6B /* DFFindFriendsNUXViewController.m */; };
@@ -351,6 +353,9 @@
 		5A188D6319803523009D3244 /* DFErrorScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFErrorScreen.xib; sourceTree = "<group>"; };
 		5A188D651980366C009D3244 /* DFErrorScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFErrorScreen.h; sourceTree = "<group>"; };
 		5A188D661980366C009D3244 /* DFErrorScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFErrorScreen.m; sourceTree = "<group>"; };
+		5A1C69A31A89394900C8D9DE /* DFHeadPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFHeadPickerViewController.h; sourceTree = "<group>"; };
+		5A1C69A41A89394900C8D9DE /* DFHeadPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFHeadPickerViewController.m; sourceTree = "<group>"; };
+		5A1C69A51A89394900C8D9DE /* DFHeadPickerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFHeadPickerViewController.xib; sourceTree = "<group>"; };
 		5A28652D19DF4EC300638B94 /* DFOutlineSubviewsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOutlineSubviewsView.h; sourceTree = "<group>"; };
 		5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOutlineSubviewsView.m; sourceTree = "<group>"; };
 		5A2E9F271A78340F0097EB6B /* DFAddFriendsNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAddFriendsNUXViewController.h; sourceTree = "<group>"; };
@@ -1449,6 +1454,9 @@
 				5AAF03A119B4D5B200EF021C /* DFPeoplePickerViewController.h */,
 				5AAF03A219B4D5B200EF021C /* DFPeoplePickerViewController.m */,
 				5AA9292A19A6502200032A3F /* DFPeoplePickerViewController.xib */,
+				5A1C69A31A89394900C8D9DE /* DFHeadPickerViewController.h */,
+				5A1C69A41A89394900C8D9DE /* DFHeadPickerViewController.m */,
+				5A1C69A51A89394900C8D9DE /* DFHeadPickerViewController.xib */,
 				5A4307241A7177C30089C790 /* DFRecipientPickerViewController.h */,
 				5A4307251A7177C30089C790 /* DFRecipientPickerViewController.m */,
 				5A5B80BC1A72BFE7005C61D2 /* DFUserListViewController.h */,
@@ -1921,6 +1929,7 @@
 				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */,
 				5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */,
+				5A1C69A71A89394900C8D9DE /* DFHeadPickerViewController.xib in Resources */,
 				65E241561A3A53AF0044F1CB /* DFSuggestionViewController.xib in Resources */,
 				5A5B80C91A73100D005C61D2 /* DFImageNUXViewViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
@@ -2211,6 +2220,7 @@
 				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
+				5A1C69A61A89394900C8D9DE /* DFHeadPickerViewController.m in Sources */,
 				65E2414E1A364EA90044F1CB /* DFCardViewController.m in Sources */,
 				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFCreateAccountViewController.m in Sources */,

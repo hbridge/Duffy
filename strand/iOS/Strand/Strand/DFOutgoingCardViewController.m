@@ -14,6 +14,8 @@
 #import "DFFriendProfileViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFDefaultsStore.h"
+#import "DFHeadPickerViewController.h"
+#import "DFDismissableModalViewController.h"
 
 @interface DFOutgoingCardViewController ()
 
@@ -67,9 +69,12 @@
 
 - (void)configureSuggestionContentView
 {
-  self.suggestionContentView.profileStackView.showNames = NO;
+  self.suggestionContentView.profileStackView.showNames = YES;
+  self.suggestionContentView.profileStackView.nameLabelColor = [UIColor whiteColor];
+  self.suggestionContentView.profileStackView.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Thin" size:11.0];
   self.suggestionContentView.profileStackView.delegate = self;
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self.suggestionContentView invalidateIntrinsicContentSize];
   DFOutgoingCardViewController __weak *weakSelf = self;
   self.suggestionContentView.addHandler = ^{
     [weakSelf addPersonButtonPressed:weakSelf.suggestionContentView.addButton];
@@ -115,11 +120,7 @@
 - (void)configurePeopleLabel
 {
   if (self.selectedPeanutContacts.count > 0) {
-    NSArray *contactNames = [self.selectedPeanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
-      return [contact firstName];
-    }];
-    NSString *commaList = [contactNames componentsJoinedByString:@", "];
-    self.suggestionContentView.topLabel.text = [NSString stringWithFormat:@"Send to %@",commaList];
+    self.suggestionContentView.topLabel.text = @"Send to:";
   } else {
     self.suggestionContentView.topLabel.text = @"Pick Recipients";
   }
@@ -146,7 +147,7 @@
   if (sender == self.yesButton && self.yesButtonHandler) {
     if (self.selectedPeanutContacts.count > 0) {
       [UIView animateWithDuration:0.3 delay:0.2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.view.center = CGPointMake(self.cardView.center.x,
+        self.view.center = CGPointMake(self.suggestionContentView.center.x,
                                        0 - self.view.frame.size.height / 2.0);
       } completion:^(BOOL finished) {
         self.view.hidden = YES;
@@ -179,29 +180,29 @@
 
 - (IBAction)addPersonButtonPressed:(UIButton *)sender {
   [self.suggestionContentView dismissAddPeoplePopup];
-  self.addPersonViewController = [[DFRecipientPickerViewController alloc]
+  self.addPersonViewController = [[DFHeadPickerViewController alloc]
                                   initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
   self.addPersonViewController.doneButtonActionText = @"Select";
   self.addPersonViewController.allowsMultipleSelection = YES;
   self.addPersonViewController.delegate = self;
   
-  [self.class configurePopoverTheme];
-  self.addPersonPopoverController = [[WYPopoverController alloc]
-                                     initWithContentViewController:self.addPersonViewController];
-  self.addPersonPopoverController.passthroughViews = @[
-                                                       self.suggestionContentView.profileStackView,
-                                                       ];
-
-  CGRect rect = [self.view convertRect:sender.frame fromView:sender.superview];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self.addPersonPopoverController presentPopoverFromRect:rect
-                                                     inView:self.view
-                                   permittedArrowDirections:WYPopoverArrowDirectionUp
-                                                   animated:YES
-                                                    options:WYPopoverAnimationOptionFadeWithScale
-                                                 completion:nil];
-  });
-
+  DFDismissableModalViewController *dmvc = [DFDismissableModalViewController
+                                            presentWithRootController:self.addPersonViewController
+                                                     inParent:self
+                                                     animated:YES];
+  
+  // try to grab the background blur from our parent to carry over
+  UIViewController *parent = self.parentViewController;
+  UIImage *backgroundImage = nil;
+  while (parent != nil) {
+    if ([parent respondsToSelector:@selector(backgroundImage)]) {
+      backgroundImage = [(id)parent backgroundImage];
+      break;
+    }
+    parent = parent.parentViewController;
+  }
+  if (backgroundImage)
+    dmvc.backgroundImage = backgroundImage;
 }
 
 + (void)configurePopoverTheme
@@ -217,7 +218,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   self.selectedPeanutContacts = peanutContacts;
   if (self.presentedViewController) {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:NO completion:nil];
   } else {
     [self.addPersonPopoverController dismissPopoverAnimated:YES];
   }
