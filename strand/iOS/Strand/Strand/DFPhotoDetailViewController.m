@@ -85,7 +85,6 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (void)reloadData
 {
-  dispatch_async(dispatch_get_main_queue(), ^{
     self.unreadActions = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
     _photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:self.photoObject.id shareInstance:self.photoObject.share_instance.longLongValue];
     
@@ -101,16 +100,14 @@ const NSUInteger CompressedModeMaxRows = 1;
     }
     
     [self.tableView reloadData];
-  });
 }
 
 - (void)newDataArrived
 {
-  [self reloadData];
-  
-  // Temporarily disable marking actions as seen until can be reworked.
-  // Issue is that the server doesn't know that the action is read so the badge on the homescreen is different from the app
-  [self markActionsAsSeen];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self reloadData];
+    [self markActionsAsSeen];
+  });
 }
 
 
