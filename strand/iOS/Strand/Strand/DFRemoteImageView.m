@@ -174,6 +174,8 @@
    deliveryMode:deliveryMode
    completion:^(UIImage *image) {
      if (!CGSizeEqualToSize(requestSize, self.lastRequestedImageSize)) return;
+     // don't replace a full with a smaller image (thumbnail)
+     if (photoID == self.photoID && self.image.size.width > image.size.width) return;
      dispatch_async(dispatch_get_main_queue(), ^{
        if (!self.image && image) {
          self.alpha = 0.0;
