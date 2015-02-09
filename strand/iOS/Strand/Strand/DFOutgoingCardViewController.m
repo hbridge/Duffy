@@ -181,8 +181,8 @@
 
 - (IBAction)addPersonButtonPressed:(UIButton *)sender {
   [self.suggestionContentView dismissAddPeoplePopup];
-  self.addPersonViewController = [[DFHeadPickerViewController alloc]
-                                  initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
+  self.addPersonViewController = [[DFHeadPickerViewController alloc] init];
+  self.addPersonViewController.selectedContacts = [self selectedPeanutContacts];
   self.addPersonViewController.doneButtonActionText = @"Select";
   self.addPersonViewController.allowsMultipleSelection = YES;
   self.addPersonViewController.delegate = self;

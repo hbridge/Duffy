@@ -105,8 +105,8 @@
   }
   
   NSArray *suggestedContacts = [self suggestedContactsForFeedObjects:selectedFeedObjects];
-  self.peoplePickerController = [[DFRecipientPickerViewController alloc]
-                                 initWithSuggestedPeanutContacts:suggestedContacts];
+  self.peoplePickerController = [[DFRecipientPickerViewController alloc] init];
+  self.peoplePickerController.selectedContacts = suggestedContacts;
   self.peoplePickerController.delegate = self;
   self.peoplePickerController.allowsMultipleSelection = YES;
   [self pushViewController:self.peoplePickerController animated:YES];

@@ -49,8 +49,15 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   if ([[NSBundle mainBundle] pathForResource:NSStringFromClass([self class]) ofType:@"nib"] != nil) {
     self = [super init];
   } else {
-    self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
+    self = [self initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
   }
+
+  return self;
+}
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     self.disableContactsUpsell = NO;
     self.selectedContacts = [NSMutableArray new];
@@ -71,7 +78,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (void)setSections:(NSArray *)sections
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    
     self.unfilteredSections = sections;
     [self.tableView reloadData];
     [self updateSearchResults];

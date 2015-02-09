@@ -10,11 +10,6 @@
 
 @interface DFRecipientPickerViewController : DFPeoplePickerViewController
 
-- (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts;
-- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers;
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
-                    notSelectablePeanutContacts:(NSArray *)notSelectableContacts
-                            notSelectableReason:(NSString *)notSelectableReason;
+- (void)setSuggestedPeanutUsers:(NSArray *)peanutUsers;
 
 @end

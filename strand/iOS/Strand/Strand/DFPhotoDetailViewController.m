@@ -26,6 +26,7 @@
 #import "DFFriendProfileViewController.h"
 #import <MMPopLabel/MMLabel.h>
 #import "UIView+DFExtensions.h"
+#import "DFDismissableModalViewController.h"
 
 const NSUInteger CompressedModeMaxRows = 1;
 
@@ -539,14 +540,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 
 - (IBAction)addPersonPressed:(id)sender {
   NSArray *peanutContacts = self.photoObject.actorPeanutContacts;
-  DFInviteStrandViewController *inviteStrandController = [[DFInviteStrandViewController alloc]
-                                                          initWithSuggestedPeanutContacts:nil
-                                                          notSelectablePeanutContacts:peanutContacts
-                                                          notSelectableReason:@"Already Member"];
+  DFInviteStrandViewController *inviteStrandController = [[DFInviteStrandViewController alloc] init];
+  inviteStrandController.notSelectableContacts = peanutContacts;
+  inviteStrandController.notSelectableReason = @"Already Member";
   inviteStrandController.photoObject = self.photoObject;
-  [DFNavigationController presentWithRootController:inviteStrandController
-                                           inParent:self
-                                withBackButtonTitle:@"Cancel"];
+  [DFDismissableModalViewController presentWithRootController:inviteStrandController inParent:self animated:YES];
 }
 
 - (void)setLikedByUser:(BOOL)likedByUser

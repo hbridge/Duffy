@@ -31,7 +31,6 @@
 
 - (void)configureHeadScrollView
 {
-
   self.profileStackView = [[DFProfileStackView alloc] initWithFrame:self.headScrollView.bounds];
   self.profileStackView.deleteButtonsVisible = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];

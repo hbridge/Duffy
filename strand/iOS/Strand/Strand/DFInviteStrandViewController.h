@@ -6,10 +6,10 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFRecipientPickerViewController.h"
+#import "DFHeadPickerViewController.h"
 #import "DFPeanutFeedObject.h"
 
-@interface DFInviteStrandViewController : DFRecipientPickerViewController <DFPeoplePickerDelegate>
+@interface DFInviteStrandViewController : DFHeadPickerViewController <DFPeoplePickerDelegate>
 
 @property (nonatomic) DFPeanutFeedObject *photoObject;
 

@@ -50,34 +50,13 @@ NSString *const ContactsSectionTitle = @"Contacts";
                                              object:nil];
 }
 
-- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers
+- (void)setSuggestedPeanutUsers:(NSArray *)peanutUsers
 {
-  NSArray *peanutContacts = [suggestedPeanutedUsers arrayByMappingObjectsWithBlock:^id(id input) {
+  NSArray *peanutContacts = [peanutUsers arrayByMappingObjectsWithBlock:^id(id input) {
     DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
     return contact;
   }];
-  self = [self initWithSuggestedPeanutContacts:peanutContacts];
-  if (self) {
-    
-  }
-  return self;
-}
-
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
-{
-  return [self initWithSelectedPeanutContacts:suggestedPeanutContacts];
-}
-
-- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
-                    notSelectablePeanutContacts:(NSArray *)notSelectableContacts
-                            notSelectableReason:(NSString *)notSelectableReason
-{
-  self = [self initWithSuggestedPeanutContacts:suggestedPeanutContacts];
-  if (self) {
-    self.notSelectableContacts = notSelectableContacts;
-    self.notSelectableReason = notSelectableReason;
-  }
-  return self;
+  self.selectedContacts = peanutContacts;
 }
 
 - (void)viewDidLoad

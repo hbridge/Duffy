@@ -24,7 +24,7 @@
 
 - (instancetype)init
 {
-  self = [super init];
+  self = [super initWithNibName:NSStringFromClass([DFHeadPickerViewController class]) bundle:nil];
   if (self) {
     [self configure];
   }
@@ -84,6 +84,7 @@
      } else {
        [self dismissWithErrorString:nil];
      }
+     [[DFPeanutFeedDataManager sharedManager] refreshFeedFromServer:DFInboxFeed completion:nil];
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:error.localizedDescription];
      DDLogError(@"%@ adding users failed: %@", self.class, error);
