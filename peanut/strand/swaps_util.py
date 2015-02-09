@@ -114,9 +114,6 @@ def getFeedObjectsForSwaps(user):
 	
 	interestedUsersByStrandId, matchReasonsByStrandId, strands = getInterestedUsersForStrands(user, recentStrands, True, fullFriends)
 	stats_util.printStats("swaps-b")
-	
-	actionsByPhotoId = getActionsByPhotoIdForStrands(user, strands)
-	stats_util.printStats("swaps-d")
 
 	for strand in strands:
 		strandObjectData = serializers.objectDataForPrivateStrand(user,
@@ -126,7 +123,7 @@ def getFeedObjectsForSwaps(user):
 																  False, # includeFaces
 																  False, # includeAll
 																  "friend-location", # suggestionType
-																  interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+																  interestedUsersByStrandId, matchReasonsByStrandId)
 		if strandObjectData:
 			strandIdsAlreadyIncluded.append(strand.id)
 			# Make sure the photos appear in reverse order
@@ -136,7 +133,6 @@ def getFeedObjectsForSwaps(user):
 	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
 
 	# Look for strands with faces
-	actionsByPhotoId = getActionsByPhotoIdForStrands(user, recentStrands)
 	for strand in recentStrands:
 		strandObjectData = serializers.objectDataForPrivateStrand(user,
 																  strand,
@@ -145,7 +141,7 @@ def getFeedObjectsForSwaps(user):
 																  True, # includeFaces
 																  False, # includeAll
 																  "faces", # suggestionType
-																  interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId)
+																  interestedUsersByStrandId, matchReasonsByStrandId)
 
 		if strandObjectData and strand.id not in strandIdsAlreadyIncluded:
 			strandIdsAlreadyIncluded.append(strand.id)
@@ -178,26 +174,12 @@ def getFeedObjectsForPrivateStrands(user):
 																  True, # includeFaces
 																  True, # includeAll
 																  "", # suggestionType
-																  interestedUsersByStrandId, matchReasonsByStrandId, dict())
+																  interestedUsersByStrandId, matchReasonsByStrandId)
 
 		if strandObjectData:
 			responseObjects.append(strandObjectData)
 
 	return responseObjects
-
-def getActionsByPhotoIdForStrands(user, strands):
-	photoIds = list()
-	for strand in strands:
-		photoIds.extend(Photo.getIds(strand.photos.all()))
-
-	evalActions = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED) & Q(user=user) & Q(photo_id__in=photoIds))
-	actionsByPhotoId = dict()
-	for action in evalActions:
-		if action.photo_id not in actionsByPhotoId:
-			actionsByPhotoId[action.photo_id] = list()
-		actionsByPhotoId[action.photo_id].append(action)
-
-	return actionsByPhotoId
 
 # Takes in a list of strands and finds all the users that are interested in them.
 # Returns back a dict of users by strand id, along with the strands prefilled

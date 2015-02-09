@@ -122,7 +122,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	return shareInstanceData
 
 
-def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFaces, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId, actionsByPhotoId):
+def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFaces, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId):
 	strandData = dict()
 	strandData['id'] = strand.id
 	if strand.id in interestedUsersByStrandId:
@@ -151,21 +151,11 @@ def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFac
 			photosIncluded += 1
 			continue
 
-		# TODO(Derek): This code can be removed once we run the script to update owner_evaluated for all photos
-		evaled = False
-		if photo.id in actionsByPhotoId:
-			for action in actionsByPhotoId[photo.id]:
-				if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED:
-					evaled = True
-
-		if photo.owner_evaluated:
-			evaled = True
-
-		if includeNotEval and not evaled:
+		if includeNotEval and not photo.owner_evaluated:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
 			photosIncluded += 1
 
-		if not includeNotEval and evaled:
+		if not includeNotEval and photo.owner_evaluated:
 			continue
 		
 		if (includeFaces and (photo.iphone_faceboxes_topleft != None)):
