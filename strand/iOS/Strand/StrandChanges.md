@@ -1,5 +1,9 @@
 # Swap v2
 
+## Feb 9, 2015 (4851)
+
+- New recipient selection UI
+
 ## Feb 6th, 2015 (4850)
 
 - New screen explaining Quick Share/Suggestions
