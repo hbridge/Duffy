@@ -11,7 +11,6 @@
                 <outlet property="buttonBarHeightConstraint" destination="fAN-cS-318" id="3nL-IO-ssO"/>
                 <outlet property="buttonBarLabel" destination="KTE-xE-giG" id="CA7-OA-XmR"/>
                 <outlet property="collectionView" destination="kHh-uZ-vK1" id="QzN-eD-Y9P"/>
-                <outlet property="flowLayout" destination="kcj-Dt-vx5" id="xF5-Md-2po"/>
                 <outlet property="sendBadgeView" destination="Pba-eB-LD4" id="gfR-4r-0xC"/>
                 <outlet property="sendButton" destination="sao-uL-Ezk" id="sdY-qw-l1R"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -70,7 +69,7 @@
                 </view>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-uZ-vK1">
                     <rect key="frame" x="0.0" y="160" width="600" height="440"/>
-                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="kcj-Dt-vx5" customClass="DFBadgingCollectionViewFlowLayout">
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="kcj-Dt-vx5" customClass="FBLikeLayout">
                         <size key="itemSize" width="50" height="50"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>

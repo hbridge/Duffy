@@ -137,6 +137,16 @@ const NSUInteger MinPhotosToShowFilter = 20;
 
 - (void)configureCollectionView
 {
+  // configure layout
+  self.photoLayout = [FBLikeLayout new];
+  self.photoLayout.maxCellSpace = 3;
+  self.photoLayout.fullImagePercentageOfOccurrency = 100;
+  self.photoLayout.minimumInteritemSpacing = 0.5;
+  self.photoLayout.minimumLineSpacing = 0.5;
+  self.photoLayout.forceCellWidthForMinimumInteritemSpacing = YES;
+  self.collectionView.collectionViewLayout = self.photoLayout;
+  
+  // configure data source
   self.datasource = [[DFImageDataSource alloc]
                      initWithSections:nil
                      collectionView:self.collectionView];
@@ -152,11 +162,23 @@ const NSUInteger MinPhotosToShowFilter = 20;
   [self.collectionView registerNib:[UINib nibForClass:[DFLabelReusableView class]]
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:@"footer"];
-  //self.flowLayout.footerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
 
   self.datasource.showActionsBadge = YES;
   self.datasource.showUnreadNotifsCount = YES;
   self.collectionView.backgroundColor = [UIColor whiteColor];
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  // if we don't support high res thumbnail (they're slow on iOS7-), use a regular grid
+  if (![DFImageManager supportsHighResThumbnails]) return self.photoLayout.itemSize;
+  
+  DFPeanutFeedObject *object = [self.datasource feedObjectForIndexPath:indexPath];
+  if (object.actions.count > 0) {
+    return CGSizeMake(object.full_width.floatValue, object.full_height.floatValue);
+  } else {
+    return self.photoLayout.itemSize;
+  }
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
@@ -267,16 +289,18 @@ static BOOL showFilters = NO;
   [super viewDidLayoutSubviews];
   
   CGFloat usableWidth = self.collectionView.frame.size.width -
-  ((CGFloat)(self.numPhotosPerRow - 1)  * self.flowLayout.minimumInteritemSpacing);
+  ((CGFloat)(self.numPhotosPerRow - 1)  * self.photoLayout.minimumInteritemSpacing);
   CGFloat itemSize = usableWidth / (CGFloat)self.numPhotosPerRow;
-  CGSize oldSize = self.flowLayout.itemSize;
+  CGSize oldSize = self.photoLayout.itemSize;
   CGSize newSize =  CGSizeMake(itemSize, itemSize);
   if (!CGSizeEqualToSize(oldSize, newSize)) {
-    self.flowLayout.itemSize = newSize;
-    [self.flowLayout invalidateLayout];
+    self.photoLayout.itemSize = newSize;
+    self.photoLayout.singleCellWidth = newSize.width;
+    
+    [self.photoLayout invalidateLayout];
     [self.collectionView reloadData];
   }
-  [self.flowLayout invalidateLayout];
+  [self.photoLayout invalidateLayout];
 }
 
 - (void)reloadData
