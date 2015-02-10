@@ -163,17 +163,20 @@ def swap_inbox(request):
 		if num:
 			num = 25
 
-		useCache = True
-
 		dirtyShareInstances = ShareInstance.objects.prefetch_related('users').filter(cache_dirty=True)
 
+		dirtyList = list()
 		for shareInstance in dirtyShareInstances:
 			if user in shareInstance.users.all():
-				useCache = False
-				logger.error("Go an inbox request where user %s was in shareinstance %s and was dirty" % (user.id, shareInstance.id))
+				dirtyList.append(shareInstance)
+
+		if len(dirtyList) > 0:
+			ret = popcaches.processInboxIds(ShareInstance.getIds(shareInstance))
+			logger.error("Go an inbox request where user %s was in shareinstance %s and was dirty.  Result: %s" % (user.id, shareInstance.id, ret.status))
+
 
 		# Add in buffer for the last timestamp, or if not sent in, use long ago date
-		if form.cleaned_data['last_timestamp'] or not useCache:
+		if form.cleaned_data['last_timestamp']:
 			if form.cleaned_data['last_timestamp']:
 				lastTimestamp = form.cleaned_data['last_timestamp'] - datetime.timedelta(seconds=10)
 				
