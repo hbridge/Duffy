@@ -268,22 +268,49 @@ static DFAnalytics *defaultLogger;
                      result:(NSString *)result
                 photoObject:(DFPeanutFeedObject *)photo
 {
+  NSMutableDictionary *params = [[self dictForPhoto:photo] mutableCopy];
+  [params addEntriesFromDictionary:@{
+                                     ResultKey: result,
+                                     @"ActionType" : [self actionStringForType:action],
+                                     @"View" : [self screenNameForControllerViewed:viewController]
+                                     }];
+  
+  [DFAnalytics logEvent:PhotoActionEvent
+         withParameters:params];
+}
+
++ (void)logOtherPhotoActionTaken:(NSString *)customActionType
+         fromViewController:(UIViewController *)viewController
+                     result:(NSString *)result
+                photoObject:(DFPeanutFeedObject *)photo
+{
+  NSMutableDictionary *params = [[self dictForPhoto:photo] mutableCopy];
+  [params addEntriesFromDictionary:@{
+                                     ResultKey: result,
+                                     @"ActionType" : customActionType,
+                                     @"View" : [self screenNameForControllerViewed:viewController]
+                                     }];
+  
+  [DFAnalytics logEvent:PhotoActionEvent
+         withParameters:params];
+}
+
++ (NSDictionary *)dictForPhoto:(DFPeanutFeedObject *)photo
+{
   NSTimeInterval takenInterval = [[NSDate date] timeIntervalSinceDate:photo.time_taken];
-  NSTimeInterval postedInterval = [[NSDate date] timeIntervalSinceDate:photo.time_stamp];
+  NSTimeInterval postedInterval = [[NSDate date] timeIntervalSinceDate:photo.shared_at_timestamp];
   NSArray *comments = [photo actionsOfType:DFPeanutActionComment forUser:0];
   NSArray *likes = [photo actionsOfType:DFPeanutActionFavorite forUser:0];
   
-  [DFAnalytics logEvent:PhotoActionEvent
-         withParameters:@{
-                          ResultKey: result,
-                          @"ActionType" : [self actionStringForType:action],
-                          PhotoAgeKey : [self bucketStringForTimeInternval:takenInterval],
-                          PostAge : [self bucketStringForTimeInternval:postedInterval],
-                          @"NumComments" : [self bucketStringForObjectCount:comments.count],
-                          @"NumLikes" : [self bucketStringForObjectCount:likes.count],
-                          @"View" : [self screenNameForControllerViewed:viewController]
-                          }];
+  return @{
+           PhotoAgeKey : [self bucketStringForTimeInternval:takenInterval],
+           PostAge : [self bucketStringForTimeInternval:postedInterval],
+           @"NumComments" : [self bucketStringForObjectCount:comments.count],
+           @"NumLikes" : [self bucketStringForObjectCount:likes.count],
+           };
 }
+
+
 
 + (NSString *)actionStringForType:(DFPeanutActionType)action
 {
