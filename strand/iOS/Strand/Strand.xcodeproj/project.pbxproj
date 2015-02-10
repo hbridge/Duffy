@@ -72,6 +72,7 @@
 		5A4C820E19EDC11800C22A12 /* DFActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C820D19EDC11800C22A12 /* DFActionButton.m */; };
 		5A4C821219EDC82100C22A12 /* DFSelectSuggestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C821019EDC82100C22A12 /* DFSelectSuggestionsViewController.m */; };
 		5A4C821319EDC82100C22A12 /* DFSelectSuggestionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4C821119EDC82100C22A12 /* DFSelectSuggestionsViewController.xib */; };
+		5A50AD181A8A9DE700B36C99 /* DFBorderedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A50AD171A8A9DE700B36C99 /* DFBorderedTextField.m */; };
 		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
 		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
 		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
@@ -421,6 +422,8 @@
 		5A4C820F19EDC82100C22A12 /* DFSelectSuggestionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSelectSuggestionsViewController.h; sourceTree = "<group>"; };
 		5A4C821019EDC82100C22A12 /* DFSelectSuggestionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSelectSuggestionsViewController.m; sourceTree = "<group>"; };
 		5A4C821119EDC82100C22A12 /* DFSelectSuggestionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSelectSuggestionsViewController.xib; sourceTree = "<group>"; };
+		5A50AD161A8A9DE700B36C99 /* DFBorderedTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBorderedTextField.h; sourceTree = "<group>"; };
+		5A50AD171A8A9DE700B36C99 /* DFBorderedTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBorderedTextField.m; sourceTree = "<group>"; };
 		5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOverlayViewController.h; sourceTree = "<group>"; };
 		5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayViewController.m; sourceTree = "<group>"; };
 		5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationBar.h; sourceTree = "<group>"; };
@@ -1578,6 +1581,8 @@
 				5AC4A9511947C77300862D9C /* DFCreateAccountViewController.h */,
 				5AC4A9521947C77300862D9C /* DFCreateAccountViewController.m */,
 				5AC4A9531947C77300862D9C /* DFCreateAccountViewController.xib */,
+				5A50AD161A8A9DE700B36C99 /* DFBorderedTextField.h */,
+				5A50AD171A8A9DE700B36C99 /* DFBorderedTextField.m */,
 				5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */,
 				5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */,
 				5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */,
@@ -2217,6 +2222,7 @@
 				5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */,
 				5A7233B71A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
+				5A50AD181A8A9DE700B36C99 /* DFBorderedTextField.m in Sources */,
 				5ACE17651A1ABD4300DE998A /* DFAlertAction.m in Sources */,
 				5A83A3DE19F046390068F08B /* DFNoTableItemsView.m in Sources */,
 				5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */,

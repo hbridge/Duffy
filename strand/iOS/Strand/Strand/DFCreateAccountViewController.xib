@@ -7,9 +7,10 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFCreateAccountViewController">
             <connections>
-                <outlet property="countryCodeLabel" destination="cQr-c6-wNf" id="wTU-HB-ptk"/>
+                <outlet property="countryCodeLabel" destination="TLT-6J-lRX" id="2z2-Wb-xko"/>
+                <outlet property="countryTextField" destination="Xw4-15-B5R" id="Y6e-U5-7Py"/>
                 <outlet property="nameTextField" destination="rUd-za-pBH" id="7Lp-WC-pGN"/>
-                <outlet property="phoneNumberField" destination="mXL-H9-AQn" id="Agk-AT-KtW"/>
+                <outlet property="phoneNumberField" destination="JhT-fN-bu9" id="jhy-V8-Fiv"/>
                 <outlet property="statusLabel" destination="hu3-qZ-cOj" id="NbU-rT-S0G"/>
                 <outlet property="termsButton" destination="NCZ-gh-ZBO" id="aTF-lZ-LN4"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -17,7 +18,7 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please enter your phone number and name to get started" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="hu3-qZ-cOj">
@@ -25,113 +26,8 @@
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2gi-Mw-roE" userLabel="View - Phone number inpu">
-                    <rect key="frame" x="20" y="67" width="280" height="111"/>
-                    <subviews>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Phone" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qg4-dp-Vy6">
-                            <rect key="frame" x="0.0" y="1" width="86" height="54"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="86" id="VxR-XS-duM"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="21"/>
-                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                        <label opaque="NO" clipsSubviews="YES" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="cQr-c6-wNf">
-                            <rect key="frame" x="86" y="1" width="40" height="54"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <gestureRecognizers/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="40" id="PKC-aS-c1O"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="21"/>
-                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                            <connections>
-                                <outletCollection property="gestureRecognizers" destination="7CH-rJ-0xT" appends="YES" id="ANx-f2-nFp"/>
-                            </connections>
-                        </label>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="phone number" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="mXL-H9-AQn" userLabel="Phone Number Field">
-                            <rect key="frame" x="126" y="1" width="154" height="54"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="21"/>
-                            <textInputTraits key="textInputTraits" keyboardType="phonePad"/>
-                            <connections>
-                                <action selector="phoneNumberFieldValueChanged:" destination="-1" eventType="editingChanged" id="2KF-Hu-4X3"/>
-                                <outlet property="delegate" destination="-1" id="E5d-19-CNM"/>
-                            </connections>
-                        </textField>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WUY-Ad-AqU" userLabel="Phone Number Field Blocker">
-                            <rect key="frame" x="126" y="1" width="154" height="54"/>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                            <gestureRecognizers/>
-                            <connections>
-                                <outletCollection property="gestureRecognizers" destination="GgI-3Y-Ntm" appends="YES" id="OB8-bC-dL4"/>
-                            </connections>
-                        </view>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AVN-aF-MUr">
-                            <rect key="frame" x="0.0" y="56" width="86" height="54"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="21"/>
-                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x5Y-Td-bBZ" userLabel="Spacer">
-                            <rect key="frame" x="86" y="56" width="11" height="54"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="11" id="r9v-5C-JIK"/>
-                            </constraints>
-                        </view>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rUd-za-pBH" userLabel="Name Text field">
-                            <rect key="frame" x="97" y="56" width="183" height="54"/>
-                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="deviceRGB"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="183" id="0Ne-Do-GsE"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="21"/>
-                            <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
-                            <connections>
-                                <action selector="nameTextFieldChanged:" destination="-1" eventType="editingChanged" id="kte-YQ-Cf5"/>
-                            </connections>
-                        </textField>
-                    </subviews>
-                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                    <constraints>
-                        <constraint firstItem="AVN-aF-MUr" firstAttribute="width" secondItem="qg4-dp-Vy6" secondAttribute="width" id="1Vs-ji-mdj"/>
-                        <constraint firstItem="qg4-dp-Vy6" firstAttribute="top" secondItem="2gi-Mw-roE" secondAttribute="top" constant="1" id="2EL-Yn-6nm"/>
-                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="leading" secondItem="mXL-H9-AQn" secondAttribute="leading" id="2p2-BV-ZmQ"/>
-                        <constraint firstItem="x5Y-Td-bBZ" firstAttribute="leading" secondItem="AVN-aF-MUr" secondAttribute="trailing" id="5u1-io-mO7"/>
-                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="bottom" secondItem="mXL-H9-AQn" secondAttribute="bottom" id="8eP-eO-aQ9"/>
-                        <constraint firstItem="qg4-dp-Vy6" firstAttribute="height" secondItem="mXL-H9-AQn" secondAttribute="height" id="A1H-j7-xU5"/>
-                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="top" secondItem="mXL-H9-AQn" secondAttribute="top" id="DNy-1l-Wb2"/>
-                        <constraint firstItem="rUd-za-pBH" firstAttribute="height" secondItem="AVN-aF-MUr" secondAttribute="height" id="DXE-qp-FCo"/>
-                        <constraint firstAttribute="trailing" secondItem="rUd-za-pBH" secondAttribute="trailing" id="ELx-H1-o7l"/>
-                        <constraint firstItem="cQr-c6-wNf" firstAttribute="top" secondItem="2gi-Mw-roE" secondAttribute="top" constant="1" id="FEp-Yr-wIF"/>
-                        <constraint firstItem="x5Y-Td-bBZ" firstAttribute="top" secondItem="cQr-c6-wNf" secondAttribute="bottom" constant="1" id="FTq-On-Y9v"/>
-                        <constraint firstItem="cQr-c6-wNf" firstAttribute="leading" secondItem="qg4-dp-Vy6" secondAttribute="trailing" id="HX4-ki-7F3"/>
-                        <constraint firstItem="rUd-za-pBH" firstAttribute="leading" secondItem="x5Y-Td-bBZ" secondAttribute="trailing" id="Knv-UF-UyY"/>
-                        <constraint firstItem="AVN-aF-MUr" firstAttribute="top" secondItem="qg4-dp-Vy6" secondAttribute="bottom" constant="1" id="LW9-x3-qWi"/>
-                        <constraint firstItem="mXL-H9-AQn" firstAttribute="leading" secondItem="cQr-c6-wNf" secondAttribute="trailing" id="Nyp-Sr-piX"/>
-                        <constraint firstItem="rUd-za-pBH" firstAttribute="top" secondItem="mXL-H9-AQn" secondAttribute="bottom" constant="1" id="OrC-e8-4nU"/>
-                        <constraint firstAttribute="height" constant="111" id="QAH-6U-z2i"/>
-                        <constraint firstAttribute="trailing" secondItem="mXL-H9-AQn" secondAttribute="trailing" id="SbL-Ka-VxG"/>
-                        <constraint firstItem="x5Y-Td-bBZ" firstAttribute="leading" secondItem="AVN-aF-MUr" secondAttribute="trailing" id="UyR-C5-tzg"/>
-                        <constraint firstItem="qg4-dp-Vy6" firstAttribute="leading" secondItem="2gi-Mw-roE" secondAttribute="leading" id="b6W-Td-k1I"/>
-                        <constraint firstItem="AVN-aF-MUr" firstAttribute="height" secondItem="qg4-dp-Vy6" secondAttribute="height" id="blU-2Y-aUi"/>
-                        <constraint firstItem="AVN-aF-MUr" firstAttribute="leading" secondItem="2gi-Mw-roE" secondAttribute="leading" id="cTx-Ax-6ds"/>
-                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="trailing" secondItem="mXL-H9-AQn" secondAttribute="trailing" id="d7w-Z4-ikY"/>
-                        <constraint firstItem="rUd-za-pBH" firstAttribute="leading" secondItem="x5Y-Td-bBZ" secondAttribute="trailing" id="dbL-iv-odz"/>
-                        <constraint firstAttribute="bottom" secondItem="AVN-aF-MUr" secondAttribute="bottom" constant="1" id="oQL-ZY-YTU"/>
-                        <constraint firstItem="cQr-c6-wNf" firstAttribute="leading" secondItem="qg4-dp-Vy6" secondAttribute="trailing" id="pzS-Wd-HZt"/>
-                        <constraint firstAttribute="bottom" secondItem="rUd-za-pBH" secondAttribute="bottom" constant="1" id="rcP-Zb-FFT"/>
-                        <constraint firstItem="rUd-za-pBH" firstAttribute="top" secondItem="cQr-c6-wNf" secondAttribute="bottom" constant="1" id="wGQ-Te-dBu"/>
-                        <constraint firstAttribute="bottom" secondItem="x5Y-Td-bBZ" secondAttribute="bottom" constant="1" id="xqm-1F-i9E"/>
-                    </constraints>
-                </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="wordWrap" translatesAutoresizingMaskIntoConstraints="NO" id="NCZ-gh-ZBO" userLabel="By continuing, you agree to our Terms of Use and our Privacy Policy. .">
-                    <rect key="frame" x="20" y="193" width="280" height="29"/>
+                    <rect key="frame" x="20" y="262" width="280" height="29"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <state key="normal" title="By continuing, you agree to our Terms of Use and our Privacy Policy.">
                         <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -141,28 +37,169 @@
                         <action selector="termsButtonPressed:" destination="-1" eventType="touchUpInside" id="Vnt-mP-izq"/>
                     </connections>
                 </button>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Country" placeholder="phone number" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="Xw4-15-B5R" userLabel="Country Field" customClass="DFBorderedTextField">
+                    <rect key="frame" x="20" y="71" width="280" height="54"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <gestureRecognizers/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="54" id="iem-pj-aug"/>
+                    </constraints>
+                    <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <textInputTraits key="textInputTraits" keyboardType="phonePad"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="topBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="bottomBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <outlet property="delegate" destination="-1" id="XJ8-Wk-wq7"/>
+                    </connections>
+                </textField>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="+1" placeholder="+1" textAlignment="center" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="TLT-6J-lRX" userLabel="Country Code Field" customClass="DFBorderedTextField">
+                    <rect key="frame" x="20" y="124" width="60" height="54"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <gestureRecognizers/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="60" id="Sbu-Hp-Aby"/>
+                        <constraint firstAttribute="height" constant="54" id="TG8-uA-IuI"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="21"/>
+                    <textInputTraits key="textInputTraits" keyboardType="phonePad"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="topBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="bottomBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="rightBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <outlet property="delegate" destination="-1" id="xyC-TM-Yoj"/>
+                    </connections>
+                </textField>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="phone number" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="JhT-fN-bu9" userLabel="Phone Number Field" customClass="DFBorderedTextField">
+                    <rect key="frame" x="80" y="124" width="220" height="54"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="54" id="OOw-fI-nbu"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="21"/>
+                    <textInputTraits key="textInputTraits" keyboardType="phonePad"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="topBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="bottomBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                            <real key="value" value="8"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="phoneNumberFieldValueChanged:" destination="-1" eventType="editingChanged" id="wB0-U2-bXu"/>
+                        <outlet property="delegate" destination="-1" id="3nk-Ok-2Yv"/>
+                    </connections>
+                </textField>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WUY-Ad-AqU" userLabel="Phone Number Field Blocker">
+                    <rect key="frame" x="80" y="124" width="220" height="54"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <gestureRecognizers/>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="GgI-3Y-Ntm" appends="YES" id="OB8-bC-dL4"/>
+                    </connections>
+                </view>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rUd-za-pBH" userLabel="Name Text field" customClass="DFBorderedTextField">
+                    <rect key="frame" x="93" y="188" width="207" height="54"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="deviceRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="54" id="jbJ-23-fGP"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="21"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="bottomBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="topBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="nameTextFieldChanged:" destination="-1" eventType="editingChanged" id="kte-YQ-Cf5"/>
+                    </connections>
+                </textField>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Name" placeholder="Name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="6Gc-lC-XbY" userLabel="Name Label" customClass="DFBorderedTextField">
+                    <rect key="frame" x="20" y="188" width="73" height="54"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="deviceRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="54" id="V4y-c9-YPl"/>
+                        <constraint firstAttribute="width" constant="73" id="XBD-Yc-qSM"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="21"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="bottomBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="topBorder">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </textField>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstItem="WUY-Ad-AqU" firstAttribute="trailing" secondItem="JhT-fN-bu9" secondAttribute="trailing" id="23f-QF-X76"/>
                 <constraint firstAttribute="trailing" secondItem="hu3-qZ-cOj" secondAttribute="trailing" constant="20" id="41f-GA-y8m"/>
+                <constraint firstItem="rUd-za-pBH" firstAttribute="leading" secondItem="6Gc-lC-XbY" secondAttribute="trailing" id="4fk-8e-nei"/>
+                <constraint firstAttribute="trailing" secondItem="Xw4-15-B5R" secondAttribute="trailing" constant="20" id="7pf-DL-n5Y"/>
+                <constraint firstItem="TLT-6J-lRX" firstAttribute="bottom" secondItem="JhT-fN-bu9" secondAttribute="bottom" id="AW5-Ae-he6"/>
                 <constraint firstItem="hu3-qZ-cOj" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="ErU-t8-Sbe"/>
-                <constraint firstItem="2gi-Mw-roE" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="Jhp-80-Xr3"/>
-                <constraint firstItem="2gi-Mw-roE" firstAttribute="top" secondItem="hu3-qZ-cOj" secondAttribute="bottom" constant="16" id="Keb-vL-bKD"/>
+                <constraint firstItem="NCZ-gh-ZBO" firstAttribute="top" secondItem="rUd-za-pBH" secondAttribute="bottom" constant="20" id="Koe-Rv-7YN"/>
                 <constraint firstItem="hu3-qZ-cOj" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="10" id="Pfc-Ig-hFv"/>
                 <constraint firstAttribute="trailing" secondItem="NCZ-gh-ZBO" secondAttribute="trailing" constant="20" id="Q7Y-tC-s99"/>
-                <constraint firstItem="NCZ-gh-ZBO" firstAttribute="top" secondItem="2gi-Mw-roE" secondAttribute="bottom" constant="15" id="hyD-ni-PKm"/>
-                <constraint firstItem="NCZ-gh-ZBO" firstAttribute="top" secondItem="2gi-Mw-roE" secondAttribute="bottom" constant="15" id="pYD-Cy-bMa"/>
+                <constraint firstItem="WUY-Ad-AqU" firstAttribute="leading" secondItem="JhT-fN-bu9" secondAttribute="leading" id="TwX-KQ-IjY"/>
+                <constraint firstItem="Xw4-15-B5R" firstAttribute="top" secondItem="hu3-qZ-cOj" secondAttribute="bottom" constant="20" id="Uh2-gE-ris"/>
+                <constraint firstItem="6Gc-lC-XbY" firstAttribute="top" secondItem="TLT-6J-lRX" secondAttribute="bottom" constant="10" id="UhW-aD-C2X"/>
+                <constraint firstAttribute="trailing" secondItem="JhT-fN-bu9" secondAttribute="trailing" constant="20" id="X8X-F2-Bdk"/>
+                <constraint firstItem="WUY-Ad-AqU" firstAttribute="bottom" secondItem="JhT-fN-bu9" secondAttribute="bottom" id="Z0s-gz-yFe"/>
+                <constraint firstItem="JhT-fN-bu9" firstAttribute="leading" secondItem="TLT-6J-lRX" secondAttribute="trailing" id="bWq-Lo-BOL"/>
+                <constraint firstItem="JhT-fN-bu9" firstAttribute="top" secondItem="Xw4-15-B5R" secondAttribute="bottom" constant="-1" id="dmq-64-ckH"/>
+                <constraint firstItem="6Gc-lC-XbY" firstAttribute="leading" secondItem="TLT-6J-lRX" secondAttribute="leading" id="dtX-FF-4Fa"/>
+                <constraint firstItem="Xw4-15-B5R" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="maY-CN-ff4"/>
+                <constraint firstItem="WUY-Ad-AqU" firstAttribute="top" secondItem="JhT-fN-bu9" secondAttribute="top" id="q3N-sY-Lx8"/>
                 <constraint firstItem="NCZ-gh-ZBO" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="rgd-fn-9ja"/>
-                <constraint firstAttribute="trailing" secondItem="2gi-Mw-roE" secondAttribute="trailing" constant="20" id="zdR-H3-vet"/>
+                <constraint firstItem="6Gc-lC-XbY" firstAttribute="top" secondItem="rUd-za-pBH" secondAttribute="top" id="uPx-Pt-qJw"/>
+                <constraint firstAttribute="trailing" secondItem="rUd-za-pBH" secondAttribute="trailing" constant="20" id="vSj-YC-6cQ"/>
+                <constraint firstItem="Xw4-15-B5R" firstAttribute="leading" secondItem="TLT-6J-lRX" secondAttribute="leading" id="zyP-xm-ttE"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
         </view>
         <barButtonItem title="Item" id="kDG-iO-BMt"/>
-        <tapGestureRecognizer id="7CH-rJ-0xT" userLabel="Country Code Tap Gesture Recognizer">
-            <connections>
-                <action selector="countryCodeTapped:" destination="-1" id="R3g-3G-TKZ"/>
-            </connections>
-        </tapGestureRecognizer>
         <tapGestureRecognizer id="GgI-3Y-Ntm">
             <connections>
                 <action selector="phoneFieldTapped:" destination="-1" id="H5O-ye-rgs"/>

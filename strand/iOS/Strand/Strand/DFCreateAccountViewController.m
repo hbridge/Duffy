@@ -92,6 +92,15 @@
   }
 }
 
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+  if (textField == self.countryTextField || textField == self.countryCodeLabel) {
+    [self showCountryCodePicker:textField];
+    return NO;
+  }
+  return YES;
+}
+
 - (IBAction)nameTextFieldChanged:(UITextField *)sender {
   [self textFieldChanged];
 }
@@ -191,11 +200,13 @@
 
 - (void)showInvalidNumberAlert:(NSString *)phoneNumber
 {
+  NSString *formattedNumber = [self E164FormattedPhoneNumber];
+  if (![formattedNumber isNotEmpty]) formattedNumber = phoneNumber;
   UIAlertView *alert = [[UIAlertView alloc]
                         initWithTitle:@"Invalid Phone Number"
                         message:[NSString stringWithFormat:@"%@ is not a valid phone number."
                                  " Please enter a valid mobile phone number.",
-                                 [self E164FormattedPhoneNumber]]
+                                 formattedNumber]
                         delegate:nil
                         cancelButtonTitle:@"OK"
                         otherButtonTitles:nil];
@@ -257,27 +268,40 @@
 
 #pragma mark - International Support
 
-- (IBAction)countryCodeTapped:(UITapGestureRecognizer *)sender {
+- (void)showCountryCodePicker:(id)sender {
+  NSUInteger indexOfCurrentSelection = [[self.class supportedRegionCodes] indexOfObject:self.selectedRegion];
   [ActionSheetStringPicker
-   showPickerWithTitle:@"Select Country Code"
+   showPickerWithTitle:@"Select Country"
    rows:[self.class countrySelectorOptions]
-   initialSelection:0
+   initialSelection: indexOfCurrentSelection != NSNotFound ? indexOfCurrentSelection : 0
    doneBlock:^(ActionSheetStringPicker *picker, NSInteger selectedIndex, id selectedValue) {
      self.selectedRegion = [[self.class supportedRegionCodes] objectAtIndex:selectedIndex];
    }
    cancelBlock:^(ActionSheetStringPicker *picker) {
      NSLog(@"Block Picker Canceled");
    }
-   origin:self.nameTextField];
+   origin:sender];
 }
 
 - (void)setSelectedRegion:(NSString *)selectedRegion
 {
   _selectedRegion = selectedRegion;
+  
+  self.countryTextField.text = [self.class localizedCountryNameForRegion:selectedRegion];
   self.countryCodeLabel.text = [@"+" stringByAppendingString:[NBMetadataHelper
                                                               countryCodeFromRegionCode:selectedRegion]];
   self.phoneNumberFormatter = [[NBAsYouTypeFormatter alloc] initWithRegionCode:selectedRegion];
   [self phoneNumberFieldValueChanged:self.phoneNumberField];
+}
+
++ (NSString *)localizedCountryNameForRegion:(NSString *)regionCode
+{
+  // get the name of the selected region in the current user's language
+  id countryDictionaryInstance = [NSDictionary dictionaryWithObject:regionCode
+                                                             forKey:NSLocaleCountryCode];
+  NSString *identifier = [NSLocale localeIdentifierFromComponents:countryDictionaryInstance];
+  NSString *country = [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:identifier];
+  return country;
 }
 
 + (NSArray *)countrySelectorOptions
@@ -286,7 +310,9 @@
   NSArray *regionCodes = [self supportedRegionCodes];
   for (NSString *regionCode in regionCodes) {
     NSString *countryCode = [NBMetadataHelper countryCodeFromRegionCode:regionCode];
-    NSString *option = [NSString stringWithFormat:@"%@ +%@", regionCode, countryCode];
+    NSString *option = [NSString stringWithFormat:@"%@ +%@",
+                        [self localizedCountryNameForRegion:regionCode],
+                        countryCode];
     [options addObject:option];
   }
   
