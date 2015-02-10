@@ -356,5 +356,6 @@ class BASE_CELERY_CONFIG:
         'async.suggestion_notifications.processIds': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'async.suggestion_notifications.processUserId': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'async.notifications.sendRefreshFeedToUserIds': {'queue': 'independent', 'routing_key': 'independent'},
+        'async.notifications.sendNewPhotoNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
     }
 

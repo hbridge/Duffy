@@ -806,9 +806,18 @@ class CreateShareInstanceAPI(BulkCreateAPIView):
 class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
     def pre_save(self, shareInstance):
         shareInstance.cache_dirty = True
-        
+        shareInstance.existingIds = set(User.getIds(shareInstance.users.all()))
+
     def post_save(self, shareInstance, created):
         popcaches.processInboxIds.delay([shareInstance.id])
+        
+        newIds =  [id for id in set(User.getIds(shareInstance.users.all())) if id not in shareInstance.existingIds]
+       
+        if shareInstance.photo.full_filename:
+            for userId in newIds:
+                notifications.sendNewPhotoNotificationBatch.delay(userId, [shareInstance.id])
+
+
 
     def delete(self, *args, **kwargs):
         shareInstance = None

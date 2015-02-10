@@ -21,72 +21,9 @@ from common.models import ShareInstance, User, LocationRecord, NotificationLog
 from common import api_util
 
 from strand import notifications_util, strands_util
+from async import notifications
 
 logger = logging.getLogger(__name__)
-
-def sendNewPhotoNotifications(shareInstance):
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	logger.debug("in sendNewPhotoNotifications for share instance id %s" % shareInstance.id)
-	location = strands_util.getBestLocation(shareInstance.photo)
-	prettyDate = api_util.prettyDate(shareInstance.photo.time_taken)
-
-	if now - shareInstance.photo.time_taken < datetime.timedelta(days=3):
-		msg = "%s sent you a photo from %s" % (shareInstance.user.display_name, prettyDate)
-	elif location:
-		msg = "%s sent you a photo from %s" % (shareInstance.user.display_name, location)
-	else:
-		msg = "%s sent you a photo" % (shareInstance.user.display_name)
-		
-	doNotification = True
-
-	if not shareInstance.photo.full_filename:
-		return False
-
-	for user in shareInstance.users.all():
-		if user.id != shareInstance.user.id:
-			logger.debug("going to send %s to user id %s" % (msg, user.id))
-			customPayload = {'share_instance_id': shareInstance.id, 'id': shareInstance.photo.id}
-			notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
-
-	# Kickoff separate notification for badging
-	userIds = User.getIds(list(shareInstance.users.all()))
-	Thread(target=notifications_util.threadedSendNotifications, args=(userIds,)).start()
-	
-	return True
-
-def sendNewPhotoNotificationBatch(user, siList):
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	logger.debug("in sendNewPhotoNotificationsBatch for user id %s" % user.id)
-
-	if len(siList) == 1:
-		msg = "You have %s new photo from %s" % (len(siList), siListToUserPhrase(siList))		
-	else:
-		msg = "You have %s new photos from %s" % (len(siList), siListToUserPhrase(siList))
-
-	logger.info("going to send '%s' to user id %s" %(msg, user.id))
-	customPayload = {'share_instance_id': siList[0].id, 'id': siList[0].photo.id}
-	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
-
-	# Kickoff separate notification for badging
-	Thread(target=notifications_util.threadedSendNotifications, args=([user.id],)).start()	
-
-
-def siListToUserPhrase(siList):
-	userNames = set()
-	
-	for si in siList:
-		userNames.add(si.user.display_name.split(' ', 1)[0])
-
-	userPhrase = ""
-	userNames = list(userNames)
-	if len(userNames) == 1:
-		userPhrase = userNames[0]
-	elif len(userNames) == 2:
-		userPhrase = userNames[0] + " and " + userNames[1]
-	elif len(userNames) > 2:
-		userPhrase = ', '.join(userNames[:-1]) + ', and ' + userNames[-1]
-	
-	return userPhrase
 
 def main(argv):
 	logger.info("Starting... ")
@@ -134,7 +71,7 @@ def main(argv):
 								siByUser[user] = [si]
 
 			for user, siList in siByUser.items():
-				sendNewPhotoNotificationBatch(user, siList)
+				notifications.sendNewPhotoNotificationBatch(user.id, ShareInstance.getIds(siList))
 
 			if len(notificationsSent) > 0:
 				ShareInstance.bulkUpdate(notificationsSent, ['notification_sent'])
