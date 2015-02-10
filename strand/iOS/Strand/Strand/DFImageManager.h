@@ -37,7 +37,6 @@ typedef void (^SetImageCompletion)(NSError *error);
                            targetSize:(CGSize)size
                           contentMode:(DFImageRequestContentMode)contentMode;
 - (void)clearCache;
-+ (BOOL)supportsHighResThumbnails;
 
 
 @end

@@ -502,9 +502,6 @@ static BOOL logRouting = NO;
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
-+ (BOOL)supportsHighResThumbnails
-{
-  return ([PHImageManager class] != nil);
-}
+
 
 @end

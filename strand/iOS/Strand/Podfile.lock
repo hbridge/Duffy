@@ -12,7 +12,6 @@ PODS:
   - EasyMapping (0.12.0):
     - EasyMapping/Core (= 0.12.0)
   - EasyMapping/Core (0.12.0)
-  - FBLikeLayout (1.1)
   - FMDB/common (2.5)
   - FMDB/FTS (2.5):
     - FMDB/standard
@@ -62,7 +61,6 @@ DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
   - CRToast (~> 0.0.7)
   - EasyMapping (~> 0.12.0)
-  - FBLikeLayout (~> 1.1)
   - FMDB/FTS (~> 2.4)
   - FormKit.m (~> 0.4.0)
   - GBFlatButton (~> 2.1.0)
@@ -108,7 +106,6 @@ SPEC CHECKSUMS:
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   EasyMapping: fe5464880fa8af81604620f98a65d81973324363
-  FBLikeLayout: 5752c8d78363983eed82a445608c01a698b7a2f9
   FMDB: 0efa188cf0dd1ce82c27a478cd5f5fa245308677
   FormKit.m: 68e35d2e70558109fa9ce5935e0f16a65c8b2b51
   GBFlatButton: 30bf30c2594129ffeac1e6dce531022a4759c904

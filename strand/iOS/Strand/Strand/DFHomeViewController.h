@@ -13,15 +13,14 @@
 #import "DFNotificationsViewController.h"
 #import <SAMGradientView/SAMGradientView.h>
 #import <MMPopLabel/MMPopLabel.h>
-#import <FBLikeLayout/FBLikeLayout.h>
 
 
-@interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate, DFNotificationsViewControllerDelegate, MMPopLabelDelegate, UICollectionViewDelegateFlowLayout>
+@interface DFHomeViewController : UIViewController <UICollectionViewDelegate, DFImageDataSourceDelegate, DFNotificationsViewControllerDelegate, MMPopLabelDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
 - (IBAction)sendButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet LKBadgeView *sendBadgeView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
-@property (strong, nonatomic) FBLikeLayout *photoLayout;
+@property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic) NSUInteger numPhotosPerRow;
 @property (weak, nonatomic) IBOutlet SAMGradientView *buttonBar;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *buttonBarHeightConstraint;
