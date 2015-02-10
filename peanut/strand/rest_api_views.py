@@ -691,8 +691,9 @@ class CreateActionAPI(CreateAPIView):
             
     def post_save(self, action, created):
         if created:
-            if action.share_instance and action.action_type == constants.ACTION_TYPE_COMMENT:
-                action.share_instance.last_action_timestamp = action.added
+            if action.share_instance:
+                if action.action_type == constants.ACTION_TYPE_COMMENT:
+                    action.share_instance.last_action_timestamp = action.added
                 action.share_instance.cache_dirty = True
                 action.share_instance.save()
                 popcaches.processInboxIds.delay([action.share_instance.id])
