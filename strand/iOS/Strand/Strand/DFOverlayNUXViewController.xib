@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFOverlayNUXViewController">
             <connections>
+                <outlet property="closeButton" destination="zTt-6t-pdr" id="N3P-kY-l4i"/>
                 <outlet property="explanatoryGradientView" destination="chU-Uu-ybZ" id="sp6-ZB-VwX"/>
                 <outlet property="explanatoryTextLabel" destination="M8s-Bf-oFa" id="elr-1p-xSW"/>
                 <outlet property="subtitleLabel" destination="f3Z-8Q-2OS" id="ovQ-tY-dCR"/>
@@ -21,7 +22,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3EZ-9O-T1A">
-                    <rect key="frame" x="40" y="142" width="240" height="196"/>
+                    <rect key="frame" x="40" y="112" width="240" height="256"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Wh6-gE-eqn">
                             <rect key="frame" x="0.0" y="0.0" width="240" height="150"/>
@@ -31,7 +32,7 @@
                             </constraints>
                         </imageView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="chU-Uu-ybZ" customClass="SAMGradientView">
-                            <rect key="frame" x="0.0" y="150" width="240" height="46"/>
+                            <rect key="frame" x="0.0" y="150" width="240" height="106"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ynO-I5-dJ7">
@@ -59,10 +60,24 @@
                             </attributedString>
                             <nil key="highlightedColor"/>
                         </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zTt-6t-pdr">
+                            <rect key="frame" x="112" y="186" width="16" height="50"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="1so-Au-7e7"/>
+                            </constraints>
+                            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <state key="normal" image="Assets/Icons/OverlayNuxCloseButton.png">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="closeButtonPressed:" destination="-1" eventType="touchUpInside" id="LPp-O3-A3N"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="Wh6-gE-eqn" firstAttribute="top" secondItem="3EZ-9O-T1A" secondAttribute="top" id="41e-iO-7wF"/>
+                        <constraint firstAttribute="bottom" secondItem="zTt-6t-pdr" secondAttribute="bottom" constant="20" id="Ahm-4n-bX3"/>
                         <constraint firstItem="f3Z-8Q-2OS" firstAttribute="top" secondItem="ynO-I5-dJ7" secondAttribute="bottom" constant="4" id="Fvs-Pu-cK5"/>
                         <constraint firstItem="ynO-I5-dJ7" firstAttribute="leading" secondItem="3EZ-9O-T1A" secondAttribute="leading" constant="10" id="GgS-be-7Pm"/>
                         <constraint firstItem="Wh6-gE-eqn" firstAttribute="leading" secondItem="3EZ-9O-T1A" secondAttribute="leading" id="OCK-dD-mG0"/>
@@ -72,11 +87,12 @@
                         <constraint firstAttribute="trailing" secondItem="Wh6-gE-eqn" secondAttribute="trailing" id="UTa-1J-5mX"/>
                         <constraint firstItem="M8s-Bf-oFa" firstAttribute="top" secondItem="Wh6-gE-eqn" secondAttribute="bottom" constant="10" id="VQr-eB-hO7"/>
                         <constraint firstAttribute="trailing" secondItem="chU-Uu-ybZ" secondAttribute="trailing" id="WBl-pT-rs3"/>
-                        <constraint firstAttribute="bottom" secondItem="M8s-Bf-oFa" secondAttribute="bottom" constant="20" id="aZz-bi-oRa"/>
+                        <constraint firstItem="zTt-6t-pdr" firstAttribute="top" secondItem="M8s-Bf-oFa" secondAttribute="bottom" constant="10" id="bqJ-ZK-J4b"/>
                         <constraint firstAttribute="trailing" secondItem="ynO-I5-dJ7" secondAttribute="trailing" constant="10" id="gsM-0j-WrA"/>
                         <constraint firstAttribute="trailing" secondItem="M8s-Bf-oFa" secondAttribute="trailing" constant="20" id="iwA-sG-uPL"/>
                         <constraint firstItem="chU-Uu-ybZ" firstAttribute="leading" secondItem="3EZ-9O-T1A" secondAttribute="leading" id="jE6-2M-m6G"/>
                         <constraint firstItem="M8s-Bf-oFa" firstAttribute="leading" secondItem="3EZ-9O-T1A" secondAttribute="leading" constant="20" id="nF7-Vh-FXj"/>
+                        <constraint firstAttribute="centerX" secondItem="zTt-6t-pdr" secondAttribute="centerX" id="rDo-ZJ-K4B"/>
                         <constraint firstAttribute="trailing" secondItem="f3Z-8Q-2OS" secondAttribute="trailing" constant="8" id="rgE-8s-XDL"/>
                         <constraint firstItem="ynO-I5-dJ7" firstAttribute="top" secondItem="3EZ-9O-T1A" secondAttribute="top" constant="10" id="sKe-3n-TTx"/>
                         <constraint firstAttribute="bottom" secondItem="chU-Uu-ybZ" secondAttribute="bottom" id="vyP-mt-j67"/>
@@ -99,4 +115,7 @@
             <point key="canvasLocation" x="287" y="218"/>
         </view>
     </objects>
+    <resources>
+        <image name="Assets/Icons/OverlayNuxCloseButton.png" width="16" height="16"/>
+    </resources>
 </document>

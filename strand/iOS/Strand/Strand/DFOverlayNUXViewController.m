@@ -25,6 +25,7 @@
   return self;
 }
 
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   
@@ -54,11 +55,11 @@
   
   NSError *error;
   NSString *markup = @""
+  "<nuxHeaderText><strong>Location-Aware</strong></nuxHeaderText>\n"
+  "<nuxText>Swap suggests friends who were nearby</nuxText>"
+  "\n\n"
   "<nuxHeaderText><strong>Your Best Photos</strong></nuxHeaderText>\n"
   "<nuxText>Swap picks fun photos to share</nuxText>"
-  "\n\n"
-  "<nuxHeaderText><strong>Less Work</strong></nuxHeaderText>\n"
-  "<nuxText>Swap suggests friends who were nearby</nuxText>"
   ;
   self.explanatoryTextLabel.attributedText = [SLSMarkupParser
                                               attributedStringWithMarkup:markup
@@ -97,6 +98,10 @@
   
   
   self.explanatoryTextLabel.attributedText = res;
+}
+
+- (IBAction)closeButtonPressed:(id)sender {
+  [self dismissViewControllerAnimated:NO completion:nil];
 }
 
 

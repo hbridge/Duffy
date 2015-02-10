@@ -20,10 +20,12 @@ typedef enum {
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *explanatoryTextLabel;
 @property (weak, nonatomic) IBOutlet SAMGradientView *explanatoryGradientView;
+@property (weak, nonatomic) IBOutlet UIButton *closeButton;
 
 @property (readonly, nonatomic) DFOverlayNuxType nuxType;
 
 
 - (instancetype)initWithOverlayNUXType:(DFOverlayNuxType)nuxType;
+- (IBAction)closeButtonPressed:(id)sender;
 
 @end
