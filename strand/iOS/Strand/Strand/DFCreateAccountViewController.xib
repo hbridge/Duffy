@@ -37,7 +37,7 @@
                         <action selector="termsButtonPressed:" destination="-1" eventType="touchUpInside" id="Vnt-mP-izq"/>
                     </connections>
                 </button>
-                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Country" placeholder="phone number" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="Xw4-15-B5R" userLabel="Country Field" customClass="DFBorderedTextField">
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Country" placeholder="Blank due to simulator bug" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="Xw4-15-B5R" userLabel="Country Field" customClass="DFBorderedTextField">
                     <rect key="frame" x="20" y="71" width="280" height="54"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <gestureRecognizers/>
