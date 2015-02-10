@@ -1,5 +1,9 @@
 # Swap v2
 
+## Feb 10th, 2015 (4852)
+
+- Enlarge photos with commetns/likes in the gallery
+
 ## Feb 9, 2015 (4851)
 
 - New recipient selection UI
