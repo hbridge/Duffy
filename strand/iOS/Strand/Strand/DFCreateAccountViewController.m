@@ -7,6 +7,10 @@
 //
 
 #import "DFCreateAccountViewController.h"
+#import <ActionSheetPicker-3.0/ActionSheetStringPicker.h>
+#import <libPhoneNumber-iOS/NBMetadataHelper.h>
+#import <libPhoneNumber-iOS/NBAsYouTypeFormatter.h>
+#import <libPhoneNumber-iOS/NBPhoneNumberUtil.h>
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "AppDelegate.h"
@@ -18,9 +22,10 @@
 #import "DFAnalytics.h"
 #import "SVProgressHUD.h"
 
-UInt16 const DFPhoneNumberLength = 10;
-
 @interface DFCreateAccountViewController ()
+
+@property (nonatomic, retain) NSString *selectedRegion;
+@property (nonatomic, retain) NBAsYouTypeFormatter *phoneNumberFormatter;
 
 @end
 
@@ -52,6 +57,7 @@ UInt16 const DFPhoneNumberLength = 10;
   if ([self.nameTextField.text isEqualToString:@"iPhone"]) {
     self.nameTextField.text = @"";
   }
+  self.selectedRegion = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -78,48 +84,12 @@ UInt16 const DFPhoneNumberLength = 10;
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
-
-- (BOOL)textField:(UITextField *)textField
-shouldChangeCharactersInRange:(NSRange)range
-replacementString:(NSString *)string
-{
-  if (textField != self.phoneNumberField) return YES;
-  // dash after 3 numbers
-  if (range.location == 2 && ![string isEqualToString:@""]) {
-    textField.text = [textField.text stringByAppendingString:[NSString stringWithFormat:@"%@-", string]];
-    return  NO;
-  } else if (range.location == 3 && [string isEqualToString:@""]) {
-    textField.text = [textField.text substringToIndex:2];
-    return NO;
-  }
-  
-  // dash after 6 numbers
-  if (range.location == 6 && ![string isEqualToString:@""]) {
-    textField.text = [textField.text stringByAppendingString:[NSString stringWithFormat:@"%@-", string]];
-    return NO;
-  } else if (range.location == 7 && [string isEqualToString:@""]) {
-    textField.text = [textField.text substringToIndex:6];
-    return NO;
-  }
-  
-  // max length
-  if ([[textField.text stringByReplacingCharactersInRange:range withString:string] length] > 12) {
-    return NO;
-  }
-  
-  return YES;
-}
-
-
 - (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender {
   [self textFieldChanged];
+  if (sender == self.phoneNumberField) {
+    NSString *formattedString = [self.phoneNumberFormatter inputString:[self enteredPhoneNumber]];
+    self.phoneNumberField.text = formattedString;
+  }
 }
 
 - (IBAction)nameTextFieldChanged:(UITextField *)sender {
@@ -135,7 +105,6 @@ replacementString:(NSString *)string
   }
 }
 
-
 - (void)phoneNumberDoneButtonPressed:(id)sender
 {
   if (![self isCurrentPhoneNumberValid]) {
@@ -143,7 +112,7 @@ replacementString:(NSString *)string
     [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultInvalidInput];
     return;
   }
-  NSString __block *phoneNumberString = [self enteredPhoneNumber];
+  NSString __block *phoneNumberString = [self E164FormattedPhoneNumber];
   [SVProgressHUD show];
   
   DFSMSVerificationAdapter *smsAdapter = [[DFSMSVerificationAdapter alloc] init];
@@ -161,8 +130,24 @@ replacementString:(NSString *)string
        [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultFailure];
      }
    }];
-  
-  
+}
+
+- (NSString *)E164FormattedPhoneNumber
+{
+  NBPhoneNumberUtil *phoneUtil = [[NBPhoneNumberUtil alloc] init];
+  NSError *error = nil;
+  NBPhoneNumber *myNumber = [phoneUtil parse:[self enteredPhoneNumber]
+                               defaultRegion:self.selectedRegion
+                                       error:&error];
+  if (error == nil) {
+    // Should check error
+    return [phoneUtil format:myNumber
+                numberFormat:NBEPhoneNumberFormatE164
+                       error:&error];
+  } else {
+    DDLogInfo(@"Error formatting into E164 %@", [error localizedDescription]);
+    return nil;
+  }
 }
 
 + (UIAlertView *)smsVerificationRequestFailed:(NSError *)error
@@ -180,28 +165,28 @@ replacementString:(NSString *)string
 
 - (NSString *)enteredPhoneNumber
 {
-  NSMutableString *mutableCode = self.phoneNumberField.text.mutableCopy;
-  [mutableCode replaceOccurrencesOfString:@"-" withString:@"" options:0 range:mutableCode.fullRange];
-  [mutableCode insertString:@"+1" atIndex:0];
-  return mutableCode;
+  return [[self.phoneNumberField.text
+           componentsSeparatedByCharactersInSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789"] invertedSet]]
+          componentsJoinedByString:@""];
 }
 
 
 - (BOOL)isCurrentPhoneNumberValid
 {
-  NSError *error;
-  NSRegularExpression *regex = [[NSRegularExpression alloc]
-                                initWithPattern:[NSString stringWithFormat:@"\\d{%d}",DFPhoneNumberLength]
-                                options:0
-                                error:&error];
-  if (error) {
-    [NSException raise:@"Invalid Regex" format:@"Error: %@", error.description];
+  NBPhoneNumberUtil *phoneUtil = [[NBPhoneNumberUtil alloc] init];
+  NSError *anError = nil;
+  NBPhoneNumber *myNumber = [phoneUtil parse:[self enteredPhoneNumber]
+                               defaultRegion:self.selectedRegion
+                                       error:&anError];
+  if (anError == nil) {
+    // Should check error
+    BOOL isValid = [phoneUtil isValidNumber:myNumber];
+    DDLogInfo(@"%@ isValidPhoneNumber ? [%@]", [self enteredPhoneNumber], isValid ? @"YES":@"NO");
+    return isValid;
+  } else {
+    DDLogInfo(@"Error parsing %@ : %@", [self enteredPhoneNumber], [anError localizedDescription]);
+    return NO;
   }
-  
-  return [regex numberOfMatchesInString:[self enteredPhoneNumber]
-                                options:0
-                                  range:(NSRange){0, [[self enteredPhoneNumber] length]}
-          ] == 1;
 }
 
 - (void)showInvalidNumberAlert:(NSString *)phoneNumber
@@ -209,8 +194,8 @@ replacementString:(NSString *)string
   UIAlertView *alert = [[UIAlertView alloc]
                         initWithTitle:@"Invalid Phone Number"
                         message:[NSString stringWithFormat:@"%@ is not a valid phone number."
-                                 " Please enter your %d digit mobile phone number.",
-                                 phoneNumber, DFPhoneNumberLength]
+                                 " Please enter a valid mobile phone number.",
+                                 [self E164FormattedPhoneNumber]]
                         delegate:nil
                         cancelButtonTitle:@"OK"
                         otherButtonTitles:nil];
@@ -218,6 +203,12 @@ replacementString:(NSString *)string
 }
 
 #pragma mark - Terms button handlers
+
+- (IBAction)phoneFieldTapped:(id)sender {
+  // the phone number text field has a view on top of it to prevent
+  // copy paste, so we forward taps to activate it here
+  [self.phoneNumberField becomeFirstResponder];
+}
 
 - (IBAction)termsButtonPressed:(id)sender {
   UIActionSheet *actionSheet = [[UIActionSheet alloc]
@@ -263,5 +254,83 @@ replacementString:(NSString *)string
                                 };
   [self completedWithUserInfo:newUserInfo];
 }
+
+#pragma mark - International Support
+
+- (IBAction)countryCodeTapped:(UITapGestureRecognizer *)sender {
+  [ActionSheetStringPicker
+   showPickerWithTitle:@"Select Country Code"
+   rows:[self.class countrySelectorOptions]
+   initialSelection:0
+   doneBlock:^(ActionSheetStringPicker *picker, NSInteger selectedIndex, id selectedValue) {
+     self.selectedRegion = [[self.class supportedRegionCodes] objectAtIndex:selectedIndex];
+   }
+   cancelBlock:^(ActionSheetStringPicker *picker) {
+     NSLog(@"Block Picker Canceled");
+   }
+   origin:self.nameTextField];
+}
+
+- (void)setSelectedRegion:(NSString *)selectedRegion
+{
+  _selectedRegion = selectedRegion;
+  self.countryCodeLabel.text = [@"+" stringByAppendingString:[NBMetadataHelper
+                                                              countryCodeFromRegionCode:selectedRegion]];
+  self.phoneNumberFormatter = [[NBAsYouTypeFormatter alloc] initWithRegionCode:selectedRegion];
+  [self phoneNumberFieldValueChanged:self.phoneNumberField];
+}
+
++ (NSArray *)countrySelectorOptions
+{
+  NSMutableArray *options = [NSMutableArray new];
+  NSArray *regionCodes = [self supportedRegionCodes];
+  for (NSString *regionCode in regionCodes) {
+    NSString *countryCode = [NBMetadataHelper countryCodeFromRegionCode:regionCode];
+    NSString *option = [NSString stringWithFormat:@"%@ +%@", regionCode, countryCode];
+    [options addObject:option];
+  }
+  
+  return options;
+}
+
++ (NSArray *)supportedRegionCodes
+{
+  return @[
+           @"AE",
+           @"AT",
+           @"AU",
+           @"BE",
+           @"BR",
+           @"CH",
+           @"DE",
+           @"DK",
+           @"ES",
+           @"FI",
+           @"FR",
+           @"GB",
+           @"HK",
+           @"ID",
+           @"IE",
+           @"IL",
+           @"IN",
+           @"IS",
+           @"IT",
+           @"JP",
+           @"KR",
+           @"MX",
+           @"NL",
+           @"NO",
+           @"NZ",
+           @"PL",
+           @"PT",
+           @"RU",
+           @"SG",
+           @"SE",
+           @"TR",
+           @"TW",
+           @"US",
+           ];
+}
+
 
 @end

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment defaultVersion="1792" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFCreateAccountViewController">
             <connections>
+                <outlet property="countryCodeLabel" destination="cQr-c6-wNf" id="wTU-HB-ptk"/>
                 <outlet property="nameTextField" destination="rUd-za-pBH" id="7Lp-WC-pGN"/>
                 <outlet property="phoneNumberField" destination="mXL-H9-AQn" id="Agk-AT-KtW"/>
                 <outlet property="statusLabel" destination="hu3-qZ-cOj" id="NbU-rT-S0G"/>
@@ -37,17 +38,21 @@
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cQr-c6-wNf">
+                        <label opaque="NO" clipsSubviews="YES" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="cQr-c6-wNf">
                             <rect key="frame" x="86" y="1" width="40" height="54"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <gestureRecognizers/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="40" id="PKC-aS-c1O"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="21"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
+                            <connections>
+                                <outletCollection property="gestureRecognizers" destination="7CH-rJ-0xT" appends="YES" id="ANx-f2-nFp"/>
+                            </connections>
                         </label>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="phone number" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="mXL-H9-AQn">
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="phone number" minimumFontSize="24" translatesAutoresizingMaskIntoConstraints="NO" id="mXL-H9-AQn" userLabel="Phone Number Field">
                             <rect key="frame" x="126" y="1" width="154" height="54"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <fontDescription key="fontDescription" type="system" pointSize="21"/>
@@ -57,6 +62,14 @@
                                 <outlet property="delegate" destination="-1" id="E5d-19-CNM"/>
                             </connections>
                         </textField>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WUY-Ad-AqU" userLabel="Phone Number Field Blocker">
+                            <rect key="frame" x="126" y="1" width="154" height="54"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <gestureRecognizers/>
+                            <connections>
+                                <outletCollection property="gestureRecognizers" destination="GgI-3Y-Ntm" appends="YES" id="OB8-bC-dL4"/>
+                            </connections>
+                        </view>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AVN-aF-MUr">
                             <rect key="frame" x="0.0" y="56" width="86" height="54"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -88,8 +101,11 @@
                     <constraints>
                         <constraint firstItem="AVN-aF-MUr" firstAttribute="width" secondItem="qg4-dp-Vy6" secondAttribute="width" id="1Vs-ji-mdj"/>
                         <constraint firstItem="qg4-dp-Vy6" firstAttribute="top" secondItem="2gi-Mw-roE" secondAttribute="top" constant="1" id="2EL-Yn-6nm"/>
+                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="leading" secondItem="mXL-H9-AQn" secondAttribute="leading" id="2p2-BV-ZmQ"/>
                         <constraint firstItem="x5Y-Td-bBZ" firstAttribute="leading" secondItem="AVN-aF-MUr" secondAttribute="trailing" id="5u1-io-mO7"/>
+                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="bottom" secondItem="mXL-H9-AQn" secondAttribute="bottom" id="8eP-eO-aQ9"/>
                         <constraint firstItem="qg4-dp-Vy6" firstAttribute="height" secondItem="mXL-H9-AQn" secondAttribute="height" id="A1H-j7-xU5"/>
+                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="top" secondItem="mXL-H9-AQn" secondAttribute="top" id="DNy-1l-Wb2"/>
                         <constraint firstItem="rUd-za-pBH" firstAttribute="height" secondItem="AVN-aF-MUr" secondAttribute="height" id="DXE-qp-FCo"/>
                         <constraint firstAttribute="trailing" secondItem="rUd-za-pBH" secondAttribute="trailing" id="ELx-H1-o7l"/>
                         <constraint firstItem="cQr-c6-wNf" firstAttribute="top" secondItem="2gi-Mw-roE" secondAttribute="top" constant="1" id="FEp-Yr-wIF"/>
@@ -105,6 +121,7 @@
                         <constraint firstItem="qg4-dp-Vy6" firstAttribute="leading" secondItem="2gi-Mw-roE" secondAttribute="leading" id="b6W-Td-k1I"/>
                         <constraint firstItem="AVN-aF-MUr" firstAttribute="height" secondItem="qg4-dp-Vy6" secondAttribute="height" id="blU-2Y-aUi"/>
                         <constraint firstItem="AVN-aF-MUr" firstAttribute="leading" secondItem="2gi-Mw-roE" secondAttribute="leading" id="cTx-Ax-6ds"/>
+                        <constraint firstItem="WUY-Ad-AqU" firstAttribute="trailing" secondItem="mXL-H9-AQn" secondAttribute="trailing" id="d7w-Z4-ikY"/>
                         <constraint firstItem="rUd-za-pBH" firstAttribute="leading" secondItem="x5Y-Td-bBZ" secondAttribute="trailing" id="dbL-iv-odz"/>
                         <constraint firstAttribute="bottom" secondItem="AVN-aF-MUr" secondAttribute="bottom" constant="1" id="oQL-ZY-YTU"/>
                         <constraint firstItem="cQr-c6-wNf" firstAttribute="leading" secondItem="qg4-dp-Vy6" secondAttribute="trailing" id="pzS-Wd-HZt"/>
@@ -141,6 +158,16 @@
             <nil key="simulatedStatusBarMetrics"/>
         </view>
         <barButtonItem title="Item" id="kDG-iO-BMt"/>
+        <tapGestureRecognizer id="7CH-rJ-0xT" userLabel="Country Code Tap Gesture Recognizer">
+            <connections>
+                <action selector="countryCodeTapped:" destination="-1" id="R3g-3G-TKZ"/>
+            </connections>
+        </tapGestureRecognizer>
+        <tapGestureRecognizer id="GgI-3Y-Ntm">
+            <connections>
+                <action selector="phoneFieldTapped:" destination="-1" id="H5O-ye-rgs"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
