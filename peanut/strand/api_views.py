@@ -171,7 +171,7 @@ def swap_inbox(request):
 				dirtyList.append(shareInstance)
 
 		if len(dirtyList) > 0:
-			ret = popcaches.processInboxIds(ShareInstance.getIds(shareInstance))
+			ret = popcaches.processInboxIds(ShareInstance.getIds(dirtyList))
 			logger.error("Go an inbox request where user %s was in shareinstance %s and was dirty.  Result: %s" % (user.id, shareInstance.id, ret.status))
 
 
