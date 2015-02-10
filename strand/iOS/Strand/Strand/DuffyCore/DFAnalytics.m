@@ -280,11 +280,13 @@ static DFAnalytics *defaultLogger;
 }
 
 + (void)logOtherPhotoActionTaken:(NSString *)customActionType
-         fromViewController:(UIViewController *)viewController
-                     result:(NSString *)result
-                photoObject:(DFPeanutFeedObject *)photo
+              fromViewController:(UIViewController *)viewController
+                          result:(NSString *)result
+                     photoObject:(DFPeanutFeedObject *)photo
+                       otherInfo:(NSDictionary *)otherInfo
 {
   NSMutableDictionary *params = [[self dictForPhoto:photo] mutableCopy];
+  [params addEntriesFromDictionary:otherInfo];
   [params addEntriesFromDictionary:@{
                                      ResultKey: result,
                                      @"ActionType" : customActionType,

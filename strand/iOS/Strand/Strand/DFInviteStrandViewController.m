@@ -88,13 +88,15 @@
      [DFAnalytics logOtherPhotoActionTaken:@"addPeople"
                         fromViewController:self
                                     result:DFAnalyticsValueResultSuccess
-                               photoObject:self.photoObject];
+                               photoObject:self.photoObject
+                                 otherInfo:@{@"numInvited" : @(phoneNumbers.count)}];
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:error.localizedDescription];
      [DFAnalytics logOtherPhotoActionTaken:@"addPeople"
                         fromViewController:self
                                     result:DFAnalyticsValueResultFailure
-                               photoObject:self.photoObject];
+                               photoObject:self.photoObject
+                                 otherInfo:@{@"numInvited" : @(phoneNumbers.count)}];
      DDLogError(@"%@ adding users failed: %@", self.class, error);
    }];
 }
