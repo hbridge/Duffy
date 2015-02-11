@@ -47,7 +47,7 @@ def sendSuggestionNotification(user, interestedUsersByStrandId, matchReasonsBySt
 		msg = "Send your recent %s to %s in Swap"%(photoPhrase, userPhrase)
 
 		logger.debug("going to send '%s' to user id %s" % (msg, user.id))
-		customPayload = {}
+		customPayload = {'id': strands[0].id}
 		notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_SUGGESTION, customPayload)
 
 	return photosForNotification
