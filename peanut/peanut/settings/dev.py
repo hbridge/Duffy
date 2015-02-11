@@ -44,7 +44,9 @@ EMAIL_USE_TLS = True
 
 SERVER_EMAIL = 'dev@duffyapp.com'
 
-ADMINS = None
+ADMINS = (
+	('', ''),
+)
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "dev.duffyapp.com"]
 
