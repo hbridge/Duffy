@@ -1,6 +1,11 @@
 # Swap v2
 
-## Feb 9, 2015 (4851-4853)
+## Feb 10, 2015 (4853)
+
+- Support for registering with interntaional phone numbers
+- Bug fixes and performance improvements
+
+## Feb 9, 2015 (4851)
 
 - New recipient selection UI
 
