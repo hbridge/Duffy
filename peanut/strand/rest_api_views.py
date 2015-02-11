@@ -561,7 +561,7 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         else:
             region_code = 'US'
 
-        for match in phonenumbers.PhoneNumberMatcher(str(obj.phone_number), region_code):
+        for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, region_code):
             foundMatch = True
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
