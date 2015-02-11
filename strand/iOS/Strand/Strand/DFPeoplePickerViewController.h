@@ -47,6 +47,7 @@
 
 #pragma mark - Configuration
 
+@property (nonatomic, retain) NSString *activityTitle;
 @property (nonatomic) BOOL allowsMultipleSelection;
 @property (nonatomic, retain) NSArray *selectedContacts;
 @property (nonatomic, retain) NSArray *notSelectableContacts;

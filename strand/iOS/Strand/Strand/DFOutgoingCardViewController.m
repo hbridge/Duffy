@@ -186,6 +186,7 @@
   self.addPersonViewController.doneButtonActionText = @"Select";
   self.addPersonViewController.allowsMultipleSelection = YES;
   self.addPersonViewController.delegate = self;
+  self.addPersonViewController.activityTitle = self.suggestionContentView.topLabel.text;
   
   // try to grab the background blur from our parent to carry over
   UIViewController *parent = self.parentViewController;

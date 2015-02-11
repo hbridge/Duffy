@@ -541,6 +541,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (IBAction)addPersonPressed:(id)sender {
   NSArray *peanutContacts = self.photoObject.actorPeanutContacts;
   DFInviteStrandViewController *inviteStrandController = [[DFInviteStrandViewController alloc] init];
+  inviteStrandController.activityTitle = @"Send to:";
   inviteStrandController.notSelectableContacts = peanutContacts;
   inviteStrandController.notSelectableReason = @"Already Member";
   inviteStrandController.photoObject = self.photoObject;

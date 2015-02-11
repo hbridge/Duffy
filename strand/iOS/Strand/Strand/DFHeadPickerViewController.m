@@ -19,6 +19,8 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  self.titleLabel.text = self.activityTitle;
+  self.view.backgroundColor = [UIColor clearColor];
   self.hideSelectedSection = YES;
   [self configureHeadScrollView];
 }
@@ -43,6 +45,12 @@
 
   [self updateHeads];
   [self scrollHeadsToLast];
+}
+
+- (void)setActivityTitle:(NSString *)activityTitle
+{
+  [super setActivityTitle:activityTitle];
+  self.titleLabel.text = activityTitle;
 }
 
 - (NSArray *)selectedUsers
