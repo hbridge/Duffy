@@ -554,8 +554,14 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         Clean up the phone number and set it.  Should only be one number per entry
     """
     def pre_save(self, obj):
-        foundMatch = False      
-        for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, "US"):
+        foundMatch = False
+
+        if self.request.DATA['user_id']:
+            region_code = users_util.getRegionCodeForUser(self.request.DATA['user_id'])
+        else:
+            region_code = 'US'
+
+        for match in phonenumbers.PhoneNumberMatcher(str(obj.phone_number), region_code):
             foundMatch = True
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
@@ -616,9 +622,16 @@ class UsersBulkAPI(BulkCreateAPIView):
     def pre_save(self, obj):
         foundMatch = False
 
-        phoneNum = ''.join(ele for ele in str(obj.phone_number) if ele.isdigit())
-        
-        for match in phonenumbers.PhoneNumberMatcher(phoneNum, "US"):
+        phoneNum = str(obj.phone_number)
+
+        if self.request.DATA['user_id']:
+            region_code = users_util.getRegionCodeForUser(self.request.DATA['user_id'])
+        else:
+            region_code = 'US'
+
+        matches = phonenumbers.PhoneNumberMatcher(phoneNum, region_code)
+
+        for match in matches:
             foundMatch = True
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
             

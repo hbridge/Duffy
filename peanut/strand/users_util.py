@@ -1,6 +1,8 @@
 import random
 import logging
 import os
+import phonenumbers
+from phonenumbers import geocoder
 
 from django.db.models import Q
 
@@ -78,3 +80,14 @@ def createStrandUserThroughSmsAuth(phoneNumber, displayName, smsAuth, buildNum):
 	logger.info("Created new user %s from sms auth" % (user))
 
 	return user
+
+def getRegionCodeForUser(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        logger.error("RegionCodeCheck failed - user not found")
+
+    region_code = geocoder.region_code_for_number(user.phone_number)
+    logger.info("Found region code: %s for user: %s"%(region_code, user_id))
+    return region_code
+    
