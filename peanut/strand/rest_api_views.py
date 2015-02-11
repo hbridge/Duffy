@@ -556,7 +556,7 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
     def pre_save(self, obj):
         foundMatch = False
 
-        if self.request.DATA['user_id']:
+        if 'user_id' in self.request.DATA:
             region_code = users_util.getRegionCodeForUser(self.request.DATA['user_id'])
         else:
             region_code = 'US'
@@ -624,7 +624,7 @@ class UsersBulkAPI(BulkCreateAPIView):
 
         phoneNum = str(obj.phone_number)
 
-        if self.request.DATA['user_id']:
+        if 'user_id' in self.request.DATA:
             region_code = users_util.getRegionCodeForUser(self.request.DATA['user_id'])
         else:
             region_code = 'US'
