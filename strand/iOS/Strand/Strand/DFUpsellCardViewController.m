@@ -34,13 +34,18 @@
 
 - (void)configureUpsellContent
 {
+  self.upsellContentView.topLabel.textColor = [UIColor whiteColor];
+  self.upsellContentView.bottomLabel.textColor = [UIColor whiteColor];
+  self.upsellContentView.backgroundColor =[UIColor clearColor];
+  
   if (self.upsellType == DFUpsellCardViewGotoSuggestions) {
     self.upsellContentView.topLabel.text = @"No More Photos To Review";
     self.upsellContentView.bottomLabel.text = @"Review Suggestions?";
   } else if (self.upsellType == DFUpsellCardViewBackgroundLocation) {
-    self.upsellContentView.topLabel.text = @"Get More Photos";
-    self.upsellContentView.bottomLabel.text = @"Grant location permission to get more photos from friends";
+    self.upsellContentView.topLabel.text = @"Improve Quick Share";
+    self.upsellContentView.bottomLabel.text = @"Grant Location Access to get better Quick Share suggestions";
     self.upsellContentView.imageView.image = [UIImage imageNamed:@"Assets/Nux/LocationAccessGraphic"];
+    [self.yesButton setTitle:@"Grant" forState:UIControlStateNormal];
   }
 }
 

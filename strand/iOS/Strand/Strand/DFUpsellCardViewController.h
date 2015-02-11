@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, DFUpsellCardViewType) {
 @property (nonatomic, copy) DFVoidBlock yesButtonHandler;
 @property (nonatomic, copy) DFVoidBlock noButtonHandler;
 @property (nonatomic, retain) id<NSCopying, NSObject> cardItem;
+@property (weak, nonatomic) IBOutlet UIView *cardView;
 
 @property (weak, nonatomic) IBOutlet UIButton *noButton;
 @property (weak, nonatomic) IBOutlet UIButton *yesButton;

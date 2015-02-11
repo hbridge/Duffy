@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFUpsellCardViewController">
             <connections>
+                <outlet property="cardView" destination="5im-Pb-HT2" id="r9v-eD-Qwz"/>
                 <outlet property="noButton" destination="dDM-B3-7Xh" id="7Zq-bv-9mE"/>
                 <outlet property="upsellContentView" destination="LPK-Or-gTW" id="sKL-md-yfA"/>
                 <outlet property="view" destination="qxL-cS-x6R" id="MUm-W6-wtj"/>
@@ -19,26 +20,21 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5im-Pb-HT2" userLabel="Card view">
-                    <rect key="frame" x="10" y="40" width="580" height="440"/>
+                    <rect key="frame" x="10" y="40" width="580" height="300"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LPK-Or-gTW" customClass="DFUpsellContentView">
-                            <rect key="frame" x="4" y="0.0" width="572" height="420"/>
+                            <rect key="frame" x="4" y="0.0" width="572" height="280"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         </view>
                     </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="trailing" secondItem="LPK-Or-gTW" secondAttribute="trailing" constant="4" id="OSV-Ny-xGA"/>
+                        <constraint firstAttribute="height" priority="50" constant="300" id="aU8-98-TYo"/>
                         <constraint firstAttribute="bottom" secondItem="LPK-Or-gTW" secondAttribute="bottom" constant="20" id="iI3-gN-xwV"/>
                         <constraint firstItem="LPK-Or-gTW" firstAttribute="leading" secondItem="5im-Pb-HT2" secondAttribute="leading" constant="4" id="pzj-YB-DCR"/>
                         <constraint firstItem="LPK-Or-gTW" firstAttribute="top" secondItem="5im-Pb-HT2" secondAttribute="top" id="s4u-MC-UsK"/>
                     </constraints>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                            <integer key="value" value="4"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
-                    </userDefinedRuntimeAttributes>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gT3-mc-OnC" userLabel="Button Wrapper">
                     <rect key="frame" x="217" y="500" width="167" height="40"/>
@@ -77,8 +73,6 @@
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="5im-Pb-HT2" secondAttribute="trailing" constant="10" id="9Fj-P8-IhM"/>
-                <constraint firstItem="gT3-mc-OnC" firstAttribute="top" secondItem="5im-Pb-HT2" secondAttribute="bottom" priority="998" constant="20" id="L88-U4-zzJ"/>
-                <constraint firstAttribute="bottom" secondItem="5im-Pb-HT2" secondAttribute="bottom" priority="997" constant="10" id="Qdv-fW-c9x"/>
                 <constraint firstItem="5im-Pb-HT2" firstAttribute="top" secondItem="qxL-cS-x6R" secondAttribute="top" constant="40" id="cB1-5U-Fe6"/>
                 <constraint firstAttribute="centerX" secondItem="gT3-mc-OnC" secondAttribute="centerX" id="fX7-sc-gjR"/>
                 <constraint firstAttribute="bottom" secondItem="gT3-mc-OnC" secondAttribute="bottom" constant="60" id="jtH-Ec-9Bb"/>
