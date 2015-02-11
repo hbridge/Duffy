@@ -287,37 +287,32 @@ static BOOL ShowInAppNotifications = NO;
       
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
     } else if (pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER) {
-      // This is very similar code to above, if we change this, might want to pull together
-      NSArray *suggestedStrands = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-      DFPeanutFeedObject *foundObject;
-      for (DFPeanutFeedObject *object in suggestedStrands) {
-        if (object.id == openedNotif.id.longLongValue) {
-          foundObject = object;
-          break;
-        }
-      }
-      
-      if (!foundObject) {
-        // if we don't find an object in the feed, we have to fake it so that when the feed
-        // data manager gets the actual object, we sub in the correct data
-        foundObject = [[DFPeanutFeedObject alloc] init];
-        foundObject.id = openedNotif.id.longLongValue;
-        foundObject.type = DFFeedObjectSwapSuggestion;
-      }
-      UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
-                                          rootViewController];
-      
-      [DFCreateStrandFlowViewController presentFeedObject:foundObject modallyInViewController:rootController];
-      [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
+      DDLogWarn(@"%@ received NOTIFICATIONS_RETRO_FIRESTARTER but this is unused!", self.class);
     } else if (pushNotif.type == NOTIFICATIONS_NEW_SUGGESTION) {
-      UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
-                                          rootViewController];
-      [DFDismissableModalViewController
-       presentWithRootController:[[DFCardsPageViewController alloc]
-                                  initWithPreferredType:DFSuggestionViewType]
-       inParent:rootController];
+      [SVProgressHUD show];
+      [[DFPeanutFeedDataManager sharedManager]
+       suggestedStrandWithID:openedNotif.id.longLongValue
+       completion:^(DFPeanutFeedObject *suggestedStrand) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           if (suggestedStrand) {
+             UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
+                                                 rootViewController];
+             DFPeanutFeedObject *photo = [[suggestedStrand leafNodesFromObjectOfType:DFFeedObjectPhoto]
+                                          firstObject];
+             DFCardsPageViewController *cardsController = [[DFCardsPageViewController alloc]
+                                                           initWithPreferredType:DFSuggestionViewType
+                                                           startingPhoto:photo];
+             [DFDismissableModalViewController
+              presentWithRootController:cardsController
+              inParent:rootController];
+             [SVProgressHUD dismiss];
+           } else {
+             DDLogError(@"%@ couldn't find suggested strand when asked to open %@", self.class, openedNotif);
+             [SVProgressHUD dismiss];
+           }
+         });
+       }];
     }
-    
   };
   return handler;
 }

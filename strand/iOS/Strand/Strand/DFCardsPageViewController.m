@@ -45,18 +45,16 @@ const NSUInteger UpsellCardFrequency = 5;
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
 {
-  return [self initWithPreferredType:preferredType photoID:0 shareInstance:0];
+  return [self initWithPreferredType:preferredType startingPhoto:nil];
 }
 
 - (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
-                              photoID:(DFPhotoIDType)photoID
-                        shareInstance:(DFShareInstanceIDType)shareID
+                        startingPhoto:(DFPeanutFeedObject *)startingPhoto
 {
   self = [self init];
   if (self) {
     _preferredType = preferredType;
-    _startingPhotoID = photoID;
-    _startingShareInstanceID = shareID;
+    _startingPhoto = startingPhoto;
     _sentContactsByStrandID = [NSMutableDictionary new];
     _allSuggestedItems = [NSMutableArray new];
   }
@@ -258,7 +256,11 @@ const NSUInteger UpsellCardFrequency = 5;
                                    fromViewController:(DFCardViewController *)cvc
 {
   if (!cvc) {
-    return [self cardViewForItem:self.allSuggestedItems.firstObject];
+    if (self.startingPhoto) {
+      return [self cardViewForItem:self.startingPhoto];
+    } else {
+      return [self cardViewForItem:self.allSuggestedItems.firstObject];
+    }
   }
   
   // figure out which object we were on

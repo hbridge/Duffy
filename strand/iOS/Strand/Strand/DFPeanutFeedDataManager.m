@@ -538,6 +538,32 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
+- (DFPeanutFeedObject *)suggestedStrandWithID:(DFStrandIDType)strandID
+{
+  DFPeanutFeedObject *foundObject = nil;
+  for (DFPeanutFeedObject *object in [self suggestedStrands]) {
+    if (object.id == strandID) {
+      foundObject = object;
+      break;
+    }
+  }
+  return foundObject;
+}
+
+- (void)suggestedStrandWithID:(DFStrandIDType)strandID
+                   completion:(void (^)(DFPeanutFeedObject *suggestedStrand))completion
+{
+  DFPeanutFeedObject *suggestedStrand = [self suggestedStrandWithID:strandID];
+  
+  if (suggestedStrand) {
+    completion(suggestedStrand);
+  } else {
+    [self refreshFeedFromServer:DFSwapsFeed completion:^{
+      completion([self suggestedStrandWithID:strandID]);
+    }];
+  }
+}
+
 - (DFPeanutFeedObject *)suggestedStrandForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto
 {
   for (DFPeanutFeedObject *suggestedStrand in [self suggestedStrands]) {

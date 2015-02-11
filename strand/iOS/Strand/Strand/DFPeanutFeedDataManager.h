@@ -32,6 +32,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;
+- (DFPeanutFeedObject *)suggestedStrandWithID:(DFStrandIDType)strandID;
+- (void)suggestedStrandWithID:(DFStrandIDType)strandID
+                   completion:(void (^)(DFPeanutFeedObject *suggestedStrand))completion;
 - (DFPeanutFeedObject *)suggestedStrandForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto;
 - (NSArray *)suggestedPhotosIncludeEvaled:(BOOL)includeEvaled;
 - (NSArray *)photosWithUserID:(DFUserIDType)userID onlyEvaluated:(BOOL)evaluated;
