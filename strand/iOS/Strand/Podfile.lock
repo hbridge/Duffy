@@ -26,7 +26,7 @@ PODS:
   - JDStatusBarNotification (1.4.9)
   - libPhoneNumber-iOS (0.8.2)
   - LKbadgeView (1.1.0)
-  - Localytics-iOS-Client (2.71.0)
+  - Localytics (3.0.0)
   - MCSwipeTableViewCell (2.1.2)
   - MMPopLabel (0.1.2)
   - RequestUtils (1.1)
@@ -70,7 +70,7 @@ DEPENDENCIES:
   - JDStatusBarNotification (~> 1.4.7)
   - libPhoneNumber-iOS (~> 0.8)
   - LKbadgeView (~> 1.1.0)
-  - Localytics-iOS-Client (~> 2.23)
+  - Localytics (~> 3.0.0)
   - MCSwipeTableViewCell (~> 2.1.2)
   - MMPopLabel (from `https://github.com/hbridge/MMPopLabel.git`)
   - RequestUtils (~> 1.1)
@@ -121,7 +121,7 @@ SPEC CHECKSUMS:
   JDStatusBarNotification: 9d833032d343e9a7abe0ec219c415dc115ba67a8
   libPhoneNumber-iOS: 2b5a6aeb7fd720ae856f133aea9937336bd47819
   LKbadgeView: 8e14044ee22c6d570c07e69e1ce73a3f91061730
-  Localytics-iOS-Client: 3553cabdfcd6255364ec9eb3ecfe9ec4f74d7be4
+  Localytics: c42d816fd7bf4a770812a5af0d2e4a92bc6dcfdd
   MCSwipeTableViewCell: 8e78ff197ab06ba7bfd5c938a00149de8a33afa9
   MMPopLabel: 954f89f32e56435993cc1781c0174f2ddf9468b4
   RequestUtils: 3ea776d3ecc0370dd35cd90aef8319cdb741dae9

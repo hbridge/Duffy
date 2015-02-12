@@ -9,8 +9,8 @@
 #import "DFAnalytics.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <AddressBook/AddressBook.h>
+#import <Localytics/Localytics.h>
 #import "NSDictionary+DFJSON.h"
-#import "LocalyticsSession.h"
 #import "DFDefaultsStore.h"
 #import "DFPeanutPushNotification.h"
 #import "DFPeanutFeedObject.h"
@@ -100,49 +100,46 @@ static DFAnalytics *defaultLogger;
 + (void)StartAnalyticsSession
 {
 #ifdef DEBUG
-  [[LocalyticsSession shared]
-   LocalyticsSession:@"7790abca456e78bb24ebdbb-8e7455f6-fe36-11e3-9fb0-009c5fda0a25"];
-   [[LocalyticsSession shared] setLoggingEnabled:NO];
+  [Localytics integrate:@"7790abca456e78bb24ebdbb-8e7455f6-fe36-11e3-9fb0-009c5fda0a25"];
+   [Localytics setLoggingEnabled:NO];
 #else
-  [[LocalyticsSession shared]
-   LocalyticsSession:@"b9370b33afb6b68728b25b7-952efd94-8487-11e4-5060-00a426b17dd8"];
-  [[LocalyticsSession shared] setEnableHTTPS:YES];
+  [Localytics integrate:@"b9370b33afb6b68728b25b7-952efd94-8487-11e4-5060-00a426b17dd8"];
+  [Localytics setEnableHTTPS:YES];
 #endif
-  [[LocalyticsSession shared] enableHTTPS];
   [DFAnalytics ResumeAnalyticsSession];
 }
 
 + (void)ResumeAnalyticsSession
 {
-  [[LocalyticsSession shared] resume];
-  [[LocalyticsSession shared] upload];
+  [Localytics openSession];
+  [Localytics upload];
 }
 
 + (void)CloseAnalyticsSession
 {
-  [[LocalyticsSession shared] close];
-  [[LocalyticsSession shared] upload];
+  [Localytics closeSession];
+  [Localytics upload];
 }
 
 
 + (void)logEvent:(NSString *)eventName withParameters:(NSDictionary *)parameters
 {
-  [[LocalyticsSession shared] tagEvent:eventName attributes:parameters];
-  if ([[LocalyticsSession shared] loggingEnabled]) {
+  [Localytics tagEvent:eventName attributes:parameters];
+  if ([Localytics isLoggingEnabled]) {
     DDLogVerbose(@"%@: \n%@", eventName, parameters);
   }
 }
 
 + (void)logEvent:(NSString *)eventName
 {
-  [[LocalyticsSession shared] tagEvent:eventName];
+  [Localytics tagEvent:eventName];
 }
 
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params
 {
   NSString *screenName = [self screenNameForControllerViewed:viewController];
-  [[LocalyticsSession shared] tagScreen:screenName];
+  [Localytics tagScreen:screenName];
   [DFAnalytics logEvent:[NSString stringWithFormat:@"%@Viewed",screenName] withParameters:params];
 }
 
