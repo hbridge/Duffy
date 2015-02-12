@@ -141,7 +141,9 @@ static CGFloat deleteButtonMargin = 4;
     if (user.id == [[DFUser currentUser] userID]) {
       firstName = @"You";
     }
-    firstNames[[self.class idForUser:user]] = [firstName isNotEmpty] ? firstName : user.phone_number;
+    firstName = [firstName isNotEmpty] ? firstName : user.phone_number;
+    if (![firstName isNotEmpty]) firstName = @"?";
+    firstNames[[self.class idForUser:user]] = firstName;
   }
   
   _fillColorsById = fillColors;
