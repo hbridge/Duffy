@@ -11,12 +11,16 @@
 
 @interface DFBackgroundLocationManager : NSObject <CLLocationManagerDelegate>
 
+typedef void (^DFLocationManagerAuthPromptHandler)(CLAuthorizationStatus resultStatus);
+
 + (DFBackgroundLocationManager *)sharedManager;
 - (void)startUpdatingOnSignificantLocationChange;
 - (CLLocation *)lastLocation;
 - (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 - (BOOL)canPromptForAuthorization;
-- (void)promptForAuthorization;
+- (void)promptForAuthorization:(DFLocationManagerAuthPromptHandler)handler;
 - (BOOL)isPermssionGranted;
+
+@property (nonatomic, copy) DFLocationManagerAuthPromptHandler authPromptHandler;
 
 @end

@@ -364,26 +364,27 @@ const NSUInteger UpsellCardFrequency = 5;
 
 - (DFCardViewController *)nextOutgoingUpsellWithSentinalValue:(id)sentinalValue
 {
-  DFCardsPageViewController __weak *weakSelf = self;
-  if (![[DFBackgroundLocationManager sharedManager] isPermssionGranted]
-      && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
-    DFUpsellCardViewController *locationUpsellController = [[DFUpsellCardViewController alloc]
-                                                            initWithType:DFUpsellCardViewBackgroundLocation];
-    locationUpsellController.cardItem = sentinalValue;
-    locationUpsellController.yesButtonHandler = ^{
-      [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
-      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
-      [weakSelf gotoNextController];
-    };
-    locationUpsellController.noButtonHandler = ^{
-      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
-      [weakSelf gotoNextController];
-    };
-    
-    return locationUpsellController;
-  }
-  
   return nil;
+//  DFCardsPageViewController __weak *weakSelf = self;
+//  if (![[DFBackgroundLocationManager sharedManager] isPermssionGranted]
+//      && ![DFDefaultsStore lastDateForAction:DFUserActionLocationUpsellProcessed]) {
+//    DFUpsellCardViewController *locationUpsellController = [[DFUpsellCardViewController alloc]
+//                                                            initWithType:DFUpsellCardViewBackgroundLocation];
+//    locationUpsellController.cardItem = sentinalValue;
+//    locationUpsellController.yesButtonHandler = ^{
+//      [[DFBackgroundLocationManager sharedManager] promptForAuthorization:nil];
+//      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
+//      [weakSelf gotoNextController];
+//    };
+//    locationUpsellController.noButtonHandler = ^{
+//      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionLocationUpsellProcessed];
+//      [weakSelf gotoNextController];
+//    };
+//    
+//    return locationUpsellController;
+//  }
+//  
+//  return nil;
 }
 
 #pragma mark - Action Handlers

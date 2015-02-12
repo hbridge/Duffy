@@ -166,6 +166,14 @@ static DFBackgroundLocationManager *defaultManager;
     [self locationManager:manager didChangeAuthorizationStatus:kCLAuthorizationStatusDenied];
     [manager stopMonitoringSignificantLocationChanges];
   }
+  
+  if (self.authPromptHandler) {
+    if (error.code == kCLErrorDenied)
+      self.authPromptHandler(kCLAuthorizationStatusDenied);
+    else
+      self.authPromptHandler(kCLAuthorizationStatusAuthorizedAlways);
+    self.authPromptHandler = nil;
+  }
 }
 
 - (DFPeanutLocationAdapter *)locationAdapter
@@ -244,7 +252,7 @@ static DFBackgroundLocationManager *defaultManager;
           || status == kCLAuthorizationStatusAuthorized);
 }
 
-- (void)promptForAuthorization
+- (void)promptForAuthorization:(DFLocationManagerAuthPromptHandler)handler
 {
   CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
   if (status != kCLAuthorizationStatusNotDetermined) {
@@ -252,9 +260,11 @@ static DFBackgroundLocationManager *defaultManager;
               [self permissionStateForCLAuthStatus:status]);
     
     if (status == kCLAuthorizationStatusDenied) [DFSettings showPermissionDeniedAlert];
+    if (handler) handler(status);
     return;
   }
   
+  self.authPromptHandler = handler;
   [DFDefaultsStore setState:DFPermissionStateRequested forPermission:DFPermissionLocation];
   if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
     // iOS 8 method, the actual text displayed is kept in Info.plist
@@ -279,6 +289,8 @@ static DFBackgroundLocationManager *defaultManager;
   if (status == kCLAuthorizationStatusAuthorizedAlways) {
     [self startUpdatingOnSignificantLocationChange];
   }
+  if (self.authPromptHandler) self.authPromptHandler(status);
+  self.authPromptHandler = nil;
 }
                                         
 - (DFPermissionStateType)permissionStateForCLAuthStatus:(CLAuthorizationStatus)status

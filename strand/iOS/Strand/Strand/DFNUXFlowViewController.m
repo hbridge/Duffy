@@ -19,6 +19,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFImageDownloadManager.h"
 #import "DFWelcomeNUXViewController.h"
+#import "DFLocationPermissionViewController.h"
 
 
 @interface DFNUXFlowViewController ()
@@ -42,6 +43,7 @@
   DFCreateAccountViewController *createAccount = [DFCreateAccountViewController new];
   DFSMSAuthViewController *smsAuth = [DFSMSAuthViewController new];
   DFPhotosPermissionViewController *photosPermission = [DFPhotosPermissionViewController new];
+  DFLocationPermissionViewController *locationPermission = [DFLocationPermissionViewController new];
   DFFindFriendsNUXViewController *findFriends = [DFFindFriendsNUXViewController new];
   DFAddFriendsNUXViewController *addFriends = [DFAddFriendsNUXViewController new];
   
@@ -51,6 +53,7 @@
     createAccount,
     smsAuth,
     photosPermission,
+    locationPermission,
     findFriends,
     addFriends
     ];

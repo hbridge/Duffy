@@ -191,7 +191,7 @@ static DFSettings *defaultSettings;
 - (void)setLocationEnabled:(BOOL)locationEnabled
 {
   if (locationEnabled) {
-    [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
+    [[DFBackgroundLocationManager sharedManager] promptForAuthorization:nil];
   }
 }
 
@@ -202,20 +202,30 @@ static DFSettings *defaultSettings;
 
 + (void)showPermissionDeniedAlert
 {
-  DFAlertController *alert = [DFAlertController
-                              alertControllerWithTitle:@"Grant Permission"
-                              message:@"You have previously denied access.  Please grant permission in Settings."
-                              preferredStyle:DFAlertControllerStyleAlert];
-  [alert addAction:[DFAlertAction actionWithTitle:@"Cancel" style:DFAlertActionStyleCancel handler:nil]];
-  [alert addAction:[DFAlertAction
-                    actionWithTitle:@"Settings"
-                    style:DFAlertActionStyleDefault
-                    handler:^(DFAlertAction *action) {
-                      if (&UIApplicationOpenSettingsURLString != NULL) {
-                        NSURL *appSettings = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-                        [[UIApplication sharedApplication] openURL:appSettings];
-    }
-  }]];
+  DFAlertController *alert;
+  if (&UIApplicationOpenSettingsURLString != NULL) {
+    // iOS 8 lets you deep link into the settings app
+    alert = [DFAlertController
+                                alertControllerWithTitle:@"Grant Permission"
+                                message:@"You have previously denied access.  Please grant permission in Settings."
+                                preferredStyle:DFAlertControllerStyleAlert];
+    [alert addAction:[DFAlertAction actionWithTitle:@"Cancel" style:DFAlertActionStyleCancel handler:nil]];
+    [alert addAction:[DFAlertAction
+                      actionWithTitle:@"Settings"
+                      style:DFAlertActionStyleDefault
+                      handler:^(DFAlertAction *action) {
+                        if (&UIApplicationOpenSettingsURLString != NULL) {
+                          NSURL *appSettings = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                          [[UIApplication sharedApplication] openURL:appSettings];
+                        }
+                      }]];
+  } else {
+    alert = [DFAlertController
+             alertControllerWithTitle:@"Grant Permission"
+             message:@"You have previously denied access.  Please grant permission in Settings > Privacy."
+             preferredStyle:DFAlertControllerStyleAlert];
+    [alert addAction:[DFAlertAction actionWithTitle:@"OK" style:DFAlertActionStyleDefault handler:nil]];
+  }
   
   UIViewController *vc = [self topMostController];
   [alert showWithParentViewController:vc animated:YES completion:nil];
