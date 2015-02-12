@@ -60,23 +60,26 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
-  DFPhotoDetailViewController *detailViewController = (DFPhotoDetailViewController *)viewController;
-  DFPeanutFeedObject *photoObject = detailViewController.photoObject;
-  DFPeanutFeedObject *afterPhoto = [self.photos objectAfterObject:photoObject wrap:NO];
-  if (!afterPhoto) return nil;
-  return [self detailViewControllerForPhotoObject:afterPhoto
-                               theatreModeEnabled:detailViewController.theatreModeEnabled];
+  return [self detailViewControllerAscending:YES
+                    fromDetailViewController:(DFPhotoDetailViewController *)viewController];
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
       viewControllerBeforeViewController:(UIViewController *)viewController
 {
-  DFPhotoDetailViewController *detailViewController = (DFPhotoDetailViewController *)viewController;
+  return [self detailViewControllerAscending:NO
+                    fromDetailViewController:(DFPhotoDetailViewController *)viewController];
+}
+
+- (UIViewController *)detailViewControllerAscending:(BOOL)ascending fromDetailViewController:(DFPhotoDetailViewController *)detailViewController
+{
   DFPeanutFeedObject *photoObject = detailViewController.photoObject;
-  DFPeanutFeedObject *beforePhoto = [self.photos objectBeforeObject:photoObject wrap:NO];
-  if (!beforePhoto) return nil;
-  return [self detailViewControllerForPhotoObject:beforePhoto
-          theatreModeEnabled:detailViewController.theatreModeEnabled];
+  NSUInteger index = [DFPeanutFeedObject indexOfFeedObject:photoObject inArray:self.photos];
+  index = index + (ascending ? 1 : - 1);
+  if (index >= self.photos.count) return nil;
+  DFPeanutFeedObject *afterPhoto = self.photos[index];
+  return [self detailViewControllerForPhotoObject:afterPhoto
+                               theatreModeEnabled:detailViewController.theatreModeEnabled];
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController

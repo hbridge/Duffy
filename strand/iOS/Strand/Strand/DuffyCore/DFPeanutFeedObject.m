@@ -503,4 +503,16 @@ static NSArray *FeedObjectTypes;
   return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];
 }
 
+/* finds a feed object based on immutable properties like id and share_instance */
++ (NSUInteger)indexOfFeedObject:(DFPeanutFeedObject *)searchObject inArray:(NSArray *)array
+{
+  for (NSUInteger i = 0; i < array.count; i++) {
+    DFPeanutFeedObject *feedObject = array[i];
+    if (feedObject.id == searchObject.id
+        && feedObject.share_instance.longLongValue == searchObject.share_instance.longLongValue)
+      return i;
+  }
+  return NSNotFound;
+}
+
 @end

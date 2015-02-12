@@ -105,4 +105,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 #pragma mark - Analytics helpers
 - (NSDictionary *)suggestionAnalyticsSummary;
 
+/* finds a feed object based on immutable properties like id and share_instance */
++ (NSUInteger)indexOfFeedObject:(DFPeanutFeedObject *)feedObject inArray:(NSArray *)array;
+
 @end
