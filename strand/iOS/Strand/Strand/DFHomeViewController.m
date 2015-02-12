@@ -474,7 +474,7 @@ static BOOL showFilters = NO;
   [self logHomeButtonPressed:sender];
   
   // handle nux
-  // don't mark the NUX as passed here, the card view controller will do it
+  [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
   [self.suggestionsNuxPopLabel dismiss];
 }
 
