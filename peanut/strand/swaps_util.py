@@ -106,7 +106,7 @@ def getFeedObjectsForSwaps(user):
 	if '555555' in str(user.phone_number):
 		days = 365
 	else:
-		days = 30
+		days = 14
 
 	timeCutoff = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(days=days)
 	recentStrands = Strand.objects.filter(user=user).filter(private=True).filter(first_photo_time__gt=timeCutoff).order_by('-first_photo_time')
@@ -130,17 +130,15 @@ def getFeedObjectsForSwaps(user):
 			strandObjectData['objects'] = sorted(strandObjectData['objects'], key=lambda x: x['time_taken'], reverse=True)
 			responseObjects.append(strandObjectData)
 
-	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
-
-	# Look for strands with faces
+	# Look for all recent photos
 	for strand in recentStrands:
 		strandObjectData = serializers.objectDataForPrivateStrand(user,
 																  strand,
 																  fullFriends,
-																  False, # includeNotEval
-																  True, # includeFaces
+																  True, # includeNotEval
+																  False, # includeFaces
 																  False, # includeAll
-																  "faces", # suggestionType
+																  "recent", # suggestionType
 																  interestedUsersByStrandId, matchReasonsByStrandId)
 
 		if strandObjectData and strand.id not in strandIdsAlreadyIncluded:
@@ -149,6 +147,8 @@ def getFeedObjectsForSwaps(user):
 			strandObjectData['objects'] = sorted(strandObjectData['objects'], key=lambda x: x['time_taken'], reverse=True)
 			responseObjects.append(strandObjectData)
 
+	responseObjects = sorted(responseObjects, key=lambda x: x['time_taken'], reverse=True)
+	
 	return responseObjects
 
 def getFeedObjectsForPrivateStrands(user):
