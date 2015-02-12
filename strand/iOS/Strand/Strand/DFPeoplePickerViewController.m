@@ -131,9 +131,11 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (void)configureNoResultsView
 {
   if (self.unfilteredSections.count == 0) {
-    self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-    self.noResultsView.button.hidden = NO;
-    [self.noResultsView setSuperView:self.tableView];
+    if (!self.noResultsView) {
+      self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+      self.noResultsView.button.hidden = NO;
+      [self.noResultsView setSuperView:self.tableView];
+    }
     if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized
         && !self.disableContactsUpsell) {
       self.noResultsView.titleLabel.text = @"Show Contacts";
