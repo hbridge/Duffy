@@ -1,5 +1,10 @@
 # Swap v2
 
+# Feb 11th, 2015 (4854)
+
+- Notifications to send a photo now open the correct photo when swiped
+- Improved prompt to enable location access
+
 ## Feb 10, 2015 (4853)
 
 - Support for registering with interntaional phone numbers
