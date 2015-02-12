@@ -359,45 +359,28 @@ static BOOL showFilters = NO;
   NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO];
   NSUInteger numToSend = [suggestedPhotos count];
   
-  if (numToSend > 0) {
-    self.sendBadgeView.hidden = NO;
-    self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
-    DFPeanutFeedObject *firstPhotoToSend = [suggestedPhotos firstObject];
-    [self setNavAreaForSuggestedPhoto:firstPhotoToSend];
-    DFHomeViewController __weak *weakSelf = self;
-    [self setSuggestionsAreaHidden:NO animated:YES completion:^{
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
-            && [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO] > 0
-            && (!weakSelf.hasShownSuggestionsNux
-                || [[[DFPeanutFeedDataManager sharedManager] photosWithEvaluated:NO] count] == 0)
-            && weakSelf.view.window){
-          [weakSelf.suggestionsNuxPopLabel
-           popAtView:weakSelf.sendButton
-           animatePopLabel:YES
-           animateTargetView:NO];
-          weakSelf.hasShownSuggestionsNux = YES;
-        }
-        [weakSelf.cameraRollNuxPopLabel dismiss];
-      });
-    }];
-  } else {
-    [self setSuggestionsAreaHidden:YES animated:YES completion:nil];
-    if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSendCameraRoll]
-        && [[DFPeanutFeedDataManager sharedManager] hasSwapsData]
-        && !CGRectEqualToRect(self.cameraRollNuxPopLabel.frame, CGRectZero)) {
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSArray *suggestedPhotos = [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO];
-        //double check to make sure this hasn't changed
-        if (suggestedPhotos.count == 0
-            && self.view.window)
-          [self.cameraRollNuxPopLabel
-           popAtView:self.createButton
-           animatePopLabel:YES
-           animateTargetView:NO];
-      });
-    }
-  }
+  
+  self.sendBadgeView.hidden = YES;
+  self.sendBadgeView.text = [@(MIN(numToSend, 99)) stringValue];
+  DFPeanutFeedObject *firstPhotoToSend = [suggestedPhotos firstObject];
+  [self setNavAreaForSuggestedPhoto:firstPhotoToSend];
+  DFHomeViewController __weak *weakSelf = self;
+  [self setSuggestionsAreaHidden:NO animated:NO completion:^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
+          && [[DFPeanutFeedDataManager sharedManager] suggestedPhotosIncludeEvaled:NO] > 0
+          && (!weakSelf.hasShownSuggestionsNux
+              || [[[DFPeanutFeedDataManager sharedManager] photosWithEvaluated:NO] count] == 0)
+          && weakSelf.view.window){
+        [weakSelf.suggestionsNuxPopLabel
+         popAtView:weakSelf.sendButton
+         animatePopLabel:YES
+         animateTargetView:NO];
+        weakSelf.hasShownSuggestionsNux = YES;
+      }
+      [weakSelf.cameraRollNuxPopLabel dismiss];
+    });
+  }];
 }
 
 - (void)setNavAreaForSuggestedPhoto:(DFPeanutFeedObject *)suggestedPhoto
@@ -464,7 +447,6 @@ static BOOL showFilters = NO;
       for (UIView *view in @[self.sendButton, self.buttonBarLabel]) {
         view.alpha = 1.0;
       }
-      self.sendBadgeView.hidden = NO;
       [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
       if (finished && completion) completion();
@@ -484,10 +466,10 @@ static BOOL showFilters = NO;
 - (IBAction)sendButtonPressed:(id)sender {
   NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
   if (numToSend > 0 || ![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-  [DFDismissableModalViewController
-   presentWithRootController:[[DFCardsPageViewController alloc]
-                              initWithPreferredType:DFSuggestionViewType]
-   inParent:self];
+    [DFDismissableModalViewController
+     presentWithRootController:[[DFCardsPageViewController alloc]
+                                initWithPreferredType:DFSuggestionViewType]
+     inParent:self];
   }
   [self logHomeButtonPressed:sender];
   
