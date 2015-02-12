@@ -866,6 +866,8 @@
 		5A0E123A1976DCC300B6FF04 /* Common Views */ = {
 			isa = PBXGroup;
 			children = (
+				5A50AD161A8A9DE700B36C99 /* DFBorderedView.h */,
+				5A50AD171A8A9DE700B36C99 /* DFBorderedView.m */,
 				5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonView.h */,
 				5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonView.m */,
 				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonView.xib */,
@@ -1582,8 +1584,6 @@
 				5AC4A9511947C77300862D9C /* DFCreateAccountViewController.h */,
 				5AC4A9521947C77300862D9C /* DFCreateAccountViewController.m */,
 				5AC4A9531947C77300862D9C /* DFCreateAccountViewController.xib */,
-				5A50AD161A8A9DE700B36C99 /* DFBorderedView.h */,
-				5A50AD171A8A9DE700B36C99 /* DFBorderedView.m */,
 				5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */,
 				5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */,
 				5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */,
