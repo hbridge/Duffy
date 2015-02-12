@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 IB_DESIGNABLE
-@interface DFBorderedTextField : UITextField
+@interface DFBorderedView : UIView
 
 @property (nonatomic) IBInspectable CGFloat topBorder;
 @property (nonatomic) IBInspectable CGFloat bottomBorder;

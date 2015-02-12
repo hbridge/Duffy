@@ -6,9 +6,9 @@
 //  Copyright (c) 2015 Duffy Inc. All rights reserved.
 //
 
-#import "DFBorderedTextField.h"
+#import "DFBorderedView.h"
 
-@implementation DFBorderedTextField
+@implementation DFBorderedView
 
 - (void)drawRect:(CGRect)rect
 {
@@ -50,20 +50,5 @@
   }
 }
 
-- (CGRect)textRectForBounds:(CGRect)bounds
-{
-  CGRect rect = [super textRectForBounds:bounds];
-  rect.origin.x = self.leftInset;
-  rect.size.width -= self.leftInset;
-  return rect;
-}
-
-- (CGRect)editingRectForBounds:(CGRect)bounds
-{
-  CGRect rect = [super editingRectForBounds:bounds];
-  rect.origin.x = self.leftInset;
-  rect.size.width -= self.leftInset;
-  return rect;
-}
 
 @end

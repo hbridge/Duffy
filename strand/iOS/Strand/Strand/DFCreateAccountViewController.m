@@ -92,15 +92,6 @@
   }
 }
 
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-  if (textField == self.countryTextField || textField == self.countryCodeLabel) {
-    [self showCountryCodePicker:textField];
-    return NO;
-  }
-  return YES;
-}
-
 - (IBAction)nameTextFieldChanged:(UITextField *)sender {
   [self textFieldChanged];
 }
@@ -231,7 +222,6 @@
   [actionSheet showInView:self.view];
   
 }
-
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
   NSURL *url;
@@ -268,7 +258,7 @@
 
 #pragma mark - International Support
 
-- (void)showCountryCodePicker:(id)sender {
+- (IBAction)showCountryCodePicker:(id)sender {
   NSUInteger indexOfCurrentSelection = [[self.class supportedRegionCodes] indexOfObject:self.selectedRegion];
   [ActionSheetStringPicker
    showPickerWithTitle:@"Select Country"
@@ -287,9 +277,11 @@
 {
   _selectedRegion = selectedRegion;
   
-  self.countryTextField.text = [self.class localizedCountryNameForRegion:selectedRegion];
-  self.countryCodeLabel.text = [@"+" stringByAppendingString:[NBMetadataHelper
-                                                              countryCodeFromRegionCode:selectedRegion]];
+  [self.countryButton setTitle:[self.class localizedCountryNameForRegion:selectedRegion]
+                          forState:UIControlStateNormal];
+  [self.countryCodeButton setTitle:[@"+" stringByAppendingString:[NBMetadataHelper
+                                                                  countryCodeFromRegionCode:selectedRegion]]
+                          forState:UIControlStateNormal];
   self.phoneNumberFormatter = [[NBAsYouTypeFormatter alloc] initWithRegionCode:selectedRegion];
   [self phoneNumberFieldValueChanged:self.phoneNumberField];
 }

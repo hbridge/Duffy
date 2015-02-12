@@ -11,8 +11,8 @@
 @interface DFCreateAccountViewController : DFNUXViewController <UITextFieldDelegate, UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
-@property (weak, nonatomic) IBOutlet UITextField *countryTextField;
-@property (weak, nonatomic) IBOutlet UITextField *countryCodeLabel;
+@property (weak, nonatomic) IBOutlet UIButton *countryButton;
+@property (weak, nonatomic) IBOutlet UIButton *countryCodeButton;
 @property (weak, nonatomic) IBOutlet UITextField *phoneNumberField;
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
 @property (weak, nonatomic) IBOutlet UIButton *termsButton;
@@ -22,6 +22,7 @@
 - (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender;
 - (IBAction)nameTextFieldChanged:(UITextField *)sender;
 - (IBAction)termsButtonPressed:(id)sender;
+- (IBAction)showCountryCodePicker:(id)sender;
 
 
 
