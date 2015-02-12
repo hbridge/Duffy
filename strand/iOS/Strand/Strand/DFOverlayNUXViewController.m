@@ -72,10 +72,11 @@
 
 - (void)configureFontSizes
 {
-  CGFloat fontSize = [UIFont systemFontSize]*[UIScreen mainScreen].bounds.size.width/240;
-  CGFloat subFontSize = fontSize * 0.8;
-  self.titleLabel.font = [self.titleLabel.font fontWithSize:fontSize * 1.1];
-  self.subtitleLabel.font = [self.subtitleLabel.font fontWithSize:subFontSize];
+  CGFloat scaledDefaultFontSize = [UIFont systemFontSize]*[UIScreen mainScreen].bounds.size.width/240;
+  CGFloat titleFontSize = 1.2 * scaledDefaultFontSize;
+  CGFloat textFontSize = 0.9 * scaledDefaultFontSize;
+  self.titleLabel.font = [self.titleLabel.font fontWithSize:titleFontSize];
+  self.subtitleLabel.font = [self.subtitleLabel.font fontWithSize:textFontSize];
   
   
   NSMutableAttributedString *res = [self.explanatoryTextLabel.attributedText mutableCopy];
@@ -85,7 +86,7 @@
   [res enumerateAttribute:NSFontAttributeName inRange:NSMakeRange(0, res.length) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
     if (value) {
       UIFont *oldFont = (UIFont *)value;
-      UIFont *newFont = [oldFont fontWithSize:subFontSize];
+      UIFont *newFont = [oldFont fontWithSize:textFontSize];
       [res removeAttribute:NSFontAttributeName range:range];
       [res addAttribute:NSFontAttributeName value:newFont range:range];
       found = YES;
