@@ -14,6 +14,7 @@
 @interface DFOutgoingCardContentView()
 
 @property (nonatomic) MMPopLabel *selectPeoplePopLabel;
+@property (nonatomic) MMPopLabel *nearbyPeoplePopLabel;
 
 @end
 
@@ -22,7 +23,7 @@
 - (void)awakeFromNib
 {
   [super awakeFromNib];
-  [self configurePopLabel];
+  [self configurePopLabels];
   self.layer.cornerRadius = 4.0;
   self.layer.masksToBounds = YES;
   self.imageView.layer.cornerRadius = 4.0;
@@ -68,10 +69,12 @@
   return self;
 }
 
-- (void)configurePopLabel
+- (void)configurePopLabels
 {
   self.selectPeoplePopLabel = [MMPopLabel popLabelWithText:@"Add the people you were with"];
   [self addSubview:self.selectPeoplePopLabel];
+  self.nearbyPeoplePopLabel = [MMPopLabel popLabelWithText:@"Friends were nearby when you took this photo"];
+  [self addSubview:self.nearbyPeoplePopLabel];
 }
 
 - (void)showAddPeoplePopup
@@ -82,6 +85,16 @@
 - (void)dismissAddPeoplePopup
 {
   [self.selectPeoplePopLabel dismiss];
+}
+
+- (void)showNearbyPeoplePopup
+{
+  [self.nearbyPeoplePopLabel popAtView:self.profileStackView animatePopLabel:YES animateTargetView:NO];
+}
+
+- (void)dismissNearbyPeoplePopup
+{
+  [self.nearbyPeoplePopLabel dismiss];
 }
 
 - (IBAction)contentViewTapped:(id)sender {

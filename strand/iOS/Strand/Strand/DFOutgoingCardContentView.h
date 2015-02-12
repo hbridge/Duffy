@@ -24,5 +24,8 @@
 
 - (void)showAddPeoplePopup;
 - (void)dismissAddPeoplePopup;
+- (void)showNearbyPeoplePopup;
+- (void)dismissNearbyPeoplePopup;
+
 
 @end

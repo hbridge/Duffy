@@ -22,6 +22,7 @@
 @property (nonatomic ,retain) WYPopoverController *addPersonPopoverController;
 @property (nonatomic, retain) DFPeoplePickerViewController *addPersonViewController;
 @property (nonatomic, retain) MMPopLabel *sendPopLabel;
+@property (nonatomic) BOOL addPersonPressed;
 
 @end
 
@@ -132,12 +133,24 @@
   // Dispose of any resources that can be recreated.
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  self.yesButton.enabled = (self.selectedPeanutContacts.count > 0);
+  self.yesButton.alpha = (self.selectedPeanutContacts.count > 0) ? 1.0 : 0.5;
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
     if (self.selectedPeanutContacts.count == 0) {
       [self.suggestionContentView showAddPeoplePopup];
+    } else if (self.suggestionFeedObject.actors.count > 0 && !self.addPersonPressed){
+      [self.suggestionContentView showNearbyPeoplePopup];
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.suggestionContentView dismissNearbyPeoplePopup];
+      });
     }
   });
 }
@@ -213,7 +226,7 @@
     
   }
   
-  
+  self.addPersonPressed = YES;
 }
 
 + (void)configurePopoverTheme
