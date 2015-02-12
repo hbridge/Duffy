@@ -32,7 +32,7 @@ extern const int DFMessageComposeResultCouldntStart;
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
 + (void)logSetupLocationCompletedWithResult:(NSString *)result
-                        userTappedLearnMore:(BOOL)didTapLearnMore;
+                                  denyCount:(NSUInteger)denyCount;
 + (void)logSetupContactsCompletedWithABPermission:(int)status
                                  numAddedManually:(NSUInteger)numAddedManually;
 + (void)logSetupPhotosCompletedWithResult:(NSString *)result;

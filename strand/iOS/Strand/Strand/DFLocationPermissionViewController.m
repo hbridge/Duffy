@@ -15,6 +15,7 @@
 
 @property (nonatomic) BOOL calledCompleted;
 @property (nonatomic) BOOL showedLocationRequired;
+@property (nonatomic) NSUInteger denyCount;
 
 @end
 
@@ -56,7 +57,10 @@
   if (!self.calledCompleted && granted) {
     self.calledCompleted = YES;
     [self completedWithUserInfo:nil];
+    [DFAnalytics logSetupLocationCompletedWithResult:DFAnalyticsValueResultSuccess
+                                           denyCount:self.denyCount];
   } else if (!granted) {
+    self.denyCount++;
     self.button.enabled = YES;
     if (!self.showedLocationRequired) {
       [UIAlertView showSimpleAlertWithTitle:@"Location Required"

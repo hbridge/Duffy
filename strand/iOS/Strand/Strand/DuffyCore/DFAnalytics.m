@@ -342,12 +342,12 @@ static DFAnalytics *defaultLogger;
 }
 
 + (void)logSetupLocationCompletedWithResult:(NSString *)result
-                        userTappedLearnMore:(BOOL)didTapLearnMore
+                                  denyCount:(NSUInteger)denyCount
 {
   [DFAnalytics logEvent:SetupLocationCompleted
          withParameters:@{
                           ResultKey: result,
-                          @"didPressLearnMore" : [NSNumber numberWithBool:didTapLearnMore]
+                          @"denyCount" : @(denyCount)
                           }];
 }
 
