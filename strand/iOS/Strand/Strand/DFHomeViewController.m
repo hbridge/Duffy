@@ -334,7 +334,7 @@ static BOOL showFilters = NO;
 - (void)configureNUXPopLabels
 {
   self.suggestionsNuxPopLabel = [MMPopLabel
-                           popLabelWithText:@"Share photos fast with Quick Share"];
+                           popLabelWithText:@"Share photos fast"];
   [self.view addSubview:self.suggestionsNuxPopLabel];
   self.cameraRollNuxPopLabel = [MMPopLabel popLabelWithText:@"Send a photo to a friend"];
   self.cameraRollNuxPopLabel.delegate = self;
