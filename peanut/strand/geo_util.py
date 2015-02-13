@@ -24,6 +24,7 @@ def getDistanceBetweenPhotos(photo1, photo2):
 	return None
 
 def getDistanceBetweenStrands(strand1, strand2):
+	"""
 	lowestDistance = None
 	for photo1 in strand1.photos.all():
 		if photo1.location_point:
@@ -34,8 +35,14 @@ def getDistanceBetweenStrands(strand1, strand2):
 						lowestDistance = dist
 
 	return lowestDistance
+	"""
+	if strand1.location_point and strand2.location_point:
+		return int(haversine(strand1.location_point.x, strand1.location_point.y, strand2.location_point.x, strand2.location_point.y) * 1000)
+	return None
+
 
 def getDistanceBetweenStrandAndLocationRecord(strand, locationRecord):
+	"""
 	lowestDistance = None
 	for photo in strand.photos.all():
 		if photo.location_point:
@@ -44,6 +51,10 @@ def getDistanceBetweenStrandAndLocationRecord(strand, locationRecord):
 				lowestDistance = dist
 
 	return lowestDistance
+	"""
+	if strand.location_point:
+		return int(haversine(strand.location_point.x, strand.location_point.y, locationRecord.point.x, locationRecord.point.y) * 1000)
+	return None
 
 def getDistanceToPhoto(lon, lat, photo):
 	geoDistance = int(haversine(lon, lat, photo.location_point.x, photo.location_point.y) * 1000)
