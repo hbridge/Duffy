@@ -70,7 +70,7 @@ DEPENDENCIES:
   - JDStatusBarNotification (~> 1.4.7)
   - libPhoneNumber-iOS (~> 0.8)
   - LKbadgeView (~> 1.1.0)
-  - Localytics (~> 3.0.0)
+  - Localytics (~> 3.0)
   - MCSwipeTableViewCell (~> 2.1.2)
   - MMPopLabel (from `https://github.com/hbridge/MMPopLabel.git`)
   - RequestUtils (~> 1.1)
