@@ -1,5 +1,10 @@
 # Swap v2
 
+# Feb 13th, 2015 (4856)
+
+- All recent photos now appear in Quick Share
+- Bug fixes
+
 # Feb 11th, 2015 (4854)
 
 - Notifications to send a photo now open the correct photo when swiped
