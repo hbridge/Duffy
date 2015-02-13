@@ -171,14 +171,14 @@
     actionString = @"liked a photo.";
   } else if (action.action_type == DFPeanutActionComment) {
     actionString = @"commented: ";
-  } else if (action.action_type == DFPeanutActionAddedPhotos) {
+  } else {
     actionString = action.text;
   }
 
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:action.user];
   NSString *markup =
   [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@</gray>",
-   [user firstName],
+   (user.id == [[DFUser currentUser] userID]) ? @"You" : [user firstName],
    actionString,
    action.action_type == DFPeanutActionComment ? [action.text stringByEscapingCharsInString:@"<>"] : @"",
    [NSDateFormatter relativeTimeStringSinceDate:action.time_stamp abbreviate:YES]

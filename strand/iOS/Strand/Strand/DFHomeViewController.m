@@ -27,6 +27,7 @@
 #import "DFBadgeButton.h"
 #import "UIView+DFExtensions.h"
 #import "UIImageEffects.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 const CGFloat ExpandedNavBarHeight = 19 + 44 + 87;
 const CGFloat CollapsedNavBarHeight = 19 + 44;
@@ -584,10 +585,29 @@ static DFPeanutFeedObject *currentPhoto;
    didSelectNotificationWithAction:(DFPeanutAction *)peanutAction
 {
   [self.notificationsPopupController dismissPopoverAnimated:YES];
-  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
-                                     photoWithID:peanutAction.photo.longLongValue
-                                     shareInstance:peanutAction.share_instance.longLongValue];
-  [self showMultiPhotoControllerWithStartingPhoto:photoObject];
+  if (peanutAction.action_type == DFPeanutActionSuggestedPhoto) {
+    DFPeanutFeedObject *suggestedPhoto;
+    for (DFPeanutFeedObject *photo in [[DFPeanutFeedDataManager sharedManager]
+                                       suggestedPhotosIncludeEvaled:NO]) {
+      if (photo.id == peanutAction.photo.longLongValue) {
+        suggestedPhoto = photo;
+        break;
+      }
+    }
+    if (suggestedPhoto) {
+      DFCardsPageViewController *cardsPVC = [[DFCardsPageViewController alloc]
+                                             initWithPreferredType:DFSuggestionViewType
+                                             startingPhoto:suggestedPhoto];
+      [DFDismissableModalViewController presentWithRootController:cardsPVC inParent:self];
+    } else {
+      [SVProgressHUD showSuccessWithStatus:@"Photo already processed"];
+    }
+  } else {
+    DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
+                                       photoWithID:peanutAction.photo.longLongValue
+                                       shareInstance:peanutAction.share_instance.longLongValue];
+    [self showMultiPhotoControllerWithStartingPhoto:photoObject];
+  }
 }
 
 - (void)dismissedPopLabel:(MMPopLabel *)popLabel
