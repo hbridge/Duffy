@@ -47,6 +47,7 @@ urlpatterns = patterns('',
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
 	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),
+	url(r'^rebuild_inbox', 'strand.api_views.rebuild_inbox'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

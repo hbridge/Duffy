@@ -378,6 +378,21 @@ def send_notifications_test(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+def rebuild_inbox(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+
+		ret = popcaches.processInboxFull(user.id)
+		response['output'] = ret
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
 """
 	Sends a test text message to a phone number
 """
