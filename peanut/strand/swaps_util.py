@@ -298,8 +298,14 @@ def getActionsList(user):
 	responseObjects = list()
 	actionsData = list()
 
-	# Do favorites and comments
-	actions = Action.objects.prefetch_related('user', 'share_instance', 'photo').filter(photo__thumb_filename__isnull=False).exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(share_instance__users__in=[user.id]).order_by("-added")[:60]
+	# Do favorites, comments and suggestions
+	actions = Action.objects.prefetch_related('user', 'share_instance', 'photo').filter(
+		(Q(photo__thumb_filename__isnull=False) & 
+		~Q(user=user) & 
+		(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)) &
+		Q(share_instance__users__in=[user.id])) | 
+		(Q(action_type=constants.ACTION_TYPE_SUGGESTION) & Q(user=user))).order_by("-added")[:60]
+
 	for action in actions:
 		actionData = serializers.actionDataOfActionApiSerializer(user, action)
 		if actionData:

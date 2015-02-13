@@ -14,7 +14,7 @@ from django.db.models import Count
 from django.db.models import Q, F
 
 from peanut.settings import constants
-from common.models import Photo, NotificationLog, User, Strand
+from common.models import Photo, NotificationLog, User, Strand, Action
 
 from strand import notifications_util, friends_util, swaps_util
 
@@ -49,6 +49,10 @@ def sendSuggestionNotification(user, interestedUsersByStrandId, matchReasonsBySt
 		logger.debug("going to send '%s' to user id %s" % (msg, user.id))
 		customPayload = {'id': strands[0].id}
 		notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_SUGGESTION, customPayload)
+
+		# Add an entry in the Actions table to be used for actions_list
+		text = 'took %s near %s'%(photoPhrase, userPhrase)
+		Action.objects.create(user=user, action_type=constants.ACTION_TYPE_SUGGESTION, photo=photosForNotification[0], text=text)
 
 	return photosForNotification
 
