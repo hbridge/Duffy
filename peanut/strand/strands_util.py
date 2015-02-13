@@ -236,7 +236,15 @@ def updateOrCreateStrandNeighbors(strandNeighbors):
 	allIds = getAllStrandIds(strandNeighbors)
 	existingRows = StrandNeighbor.objects.filter(strand_1_id__in=allIds).filter(Q(strand_2_id__in=allIds) | Q(strand_2_id__isnull=True))
 	neighborRowsToCreate, neighborRowsToUpdate = processWithExisting(existingRows, strandNeighbors)
-	StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
+	
+	try:
+		StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
+	except IntegrityError:
+		for row in neighborRowsToCreate:
+			try:
+				row.save()
+			except IntegrityError:
+				logger.error("Got IntegrityError trying to save %s %s" % (row.strand_1_id, row.strand_2_id))
 
 	StrandNeighbor.bulkUpdate(neighborRowsToUpdate, ["distance_in_meters"])
 

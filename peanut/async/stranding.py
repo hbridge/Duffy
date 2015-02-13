@@ -304,23 +304,22 @@ def processBatch(photosToProcess):
 			try:
 				Strand.photos.through.objects.bulk_create(strandPhotosToCreate)
 			except IntegrityError:
-				try:
-					for obj in strandPhotosToCreate:
+				for obj in strandUsersToCreate:
+					try:
 						obj.save()
-				except IntegrityError:
-					logger.error("Got IntegrityError trying to save photo %s and strand %s" % (obj.photo_id, obj.strand_id))
-					pass
+					except IntegrityError:
+						logger.error("Got IntegrityError trying to save photo %s and strand %s" % (obj.photo_id, obj.strand_id))
 
 		if len(strandUsersToCreate) > 0:
 			try:
 				Strand.users.through.objects.bulk_create(strandUsersToCreate)
 			except IntegrityError:
-				try:
-					for obj in strandUsersToCreate:
+				for obj in strandUsersToCreate:
+					try:
 						obj.save()
-				except IntegrityError:
-					logger.error("Got IntegrityError trying to save user %s and strand %s" % (obj.user_id, obj.strand_id))
-					pass
+					except IntegrityError:
+						logger.error("Got IntegrityError trying to save user %s and strand %s" % (obj.user_id, obj.strand_id))
+
 
 		strandsToUpdate = list()
 		for strand in strandsAddedTo:
