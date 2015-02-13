@@ -716,6 +716,27 @@ const NSUInteger CompressedModeMaxRows = 1;
                                    initWithActivityItems:@[self.imageView.image]
                                    applicationActivities:nil];
   avc.excludedActivityTypes = @[UIActivityTypeSaveToCameraRoll];
+  if ([avc respondsToSelector:@selector(setCompletionWithItemsHandler:)]) {
+    avc.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+      [DFAnalytics logOtherPhotoActionTaken:@"shareActivity"
+                         fromViewController:self
+                                     result:completed ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
+                                photoObject:self.photoObject
+                                  otherInfo:@{
+                                              @"activityType" : activityType ? activityType : @"none"
+                                              }];
+    };
+  } else if ([avc respondsToSelector:@selector(setCompletionHandler:)]) {
+    avc.completionHandler = ^(NSString *activityType, BOOL completed) {
+      [DFAnalytics logOtherPhotoActionTaken:@"shareActivity"
+                         fromViewController:self
+                                     result:completed ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
+                                photoObject:self.photoObject
+                                  otherInfo:@{
+                                              @"activityType" : activityType ? activityType : @"none"
+                                              }];
+    };
+  }
   [self presentViewController:avc animated:YES completion:nil];
 }
 

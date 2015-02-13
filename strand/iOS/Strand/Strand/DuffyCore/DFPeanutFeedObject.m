@@ -18,7 +18,6 @@
 
 @implementation DFPeanutFeedObject
 
-
 DFFeedObjectType DFFeedObjectSection = @"section";
 DFFeedObjectType DFFeedObjectPhoto = @"photo";
 DFFeedObjectType DFFeedObjectCluster = @"cluster";
