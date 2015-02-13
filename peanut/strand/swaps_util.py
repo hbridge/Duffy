@@ -207,15 +207,15 @@ def getInterestedUsersForStrands(user, strands, locationRequired, friends):
 		interestedUsers = list()
 		if strand.id in neighborStrandsByStrandId:
 			for neighborStrand in neighborStrandsByStrandId[strand.id]:
-				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
-					val, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
+				shouldBeNeighbors, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
+				if neighborStrand.location_point and strand.location_point and shouldBeNeighbors:
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
 					for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
 						dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
 						matchReasons[friend.id] = "location-strand %s" % reason
 
-				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
+				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = False):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
 					for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
