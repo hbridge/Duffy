@@ -407,6 +407,8 @@ static BOOL showFilters = NO;
      });
    }];
   } else {
+    self.navBackgroundImageView.image = nil;
+    [self.sendButton setImage:[UIImage imageNamed:@"Assets/Icons/HomeSend"] forState:UIControlStateNormal];
     [self.sendButton setBackgroundImage:[UIImage imageNamed:@"Assets/Icons/HomeSendHighlighted"]
                                forState:UIControlStateNormal];
     self.buttonBar.gradientColors = [DFStrandConstants homeNavBarGradientColors];
