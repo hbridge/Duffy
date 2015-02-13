@@ -308,6 +308,7 @@ def processBatch(photosToProcess):
 					for obj in strandPhotosToCreate:
 						obj.save()
 				except IntegrityError:
+					logger.error("Got IntegrityError trying to save photo %s and strand %s" % (obj.photo_id, obj.strand_id))
 					pass
 
 		if len(strandUsersToCreate) > 0:
@@ -318,6 +319,7 @@ def processBatch(photosToProcess):
 					for obj in strandUsersToCreate:
 						obj.save()
 				except IntegrityError:
+					logger.error("Got IntegrityError trying to save user %s and strand %s" % (obj.user_id, obj.strand_id))
 					pass
 
 		strandsToUpdate = list()

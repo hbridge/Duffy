@@ -54,6 +54,11 @@ def threadedPerformFullPrivateStrands(userId):
 
 	apiCache.save()
 
+	dirtyStrands = Strand.objects.filter(user_id=userId).filter(cache_dirty=True)
+	for strand in dirtyStrands:
+		strand.cache_dirty = False
+	Strand.bulkUpdate(dirtyStrands, ["cache_dirty"])
+	
 	logger.info("Finished full private strand refresh for user %s" % (userId))
 	notifications.sendRefreshFeedToUserIds.delay([userId])
 
