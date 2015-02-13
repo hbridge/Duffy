@@ -54,7 +54,7 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < distanceLimit):
 			return True, "location-%s" % geo_util.getDistanceBetweenStrands(strand, possibleNeighbor)
-	return False
+	return False, ""
 
 def userShouldBeNeighborToStrand(strand, locationRecord):
 	if strand.location_point:
