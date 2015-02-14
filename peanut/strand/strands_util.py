@@ -5,6 +5,7 @@ import pytz
 import logging
 import json
 
+from django.db import IntegrityError
 from django.db.models import Q
 
 from peanut.settings import constants
