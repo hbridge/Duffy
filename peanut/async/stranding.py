@@ -304,7 +304,7 @@ def processBatch(photosToProcess):
 			try:
 				Strand.photos.through.objects.bulk_create(strandPhotosToCreate)
 			except IntegrityError:
-				for obj in strandUsersToCreate:
+				for obj in strandPhotosToCreate:
 					try:
 						obj.save()
 					except IntegrityError:
