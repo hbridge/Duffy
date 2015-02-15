@@ -388,7 +388,11 @@ const NSUInteger UpsellCardFrequency = 5;
     [self gotoNextController];
     return;
   }
-  DDLogInfo(@"%@ suggestion selected with photo: %@", self.class, photo);
+  DDLogInfo(@"%@ suggestion selected with suggestion:%@ photo: %@, contacts:%@",
+            self.class,
+            suggestion,
+            photo,
+            contacts);
   
   [self.alreadyProcessedPhotoIDs addObject:@(photo.id)];
   self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];
