@@ -384,9 +384,11 @@ const NSUInteger UpsellCardFrequency = 5;
                    caption:(NSString *)caption
 {
   if (!suggestion) {
+    DDLogWarn(@"%@ suggestion selected but suggestion is nil", self.class);
     [self gotoNextController];
     return;
   }
+  DDLogInfo(@"%@ suggestion selected with photo: %@", self.class, photo);
   
   [self.alreadyProcessedPhotoIDs addObject:@(photo.id)];
   self.sentContactsByStrandID[suggestion.strand_id] = [contacts copy];

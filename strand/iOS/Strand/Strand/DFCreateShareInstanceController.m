@@ -43,11 +43,19 @@ static NSMutableSet *textedPhoneNumberStrings;
     }
   }
   
+  DDLogInfo(@"%@ create share instance, requreServerRoundtrip %@", self, @(requireServerRoundtrip));
+  // Create the Share Instance
   [[DFPeanutFeedDataManager sharedManager]
    sharePhotoObjects:photos
    withPhoneNumbers:phoneNumbers
    success:^(NSArray *shareInstances, NSArray *unAuthedPhoneNumbers) {
+     // Successfully create the share instance
+     DDLogInfo(@"%@ created share instances: %@, unauthedPhoneNumbers:%@",
+               self,
+               shareInstances,
+               @(unAuthedPhoneNumbers.count));
      DFPeanutShareInstance *shareInstance = shareInstances.firstObject;
+
      // add the caption if there is one, but success or failure has no bearing
      if ([caption isNotEmpty]) {
        [[DFPeanutFeedDataManager sharedManager]
@@ -91,6 +99,7 @@ static NSMutableSet *textedPhoneNumberStrings;
                   if (completionBlock) completionBlock(YES, nil);
                 });
               } else {
+                DDLogInfo(@"%@ invites not sent", self);
                 [SVProgressHUD showErrorWithStatus:@"Invites not sent."];
                 if (completionBlock) completionBlock(NO, nil);
               }
