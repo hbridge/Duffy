@@ -9,6 +9,12 @@ import pytz
 from django.db.models import Q
 from django import db
 
+parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
+if parentPath not in sys.path:
+	sys.path.insert(0, parentPath)
+import django
+django.setup()
+
 from common.models import Photo
 from common import location_util
 
