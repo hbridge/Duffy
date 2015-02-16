@@ -932,7 +932,7 @@ def doBulkUpdate(cls, objs, attributesList):
 	else:
 		attributesList = [attributesList, "updated"]
 
-	retries = 3:
+	retries = 3
 	success = False
 
 	while retries > 0 and not success:
