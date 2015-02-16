@@ -2,6 +2,7 @@ import os
 import json
 import datetime
 import logging
+import time
 
 from django.contrib.gis.db import models
 from django.template.defaultfilters import escape
@@ -10,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.db.models.query import QuerySet
-from django.db import IntegrityError
+from django.db import IntegrityError, OperationalError
 
 from phonenumber_field.modelfields import PhoneNumberField
 from uuidfield import UUIDField
@@ -931,5 +932,14 @@ def doBulkUpdate(cls, objs, attributesList):
 	else:
 		attributesList = [attributesList, "updated"]
 
-	bulk_updater.bulk_update(objs, update_fields=attributesList)
+	retries = 3:
+	success = False
+
+	while retries > 0 and not success:
+		try:
+			bulk_updater.bulk_update(objs, update_fields=attributesList)
+		except OperationalError as e:
+			logger.error("Just hit OperationalError %s, retrying %s" % (e, retries))
+			time.sleep(.3)
+			retries = retries - 1
 
