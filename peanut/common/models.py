@@ -938,8 +938,10 @@ def doBulkUpdate(cls, objs, attributesList):
 	while retries > 0 and not success:
 		try:
 			bulk_updater.bulk_update(objs, update_fields=attributesList)
+			success = True
 		except OperationalError as e:
 			logger.error("Just hit OperationalError %s, retrying %s" % (e, retries))
 			time.sleep(.3)
 			retries = retries - 1
+			
 
