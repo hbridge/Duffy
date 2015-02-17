@@ -78,7 +78,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 				# This sends
 				apns.push_notification_to_devices(notification, [device])
 			except:
-				logger.error("Barfed on sending %s to %s with device service_id: %s and full device object: %s" % (msg, user.id, device.service_id, device))
+				logger.debug("Barfed on sending %s to %s with device service_id: %s and full device object: %s" % (msg, user.id, device.service_id, device))
 
 		# This is for logging
 		logEntries.append(NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_SENT, msg_type=msgTypeId, metadata=metadata))
@@ -131,10 +131,10 @@ def sendSMSThroughTwilio(phoneNumber, msg):
 def sendSMSThroughPlivo(phoneNumber, msg):
 
 	messageParams = {
-      'src':constants.PLIVO_PHONE_NUM,
-      'dst':phoneNumber,
-      'text':msg,
-    }
+	  'src':constants.PLIVO_PHONE_NUM,
+	  'dst':phoneNumber,
+	  'text':msg,
+	}
 	p = plivo.RestAPI(constants.PLIVO_AUTH_ID, constants.PLIVO_AUTH_TOKEN)
 	logger.info(p.send_message(messageParams))
 
