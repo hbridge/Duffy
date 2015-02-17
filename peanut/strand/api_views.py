@@ -452,7 +452,7 @@ def auth_phone(request):
 	response = dict({'result': True})
 	form = AuthPhoneForm(api_util.getRequestData(request))
 
-	timeWithinMinutes = 10
+	timeWithinMinutes = 240
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['phone_number'])
