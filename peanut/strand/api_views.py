@@ -172,7 +172,7 @@ def swap_inbox(request):
 
 		if len(dirtyList) > 0:
 			ret = popcaches.processInboxIds(ShareInstance.getIds(dirtyList))
-			logger.error("Go an inbox request where user %s was in shareinstance %s and was dirty.  Result: %s" % (user.id, shareInstance.id, ret))
+			logger.info("Got an inbox request where user %s was in shareinstance %s and was dirty.  Result: %s" % (user.id, shareInstance.id, ret))
 
 
 		# Add in buffer for the last timestamp, or if not sent in, use long ago date

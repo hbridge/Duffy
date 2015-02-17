@@ -561,7 +561,7 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         else:
             region_code = 'US'
 
-        phoneNum = re.sub('[^0-9]','', obj.phone_number)
+        phoneNum = filter(lambda x: x in string.printable, str(obj.phone_number))
 
         for match in phonenumbers.PhoneNumberMatcher(phoneNum, region_code):
             foundMatch = True
@@ -624,7 +624,7 @@ class UsersBulkAPI(BulkCreateAPIView):
     def pre_save(self, obj):
         foundMatch = False
 
-        phoneNum = re.sub('[^0-9]','', str(obj.phone_number))
+        phoneNum = filter(lambda x: x in string.printable, str(obj.phone_number))
 
         if 'user_id' in self.request.DATA:
             region_code = users_util.getRegionCodeForUser(self.request.DATA['user_id'])
@@ -711,6 +711,7 @@ class CreateActionAPI(CreateAPIView):
                     action.share_instance.last_action_timestamp = action.added
                 action.share_instance.cache_dirty = True
                 action.share_instance.save()
+                logger.debug("setting share instance %s cache_dirty to True" % (action.share_instance.id))
                 popcaches.processInboxIds.delay([action.share_instance.id])
 
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
