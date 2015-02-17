@@ -12,7 +12,7 @@
 #import "DFGallerySectionHeader.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UICollectionView+DFExtras.h"
-#import "DFPhotoDetailViewController.h"
+#import "DFMultiPhotoDetailPageController.h"
 #import "DFNoTableItemsView.h"
 #import "DFDismissableModalViewController.h"
 
@@ -188,9 +188,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DFPhotoDetailViewController *evc = [[DFPhotoDetailViewController alloc]
-                                      initWithPhotoObject:photo];
-  [DFDismissableModalViewController presentWithRootController:evc inParent:self];
+  DFMultiPhotoDetailPageController *photosController = [[DFMultiPhotoDetailPageController alloc]
+                                                        initWithCurrentPhoto:photo
+                                                        inPhotos:[self.datasource
+                                                                  photosForSection:indexPath.section]];
+  [DFDismissableModalViewController presentWithRootController:photosController inParent:self];
 }
 
 - (void)createButtonPressed:(id)sender
