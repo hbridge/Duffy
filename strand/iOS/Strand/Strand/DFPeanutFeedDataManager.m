@@ -1014,10 +1014,10 @@ static DFPeanutFeedDataManager *defaultManager;
        DDLogVerbose(@"Refreshed private photos data after successful delete");
      }];
      
-     success();
+     if (success) success();
    } failure:^(NSError *error) {
      DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
-     failure(error);
+     if (failure) failure(error);
    }];
 }
 

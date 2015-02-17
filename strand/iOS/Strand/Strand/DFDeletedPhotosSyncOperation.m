@@ -65,14 +65,10 @@
       return;
     }
     if (photoIdsToRemove.count > 0) {
-      dispatch_semaphore_t completionSemaphore = dispatch_semaphore_create(0);
-      [[DFPeanutFeedDataManager sharedManager] markPhotosAsNotOnSystem:photoIdsToRemove success:^(){
-        dispatch_semaphore_signal(completionSemaphore);
-      } failure:^(NSError *error){
-        dispatch_semaphore_signal(completionSemaphore);
-      }];
-      dispatch_semaphore_wait(completionSemaphore,
-                              dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)));
+      // optimistically hand this off to the feed data manager
+      [[DFPeanutFeedDataManager sharedManager] markPhotosAsNotOnSystem:photoIdsToRemove
+                                                               success:nil
+                                                               failure:nil];
     }
     
     DDLogInfo(@"Delete sync completed");
