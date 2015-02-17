@@ -561,7 +561,9 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         else:
             region_code = 'US'
 
-        for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, region_code):
+        phoneNum = re.sub('[^0-9]','', obj.phone_number)
+
+        for match in phonenumbers.PhoneNumberMatcher(phoneNum, region_code):
             foundMatch = True
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
@@ -622,7 +624,7 @@ class UsersBulkAPI(BulkCreateAPIView):
     def pre_save(self, obj):
         foundMatch = False
 
-        phoneNum = str(obj.phone_number)
+        phoneNum = re.sub('[^0-9]','', str(obj.phone_number))
 
         if 'user_id' in self.request.DATA:
             region_code = users_util.getRegionCodeForUser(self.request.DATA['user_id'])
