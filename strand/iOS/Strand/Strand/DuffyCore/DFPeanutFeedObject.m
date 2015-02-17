@@ -453,33 +453,52 @@ static NSArray *FeedObjectTypes;
   return newObject;
 }
 
-/* Compares equality by looking at the object IDs */
+/* Compares equality by looking at only immutable properties */
 - (BOOL)isEqual:(id)object
 {
   DFPeanutFeedObject *otherObject = object;
   if (![[otherObject class] isSubclassOfClass:[self class]]) return NO;
   
+  if (!self.id == otherObject.id
+      || !IsEqual(self.share_instance, otherObject.share_instance)
+      || !IsEqual(self.type, otherObject.type)
+      ) return NO;
   
-  if ([self.type isEqual:DFFeedObjectSection] && [otherObject.type isEqual:DFFeedObjectSection]) {
-    if ([self.objects count] != [otherObject.objects count]) return NO;
+  return YES;
+}
+
+- (BOOL)isUserVisibleEqual:(DFPeanutFeedObject *)otherObject
+{
+  if (![self isEqual:otherObject]) return NO;
+  
+  if ([self.type isEqual:DFFeedObjectSection]) {
+    if (![self.objects isEqual:otherObject.objects]) return NO;
   }
   
-  if ([self.type isEqual:DFFeedObjectPhoto] && [otherObject.type isEqual:DFFeedObjectPhoto]) {
-    if ([self.actions count] != [otherObject.actions count]
+  if ([self.type isEqual:DFFeedObjectPhoto]) {
+    if ( !IsEqual(self.actions, otherObject.actions)
         || !IsEqual(self.actor_ids, otherObject.actor_ids)
         || !IsEqual(self.thumb_image_path, otherObject.thumb_image_path)
         || !IsEqual(self.full_image_path, otherObject.full_image_path)
-        || (self.evaluated.boolValue != otherObject.evaluated.boolValue)) return NO;
+        || self.evaluated.boolValue != otherObject.evaluated.boolValue) return NO;
   }
   
-  if ([self.type isEqual:DFFeedObjectActionsList] && [otherObject.type isEqual:DFFeedObjectActionsList]) {
+  if ([self.type isEqual:DFFeedObjectActionsList]) {
     if (![self.actions isEqualToArray:otherObject.actions]) return NO;
   }
   
-  if (otherObject.id == self.id
-      && otherObject.share_instance.longLongValue == self.share_instance.longLongValue
-      && [otherObject.type isEqual:self.type]) return YES;
-  return NO;
+  return YES;
+}
+
++ (BOOL)isArray:(NSArray *)array1 userVisbleEqualToArray:(NSArray *)array2
+{
+  if (array1.count != array2.count) return NO;
+  for (NSUInteger i = 0; i < array1.count; i++) {
+    DFPeanutFeedObject *item1 = array1[i];
+    DFPeanutFeedObject *item2 = array2[i];
+    if (![item1 isUserVisibleEqual:item2]) return NO;
+  }
+  return YES;
 }
 
 - (NSNumber *)getUniqueId
@@ -493,7 +512,7 @@ static NSArray *FeedObjectTypes;
 
 - (NSUInteger)hash
 {
-  return (NSUInteger)self.id;
+  return (NSUInteger)[[self getUniqueId] longLongValue];
 }
 
 

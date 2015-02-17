@@ -108,4 +108,11 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 /* finds a feed object based on immutable properties like id and share_instance */
 + (NSUInteger)indexOfFeedObject:(DFPeanutFeedObject *)feedObject inArray:(NSArray *)array;
 
+
+#pragma mark - Testing for precise equality
+/* Tests whether non-unique, user visible attributes such as evaluted, actors etc are equal */
+- (BOOL)isUserVisibleEqual:(DFPeanutFeedObject *)otherObject;
++ (BOOL)isArray:(NSArray *)array1 userVisbleEqualToArray:(NSArray *)array2;
+
+
 @end

@@ -165,7 +165,9 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-- (void)processFeedWithCurrentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
+- (void)processFeedWithCurrentObjects:(NSArray *)currentObjects
+                       withNewObjects:(NSArray *)newObjects
+                          returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
   BOOL updated = NO;
   
@@ -177,7 +179,7 @@ static DFPeanutFeedDataManager *defaultManager;
   
   for (DFPeanutFeedObject *object in newObjects) {
     DFPeanutFeedObject *existingObject = [combinedObjectsById objectForKey:[object getUniqueId]];
-    if (!existingObject || ![existingObject isEqual:object]) {
+    if (!existingObject || ![existingObject isUserVisibleEqual:object]) {
       updated = YES;
     }
     [combinedObjectsById setObject:object forKey:[object getUniqueId]];
@@ -199,7 +201,12 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshFeedFromServer:feedType completion:completion fullRefresh:NO];
 }
 
-- (void)processFeedOfType:(DFFeedType)feedType currentObjects:(NSArray *)currentObjects withNewObjects:(NSArray *)newObjects fullRefresh:(BOOL)fullRefresh responseHash:(NSData *)responseHash returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
+- (void)processFeedOfType:(DFFeedType)feedType
+           currentObjects:(NSArray *)currentObjects
+           withNewObjects:(NSArray *)newObjects
+              fullRefresh:(BOOL)fullRefresh
+             responseHash:(NSData *)responseHash
+              returnBlock:(void (^)(BOOL updated, NSArray *newObjects))returnBlock
 {
   [self processPeopleListFromFeedObjects:newObjects];
   [self setEvaluatedStateFromLocalCacheForObjects:newObjects];
@@ -210,7 +217,9 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   if (fullRefresh || feedType == DFActionsFeed || feedType == DFSwapsFeed) {
-    BOOL updated = ![self.feedObjects[@(feedType)] isEqualToArray:newObjects];
+    BOOL updated = ![DFPeanutFeedObject
+                     isArray:self.feedObjects[@(feedType)]
+                         userVisbleEqualToArray:newObjects];
     returnBlock(updated, newObjects);
     return;
   }
