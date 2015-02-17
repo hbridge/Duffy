@@ -15,7 +15,7 @@
 #import "DFPeanutPushNotification.h"
 #import "DFPeanutFeedObject.h"
 
-static BOOL DebugLogging = YES;
+static BOOL DebugLogging = NO;
 
 @interface DFAnalytics()
 
