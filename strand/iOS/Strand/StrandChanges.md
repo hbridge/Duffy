@@ -1,5 +1,10 @@
 # Swap v2
 
+
+# Feb 17th, 2015 (4860)
+
+- Bug fixes
+
 # Feb 13th, 2015 (4856-4857)
 
 - All recent photos now appear in Quick Share
