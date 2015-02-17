@@ -9,6 +9,6 @@
 #ifndef Strand_DFMacros_h
 #define Strand_DFMacros_h
 
-#define IsEqual(x,y) (x == y) || [x isEqual:y]
+#define IsEqual(x,y) ((x == y) || [x isEqual:y])
 
 #endif
