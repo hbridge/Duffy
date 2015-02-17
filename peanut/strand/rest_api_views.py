@@ -644,6 +644,9 @@ class UsersBulkAPI(BulkCreateAPIView):
 
     def post_save(self, user, created):
         if created:
+            print self.request.DATA['user_id']
+            user.created_by = int(self.request.DATA['user_id'])
+            user.save()
             users_util.initNewUser(user, False, None)
 
 """

@@ -84,6 +84,7 @@ class User(models.Model):
 	install_num = models.IntegerField(default=0)
 	has_sms_authed = models.BooleanField(default=0)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
+	created_by = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
