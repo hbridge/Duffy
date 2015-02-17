@@ -38,16 +38,28 @@ static DFContactDataManager *defaultManager;
   self = [super init];
   if (self) {
     self.addressBook = [[RHAddressBook alloc] init];
-    self.phoneNumberToPersonCache = [NSMutableDictionary new];
+    [self refreshCacheWithCompletion:nil];
   }
   return self;
 }
 
-- (void)refreshCache
+- (void)refreshCacheWithCompletion:(DFVoidBlock)completion
 {
-  _phoneNumberToPersonCache = nil;
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self phoneNumberToPersonCache];
+    _phoneNumberToPersonCache = [NSMutableDictionary new];
+    for (RHPerson *person in [self.addressBook people]) {
+      RHMultiStringValue *phoneMultiValue = [person phoneNumbers];
+      for (int x = 0; x < phoneMultiValue.count; x++) {
+        NSString *rawPhoneNumber = [[phoneMultiValue valueAtIndex:x] description];
+        NSString *phoneNumber =[DFPhoneNumberUtils normalizePhoneNumber:rawPhoneNumber];
+        if (![_phoneNumberToPersonCache objectForKey:phoneNumber]) {
+          [_phoneNumberToPersonCache setObject:[NSMutableArray new] forKey:phoneNumber];
+        }
+        
+        [[_phoneNumberToPersonCache objectForKey:phoneNumber] addObject:person];
+      }
+    }
+    if (completion) completion();
   });
 }
 
@@ -68,27 +80,6 @@ static DFContactDataManager *defaultManager;
   }
   
   return nil;
-}
-
-
-- (NSMutableDictionary *)phoneNumberToPersonCache
-{
-  if (!_phoneNumberToPersonCache) {
-    _phoneNumberToPersonCache = [NSMutableDictionary new];
-    for (RHPerson *person in [self.addressBook people]) {
-      RHMultiStringValue *phoneMultiValue = [person phoneNumbers];
-      for (int x = 0; x < phoneMultiValue.count; x++) {
-        NSString *rawPhoneNumber = [[phoneMultiValue valueAtIndex:x] description];
-        NSString *phoneNumber =[DFPhoneNumberUtils normalizePhoneNumber:rawPhoneNumber];
-        if (![_phoneNumberToPersonCache objectForKey:phoneNumber]) {
-          [_phoneNumberToPersonCache setObject:[NSMutableArray new] forKey:phoneNumber];
-        }
-        
-        [[_phoneNumberToPersonCache objectForKey:phoneNumber] addObject:person];
-      }
-    }
-  }
-  return _phoneNumberToPersonCache;
 }
 
 - (NSArray *)allPeanutContacts

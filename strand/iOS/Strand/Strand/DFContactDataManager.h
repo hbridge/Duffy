@@ -15,7 +15,7 @@
 
 - (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber;
 - (RHPerson *)personFromPhoneNumber:(NSString *)phoneNumber;
-- (void)refreshCache;
+- (void)refreshCacheWithCompletion:(DFVoidBlock)completion;
 
 /* All contacts in the phone book, returned as DFPeanutContacts */
 - (NSArray *)allPeanutContacts;

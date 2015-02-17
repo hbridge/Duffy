@@ -252,7 +252,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];
       [[DFBackgroundLocationManager sharedManager] startUpdatingOnSignificantLocationChange];
       // Clearing out our phone number to name cache incase the contact list changed
-      [[DFContactDataManager sharedManager] refreshCache];
+      [[DFContactDataManager sharedManager] refreshCacheWithCompletion:nil];
       [DFPushNotificationsManager refreshPushToken];
     }
   } else {

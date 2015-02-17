@@ -55,9 +55,10 @@
                                  handler:^(DFAlertAction *action) {
                                    [DFContactSyncManager askForContactsPermissionWithSuccess:^{
                                      dispatch_async(dispatch_get_main_queue(), ^{
-                                       [self completedWithUserInfo:nil];
                                        [DFAnalytics logNux:@"Contacts" completedWithResult:@"Yes-Granted"];
-                                       [[DFContactDataManager sharedManager] refreshCache];
+                                       [[DFContactDataManager sharedManager] refreshCacheWithCompletion:^{
+                                         [self completedWithUserInfo:nil];
+                                       }];
                                      });
                                    } failure:^(NSError *error) {
                                      dispatch_async(dispatch_get_main_queue(), ^{
