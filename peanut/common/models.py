@@ -13,7 +13,6 @@ from django.dispatch import receiver
 from django.db.models.query import QuerySet
 from django.db import IntegrityError, OperationalError
 
-from phonenumber_field.modelfields import PhoneNumberField
 from uuidfield import UUIDField
 
 from peanut.settings import constants
@@ -63,7 +62,7 @@ class User(models.Model):
 	uuid = UUIDField(auto=True)
 	display_name = models.CharField(max_length=100)
 	phone_id = models.CharField(max_length=100, null=True)
-	phone_number = PhoneNumberField(null=True, db_index=True)
+	phone_number = models.CharField(null=True, db_index=True, max_length=100)
 	auth_token = models.CharField(max_length=100, null=True)
 	product_id = models.IntegerField(default=2)
 	device_token = models.TextField(null=True)
@@ -84,7 +83,6 @@ class User(models.Model):
 	install_num = models.IntegerField(default=0)
 	has_sms_authed = models.BooleanField(default=0)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
-	created_by = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -487,7 +485,7 @@ class Similarity(models.Model):
 
 class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
-	phone_number = PhoneNumberField(null=True, db_index=True)
+	phone_number = models.CharField(null=True, db_index=True, max_length=100)
 	device_token = models.TextField(null=True)
 	msg = models.TextField(null=True)
 	msg_type = models.IntegerField(db_index=True)

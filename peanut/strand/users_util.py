@@ -82,12 +82,13 @@ def createStrandUserThroughSmsAuth(phoneNumber, displayName, smsAuth, buildNum):
 	return user
 
 def getRegionCodeForUser(user_id):
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        logger.error("RegionCodeCheck failed - user not found")
+	try:
+		user = User.objects.get(id=user_id)
+	except User.DoesNotExist:
+		logger.error("RegionCodeCheck failed - user not found")
 
-    region_code = geocoder.region_code_for_number(user.phone_number)
-    logger.info("Found region code: %s for user: %s"%(region_code, user_id))
-    return region_code
-    
+	number = phonenumbers.parse(user.phone_number, None)
+	region_code = geocoder.region_code_for_number(number)
+	logger.info("Found region code: %s for user: %s"%(region_code, user_id))
+	return region_code
+	
