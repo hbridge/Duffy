@@ -404,14 +404,14 @@ def send_sms_test(request):
 	if data.has_key('phone'):
 		phone = data['phone']
 	else:
-		phone = '6505759014'
+		phone = '+16508158274'
 
 	if data.has_key('body'):
 		bodytext = data['body']
 	else:
 		bodytext = "Test msg from Strand/send_sms_test"
 	
-	notifications_util.sendSMS(phone, bodytext)
+	notifications_util.sendSMSThroughPlivo(phone, bodytext)
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """

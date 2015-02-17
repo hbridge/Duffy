@@ -15,6 +15,7 @@ from strand import strands_util, swaps_util
 
 from ios_notifications.models import APNService, Device
 from twilio.rest import TwilioRestClient
+import plivo
 
 logger = logging.getLogger(__name__)
 
@@ -117,12 +118,25 @@ def sendRefreshFeedToUsers(users):
 
 
 def sendSMS(phoneNumber, msg):
-	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
+	if phoneNumber.startswith('+91'):
+		sendSMSThroughPlivo(phoneNumber, msg)
+	else:
+		sendSMSThroughTwilio(phoneNumber, msg)
 
-	if not phoneNumber.startswith('+'):
-		phoneNumber = "+1" + phoneNumber
+def sendSMSThroughTwilio(phoneNumber, msg):
+	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
 		
 	twilioclient.sms.messages.create(to=phoneNumber, from_=constants.TWILIO_PHONE_NUM, body=msg)
+
+def sendSMSThroughPlivo(phoneNumber, msg):
+
+	messageParams = {
+      'src':constants.PLIVO_PHONE_NUM,
+      'dst':phoneNumber,
+      'text':msg,
+    }
+	p = plivo.RestAPI(constants.PLIVO_AUTH_ID, constants.PLIVO_AUTH_TOKEN)
+	logger.info(p.send_message(messageParams))
 
 """
 	Create a dictionary per user_id on last notification time of NewPhoto notifications
