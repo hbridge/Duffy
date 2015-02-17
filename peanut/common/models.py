@@ -63,7 +63,7 @@ class User(models.Model):
 	uuid = UUIDField(auto=True)
 	display_name = models.CharField(max_length=100)
 	phone_id = models.CharField(max_length=100, null=True)
-	phone_number = PhoneNumberField(db_index=True)
+	phone_number = PhoneNumberField(null=True, db_index=True)
 	auth_token = models.CharField(max_length=100, null=True)
 	product_id = models.IntegerField(default=2)
 	device_token = models.TextField(null=True)
