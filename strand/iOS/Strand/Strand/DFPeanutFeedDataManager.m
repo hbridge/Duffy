@@ -568,7 +568,8 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   for (DFPeanutFeedObject *suggestedStrand in [self suggestedStrands]) {
     NSArray *photos = [suggestedStrand leafNodesFromObjectOfType:DFFeedObjectPhoto];
-    if ([photos containsObject:suggestedPhoto]) return suggestedStrand;
+    if ([DFPeanutFeedObject indexOfFeedObject:suggestedPhoto inArray:photos] != NSNotFound)
+      return suggestedStrand;
   }
   return nil;
 }
