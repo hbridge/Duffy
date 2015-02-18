@@ -75,6 +75,7 @@ def getFriendsObjectData(userId, users, includePhone = True):
 		if includePhone:
 			entry['phone_number'] = user.phone_number
 
+		entry['has_sms_authed'] = user.has_sms_authed
 		userData.append(entry)
 
 	return userData

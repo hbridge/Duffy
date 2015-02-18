@@ -135,7 +135,6 @@ def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFac
 	if strand.id in interestedUsersByStrandId:
 		interestedUsers = interestedUsersByStrandId[strand.id]
 		strandData['match_reasons'] = matchReasonsByStrandId[strand.id]
-		strandData['actors'] = actorsData(friends, interestedUsers)
 		strandData['actor_ids'] = User.getIds(interestedUsers)
 
 	strandData['strand_id'] = strand.id
@@ -238,24 +237,3 @@ def actionDataOfShareInstanceApiSerializer(user, shareInstance):
 	actionData['text'] = "Shared a photo"
 
 	return actionData
-
-def actorsData(friends, users, includePhone = True):
-	if not isinstance(users, list) and not isinstance(users, set):
-		users = [users]
-
-	userData = list()
-
-	for user in users:
-		if user in friends:
-			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_FRIEND
-		else:
-			relationship = constants.FEED_OBJECT_TYPE_RELATIONSHIP_USER
-		
-		entry = {'display_name': user.display_name, 'id': user.id, constants.FEED_OBJECT_TYPE_RELATIONSHIP: relationship}
-
-		if includePhone:
-			entry['phone_number'] = user.phone_number
-
-		userData.append(entry)
-
-	return userData
