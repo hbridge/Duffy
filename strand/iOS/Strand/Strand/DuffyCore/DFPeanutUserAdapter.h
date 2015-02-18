@@ -26,6 +26,10 @@
 
 - (void)getCurrentUserWithSuccess:(DFPeanutRestFetchSuccess)succcess
                           failure:(DFPeanutRestFetchFailure)failure;
+- (void)userWithPhoneNumber:(NSString *)phoneNumber
+                    success:(DFPeanutRestFetchSuccess)success
+                    failure:(DFPeanutRestFetchFailure)failure;
+
 
 - (void)performRequest:(RKRequestMethod)requestMethod
         withPeanutUser:(DFPeanutUserObject *)peanutUser

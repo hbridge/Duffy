@@ -72,6 +72,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 /* User lookup */
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
 - (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber;
+- (void)fetchUserWithPhoneNumber:(NSString *)phoneNumber
+                         success:(void (^)(DFPeanutUserObject *resultUser))success
+                         failure:(DFFailureBlock)failure;
 /* Maps phone numbers to userIDs, creating UIDs for any phone numbers not already created */
 - (void)userIDsFromPhoneNumbers:(NSArray *)phoneNumbers
                         success:(void(^)(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers))success

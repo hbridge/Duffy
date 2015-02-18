@@ -665,13 +665,34 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (DFPeanutUserObject *)userWithPhoneNumber:(NSString *)phoneNumber
 {
+  DFPeanutUserObject *resultUser = nil;
   NSString *normalizedPhoneNumber = [DFPhoneNumberUtils normalizePhoneNumber:phoneNumber];
   for (DFPeanutUserObject *user in self.cachedPeopleList) {
     if ([user.phone_number isEqualToString:normalizedPhoneNumber]) {
-      return user;
+      resultUser = user;
+      break;
     }
   }
-  return nil;
+
+  return resultUser;
+}
+
+- (void)fetchUserWithPhoneNumber:(NSString *)phoneNumber
+                                         success:(void (^)(DFPeanutUserObject *resultUser))success
+                                         failure:(DFFailureBlock)failure
+{
+  DFPeanutUserObject *localResult = [self userWithPhoneNumber:phoneNumber];
+  if (localResult) {
+    success(localResult);
+    return;
+  }
+  
+  NSString *normalizedPhoneNumber = [DFPhoneNumberUtils normalizePhoneNumber:phoneNumber];
+  [self.userAdapter userWithPhoneNumber:normalizedPhoneNumber success:^(NSArray *resultObjects) {
+    success(resultObjects.firstObject);
+  } failure:^(NSError *error) {
+    failure(error);
+  }];
 }
 
 - (NSArray *)usersThatFriendedUser:(DFUserIDType)user excludeFriends:(BOOL)excludeFriends;

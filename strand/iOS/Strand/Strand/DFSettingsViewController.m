@@ -32,6 +32,7 @@
 #import "DFDefaultsStore.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFAlertController.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFSettingsViewController ()
 
@@ -297,20 +298,15 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            DFAlertController *ac = [DFAlertController alertControllerWithTitle:@"Test"
-                                                                        message:@"Test message"
-                                                                 preferredStyle:DFAlertControllerStyleAlert];
-            [ac addAction:[DFAlertAction actionWithTitle:@"OK"
-                                                   style:DFAlertActionStyleDefault
-                                                 handler:^(DFAlertAction *action) {
-                                                   [SVProgressHUD showSuccessWithStatus:@"OK"];
-                                                 }]];
-            [ac addAction:[DFAlertAction actionWithTitle:@"Cancel"
-                                                   style:DFAlertActionStyleCancel
-                                                 handler:^(DFAlertAction *action) {
-                                                   
-                                                 }]];
-            [ac showWithParentViewController:self animated:YES completion:nil];
+            NSString *phoneNumber = @"+16505759014";
+            [[DFPeanutFeedDataManager sharedManager]
+             fetchUserWithPhoneNumber:phoneNumber
+             success:^(DFPeanutUserObject *resultUser) {
+               DDLogVerbose(@"user for %@: %@", phoneNumber, resultUser);
+             }
+             failure:^(NSError *error) {
+               DDLogVerbose(@"failed: %@", error);
+             }];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   

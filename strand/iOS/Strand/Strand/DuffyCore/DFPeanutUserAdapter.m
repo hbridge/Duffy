@@ -108,7 +108,8 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
   user.id = [[DFUser currentUser] userID];
   [super performRequest:RKRequestMethodGET
                withPath:RestUserBasePath
-                objects:@[user] parameters:nil
+                objects:@[user]
+             parameters:nil
         forceCollection:NO
                 success:succcess
                 failure:failure];
@@ -136,6 +137,20 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
      DDLogError(@"%@ createUser error: %@", self.class, error);
      failureBlock(error);
    }];
+}
+
+- (void)userWithPhoneNumber:(NSString *)phoneNumber
+           success:(DFPeanutRestFetchSuccess)success
+               failure:(DFPeanutRestFetchFailure)failure
+{
+  NSURL *url = [NSURL URLWithString:[RestUserBasePath stringByAppendingString:phoneNumber]];
+  [super performRequest:RKRequestMethodGET
+               withPath:url.absoluteString
+                objects:@[]
+             parameters:nil
+        forceCollection:NO
+                success:success
+                failure:failure];
 }
 
 - (void)performRequest:(RKRequestMethod)requestMethod
