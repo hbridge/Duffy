@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 #import <RestKit/RestKit.h>
 #import "DFNetworkingConstants.h"
 #import "DFUser.h"
@@ -21,7 +21,7 @@ NSString *const DisplayNameKey = @"display_name";
 NSString *const DFUserPeanutPhoneNumberKey = @"phone_number";
 NSString *const SMSAccessCodeKey = @"sms_access_code";
 
-@implementation DFUserPeanutAdapter
+@implementation DFPeanutUserAdapter
 
 + (void)initialize
 {

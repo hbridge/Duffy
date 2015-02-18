@@ -7,7 +7,7 @@
 //
 
 #import "DFSMSAuthViewController.h"
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 #import "DFUser.h"
 #import "NSString+DFHelpers.h"
 #import "DFAnalytics.h"
@@ -188,7 +188,7 @@ replacementString:(NSString *)string
 {
   [SVProgressHUD show];
   
-  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+  DFPeanutUserAdapter *userAdapter = [[DFPeanutUserAdapter alloc] init];
   
   [userAdapter
    authDeviceID:[[DFUser currentUser] deviceID]

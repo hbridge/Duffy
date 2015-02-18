@@ -7,12 +7,12 @@
 //
 
 #import "DFUserInfoManager.h"
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 
 
 @interface DFUserInfoManager()
 
-@property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
+@property (readonly, nonatomic, retain) DFPeanutUserAdapter *userAdapter;
 
 @end
 
@@ -105,10 +105,10 @@ static DFUserInfoManager *defaultManager;
 
 }
 
-- (DFUserPeanutAdapter *)userAdapter
+- (DFPeanutUserAdapter *)userAdapter
 {
   if (!_userAdapter) {
-    _userAdapter = [[DFUserPeanutAdapter alloc] init];
+    _userAdapter = [[DFPeanutUserAdapter alloc] init];
   }
   return _userAdapter;
 }

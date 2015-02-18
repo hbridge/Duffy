@@ -14,7 +14,7 @@
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFUser.h"
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 #import "DFNUXFlowViewController.h"
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"

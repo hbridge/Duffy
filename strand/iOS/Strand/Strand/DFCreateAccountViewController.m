@@ -11,7 +11,7 @@
 #import <libPhoneNumber-iOS/NBMetadataHelper.h>
 #import <libPhoneNumber-iOS/NBAsYouTypeFormatter.h>
 #import <libPhoneNumber-iOS/NBPhoneNumberUtil.h>
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 #import "DFUser.h"
 #import "AppDelegate.h"
 #import "DFSMSAuthViewController.h"

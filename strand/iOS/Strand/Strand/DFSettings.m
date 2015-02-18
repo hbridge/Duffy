@@ -9,7 +9,7 @@
 #import "DFSettings.h"
 #import "DFAppInfo.h"
 #import "DFUser.h"
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIAlertView+DFHelpers.h"
 #import "DFPushNotificationsManager.h"
@@ -21,7 +21,7 @@ NSString *const AutosaveToCameraRollDefaultsKey = @"DFSettingsAutosaveToCameraRo
 
 @interface DFSettings ()
 
-@property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
+@property (readonly, nonatomic, retain) DFPeanutUserAdapter *userAdapter;
 
 @end
 
@@ -161,9 +161,9 @@ static DFSettings *defaultSettings;
   [[DFUser currentUser] setUserServerPortString:serverPort];
 }
 
-- (DFUserPeanutAdapter *)userAdapter
+- (DFPeanutUserAdapter *)userAdapter
 {
-  if (!_userAdapter) _userAdapter = [[DFUserPeanutAdapter alloc] init];
+  if (!_userAdapter) _userAdapter = [[DFPeanutUserAdapter alloc] init];
   return _userAdapter;
 }
 

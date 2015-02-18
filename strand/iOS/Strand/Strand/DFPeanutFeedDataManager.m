@@ -23,7 +23,7 @@
 #import "DFAnalytics.h"
 #import "DFPeanutShareInstanceAdapter.h"
 #import "DFPeanutFriendConnectionAdapter.h"
-#import "DFUserPeanutAdapter.h"
+#import "DFPeanutUserAdapter.h"
 #import "DFPeanutPhotoAdapter.h"
 
 #define REFRESH_FEED_AFTER_SECONDS 300 //seconds between a full refresh of a feed
@@ -45,7 +45,7 @@
 @property (readonly, nonatomic, retain) DFPeanutShareInstanceAdapter *shareInstanceAdapter;
 @property (readonly, nonatomic, retain) DFPeanutFriendConnectionAdapter *friendConnectionAdapter;
 @property (readonly, nonatomic, retain) DFPeanutPhotoAdapter *photoAdapter;
-@property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
+@property (readonly, nonatomic, retain) DFPeanutUserAdapter *userAdapter;
 
 // Dict with keys of DFFeedType and value of NSArray * or DFPeanutFeedObjects *'s
 @property (atomic, retain) NSMutableDictionary *feedObjects;
@@ -1333,9 +1333,9 @@ static NSDictionary *nameMapping;
   return _photoAdapter;
 }
 
-- (DFUserPeanutAdapter *)userAdapter
+- (DFPeanutUserAdapter *)userAdapter
 {
-  if (!_userAdapter) _userAdapter = [DFUserPeanutAdapter new];
+  if (!_userAdapter) _userAdapter = [DFPeanutUserAdapter new];
   return _userAdapter;
 }
 

@@ -11,7 +11,7 @@
 #import "DFPeanutUserObject.h"
 #import <RKHTTPUtilities.h>
 
-@interface DFUserPeanutAdapter : DFPeanutRestEndpointAdapter <DFNetworkAdapter>
+@interface DFPeanutUserAdapter : DFPeanutRestEndpointAdapter <DFNetworkAdapter>
 
 - (void)authDeviceID:(NSString *)deviceId
           deviceName:(NSString *)deviceName
