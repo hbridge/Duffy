@@ -53,7 +53,7 @@ def sendUnactivatedAccountFS():
 	intervalTimedeltaDays = datetime.timedelta(days=constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS_INTERVAL_DAYS)
 
 	# generate a list of non-authed users
-	nonAuthedUsers = list(User.objects.filter(product_id=2).filter(has_sms_authed=False).filter(added__lt=now-gracePeriodTimedeltaDays).filter(added_gt=now-intervalTimedeltaDays))
+	nonAuthedUsers = list(User.objects.filter(product_id=2).filter(has_sms_authed=False).filter(added__lt=now-gracePeriodTimedeltaDays).filter(added__gt=now-intervalTimedeltaDays))
 	
 	logger.info("Non-authed users: %s"% nonAuthedUsers)
 
