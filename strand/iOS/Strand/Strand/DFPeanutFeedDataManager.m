@@ -131,7 +131,7 @@ static DFPeanutFeedDataManager *defaultManager;
     if ([object.type isEqual:DFFeedObjectPeopleList]) {
       NSArray *peopleList = [self processPeopleList:_cachedPeopleList withNewPeople:object.people];
 
-      if (![peopleList isEqualToArray:_cachedPeopleList]) {
+      if (![DFPeanutFeedDataManager isPeopleList:peopleList equalToPeopleList:_cachedPeopleList]) {
         [[NSNotificationCenter defaultCenter]
          postNotificationName:DFStrandNewFriendsDataNotificationName
          object:self];
@@ -140,6 +140,21 @@ static DFPeanutFeedDataManager *defaultManager;
       _cachedPeopleList = peopleList;
     }
   }
+}
+
+/* The people list is returned in a random order, so we need to sort them first */
++ (BOOL)isPeopleList:(NSArray *)peopleList1 equalToPeopleList:(NSArray *)peopleList2
+{
+  NSComparator peopleCompare = ^NSComparisonResult(DFPeanutUserObject *user1, DFPeanutUserObject *user2) {
+    if (user1.id < user2.id) return NSOrderedAscending;
+    else if (user1.id > user2.id) return NSOrderedDescending;
+    return NSOrderedSame;
+  };
+  
+  NSArray *sorted1 = [peopleList1 sortedArrayUsingComparator:peopleCompare];
+  NSArray *sorted2 = [peopleList2 sortedArrayUsingComparator:peopleCompare];
+  
+  return [sorted1 isEqual:sorted2];
 }
 
 - (NSArray *)processPeopleList:(NSArray *)currentPeopleList withNewPeople:(NSArray *)newPeople
