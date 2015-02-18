@@ -26,7 +26,7 @@ from rest_framework.views import APIView
 from peanut.settings import constants
 
 from common.models import ContactEntry, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, ShareInstance
-from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
+from common.serializers import LimitedUserSerializer, PhotoSerializer, BulkContactEntrySerializer, BulkShareInstanceSerializer, ShareInstanceSerializer, BulkUserSerializer, BulkFriendConnectionSerializer
 from common import location_util, api_util
 
 from async import two_fishes, stranding, similarity, popcaches, friending, suggestion_notifications, notifications
@@ -719,6 +719,21 @@ class CreateActionAPI(CreateAPIView):
                 popcaches.processInboxIds.delay([action.share_instance.id])
 
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
+    def get(self, request, id):
+        maybeUserIdOrPhoneNum = id
+        print maybeUserIdOrPhoneNum
+        try:
+            if maybeUserIdOrPhoneNum.startswith("+"):
+                user = User.objects.get(phone_number=str(maybeUserIdOrPhoneNum))
+            else:
+                user = User.objects.get(id=maybeUserIdOrPhoneNum)
+            serializer = LimitedUserSerializer(user)
+            return Response(serializer.data)
+        except:
+            logger.warn("Had a request to get user by id %s and didn't find." % maybeUserIdOrPhoneNum)
+            raise Http404
+
+
     def pre_save(self, user):
         if self.request.DATA['build_id'] and self.request.DATA['build_number']:
             # if last_build_info is empty or if either build_id or build_number is not in last_build_info

@@ -29,6 +29,12 @@ class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 
+class LimitedUserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = ('id', 'display_name', 'has_sms_authed')
+	
+
 class ActionWithUserNameSerializer(serializers.ModelSerializer):
 	#user_display_name = serializers.Field('getUserDisplayName')
 	
