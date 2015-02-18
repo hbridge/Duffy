@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+from celery.schedules import crontab
 
 from kombu import Exchange, Queue
 
@@ -361,5 +362,13 @@ class BASE_CELERY_CONFIG:
         'async.suggestion_notifications.processUserId': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'async.notifications.sendRefreshFeedToUserIds': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendNewPhotoNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
+        'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
     }
+    CELERYBEAT_SCHEDULE = {
+    'unactivated-accounts': {
+        'task': 'async.notifications.sendUnactivatedAccountFS',
+        'schedule': crontab(hour=23, minute=0),
+        'args': None,
+    },
+}
 
