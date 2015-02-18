@@ -697,17 +697,24 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)savePhotoToCameraRoll
 {
   DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithFeedObject:self.photoObject];
-  [[DFPhotoStore sharedStore] saveImageToCameraRoll:self.imageView.image
-                                       withMetadata:peanutPhoto.metadataDictionary
-                                         completion:^(NSURL *assetURL, NSError *error) {
-                                           dispatch_async(dispatch_get_main_queue(), ^{
-                                             if (error) {
-                                               [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-                                             } else {
-                                               [SVProgressHUD showSuccessWithStatus:@"Saved"];
-                                             }
-                                           });
-                                         }];
+  [[DFPhotoStore sharedStore]
+   saveImageToCameraRoll:self.imageView.image
+   withMetadata:peanutPhoto.metadataDictionary
+   completion:^(NSURL *assetURL, NSError *error) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if (error) {
+         [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+       } else {
+         [SVProgressHUD showSuccessWithStatus:@"Saved"];
+       }
+       [DFAnalytics logOtherPhotoActionTaken:@"Save"
+                          fromViewController:self
+                                      result:(error == nil) ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
+                                 photoObject:self.photoObject
+                                   otherInfo:nil];
+       
+     });
+   }];
 }
 
 - (void)sharePhoto
@@ -718,7 +725,7 @@ const NSUInteger CompressedModeMaxRows = 1;
   avc.excludedActivityTypes = @[UIActivityTypeSaveToCameraRoll];
   if ([avc respondsToSelector:@selector(setCompletionWithItemsHandler:)]) {
     avc.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-      [DFAnalytics logOtherPhotoActionTaken:@"shareActivity"
+      [DFAnalytics logOtherPhotoActionTaken:@"Share"
                          fromViewController:self
                                      result:completed ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
                                 photoObject:self.photoObject
@@ -728,7 +735,7 @@ const NSUInteger CompressedModeMaxRows = 1;
     };
   } else if ([avc respondsToSelector:@selector(setCompletionHandler:)]) {
     avc.completionHandler = ^(NSString *activityType, BOOL completed) {
-      [DFAnalytics logOtherPhotoActionTaken:@"shareActivity"
+      [DFAnalytics logOtherPhotoActionTaken:@"Share"
                          fromViewController:self
                                      result:completed ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
                                 photoObject:self.photoObject
