@@ -171,7 +171,7 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
 
 - (BOOL)hasAuthedPhone
 {
-  return [self.display_name isNotEmpty];
+  return [self.has_sms_authed boolValue];
 }
 
 @end
