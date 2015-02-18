@@ -670,22 +670,36 @@ const NSUInteger CompressedModeMaxRows = 1;
                                           alertControllerWithTitle:@"Delete Photo?"
                                           message:@"Other Swap users will no longer be able to see this photo."
                                           preferredStyle:DFAlertControllerStyleAlert];
-  [confirmController addAction:[DFAlertAction
-                                actionWithTitle:@"Delete"
-                                style:DFAlertActionStyleDestructive
-                                handler:^(DFAlertAction *action) {
-                                  [[DFPeanutFeedDataManager sharedManager]
-                                   deleteShareInstance:self.photoObject.share_instance.longLongValue
-                                   success:^{
-                                     [SVProgressHUD showSuccessWithStatus:@"Deleted"];
-                                     [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                                   } failure:^(NSError *error) {
-                                     [SVProgressHUD
-                                      showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",
-                                      error.localizedDescription]];
-                                   }];
-                                  
-                                }]];
+  [confirmController
+   addAction:[DFAlertAction
+              actionWithTitle:@"Delete"
+              style:DFAlertActionStyleDestructive
+              handler:^(DFAlertAction *action) {
+                [[DFPeanutFeedDataManager sharedManager]
+                 deleteShareInstance:self.photoObject.share_instance.longLongValue
+                 success:^{
+                   [SVProgressHUD showSuccessWithStatus:@"Deleted"];
+                   [weakSelf dismissViewControllerAnimated:YES completion:nil];
+                   [DFAnalytics logOtherPhotoActionTaken:@"Delete"
+                                      fromViewController:self
+                                                  result:DFAnalyticsValueResultSuccess
+                                             photoObject:self.photoObject
+                                               otherInfo:@{
+                                                           }];
+                   
+                 } failure:^(NSError *error) {
+                   [SVProgressHUD
+                    showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",
+                                         error.localizedDescription]];
+                   [DFAnalytics logOtherPhotoActionTaken:@"Delete"
+                                      fromViewController:self
+                                                  result:DFAnalyticsValueResultFailure
+                                             photoObject:self.photoObject
+                                               otherInfo:@{
+                                                           }];
+                 }];
+                
+              }]];
   [confirmController addAction:[DFAlertAction
                                 actionWithTitle:@"Cancel"
                                 style:DFAlertActionStyleCancel
