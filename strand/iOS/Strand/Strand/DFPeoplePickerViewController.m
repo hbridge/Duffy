@@ -83,7 +83,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     [self updateSearchResults];
     [self.sdc.searchResultsTableView reloadData];
     [self configureNoResultsView];
-    [self selectionUpdatedSilently:YES];
   });
 }
 
@@ -240,33 +239,19 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (void)setDoneButtonActionText:(NSString *)doneButtonActionText
 {
   _doneButtonActionText = doneButtonActionText;
-  [self selectionUpdatedSilently:YES];
+  [self updateButtons];
 }
 
-- (NSString *)doneButtonActionText
-{
-  if (!_doneButtonActionText) return @"Send to";
-  return _doneButtonActionText;
-}
-
-- (void)setSelectedContacts:(NSArray *)selectedPeanutContacts
-{
-  _selectedContacts = selectedPeanutContacts ? selectedPeanutContacts : @[];
-  [self selectionUpdatedSilently:YES];
-}
-
-- (void)selectionUpdatedSilently:(BOOL)silently
+- (void)updateButtons
 {
   int count = (int)self.selectedContacts.count;
   NSString *buttonTitle;
   if (count > 1 && self.allowsMultipleSelection) {
-    //self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
     buttonTitle = [NSString stringWithFormat:@"%@ %d People", self.doneButtonActionText, count];
     self.doneButton.enabled = YES;
     self.doneButtonWrapper.hidden = NO;
   } else if (count == 1 && self.allowsMultipleSelection) {
-    //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
     buttonTitle = [NSString stringWithFormat:@"%@ 1 Person", self.doneButtonActionText];
     self.doneButton.enabled = YES;
@@ -282,6 +267,29 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     self.doneButton.enabled = NO;
   }
   [self.doneButton setTitle:buttonTitle forState:UIControlStateNormal];
+}
+
+- (NSString *)doneButtonActionText
+{
+  if (!_doneButtonActionText) return @"Send to";
+  return _doneButtonActionText;
+}
+
+- (void)setSelectedContacts:(NSArray *)selectedContacts
+{
+  [self setSelectedContacts:selectedContacts silently:YES];
+}
+
+- (void)setSelectedContacts:(NSArray *)selectedContacts silently:(BOOL)silently
+{
+  if (IsEqual(_selectedContacts, selectedContacts)) return;
+  _selectedContacts = selectedContacts ? selectedContacts : @[];
+  [self selectionUpdatedSilently:silently];
+}
+
+- (void)selectionUpdatedSilently:(BOOL)silently
+{
+  [self updateButtons];
   
   if (self.allowsMultipleSelection) {
     if (!self.selectedSection) {
@@ -303,6 +311,10 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
       && [self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
     [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
   }
+  DDLogInfo(@"%@ contacts updated silently:%d selected contacts:%@",
+            self.class,
+            silently,
+            self.selectedContacts);
   
   [self.tableView reloadData];
 }
@@ -600,9 +612,7 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
       }
     }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-  } 
-
-  DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
+  }
   
   if (contactSelected) {
     if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
@@ -615,8 +625,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
       [self.tableView reloadData];
       [self.sdc setActive:NO animated:NO];
     }
-    
-    [self selectionUpdatedSilently:NO];
   }
 }
 
@@ -626,10 +634,12 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   if (self.allowsMultipleSelection) {
     CGFloat yOffset;
     if (self.selectedContacts.count > 0) {
-      self.selectedContacts = [self.selectedContacts arrayByAddingObject:contact];
+      [self setSelectedContacts:[self.selectedContacts arrayByAddingObject:contact]
+                       silently:NO];
       yOffset = DFPersonSelectionTableViewCellHeight;
     } else {
-      self.selectedContacts = @[contact];
+      [self setSelectedContacts:@[contact]
+                       silently:NO];
       yOffset = DFPersonSelectionTableViewCellHeight +
       self.tableView.sectionHeaderHeight +
       self.tableView.sectionFooterHeight
@@ -641,7 +651,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   }
   else
     [self.delegate pickerController:self didFinishWithPickedContacts:@[contact]];
-  [self selectionUpdatedSilently:NO];
 }
 
 - (void)textNumberRowSelected:(NSString *)phoneNumber
@@ -659,11 +668,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   id object = [self objectForIndexPath:indexPath tableView:tableView];
-  DDLogVerbose(@"tapped object:%@", object);
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
-    self.selectedContacts = [self.selectedContacts arrayByRemovingObject:object];
-    [self selectionUpdatedSilently:NO];
-    DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
+    [self setSelectedContacts:[self.selectedContacts arrayByRemovingObject:object]
+                     silently:NO];
   }
   if (self.allowsMultipleSelection) {
     CGFloat yOffset = DFPersonSelectionTableViewCellHeight;
@@ -674,7 +681,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
                                                self.tableView.contentOffset.y - yOffset);
   }
 
-  
   // if this happened in the search tableview, we have to reload the regular table view in the bg
   if (tableView != self.tableView) [self.tableView reloadData];
 }

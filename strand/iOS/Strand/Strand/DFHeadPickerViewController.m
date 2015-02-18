@@ -72,11 +72,20 @@
   });
 }
 
+- (NSArray *)selectedNames
+{
+  return [self.selectedContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+    return contact.name ? contact.name : @"";
+  }];
+}
+
 static CGFloat HeadsHorizontalMargin = 10.0;
 - (void)updateHeads
 {
   NSArray *users = [self selectedUsers];
-  DDLogVerbose(@"new selected users: %@", users);
+  DDLogInfo(@"%@ updating heads with names: %@",
+            self.class,
+            [[self selectedNames] componentsJoinedByString:@", "]);
   [self.profileStackView setPeanutUsers:users];
   // we have to reset the frame each time becasuse the stackview calcs its width based on height
   CGRect profileStackFrame = self.headScrollView.bounds;
