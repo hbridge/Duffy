@@ -30,6 +30,7 @@ typedef void (^DFPeanutRestFetchFailure)(NSError *error);
                success:(DFPeanutRestFetchSuccess)success
                failure:(DFPeanutRestFetchFailure)failure;
 
++ (NSError *)NotFoundError;
 
 
 

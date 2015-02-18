@@ -298,7 +298,7 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            NSString *phoneNumber = @"+16505759014";
+            NSString *phoneNumber = @"+165054759014";
             [[DFPeanutFeedDataManager sharedManager]
              fetchUserWithPhoneNumber:phoneNumber
              success:^(DFPeanutUserObject *resultUser) {

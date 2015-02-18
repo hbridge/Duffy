@@ -28,6 +28,7 @@
                           failure:(DFPeanutRestFetchFailure)failure;
 - (void)userWithPhoneNumber:(NSString *)phoneNumber
                     success:(DFPeanutRestFetchSuccess)success
+                   notFound:(DFVoidBlock)notFound
                     failure:(DFPeanutRestFetchFailure)failure;
 
 

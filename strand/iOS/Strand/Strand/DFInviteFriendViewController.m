@@ -129,6 +129,7 @@
 {
   [super viewDidDisappear:animated];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
+  [SVProgressHUD dismiss];
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
@@ -187,44 +188,50 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   DFInviteFriendViewController __weak *weakSelf = self;
   return ^(DFPeanutContact *contact) {
-    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithPhoneNumber:contact.phone_number];
-    if ([user hasAuthedPhone]) {
-      [[DFPeanutFeedDataManager sharedManager] setUser:[[DFUser currentUser] userID]
-                                             isFriends:YES
-                                           withUserIDs:@[@(user.id)]
-                                               success:^{
-                                                 [SVProgressHUD showSuccessWithStatus:@"Added!"];
-                                                 [self reloadData];
-                                               } failure:^(NSError *error) {
-                                                 [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
-                                                 DDLogError(@"%@ adding users failed: %@", self.class, error);
-                                               }];
-      [DFAnalytics logInviteActionTaken:@"add" userInfo:[weakSelf analyticsDict]];
-      return;
-    }
-    
-    // we call this mapping function to force creation of a userID if none exists
+    // first see if there is an existing user for the phone number
     [[DFPeanutFeedDataManager sharedManager]
-     userIDsFromPhoneNumbers:@[contact.phone_number]
-     success:^(NSDictionary *phoneNumbersToUserIDs, NSArray *unAuthedPhoneNumbers) {
-       [DFSMSInviteStrandComposeViewController
-        showWithParentViewController:weakSelf
-        phoneNumbers:@[contact.phone_number]
-        completionBlock:^(MessageComposeResult result) {
-          if (result == MessageComposeResultSent)
-            [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-          else if (result == MessageComposeResultCancelled)
-            [SVProgressHUD showErrorWithStatus:@"Cancelled"];
-          
-          // force a refresh of users
-          [[DFPeanutFeedDataManager sharedManager] refreshUsersFromServerWithCompletion:nil];
-        }];
+     fetchUserWithPhoneNumber:contact.phone_number
+     success:^(DFPeanutUserObject *user) {
+       if ([user hasAuthedPhone]) {
+         [[DFPeanutFeedDataManager sharedManager] setUser:[[DFUser currentUser] userID]
+                                                isFriends:YES
+                                              withUserIDs:@[@(user.id)]
+                                                  success:^{
+                                                    [SVProgressHUD showSuccessWithStatus:@"Added!"];
+                                                    [self reloadData];
+                                                  } failure:^(NSError *error) {
+                                                    [SVProgressHUD showErrorWithStatus:@"Failed to add users"];
+                                                    DDLogError(@"%@ adding users failed: %@", self.class, error);
+                                                  }];
+         [DFAnalytics logInviteActionTaken:@"inviteExisting" userInfo:[weakSelf analyticsDict]];
+       } else {
+         // the user doesn't exist or hasn't authed their phone, send them a text
+         [DFSMSInviteStrandComposeViewController
+          showWithParentViewController:weakSelf
+          phoneNumbers:@[contact.phone_number]
+          completionBlock:^(MessageComposeResult result) {
+            if (result == MessageComposeResultSent) {
+              [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+              // we call this mapping function to force creation of a userID if none exists
+              [[DFPeanutFeedDataManager sharedManager]
+               userIDsFromPhoneNumbers:@[contact.phone_number]
+               success:nil
+               failure:nil];
+              
+              // force a refresh of users
+              [[DFPeanutFeedDataManager sharedManager] refreshUsersFromServerWithCompletion:nil];
+              [DFAnalytics logInviteActionTaken:@"inviteNew"
+                                       userInfo:[weakSelf analyticsDict]];
+            } else if (result == MessageComposeResultCancelled) {
+              [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+            }
+          }];
+       }
      } failure:^(NSError *error) {
-       [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Failed: %@",
-                                            error.localizedDescription]];
+       // we failed to even be able to see if the phone number is a user
+       DDLogError(@"%@ couldn't fetch user to check if should create %@", self.class, error.description);
+       [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"Error:%@", error.localizedDescription]];
      }];
-    
-    [DFAnalytics logInviteActionTaken:@"invite" userInfo:[weakSelf analyticsDict]];
   };
 }
 

@@ -686,10 +686,12 @@ static DFPeanutFeedDataManager *defaultManager;
     success(localResult);
     return;
   }
-  
+
   NSString *normalizedPhoneNumber = [DFPhoneNumberUtils normalizePhoneNumber:phoneNumber];
   [self.userAdapter userWithPhoneNumber:normalizedPhoneNumber success:^(NSArray *resultObjects) {
     success(resultObjects.firstObject);
+  } notFound:^{
+    success(nil);
   } failure:^(NSError *error) {
     failure(error);
   }];
@@ -868,12 +870,12 @@ static DFPeanutFeedDataManager *defaultManager;
            if (![user hasAuthedPhone]) [unAuthedPhoneNumbers addObject:user.phone_number];
          }
        }
-       success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);
+       if (success) success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);
     } failureBlock:^(NSError *error) {
-      failure(error);
+      if (failure) failure(error);
     }];
   } else {
-    success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);
+    if (success) success(phoneNumbersToUserIDs, unAuthedPhoneNumbers);
   }
 }
 

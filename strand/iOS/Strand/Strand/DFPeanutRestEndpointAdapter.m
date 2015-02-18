@@ -124,12 +124,25 @@
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
-     NSError *betterError = [DFPeanutInvalidField invalidFieldsErrorForError:error];
-     DDLogWarn(@"%@ got error: %@", [self.class description], betterError);
-     failure(betterError);
+     NSError *errorToReturn = error;
+     if (operation.HTTPRequestOperation.response.statusCode == 404) {
+       errorToReturn = [self.class NotFoundError];
+     } else {
+       errorToReturn = [DFPeanutInvalidField invalidFieldsErrorForError:error];
+     }
+     DDLogWarn(@"%@ got error: %@", [self.class description], errorToReturn);
+     failure(errorToReturn);
    }];
   
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
+}
+
++ (NSError *)NotFoundError
+{
+  NSError *error = [NSError errorWithDomain:@"com.duffyapp.strand"
+                                       code:-404
+                                   userInfo:@{NSLocalizedDescriptionKey : @"Not found"}];
+  return error;
 }
 
 

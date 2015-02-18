@@ -140,8 +140,9 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
 }
 
 - (void)userWithPhoneNumber:(NSString *)phoneNumber
-           success:(DFPeanutRestFetchSuccess)success
-               failure:(DFPeanutRestFetchFailure)failure
+                    success:(DFPeanutRestFetchSuccess)success
+                   notFound:(DFVoidBlock)notFound
+                    failure:(DFPeanutRestFetchFailure)failure
 {
   NSURL *url = [NSURL URLWithString:[RestUserBasePath stringByAppendingString:phoneNumber]];
   [super performRequest:RKRequestMethodGET
@@ -150,7 +151,13 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
              parameters:nil
         forceCollection:NO
                 success:success
-                failure:failure];
+   failure:^(NSError *error) {
+     if (error.code == [self.class NotFoundError].code) {
+       notFound();
+     } else {
+       failure(error);
+     }
+   }];
 }
 
 - (void)performRequest:(RKRequestMethod)requestMethod
