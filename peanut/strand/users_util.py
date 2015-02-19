@@ -28,6 +28,11 @@ def initNewUser(user, fromSmsAuth, buildNum):
 	if len(reverseFriends) > 0:
 		FriendConnection.addReverseConnections(user, list(reverseFriends))
 
+	authToken = random.randrange(10000, 10000000)
+	if not user.auth_token:
+		user.auth_token = str(authToken)
+		user.save()
+
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
@@ -65,10 +70,7 @@ def createStrandUserThroughSmsAuth(phoneNumber, displayName, smsAuth, buildNum):
 	except User.DoesNotExist:
 		pass
 
-	# TODO(Derek): Make this more interesting when we add auth to the APIs
-	authToken = random.randrange(10000, 10000000)
-
-	user = User.objects.create(phone_number = phoneNumber, has_sms_authed= True, display_name = displayName, product_id = 2, auth_token = str(authToken))
+	user = User.objects.create(phone_number = phoneNumber, has_sms_authed= True, display_name = displayName, product_id = 2)
 
 	initNewUser(user, True, buildNum)
 	
@@ -91,4 +93,3 @@ def getRegionCodeForUser(user_id):
 	region_code = geocoder.region_code_for_number(number)
 	logger.info("Found region code: %s for user: %s"%(region_code, user_id))
 	return region_code
-	
