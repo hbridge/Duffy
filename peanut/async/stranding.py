@@ -279,6 +279,8 @@ def processBatch(photosToProcess):
 					if i > 0:
 						# remove from our cache and db
 						strandsCache = filter(lambda a: a.id != strand.id, strandsCache)
+						strandsCreated = filter(lambda a: a.id != strand.id, strandsCreated)
+						strandsAddedTo = filter(lambda a: a.id != strand.id, strandsAddedTo)
 						strandPhotosToCreate = filter(lambda a: a.strand_id != strand.id, strandPhotosToCreate)
 						strandUsersToCreate = filter(lambda a: a.strand_id != strand.id, strandUsersToCreate)
 						logger.debug("Deleted strand %s" % strand.id)
