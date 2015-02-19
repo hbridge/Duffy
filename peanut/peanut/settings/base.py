@@ -363,6 +363,7 @@ class BASE_CELERY_CONFIG:
         'async.notifications.sendRefreshFeedToUserIds': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendNewPhotoNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
+        'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
     }
     CELERYBEAT_SCHEDULE = {
     'unactivated-accounts': {

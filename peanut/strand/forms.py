@@ -63,6 +63,10 @@ class InappropriateContentForm(forms.Form):
 	contenttime = forms.CharField(required=False)
 	discuss = forms.CharField(required=False)
 
+class SmsContentForm(forms.Form):
+	From = forms.CharField(required=True)
+	Body = forms.CharField(required=False)
+
 
 """
 	API Forms

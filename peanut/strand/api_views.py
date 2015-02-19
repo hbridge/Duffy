@@ -21,11 +21,11 @@ from common.serializers import UserSerializer
 from common import api_util, serializers, stats_util
 
 from strand import geo_util, notifications_util, friends_util, strands_util, users_util, swaps_util
-from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
+from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, SmsContentForm
 
 from ios_notifications.models import APNService, Device, Notification
 
-from async import neighboring, popcaches
+from async import neighboring, popcaches, internal
 
 logger = logging.getLogger(__name__)
 
@@ -488,7 +488,19 @@ def auth_phone(request):
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+@csrf_exempt
+def incoming_sms(request):
+	form = SmsContentForm(api_util.getRequestData(request))
 
+	if (form.is_valid()):
+		phoneNumber = str(form.cleaned_data['From'])
+		msg = str(form.cleaned_data['Body'])
+
+		dataDict = {'msg': msg, 'from': phoneNumber}
+		content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+		content += "<Response> <sms> Thanks for the msg. We'll get back to you shortly. </sms></Response>"
+		internal.sendEmailForIncomingSMS.delay(dataDict)
+	return HttpResponse(content, content_type="text/xml")
 
 def nothing(request):
 	return HttpResponse(json.dumps(dict()), content_type="application/json")

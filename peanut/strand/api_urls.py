@@ -44,6 +44,9 @@ urlpatterns = patterns('',
 	url(r'^friend_connection/$', strand_rest_api_views.CreateFriendConnectionAPI.as_view()),	
 	url(r'^friend_connection/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=FriendConnection, lookup_field='id')),
 
+	# external services
+	url(r'^incoming_sms.xml', 'strand.api_views.incoming_sms'),
+
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
 	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),
