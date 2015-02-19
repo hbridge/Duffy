@@ -367,7 +367,7 @@ class BASE_CELERY_CONFIG:
     CELERYBEAT_SCHEDULE = {
     'unactivated-accounts': {
         'task': 'async.notifications.sendUnactivatedAccountFS',
-        'schedule': crontab(hour=20, minute=26),
+        'schedule': crontab(hour=23, minute=0),
         'args': None,
     }
 
