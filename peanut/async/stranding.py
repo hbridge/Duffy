@@ -377,8 +377,11 @@ def processAll():
 	return celery_helper.processBatch(baseQuery, numToProcess, processBatch)
 
 @app.task
-def processIds(ids):
-	return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processBatch)
+def processIds(ids, count=1, **kwargs):
+	try:
+		return celery_helper.processBatch(baseQuery.filter(id__in=ids), numToProcess, processBatch)
+	except Exception as exc:
+		raise processIds.retry(exc=exc)
 
 @app.task
 def processUserIdsForFriendGPSInfoAppTask(userIds):
