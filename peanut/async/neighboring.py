@@ -102,7 +102,8 @@ def processStrands(strandsToProcess):
 		idsCreated = list()
 		for strand in nonNeighboredStrands:
 			for possibleStrandNeighbor in possibleStrandNeighbors:
-				if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor, locationRequired = False, doNoLocation = doNoLoc):
+				shouldBeNeighbors, reason = strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor, locationRequired = False, doNoLocation = doNoLoc)
+				if shouldBeNeighbors:
 					#usersByStrandId[possibleStrandNeighbor.id] = list(possibleStrandNeighbor.users.all())
 					strandsByStrandId[strand.id] = strand
 					strandsByStrandId[possibleStrandNeighbor.id] = possibleStrandNeighbor
@@ -112,7 +113,7 @@ def processStrands(strandsToProcess):
 					else:
 						s1 = strand
 						s2 = possibleStrandNeighbor
-					# This deals de-duping
+					# This deals with de-duping
 					if (s1.id, s2.id) not in idsCreated:
 						idsCreated.append((s1.id, s2.id))
 						distance = geo_util.getDistanceBetweenStrands(s1, s2)

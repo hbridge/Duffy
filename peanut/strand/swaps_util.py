@@ -210,17 +210,23 @@ def getInterestedUsersForStrands(user, strands, locationRequired, friends):
 			for neighborStrand in neighborStrandsByStrandId[strand.id]:
 				shouldBeNeighbors, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
 				if neighborStrand.location_point and strand.location_point and shouldBeNeighbors:
-					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+					users = friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all())
+					if len(users) > 0:
+						interestedUsers.extend(users)
+						for friend in users:
+							dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
+							matchReasons[friend.id] = "location-strand %s %s" % (reason, dist)
+				"""
+				turn off no-location neighboring
+				elif not locationRequired:
+					# Do no-location neighboring
+					shouldBeNeighbors, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = False)
+					if shouldBeNeighbors:
+						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
-					for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
-						dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
-						matchReasons[friend.id] = "location-strand %s" % reason
-
-				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = False):
-					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
-
-					for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
-						matchReasons[friend.id] = "nolocation-strand"
+						for friend in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+							matchReasons[friend.id] = "nolocation-strand"
+				"""
 
 			if strand.id in neighborUsersByStrandId:
 				interestedUsers.extend(neighborUsersByStrandId[strand.id])
