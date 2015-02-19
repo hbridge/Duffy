@@ -25,5 +25,8 @@ def sendEmail(emailSubj, dataDict, emailToList):
 
 @app.task
 def sendEmailForIncomingSMS(dataDict):
-	sendEmail("Incoming SMS", dataDict, ['support@duffytech.co'])
+	subject = 'Incoming SMS'
+	if 'from' in dataDict:
+		subject += ": " + dataDict['from']
+	sendEmail(subject, dataDict, ['support@duffytech.co'])
 	return 1

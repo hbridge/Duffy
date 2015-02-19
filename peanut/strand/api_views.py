@@ -500,7 +500,9 @@ def incoming_sms(request):
 		content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 		content += "<Response> <sms> Thanks for the msg. We'll get back to you shortly. </sms></Response>"
 		internal.sendEmailForIncomingSMS.delay(dataDict)
-	return HttpResponse(content, content_type="text/xml")
+		return HttpResponse(content, content_type="text/xml")
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 def nothing(request):
 	return HttpResponse(json.dumps(dict()), content_type="application/json")
