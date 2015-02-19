@@ -49,6 +49,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)photosWithActivity;
 
 - (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID shareInstance:(DFStrandIDType)shareInstance;
+- (DFPeanutFeedObject *)firstPhotoInAllStrandsWithId:(DFPhotoIDType)photoID;
 - (NSArray *)photosSentByUser:(DFUserIDType)user;
 
 - (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;

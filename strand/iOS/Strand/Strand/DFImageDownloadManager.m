@@ -14,7 +14,10 @@
 #import "DFObjectManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFUser.h"
+#import "DFPhotoStore.h"
 #import "DFDeferredCompletionScheduler.h"
+#import "DFPeanutPhoto.h"
+#import "DFSettings.h"
 
 const NSUInteger maxConcurrentImageDownloads = 2;
 const NSUInteger maxDownloadRetries = 3;
@@ -69,6 +72,23 @@ static DFImageDownloadManager *defaultManager;
                                              object:nil];
 }
 
+- (void)saveImageToCameraRoll:(UIImage *)image photoID:(DFPhotoIDType)photoID
+{
+  DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithFeedObject:[self.dataManager firstPhotoInAllStrandsWithId:photoID]];
+  [[DFPhotoStore sharedStore]
+   saveImageToCameraRoll:image
+   withMetadata:peanutPhoto.metadataDictionary
+   completion:^(NSURL *assetURL, NSError *error) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if (error) {
+         DDLogError(@"Unable to auto-save photo %llu to disk", photoID);
+       } else {
+         DDLogInfo(@"Successfully auto-saved photo %llu to disk", photoID);
+       }
+      });
+   }];
+}
+
 - (void)fetchNewImages
 {
   // Get list of photo from feed manager
@@ -90,6 +110,9 @@ static DFImageDownloadManager *defaultManager;
          getImageDataForPath:imagePath
          priority:NSOperationQueuePriorityLow // cache requests are low pri
          completionBlock:^(UIImage *image, NSError *error) {
+           if (imageType == DFImageFull && [[DFSettings sharedSettings] autosaveToCameraRoll]) {
+             [self saveImageToCameraRoll:image photoID:photoObject.id];
+           }
            [self.imageStore
             setImage:image
             type:imageType

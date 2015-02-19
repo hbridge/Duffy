@@ -121,6 +121,9 @@
     [mapping mapAttribute:@"locationEnabled"
                     title:@"Location-only Suggestions"
                      type:FKFormAttributeMappingTypeBoolean];
+    [mapping mapAttribute:@"autosaveToCameraRoll"
+                    title:@"Auto Save to Camera Roll"
+                     type:FKFormAttributeMappingTypeBoolean];
 
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
