@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import sys, os
 import time, datetime
 import logging
+import pytz
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
@@ -12,7 +13,7 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from common.models import User, ContactEntry, FriendConnection, Action, ShareInstance
+from common.models import User, ContactEntry, FriendConnection, Action, ShareInstance, NotificationLog
 
 from strand import notifications_util
 
@@ -113,6 +114,7 @@ def shareInstancesToPhrases(siList):
 
 @app.task
 def sendUnactivatedAccountFS():
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	gracePeriodTimedeltaDays = datetime.timedelta(days=constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS_GRACE_PERIOD_DAYS)
 	intervalTimedeltaDays = datetime.timedelta(days=constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS_INTERVAL_DAYS)
