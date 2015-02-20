@@ -110,14 +110,16 @@ static DFImageDownloadManager *defaultManager;
          getImageDataForPath:imagePath
          priority:NSOperationQueuePriorityLow // cache requests are low pri
          completionBlock:^(UIImage *image, NSError *error) {
-           if (imageType == DFImageFull && [[DFSettings sharedSettings] autosaveToCameraRoll]) {
-             [self saveImageToCameraRoll:image photoID:photoObject.id];
+           if (![self.imageStore haveAlreadyDownloadedPhotoID:photoObject.id forType:imageType]) {
+             if (imageType == DFImageFull && [[DFSettings sharedSettings] autosaveToCameraRoll]) {
+               [self saveImageToCameraRoll:image photoID:photoObject.id];
+             }
+             [self.imageStore
+              setImage:image
+              type:imageType
+              forID:photoObject.id
+              completion:nil];
            }
-           [self.imageStore
-            setImage:image
-            type:imageType
-            forID:photoObject.id
-            completion:nil];
          }];
       }
     }

@@ -35,6 +35,7 @@ typedef void (^SetImageCompletion)(NSError *error);
 + (NSURL *)localThumbnailsDirectoryURL;
 
 - (NSSet *)getPhotoIdsForType:(DFImageType)type;
+- (BOOL)haveAlreadyDownloadedPhotoID:(DFPhotoIDType)photoID forType:(DFImageType)type;
 - (void)loadDownloadedImagesCache;
 - (BOOL)canServeRequest:(DFImageManagerRequest *)request;
 

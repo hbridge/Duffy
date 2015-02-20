@@ -88,6 +88,12 @@ static DFImageDiskCache *defaultStore;
   return resultIDs;
 }
 
+- (BOOL)haveAlreadyDownloadedPhotoID:(DFPhotoIDType)photoID forType:(DFImageType)type
+{
+  NSSet *ids = [self imageIdsFromDBForType:type];
+  return [ids containsObject:@(photoID)];
+}
+
 - (void)addToDBImageForType:(DFImageType)type forPhotoID:(DFPhotoIDType)photoID
 {
   [self.dbQueue inDatabase:^(FMDatabase *db) {
