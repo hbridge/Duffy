@@ -87,6 +87,13 @@ DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection = @"connection";
   return self;
 }
 
++ (NSArray *)peanutUsersFromPeanutContacts:(NSArray *)peanutContacts
+{
+  return [peanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+    return [[DFPeanutUserObject alloc] initWithPeanutContact:contact];
+  }];
+}
+
 - (NSString *)description
 {
   return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];

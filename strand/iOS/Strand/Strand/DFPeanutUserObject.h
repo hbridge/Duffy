@@ -57,6 +57,7 @@ extern DFPeanutUserRelationshipType DFPeanutUserRelationshipConnection;
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
 - (BOOL)hasAuthedPhone;
 - (instancetype)initWithPeanutContact:(DFPeanutContact *)peanutContact;
++ (NSArray *)peanutUsersFromPeanutContacts:(NSArray *)peanutContacts;
 
 + (DFPeanutUserObject *)TeamSwapUser;
 + (EKObjectMapping *)objectMapping;

@@ -75,6 +75,7 @@
   self.suggestionContentView.profileStackView.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Thin" size:11.0];
   self.suggestionContentView.profileStackView.delegate = self;
   self.suggestionContentView.profileStackView.photoMargins = 4.0;
+  self.suggestionContentView.profileStackView.deleteButtonsVisible = NO;
   self.suggestionContentView.translatesAutoresizingMaskIntoConstraints = NO;
   [self.suggestionContentView invalidateIntrinsicContentSize];
   DFOutgoingCardViewController __weak *weakSelf = self;
@@ -89,11 +90,21 @@
 }
 
 
+- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo
+{
+  self.suggestionFeedObject = suggestion;
+  self.photoFeedObject = photo;
+  [self configurePeopleLabel];
+  
+  [self.view setNeedsLayout];
+}
+
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
 {
   _suggestionFeedObject = suggestionFeedObject;
   self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
-  self.selectedPeanutContacts = self.suggestionFeedObject.actorPeanutContacts;
+  if (self.selectedPeanutContacts.count == 0) // don't overwrite if there is already a contact selection
+    self.selectedPeanutContacts = self.suggestionFeedObject.actorPeanutContacts;
 }
 
 - (void)configureButtons
@@ -258,38 +269,14 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   _selectedPeanutContacts = selectedPeanutContacts;
   [self configurePeopleLabel];
   if (selectedPeanutContacts.count > 0) {
-    [self.suggestionContentView.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
-    self.suggestionContentView.profileStackView.deleteButtonsVisible = NO;
+    [self.suggestionContentView.profileStackView
+     setPeanutUsers:[DFPeanutUserObject peanutUsersFromPeanutContacts:selectedPeanutContacts]];
   } else {
     DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
     dummyUser.display_name = @"?";
     dummyUser.phone_number = @"?";
     self.suggestionContentView.profileStackView.peanutUsers = @[dummyUser];
-    self.suggestionContentView.profileStackView.deleteButtonsVisible = NO;
   }
-  [self.view setNeedsLayout];
-}
-
-- (NSArray *)selectedPeanutUsers
-{
-  NSMutableArray *result = [NSMutableArray new];
-  for (DFPeanutContact *contact in self.selectedPeanutContacts) {
-    DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
-    user.phone_number = contact.phone_number;
-    user.display_name = contact.name;
-    user.id = contact.user.longLongValue;
-    [result addObject:user];
-  }
-  return result;
-}
-
-- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo
-{
-  self.suggestionFeedObject = suggestion;
-  self.photoFeedObject = photo;
-
-  [self configurePeopleLabel];
-  
   [self.view setNeedsLayout];
 }
 
