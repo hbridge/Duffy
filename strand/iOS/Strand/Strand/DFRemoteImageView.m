@@ -156,6 +156,13 @@
 
 - (void)loadImageWithID:(DFPhotoIDType)photoID deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
 {
+  [self loadImageWithID:photoID deliveryMode:deliveryMode scale:1.0];
+}
+
+- (void)loadImageWithID:(DFPhotoIDType)photoID
+           deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
+                  scale:(CGFloat)scale
+{
   [self setIsLoading:YES error:NO];
   
   self.photoID = photoID;
@@ -166,10 +173,12 @@
     contentMode = DFImageRequestContentModeAspectFit;
   
   CGSize requestSize = self.frame.size;
+  requestSize.width = requestSize.width * scale;
+  requestSize.height = requestSize.height * scale;
   self.lastRequestedImageSize = requestSize;
   [[DFImageManager sharedManager]
    imageForID:photoID
-   pointSize:self.frame.size
+   pointSize:requestSize
    contentMode:DFImageRequestContentModeAspectFill
    deliveryMode:deliveryMode
    completion:^(UIImage *image) {

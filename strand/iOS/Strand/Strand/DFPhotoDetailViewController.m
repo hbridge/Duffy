@@ -392,7 +392,8 @@ const NSUInteger CompressedModeMaxRows = 1;
   
   if (loadImage) {
     [self.theatreModeImageView loadImageWithID:self.photoObject.id
-                                  deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
+                                  deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
+                                         scale:3.0]; // 3.0 to support zooming
   }
   
   

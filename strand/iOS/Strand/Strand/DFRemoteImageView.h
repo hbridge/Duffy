@@ -18,5 +18,8 @@
 @property (nonatomic, retain) UIButton *reloadButton;
 
 - (void)loadImageWithID:(DFPhotoIDType)photoID deliveryMode:(DFImageRequestDeliveryMode)deliveryMode;
+- (void)loadImageWithID:(DFPhotoIDType)photoID
+           deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
+                  scale:(CGFloat)scale;
 
 @end
