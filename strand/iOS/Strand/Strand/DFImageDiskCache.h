@@ -38,5 +38,6 @@ typedef void (^SetImageCompletion)(NSError *error);
 - (BOOL)haveAlreadyDownloadedPhotoID:(DFPhotoIDType)photoID forType:(DFImageType)type;
 - (void)loadDownloadedImagesCache;
 - (BOOL)canServeRequest:(DFImageManagerRequest *)request;
+- (UIImage *)fullImageForPhotoID:(DFPhotoIDType)photoID;
 
 @end

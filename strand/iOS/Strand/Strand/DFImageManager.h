@@ -32,6 +32,9 @@ typedef void (^SetImageCompletion)(NSError *error);
       deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
         completion:(ImageLoadCompletionBlock)completionBlock;
 
+// highest resolution version of image available, skips cache
+- (void)originalImageForID:(DFPhotoIDType)photoID
+                completion:(ImageLoadCompletionBlock)completion;
 
 - (void)startCachingImagesForPhotoIDs:(NSArray *)photoIDs
                            targetSize:(CGSize)size

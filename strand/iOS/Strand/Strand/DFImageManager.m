@@ -187,6 +187,12 @@ static BOOL logRouting = NO;
   }
 }
 
+- (void)originalImageForID:(DFPhotoIDType)photoID
+                completion:(ImageLoadCompletionBlock)completion
+{
+  completion([[DFImageDiskCache sharedStore] fullImageForPhotoID:photoID]);
+}
+
 - (void)startCachingImagesForPhotoIDs:(NSArray *)photoIDs
                            targetSize:(CGSize)size
                           contentMode:(DFImageRequestContentMode)contentMode

@@ -714,23 +714,32 @@ const NSUInteger CompressedModeMaxRows = 1;
 - (void)savePhotoToCameraRoll
 {
   DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithFeedObject:self.photoObject];
-  [[DFPhotoStore sharedStore]
-   saveImageToCameraRoll:self.imageView.image
-   withMetadata:peanutPhoto.metadataDictionary
-   completion:^(NSURL *assetURL, NSError *error) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       if (error) {
-         [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-       } else {
-         [SVProgressHUD showSuccessWithStatus:@"Saved"];
-       }
-       [DFAnalytics logOtherPhotoActionTaken:@"Save"
-                          fromViewController:self
-                                      result:(error == nil) ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
-                                 photoObject:self.photoObject
-                                   otherInfo:nil];
-       
-     });
+  [[DFImageManager sharedManager]
+   originalImageForID:self.photoObject.id
+   completion:^(UIImage *image) {
+     if (!image) {
+       [SVProgressHUD showErrorWithStatus:@"Couldn't save"];
+       DDLogError(@"%@ save image nil", self.class);
+       return;
+     }
+     [[DFPhotoStore sharedStore]
+      saveImageToCameraRoll:image
+      withMetadata:peanutPhoto.metadataDictionary
+      completion:^(NSURL *assetURL, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          if (error) {
+            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+          } else {
+            [SVProgressHUD showSuccessWithStatus:@"Saved"];
+          }
+          [DFAnalytics logOtherPhotoActionTaken:@"Save"
+                             fromViewController:self
+                                         result:(error == nil) ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultAborted
+                                    photoObject:self.photoObject
+                                      otherInfo:nil];
+          
+        });
+      }];
    }];
 }
 

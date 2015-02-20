@@ -335,4 +335,11 @@ static DFImageDiskCache *defaultStore;
   return nil;
 }
 
+- (UIImage *)fullImageForPhotoID:(DFPhotoIDType)photoID
+{
+  NSURL *url = [self.class localURLForPhotoID:photoID type:DFImageFull];
+  NSData *imageData = [NSData dataWithContentsOfURL:url];
+  return [UIImage imageWithData:imageData];
+}
+
 @end
