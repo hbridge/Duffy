@@ -129,7 +129,7 @@ def objectDataForShareInstance(shareInstance, actions, user):
 	return shareInstanceData
 
 
-def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFaces, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId):
+def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType, interestedUsersByStrandId, matchReasonsByStrandId):
 	strandData = dict()
 	strandData['id'] = strand.id
 	if strand.id in interestedUsersByStrandId:
@@ -157,14 +157,8 @@ def objectDataForPrivateStrand(user, strand, friends, includeNotEval, includeFac
 			photosIncluded += 1
 			continue
 
-		if includeNotEval and not photo.owner_evaluated:
-			strandData['objects'].append(photoDataForApiSerializer(photo))
-			photosIncluded += 1
-
-		if not includeNotEval and photo.owner_evaluated:
-			continue
-		
-		if (includeFaces and (photo.iphone_faceboxes_topleft != None)):
+		# By default, don't include saved_from_swap or evaluated photos
+		if not photo.saved_from_swap and not photo.owner_evaluated:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
 			photosIncluded += 1
 

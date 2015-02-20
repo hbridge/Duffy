@@ -114,8 +114,6 @@ def processPrivateStrandsBatch(strandsToProcess):
 			strandObjectData = serializers.objectDataForPrivateStrand(user,
 																  strand,
 																  fullFriends,
-																  True, # includeNotEval
-																  True, # includeFaces
 																  True, # includeAll
 																  "", # suggestionType
 																  interestedUsersByStrandId, matchReasonsByStrandId)

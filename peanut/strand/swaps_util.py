@@ -120,8 +120,6 @@ def getFeedObjectsForSwaps(user):
 		strandObjectData = serializers.objectDataForPrivateStrand(user,
 																  strand,
 																  fullFriends,
-																  True, # includeNotEval
-																  False, # includeFaces
 																  False, # includeAll
 																  "friend-location", # suggestionType
 																  interestedUsersByStrandId, matchReasonsByStrandId)
@@ -136,8 +134,6 @@ def getFeedObjectsForSwaps(user):
 		strandObjectData = serializers.objectDataForPrivateStrand(user,
 																  strand,
 																  fullFriends,
-																  True, # includeNotEval
-																  False, # includeFaces
 																  False, # includeAll
 																  "recent", # suggestionType
 																  interestedUsersByStrandId, matchReasonsByStrandId)
@@ -171,8 +167,6 @@ def getFeedObjectsForPrivateStrands(user):
 		strandObjectData = serializers.objectDataForPrivateStrand(user,
 																  strand,
 																  fullFriends,
-																  True, # includeNotEval
-																  True, # includeFaces
 																  True, # includeAll
 																  "", # suggestionType
 																  interestedUsersByStrandId, matchReasonsByStrandId)
