@@ -38,7 +38,7 @@ NSString const *BuildIDKey = @"build_id";
 // Upload quality constants
 CGFloat const IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 float const IMAGE_UPLOAD_JPEG_QUALITY = 0.6;
-CGFloat const IMAGE_UPLOAD_MAX_LENGTH = 1136.0;
+CGFloat const IMAGE_UPLOAD_MAX_LENGTH = 1920.0;
 
 DFPhotoUploadOperationImageDataType DFPhotoUploadOperationMetadata = @"DFPhotoUploadOperationMetadata";
 DFPhotoUploadOperationImageDataType DFPhotoUploadOperationThumbnailData = @"DFPhotoUploadOperationThumbnailData";
