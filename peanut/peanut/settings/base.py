@@ -148,6 +148,7 @@ AWS_SECRET_ACCESS_KEY = '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL'
 AWS_HEADERS = {
     'Content-type': 'image/jpeg'
 }
+AWS_REGION = "us-east-1"
 
 import djcelery
 djcelery.setup_loader()
@@ -370,7 +371,6 @@ class BASE_CELERY_CONFIG:
         'task': 'async.notifications.sendUnactivatedAccountFS',
         'schedule': crontab(hour=23, minute=0),
         'args': None,
-    }
-
+    },
 }
 
