@@ -14,13 +14,13 @@
 NSString const *DFServerBaseHost = @"dev.strand.duffyapp.com";
 NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com";
 NSString const *DFServerScheme = @"http";
-NSString const *DFImageServerBaseURL = @"http://strand-dev.s3-website-us-east-1.amazonaws.com";
+NSString const *DFImageServerBaseURL = @"https://s3-external-1.amazonaws.com/strand-dev";
 int DFSocketPort = 8005;
 #else
 NSString const *DFServerBaseHost = @"prod.strand.duffyapp.com";
 NSString const *DFServerBaseURL = @"https://prod.strand.duffyapp.com";
 NSString const *DFServerScheme = @"https";
-NSString const *DFImageServerBaseURL = @"http://strand-prod.s3-website-us-east-1.amazonaws.com";
+NSString const *DFImageServerBaseURL = @"https://s3-external-1.amazonaws.com/strand-prod";
 int DFSocketPort = 8005;
 #endif
 NSString const *DFServerAPIPath = @"/strand/api/v1/";
