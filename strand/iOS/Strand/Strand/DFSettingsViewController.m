@@ -121,9 +121,7 @@
     [mapping mapAttribute:@"locationEnabled"
                     title:@"Location-only Suggestions"
                      type:FKFormAttributeMappingTypeBoolean];
-    [mapping mapAttribute:@"autosaveToCameraRoll"
-                    title:@"Auto Save to Camera Roll"
-                     type:FKFormAttributeMappingTypeBoolean];
+
 
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
@@ -297,7 +295,10 @@
             [SVProgressHUD showSuccessWithStatus:@"Reset"];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
-  
+      [mapping mapAttribute:@"autosaveToCameraRoll"
+                      title:@"Auto Save to Camera Roll"
+                       type:FKFormAttributeMappingTypeBoolean];
+
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
