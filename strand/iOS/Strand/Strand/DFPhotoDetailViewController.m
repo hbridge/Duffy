@@ -27,6 +27,7 @@
 #import <MMPopLabel/MMLabel.h>
 #import "UIView+DFExtensions.h"
 #import "DFDismissableModalViewController.h"
+#import "DFImageViewZoomScrollView.h"
 
 const NSUInteger CompressedModeMaxRows = 1;
 
@@ -39,7 +40,7 @@ const NSUInteger CompressedModeMaxRows = 1;
 @property (nonatomic, retain) DFAlertController *alertController;
 @property (nonatomic, retain) NSArray *unreadActions;
 @property (nonatomic, retain) DFRemoteImageView *theatreModeImageView;
-@property (nonatomic, retain) UIView *theatreModeBackgroundView;
+@property (nonatomic, retain) DFImageViewZoomScrollView *theatreModeZoomView;
 
 @end
 
@@ -366,17 +367,16 @@ const NSUInteger CompressedModeMaxRows = 1;
   if (!self.theatreModeImageView) {
     loadImage = YES;
     // background
-    self.theatreModeBackgroundView = [UIView new];
-    self.theatreModeBackgroundView.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:self.theatreModeBackgroundView];
-    [self.theatreModeBackgroundView constrainToSuperviewSize];
-    self.theatreModeBackgroundView.hidden = !_theatreModeEnabled;
+    self.theatreModeZoomView = [[DFImageViewZoomScrollView alloc] init];
+    self.theatreModeZoomView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:self.theatreModeZoomView];
+    [self.theatreModeZoomView constrainToSuperviewSize];
+    self.theatreModeZoomView.hidden = !_theatreModeEnabled;
     
     // image view
     self.theatreModeImageView = [[DFRemoteImageView alloc] initWithFrame:self.view.frame];
     self.theatreModeImageView.contentMode = UIViewContentModeScaleAspectFit;
-    [self.view addSubview:self.theatreModeImageView];
-    [self.theatreModeImageView constrainToSuperviewSize];
+    self.theatreModeZoomView.imageView = self.theatreModeImageView;
     [self addGestureRecognizersToImageView:self.theatreModeImageView];
     self.theatreModeImageView.userInteractionEnabled = YES;
     self.theatreModeImageView.hidden = !_theatreModeEnabled;
@@ -384,7 +384,9 @@ const NSUInteger CompressedModeMaxRows = 1;
     // we need to call layoutIfNeeded here or the system gets cranky on iOS7
     // because another layout pass is required and this is called from viewDidLayoutSubviews
     [self.view layoutIfNeeded];
-  } else if (!CGRectEqualToRect(self.theatreModeImageView.frame, self.view.bounds)) {
+
+    self.theatreModeImageView.frame = self.theatreModeZoomView.bounds;
+  } else if (!CGSizeEqualToSize(self.theatreModeZoomView.bounds.size, self.view.bounds.size)) {
     loadImage = YES;
   }
   
@@ -926,11 +928,11 @@ const NSUInteger CompressedModeMaxRows = 1;
 {
   _theatreModeEnabled = theatreModeEnabled;
   if (theatreModeEnabled && self.theatreModeImageView) {
-    self.theatreModeBackgroundView.hidden = NO;
+    self.theatreModeZoomView.hidden = NO;
     self.theatreModeImageView.hidden = NO;
   } else if (self.theatreModeImageView){
     self.theatreModeImageView.hidden = YES;
-    self.theatreModeBackgroundView.hidden = YES;
+    self.theatreModeZoomView.hidden = YES;
   }
 }
 
