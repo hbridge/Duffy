@@ -24,7 +24,6 @@ extern NSString *DFDeviceIDParameterKey;
 extern NSString *DFAuthTokenParameterKey;
 
 // Upload quality constants
-extern const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION;
 extern const float IMAGE_UPLOAD_JPEG_QUALITY;
 extern CGFloat const IMAGE_UPLOAD_MAX_LENGTH;
 
