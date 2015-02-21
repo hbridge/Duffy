@@ -1,5 +1,11 @@
 # Swap v2
 
+# Feb 20th 2015 (4862)
+
+- Swap now uploads (and saves) HD quality images!
+- Support for zooming into a photo: when viewing a photo, tap to enter theater mode then pinch to zoom
+- Bug fixes
+
 # Feb 18th, 2015 (4861)
 
 - Bug fixes
