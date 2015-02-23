@@ -866,12 +866,13 @@ class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
         shareInstance = None
         try:
             shareInstance = ShareInstance.objects.get(id=kwargs.get('id', None))
+            userIds = User.getIds(shareInstance.users.all())
         except ShareInstance.DoesNotExist:
             pass
 
         ret = super(RetrieveUpdateDestroyShareInstanceAPIView, self).delete(*args, **kwargs)
-        if shareInstance:
-            popcaches.processInboxFull.delay(shareInstance.user_id)
-        
+        for userId in userIds:
+            popcaches.processInboxFull.delay(userId)
+    
         return ret
 
