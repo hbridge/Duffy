@@ -145,6 +145,7 @@ def processStrands(strandsToProcess):
 
 		for strand in nonNeighboredStrands:
 			strand.neighbor_evaluated = True
+
 		Strand.bulkUpdate(nonNeighboredStrands, ['neighbor_evaluated'])
 
 		if len(strandNeighbors) > 0:

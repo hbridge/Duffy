@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.db.models.query import QuerySet
-from django.db import IntegrityError, OperationalError
+from django.db import IntegrityError, OperationalError, DatabaseError
 
 from uuidfield import UUIDField
 
@@ -941,5 +941,12 @@ def doBulkUpdate(cls, objs, attributesList):
 			logger.error("Just hit OperationalError %s, retrying %s" % (e, retries))
 			time.sleep(.3)
 			retries = retries - 1
+		except DatabaseError as e:
+			excString = str(e)
+			if "did not affect any rows" in excString:
+				ids = [obj.id for obj in objs]
+				logger.warning("Got DatabaseError %s, for ids %s" % (e, ids))
+			else:
+				raise e
 			
 
