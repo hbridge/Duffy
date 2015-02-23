@@ -215,6 +215,13 @@ class PhotoAPI(BasePhotoAPI):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PhotoBulkAPI(BasePhotoAPI):
+    def getDupPhoto(self, photo, existingPhotos):
+        existingPhotos = sorted(existingPhotos, key=lambda x: x.install_num, reverse=True)
+        for existingPhoto in existingPhotos:
+            if existingPhoto.file_key == photo.file_key:
+                return existingPhoto
+        return existingPhotos[0]
+
     def updateCacheStateForPhotos(self, user, photos):
         privateStrands = Strand.objects.filter(user=user).filter(private=True).filter(photos__in=Photo.getIds(photos))
         if len(privateStrands) > 0:
@@ -333,7 +340,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                     if len(existingPhotosByHash[photo.iphone_hash]) == 0:
                         logger.error("Trying to deal with a dup for photo with hash %s but my list is 0" % photo.iphone_hash)
                     else:
-                        existingPhoto = existingPhotosByHash[photo.iphone_hash][0]
+                        existingPhoto = self.getDupPhoto(photo, existingPhotosByHash[photo.iphone_hash])
                         existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
                         existingPhoto.file_key = photo.file_key
                         existingPhoto.install_num = user.install_num
@@ -859,8 +866,6 @@ class RetrieveUpdateDestroyShareInstanceAPIView(RetrieveUpdateDestroyAPIView):
         if shareInstance.photo.full_filename:
             for userId in newIds:
                 notifications.sendNewPhotoNotificationBatch.delay(userId, [shareInstance.id])
-
-
 
     def delete(self, *args, **kwargs):
         shareInstance = None
