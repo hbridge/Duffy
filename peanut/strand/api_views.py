@@ -498,7 +498,7 @@ def incoming_sms(request):
 
 		dataDict = {'msg': msg, 'from': phoneNumber}
 		content = '<?xml version="1.0" encoding="UTF-8"?>\n'
-		content += "<Response> <sms> Thanks for the msg. We'll get back to you shortly. </sms></Response>"
+		content += "<Response> <Sms> Thanks for the msg. We'll get back to you shortly. </Sms></Response>"
 		internal.sendEmailForIncomingSMS.delay(dataDict)
 		return HttpResponse(content, content_type="text/xml")
 	else:
