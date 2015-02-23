@@ -733,9 +733,15 @@ class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
             logger.warn("Had a request to get user by id %s and didn't find." % maybeUserIdOrPhoneNum)
             raise Http404
 
+    # Putting this in to prevent invalid requests
+    def put(self, request, id):
+        if 'user_id' not in request.DATA or int(request.DATA['user_id']) != int(id):
+            raise Http404
+        else:
+            return super(RetrieveUpdateUserAPI, self).put(request, id)
 
     def pre_save(self, user):
-        if self.request.DATA['build_id'] and self.request.DATA['build_number']:
+        if 'build_id' in self.request.DATA and 'build_number' in self.request.DATA:
             # if last_build_info is empty or if either build_id or build_number is not in last_build_info
             #    update last_build_info
             buildId = self.request.DATA['build_id']
@@ -745,6 +751,7 @@ class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
                 str(buildNum) not in user.last_build_info):
                 user.last_build_info = "%s-%s" % (buildId, buildNum)
                 logger.info("Build info updated to %s for user %s" % (user.last_build_info, user.id))
+
 
 def updateStrandWithCorrectMetadata(strand, created):
     changed = False
