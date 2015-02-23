@@ -37,7 +37,7 @@ def sendSuggestionNotification(user, interestedUsersByStrandId, matchReasonsBySt
 			userNames.add(intUser.display_name.split(' ', 1)[0])
 
 		for photo in strand.photos.all():
-			if not photo.notification_evaluated:
+			if not photo.notification_evaluated and not photo.saved_with_swap:
 				photo.notification_evaluated = True
 				photosForNotification.append(photo)
 
