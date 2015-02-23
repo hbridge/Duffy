@@ -215,6 +215,9 @@ class PhotoAPI(BasePhotoAPI):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PhotoBulkAPI(BasePhotoAPI):
+
+    # This finds the first dup that looks reasonable for us to merge in.
+    # First look for one which already has the same filekey.  After that, do the highest install_num
     def getDupPhoto(self, photo, existingPhotos):
         existingPhotos = sorted(existingPhotos, key=lambda x: x.install_num, reverse=True)
         for existingPhoto in existingPhotos:
