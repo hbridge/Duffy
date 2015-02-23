@@ -736,6 +736,7 @@ class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     # Putting this in to prevent invalid requests
     def put(self, request, id):
         if 'user_id' not in request.DATA or int(request.DATA['user_id']) != int(id):
+            logger.warning("Rejecting request for user id %s due to invalid data" % id)
             raise Http404
         else:
             return super(RetrieveUpdateUserAPI, self).put(request, id)
