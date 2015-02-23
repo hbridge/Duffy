@@ -44,6 +44,7 @@
 #import "DFContactDataManager.h"
 #import "DFCardsPageViewController.h"
 #import "DFHomeViewController.h"
+#import "DFSettings.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 
@@ -479,6 +480,9 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     [DFPhotoStore resetStore];
     [[DFContactsStore sharedStore] resetStore];
     [[DFPeanutFeedDataManager sharedManager] resetManager];
+    
+    // If more settings reset goes here, move to a DFSettings "reset" method
+    [[DFSettings sharedSettings] setAutosaveToCameraRoll:NO];
     
     // clear user defaults
     NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
