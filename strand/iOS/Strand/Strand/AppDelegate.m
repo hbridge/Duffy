@@ -536,7 +536,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 
 + (AppDelegate *)appDelegate
 {
-  return [[UIApplication sharedApplication] delegate];
+  return (AppDelegate *)[[UIApplication sharedApplication] delegate];
 }
 
 @end
