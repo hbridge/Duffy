@@ -10,6 +10,7 @@
 #import "DFPeanutInvalidField.h"
 #import "RestKit/RestKit.h"
 #import "DFObjectManager.h"
+#import "AppDelegate.h"
 
 @implementation DFPeanutRestEndpointAdapter
 
@@ -125,7 +126,10 @@
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
      NSError *errorToReturn = error;
-     if (operation.HTTPRequestOperation.response.statusCode == 404) {
+     if (operation.HTTPRequestOperation.response.statusCode == 401) {
+       // authentication required, user needs to log in again
+       [[AppDelegate appDelegate] resetApplication];
+     } else if (operation.HTTPRequestOperation.response.statusCode == 404) {
        errorToReturn = [self.class NotFoundError];
      } else {
        errorToReturn = [DFPeanutInvalidField invalidFieldsErrorForError:error];

@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
++ (AppDelegate *)appDelegate;
 - (void)resetApplication;
 - (void)firstTimeSetupComplete;
 - (void)application:(UIApplication *)application
