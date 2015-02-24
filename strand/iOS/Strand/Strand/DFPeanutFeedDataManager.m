@@ -31,7 +31,7 @@
 @interface DFPeanutFeedDataManager ()
 
 @property (nonatomic, retain) NSArray *swapsFeedObjects;
-@property (nonatomic, retain) NSArray *actionsFeedObjects;
+@property (readonly, nonatomic, retain) NSArray *actionsFeedObjects;
 @property (nonatomic, retain) NSArray *inboxFeedObjects;
 @property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
 
@@ -1245,7 +1245,6 @@ static NSDictionary *nameMapping;
 @synthesize photoAdapter = _photoAdapter;
 
 @synthesize inboxFeedObjects = _inboxFeedObjects;
-@synthesize actionsFeedObjects = _actionsFeedObjects;
 @synthesize privateStrandsFeedObjects = _privateStrandsFeedObjects;
 @synthesize swapsFeedObjects = _swapsFeedObjects;
 
@@ -1273,7 +1272,10 @@ static NSDictionary *nameMapping;
 {
   for (DFPeanutFeedObject *object in [self.feedObjects objectForKey:@(DFActionsFeed)]) {
     if ([object.type isEqualToString:DFFeedObjectActionsList]) {
-      return object.actions;
+      NSArray *supportedActions = [object.actions objectsPassingTestBlock:^BOOL(DFPeanutAction *action) {
+        return [action isSupportedAction];
+      }];
+      return supportedActions;
     }
   }
   return nil;

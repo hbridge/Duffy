@@ -48,4 +48,10 @@ typedef UInt64 DFActionID;
 + (NSArray *)simpleAttributeKeys;
 + (EKObjectMapping *)objectMapping;
 
+/* 
+ Tests to see if the action is of a type recognized by the client
+ Used to help ensure forwards-compatibility with feed data
+ */
+- (BOOL)isSupportedAction;
+
 @end

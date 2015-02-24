@@ -49,6 +49,19 @@
   return [[self dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]] description];
 }
 
+- (BOOL)isSupportedAction
+{
+  if (self.action_type == DFPeanutActionFavorite
+      || self.action_type == DFPeanutActionComment
+      || self.action_type == DFPeanutActionAddedPhotos
+      || self.action_type == DFPeanutActionEvalPhoto
+      || self.action_type == DFPeanutActionSuggestedPhoto
+      || self.action_type == DFPeanutActionAddedAsFriend
+      ) return YES;
+  
+  return NO;
+}
+
 - (BOOL)isEqual:(id)object
 {
   if (![[object class] isSubclassOfClass:[self class]]) return NO;

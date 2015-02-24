@@ -251,6 +251,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
+  if (![action isSupportedAction]) {
+    DDLogWarn(@"%@ unsupported action tapped: %@", self.class, action);
+    return;
+  }
   [DFAnalytics logNotificationViewItemOpened:[DFAnalytics actionStringForType:action.action_type]
                                    notifDate:action.time_stamp];
   [self.delegate notificationViewController:self didSelectNotificationWithAction:action];
