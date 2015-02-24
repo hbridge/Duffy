@@ -1,5 +1,10 @@
 # Swap v2
 
+# Feb 20th 2015 (4863)
+
+- Notifications when someone joins Swap or adds you as a friend
+- Bug fixes
+
 # Feb 20th 2015 (4862)
 
 - Swap now uploads (and saves) HD quality images!
