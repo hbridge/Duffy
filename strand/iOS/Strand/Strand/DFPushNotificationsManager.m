@@ -20,6 +20,7 @@
 #import "SVProgressHUD.h"
 #import "DFDismissableModalViewController.h"
 #import "AppDelegate.h"
+#import "DFFriendProfileViewController.h"
 
 static BOOL ShowInAppNotifications = NO;
 
@@ -312,6 +313,18 @@ static BOOL ShowInAppNotifications = NO;
            }
          });
        }];
+    } else if (pushNotif.type == NOTIFICATIONS_ADD_FRIEND) {
+      [SVProgressHUD show];
+      [[DFPeanutFeedDataManager sharedManager] refreshUsersFromServerWithCompletion:^{
+        [SVProgressHUD dismiss];
+        DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
+                                    userWithID:pushNotif.id.longLongValue];
+        DFFriendProfileViewController *userViewController = [[DFFriendProfileViewController alloc]
+                                                             initWithPeanutUser:user];
+        UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
+                                            rootViewController];
+        [rootController presentViewController:userViewController animated:YES completion:nil];
+      }];
     }
   };
   return handler;
