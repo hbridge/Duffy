@@ -593,7 +593,9 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
     if (select) {
       [self contactSelected:object];
       contactSelected = YES;
-    } else {
+    }
+    
+    if (!select || !self.allowsMultipleSelection){
       [tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
     if ([self.delegate respondsToSelector:@selector(pickerController:contactTapped:)]) {
