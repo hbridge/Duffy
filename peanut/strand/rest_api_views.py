@@ -419,6 +419,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                     # TODO(Derek):  Probably should do this more intelligently
                     Photo.bulkUpdate(allPhotos, ["full_filename", "thumb_filename"])
                     logger.info("Doing another update for created photos because %s photos had images" % (numImagesProcessed))
+                    self.updateCacheStateForPhotos(user, allPhotos)
             else:
                 logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
             
