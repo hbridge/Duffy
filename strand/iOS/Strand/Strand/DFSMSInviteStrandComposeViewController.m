@@ -67,7 +67,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   self = [super init];
   if (self) {
     self.recipients = recipients;
-    self.body = [NSString stringWithFormat:@"Hey! Check out Swap app for sharing pics (still in private beta). %@", appURL];
+    self.body = [NSString stringWithFormat:@"Hey! Check out Swap app for sharing pics %@", appURL];
     _originalRecipients = self.recipients;
     _originalBody = self.body;
     [DFAnalytics logInviteComposeInitialized];
