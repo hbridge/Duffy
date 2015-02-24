@@ -1,7 +1,7 @@
 from peanut.settings.base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Used to support utf8 4 byte encoding in mysql.  Don't ask
 # http://stackoverflow.com/questions/21517358/django-mysql-unknown-encoding-utf8mb4
@@ -20,8 +20,9 @@ DATABASES = {
 	}
 }
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'f(*vzc)x9!1-5nisajkfl3kjlflalsk!7)x9#x@&n2s=-)vb'
+with open('/mnt/run/django_secret_key.txt') as f:
+	SECRET_KEY = f.read().strip()
+
 
 DEFAULT_FROM_EMAIL = 'server-errors@duffytech.co'
 
