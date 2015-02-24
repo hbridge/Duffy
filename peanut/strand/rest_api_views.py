@@ -738,7 +738,6 @@ class CreateActionAPI(CreateAPIView):
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def get(self, request, id):
         maybeUserIdOrPhoneNum = id
-        print maybeUserIdOrPhoneNum
         try:
             if maybeUserIdOrPhoneNum.startswith("+"):
                 user = User.objects.get(phone_number=str(maybeUserIdOrPhoneNum))
@@ -752,7 +751,7 @@ class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
 
     # Putting this in to prevent invalid requests
     def put(self, request, id):
-        if 'user_id' not in request.DATA or int(request.DATA['user_id']) != int(id):
+        if 'user_id' not in request.DATA or int(request.DATA['user_id']) != int(id) or int(request.DATA['user_id']) < 500:
             logger.warning("Rejecting request for user id %s due to invalid data" % id)
             raise Http404
         else:
