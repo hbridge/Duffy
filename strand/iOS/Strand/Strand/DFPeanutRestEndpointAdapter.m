@@ -126,7 +126,8 @@
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
      NSError *errorToReturn = error;
-     if (operation.HTTPRequestOperation.response.statusCode == 401) {
+     // 401 wasn't making it through for some reason...
+     if (operation.HTTPRequestOperation.response.statusCode == 477) {
        // authentication required, user needs to log in again
        [[AppDelegate appDelegate] resetApplication];
      } else if (operation.HTTPRequestOperation.response.statusCode == 404) {
