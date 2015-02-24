@@ -102,9 +102,14 @@
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
 {
   _suggestionFeedObject = suggestionFeedObject;
-  self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
-  if (self.selectedPeanutContacts.count == 0) // don't overwrite if there is already a contact selection
+  if (self.selectedPeanutContacts.count == 0) {// don't overwrite if there is already a contact selection
+    self.suggestionContentView.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
     self.selectedPeanutContacts = self.suggestionFeedObject.actorPeanutContacts;
+  } else {
+    self.suggestionContentView.profileStackView.peanutUsers = [DFPeanutUserObject
+                                                               peanutUsersFromPeanutContacts:self.selectedPeanutContacts];
+    
+  }
 }
 
 - (void)configureButtons

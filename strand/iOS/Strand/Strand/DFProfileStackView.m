@@ -198,7 +198,7 @@ static CGFloat deleteButtonMargin = 4;
 
 - (CGSize)intrinsicContentSize
 {
-  return [self sizeThatFits:CGSizeZero];
+  return [self sizeThatFits:self.bounds.size];
 }
 
 - (NSInteger)numberForUser:(DFPeanutUserObject *)user {
@@ -210,7 +210,7 @@ static CGFloat deleteButtonMargin = 4;
 
 - (CGSize)sizeThatFits:(CGSize)size
 {
-  if (self.peanutUsers.count == 0) return CGSizeZero;
+  if (self.peanutUsers.count == 0) return size;
   CGSize newSize = size;
   newSize.height = self.frame.size.height;
   NSUInteger numProfiles = [self maxPeanutUsersToDraw];
@@ -228,7 +228,7 @@ static CGFloat deleteButtonMargin = 4;
 
 - (CGFloat)profilePhotoWidth
 {
-  return self.frame.size.height - [self otherContentHeight];
+  return MAX(self.frame.size.height - [self otherContentHeight], 0);
 }
 
 - (CGRect)rectForCircleAtIndex:(NSUInteger)index
