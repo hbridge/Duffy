@@ -28,4 +28,5 @@ DFPeanutActionType DFPeanutActionAddedPhotos = 2;
 DFPeanutActionType DFPeanutActionComment = 4;
 DFPeanutActionType DFPeanutActionEvalPhoto = 5;
 DFPeanutActionType DFPeanutActionSuggestedPhoto = 6;
+DFPeanutActionType DFPeanutActionAddedAsFriend = 7;
 

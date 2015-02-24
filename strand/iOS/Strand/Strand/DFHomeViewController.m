@@ -28,6 +28,7 @@
 #import "UIView+DFExtensions.h"
 #import "UIImageEffects.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFFriendProfileViewController.h"
 
 const CGFloat ExpandedNavBarHeight = 19 + 44 + 87;
 const CGFloat CollapsedNavBarHeight = 19 + 44;
@@ -602,6 +603,12 @@ static DFPeanutFeedObject *currentPhoto;
     } else {
       [SVProgressHUD showSuccessWithStatus:@"Photo already processed"];
     }
+  } else if (peanutAction.action_type == DFPeanutActionAddedAsFriend) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:peanutAction.user];
+    
+    DFFriendProfileViewController *friendProfile = [[DFFriendProfileViewController alloc]
+                                                    initWithPeanutUser:user];
+    [self.navigationController pushViewController:friendProfile animated:YES];
   } else {
     DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                        photoWithID:peanutAction.photo.longLongValue

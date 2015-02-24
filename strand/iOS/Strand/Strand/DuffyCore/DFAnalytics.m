@@ -317,6 +317,10 @@ static DFAnalytics *defaultLogger;
     return @"Like";
   } else if (action == DFPeanutActionComment) {
     return @"Comment";
+  } else if (action == DFPeanutActionAddedAsFriend) {
+    return @"AddedAsFriend";
+  } else if (action == DFPeanutActionSuggestedPhoto) {
+    return @"SuggestedPhoto";
   } else {
     return [@(action) stringValue];
   }

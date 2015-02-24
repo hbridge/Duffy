@@ -75,6 +75,7 @@ extern DFPeanutActionType DFPeanutActionComment;
 extern DFPeanutActionType DFPeanutActionAddedPhotos;
 extern DFPeanutActionType DFPeanutActionEvalPhoto;
 extern DFPeanutActionType DFPeanutActionSuggestedPhoto;
+extern DFPeanutActionType DFPeanutActionAddedAsFriend;
 
 // common block type
 typedef void(^DFVoidBlock)(void);
