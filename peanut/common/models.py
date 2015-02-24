@@ -846,6 +846,7 @@ class Action(models.Model):
 	photo = models.ForeignKey(Photo, db_index=True, related_name = "action_photo", null=True)
 	photos = models.ManyToManyField(Photo, related_name = "action_photos")
 	strand = models.ForeignKey(Strand, db_index=True, null=True)
+	target_user = models.ForeignKey(User, db_index=True, related_name ="action_target_user", null=True)
 	notification_sent = models.DateTimeField(null=True)
 	text = models.TextField(null=True)
 	share_instance = models.ForeignKey(ShareInstance, db_index=True, null=True)

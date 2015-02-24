@@ -603,12 +603,19 @@ class CreateFriendConnectionAPI(BulkCreateAPIView):
 
     def post_save_bulk(self, objs):
         userIds = set()
+        actionIdsToNotify = list()
         for obj in objs:
             userIds.add(obj.user_1_id)
             userIds.add(obj.user_2_id)
 
+            # TODO: Probably should be turned into a bulkcreate at some point.
+            action = Action.objects.create(user_id=obj.user_1_id, action_type=constants.ACTION_TYPE_ADD_FRIEND, text='added you as a friend', target_user_id=obj.user_2_id)
+            actionIdsToNotify.append(action.id)
+
+        notifications.sendAddFriendNotificationBatch.delay(actionIdsToNotify)
         for userId in userIds:
             suggestion_notifications.processUserId.delay(userId)
+
 
 def getBuildNumForUser(user):
     if user.last_build_info:
