@@ -336,10 +336,6 @@ static BOOL logRouting = NO;
      andPhotoID:request.photoID
      completion:^(UIImage *image) {
        result = image;
-       [[DFImageDiskCache sharedStore] setImage:image
-                                       type:request.imageType
-                                      forID:request.photoID
-                                 completion:nil];
        dispatch_semaphore_signal(downloadSema);
      }];
     

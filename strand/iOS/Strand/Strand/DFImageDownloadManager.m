@@ -14,10 +14,10 @@
 #import "DFObjectManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFUser.h"
-#import "DFPhotoStore.h"
 #import "DFDeferredCompletionScheduler.h"
-#import "DFPeanutPhoto.h"
 #import "DFSettings.h"
+#import "DFPhotoStore.h"
+#import "DFPeanutPhoto.h"
 
 const NSUInteger maxConcurrentImageDownloads = 2;
 const NSUInteger maxDownloadRetries = 3;
@@ -27,6 +27,7 @@ const NSUInteger maxDownloadRetries = 3;
 @property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 @property (nonatomic, retain) DFImageDiskCache *imageStore;
 @property (nonatomic, retain) DFDeferredCompletionScheduler *downloadScheduler;
+@property (nonatomic) dispatch_semaphore_t photoFetchedSemaphore;
 
 @end
 
@@ -59,6 +60,7 @@ static DFImageDownloadManager *defaultManager;
                               executionPriority:DISPATCH_QUEUE_PRIORITY_DEFAULT];
     self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.imageStore = [DFImageDiskCache sharedStore];
+    self.photoFetchedSemaphore = dispatch_semaphore_create(1);
   }
   return self;
 }
@@ -72,6 +74,82 @@ static DFImageDownloadManager *defaultManager;
                                              object:nil];
 }
 
+- (void)fetchNewImages
+{
+  // Get list of photo from feed manager
+  NSArray *remotePhotos = [self.dataManager remotePhotos];
+  
+  DFImageType imageTypes[2] = {DFImageThumbnail, DFImageFull};
+  for (int i = 0; i < 2; i++) {
+    //figure out which have already been download for the type
+    DFImageType imageType = imageTypes[i];
+    NSSet *fulfilledForType = [self.imageStore getPhotoIdsForType:imageType];
+    for (DFPeanutFeedObject *photoObject in remotePhotos) {
+      if (![fulfilledForType containsObject:@(photoObject.id)]) {
+        // If we don't have this image yet, queue it for download
+        // It will automatically fill the cache
+        [self fetchImageDataForImageType:imageType andPhotoID:photoObject.id priority:NSOperationQueuePriorityLow completion:nil];
+      }
+    }
+  }
+}
+
+- (void)fetchImageDataForImageType:(DFImageType)type
+                        andPhotoID:(DFPhotoIDType)photoID
+                        completion:(ImageLoadCompletionBlock)completionBlock
+{
+  NSOperationQueuePriority priority = type == DFImageThumbnail ?
+  NSOperationQueuePriorityVeryHigh : NSOperationQueuePriorityHigh; // thumbnails are highest
+  [self fetchImageDataForImageType:type andPhotoID:photoID priority:priority completion:completionBlock];
+}
+
+- (void)fetchImageDataForImageType:(DFImageType)type
+                        andPhotoID:(DFPhotoIDType)photoID
+                          priority:(NSOperationQueuePriority)priority
+                        completion:(ImageLoadCompletionBlock)completionBlock
+{
+  NSString *path = [self.dataManager imagePathForPhotoWithID:photoID ofType:type];
+  BOOL didDispatchForCompletion = NO;
+  
+  if (path && [path length] > 0) {
+    didDispatchForCompletion = YES;
+    [self getImageDataForPath:path
+                     priority:priority
+              completionBlock:^(UIImage *image, NSError *error) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                  dispatch_semaphore_wait(self.photoFetchedSemaphore, DISPATCH_TIME_FOREVER);
+                  
+                  if (![[DFImageDiskCache sharedStore] haveAlreadyDownloadedPhotoID:photoID forType:type]) {
+                    [[DFImageDiskCache sharedStore] setImage:image
+                                                        type:type
+                                                       forID:photoID
+                                                  completion:^(NSError *error) {
+                                                    dispatch_semaphore_signal(self.photoFetchedSemaphore);
+                                                    
+                                                    if (type == DFImageFull && [[DFSettings sharedSettings] autosaveToCameraRoll]) {
+                                                      // This is async so fast
+                                                      [self saveImageToCameraRoll:image photoID:photoID];
+                                                    }
+                                                    
+                                                    if (completionBlock) completionBlock(image);
+                                                  }];
+                  } else {
+                    dispatch_semaphore_signal(self.photoFetchedSemaphore);
+                    if (completionBlock) completionBlock(image);
+                  }
+                });
+              }];
+  } else {
+    DDLogWarn(@"%@ asked to fetch photoID:%@ but dataManager returned nil.",
+              self.class, @(photoID));
+  }
+  
+  if (!didDispatchForCompletion && completionBlock) completionBlock(nil);
+}
+
+/*
+ * Not ideal here but no where else really
+ */
 - (void)saveImageToCameraRoll:(UIImage *)image photoID:(DFPhotoIDType)photoID
 {
   DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithFeedObject:[self.dataManager firstPhotoInAllStrandsWithId:photoID]];
@@ -85,70 +163,10 @@ static DFImageDownloadManager *defaultManager;
        } else {
          DDLogInfo(@"Successfully auto-saved photo %llu to disk", photoID);
        }
-      });
+     });
    }];
 }
 
-- (void)fetchNewImages
-{
-  // Get list of photo from feed manager
-  NSArray *remotePhotos = [self.dataManager remotePhotos];
-  
-  DFImageType imageTypes[2] = {DFImageThumbnail, DFImageFull};
-  for (int i = 0; i < 2; i++) {
-    //figure out which have already been download for the type
-    DFImageType imageType = imageTypes[i];
-    NSSet *fulfilledForType = [self.imageStore getPhotoIdsForType:imageType];
-    for (DFPeanutFeedObject *photoObject in remotePhotos) {
-      NSString *imagePath;
-      if (imageType == DFImageThumbnail) imagePath = photoObject.thumb_image_path;
-      else if (imageType == DFImageFull) imagePath = photoObject.full_image_path;
-      if (![fulfilledForType containsObject:@(photoObject.id)]
-          && [imagePath isNotEmpty]) {
-        // if there's an image path for and it hasn't been fulfilled, queue it for download
-        [self
-         getImageDataForPath:imagePath
-         priority:NSOperationQueuePriorityLow // cache requests are low pri
-         completionBlock:^(UIImage *image, NSError *error) {
-           if (![self.imageStore haveAlreadyDownloadedPhotoID:photoObject.id forType:imageType]) {
-             if (imageType == DFImageFull && [[DFSettings sharedSettings] autosaveToCameraRoll]) {
-               [self saveImageToCameraRoll:image photoID:photoObject.id];
-             }
-             [self.imageStore
-              setImage:image
-              type:imageType
-              forID:photoObject.id
-              completion:nil];
-           }
-         }];
-      }
-    }
-  }
-}
-
-- (void)fetchImageDataForImageType:(DFImageType)type
-                        andPhotoID:(DFPhotoIDType)photoID
-                        completion:(ImageLoadCompletionBlock)completionBlock
-{
-  NSString *path = [self.dataManager imagePathForPhotoWithID:photoID ofType:type];
-  NSOperationQueuePriority priority = type == DFImageThumbnail ?
-    NSOperationQueuePriorityVeryHigh : NSOperationQueuePriorityHigh; // thumbnails are highest
-  BOOL didDispatchForCompletion = NO;
-  
-  if (path && [path length] > 0) {
-    didDispatchForCompletion = YES;
-    [self getImageDataForPath:path
-                     priority:priority
-              completionBlock:^(UIImage *image, NSError *error) {
-                completionBlock(image);
-              }];
-  } else {
-    DDLogWarn(@"%@ asked to fetch photoID:%@ but dataManager returned nil.",
-              self.class, @(photoID));
-  }
-  
-  if (!didDispatchForCompletion) completionBlock(nil);
-}
 
 - (void)getImageDataForPath:(NSString *)path
         withCompletionBlock:(DFImageFetchCompletionBlock)completion
