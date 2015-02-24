@@ -21,6 +21,7 @@ DATABASES = {
 }
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# TODO(Derek): move this out https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 SECRET_KEY = 'f(*vzc)x9!1-5nisajkfl3kjlflalsk!7)x9#x@&n2s=-)vb'
 
 DEFAULT_FROM_EMAIL = 'server-errors@duffytech.co'
