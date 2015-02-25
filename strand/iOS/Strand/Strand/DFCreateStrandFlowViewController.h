@@ -8,7 +8,7 @@
 
 #import "DFNavigationController.h"
 #import "DFSelectPhotosViewController.h"
-#import "DFRecipientPickerViewController.h"
+#import "DFHeadPickerViewController.h"
 
 @class DFCreateStrandFlowViewController;
 
@@ -31,7 +31,7 @@ typedef NS_ENUM(NSInteger, DFCreateStrandResult) {
 @interface DFCreateStrandFlowViewController : DFNavigationController <DFSelectPhotosViewControllerDelegate, DFPeoplePickerDelegate>
 
 @property (nonatomic, retain) DFSelectPhotosViewController *selectPhotosController;
-@property (nonatomic, retain) DFRecipientPickerViewController *peoplePickerController;
+@property (nonatomic, retain) DFHeadPickerViewController *peoplePickerController;
 @property (nonatomic, retain) DFPeanutFeedObject *highlightedCollection;
 @property (nonatomic, retain) NSDictionary *extraAnalyticsInfo;
 @property (nonatomic, weak) id<DFCreateStrandFlowViewControllerDelegate> delegate;

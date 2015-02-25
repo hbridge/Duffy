@@ -20,7 +20,7 @@
   [super viewDidLoad];
   
   self.titleLabel.text = self.activityTitle;
-  self.view.backgroundColor = [UIColor clearColor];
+  self.view.backgroundColor = self.backgroundColor ? self.backgroundColor : [UIColor clearColor];
   self.hideSelectedSection = YES;
   [self configureHeadScrollView];
 }

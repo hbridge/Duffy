@@ -19,4 +19,6 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *headScrollView;
 @property (nonatomic, retain) DFProfileStackView *profileStackView;
 
+@property (nonatomic, retain) UIColor *backgroundColor;
+
 @end

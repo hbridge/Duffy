@@ -236,6 +236,12 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
   self.sdc.delegate = self;
 }
 
+- (UINavigationController *)navigationController
+{
+  // return nil to fool the search display controller into not hiding the nav bar
+  return nil;
+}
+
 - (void)setDoneButtonActionText:(NSString *)doneButtonActionText
 {
   _doneButtonActionText = doneButtonActionText;
@@ -329,16 +335,6 @@ NSString *const UsersThatAddedYouSectionTitle = @"People who Added You";
 }
 
 #pragma mark - UISearchDisplayController Delegate
-
-- (void)searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller
-{
-  self.hideStatusBar = YES;
-}
-
-- (void)searchDisplayControllerWillEndSearch:(UISearchDisplayController *)controller
-{
-  self.hideStatusBar = NO;
-}
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {

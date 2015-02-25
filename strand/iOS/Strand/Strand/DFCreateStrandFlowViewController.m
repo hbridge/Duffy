@@ -105,7 +105,10 @@
   }
   
   NSArray *suggestedContacts = [self suggestedContactsForFeedObjects:selectedFeedObjects];
-  self.peoplePickerController = [[DFRecipientPickerViewController alloc] init];
+  self.peoplePickerController = [[DFHeadPickerViewController alloc] init];
+  self.peoplePickerController.backgroundColor = [UIColor darkGrayColor];
+  self.peoplePickerController.activityTitle = @"Send to:";
+  [self.peoplePickerController.titleLabel sizeToFit];
   self.peoplePickerController.selectedContacts = suggestedContacts;
   self.peoplePickerController.delegate = self;
   self.peoplePickerController.allowsMultipleSelection = YES;
