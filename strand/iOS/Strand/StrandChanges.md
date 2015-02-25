@@ -1,8 +1,9 @@
 # Swap v2
 
-# Feb 24th-25th 2015 (4863-4865)
+# Feb 24th-25th 2015 (4863-4866)
 
 - Notifications when someone joins Swap or adds you as a friend
+- Fix marking comments read when you open a photo
 - Bug fixes
 
 # Feb 20th 2015 (4862)
