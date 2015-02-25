@@ -11,6 +11,7 @@
 #import <CocoaLumberjack/DDASLLogger.h>
 #import <CocoaLumberjack/DDFileLogger.h>
 #import <HockeySDK/HockeySDK.h>
+#import <Facebook-iOS-SDK/FacebookSDK/FacebookSDK.h>
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFUser.h"
@@ -288,6 +289,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
   [DFAnalytics StartAnalyticsSession];
+  [FBSettings setDefaultAppID:@"349028151970059"];
+  [FBAppEvents activateApp];
   [self performForegroundOperations];
 }
 

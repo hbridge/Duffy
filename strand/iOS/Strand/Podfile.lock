@@ -1,6 +1,7 @@
 PODS:
   - ActionSheetPicker-3.0 (1.3.12)
   - AFNetworking (1.3.4)
+  - Bolts (1.1.3)
   - BWLongTextViewController (1.0)
   - BWSelectViewController (0.4.3)
   - CocoaLumberjack (1.8.1):
@@ -12,6 +13,8 @@ PODS:
   - EasyMapping (0.12.1):
     - EasyMapping/Core (= 0.12.1)
   - EasyMapping/Core (0.12.1)
+  - Facebook-iOS-SDK (3.23.0):
+    - Bolts (~> 1.0)
   - FMDB/common (2.5)
   - FMDB/FTS (2.5):
     - FMDB/standard
@@ -63,6 +66,7 @@ DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
   - CRToast (~> 0.0.7)
   - EasyMapping (~> 0.12.0)
+  - Facebook-iOS-SDK (~> 3.2)
   - FMDB/FTS (~> 2.4)
   - FormKit.m (from `https://github.com/hbridge/FormKit.m.git`)
   - GBFlatButton (~> 2.1.0)
@@ -109,11 +113,13 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   ActionSheetPicker-3.0: e49127271ec833864f3235ba7261b1f0d093a503
   AFNetworking: 80c4e0652b08eb34e25b9c0ff3c82556fe5967b4
+  Bolts: 3db0a875235e0c9042b013af13af0f00f79b102c
   BWLongTextViewController: dbc59050dcff4fd7672ef29c21c6359991e5e88a
   BWSelectViewController: d1871257a78d980a52aa543804eed8a85c2f75d0
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   EasyMapping: ac05b3cd7456d28d5eae65b43e128c0202ee5d30
+  Facebook-iOS-SDK: 3d65f685348b789e46a9aacf92bfa85b60b63755
   FMDB: 0efa188cf0dd1ce82c27a478cd5f5fa245308677
   FormKit.m: 48d55815316f3a617694ec6aac7c874a22a0c47c
   GBFlatButton: 30bf30c2594129ffeac1e6dce531022a4759c904
