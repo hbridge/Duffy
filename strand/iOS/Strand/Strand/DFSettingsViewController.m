@@ -113,15 +113,14 @@
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
     [mapping sectionWithTitle:@"Preferences"
-                       footer:@"Turn on Location-only Suggestions to get swap suggestions even when you didn't take a photo."
+                       footer:nil
                    identifier:@"preferences"];
     [mapping mapAttribute:@"pushNotificationsEnabled"
                     title:@"Push Notifications"
                      type:FKFormAttributeMappingTypeBoolean];
-    [mapping mapAttribute:@"locationEnabled"
-                    title:@"Location-only Suggestions"
+    [mapping mapAttribute:@"autosaveToCameraRoll"
+                    title:@"Auto Save to Camera Roll"
                      type:FKFormAttributeMappingTypeBoolean];
-
 
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
@@ -295,9 +294,6 @@
             [SVProgressHUD showSuccessWithStatus:@"Reset"];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
-      [mapping mapAttribute:@"autosaveToCameraRoll"
-                      title:@"Auto Save to Camera Roll"
-                       type:FKFormAttributeMappingTypeBoolean];
 
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
