@@ -6,6 +6,7 @@ import phonenumbers
 import json
 from threading import Thread
 import dateutil.parser
+import copy
 import string
 
 from django.shortcuts import get_list_or_404
@@ -328,7 +329,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                     if photo.iphone_hash not in existingPhotosByHash:
                         existingPhotosByHash[photo.iphone_hash] = list()
                     existingPhotosByHash[photo.iphone_hash].append(photo)
-            copyOfExistingPhotosByHash = existingPhotosByHash.deepcopy()
+            copyOfExistingPhotosByHash = copy.deepcopy(existingPhotosByHash)
                 
             for photoData in photosData:
                 photoData = self.jsonDictToSimple(photoData)
