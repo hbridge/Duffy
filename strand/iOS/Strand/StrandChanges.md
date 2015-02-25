@@ -1,6 +1,6 @@
 # Swap v2
 
-# Feb 20th 2015 (4863)
+# Feb 24th 2015 (4863-4864)
 
 - Notifications when someone joins Swap or adds you as a friend
 - Bug fixes
