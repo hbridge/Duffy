@@ -89,7 +89,6 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
-  [[DFUserInfoManager sharedManager] setLastNotifsOpenedTimestamp:[NSDate date]];
   [[DFPeanutNotificationsManager sharedManager] markAllNotificationsAsRead];
   [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];

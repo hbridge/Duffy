@@ -131,9 +131,7 @@ const NSUInteger CompressedModeMaxRows = 1;
     if (action.id) [actionIDs addObject:action.id];
     else DDLogWarn(@"%@ action with no ID, can't mark as seen: %@", self.class, action);
   }
-  // Temporarily disable marking notifications as seen until can be reworked.
-  // Issue is that the server doesn't know that the action is read so the badge on the homescreen is different from the app
-  //[[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
+  [[DFPeanutNotificationsManager sharedManager] markActionIDsSeen:actionIDs];
   
   if (!self.photoObject.evaluated.boolValue) {
     [[DFPeanutFeedDataManager sharedManager] setHasEvaluatedPhoto:self.photoObject.id shareInstance:[self.photoObject.share_instance longLongValue]];

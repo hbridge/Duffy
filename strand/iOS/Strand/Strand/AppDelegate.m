@@ -255,6 +255,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       // Clearing out our phone number to name cache incase the contact list changed
       [[DFContactDataManager sharedManager] refreshCacheWithCompletion:nil];
       [DFPushNotificationsManager refreshPushToken];
+      [[DFUserInfoManager sharedManager] setLastNotifsOpenedTimestamp:[NSDate date]];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
