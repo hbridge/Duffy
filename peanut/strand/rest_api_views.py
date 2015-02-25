@@ -328,6 +328,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                     if photo.iphone_hash not in existingPhotosByHash:
                         existingPhotosByHash[photo.iphone_hash] = list()
                     existingPhotosByHash[photo.iphone_hash].append(photo)
+            copyOfExistingPhotosByHash = existingPhotosByHash.deepcopy()
                 
             for photoData in photosData:
                 photoData = self.jsonDictToSimple(photoData)
@@ -341,14 +342,14 @@ class PhotoBulkAPI(BasePhotoAPI):
                 # If we see that this photo's hash already exists then 
                 if photo.iphone_hash in existingPhotosByHash:
                     if len(existingPhotosByHash[photo.iphone_hash]) == 0:
-                        logger.error("Trying to deal with a dup for photo with hash %s but my list is 0" % photo.iphone_hash)
+                        logger.error("Trying to deal with a dup for photo with hash %s but my list is 0.  Debug info: %s   And:  %s" % (photo.iphone_hash, copyOfExistingPhotosByHash, photosData))
                     else:
                         existingPhoto = self.getDupPhoto(photo, existingPhotosByHash[photo.iphone_hash])
                         existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
                         existingPhoto.file_key = photo.file_key
                         existingPhoto.install_num = user.install_num
 
-                        logger.debug("Uploaded photo found with same hash as existing, setting to id %s and filekey %s" % (existingPhoto.id, existingPhoto.file_key))
+                        logger.debug("Uploaded photo found with same hash as existing, setting to id %s and filekey %s for hash %s" % (existingPhoto.id, existingPhoto.file_key, existingPhoto.iphone_hash))
                         objsToUpdate.append(existingPhoto)
                 elif photo.id:
                     objsToUpdate.append(photo)
