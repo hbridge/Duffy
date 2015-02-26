@@ -222,9 +222,9 @@ class PhotoBulkAPI(BasePhotoAPI):
     def getDupPhoto(self, photo, existingPhotos):
         existingPhotos = sorted(existingPhotos, key=lambda x: x.install_num, reverse=True)
         for existingPhoto in existingPhotos:
-            if existingPhoto.file_key == photo.file_key:
+            if existingPhoto.file_key == photo.file_key or existingPhoto.time_taken == photo.time_taken:
                 return existingPhoto
-        return existingPhotos[0]
+        return None
 
     def updateCacheStateForPhotos(self, user, photos):
         privateStrands = Strand.objects.filter(user=user).filter(private=True).filter(photos__in=Photo.getIds(photos))
@@ -342,16 +342,17 @@ class PhotoBulkAPI(BasePhotoAPI):
 
                 # If we see that this photo's hash already exists then 
                 if photo.iphone_hash in existingPhotosByHash:
-                    if len(existingPhotosByHash[photo.iphone_hash]) == 0:
-                        logger.error("Trying to deal with a dup for photo with hash %s but my list is 0.  Debug info: %s   And:  %s" % (photo.iphone_hash, copyOfExistingPhotosByHash, photosData))
-                    else:
-                        existingPhoto = self.getDupPhoto(photo, existingPhotosByHash[photo.iphone_hash])
-                        existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
+                    existingPhoto = self.getDupPhoto(photo, existingPhotosByHash[photo.iphone_hash])
+
+                    if existingPhoto:
                         existingPhoto.file_key = photo.file_key
                         existingPhoto.install_num = user.install_num
 
                         logger.debug("Uploaded photo found with same hash as existing, setting to id %s and filekey %s for hash %s" % (existingPhoto.id, existingPhoto.file_key, existingPhoto.iphone_hash))
                         objsToUpdate.append(existingPhoto)
+                    else:
+                        objsToCreate.append(photo)
+                        logger.debug("Uploaded photo found with same hash %s as some existing, but different time_taken %s, creating new" % (photo.iphone_hash, photo.time_taken))
                 elif photo.id:
                     objsToUpdate.append(photo)
                 else:
