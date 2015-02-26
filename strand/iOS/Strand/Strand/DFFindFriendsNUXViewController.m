@@ -23,7 +23,7 @@
   self = [super initWithTitle:@"Find Friends"
                         image:[UIImage imageNamed:@"Assets/Nux/FriendsGraphic"]
               explanationText:@"Swap can suggest people to share photos with, but first you’ll need to find some friends on Swap."
-                  buttonTitle:@"Find Friends"];
+                  buttonTitle:@"Next"];
   if (self) {
     
   }
@@ -38,36 +38,8 @@
 
 - (void)buttonPressed:(id)sender
 {
-  DFAlertController *softAskForContacts = [DFAlertController
-                                           alertControllerWithTitle:@"Contacts Access"
-                                           message:@"Find all friends on Swap in your address book?"
-                                           preferredStyle:DFAlertControllerStyleAlert];
-  [softAskForContacts addAction:[DFAlertAction
-                                 actionWithTitle:@"Not Now"
-                                 style:DFAlertActionStyleCancel
-                                 handler:^(DFAlertAction *action) {
-                                   [self completedWithUserInfo:nil];
-                                   [DFAnalytics logNux:@"Contacts" completedWithResult:@"Not Now"];
-                                 }]];
-  [softAskForContacts addAction:[DFAlertAction
-                                 actionWithTitle:@"Yes"
-                                 style:DFAlertActionStyleDefault
-                                 handler:^(DFAlertAction *action) {
-                                   [DFContactSyncManager askForContactsPermissionWithSuccess:^{
-                                     dispatch_async(dispatch_get_main_queue(), ^{
-                                       [DFAnalytics logNux:@"Contacts" completedWithResult:@"Yes-Granted"];
-                                       [[DFContactDataManager sharedManager] refreshCacheWithCompletion:^{
-                                         [self completedWithUserInfo:nil];
-                                       }];
-                                     });
-                                   } failure:^(NSError *error) {
-                                     dispatch_async(dispatch_get_main_queue(), ^{
-                                       [self completedWithUserInfo:nil];
-                                       [DFAnalytics logNux:@"Contacts" completedWithResult:@"Yes-NotGranted"];
-                                     });
-                                   }];
-                                 }]];
-  [softAskForContacts showWithParentViewController:self animated:YES completion:nil];
+  [DFAnalytics logNux:@"Contacts" completedWithResult:@"Next"];
+  [self completedWithUserInfo:nil];
 }
 
 @end
