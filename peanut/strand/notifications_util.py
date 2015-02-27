@@ -90,7 +90,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 		if constants.NOTIFICATIONS_SMS_DICT[msgTypeId]:
 			logger.info("Sending txt instead %s" % user.id)
 			if (not '555555' in str(user.phone_number)):
-				msg = msg + " " + constants.NOTIFICATIONS_SMS_URL_DICT[msgTypeId]
+				msg = "Swap: " + msg + " " + constants.NOTIFICATIONS_SMS_URL_DICT[msgTypeId]
 				sendSMS(str(user.phone_number), msg)
 				logger.debug("SMS sent to %s: %s" % (user, msg))
 			else:

@@ -173,7 +173,7 @@ def sendUnactivatedAccountFS():
 	for user in list(usersWithPhotos):
 		# generate msg
 		photoPhrase, userPhrase = shareInstancesToPhrases(shareInstancesByUserId[user.id])
-		msg = "You have " + photoPhrase + " " + userPhrase + " waiting for you in Swap."
+		msg = "You have " + photoPhrase + " " + userPhrase + " waiting for you."
 		msgCount += 1
 
 		# send msg
