@@ -151,14 +151,18 @@ def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType
 		if photo.install_num != user.install_num:
 			continue
 
+		# We never ever want to deal with a photo saved with swap
+		if photo.saved_from_swap:
+			continue
+			
 		# Grab all if we're not supposed to filter
 		if includeAll:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
 			photosIncluded += 1
 			continue
 
-		# By default, don't include saved_from_swap or evaluated photos
-		if not photo.saved_with_swap and not photo.owner_evaluated:
+		# By default, don't include evaluated photos
+		if not photo.owner_evaluated:
 			strandData['objects'].append(photoDataForApiSerializer(photo))
 			photosIncluded += 1
 
