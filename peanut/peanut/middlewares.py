@@ -63,7 +63,7 @@ class StatsMiddleware(object):
                 response.content = s
 
         return response
-
+"""
 class SqlLogMiddleware(object):
     logging.basicConfig(filename='/mnt/log/requests.log',
                         level=logging.DEBUG,
@@ -77,7 +77,10 @@ class SqlLogMiddleware(object):
         for query in connection.queries:
             sqltime += float(query["time"])  # Add the time that the query took to the total
  
-        # len(connection.queries) = total number of queries
-        self.logger.info("Page render for url %s: %s sec with %s queries" % (request.build_absolute_uri(), unicode(sqltime), unicode(len(connection.queries))))
+        try:
+            # len(connection.queries) = total number of queries
+            self.logger.info("Page render for url %s: %s sec with %s queries" % (request.build_absolute_uri(), unicode(sqltime), unicode(len(connection.queries))))
+
         
         return response
+"""
