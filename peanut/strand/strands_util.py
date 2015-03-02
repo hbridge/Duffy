@@ -241,11 +241,18 @@ def updateOrCreateStrandNeighbors(strandNeighbors):
 	try:
 		StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
 	except IntegrityError:
+		# This almost always means one strand got deleted in the meantime (it got merged into something else)
+		# So refetch and filter to try again
+		
+		allStrands = Strand.objects.filter(id__in=allIds)
+		freshAllIds = Strand.getIds(allStrands)
 		for row in neighborRowsToCreate:
 			try:
-				row.save()
+				if row.strand_1_id and row.strand_1_id in freshAllIds:
+					if ((row.strand_2_id and row.strand_2_id in freshAllIds) or not row.strand_2_id):
+						row.save()
 			except IntegrityError:
-				logger.error("Got IntegrityError trying to save %s %s" % (row.strand_1_id, row.strand_2_id))
+				logger.error("Got IntegrityError trying to save %s %s.  Normally this is due to strand merges but I think that these exist" % (row.strand_1_id, row.strand_2_id))
 
 	StrandNeighbor.bulkUpdate(neighborRowsToUpdate, ["distance_in_meters"])
 
