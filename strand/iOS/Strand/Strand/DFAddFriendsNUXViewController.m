@@ -8,6 +8,8 @@
 
 #import "DFAddFriendsNUXViewController.h"
 #import "UIView+DFExtensions.h"
+#import "DFPeanutFeedDataManager.h"
+#import "DFFriendsRequiredNUXViewController.h"
 
 @interface DFAddFriendsNUXViewController ()
 
@@ -42,9 +44,22 @@
                                             action:@selector(doneButtonPressed:)];
 }
 
+const int MinFriendsRequired = 4;
+
+
 - (void)doneButtonPressed:(id)sender
 {
-  [self completedWithUserInfo:nil];
+  // ensure the user has at least 4 friends before continuing
+  NSArray *authedFriends = [[[DFPeanutFeedDataManager sharedManager] friendsList]
+                            objectsPassingTestBlock:^BOOL(id input) {
+                              return [input hasAuthedPhone];
+                            }];
+  
+  if (authedFriends.count < MinFriendsRequired) {
+    [self.navigationController pushViewController:[DFFriendsRequiredNUXViewController new] animated:YES];
+  } else {
+    [self completedWithUserInfo:nil];
+  }
 }
 
 - (BOOL)prefersStatusBarHidden

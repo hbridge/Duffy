@@ -116,8 +116,6 @@ DFUserActionType DFUserActionLastBackgroundReferesh = @"DFUserActionLastBackgrou
   return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
 
-
-
 // whether setup steps have been passed
 DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll = @"DFSetupStepAskToAutoSaveToCameraRoll";
 DFSetupStepType DFSetupStepSuggestionsNux = @"DFSetupStepSuggestionNux";
@@ -144,6 +142,44 @@ DFSetupStepType DFSetupStepSendCameraRoll = @"DFSetupStepSendCameraRoll";
   NSNumber *flashMode = [[NSUserDefaults standardUserDefaults] objectForKey:@"FlashMode"];
   return [flashMode intValue];
 }
+
+
++ (void)setSetupStartedWithBuildNumber:(NSNumber *)buildNumber
+{
+  [[NSUserDefaults standardUserDefaults] setObject:buildNumber forKey:@"SetupStartedBuildNumber"];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (void)setSetupCompletedForBuildNumber:(NSNumber *)buildNumber
+{
+  [[NSUserDefaults standardUserDefaults] setObject:buildNumber forKey:@"SetupCompletedBuildNumber"];
+  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SetupStartedBuildNumber"];
+  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SetupCompletedStepNum"];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (void)setSetupCompletedStep:(NSNumber *)step
+{
+  [[NSUserDefaults standardUserDefaults] setObject:step forKey:@"SetupCompletedStepNum"];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (NSNumber *)setupIncompleteBuildNum
+{
+  return [[NSUserDefaults standardUserDefaults] objectForKey:@"SetupStartedBuildNumber"];
+}
+
++ (NSNumber *)setupCompletedBuildNum;
+{
+  return [[NSUserDefaults standardUserDefaults] objectForKey:@"SetupCompletedBuildNumber"];
+}
+
++ (NSNumber *)setupCompletedStepIndex
+{
+  return [[NSUserDefaults standardUserDefaults] objectForKey:@"SetupCompletedStepNum"];
+}
+
+
 
 
 @end

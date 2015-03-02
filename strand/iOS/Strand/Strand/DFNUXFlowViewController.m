@@ -22,6 +22,8 @@
 #import "DFLocationPermissionViewController.h"
 #import "DFFriendsRequiredNUXViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFDefaultsStore.h"
+#import "DFAppInfo.h"
 
 
 @interface DFNUXFlowViewController ()
@@ -46,7 +48,6 @@
   DFSMSAuthViewController *smsAuth = [DFSMSAuthViewController new];
   DFPhotosPermissionViewController *photosPermission = [DFPhotosPermissionViewController new];
   DFLocationPermissionViewController *locationPermission = [DFLocationPermissionViewController new];
-  DFFindFriendsNUXViewController *findFriends = [DFFindFriendsNUXViewController new];
   DFAddFriendsNUXViewController *addFriends = [DFAddFriendsNUXViewController new];
   
   self.allNuxViewControllers =
@@ -59,6 +60,23 @@
     addFriends
     ];
   
+  // figure out if we can resume setup from an earlier run
+  BOOL resumeSetup = [[DFAppInfo buildNumber] isEqual:[DFDefaultsStore setupIncompleteBuildNum]];
+  if (resumeSetup) {
+    NSNumber *stepCompleted = [DFDefaultsStore setupCompletedStepIndex];
+    DDLogInfo(@"%@ resuming setup at step: %@", self.class, stepCompleted);
+    if (stepCompleted.integerValue >= 2) { // if we've passed auth, pick up from where we were
+      NSUInteger startingIndex = stepCompleted.integerValue + 1;
+      self.allNuxViewControllers = [self.allNuxViewControllers
+                                    subarrayWithRange:(NSRange){startingIndex,
+                                      self.allNuxViewControllers.count - startingIndex}];
+    }
+  } else {
+    DDLogInfo(@"%@ starting setup from beginning", self.class);
+  }
+  
+  [DFDefaultsStore setSetupStartedWithBuildNumber:[DFAppInfo buildNumber]];
+  
   self.backEnabledViews = @[
                             smsAuth
                             ];
@@ -66,7 +84,6 @@
   [self gotoNextStep];
 }
 
-const int MinFriendsRequired = 4;
 - (void)gotoNextStep
 {
   DFNUXViewController *nextNuxController;
@@ -80,20 +97,7 @@ const int MinFriendsRequired = 4;
   if (nextNuxController) {
     [self setActiveNUXController:nextNuxController];
   } else {
-    // ensure the user has at least 4 friends before continuing
-    NSArray *authedFriends = [[[DFPeanutFeedDataManager sharedManager] friendsList]
-                              objectsPassingTestBlock:^BOOL(id input) {
-                                return [input hasAuthedPhone];
-                              }];
-    
-    if ([self.currentViewController isKindOfClass:[DFAddFriendsNUXViewController class]]
-        && authedFriends.count < MinFriendsRequired) {
-      [self setActiveNUXController:[DFFriendsRequiredNUXViewController new]];
-    } else if ([self.currentViewController isKindOfClass:[DFFriendsRequiredNUXViewController class]]){
-      [self setActiveNUXController:[DFAddFriendsNUXViewController new]];
-    } else {
-      [self flowComplete];
-    }
+    [self flowComplete];
   }
 }
 
@@ -114,6 +118,10 @@ const int MinFriendsRequired = 4;
     [self userIDStepComplete];
   }
   
+  NSNumber *completedStepIndex =@([self.allNuxViewControllers indexOfObject:nuxController]);
+  DDLogInfo(@"%@ marking step %@ completed.", self.class, completedStepIndex);
+  [DFDefaultsStore setSetupCompletedStep:completedStepIndex];
+  
   if (nuxController == self.currentViewController) {
     [self gotoNextStep];
   } else {
@@ -124,6 +132,8 @@ const int MinFriendsRequired = 4;
 - (void)flowComplete
 {
   dispatch_async(dispatch_get_main_queue(), ^{
+    DDLogInfo(@"%@ setup complete", self.class);
+    [DFDefaultsStore setSetupCompletedForBuildNumber:[DFAppInfo buildNumber]];
     AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [delegate firstTimeSetupComplete];
   });

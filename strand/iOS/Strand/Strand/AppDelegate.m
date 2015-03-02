@@ -174,7 +174,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   return  ([[DFUser currentUser] userID]
            && ![[DFUser currentUser] userID] == 0
            && ![[DFDefaultsStore stateForPermission:DFPermissionPhotos]
-                isEqual:DFPermissionStateNotRequested]);
+                isEqual:DFPermissionStateNotRequested]
+           && ![DFDefaultsStore setupIncompleteBuildNum]);
 }
 
 - (void)showFirstTimeSetup

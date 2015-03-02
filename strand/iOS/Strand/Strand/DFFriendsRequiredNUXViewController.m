@@ -50,12 +50,18 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+  [super viewWillAppear:animated];
   [self.navigationController setNavigationBarHidden:YES];
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return YES;
 }
 
 - (void)buttonPressed:(id)sender
 {
-  [self completedWithUserInfo:nil];
+  [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end

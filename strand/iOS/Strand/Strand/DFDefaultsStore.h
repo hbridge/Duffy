@@ -30,6 +30,13 @@ extern DFSetupStepType DFSetupStepSuggestionsNux;
 + (void)setSetupStepPassed:(DFSetupStepType)step Passed:(BOOL)passed;
 + (BOOL)isSetupStepPassed:(DFSetupStepType)step;
 
++ (void)setSetupStartedWithBuildNumber:(NSNumber *)buildNumber;
++ (void)setSetupCompletedForBuildNumber:(NSNumber *)buildNumber;
++ (void)setSetupCompletedStep:(NSNumber *)step;
++ (NSNumber *)setupIncompleteBuildNum;
++ (NSNumber *)setupCompletedBuildNum;
++ (NSNumber *)setupCompletedStepIndex;
+
 // whether actions have happened
 typedef NSString *const DFUserActionType;
 extern DFUserActionType DFUserActionSendSuggestion;
