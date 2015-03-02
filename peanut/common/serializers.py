@@ -152,7 +152,7 @@ def objectDataForPrivateStrand(user, strand, friends, includeAll, suggestionType
 			continue
 
 		# We never ever want to deal with a photo saved with swap
-		if photo.saved_from_swap:
+		if photo.saved_with_swap:
 			continue
 			
 		# Grab all if we're not supposed to filter
