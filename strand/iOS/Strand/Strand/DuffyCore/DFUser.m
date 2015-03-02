@@ -47,7 +47,9 @@ static DFUser *currentUser;
         DDLogInfo(@"%@ unarchiving user data: %@",
                   [self.class description],
                   currentUser.description);
-      } else {
+      }
+      
+      if (!currentUser) {
         currentUser = [[DFUser alloc] init];
         DDLogInfo(@"%@ no user data found.", [self.class description]);
       }

@@ -72,6 +72,7 @@
                                       self.allNuxViewControllers.count - startingIndex}];
     }
   } else {
+    [DFUser setCurrentUser:nil];
     DDLogInfo(@"%@ starting setup from beginning", self.class);
   }
   
