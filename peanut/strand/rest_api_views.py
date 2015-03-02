@@ -344,6 +344,9 @@ class PhotoBulkAPI(BasePhotoAPI):
                 if photo.iphone_hash in existingPhotosByHash:
                     existingPhoto = self.getDupPhoto(photo, existingPhotosByHash[photo.iphone_hash])
 
+                    if not existingPhoto:
+                        logger.error("Tried to find dup photo with existing hash %s didn't get one back.  Debug: %s" % (photo.iphone_hash, copyOfExistingPhotosByHash[photo.iphone_hash]))
+                        
                     if existingPhoto:
                         existingPhoto.file_key = photo.file_key
                         existingPhoto.install_num = user.install_num
@@ -353,6 +356,8 @@ class PhotoBulkAPI(BasePhotoAPI):
                     else:
                         objsToCreate.append(photo)
                         logger.debug("Uploaded photo found with same hash %s as some existing, but different time_taken %s, creating new" % (photo.iphone_hash, photo.time_taken))
+
+                    existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
                 elif photo.id:
                     objsToUpdate.append(photo)
                 else:
