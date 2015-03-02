@@ -63,7 +63,11 @@ class StatsMiddleware(object):
                 response.content = s
 
         return response
-"""
+""" 
+
+commenting out due to it raising DisallowedHost
+Could put in that check but also it doesn't seem to really be working
+
 class SqlLogMiddleware(object):
     logging.basicConfig(filename='/mnt/log/requests.log',
                         level=logging.DEBUG,
