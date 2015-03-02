@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFFriendsRequiredNUXViewController">
+            <connections>
+                <outlet property="backgroundGradientView" destination="pXD-ET-jdp" id="v8U-bn-UlX"/>
+                <outlet property="button" destination="lot-ia-gu9" id="SQK-fP-1nX"/>
+                <outlet property="explanationLabel" destination="bBu-mt-vXA" id="V52-6A-jzf"/>
+                <outlet property="profileStackView" destination="Yfj-Kk-KgN" id="Aa9-We-uoH"/>
+                <outlet property="titleLabel" destination="buU-t6-DHC" id="kBg-1r-exl"/>
+                <outlet property="view" destination="pXD-ET-jdp" id="FmV-Z4-Clc"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="pXD-ET-jdp" customClass="SAMGradientView">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Explanation" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" preferredMaxLayoutWidth="255" translatesAutoresizingMaskIntoConstraints="NO" id="bBu-mt-vXA">
+                    <rect key="frame" x="40" y="177" width="240" height="24"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lot-ia-gu9">
+                    <rect key="frame" x="60" y="380" width="200" height="40"/>
+                    <color key="backgroundColor" red="0.21960784310000001" green="0.47058823529999999" blue="0.87058823529999996" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="40" id="eTZ-vd-T6H"/>
+                    </constraints>
+                    <state key="normal" title="Add Friends">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="buU-t6-DHC">
+                    <rect key="frame" x="139" y="43" width="42" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="ail-ah-zvO"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="20"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Yfj-Kk-KgN" customClass="DFProfileStackView">
+                    <rect key="frame" x="52" y="87" width="216" height="50"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="TQb-2N-BRt"/>
+                        <constraint firstAttribute="width" priority="1" constant="216" id="Vux-gV-GGf"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="centerX" secondItem="Yfj-Kk-KgN" secondAttribute="centerX" id="8vd-1a-ytY"/>
+                <constraint firstItem="Yfj-Kk-KgN" firstAttribute="top" secondItem="buU-t6-DHC" secondAttribute="bottom" constant="20" id="Afq-IQ-us2"/>
+                <constraint firstItem="buU-t6-DHC" firstAttribute="top" secondItem="pXD-ET-jdp" secondAttribute="top" constant="43" id="CC0-kM-HK3"/>
+                <constraint firstAttribute="bottom" secondItem="lot-ia-gu9" secondAttribute="bottom" constant="60" id="CgR-Tq-gOs"/>
+                <constraint firstItem="lot-ia-gu9" firstAttribute="leading" secondItem="pXD-ET-jdp" secondAttribute="leading" constant="60" id="QkC-hT-WfJ"/>
+                <constraint firstAttribute="centerX" secondItem="bBu-mt-vXA" secondAttribute="centerX" id="ThK-Ts-7dT"/>
+                <constraint firstAttribute="trailing" secondItem="bBu-mt-vXA" secondAttribute="trailing" constant="40" id="Uu1-It-1Ec"/>
+                <constraint firstAttribute="trailing" secondItem="lot-ia-gu9" secondAttribute="trailing" constant="60" id="Z2R-Pa-KUE"/>
+                <constraint firstItem="bBu-mt-vXA" firstAttribute="leading" secondItem="pXD-ET-jdp" secondAttribute="leading" constant="40" id="aYC-f1-0JK"/>
+                <constraint firstAttribute="centerX" secondItem="buU-t6-DHC" secondAttribute="centerX" id="r7j-cL-tft"/>
+                <constraint firstItem="bBu-mt-vXA" firstAttribute="top" secondItem="Yfj-Kk-KgN" secondAttribute="bottom" constant="40" id="t6p-ZM-FuD"/>
+                <constraint firstItem="lot-ia-gu9" firstAttribute="top" relation="greaterThanOrEqual" secondItem="bBu-mt-vXA" secondAttribute="bottom" constant="20" id="yPd-sP-J7H"/>
+            </constraints>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="605" y="475"/>
+        </view>
+    </objects>
+</document>

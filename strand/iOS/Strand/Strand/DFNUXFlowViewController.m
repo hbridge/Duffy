@@ -20,6 +20,8 @@
 #import "DFImageDownloadManager.h"
 #import "DFWelcomeNUXViewController.h"
 #import "DFLocationPermissionViewController.h"
+#import "DFFriendsRequiredNUXViewController.h"
+#import "DFPeanutFeedDataManager.h"
 
 
 @interface DFNUXFlowViewController ()
@@ -54,7 +56,6 @@
     smsAuth,
     photosPermission,
     locationPermission,
-    findFriends,
     addFriends
     ];
   
@@ -62,40 +63,43 @@
                             smsAuth
                             ];
   
-  for (DFNUXViewController *vc in self.allNuxViewControllers) {
-    vc.delegate = self;
-  }
-  
   [self gotoNextStep];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
+const int MinFriendsRequired = 4;
 - (void)gotoNextStep
 {
   DFNUXViewController *nextNuxController;
   if (!self.currentViewController) {
     nextNuxController = self.allNuxViewControllers.firstObject;
   } else {
-    nextNuxController = [self.allNuxViewControllers objectAfterObject:self.currentViewController
-                                                                 wrap:NO];
+    nextNuxController = [self.allNuxViewControllers objectAfterObject:self.currentViewController wrap:NO];
   }
-  
-  
   nextNuxController.inputUserInfo = self.allUserInfo;
   
   if (nextNuxController) {
     [self setActiveNUXController:nextNuxController];
   } else {
-    [self flowComplete];
+    // ensure the user has at least 4 friends before continuing
+    NSArray *authedFriends = [[[DFPeanutFeedDataManager sharedManager] friendsList]
+                              objectsPassingTestBlock:^BOOL(id input) {
+                                return [input hasAuthedPhone];
+                              }];
+    
+    if ([self.currentViewController isKindOfClass:[DFAddFriendsNUXViewController class]]
+        && authedFriends.count < MinFriendsRequired) {
+      [self setActiveNUXController:[DFFriendsRequiredNUXViewController new]];
+    } else if ([self.currentViewController isKindOfClass:[DFFriendsRequiredNUXViewController class]]){
+      [self setActiveNUXController:[DFAddFriendsNUXViewController new]];
+    } else {
+      [self flowComplete];
+    }
   }
 }
 
 - (void)setActiveNUXController:(DFNUXViewController *)nuxController
 {
+  nuxController.delegate = self;
   if ([self.backEnabledViews containsObject:nuxController]) {
     [self pushViewController:nuxController animated:YES];
   } else {
