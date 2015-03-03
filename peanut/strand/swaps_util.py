@@ -299,11 +299,13 @@ def getActionsList(user):
 	responseObjects = list()
 	actionsData = list()
 
-	# Do favorites, comments and suggestions
+	# Do favorites/comments, suggestions, add_Friends and request notifications
 	actions = Action.objects.prefetch_related('user', 'share_instance', 'photo', 'target_user').filter(
 		(Q(photo__thumb_filename__isnull=False) & ~Q(user=user) & (Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)) & Q(share_instance__users__in=[user.id])) | 
 		(Q(action_type=constants.ACTION_TYPE_SUGGESTION) & Q(user=user)) |
-		(Q(action_type=constants.ACTION_TYPE_ADD_FRIEND) & Q(target_user=user))
+		(Q(action_type=constants.ACTION_TYPE_ADD_FRIEND) & Q(target_user=user)) |
+		(Q(action_type=constants.ACTION_TYPE_REQUEST_PHOTOS_SUGGESTION) & Q(user=user)) |
+		(Q(action_type=constants.ACTION_TYPE_PHOTOS_REQUESTED) & Q(target_user=user))
 		).order_by("-added")[:60]
 
 	for action in actions:
