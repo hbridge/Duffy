@@ -304,7 +304,7 @@ def getActionsList(user):
 		(Q(photo__thumb_filename__isnull=False) & ~Q(user=user) & (Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_COMMENT)) & Q(share_instance__users__in=[user.id])) | 
 		(Q(action_type=constants.ACTION_TYPE_SUGGESTION) & Q(user=user)) |
 		(Q(action_type=constants.ACTION_TYPE_ADD_FRIEND) & Q(target_user=user)) |
-		(Q(action_type=constants.ACTION_TYPE_REQUEST_PHOTOS_SUGGESTION) & Q(user=user)) |
+		(Q(action_type=constants.ACTION_TYPE_REQUEST_PHOTOS_SUGGESTION) & Q(target_user=user)) |
 		(Q(action_type=constants.ACTION_TYPE_PHOTOS_REQUESTED) & Q(target_user=user))
 		).order_by("-added")[:60]
 
