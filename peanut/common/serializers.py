@@ -211,6 +211,7 @@ def actionDataOfActionApiSerializer(user, action):
 	actionData['action_type'] = action.action_type
 	actionData['share_instance'] = action.share_instance_id
 	actionData['photo'] = action.photo_id
+	actionData['strand'] = action.strand_id
 	actionData['text'] = action.text
 
 	return actionData
