@@ -14,8 +14,9 @@ import django
 django.setup()
 
 from common.models import User, ContactEntry, FriendConnection, Action, ShareInstance, NotificationLog
+from common import api_util
 
-from strand import notifications_util
+from strand import notifications_util, users_util
 
 from peanut.settings import constants
 from peanut.celery import app
@@ -57,6 +58,22 @@ def siListToUserPhrase(shareInstances):
 		userPhrase = ', '.join(userNames[:-1]) + ', and ' + userNames[-1]
 	
 	return userPhrase
+
+@app.task
+def sendRequestPhotosNotification(actionId):
+	action = Action.objects.prefetch_related('strand').get(id=actionId)
+	privateStrand = action.strand
+	name = users_util.getContactBasedFirstName(action.user, privateStrand.user)
+
+	msg = "%s wants your photos from %s, his memory is fuzzy" % (name, api_util.prettyDate(privateStrand.first_photo_time).lower())		
+	
+	logger.info("going to send '%s' to user id %s" %(msg, privateStrand.user_id))
+	customPayload = {'strand_id': privateStrand.id, 'id': privateStrand.photos.all()[0].id}
+	notifications_util.sendNotification(privateStrand.user, msg, constants.NOTIFICATIONS_PHOTOS_REQUESTED, customPayload)
+
+	# Kickoff separate notification for badging
+	sendRefreshFeedToUserIds.delay([privateStrand.user_id])
+
 
 @app.task
 def sendNewPhotoNotificationBatch(userId, shareInstanceIdList):

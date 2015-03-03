@@ -365,6 +365,7 @@ class BASE_CELERY_CONFIG:
         'async.notifications.sendNewPhotoNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendAddFriendNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
+        'async.notifications.sendRequestPhotosNotification': {'queue': 'independent', 'routing_key': 'independent'},
         'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
     }
     CELERYBEAT_SCHEDULE = {

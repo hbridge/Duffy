@@ -743,6 +743,9 @@ class CreateActionAPI(CreateAPIView):
                 action.share_instance.save()
                 logger.debug("setting share instance %s cache_dirty to True" % (action.share_instance.id))
                 popcaches.processInboxIds.delay([action.share_instance.id])
+            elif (action.action_type == constants.ACTION_TYPE_PHOTOS_REQUESTED):
+                notifications.sendRequestPhotosNotification.delay(action.id)
+                
 
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def get(self, request, id):

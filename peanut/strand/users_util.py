@@ -93,3 +93,23 @@ def getRegionCodeForUser(user_id):
 	region_code = geocoder.region_code_for_number(number)
 	logger.info("Found region code: %s for user: %s"%(region_code, user_id))
 	return region_code
+
+"""
+	Get the first name of a user according to the address book of another user.
+"""
+def getContactBasedFirstName(targetUser, sourceUser):
+	contactEntries = ContactEntry.objects.filter(phone_number = targetUser.phone_number).filter(user=sourceUser).exclude(skip=True)
+
+	bestName = None
+	for contactEntry in contactEntries:
+		if contactEntry.name:
+			name = contactEntry.name.split(' ')[0]
+			if not bestName or len(name) > len(bestName):
+				bestName = name
+
+	if not bestName:
+		return targetUser.display_name
+	else:
+		return bestName 
+
+
