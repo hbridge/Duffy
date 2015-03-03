@@ -116,7 +116,7 @@ disappearedWithParameters:(NSDictionary *)params;
 + (void)logNux:(NSString *)nuxName
 completedWithResult:(NSString *)result;
 
-
++ (void)logPhotoRequestInitiatedWithResult:(NSString *)result;
 
 #pragma mark - Utilities
 

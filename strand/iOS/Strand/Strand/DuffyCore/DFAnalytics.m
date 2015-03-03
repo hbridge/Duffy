@@ -612,7 +612,10 @@ static DFAnalytics *defaultLogger;
   [self logEvent:eventName withParameters:@{ResultKey : result}];
 }
 
-
++ (void)logPhotoRequestInitiatedWithResult:(NSString *)result
+{
+  [self logEvent:@"PhotoRequestInitiated" withParameters:@{ResultKey: result}];
+}
 
 #pragma mark - Bucket Value helpers
 

@@ -70,13 +70,17 @@ typedef NSString *DFUIActionType;
 extern DFUIActionType DFUIActionButtonPress;
 extern DFUIActionType DFUIActionDoubleTap;
 
-typedef UInt64 DFPeanutActionType;
-extern DFPeanutActionType DFPeanutActionFavorite;
-extern DFPeanutActionType DFPeanutActionComment;
-extern DFPeanutActionType DFPeanutActionAddedPhotos;
-extern DFPeanutActionType DFPeanutActionEvalPhoto;
-extern DFPeanutActionType DFPeanutActionSuggestedPhoto;
-extern DFPeanutActionType DFPeanutActionAddedAsFriend;
+typedef enum {
+  DFPeanutActionFavorite = 0,
+  DFPeanutActionAddedPhotos = 2,
+  DFPeanutActionComment = 4,
+  DFPeanutActionEvalPhoto = 5,
+  DFPeanutActionSuggestedPhoto = 6,
+  DFPeanutActionAddedAsFriend = 7,
+  DFPeanutActionRequestPhotos = 8,
+  DFPeanutActionSendRequestedPhotos = 9,
+} DFPeanutActionType;
+
 
 // common block type
 typedef void(^DFVoidBlock)(void);

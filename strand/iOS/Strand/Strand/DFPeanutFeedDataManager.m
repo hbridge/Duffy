@@ -1069,6 +1069,16 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
+
+- (void)requestPhoto:(DFPhotoIDType)photoID
+            fromUser:(DFUserIDType)userID
+             success:(DFVoidBlock)success
+             failure:(DFFailureBlock)failure
+{
+#warning incomplete implementation
+  success();
+}
+
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
 {
   NSDate *minDateFound;

@@ -29,6 +29,7 @@
 #import "UIImageEffects.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFFriendProfileViewController.h"
+#import "DFAlertController.h"
 
 const CGFloat ExpandedNavBarHeight = 19 + 44 + 87;
 const CGFloat CollapsedNavBarHeight = 19 + 44;
@@ -586,7 +587,8 @@ static DFPeanutFeedObject *currentPhoto;
    didSelectNotificationWithAction:(DFPeanutAction *)peanutAction
 {
   [self.notificationsPopupController dismissPopoverAnimated:YES];
-  if (peanutAction.action_type == DFPeanutActionSuggestedPhoto) {
+  if (peanutAction.action_type == DFPeanutActionSuggestedPhoto ||
+      peanutAction.action_type == DFPeanutActionSendRequestedPhotos) {
     DFPeanutFeedObject *suggestedPhoto;
     for (DFPeanutFeedObject *photo in [[DFPeanutFeedDataManager sharedManager]
                                        suggestedPhotosIncludeEvaled:NO]) {
@@ -609,12 +611,48 @@ static DFPeanutFeedObject *currentPhoto;
     DFFriendProfileViewController *friendProfile = [[DFFriendProfileViewController alloc]
                                                     initWithPeanutUser:user];
     [self.navigationController pushViewController:friendProfile animated:YES];
+  } else if (peanutAction.action_type == DFPeanutActionRequestPhotos) {
+    [self requestPhoto:peanutAction.id.longLongValue user:peanutAction.user];
   } else {
     DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                        photoWithID:peanutAction.photo.longLongValue
                                        shareInstance:peanutAction.share_instance.longLongValue];
     [self showMultiPhotoControllerWithStartingPhoto:photoObject];
   }
+}
+
+- (void)requestPhoto:(DFPhotoIDType)photoID user:(DFUserIDType)userID
+{
+  DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:userID];
+  NSString *messageString = [NSString stringWithFormat:@"Request photos from %@?", user.fullName];
+  DFAlertController *requestAlert = [DFAlertController
+                                     alertControllerWithTitle:@"Request Photos"
+                                     message:messageString
+                                     preferredStyle:DFAlertControllerStyleAlert];
+  [requestAlert
+   addAction:[DFAlertAction
+              actionWithTitle:@"Cancel"
+              style:DFAlertActionStyleCancel
+              handler:^(DFAlertAction *action) {
+                [DFAnalytics logPhotoRequestInitiatedWithResult:DFAnalyticsValueResultAborted];
+              }]];
+  [requestAlert
+   addAction:[DFAlertAction
+              actionWithTitle:@"Request"
+              style:DFAlertActionStyleDefault
+              handler:^(DFAlertAction *action) {
+                [[DFPeanutFeedDataManager sharedManager]
+                 requestPhoto:photoID fromUser:userID
+                 success:^{
+                   [DFAnalytics logPhotoRequestInitiatedWithResult:@"Requested"];
+                   [SVProgressHUD showSuccessWithStatus:@"Request Sent!"];
+                 } failure:^(NSError *error) {
+                   [DFAnalytics logPhotoRequestInitiatedWithResult:DFAnalyticsValueResultFailure];
+                   [SVProgressHUD showSuccessWithStatus:[NSString stringWithFormat:@"Error: %@",
+                                                         error.localizedDescription]];
+                 }];
+              }]];
+  [requestAlert showWithParentViewController:self animated:YES completion:nil];
 }
 
 - (void)dismissedPopLabel:(MMPopLabel *)popLabel
@@ -624,7 +662,7 @@ static DFPeanutFeedObject *currentPhoto;
     [DFDefaultsStore setSetupStepPassed:DFSetupStepSendCameraRoll Passed:YES];
   }
 }
-                              
+
 
 
 @end
