@@ -77,8 +77,8 @@ typedef enum {
   DFPeanutActionEvalPhoto = 5,
   DFPeanutActionSuggestedPhoto = 6,
   DFPeanutActionAddedAsFriend = 7,
-  DFPeanutActionRequestPhotos = 8,
-  DFPeanutActionSendRequestedPhotos = 9,
+  DFPeanutActionCanRequestPhotos = 8,
+  DFPeanutActionRequestPhotos = 9,
 } DFPeanutActionType;
 
 

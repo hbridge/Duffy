@@ -1070,13 +1070,31 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 
-- (void)requestPhoto:(DFPhotoIDType)photoID
+- (void)requestPhotos:(DFStrandIDType)strandID
             fromUser:(DFUserIDType)userID
              success:(DFVoidBlock)success
              failure:(DFFailureBlock)failure
 {
-#warning incomplete implementation
-  success();
+  DDLogVerbose(@"Going to create action to request strand %llu from %llu", strandID, userID);
+  
+  DFPeanutAction *action = [[DFPeanutAction alloc] init];
+  action.user = [[DFUser currentUser] userID];
+  action.action_type = DFPeanutActionRequestPhotos;
+  action.strand = @(strandID);
+  action.target_user = @(userID);
+  
+  [self.actionAdapter
+   performRequest:RKRequestMethodPOST
+   withPath:ActionBasePath
+   objects:@[action]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     if (success) success();
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ requestPhotos failed: %@", self.class, error);
+     if (failure) failure(error);
+   }];
 }
 
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects

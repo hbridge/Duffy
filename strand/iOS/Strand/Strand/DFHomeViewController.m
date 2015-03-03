@@ -588,7 +588,7 @@ static DFPeanutFeedObject *currentPhoto;
 {
   [self.notificationsPopupController dismissPopoverAnimated:YES];
   if (peanutAction.action_type == DFPeanutActionSuggestedPhoto ||
-      peanutAction.action_type == DFPeanutActionSendRequestedPhotos) {
+      peanutAction.action_type == DFPeanutActionRequestPhotos) {
     DFPeanutFeedObject *suggestedPhoto;
     for (DFPeanutFeedObject *photo in [[DFPeanutFeedDataManager sharedManager]
                                        suggestedPhotosIncludeEvaled:NO]) {
@@ -611,7 +611,7 @@ static DFPeanutFeedObject *currentPhoto;
     DFFriendProfileViewController *friendProfile = [[DFFriendProfileViewController alloc]
                                                     initWithPeanutUser:user];
     [self.navigationController pushViewController:friendProfile animated:YES];
-  } else if (peanutAction.action_type == DFPeanutActionRequestPhotos) {
+  } else if (peanutAction.action_type == DFPeanutActionCanRequestPhotos) {
     [self requestPhoto:peanutAction.id.longLongValue user:peanutAction.user];
   } else {
     DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]

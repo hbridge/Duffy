@@ -42,6 +42,8 @@ typedef UInt64 DFActionID;
 @property (nonatomic) DFUserIDType user;
 @property (nonatomic, retain) NSNumber *photo;
 @property (nonatomic, retain) NSNumber *share_instance;
+@property (nonatomic, retain) NSNumber *strand;
+@property (nonatomic, retain) NSNumber *target_user;
 @property (nonatomic, retain) NSString *text;
 @property (nonatomic, retain) NSDate *time_stamp;
 

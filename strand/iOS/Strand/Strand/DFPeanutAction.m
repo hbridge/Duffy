@@ -57,8 +57,8 @@
       || self.action_type == DFPeanutActionEvalPhoto
       || self.action_type == DFPeanutActionSuggestedPhoto
       || self.action_type == DFPeanutActionAddedAsFriend
+      || self.action_type == DFPeanutActionCanRequestPhotos
       || self.action_type == DFPeanutActionRequestPhotos
-      || self.action_type == DFPeanutActionSendRequestedPhotos
       ) return YES;
   
   return NO;
