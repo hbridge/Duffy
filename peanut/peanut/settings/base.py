@@ -260,6 +260,13 @@ LOGGING = {
         #},
     },
     'loggers': {
+        # Silence SuspiciousOperation.DisallowedHost exception ('Invalid
+        # HTTP_HOST' header messages). Set the handler to 'null' so we don't
+        # get those annoying emails.
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
         'django': {
             'handlers':['djangofile', 'djangoerror', 'mail_admins'],#, 'console'],
             'propagate': True,
