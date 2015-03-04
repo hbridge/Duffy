@@ -42,8 +42,10 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com"]
 
 #S3 Prod server settings
 AWS_STORAGE_BUCKET_NAME = 'strand-prod'
+AWS_IMAGE_HOST = "https://s3-external-1.amazonaws.com/" + AWS_STORAGE_BUCKET_NAME
 
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	CELERY_SEND_TASK_ERROR_EMAILS = True
 	ADMINS = [('Admins', 'server-errors@duffytech.co')]
 	BROKER_URL = "amqp://duffy:du44y@172.31.21.173:5672/swap"
+

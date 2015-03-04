@@ -91,7 +91,12 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			logger.info("Sending txt instead %s" % user.id)
 			if (not '555555' in str(user.phone_number)):
 				msg = "Swap: " + msg + " " + constants.NOTIFICATIONS_SMS_URL_DICT[msgTypeId]
-				sendSMS(str(user.phone_number), msg)
+
+				if "mms_url" in customPayload:
+					sendSMS(str(user.phone_number), msg, customPayload["mms_url"])
+				else:
+					sendSMS(str(user.phone_number), msg, None)
+					
 				logger.debug("SMS sent to %s: %s" % (user, msg))
 			else:
 				logger.debug("Nothing sent to %s: %s" % (user, msg))
@@ -117,16 +122,19 @@ def sendRefreshFeedToUsers(users):
 	result = urllib2.urlopen(httpRefreshFeedServerUrl).read()
 
 
-def sendSMS(phoneNumber, msg):
+def sendSMS(phoneNumber, msg, mmsUrl):
 	if phoneNumber.startswith('+91'):
 		sendSMSThroughPlivo(phoneNumber, msg)
 	else:
-		sendSMSThroughTwilio(phoneNumber, msg)
+		sendSMSThroughTwilio(phoneNumber, msg, mmsUrl)
 
-def sendSMSThroughTwilio(phoneNumber, msg):
+def sendSMSThroughTwilio(phoneNumber, msg, mmsUrl):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
 		
-	twilioclient.sms.messages.create(to=phoneNumber, from_=constants.TWILIO_PHONE_NUM, body=msg)
+	if mmsUrl:
+		twilioclient.messages.create(to=phoneNumber, from_=constants.TWILIO_PHONE_NUM, body=msg, media_url=mmsUrl)
+	else:
+		twilioclient.messages.create(to=phoneNumber, from_=constants.TWILIO_PHONE_NUM, body=msg)
 
 def sendSMSThroughPlivo(phoneNumber, msg):
 

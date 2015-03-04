@@ -13,6 +13,8 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
+from django.conf import settings
+
 from common.models import User, ContactEntry, FriendConnection, Action, ShareInstance, NotificationLog
 from common import api_util
 
@@ -144,7 +146,6 @@ def shareInstancesToPhrases(siList):
 
 	return photoPhrase, userPhrase
 
-
 @app.task
 def sendUnactivatedAccountFS():
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
@@ -195,7 +196,15 @@ def sendUnactivatedAccountFS():
 
 		# send msg
 		logger.debug("going to send '%s' to user id %s" % (msg, user.id))
+
 		customPayload = {}
+
+		photo = shareInstancesByUserId[user.id][0].photo
+		if photo.full_filename:
+			customPayload["mms_url"] = settings.AWS_IMAGE_HOST + photo.getFullUrlImagePath()
+		elif photo.thumb_filename:
+			customPayload["mms_url"] = settings.AWS_IMAGE_HOST + photo.getThumbUrlImagePath()
+
 		notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_ACTIVATE_ACCOUNT_FS, customPayload)
 
 	return msgCount
