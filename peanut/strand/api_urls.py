@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
+	url(r'^website_registration', 'strand.api_views.website_registration'),
+
 	# decremented
 	url(r'^strand_inbox', 'strand.api_views.nothing'),
 

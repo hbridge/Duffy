@@ -5,6 +5,7 @@ import os
 import pytz
 import random
 import logging
+import csv
 
 from django.http import HttpResponse
 from django.db.models import Q
@@ -21,7 +22,7 @@ from common.serializers import UserSerializer
 from common import api_util, serializers, stats_util
 
 from strand import geo_util, notifications_util, friends_util, strands_util, users_util, swaps_util
-from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, SmsContentForm
+from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, SmsContentForm, WebsiteRegistrationForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -225,7 +226,19 @@ def actions_list(request):
 
 #   -------------------------  OTHER ENDPOINTS ---------------------
 
+def website_registration(request):
+	response = dict({'result': True})
+	form = WebsiteRegistrationForm(api_util.getRequestData(request))
 
+	if (form.is_valid()):
+		f = open(constants.WEBSITE_REGISTRATION_FILE, 'ab')
+		w = csv.writer(f)
+
+		w.writerow([form.cleaned_data['phone_number'], form.cleaned_data['source']])
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
 	Registers a user's current location (and only stores the last location)

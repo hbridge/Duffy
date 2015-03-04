@@ -112,3 +112,8 @@ class OnlyUserIdForm(StrandApiForm, UserIdMixin):
 class UserIdAndStrandIdForm(StrandApiForm, UserIdMixin, StrandIdMixin):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 	strand_id = forms.IntegerField(min_value=1, max_value=10000000)
+
+
+class WebsiteRegistrationForm(forms.Form):
+	phone_number = forms.CharField(min_length=1, max_length=100)
+	source = forms.CharField(min_length=1, max_length=100)
