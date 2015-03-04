@@ -262,12 +262,13 @@ def actions_list(request):
 def website_registration(request):
 	response = dict({'result': True})
 	form = WebsiteRegistrationForm(api_util.getRequestData(request))
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
 	if (form.is_valid()):
 		f = open(constants.WEBSITE_REGISTRATION_FILE, 'ab')
 		w = csv.writer(f)
 
-		w.writerow([form.cleaned_data['phone_number'], form.cleaned_data['source']])
+		w.writerow([now.strftime("%Y-%m-%d %H:%M:%S"), form.cleaned_data['phone_number'], form.cleaned_data['source']])
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
