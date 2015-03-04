@@ -344,9 +344,6 @@ class PhotoBulkAPI(BasePhotoAPI):
                 if photo.iphone_hash in existingPhotosByHash:
                     existingPhoto = self.getDupPhoto(photo, existingPhotosByHash[photo.iphone_hash])
 
-                    if not existingPhoto:
-                        logger.error("Tried to find dup photo with existing hash %s didn't get one back.  Debug: %s" % (photo.iphone_hash, copyOfExistingPhotosByHash[photo.iphone_hash]))
-                        
                     if existingPhoto:
                         existingPhoto.file_key = photo.file_key
                         existingPhoto.install_num = user.install_num
