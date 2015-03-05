@@ -350,11 +350,11 @@ class PhotoBulkAPI(BasePhotoAPI):
 
                         logger.debug("Uploaded photo found with same hash as existing, setting to id %s and filekey %s for hash %s" % (existingPhoto.id, existingPhoto.file_key, existingPhoto.iphone_hash))
                         objsToUpdate.append(existingPhoto)
+                        existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
                     else:
                         objsToCreate.append(photo)
                         logger.debug("Uploaded photo found with same hash %s as some existing, but different time_taken %s, creating new" % (photo.iphone_hash, photo.time_taken))
-
-                    existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
+                    
                 elif photo.id:
                     objsToUpdate.append(photo)
                 else:
