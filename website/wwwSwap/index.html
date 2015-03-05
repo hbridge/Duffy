@@ -135,7 +135,7 @@
 	}
 	.ui-bottom {
 		float: left;
-		height: 30px;
+
 		padding: 0px 25px 20px 25px;
 		text-align: center;
 		font-size: 17px;
@@ -205,6 +205,15 @@
 		</div>
 		<div class='ui-pages'>
 			<div class='ui-screenshots'>
+				<img class='ui-image' src='/resources/images/4a.jpg'>
+			</div>
+
+			<div class="ui-bottom"> 
+				Build a shared gallery with friends!
+			</div>
+		</div>		
+		<div class='ui-pages'>
+			<div class='ui-screenshots'>
 				<img class='ui-image' src='/resources/images/2a.jpg'>
 			</div>
 
@@ -219,15 +228,6 @@
 
 			<div class="ui-bottom"> 
 				Like and comment privately with friends on a photo!
-			</div>
-		</div>
-		<div class='ui-pages'>
-			<div class='ui-screenshots'>
-				<img class='ui-image' src='/resources/images/4a.jpg'>
-			</div>
-
-			<div class="ui-bottom"> 
-				Build a shared gallery with friends!
 			</div>
 		</div>
 		<div class="ui-phone-num post-install hidden"> 
@@ -258,23 +258,13 @@
 
 </body>
 <script>
-	function dlClicked(){
-		if (detectiPhone()) {
-			$('#install-text').empty();
-			$('#install-text').append("See below");
-			$('#install-text').addClass('ui-button-clicked');
-			$('div.ui-pages').fadeOut(200);
-			$('div.post-install').fadeIn(200);
-			localytics.tagEvent("DL_Swap_2");
-		}
-		else {
-			$('#install-text').empty();
-			$('#install-text').append("iPhone required");
-		}
-	}
-
-	function getAccessSoonerClicked(){
-		$('div.ui-post-signup-details').fadeIn(200);
+	function signupClicked(){
+		$('#install-text').empty();
+		$('#install-text').append("See below");
+		$('#install-text').addClass('ui-button-clicked');
+		$('div.ui-pages').fadeOut(200);
+		$('div.post-install').fadeIn(200);
+		localytics.tagEvent("DL_Swap_2");
 	}
 
 	function getCode(){
@@ -320,21 +310,20 @@
 
 	  	// Install button clicked
 		$('div.ui-install-button').click(function() {
-			dlClicked();
+			signupClicked();
 		});
 
 		// submit button clicked
 		$('div.ui-submit-button').click(function(){
 			if ($('#phone').val().indexOf("5555") == -1){
 				url = 'http://prod.strand.duffyapp.com/strand/api/website_registration';
-				url = 'http://dev.duffyapp.com/strand/api/website_registration';
 				code = getCode();
 				console.log(code);
 				$.ajax({
 	     			url: url,
 	     			type: 'get',
 	     			dataType: 'jsonp',
-	     			data: { phone_number: $('#phone').val(), source: 'main', invite_code: code },
+	     			data: { phone_number: $('#phone').val(), source: 'index.html', invite_code: code },
 	     			success: function(data) {
 						$('div.post-install').fadeOut(200, function(){
 							$('#post-signup').fadeIn(200);
@@ -347,7 +336,7 @@
 
 		// More info on signup button clicked
 		$('div.ui-post-signup-more').click(function(){
-			getAccessSoonerClicked();
+			$('div.ui-post-signup-details').fadeIn(200);
 		});
 
 		// Textarea selected to copy link
