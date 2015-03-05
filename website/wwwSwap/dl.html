@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Download Swap </title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="/swap/swap.css" media="screen" />
+	<script src='/resources/jquery-1.10.2.min.js'> </script>
+	<script type="text/javascript" src="//web.localytics.com/latest/localytics.min.js"></script>
+	<script type="text/javascript">
+		var localytics = LocalyticsSession("a592cd77469784a29d9bb69-f41b5cee-2171-11e4-4a11-00a426b17dd8", {logger:true, namespace:"websdk"});
+		localytics.open();
+	</script>
+	<style>
+	body {
+		margin: 0px;
+		font-family: HelveticaNeue;	
+		overflow: scroll;
+	}
+	.ui-content {
+		overflow: scroll;
+	}
+	.ui-header {
+		position: fixed;
+		overflow: auto;
+		height: 76px;
+		padding: 0px;
+		width: 100%;
+		box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+		z-index: 100;
+	}
+	.ui-header-lhs {
+		float:left;
+	}
+	.ui-header-rhs {
+		float:right;
+		margin-right: 10px;
+		margin-top: 25px;
+	}
+	.ui-header-top-text {
+		font-size: 16px;
+		color: #000000;
+		line-height: 20px;
+		padding-top: 19px;
+	}
+	.ui-header-bottom-text {
+		font-size: 14px;
+		color: #4A4A4A;
+		line-height: 17px;
+	}
+	img.ui-icon {
+		float:left;
+		height: 49px;
+		width: 49px;
+		margin: 10px;
+		border-radius: 6px;
+	}	
+	.ui-body {
+		margin-top: 89px;
+		overflow: auto;
+	}
+	.ui-screenshots {
+		margin-right: auto;
+		margin-left: auto;
+		position:relative;
+		text-align: center;
+		/*width: 161px;*/
+	}
+	img.ui-image {
+		display:block;
+		margin-right: auto;
+		margin-left: auto;
+		height: 350px;
+	}
+	img.ui-home-button {
+		position: absolute;
+		top: 305px;
+		left: 146px;
+		height: 26px;
+		width: 26px;
+	}
+	.ui-install-button{
+		background: #50A1FF;
+		font-family: HelveticaNeue;
+		font-size: 16px;
+		color: #FFFFFF;
+		line-height: 19px;
+		border-radius: 12px;
+		border: 0px solid white;
+		padding: 3px 19px;			
+	}
+	.ui-install-button-clicked {
+		background: #979797;
+	}
+	.ui-bottom {
+		float: left;
+		height: 30px;
+		padding: 0px 25px 20px 25px;
+		text-align: center;
+		font-size: 17px;
+		line-height: 20px;
+		margin-bottom:15px;
+	}
+	</style>
+</head>
+<body>
+
+<div class='ui-content'>
+
+	<div class='ui-header'>
+		<img class='ui-icon' src='/resources/swap_icon.png'> 
+		<div class='ui-header-lhs'>
+			<div class='ui-header-top-text'> Swap Beta </div>
+			<div class='ui-header-bottom-text'> Duffy, Inc. </div>
+		</div>
+		<div class='ui-header-rhs'>
+			<div class='ui-install-button' id='install-text'> Install </div>
+		</div>
+	</div>
+
+	<div class='ui-body'>
+
+		<div class='ui-pages'>
+			<div class='ui-screenshots'>
+				<img class='ui-image' id='main-image' src='/resources/1a.jpg'>
+				<img class='ui-home-button hidden' src='/resources/flashing_oval.png'>
+			</div>
+
+			<div class="ui-bottom pre-install"> 
+				Get notified when you take a picture with your friends!
+			</div>
+		</div>
+		<div class='ui-pages-bottom'>
+			<div class='ui-screenshots'>
+				<img class='ui-image' src='/resources/2a.jpg'>
+			</div>
+
+			<div class="ui-bottom pre-install"> 
+				Share photos with a single tap - friends who were there are preselected!
+			</div>
+		</div>
+		<div class='ui-pages-bottom'>
+			<div class='ui-screenshots'>
+				<img class='ui-image' src='/resources/3a.jpg'>
+			</div>
+
+			<div class="ui-bottom pre-install"> 
+				Like and comment privately with friends on a photo!
+			</div>
+		</div>
+		<div class='ui-pages-bottom'>
+			<div class='ui-screenshots'>
+				<img class='ui-image' src='/resources/4a.jpg'>
+			</div>
+
+			<div class="ui-bottom pre-install"> 
+				Build a shared gallery with friends!
+			</div>
+		</div>
+
+
+		<div class="ui-bottom post-install hidden"> 
+			Swap is now installing. Please press your iPhone's home button.
+		</div>		
+
+		<div class='ui-dl-appstore hidden'>
+			<img class='ui-appstore' src='/resources/appstore.svg'>
+		</div>
+
+	</div>
+
+</div>
+
+</body>
+<script>
+	function dlClicked(){
+		if (detectiPhone()) {
+			window.location.href = 'itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F1000%3F';			
+			$('#install-text').empty();
+			$('#install-text').append("Installing...");
+			$('#install-text').addClass('ui-install-button-clicked');
+			$('div.pre-install').addClass('hidden');
+			$('div.ui-pages-bottom').addClass('hidden');
+			$('div.post-install').fadeIn(200);
+			$('#main-image').fadeOut(200, function() {
+				$('#main-image').attr('src','/resources/installing.jpg');
+			}).fadeIn(200);
+			window.setTimeout(flashHomeButton, 3000);
+			localytics.tagEvent("DL_Swap");
+		}
+		else {
+			$('#install-text').empty();
+			$('#install-text').append("iPhone required");
+		}
+	}
+
+	function flashHomeButton() {
+    var img = $("img.ui-home-button");
+
+	    doFadeIn();
+
+	    function doFadeIn() {
+	        img.fadeIn("slow", doFadeOut);
+	    }
+
+	    function doFadeOut() {
+	        img.fadeOut("slow", doFadeIn);
+	    }
+	}
+
+	function detectiPhone(){
+		var ua = navigator.userAgent;
+		console.log(ua);
+		if(ua.match(/iPhone/i)){
+			return true;
+		}
+		return false;
+	}
+
+	$(document).ready(function(){
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  	ga('create', 'UA-53853203-1', 'auto');
+	  	ga('send', 'pageview');
+
+		$('div.ui-install-button').click(function() {
+			dlClicked();
+		});
+	});
+	
+</script>
+</html>

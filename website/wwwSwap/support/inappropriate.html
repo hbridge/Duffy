@@ -1,0 +1,60 @@
+<html>
+<title>
+	Swap - Report inappropriate content
+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/strand/strand.css" media="screen" />
+<style>
+fieldset {
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    font-size:100%;
+    font:inherit;
+    vertical-align:baseline;
+    color: #666
+}
+input[type="text"] {
+	width: 100%;
+}
+textarea {
+	width: 100%;
+}
+
+</style>
+
+<body>
+	<div class='ui-header'>Report inappropriate content on Swap</div>
+
+	<div class="ui-top-summary">
+		Please use the form below to report any inappropriate content and Swap user who shared that content.
+	</div>
+
+<div class="ui-fields">
+
+<form action="http://prod.strand.duffyapp.com/strand/viz/report_inappropriate">
+  <fieldset>
+    <label for="name">Your phone #:</label>
+    <input type="text" name="name" id="name" autocomplete='off'/>
+    <br /><br />
+    <label for="mail">Your email:</label>
+    <input type="text" name="mail" id="mail" autocomplete='off'/>
+    <br /><br />
+    <label for="offender">Offender's phone # or username:</label>
+    <input type="text" name="offender" id="offender" />
+    <br /><br />
+    <label for="offender">Date and time of the content:</label>
+    <input type="text" name="contenttime" id="contenttime" autocomplete='off'/>    
+    <br /><br />
+    <label for="discuss">Please explain what happened:</label>
+    <textarea rows="7" name="discuss" autocomplete='off'></textarea>
+    <br /><br />
+    <input type="submit" id="submit-button" value="Send"/>
+    <br />
+  </fieldset>
+</form>
+</div>
+<div class="ui-footer"> &copy; 2015 Duffy, Inc.</div>  
+</body>
+</html>
