@@ -479,7 +479,7 @@ def send_sms_code(request):
 
 			msg = "Your Swap code is:  %s" % (accessCode)
 	
-			notifications_util.sendSMS(phoneNumber, msg)
+			notifications_util.sendSMS(phoneNumber, msg, None)
 			SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
 		else:
 			response['debug'] = "Skipped"
