@@ -269,6 +269,14 @@ def website_registration(request):
 		w = csv.writer(f)
 
 		w.writerow([now.strftime("%Y-%m-%d %H:%M:%S"), form.cleaned_data['phone_number'], form.cleaned_data['source'], form.cleaned_data['invite_code']])
+
+		# clean phone number, append +1
+		phone = '+1'
+		for c in str(form.cleaned_data['phone_number']):
+			if str.isdigit(c):
+				phone += c
+		bodyText = "Swap: Thanks for signing up for our beta! We'll txt you as soon as we are ready."
+		notifications_util.sendSMS(phone, bodyText, None)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
