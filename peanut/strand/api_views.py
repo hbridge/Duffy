@@ -6,6 +6,7 @@ import pytz
 import random
 import logging
 import csv
+import string
 
 from django.http import HttpResponse
 from django.db.models import Q
@@ -275,7 +276,9 @@ def website_registration(request):
 		for c in str(form.cleaned_data['phone_number']):
 			if str.isdigit(c):
 				phone += c
-		bodyText = "Swap: Thanks for signing up for our beta! We'll txt you as soon as we are ready."
+
+		link = "swapapp.co/" + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		bodyText = "From Swap: We got your request. 4 friends with iPhones are required to activate. Invite link: " + link
 		notifications_util.sendSMS(phone, bodyText, None)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
