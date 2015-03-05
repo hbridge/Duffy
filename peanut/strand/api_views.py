@@ -458,7 +458,7 @@ def send_sms_test(request):
 	else:
 		bodytext = "Test msg from Strand/send_sms_test"
 	
-	notifications_util.sendSMSThroughPlivo(phone, bodytext)
+	notifications_util.sendSMS(phone, bodytext, None)
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
