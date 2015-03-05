@@ -268,7 +268,7 @@ def website_registration(request):
 		f = open(constants.WEBSITE_REGISTRATION_FILE, 'ab')
 		w = csv.writer(f)
 
-		w.writerow([now.strftime("%Y-%m-%d %H:%M:%S"), form.cleaned_data['phone_number'], form.cleaned_data['source']])
+		w.writerow([now.strftime("%Y-%m-%d %H:%M:%S"), form.cleaned_data['phone_number'], form.cleaned_data['source'], form.cleaned_data['invite_code']])
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 

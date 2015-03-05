@@ -117,3 +117,4 @@ class UserIdAndStrandIdForm(StrandApiForm, UserIdMixin, StrandIdMixin):
 class WebsiteRegistrationForm(forms.Form):
 	phone_number = forms.CharField(min_length=1, max_length=100)
 	source = forms.CharField(min_length=1, max_length=100)
+	invite_code = forms.CharField(min_length=0, max_length=100, required=False)
