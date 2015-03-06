@@ -208,6 +208,7 @@
 		</div>
 		<div class='ui-bottom ui-post-signup hidden' id='post-signup'>
 			Thanks. You should get a confirmation SMS shortly.
+			<div class='ui-fb-tracker'> </div>
 			<div class="ui-post-signup-more hidden"> How do I get access sooner?</div>
 			<div class="ui-post-signup-details hidden"> More friends on Swap means better photo suggestions for you.
 				Invite your friends and we'll bump you up on the waitlist. 
@@ -254,7 +255,6 @@
 		$('div.ui-submit-button').click(function(){
 			if ($('#phone').val().indexOf("5555") == -1){
 				url = 'http://prod.strand.duffyapp.com/strand/api/website_registration';
-				url = 'http://dev.duffyapp.com:7000/strand/api/website_registration';
 				code = getCode();
 				$.ajax({
 	     			url: url,
@@ -266,8 +266,9 @@
 							$('#post-signup').fadeIn(200);
 						});
 						$('#link').append('swapapp.co/'+code);
+						$('div.ui-fb-tracker').load('fb_tracking.html');
 	     			}
-	 			});		
+	 			});	
 			}
 		});
 
