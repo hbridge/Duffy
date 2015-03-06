@@ -277,7 +277,8 @@ def website_registration(request):
 			if str.isdigit(c):
 				phone += c
 
-		link = "swapapp.co/" + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		#link = "swapapp.co/" + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		link = "swapapp.co/" + str(form.cleaned_data['invite_code'])
 		bodyText = "Swap: We got your request. Four friends with iPhones are needed to activate Swap. Invite link: " + link
 		notifications_util.sendSMS(phone, bodyText, None)
 	else:
