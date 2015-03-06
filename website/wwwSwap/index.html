@@ -165,7 +165,7 @@
 			</div>
 
 			<div class="ui-bottom"> 
-				Get notified when you take photos with your friends!
+				Get notified to share photos when you are hanging out with friends!
 			</div>
 		</div>
 		<div class='ui-pages'>
@@ -255,6 +255,7 @@
 		$('div.ui-submit-button').click(function(){
 			if ($('#phone').val().indexOf("5555") == -1){
 				url = 'http://prod.strand.duffyapp.com/strand/api/website_registration';
+				//url = 'http://dev.duffyapp.com:7000/strand/api/website_registration';
 				code = getCode();
 				$.ajax({
 	     			url: url,
