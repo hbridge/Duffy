@@ -278,7 +278,7 @@ def website_registration(request):
 				phone += c
 
 		link = "swapapp.co/" + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-		bodyText = "From Swap: We got your request. 4 friends with iPhones are required to activate. Invite link: " + link
+		bodyText = "Swap: We got your request. Four friends with iPhones are needed to activate Swap. Invite link: " + link
 		notifications_util.sendSMS(phone, bodyText, None)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
