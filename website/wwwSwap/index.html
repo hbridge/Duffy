@@ -13,21 +13,9 @@
 		localytics.open();
 	</script>
 	<style>
-	body {
-		margin: 0px;
-		font-family: HelveticaNeue;	
-		overflow: scroll;
-	}
 	.ui-content {
-		overflow: scroll;
+		overflow: auto;
 	}
-	img.ui-icon {
-		float:left;
-		height: 49px;
-		width: 49px;
-		margin: 10px;
-		border-radius: 6px;
-	}	
 	.ui-body {
 		margin-top: 89px;
 		overflow: auto;
@@ -38,29 +26,6 @@
 		position:relative;
 		text-align: center;
 		/*width: 161px;*/
-	}
-	img.ui-image {
-		display:block;
-		margin-right: auto;
-		margin-left: auto;
-		height: 350px;
-	}
-	img.ui-home-button {
-		position: absolute;
-		top: 305px;
-		left: 146px;
-		height: 26px;
-		width: 26px;
-	}
-	.ui-clickable-button {
-		background: #50A1FF;
-		font-family: HelveticaNeue;
-		font-size: 16px;
-		color: #FFFFFF;
-		line-height: 19px;
-		border-radius: 12px;
-		border: 0px solid white;
-		padding: 3px 15px;		
 	}
 	.ui-install-button{
 		
@@ -113,6 +78,7 @@
 		font-size: 17px;
 		line-height: 20px;
 		margin-bottom:15px;
+		width: 300px;
 	}
 	.ui-post-signup {
 		margin-top: 50px;
@@ -132,21 +98,6 @@
 		margin-left: auto;
 		margin-top: 20px;
 	}
-	/*
-	.background {
-	}
-	.ui-phone-num::after {
-	  content: "";
-	  background: url(/resources/4a_noiPhone.jpg);
-	  opacity: 0.5;
-	  top: 0;
-	  left: 0;
-	  bottom: 0;
-	  right: 0;
-	  position: absolute;
-	  z-index: -1;  
-	}
-	*/
 	</style>
 </head>
 <body>
@@ -159,98 +110,19 @@
 
 	<div class='ui-body'>
 
-		<div class='ui-pages'>
-			<div class='ui-screenshots'>
-				<img class='ui-image' id='main-image' src='/resources/images/1a.jpg'>
-			</div>
+		<!-- To be filled in via jquery -->
 
-			<div class="ui-bottom"> 
-				Get notified to share photos when you are hanging out with friends!
-			</div>
-		</div>
-		<div class='ui-pages'>
-			<div class='ui-screenshots'>
-				<img class='ui-image' src='/resources/images/4a.jpg'>
-			</div>
-
-			<div class="ui-bottom"> 
-				Build a shared gallery with friends!
-			</div>
-		</div>		
-		<div class='ui-pages'>
-			<div class='ui-screenshots'>
-				<img class='ui-image' src='/resources/images/2a.jpg'>
-			</div>
-
-			<div class="ui-bottom"> 
-				Share photos with a single tap - friends who were there are preselected!
-			</div>
-		</div>
-		<div class='ui-pages'>
-			<div class='ui-screenshots'>
-				<img class='ui-image' src='/resources/images/3a.jpg'>
-			</div>
-
-			<div class="ui-bottom"> 
-				Like and comment privately with friends on a photo!
-			</div>
-		</div>
-		<div class="ui-phone-num post-install hidden"> 
-			<div class="ui-text">
-				Enter your phone number to get on the waitlist:
-			</div>
-			<form id='phoneform' action='http://dev.duffyapp.com:8000/strand/api/website_registration'>
-				<input name='phone_number' class="textbox" type="text" id="phone" placeholder="(843) 555-5555">
-				<input type="hidden" name='source' value='main'>
-			</form>
-			<div class='ui-clickable-button ui-submit-button'> Submit </div>
-
-		</div>
-		<div class='ui-bottom ui-post-signup hidden' id='post-signup'>
-			Thanks. You should get a confirmation SMS shortly.
-			<div class='ui-fb-tracker'> </div>
-			<div class="ui-post-signup-more hidden"> How do I get access sooner?</div>
-			<div class="ui-post-signup-details hidden"> More friends on Swap means better photo suggestions for you.
-				Invite your friends and we'll bump you up on the waitlist. 
-				<br>
-				<br>
-				Use your personalized url:
-				<textarea id='link'></textarea>
-			</div>
-		</div>
 	</div>
 
 </div>
 
 </body>
 <script>
-	function signupClicked(){
-		$('#install-text').empty();
-		$('#install-text').append("See below");
-		$('#install-text').addClass('ui-button-clicked');
-		$('div.ui-pages').fadeOut(200);
-		$('div.post-install').fadeIn(200);
-		localytics.tagEvent("DL_Swap_2");
-	}
+	/*
+	Attach all the handlers after body loads
+	*/
 
-	$(document).ready(function(){
-		// fetch header
-		$('div.ui-header').load('header.html', function(){
-		 	// Install button clicked
-			$('div.ui-install-button').click(function() {
-				signupClicked();
-			});
-		});
-
-
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	  	ga('create', 'UA-53853203-1', 'auto');
-	  	ga('send', 'pageview');
-
+	function postBodyLoad(){
 		// submit button clicked
 		$('div.ui-submit-button').click(function(){
 			if ($('#phone').val().indexOf("5555") == -1){
@@ -292,6 +164,34 @@
 
 		// Enable mask on phonenum
 		$('#phone').mask("(999) 999-9999");
+	}
+
+	$(document).ready(function(){
+		// fetch header
+		$('div.ui-header').load('header.html', function(){
+		 	// Install button clicked
+			$('div.ui-install-button').click(function() {
+				signupClicked();
+			});
+		});
+
+		// load body depending on whether phone or not
+		if (detectiPhone()){
+			$('div.ui-body').load('body_mobile.html', postBodyLoad);
+		}
+		else {
+			$('div.ui-body').load('body_desktop.html', postBodyLoad);
+		}
+
+		// attach analytics
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  	ga('create', 'UA-53853203-1', 'auto');
+	  	ga('send', 'pageview');
+		
 	});
 	
 </script>

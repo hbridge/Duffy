@@ -1,0 +1,78 @@
+<style>
+	img.ui-image {
+		display:block;
+		margin-right: auto;
+		margin-left: auto;
+		height: 350px;
+	}
+</style>
+<script>
+	function signupClicked(){
+		$('#install-text').empty();
+		$('#install-text').append("See below");
+		$('#install-text').addClass('ui-button-clicked');
+		$('div.ui-pages').fadeOut(200);
+		$('div.post-install').fadeIn(200);
+		localytics.tagEvent("DL_Swap_2_mobile");
+	}
+	$('div.ui-install-button').fadeIn(200);
+</script>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' id='main-image' src='/resources/images/1a.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Get notified to share photos when you are hanging out with friends!
+	</div>
+</div>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' src='/resources/images/4a.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Build a shared gallery with friends!
+	</div>
+</div>		
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' src='/resources/images/2a.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Share photos with a single tap - friends who were there are preselected!
+	</div>
+</div>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' src='/resources/images/3a.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Like and comment privately with friends on a photo!
+	</div>
+</div>
+<div class="ui-phone-num post-install hidden"> 
+	<div class="ui-text">
+		Enter your phone number to get on the waitlist:
+	</div>
+	<form id='phoneform' action='http://dev.duffyapp.com:8000/strand/api/website_registration'>
+		<input name='phone_number' class="textbox" type="text" id="phone" placeholder="(843) 555-5555">
+		<input type="hidden" name='source' value='main'>
+	</form>
+	<div class='ui-clickable-button ui-submit-button'> Submit </div>
+
+</div>
+<div class='ui-bottom ui-post-signup hidden' id='post-signup'>
+	Thanks. You should get a confirmation SMS shortly.
+	<div class='ui-fb-tracker'> </div>
+	<div class="ui-post-signup-more hidden"> How do I get access sooner?</div>
+	<div class="ui-post-signup-details hidden"> More friends on Swap means better photo suggestions for you.
+		Invite your friends and we'll bump you up on the waitlist. 
+		<br>
+		<br>
+		Use your personalized url:
+		<textarea id='link'></textarea>
+	</div>
+</div>
