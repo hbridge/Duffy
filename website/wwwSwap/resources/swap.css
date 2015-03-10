@@ -1,6 +1,6 @@
 body {
 	margin: 0px;
-	font-family: HelveticaNeue;	
+	font-family: HelveticaNeue-Light;	
 	overflow: scroll;
 }
 .ui-header {
@@ -8,19 +8,19 @@ body {
 	font-weight: normal;
 	padding-bottom: 10px;
 	color: black;
-	background-color: #EDEDED;
+	background-color: rgba(237, 237, 237, 0.95);
 	border-bottom: 0px solid gray;
 }
 
 .ui-clickable-button {
-	background: #50A1FF;
+	background: #4b7bff;
 	font-family: HelveticaNeue;
 	font-size: 16px;
 	color: #FFFFFF;
 	line-height: 19px;
-	border-radius: 12px;
+	border-radius: 6px;
 	border: 0px solid white;
-	padding: 3px 15px;		
+	padding: 6px 15px;		
 }
 
 .ui-top-summary {
