@@ -111,7 +111,7 @@ def processBatch(contactEntries):
 			suggestion_notifications.processUserId.delay(userId)
 
 		if len(actionIdsToNotify) > 0:
-			notifications.sendAddFriendNotificationBatch.delay(actionIdsToNotify)
+			notifications.sendAddFriendNotificationFromActions.delay(actionIdsToNotify)
 
 		notifications.sendRefreshFeedToUserIds.delay(usersIdsToUpdate)
 
