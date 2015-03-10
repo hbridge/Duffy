@@ -96,14 +96,16 @@ def sendNewPhotoNotificationBatch(userId, shareInstanceIdList):
 	# Kickoff separate notification for badging
 	sendRefreshFeedToUserIds.delay([user.id])
 
+
 @app.task
-def sendAddFriendNotificationBatch(actionIdList):
+def sendAddFriendNotificationFromActions(actionIdList):
 	actions = Action.objects.prefetch_related('user', 'target_user').filter(id__in=actionIdList)
 	userIdsToRefresh = set()
 	logger.debug("in sendAddFriendNotificationBatch for actionIds: %s"%actionIdList)
 
 	for action in actions:
-		msg = action.user.display_name.split(' ', 1)[0] + ' ' + action.text
+		msg = '%s %s' % (users_util.getContactBasedFirstName(action.user, action.target_user), action.text)
+
 		logger.info("going to send '%s' to user id %s" %(msg, action.target_user_id))
 		customPayload = {'id': action.user_id}
 		notifications_util.sendNotification(action.target_user, msg, constants.NOTIFICATIONS_ADD_FRIEND, customPayload)
@@ -111,7 +113,6 @@ def sendAddFriendNotificationBatch(actionIdList):
 
 	# Kickoff separate notification for badging
 	sendRefreshFeedToUserIds.delay(userIdsToRefresh)	
-
 
 @app.task
 def sendRefreshFeedToUserIds(userIds):

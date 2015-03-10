@@ -75,6 +75,7 @@ def processBatch(contactEntries):
 
 		usersByPhoneNumber = getUsersByPhoneNumber(users)
 
+		actionIdsToNotify = list()
 		for contactEntry in contactEntries:
 			contactEntry.evaluated = True
 			
@@ -86,6 +87,10 @@ def processBatch(contactEntries):
 						continue
 					else:
 						if FriendConnection.addForwardConnection(contactEntry.user, forwardFriend):
+							# TODO: Probably should be turned into a bulkcreate at some point.
+							action = Action.objects.create(user_id=contactEntry.user.id, action_type=constants.ACTION_TYPE_ADD_FRIEND, text='added you as a friend', target_user_id=forwardFriend.id)
+							actionIdsToNotify.append(action.id)
+
 							newConnectionCount += 1
 						if contactEntry.contact_type and 'invited' in contactEntry.contact_type:
 							if FriendConnection.addReverseConnection(contactEntry.user, forwardFriend):
@@ -102,6 +107,9 @@ def processBatch(contactEntries):
 
 		for userId in usersIdsToUpdate:
 			suggestion_notifications.processUserId.delay(userId)
+
+		if len(actionIdsToNotify) > 0:
+			notifications.sendAddFriendNotificationBatch.delay(actionIdsToNotify)
 
 		notifications.sendRefreshFeedToUserIds.delay(usersIdsToUpdate)
 

@@ -374,7 +374,7 @@ class BASE_CELERY_CONFIG:
         'async.suggestion_notifications.processUserId': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'async.notifications.sendRefreshFeedToUserIds': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendNewPhotoNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
-        'async.notifications.sendAddFriendNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
+        'async.notifications.sendAddFriendNotificationFromActions': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendRequestPhotosNotification': {'queue': 'independent', 'routing_key': 'independent'},
         'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
