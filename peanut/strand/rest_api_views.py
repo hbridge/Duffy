@@ -615,7 +615,7 @@ class CreateFriendConnectionAPI(BulkCreateAPIView):
             userIds.add(obj.user_2_id)
 
             # TODO: Probably should be turned into a bulkcreate at some point.
-            action = Action.objects.create(user_id=obj.user_1_id, action_type=constants.ACTION_TYPE_ADD_FRIEND, target_user_id=obj.user_2_id)
+            action = Action.objects.create(user_id=obj.user_1_id, action_type=constants.ACTION_TYPE_ADD_FRIEND, text='added you as a friend', target_user_id=obj.user_2_id)
             actionIdsToNotify.append(action.id)
 
         notifications.sendAddFriendNotificationFromActions.delay(actionIdsToNotify)
