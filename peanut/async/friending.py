@@ -13,7 +13,7 @@ django.setup()
 from django.db.models import Count
 from django.db import IntegrityError
 
-from common.models import User, ContactEntry, FriendConnection
+from common.models import User, ContactEntry, FriendConnection, Action
 from arbus import similarity_util
 
 from strand import notifications_util
