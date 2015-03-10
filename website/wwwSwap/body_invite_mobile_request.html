@@ -1,0 +1,65 @@
+<style>
+	img.ui-image {
+		display:block;
+		margin-right: auto;
+		margin-left: auto;
+		height: 350px;
+	}
+</style>
+<script>
+	function signupClicked(){
+		$('div.ui-pages').fadeOut(200);
+		$('div.post-install').fadeIn(200);
+		localytics.tagEvent("SignupClickedMobile");
+		$('div.ui-install-button').fadeOut(200);
+	}
+	$('div.ui-install-button').fadeIn(200);
+	$('div.home-link').click(function(){
+		location.reload();
+	});
+</script>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' id='main-image' src='/resources/images/1b.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Find out when your friends have a photo that you might want
+	</div>
+</div>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' src='/resources/images/2b.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Send them a request for a particular photo
+	</div>
+</div>		
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' src='/resources/images/3b.jpg'>
+	</div>
+
+	<div class="ui-bottom"> 
+		Shared photos stay private between your friends
+	</div>
+</div>
+<div class="ui-phone-num post-install hidden"> 
+	<div class="ui-text">
+        Swap is available to a select few in private beta only.
+		Enter your phone number to get on the waitlist.
+	</div>
+	<form id='phoneform' action=''>
+		<input name='phone_number' class="textbox" type="text" id="phone" placeholder="(843) 555-5555">
+		<input type="hidden" name='source' value='main'>
+	</form>
+	<div class='ui-clickable-button ui-submit-button'> DONE </div>
+
+</div>
+<div class='ui-bottom ui-post-signup hidden' id='post-signup'>
+	We've got your spot in line! <br>
+	Hang tight. Txt confirmation on its way. <br><br>
+	<div class='ui-link home-link'> Return to Home</a>
+	<div class='ui-fb-tracker'> </div>
+</div>

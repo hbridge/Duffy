@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Swap app </title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="/resources/swap.css" media="screen" />
+	<script src='/resources/jquery-1.10.2.min.js'> </script>
+	<script src="/resources/jquery.maskedinput.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="//web.localytics.com/latest/localytics.min.js"></script>
+	<script src='/resources/swap.js'> </script>
+	<script type="text/javascript">
+		var localytics = LocalyticsSession("a592cd77469784a29d9bb69-f41b5cee-2171-11e4-4a11-00a426b17dd8", {logger:true, namespace:"websdk"});
+		localytics.open();
+	</script>
+	<style>
+	.ui-content {
+		overflow: auto;
+	}
+	.ui-body {
+		margin-top: 89px;
+		overflow: auto;
+	}
+	.ui-screenshots {
+		margin-right: auto;
+		margin-left: auto;
+		position:relative;
+		text-align: center;
+	}
+	.ui-install-button{
+		
+	}
+	.ui-submit-button {
+		width: 100px;
+		text-align: center;
+		margin-right: auto;
+		margin-left: auto;
+		margin-top: 20px;
+	}
+	.ui-phone-num {
+		float: left;
+		padding: 0px 25px 20px 25px;
+		text-align: center;
+		font-size: 17px;
+		line-height: 20px;
+		margin-bottom:15px;
+		margin-top:30px;
+	}
+	.textbox {
+	    border: 1px solid #c4c4c4; 
+	    border-radius: 4px;
+	    color: #b2b2b2;
+	    outline:0; 
+	    height:40px; 
+	    width: 150px;
+	    font-size: 16px;
+	    padding-top: 10px; 
+	    padding-bottom: 10px;
+	    padding-right: 10px;
+	    padding-left: 10px;
+	    box-sizing: border-box;
+    	box-shadow: 0 0 5px #333;
+	}
+	.color {
+		color: #565a5c;
+	}
+	.ui-text {
+		margin-bottom: 20px;
+	}
+	.ui-bottom {
+		float: left;
+		padding: 0px 25px 20px 25px;
+		text-align: center;
+		font-size: 17px;
+		line-height: 20px;
+		margin-bottom:15px;
+		max-width: 300px;
+	}
+	</style>
+</head>
+<body>
+
+<div class='ui-content'>
+
+	<div class='ui-header'>
+		<!-- To be filled in via jquery -->
+	</div>
+
+	<div class='ui-body'>
+		<!-- To be filled in via jquery -->
+	</div>
+
+</div>
+
+</body>
+<script>
+	/*
+	Attach all the handlers after body loads
+	*/
+
+	function submitClicked(){
+		value = $('#phone').val();
+		if (value.length < 10 || value.indexOf("5555") != -1) {
+			alert("Please enter a valid 10-digit phone number");
+		}
+		else {
+			url = 'http://prod.strand.duffyapp.com/strand/api/website_registration';
+			code = getCode();
+			$.ajax({
+     			url: url,
+     			type: 'get',
+     			dataType: 'jsonp',
+     			data: { phone_number: $('#phone').val(), source: 'index_request.html', invite_code: code },
+     			success: function(data) {
+					$('div.post-install').fadeOut(200, function(){
+						$('#post-signup').fadeIn(200);
+					});
+					$('#link').append('swapapp.co/'+code);
+					$('div.ui-fb-tracker').load('fb_tracking.html');
+					localytics.tagEvent("PhoneNumSubmitted");
+     			}
+ 			});	
+		}
+	}
+	function postBodyLoad(){
+		// submit button clicked
+		$('div.ui-submit-button').click(function(){
+			submitClicked();
+		});
+		$(document).on("keypress", "#phone", function(e){
+			if (e.which == 13){
+				submitClicked();
+				return false;
+			}
+		});
+		// phonenum field in focus
+		$('#phone').focus(function() {
+			$(this).addClass('color');
+		});
+
+		// Enable mask on phonenum
+		$('#phone').mask("?(999) 999-9999");
+	}
+
+	$(document).ready(function(){
+		// fetch header
+		$('div.ui-header').load('header.html', function(){
+		 	// Install button clicked
+		 	$('div.ui-header-button').append("GET ACCESS");
+			$('div.ui-install-button').click(function() {
+				signupClicked();
+			});
+		});
+
+		// load body depending on whether phone or not
+		if (detectiPhone()){
+			$('div.ui-body').load('body_invite_mobile_request.html', postBodyLoad);
+		}
+		else {
+			$('div.ui-body').load('body_invite_desktop_request.html', postBodyLoad);
+		}
+
+		// attach analytics
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  	ga('create', 'UA-53853203-1', 'auto');
+	  	ga('send', 'pageview');
+		
+	});
+	
+</script>
+</html>
