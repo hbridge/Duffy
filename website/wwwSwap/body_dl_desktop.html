@@ -1,0 +1,66 @@
+<style>
+	img.ui-image {
+		display:block;
+		margin-right: auto;
+		margin-left: auto;
+		max-height:525px;
+	}
+	.ui-pages {
+		display: inline-block;
+	}
+	.ui-big-signup-button {
+		width: 250px;
+		text-align: center;
+		margin-right: auto;
+		margin-left: auto;
+		font-size: 24px;
+		padding: 9px 8px;
+		border-radius: 22px;
+	}
+	.ui-bottomdiv {
+		clear: left;
+		margin-top: 20px;
+		overflow: auto;
+	}
+	.ui-phone-num {
+		margin-right: auto;
+		margin-left: auto;
+		width:100%;	
+	}
+	.ui-bottom {
+		width: 200px;
+	}
+	.ui-post-signup {
+		margin-right: auto;
+		margin-left: auto;
+		width: 100%;
+		text-align: center;
+	}
+</style>
+<script>
+	$('div.ui-big-signup-button').click(function(){
+		$(this).empty();
+		$(this).append("iPhone required");
+		localytics.tagEvent("DownloadClickedDesktop");
+	});
+</script>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' id='main-image' src='/resources/images/combined.jpg'>
+	</div>
+	<div class="ui-bottom"> 
+		Get personalized reminders to swap photos when you are hanging out
+	</div>
+	<div class="ui-bottom">
+		Build a shared gallery with friends
+	</div>
+	<div class='ui-bottom'>
+		Photos stay private - say what you really think
+	</div>
+
+	<div class='ui-bottomdiv'>
+		<div class='ui-clickable-button ui-big-signup-button'> Install </div>
+	</div>
+</div>
+
+

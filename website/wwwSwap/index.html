@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title> Download Swap </title>
+	<title> Swap app </title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" type="text/css" href="/resources/swap.css" media="screen" />
 	<script src='/resources/jquery-1.10.2.min.js'> </script>
@@ -25,14 +25,9 @@
 		margin-left: auto;
 		position:relative;
 		text-align: center;
-		/*width: 161px;*/
 	}
 	.ui-install-button{
 		
-	}
-
-	.ui-button-clicked {
-		background: #979797;
 	}
 	.ui-submit-button {
 		width: 100px;
@@ -78,25 +73,7 @@
 		font-size: 17px;
 		line-height: 20px;
 		margin-bottom:15px;
-		width: 300px;
-	}
-	.ui-post-signup {
-		margin-top: 50px;
-		height: 400px;
-	}
-	.ui-post-signup-more {
-		color: blue;
-		margin-top: 20px;
-	}
-	.ui-post-signup-details {
-		margin-top: 20px;
-	}
-	.ui-copy-link-button {
-		width: 100px;
-		text-align: center;
-		margin-right: auto;
-		margin-left: auto;
-		margin-top: 20px;
+		max-width: 300px;
 	}
 	</style>
 </head>
@@ -109,9 +86,7 @@
 	</div>
 
 	<div class='ui-body'>
-
 		<!-- To be filled in via jquery -->
-
 	</div>
 
 </div>
@@ -122,54 +97,56 @@
 	Attach all the handlers after body loads
 	*/
 
+	function submitClicked(){
+		value = $('#phone').val();
+		if (value.length < 10 || value.indexOf("5555") != -1) {
+			alert("Please enter a valid 10-digit phone number");
+		}
+		else {
+			url = 'http://prod.strand.duffyapp.com/strand/api/website_registration';
+			//url = 'http://dev.duffyapp.com:7000/strand/api/website_registration';
+			code = getCode();
+			$.ajax({
+     			url: url,
+     			type: 'get',
+     			dataType: 'jsonp',
+     			data: { phone_number: $('#phone').val(), source: 'index.html', invite_code: code },
+     			success: function(data) {
+					$('div.post-install').fadeOut(200, function(){
+						$('#post-signup').fadeIn(200);
+					});
+					$('#link').append('swapapp.co/'+code);
+					$('div.ui-fb-tracker').load('fb_tracking.html');
+					localytics.tagEvent("PhoneNumSubmitted");
+     			}
+ 			});	
+		}
+	}
 	function postBodyLoad(){
 		// submit button clicked
 		$('div.ui-submit-button').click(function(){
-			if ($('#phone').val().indexOf("5555") == -1){
-				url = 'http://prod.strand.duffyapp.com/strand/api/website_registration';
-				//url = 'http://dev.duffyapp.com:7000/strand/api/website_registration';
-				code = getCode();
-				$.ajax({
-	     			url: url,
-	     			type: 'get',
-	     			dataType: 'jsonp',
-	     			data: { phone_number: $('#phone').val(), source: 'index.html', invite_code: code },
-	     			success: function(data) {
-						$('div.post-install').fadeOut(200, function(){
-							$('#post-signup').fadeIn(200);
-						});
-						$('#link').append('swapapp.co/'+code);
-						$('div.ui-fb-tracker').load('fb_tracking.html');
-	     			}
-	 			});	
+			submitClicked();
+		});
+		$(document).on("keypress", "#phone", function(e){
+			if (e.which == 13){
+				submitClicked();
+				return false;
 			}
 		});
-
-		// More info on signup button clicked
-		$('div.ui-post-signup-more').click(function(){
-			$('div.ui-post-signup-details').fadeIn(200);
-		});
-
-		// Textarea selected to copy link
-		$("#link").focus(function(){
-			this.setSelectionRange(0, 9999); 
-			return false; 
-		}).mouseup(function(){ 
-			return false; });
-
 		// phonenum field in focus
 		$('#phone').focus(function() {
 			$(this).addClass('color');
 		});
 
 		// Enable mask on phonenum
-		$('#phone').mask("(999) 999-9999");
+		$('#phone').mask("?(999) 999-9999");
 	}
 
 	$(document).ready(function(){
 		// fetch header
 		$('div.ui-header').load('header.html', function(){
 		 	// Install button clicked
+		 	$('div.ui-header-button').append("GET ACCESS");
 			$('div.ui-install-button').click(function() {
 				signupClicked();
 			});
@@ -177,10 +154,10 @@
 
 		// load body depending on whether phone or not
 		if (detectiPhone()){
-			$('div.ui-body').load('body_mobile.html', postBodyLoad);
+			$('div.ui-body').load('body_invite_mobile.html', postBodyLoad);
 		}
 		else {
-			$('div.ui-body').load('body_desktop.html', postBodyLoad);
+			$('div.ui-body').load('body_invite_desktop.html', postBodyLoad);
 		}
 
 		// attach analytics

@@ -1,0 +1,87 @@
+<style>
+	img.ui-image {
+		display:block;
+		margin-right: auto;
+		margin-left: auto;
+		max-height:525px;
+	}
+	.ui-pages {
+		display: inline-block;
+	}
+	.ui-big-signup-button {
+		width: 250px;
+		text-align: center;
+		margin-right: auto;
+		margin-left: auto;
+		font-size: 24px;
+		padding: 9px 8px;
+		border-radius: 22px;
+	}
+	.ui-bottomdiv {
+		clear: left;
+		margin-top: 20px;
+		overflow: auto;
+	}
+	.ui-phone-num {
+		margin-right: auto;
+		margin-left: auto;
+		width:100%;	
+	}
+	.ui-bottom {
+		width: 200px;
+	}
+	.ui-post-signup {
+		margin-right: auto;
+		margin-left: auto;
+		width: 100%;
+		text-align: center;
+	}
+</style>
+<script>
+	function signupClicked(){
+		$('#install-text').empty();
+		$('#install-text').append("See below");
+		$('#install-text').addClass('ui-button-clicked');
+		$('div.ui-big-signup-button').fadeOut(200, function(){
+			$('div.post-install').fadeIn(200);
+		});
+		localytics.tagEvent("SignupClickedDesktop");
+	}
+	$('div.ui-big-signup-button').click(signupClicked);
+</script>
+<div class='ui-pages'>
+	<div class='ui-screenshots'>
+		<img class='ui-image' id='main-image' src='/resources/images/combined.jpg'>
+	</div>
+	<div class="ui-bottom"> 
+		Get personalized reminders to swap photos when you are hanging out
+	</div>
+	<div class="ui-bottom">
+		Build a shared gallery with friends
+	</div>
+	<div class='ui-bottom'>
+		Photos stay private - say what you really think
+	</div>
+
+<div class='ui-bottomdiv'>
+	<div class='ui-clickable-button ui-big-signup-button ui-install-button'> Get early access </div>	
+	<div class="ui-phone-num post-install hidden"> 
+		<div class="ui-text">
+			Enter your phone number to get on the waitlist:
+		</div>
+		<form id='phoneform'>
+			<input name='phone_number' class="textbox" type="text" id="phone" placeholder="(843) 555-5555">
+			<input type="hidden" name='source' value='main'>
+		</form>
+		<div class='ui-clickable-button ui-submit-button'> Submit </div>
+
+	</div>
+<div class='ui-text ui-post-signup hidden' id='post-signup'>
+	We've got your spot in line! <br>
+	Hang tight. Txt confirmation on its way. <br><br>
+	<div class='ui-fb-tracker'> </div>
+</div>
+</div>
+</div>
+
+

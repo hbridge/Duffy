@@ -8,14 +8,15 @@
 </style>
 <script>
 	function signupClicked(){
-		$('#install-text').empty();
-		$('#install-text').append("DONE");
-		$('#install-text').addClass('ui-button-clicked');
 		$('div.ui-pages').fadeOut(200);
 		$('div.post-install').fadeIn(200);
-		localytics.tagEvent("DL_Swap_2_mobile");
+		localytics.tagEvent("SignupClickedMobile");
+		$('div.ui-install-button').fadeOut(200);
 	}
 	$('div.ui-install-button').fadeIn(200);
+	$('div.home-link').click(function(){
+		location.reload();
+	});
 </script>
 <div class='ui-pages'>
 	<div class='ui-screenshots'>
@@ -55,10 +56,10 @@
 </div>
 <div class="ui-phone-num post-install hidden"> 
 	<div class="ui-text">
-        Swap is availble to a select few in private beta only.
+        Swap is available to a select few in private beta only.
 		Enter your phone number to get on the waitlist.
 	</div>
-	<form id='phoneform' action='http://dev.duffyapp.com:8000/strand/api/website_registration'>
+	<form id='phoneform' action=''>
 		<input name='phone_number' class="textbox" type="text" id="phone" placeholder="(843) 555-5555">
 		<input type="hidden" name='source' value='main'>
 	</form>
@@ -66,14 +67,8 @@
 
 </div>
 <div class='ui-bottom ui-post-signup hidden' id='post-signup'>
-	We've got your spot in line! Hang tight. You'll get an SMS confirmation shortly.
+	We've got your spot in line! <br>
+	Hang tight. Txt confirmation on its way. <br><br>
+	<div class='ui-link home-link'> Return to Home</a>
 	<div class='ui-fb-tracker'> </div>
-	<div class="ui-post-signup-more hidden"> How do I get access sooner?</div>
-	<div class="ui-post-signup-details hidden"> More friends on Swap means better photo suggestions for you.
-		Invite your friends and we'll bump you up on the waitlist. 
-		<br>
-		<br>
-		Use your personalized url:
-		<textarea id='link'></textarea>
-	</div>
 </div>

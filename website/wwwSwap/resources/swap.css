@@ -22,9 +22,8 @@ body {
 	border: 0px solid white;
 	padding: 6px 15px;		
 }
-
-.ui-top-summary {
-	padding: 0px 0px 20px 0px;
+.ui-button-clicked {
+	background: #979797;
 }
 .ui-content {
 
@@ -44,4 +43,8 @@ body {
 }
 .left {
 	text-align: left;
+}
+.ui-link {
+	color: #0000EE;
+	text-decoration: underline;
 }
