@@ -1,5 +1,10 @@
 # Swap v2
 
+# Mar 10th 2015 (4867)
+
+- 3 friends now required to use the app
+- Bug fixes
+
 # Feb 24th-25th 2015 (4863-4866)
 
 - Notifications when someone joins Swap or adds you as a friend
