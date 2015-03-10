@@ -41,7 +41,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"id", @"action_type", @"user", @"photo", @"share_instance", @"text"];
+  return @[@"id", @"action_type", @"user", @"photo", @"share_instance", @"strand", @"target_user", @"text"];
 }
 
 - (NSString *)description

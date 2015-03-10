@@ -112,7 +112,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (void)markPhotosAsNotOnSystem:(NSMutableArray *)photoIDs success:(DFSuccessBlock)success failure:(DFFailureBlock)failure;
 
 
-- (void)requestPhoto:(DFPhotoIDType)photoID
+- (void)requestPhotos:(DFStrandIDType)strandID
             fromUser:(DFUserIDType)userID
              success:(DFVoidBlock)success
              failure:(DFFailureBlock)failure;

@@ -612,7 +612,7 @@ static DFPeanutFeedObject *currentPhoto;
                                                     initWithPeanutUser:user];
     [self.navigationController pushViewController:friendProfile animated:YES];
   } else if (peanutAction.action_type == DFPeanutActionCanRequestPhotos) {
-    [self requestPhoto:peanutAction.id.longLongValue user:peanutAction.user];
+    [self requestPhotos:peanutAction.strand.longLongValue user:peanutAction.user];
   } else {
     DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager]
                                        photoWithID:peanutAction.photo.longLongValue
@@ -621,7 +621,7 @@ static DFPeanutFeedObject *currentPhoto;
   }
 }
 
-- (void)requestPhoto:(DFPhotoIDType)photoID user:(DFUserIDType)userID
+- (void)requestPhotos:(DFStrandIDType)strandID user:(DFUserIDType)userID
 {
   DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:userID];
   NSString *messageString = [NSString stringWithFormat:@"Request photos from %@?", user.fullName];
@@ -642,7 +642,7 @@ static DFPeanutFeedObject *currentPhoto;
               style:DFAlertActionStyleDefault
               handler:^(DFAlertAction *action) {
                 [[DFPeanutFeedDataManager sharedManager]
-                 requestPhoto:photoID fromUser:userID
+                 requestPhotos:strandID fromUser:userID
                  success:^{
                    [DFAnalytics logPhotoRequestInitiatedWithResult:@"Requested"];
                    [SVProgressHUD showSuccessWithStatus:@"Request Sent!"];
