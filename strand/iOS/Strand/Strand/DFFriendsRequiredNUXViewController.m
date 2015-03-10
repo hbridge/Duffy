@@ -11,15 +11,18 @@
 
 @implementation DFFriendsRequiredNUXViewController
 
+const int DFMinFriendsRequired = 3;
 
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   self.titleLabel.text = @"Invite More Friends";
-  self.explanationLabel.text = @"You need at least 4 registered friends to use Swap."
+  self.explanationLabel.text = [NSString stringWithFormat:@"You need at least %d registered friends to use Swap."
   " Please add or invite additional friends to continue."
   "\n\n"
-  "If you've already invited friends, we'll send you a text when 4 have joined.";
+  "If you've already invited friends, we'll send you a text when %d have joined.",
+                                DFMinFriendsRequired,
+                                DFMinFriendsRequired];
   [self.button addTarget:self
                   action:@selector(buttonPressed:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -31,7 +34,7 @@
   }] mutableCopy];
 
   NSMutableArray *fakeFriends = [NSMutableArray new];
-  for (NSUInteger i = friends.count; i < 4; i++) {
+  for (NSUInteger i = friends.count; i < DFMinFriendsRequired; i++) {
     DFPeanutUserObject *anon = [[DFPeanutUserObject alloc] init];
     anon.display_name = [NSString stringWithFormat:@"? %d", (int)i];
     anon.id = NSUIntegerMax - i;
@@ -44,8 +47,6 @@
   for (DFPeanutUserObject *fakeUser in fakeFriends) {
     [self.profileStackView setColor:[UIColor grayColor] forUser:fakeUser];
   }
-  
-
 }
 
 - (void)viewWillAppear:(BOOL)animated

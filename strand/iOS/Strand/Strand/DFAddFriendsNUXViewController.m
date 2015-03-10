@@ -44,9 +44,6 @@
                                             action:@selector(doneButtonPressed:)];
 }
 
-const int MinFriendsRequired = 4;
-
-
 - (void)doneButtonPressed:(id)sender
 {
   // ensure the user has at least 4 friends before continuing
@@ -55,7 +52,7 @@ const int MinFriendsRequired = 4;
                               return [input hasAuthedPhone];
                             }];
   
-  if (authedFriends.count < MinFriendsRequired) {
+  if (authedFriends.count < DFMinFriendsRequired) {
     [self.navigationController pushViewController:[DFFriendsRequiredNUXViewController new] animated:YES];
   } else {
     [self completedWithUserInfo:nil];

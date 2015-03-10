@@ -10,6 +10,8 @@
 #import <SAMGradientView/SAMGradientView.h>
 #import "DFProfileStackView.h"
 
+extern const int DFMinFriendsRequired;
+
 @interface DFFriendsRequiredNUXViewController : DFNUXViewController
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *explanationLabel;
