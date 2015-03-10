@@ -18,6 +18,8 @@ from arbus import similarity_util
 
 from strand import notifications_util
 
+from peanut.settings import constants
+
 from peanut.celery import app
 
 from async import celery_helper
