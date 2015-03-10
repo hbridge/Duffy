@@ -8,6 +8,7 @@
 
 #import "DFFriendsRequiredNUXViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFAnalytics.h"
 
 @implementation DFFriendsRequiredNUXViewController
 
@@ -53,6 +54,21 @@ const int DFMinFriendsRequired = 3;
 {
   [super viewWillAppear:animated];
   [self.navigationController setNavigationBarHidden:YES];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
+  NSArray *authedFriends = [friends objectsPassingTestBlock:^BOOL(id input) {
+    return [input hasAuthedPhone];
+  }];
+  
+  [DFAnalytics logViewController:self
+          appearedWithParameters:@{
+                                   @"authedFriends" : @(authedFriends.count),
+                                   @"unauthedFriends" : @(friends.count - authedFriends.count),
+                                   }];
 }
 
 - (BOOL)prefersStatusBarHidden
