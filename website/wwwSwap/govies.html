@@ -124,13 +124,18 @@
 	function postBodyLoad(){
 		// submit button clicked
 		$('div.ui-submit-button').click(function(){
+			// this is to prevent double clicking
+			if ($(this).hasClass('ui-button-clicked')){
+				return;
+			} 
 			$(this).addClass('ui-button-clicked');
 			$(this).empty();
 			$(this).append('<img height=16px width=16px src=/resources/images/loading.gif>');
-			submitClicked();
-			$(this).removeClass('ui-button-clicked');
-			$(this).empty();
-			$(this).append('Submit')
+			if (submitClicked()==false) {
+				$(this).removeClass('ui-button-clicked');
+				$(this).empty();
+				$(this).append('DONE')
+			}
 		});
 		$(document).on("keypress", "#phone", function(e){
 			if (e.which == 13){
