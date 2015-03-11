@@ -167,6 +167,11 @@ LOGGING = {
             'format': '%(asctime)s %(levelname)s %(message)s'
         },
     },
+    'filters': {
+        'skip_unreadable_posts': {
+            '()': 'common.peanut_logging.SkipUnreadablePostError',
+        }
+    },
     'handlers': {
         'null': {
             'level': 'DEBUG',
@@ -174,6 +179,7 @@ LOGGING = {
         },
         'mail_admins': {
            'level': 'ERROR',
+           'filters': ['skip_unreadable_posts'],
            'class': 'django.utils.log.AdminEmailHandler',
         },
         'djangofile': {
