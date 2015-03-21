@@ -358,6 +358,8 @@ class PhotoBulkAPI(BasePhotoAPI):
                 elif photo.id:
                     objsToUpdate.append(photo)
                 else:
+                    # Triple check that we don't have an id for this object
+                    del photo.id
                     objsToCreate.append(photo)
             
             # These are all the photos we're going to return back to the client, all should have ids
@@ -366,7 +368,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             # These are used to deal with dups that occur with photos to be created
             objsToCreateAgain = list()
             objsFoundToMatchExisting = list()
-
+                
             try:
                 Photo.objects.bulk_create(objsToCreate)
             except IntegrityError:
