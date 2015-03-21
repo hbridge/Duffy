@@ -360,7 +360,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                 else:
                     # Triple check that we don't have an id for this object
                     if hasattr(photo, 'id'):
-                        del photo.id
+                        photo.id = None
                     objsToCreate.append(photo)
             
             # These are all the photos we're going to return back to the client, all should have ids
