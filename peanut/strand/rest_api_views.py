@@ -359,7 +359,8 @@ class PhotoBulkAPI(BasePhotoAPI):
                     objsToUpdate.append(photo)
                 else:
                     # Triple check that we don't have an id for this object
-                    del photo.id
+                    if hasattr(photo, 'id'):
+                        del photo.id
                     objsToCreate.append(photo)
             
             # These are all the photos we're going to return back to the client, all should have ids
