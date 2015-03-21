@@ -360,6 +360,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                 else:
                     # Triple check that we don't have an id for this object
                     if hasattr(photo, 'id'):
+                        logger.debug("New photo had id %s, removing" % photo.id)
                         photo.id = None
                     objsToCreate.append(photo)
             
@@ -397,6 +398,10 @@ class PhotoBulkAPI(BasePhotoAPI):
 
                 # This call should now not barf because we've filtered out all the existing photos
                 Photo.objects.bulk_create(objsToCreateAgain)
+            except ValueError:
+                logger.warning("Got value error when trying to process:")
+                for objToCreate in objsToCreate:
+                    logger.warning(objsToCreate)
 
             # Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
             dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
