@@ -401,7 +401,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             except ValueError:
                 logger.warning("Got value error when trying to process:")
                 for objToCreate in objsToCreate:
-                    logger.warning(objsToCreate)
+                    logger.warning("%s" % objsToCreate)
 
             # Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
             dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
