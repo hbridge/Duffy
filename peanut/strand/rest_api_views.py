@@ -401,7 +401,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             except ValueError:
                 logger.warning("Got value error when trying to process:")
                 for objToCreate in objsToCreate:
-                    logger.warning("%s" % objsToCreate)
+                    logger.warning("%s" % objToCreate)
 
             # Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
             dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
@@ -434,7 +434,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                     logger.info("Doing another update for created photos because %s photos had images" % (numImagesProcessed))
                     self.updateCacheStateForPhotos(user, allPhotos)
             else:
-                logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
+                logger.warning("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
             
             # Async tasks
             ids = Photo.getIds(allPhotos)
