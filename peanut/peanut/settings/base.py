@@ -386,7 +386,8 @@ class BASE_CELERY_CONFIG:
         'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendRequestPhotosNotification': {'queue': 'independent', 'routing_key': 'independent'},
         'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        'memfresh.async.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
+        'memfresh.async.evalAllUsersForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
+        'memfresh.async.evalUserForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
 
     }
 
@@ -398,7 +399,7 @@ class BASE_CELERY_CONFIG:
         },
         'memfresh-followup': {
             'task': 'memfresh.async.evalAllUsersForFollowUp',
-            'schedule': crontab(minute=10),
+            'schedule': crontab(minute=15),
             'args': None,
         }
 }
