@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     'arbus',
     'common',
     'strand',
+    'memfresh',
     # Added.
     'haystack',
     'rest_framework',
@@ -42,7 +43,8 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'storages',
     'djcelery',
-    'async'
+    'async',
+    'django_inbound_email'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -384,12 +386,29 @@ class BASE_CELERY_CONFIG:
         'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
         'async.notifications.sendRequestPhotosNotification': {'queue': 'independent', 'routing_key': 'independent'},
         'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
+        'memfresh.async.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
+
     }
+
     CELERYBEAT_SCHEDULE = {
-    'unactivated-accounts': {
-        'task': 'async.notifications.sendUnactivatedAccountFS',
-        'schedule': crontab(hour=23, minute=0),
-        'args': None,
-    },
+        'unactivated-accounts': {
+            'task': 'async.notifications.sendUnactivatedAccountFS',
+            'schedule': crontab(hour=23, minute=0),
+            'args': None,
+        },
+        'memfresh-followup': {
+            'task': 'memfresh.async.evalAllUsersForFollowUp',
+            'schedule': crontab(minute=10),
+            'args': None,
+        }
 }
+
+# the HTTP request parser to use - we set a default as the tests need a valid parser.
+INBOUND_EMAIL_PARSER = 'django_inbound_email.backends.mailgun.MailgunRequestParser'
+
+# whether to dump out a log of all incoming email requests
+INBOUND_EMAIL_LOG_REQUESTS = True
+
+# the max size (in Bytes) of any attachment to process - defaults to 10MB
+INBOUND_EMAIL_ATTACHMENT_SIZE_MAX = 10000000
 

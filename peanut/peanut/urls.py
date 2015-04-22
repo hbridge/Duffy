@@ -20,6 +20,8 @@ urlpatterns = patterns('',
 
     url(r'^strand/api/v1/', include('strand.api_urls')),
     
+    url(r'^memfresh/', include('memfresh.urls')),
+
     url(r'^ios-notifications/', include('ios_notifications.urls')),
 )
 
