@@ -27,7 +27,7 @@ from common import api_util
 
 logger = logging.getLogger(__name__)
 
-AUTH_LINK = "http://dev.duffyapp.com:8000/memfresh/do_auth"
+AUTH_LINK = "http://dev.duffyapp.com/memfresh/do_auth"
 
 def getAuthLink(user):
 	return "%s?user_id=%s" % (AUTH_LINK, user.id)

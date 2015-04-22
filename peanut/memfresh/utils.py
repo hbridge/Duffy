@@ -27,7 +27,7 @@ CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
 FLOW = flow_from_clientsecrets(
 	CLIENT_SECRETS,
 	scope='https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email',
-	redirect_uri='http://dev.duffyapp.com:8000/memfresh/oauth2callback')
+	redirect_uri='http://dev.duffyapp.com/memfresh/oauth2callback')
 
 def getUserRedirect(user):
 	FLOW.params['state'] = user.id
