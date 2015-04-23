@@ -23,9 +23,9 @@ def sendResponse(msg):
 	print "Sending response %s" % msg
 	return HttpResponse(content, content_type="text/xml")
 
-def sendMsg(user, msg, keeperNumber):
-	print "Sending %s to %s" % (msg, user.phone_number)
-	notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
+def sendMsg(user, msg):
+	print "Sending %s" % msg
+	notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, constants.TWILIO_SMSKEEPER_PHONE_NUM)
 
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -81,9 +81,9 @@ def getData(msg, numMedia, request):
 	for n in range(numMedia):
 		param = 'MediaUrl' + str(n)
 		mediaUrlList.append(requestDict[param])
-		# TODO need to store mediacontenttype as well. 
+		#TODO need to store mediacontenttype as well. 
 
-	# TODO use a separate process but probably this is not the right place to do it.
+	#TODO use a separate process but probably this is not the right place to do it.
 	if numMedia > 0:
 		mediaUrlList = moveMediaToS3(mediaUrlList)
 	return (' '.join(nonLabels), label, mediaUrlList)
@@ -106,7 +106,7 @@ def moveMediaToS3(mediaUrlList):
 
 	return newUrlList
 
-def sendBackNote(note, fromNumber):
+def sendBackNote(note):
 	clearMsg = "Send '%s clear' to clear this list."%(note.label)
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
 	hasImages = False
@@ -123,7 +123,7 @@ def sendBackNote(note, fromNumber):
 			hasImages = True
 
 	if hasImages:
-		sendMsg(note.user, currentMsg, fromNumber)
+		sendMsg(note.user, currentMsg)
 
 		for entry in entries:
 			if entry.img_urls_json:
@@ -138,7 +138,6 @@ def incoming_sms(request):
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
-		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
 
@@ -149,7 +148,7 @@ def incoming_sms(request):
 
 			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type an item you want to buy and add '#grocery' at the end.")
 		finally:
-			IncomingMessage.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)))
+			IncomingMessage.objects.create(user=user, msg_json=json.dumps(msg))
 
 			
 		if numMedia == 0 and isLabel(msg):
@@ -157,7 +156,7 @@ def incoming_sms(request):
 			label = msg
 			try:
 				note = Note.objects.get(user=user, label=label)
-				response = sendBackNote(note, keeperNumber)
+				response = sendBackNote(note)
 				if response:
 					return response
 				else:
