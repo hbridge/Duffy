@@ -77,7 +77,7 @@ def incoming_sms(request):
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I don't have anything for %s" % label)
 		elif hasList(msg):
-			content, label, media = getData(msg)
+			content, label, media = getData(msg, numMedia, request)
 			note, created = Note.objects.get_or_create(user=user, label=label)
 			if note.text == None:
 				note.text = ""
