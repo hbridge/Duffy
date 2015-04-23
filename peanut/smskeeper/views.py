@@ -4,6 +4,7 @@ import uuid
 import boto
 import requests
 import cStringIO
+import random
 
 from django.shortcuts import render
 
@@ -45,6 +46,11 @@ def isClearLabel(msg):
 	stripedMsg = msg.strip()
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower()=='clear'))
+
+def isPickFromLabel(msg):
+	stripedMsg = msg.strip()
+	tokens = msg.split(' ')
+	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower()=='pick'))
 
 def isListsCommand(msg):
 	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
@@ -133,6 +139,18 @@ def sendBackNote(note, keeperNumber):
 	else:
 		return sendResponse(currentMsg)
 
+def sendItemFromNote(note, keeperNumber):
+	entries = NoteEntry.objects.filter(note=note).order_by("added")
+	if len(entries) == 0:
+		return False
+		
+	entry = random.choice(entries)
+	if entry.img_urls_json:
+		sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
+	else:
+		return sendResponse(entry.text)
+
+
 @csrf_exempt
 def incoming_sms(request):
 	form = SmsContentForm(api_util.getRequestData(request))
@@ -174,6 +192,19 @@ def incoming_sms(request):
 				return sendResponse("%s cleared"% (label))
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I don't have anything for %s" % label)
+		elif numMedia == 0 and isPickFromLabel(msg):
+			label = getLabel(msg)
+			try:
+				note = Note.objects.get(user=user, label=label)
+				response = sendItemFromNote(note, keeperNumber)
+				if response:
+					return response
+				else:
+					return sendResponse("Sorry, I didn't find anything for %s" % label)
+
+			except Note.DoesNotExist:
+				return sendResponse("Sorry, I didn't find anything for %s" % label)
+
 		elif hasList(msg):
 			text, label, media = getData(msg, numMedia, request)
 			note, created = Note.objects.get_or_create(user=user, label=label)
