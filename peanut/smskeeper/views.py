@@ -18,9 +18,9 @@ def sendResponse(msg):
 	print "Sending response %s" % msg
 	return HttpResponse(content, content_type="text/xml")
 
-def sendMsg(user, msg):
-	print "Sending %s" % msg
-	notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, constants.TWILIO_SMSKEEPER_PHONE_NUM)
+def sendMsg(user, msg, keeperNumber):
+	print "Sending %s to %s" % (msg, user.phone_number)
+	notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
 
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -68,7 +68,7 @@ def getData(msg, numMedia, request):
 
 	return (' '.join(nonLabels), label, media)
 
-def sendBackNote(note):
+def sendBackNote(note, fromNumber):
 	clearMsg = "Send '%s clear' to clear this list."%(note.label)
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
 	hasImages = False
@@ -85,7 +85,7 @@ def sendBackNote(note):
 			hasImages = True
 
 	if hasImages:
-		sendMsg(note.user, currentMsg)
+		sendMsg(note.user, currentMsg, fromNumber)
 
 		for entry in entries:
 			if entry.img_urls_json:
@@ -100,6 +100,7 @@ def incoming_sms(request):
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
+		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
 
@@ -110,7 +111,7 @@ def incoming_sms(request):
 
 			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type an item you want to buy and add '#grocery' at the end.")
 		finally:
-			IncomingMessage.objects.create(user=user, msg_json=json.dumps(msg))
+			IncomingMessage.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)))
 
 			
 		if numMedia == 0 and isLabel(msg):
@@ -118,7 +119,7 @@ def incoming_sms(request):
 			label = msg
 			try:
 				note = Note.objects.get(user=user, label=label)
-				response = sendBackNote(note)
+				response = sendBackNote(note, keeperNumber)
 				if response:
 					return response
 				else:

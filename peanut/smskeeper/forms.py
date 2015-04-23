@@ -6,5 +6,6 @@ class UserIdForm(forms.Form):
 
 class SmsContentForm(forms.Form):
 	From = forms.CharField(required=True)
+	To = forms.CharField(required=False)
 	Body = forms.CharField(required=False)
 	NumMedia = forms.IntegerField(required=False)
