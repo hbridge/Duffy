@@ -1,4 +1,9 @@
 import json
+from multiprocessing import Process
+import uuid
+import boto
+import requests
+import cStringIO
 
 from django.shortcuts import render
 
@@ -40,6 +45,12 @@ def isClearLabel(msg):
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower()=='clear'))
 
+def isListsCommand(msg):
+	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
+
+def isHelpCommand(msg):
+	return msg.strip().lower() == 'help'
+
 def hasList(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
@@ -63,10 +74,37 @@ def getData(msg, numMedia, request):
 			nonLabels.append(word)
 
 	# process media
-	media = list()
-	# TODO 
+	mediaUrlList = list()
 
-	return (' '.join(nonLabels), label, media)
+	requestDict = api_util.getRequestData(request)
+
+	for n in range(numMedia):
+		param = 'MediaUrl' + str(n)
+		mediaUrlList.append(requestDict[param])
+		# TODO need to store mediacontenttype as well. 
+
+	# TODO use a separate process but probably this is not the right place to do it.
+	if numMedia > 0:
+		mediaUrlList = moveMediaToS3(mediaUrlList)
+	return (' '.join(nonLabels), label, mediaUrlList)
+
+def moveMediaToS3(mediaUrlList):
+
+	conn = boto.connect_s3('AKIAJBSV42QT6SWHHGBA', '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL')
+	bucket = conn.get_bucket('smskeeper')
+	newUrlList = list()
+	
+	for mediaUrl in mediaUrlList:
+		resp = requests.get(mediaUrl)
+		media = cStringIO.StringIO(resp.content)
+
+		# Upload to S3 
+		keyStr = uuid.uuid4()
+		key = bucket.new_key(keyStr)
+		key.set_contents_from_string(media.getvalue())
+		newUrlList.append('https://s3.amazonaws.com/smskeeper/'+ str(keyStr))
+
+	return newUrlList
 
 def sendBackNote(note, fromNumber):
 	clearMsg = "Send '%s clear' to clear this list."%(note.label)
@@ -146,7 +184,9 @@ def incoming_sms(request):
 				entry.img_urls_json = json.dumps(media)
 			entry.save()
 			return sendResponse("Got it")
+		elif isHelpCommand(msg):
+			return sendResponse("You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.")
 		else:
-			return sendResponse("Oops I need a label for that message. ex: #grocery, #tobuy, #toread")
+			return sendResponse("Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'help' to find out more.")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
