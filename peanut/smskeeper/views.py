@@ -21,7 +21,8 @@ def isLabel(msg):
 def isClearLabel(msg):
 	stripedMsg = msg.strip()
 	tokens = msg.split(' ')
-	return len(tokens) == 2 and isLabel(tokens[0]) and tokens[1].lower() == 'clear'
+
+	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower()=='clear'))
 
 def hasList(msg):
 	for word in msg.split(' '):
@@ -45,6 +46,13 @@ def getData(msg, numMedia, request):
 
 	return (' '.join(nonLabels), label, media)
 
+def getLabel(msg):
+	for word in msg.split(' '):
+		if isLabel(word):
+			return word
+	return None
+
+
 @csrf_exempt
 def incoming_sms(request):
 	form = SmsContentForm(api_util.getRequestData(request))
@@ -64,13 +72,13 @@ def incoming_sms(request):
 			try:
 				label = msg
 				note = Note.objects.get(user=user, label=label)
-				clearMsg = "Send '%s clear' to clear this list."%(label)
+				clearMsg = "Send 'clear %s' to clear this list."%(label)
 				return sendResponse("%s:\n%s\n%s" % (label, note.text, clearMsg))
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I didn't find anything for %s" % label)
 		elif numMedia == 0 and isClearLabel(msg):
 			try:
-				label = msg.strip().split(' ')[0]
+				label = getLabel(msg)
 				note = Note.objects.get(user=user, label=label)
 				note.delete()
 				return sendResponse("%s cleared"% (label))
