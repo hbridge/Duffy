@@ -128,11 +128,11 @@ def sendSMS(phoneNumber, msg, mmsUrl):
 	else:
 		sendSMSThroughTwilio(phoneNumber, msg, mmsUrl)
 
-def sendSMSThroughTwilio(phoneNumber, msg, mmsUrl, fromNumber=constants.TWILIO_PHONE_NUM):
+def sendSMSThroughTwilio(phoneNumber, msg, mmsUrls, fromNumber=constants.TWILIO_PHONE_NUM):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
 		
-	if mmsUrl:
-		twilioclient.messages.create(to=phoneNumber, from_=fromNumber, body=msg, media_url=mmsUrl)
+	if mmsUrls:
+		twilioclient.messages.create(to=phoneNumber, from_=fromNumber, body=msg, media_url=mmsUrls)
 	else:
 		twilioclient.messages.create(to=phoneNumber, from_=fromNumber, body=msg)
 

@@ -23,18 +23,19 @@ def sendResponse(msg):
 	print "Sending response %s" % msg
 	return HttpResponse(content, content_type="text/xml")
 
-def sendMsg(user, msg):
-	print "Sending %s" % msg
-	notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, constants.TWILIO_SMSKEEPER_PHONE_NUM)
+def sendMsg(user, msg, mediaUrls, keeperNumber):
+	print "Sending %s to %s" % (msg, user.phone_number)
+	if mediaUrls:
+		print mediaUrls[0]
+		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
+	else:
+		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
 
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 	content += "<Response></Response>"
 	print "Sending blank response"
 	return HttpResponse(content, content_type="text/xml")
-
-def sendImageEntry():
-	pass
 
 def isLabel(msg):
 	stripedMsg = msg.strip()
@@ -106,7 +107,7 @@ def moveMediaToS3(mediaUrlList):
 
 	return newUrlList
 
-def sendBackNote(note):
+def sendBackNote(note, keeperNumber):
 	clearMsg = "Send '%s clear' to clear this list."%(note.label)
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
 	hasImages = False
@@ -123,11 +124,11 @@ def sendBackNote(note):
 			hasImages = True
 
 	if hasImages:
-		sendMsg(note.user, currentMsg)
+		sendMsg(note.user, currentMsg, None, keeperNumber)
 
 		for entry in entries:
 			if entry.img_urls_json:
-				sendImageEntry(entry)
+				sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
 		return sendNoResponse()
 	else:
 		return sendResponse(currentMsg)
@@ -138,6 +139,7 @@ def incoming_sms(request):
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
+		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
 
@@ -156,7 +158,7 @@ def incoming_sms(request):
 			label = msg
 			try:
 				note = Note.objects.get(user=user, label=label)
-				response = sendBackNote(note)
+				response = sendBackNote(note, keeperNumber)
 				if response:
 					return response
 				else:
