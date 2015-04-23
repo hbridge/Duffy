@@ -29,7 +29,8 @@ def hasList(msg):
 			return True
 	return False
 
-def getData(msg):
+def getData(msg, numMedia, request):
+	# process text
 	nonLabels = list()
 	label = None
 	for word in msg.split(' '):
@@ -37,7 +38,12 @@ def getData(msg):
 			label = word
 		else:
 			nonLabels.append(word)
-	return (' '.join(nonLabels), label)
+
+	# process media
+	media = list()
+	# TODO 
+
+	return (' '.join(nonLabels), label, media)
 
 @csrf_exempt
 def incoming_sms(request):
@@ -46,6 +52,7 @@ def incoming_sms(request):
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
 		msg = str(form.cleaned_data['Body'])
+		numMedia = int(form.cleaned_data['NumMedia'])
 
 		try:
 			user = User.objects.get(phone_number=phoneNumber)
@@ -53,7 +60,7 @@ def incoming_sms(request):
 			user = User.objects.create(phone_number=phoneNumber)
 			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type a couple of items you want to buy and add '#grocery' at the end.")
 
-		if isLabel(msg):
+		if numMedia == 0 and isLabel(msg):
 			try:
 				label = msg
 				note = Note.objects.get(user=user, label=label)
@@ -61,7 +68,7 @@ def incoming_sms(request):
 				return sendResponse("%s:\n%s\n%s" % (label, note.text, clearMsg))
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I didn't find anything for %s" % label)
-		elif isClearLabel(msg):
+		elif numMedia == 0 and isClearLabel(msg):
 			try:
 				label = msg.strip().split(' ')[0]
 				note = Note.objects.get(user=user, label=label)
@@ -70,7 +77,7 @@ def incoming_sms(request):
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I don't have anything for %s" % label)
 		elif hasList(msg):
-			content, label = getData(msg)
+			content, label, media = getData(msg)
 			note, created = Note.objects.get_or_create(user=user, label=label)
 			if note.text == None:
 				note.text = ""
