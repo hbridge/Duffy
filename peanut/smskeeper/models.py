@@ -15,5 +15,6 @@ class Note(models.Model):
 	label = models.CharField(max_length=100)
 	text = models.TextField(null=True)
 
+
 admin.site.register(User)
 admin.site.register(Note)

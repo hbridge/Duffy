@@ -18,6 +18,11 @@ def isLabel(msg):
 	stripedMsg = msg.strip()
 	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
 
+def isClearLabel(msg):
+	stripedMsg = msg.strip()
+	tokens = msg.split(' ')
+	return len(tokens) == 2 and isLabel(tokens[0]) and tokens[1].lower() == 'clear'
+
 def hasList(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
@@ -52,7 +57,16 @@ def incoming_sms(request):
 			try:
 				label = msg
 				note = Note.objects.get(user=user, label=label)
-				return sendResponse("%s:\n%s" % (label, note.text))
+				clearMsg = "Send '%s clear' to clear this list."%(label)
+				return sendResponse("%s:\n%s\n%s" % (label, note.text, clearMsg))
+			except Note.DoesNotExist:
+				return sendResponse("Sorry, I didn't find anything for %s" % label)
+		elif isClearLabel(msg):
+			try:
+				label = msg.strip().split(' ')[0]
+				note = Note.objects.get(user=user, label=label)
+				note.delete()
+				return sendResponse("%s cleared"% (label))
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I don't have anything for %s" % label)
 		elif hasList(msg):
@@ -64,6 +78,6 @@ def incoming_sms(request):
 			note.save()
 			return sendResponse("Got it")
 		else:
-			return sendResponse("You need to include that message with a label.  ex: #grocery, #tobuy, #toread")
+			return sendResponse("Oops I need a label for that message. ex: #grocery, #tobuy, #toread")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
