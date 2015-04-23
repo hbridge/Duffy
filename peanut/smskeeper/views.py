@@ -58,7 +58,7 @@ def incoming_sms(request):
 			user = User.objects.get(phone_number=phoneNumber)
 		except User.DoesNotExist:
 			user = User.objects.create(phone_number=phoneNumber)
-			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type a couple of items you want to buy and add '#grocery' at the end.")
+			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type an item you want to buy and add '#grocery' at the end.")
 
 		if numMedia == 0 and isLabel(msg):
 			try:
