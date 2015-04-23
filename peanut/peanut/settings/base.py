@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'common',
     'strand',
     'memfresh',
+    'smskeeper',
     # Added.
     'haystack',
     'rest_framework',
