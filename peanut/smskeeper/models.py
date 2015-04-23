@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib import admin
 
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
@@ -14,3 +14,6 @@ class Note(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	label = models.CharField(max_length=100)
 	text = models.TextField(null=True)
+
+admin.site.register(User)
+admin.site.register(Note)

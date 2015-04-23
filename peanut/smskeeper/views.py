@@ -46,7 +46,7 @@ def incoming_sms(request):
 			user = User.objects.get(phone_number=phoneNumber)
 		except User.DoesNotExist:
 			user = User.objects.create(phone_number=phoneNumber)
-			return sendResponse("Hi, nice to meet you.  I'm SMS Keeper.  Simply send me a message with a #listname and I'll remember it for you")
+			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type a couple of items you want to buy and add '#grocery' at the end.")
 
 		if isLabel(msg):
 			try:
@@ -64,6 +64,6 @@ def incoming_sms(request):
 			note.save()
 			return sendResponse("Got it")
 		else:
-			return sendResponse("What list do you want to add that to? ex: #grocery, #tobuy, #toread")
+			return sendResponse("You need to include that message with a label.  ex: #grocery, #tobuy, #toread")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
