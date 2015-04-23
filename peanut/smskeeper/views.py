@@ -8,13 +8,28 @@ from django.views.decorators.csrf import csrf_exempt
 from smskeeper.forms import UserIdForm, SmsContentForm
 from smskeeper.models import User, Note, NoteEntry, IncomingMessage
 
+from strand import notifications_util
 from common import api_util
+from peanut.settings import constants
 
 def sendResponse(msg):
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 	content += "<Response><Sms>%s</Sms></Response>" % msg
 	print "Sending response %s" % msg
 	return HttpResponse(content, content_type="text/xml")
+
+def sendMsg(user, msg):
+	print "Sending %s" % msg
+	notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, constants.TWILIO_SMSKEEPER_PHONE_NUM)
+
+def sendNoResponse():
+	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+	content += "<Response></Response>"
+	print "Sending blank response"
+	return HttpResponse(content, content_type="text/xml")
+
+def sendImageEntry():
+	pass
 
 def isLabel(msg):
 	stripedMsg = msg.strip()
@@ -54,8 +69,30 @@ def getData(msg, numMedia, request):
 	return (' '.join(nonLabels), label, media)
 
 def sendBackNote(note):
-	clearMsg = "Send '%s clear' to clear this list."%(label)
-	sendResponse("%s:\n%s\n%s" % (note.label, note.text, clearMsg))
+	clearMsg = "Send '%s clear' to clear this list."%(note.label)
+	entries = NoteEntry.objects.filter(note=note).order_by("added")
+	hasImages = False
+	if len(entries) == 0:
+		return False
+
+	currentMsg = "%s:" % note.label
+	responseSent = False
+
+	for entry in entries:
+		if not entry.img_urls_json:
+			currentMsg = currentMsg + "\n" + entry.text
+		else:
+			hasImages = True
+
+	if hasImages:
+		sendMsg(note.user, currentMsg)
+
+		for entry in entries:
+			if entry.img_urls_json:
+				sendImageEntry(entry)
+		return sendNoResponse()
+	else:
+		return sendResponse(currentMsg)
 
 @csrf_exempt
 def incoming_sms(request):
@@ -78,9 +115,15 @@ def incoming_sms(request):
 			
 		if numMedia == 0 and isLabel(msg):
 			# This is a label fetch.  See if a note with that label exists then return
+			label = msg
 			try:
-				note = Note.objects.get(user=user, label=msg)
-				return sendBackNote(note)
+				note = Note.objects.get(user=user, label=label)
+				response = sendBackNote(note)
+				if response:
+					return response
+				else:
+					return sendResponse("Sorry, I didn't find anything for %s" % label)
+
 			except Note.DoesNotExist:
 				return sendResponse("Sorry, I didn't find anything for %s" % label)
 		elif numMedia == 0 and isClearLabel(msg):
@@ -95,8 +138,8 @@ def incoming_sms(request):
 			text, label, media = getData(msg, numMedia, request)
 			note, created = Note.objects.get_or_create(user=user, label=label)
 
-			entry = NoteEntry()
-			if content:
+			entry = NoteEntry(note=note)
+			if text:
 				entry.text = text
 			if media:
 				entry.img_urls_json = json.dumps(media)
