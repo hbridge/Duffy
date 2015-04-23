@@ -150,7 +150,7 @@ def incoming_sms(request):
 
 			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type an item you want to buy and add '#grocery' at the end.")
 		finally:
-			IncomingMessage.objects.create(user=user, msg_json=json.dumps(msg))
+			IncomingMessage.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)))
 
 			
 		if numMedia == 0 and isLabel(msg):
