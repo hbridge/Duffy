@@ -5,5 +5,5 @@ from smskeeper import views
 urlpatterns = patterns(
 	'',
 	# external services
-	url(r'^incoming_sms.xml', 'smskeeper.views.incoming_sms'),
+	url(r'^incoming_sms', 'smskeeper.views.incoming_sms'),
 )
