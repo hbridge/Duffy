@@ -100,7 +100,7 @@ def incoming_sms(request):
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
-		msg = str(form.cleaned_data['Body'])
+		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
 
 		try:
