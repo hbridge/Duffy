@@ -29,9 +29,10 @@ class NoteEntry(models.Model):
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 
-class IncomingMessage(models.Model):
+class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	msg_json = models.TextField(null=True)
+	incoming = models.BooleanField(default=None)
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
@@ -39,4 +40,4 @@ class IncomingMessage(models.Model):
 admin.site.register(User)
 admin.site.register(Note)
 admin.site.register(NoteEntry)
-admin.site.register(IncomingMessage)
+admin.site.register(Message)

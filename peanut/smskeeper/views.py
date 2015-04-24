@@ -15,7 +15,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from smskeeper.forms import UserIdForm, SmsContentForm
-from smskeeper.models import User, Note, NoteEntry, IncomingMessage
+from smskeeper.models import User, Note, NoteEntry, Message
 
 from strand import notifications_util
 from common import api_util
@@ -23,6 +23,9 @@ from peanut.settings import constants
 
 def sendMsg(user, msg, mediaUrls, keeperNumber):
 	print "Sending %s to %s" % (msg, user.phone_number)
+	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
+	Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
+	
 	if mediaUrls:
 		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
 	else:
@@ -357,7 +360,7 @@ def incoming_sms(request):
 			dealWithTutorial(user, msg, numMedia, keeperNumber, request)
 			return sendNoResponse()
 		finally:
-			IncomingMessage.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)))
+			Message.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)), incoming=True)
 
 			
 		if numMedia == 0 and isLabel(msg):
