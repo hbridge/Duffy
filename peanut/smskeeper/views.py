@@ -115,41 +115,6 @@ def moveMediaToS3(mediaUrlList):
 
 	return newUrlList
 
-def sendBackNote(note, keeperNumber):
-	clearMsg = "\n\nSend '%s clear' to clear this list."%(note.label)
-	entries = NoteEntry.objects.filter(note=note).order_by("added")
-	mediaUrls = list()
-
-	if len(entries) == 0:
-		sendNotFoundMessage(note.user, note.label, keeperNumber)
-		return
-
-	currentMsg = "%s:" % note.label
-
-	count = 1
-	for entry in entries:
-		if not entry.img_urls_json:
-			currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
-			count += 1
-		else:
-			mediaUrls.extend(json.loads(entry.img_urls_json))
-
-
-	if len(mediaUrls) > 0:
-		if (len(mediaUrls) > 1):
-			photoPhrase = " photos"
-		else:
-			photoPhrase = " photo"
-
-		currentMsg = currentMsg + "\n +" + str(len(mediaUrls)) + photoPhrase + " coming separately"
-
-		sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
-		gridImageUrl = generateImageGridUrl(mediaUrls)
-		sendMsg(note.user, '', gridImageUrl, keeperNumber)
-	else:
-		sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
-
-
 def sendContactCard(user, keeperNumber):
 		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 		sendMsg(user, '', cardURL, keeperNumber)
@@ -195,7 +160,7 @@ def generateImageGridUrl(imageURLs):
 
 	return saveImageToS3(newImage)
 
-def dealWithAddMessage(user, msg, numMedia, keeperNumber, request):
+def dealWithAddMessage(user, msg, numMedia, keeperNumber, request, sendResponse):
 	text, label, media = getData(msg, numMedia, request)
 	note, created = Note.objects.get_or_create(user=user, label=label)
 
@@ -205,14 +170,47 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, request):
 	if media:
 		entry.img_urls_json = json.dumps(media)
 	entry.save()
-	sendMsg(user, "Got it", None, keeperNumber)
+
+	if sendResponse:
+		sendMsg(user, "Got it", None, keeperNumber)
 
 def dealWithFetchMessage(user, msg, numMedia, keeperNumber, request):
 	# This is a label fetch.  See if a note with that label exists then return
 	label = msg
 	try:
 		note = Note.objects.get(user=user, label=label)
-		sendBackNote(note, keeperNumber)
+		clearMsg = "\n\nSend '%s clear' to clear this list."%(note.label)
+		entries = NoteEntry.objects.filter(note=note).order_by("added")
+		mediaUrls = list()
+
+		if len(entries) == 0:
+			sendNotFoundMessage(note.user, note.label, keeperNumber)
+			return
+
+		currentMsg = "%s:" % note.label
+
+		count = 1
+		for entry in entries:
+			if not entry.img_urls_json:
+				currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
+				count += 1
+			else:
+				mediaUrls.extend(json.loads(entry.img_urls_json))
+
+		if len(mediaUrls) > 0:
+			if (len(mediaUrls) > 1):
+				photoPhrase = " photos"
+			else:
+				photoPhrase = " photo"
+
+			currentMsg = currentMsg + "\n +" + str(len(mediaUrls)) + photoPhrase + " coming separately"
+
+			gridImageUrl = generateImageGridUrl(mediaUrls)
+
+			sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
+			sendMsg(note.user, '', gridImageUrl, keeperNumber)
+		else:
+			sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
 	except Note.DoesNotExist:
 		sendNotFoundMessage(user, label, keeperNumber)
 
@@ -230,29 +228,64 @@ def sendItemFromNote(note, keeperNumber):
 	else:
 		sendMsg(note.user, "Random item from %s: %s"%(note.label, entry.text), None, keeperNumber)
 
-def dealWithTutorial(user, msg, keeperNumber):
+def getFirstNote(user):
+	notes = Note.objects.filter(user=user)
+	if len(notes) > 0:
+		return notes[0]
+	else:
+		return None
+
+def dealWithTutorial(user, msg, numMedia, keeperNumber, request):
 	if user.tutorial_step == 0:
 		sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
 		sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
+		user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 1:
-		sendMsg(user, "Now let's add another item to your list. Don't forget to add same hashtag. Like 'milk #grocery'", None, keeperNumber)
+		if not hasLabel(msg):
+			# They didn't send in something with a label.
+			sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.")
+		else:
+			# They sent in something with a label, have them add to it
+			dealWithAddMessage(user, msg, numMedia, keeperNumber, request, False)
+			sendMsg(user, "Now let's add another item to your list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
+			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 2:
-		sendMsg(user, "Got it. You can add items to this list anytime (including photos). To see your list, send just the hashtag to me. Like '#grocery'. Give it a shot.", None, keeperNumber)
+		# They should be sending in a second add command to an existing label
+		if not hasLabel(msg) or isLabel(msg):
+			existingLabel = getFirstNote(user).label
+			if not existingLabel:
+				sendMsg(user, "I'm borked, well done", None, keeperNumber)
+				return
+			sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
+		else:
+			dealWithAddMessage(user, msg, numMedia, keeperNumber, request, False)
+			sendMsg(user, "You can add items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
+			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
-		sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
-		time.sleep(1)
-		sendMsg(user, "Btw, here's an easy way to add me to your contacts.")
-		sendContactCard()
-	else:
-		user.completed_tutorial = True
-	user.tutorial_step = user.tutorial_step + 1
+		# The should be sending in just a label
+		existingLabel = getFirstNote(user).label
+		if not existingLabel:
+			sendMsg(user, "I'm borked, well done", None, keeperNumber)
+			return
+
+		if not isLabel(msg):
+			sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
+			return
+			
+		if not Note.objects.filter(user=user, label=msg).exists():
+			sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
+			return
+		else:	
+			dealWithFetchMessage(user, msg, numMedia, keeperNumber, request)
+			sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
+			time.sleep(1)
+			sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
+			sendContactCard()
+			user.completed_tutorial = True
+		
 	user.save()
-
-def looksLikeTutorialMsg(user, msg):
-	label = getLabel(msg)
-	return label == "#grocery"
-
+	
 def saveImageToS3(img):
 	conn = boto.connect_s3('AKIAJBSV42QT6SWHHGBA', '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL')
 	bucket = conn.get_bucket('smskeeper')
@@ -321,21 +354,18 @@ def incoming_sms(request):
 		except User.DoesNotExist:
 			user = User.objects.create(phone_number=phoneNumber)
 
-			dealWithTutorial(user, msg, keeperNumber)
+			dealWithTutorial(user, msg, numMedia, keeperNumber, request)
 			return sendNoResponse()
 		finally:
 			IncomingMessage.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)))
 
 			
 		if numMedia == 0 and isLabel(msg):
-			dealWithFetchMessage(user, msg, numMedia, keeperNumber, request)
-			if not user.completed_tutorial:
+			if user.completed_tutorial:
+				dealWithFetchMessage(user, msg, numMedia, keeperNumber, request)
+			else:
 				time.sleep(1)
-				if looksLikeTutorialMsg(user, msg):
-					dealWithTutorial(user, msg, keeperNumber)
-				else:
-					user.completed_tutorial = True
-					user.save()
+				dealWithTutorial(user, msg, numMedia, keeperNumber, request)
 		elif numMedia == 0 and isClearLabel(msg):
 			try:
 				label = getLabel(msg)
@@ -352,14 +382,11 @@ def incoming_sms(request):
 			except Note.DoesNotExist:
 				sendNotFoundMessage(user, label, keeperNumber)
 		elif hasLabel(msg):
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, request)
-			if not user.completed_tutorial:
+			if user.completed_tutorial:
+				dealWithAddMessage(user, msg, numMedia, keeperNumber, request, True)
+			else:
 				time.sleep(1)
-				if looksLikeTutorialMsg(user, msg):
-					dealWithTutorial(user, msg, keeperNumber)
-				else:
-					user.completed_tutorial = True
-					user.save()
+				dealWithTutorial(user, msg, numMedia, keeperNumber, request)
 		elif isHelpCommand(msg):
 			sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 		elif isSendContactCommand(msg):
