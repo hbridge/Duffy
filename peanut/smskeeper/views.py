@@ -234,13 +234,16 @@ def dealWithTutorial(user, msg, keeperNumber):
 	if user.tutorial_step == 0:
 		sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
-		sendMsg(user, "To try, type an item you want to buy and put '#grocery' in the message. (ie 'bread #grocery')", None, keeperNumber)
+		sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
 	elif user.tutorial_step == 1:
-		sendMsg(user, "Now let's add another item to your list. Don't forget to add #grocery. (ie 'milk #grocery')", None, keeperNumber)
+		sendMsg(user, "Now let's add another item to your list. Don't forget to add same hashtag. Like 'milk #grocery'", None, keeperNumber)
 	elif user.tutorial_step == 2:
-		sendMsg(user, "Great. You can add items to this list anytime (including pictures). To get the list back, send just '#grocery' to me. Give it a shot.", None, keeperNumber)
+		sendMsg(user, "Got it. You can add items to this list anytime (including photos). To see your list, send just the hashtag to me. Like '#grocery'. Give it a shot.", None, keeperNumber)
 	elif user.tutorial_step == 3:
-		sendMsg(user, "You got it. Type 'huh?' anytime to get help.", None, keeperNumber)
+		sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
+		time.sleep(1)
+		sendMsg(user, "Btw, here's an easy way to add me to your contacts.")
+		sendContactCard()
 	else:
 		user.completed_tutorial = True
 	user.tutorial_step = user.tutorial_step + 1
