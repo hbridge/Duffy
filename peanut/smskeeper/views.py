@@ -1,6 +1,7 @@
 import json
 from multiprocessing import Process
 import uuid
+import time
 import boto
 import requests
 import cStringIO
@@ -20,12 +21,6 @@ from strand import notifications_util
 from common import api_util
 from peanut.settings import constants
 
-def sendResponse(msg):
-	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
-	content += "<Response><Sms>%s</Sms></Response>" % msg
-	print "Sending response %s" % msg
-	return HttpResponse(content, content_type="text/xml")
-
 def sendMsg(user, msg, mediaUrls, keeperNumber):
 	print "Sending %s to %s" % (msg, user.phone_number)
 	if mediaUrls:
@@ -38,6 +33,9 @@ def sendNoResponse():
 	content += "<Response></Response>"
 	print "Sending blank response"
 	return HttpResponse(content, content_type="text/xml")
+
+def sendNotFoundMessage(user, label, keeperNumber):
+	sendMsg(user, "Sorry, I don't have anything for %s" % label, None, keeperNumber)
 
 def isLabel(msg):
 	stripedMsg = msg.strip()
@@ -57,12 +55,12 @@ def isListsCommand(msg):
 	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
 
 def isHelpCommand(msg):
-	return msg.strip().lower() == 'help'
+	return msg.strip().lower() == 'huh?'
 
 def isSendContactCommand(msg):
-        return msg.strip().lower() == 'vcard'
+	return msg.strip().lower() == 'vcard'
 
-def hasList(msg):
+def hasLabel(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
 			return True
@@ -123,7 +121,8 @@ def sendBackNote(note, keeperNumber):
 	mediaUrls = list()
 
 	if len(entries) == 0:
-		return False
+		sendNotFoundMessage(note.user, note.label, keeperNumber)
+		return
 
 	currentMsg = "%s:" % note.label
 
@@ -147,15 +146,13 @@ def sendBackNote(note, keeperNumber):
 		sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
 		gridImageUrl = generateImageGridUrl(mediaUrls)
 		sendMsg(note.user, '', gridImageUrl, keeperNumber)
-		return sendNoResponse()
 	else:
-		return sendResponse(currentMsg + clearMsg)
+		sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
 
 
 def sendContactCard(user, keeperNumber):
-        cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
-        sendMsg(user, '', cardURL, keeperNumber)
-        return sendNoResponse()
+		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
+		sendMsg(user, '', cardURL, keeperNumber)
 
 '''
 	Gets a list of urls and generates a grid image to send back.
@@ -198,7 +195,60 @@ def generateImageGridUrl(imageURLs):
 
 	return saveImageToS3(newImage)
 
-	
+def dealWithAddMessage(user, msg, numMedia, keeperNumber, request):
+	text, label, media = getData(msg, numMedia, request)
+	note, created = Note.objects.get_or_create(user=user, label=label)
+
+	entry = NoteEntry(note=note)
+	if text:
+		entry.text = text
+	if media:
+		entry.img_urls_json = json.dumps(media)
+	entry.save()
+	sendMsg(user, "Got it", None, keeperNumber)
+
+def dealWithFetchMessage(user, msg, numMedia, keeperNumber, request):
+	# This is a label fetch.  See if a note with that label exists then return
+	label = msg
+	try:
+		note = Note.objects.get(user=user, label=label)
+		sendBackNote(note, keeperNumber)
+	except Note.DoesNotExist:
+		sendNotFoundMessage(user, label, keeperNumber)
+
+
+def sendItemFromNote(note, keeperNumber):
+	entries = NoteEntry.objects.filter(note=note).order_by("added")
+	if len(entries) == 0:
+		sendNotFoundMessage(user, label, keeperNumber)
+		return
+		
+	entry = random.choice(entries)
+	if entry.img_urls_json:
+		sendMsg(note.user, "Random item from %s:"%note.label, None, keeperNumber)
+		sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
+	else:
+		sendMsg(note.user, "Random item from %s: %s"%(note.label, entry.text), None, keeperNumber)
+
+def dealWithTutorial(user, msg, keeperNumber):
+	if user.tutorial_step == 0:
+		sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		time.sleep(1)
+		sendMsg(user, "To try, type an item you want to buy and put '#grocery' in the message. (ie 'bread #grocery')", None, keeperNumber)
+	elif user.tutorial_step == 1:
+		sendMsg(user, "Now let's add another item to your list. Don't forget to add #grocery. (ie 'milk #grocery')", None, keeperNumber)
+	elif user.tutorial_step == 2:
+		sendMsg(user, "Great. You can add items to this list anytime (including pictures). To get the list back, send just '#grocery' to me. Give it a shot.", None, keeperNumber)
+	elif user.tutorial_step == 3:
+		sendMsg(user, "You got it. Type 'huh?' anytime to get help.", None, keeperNumber)
+	else:
+		user.completed_tutorial = True
+	user.tutorial_step = user.tutorial_step + 1
+	user.save()
+
+def looksLikeTutorialMsg(user, msg):
+	label = getLabel(msg)
+	return label == "#grocery"
 
 def saveImageToS3(img):
 	conn = boto.connect_s3('AKIAJBSV42QT6SWHHGBA', '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL')
@@ -268,61 +318,53 @@ def incoming_sms(request):
 		except User.DoesNotExist:
 			user = User.objects.create(phone_number=phoneNumber)
 
-			return sendResponse("Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.\n\nLet's try creating your grocery list. Type an item you want to buy and add '#grocery' at the end.")
+			dealWithTutorial(user, msg, keeperNumber)
+			return sendNoResponse()
 		finally:
 			IncomingMessage.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)))
 
 			
 		if numMedia == 0 and isLabel(msg):
-			# This is a label fetch.  See if a note with that label exists then return
-			label = msg
-			try:
-				note = Note.objects.get(user=user, label=label)
-				response = sendBackNote(note, keeperNumber)
-				if response:
-					return response
+			dealWithFetchMessage(user, msg, numMedia, keeperNumber, request)
+			if not user.completed_tutorial:
+				time.sleep(1)
+				if looksLikeTutorialMsg(user, msg):
+					dealWithTutorial(user, msg, keeperNumber)
 				else:
-					return sendResponse("Sorry, I didn't find anything for %s" % label)
-
-			except Note.DoesNotExist:
-				return sendResponse("Sorry, I didn't find anything for %s" % label)
+					user.completed_tutorial = True
+					user.save()
 		elif numMedia == 0 and isClearLabel(msg):
 			try:
 				label = getLabel(msg)
 				note = Note.objects.get(user=user, label=label)
 				note.delete()
-				return sendResponse("%s cleared"% (label))
+				sendMsg(user, "%s cleared"% (label), None, keeperNumber)
 			except Note.DoesNotExist:
-				return sendResponse("Sorry, I don't have anything for %s" % label)
+				sendNotFoundMessage(user, label, keeperNumber)
 		elif numMedia == 0 and isPickFromLabel(msg):
 			label = getLabel(msg)
 			try:
 				note = Note.objects.get(user=user, label=label)
-				response = sendItemFromNote(note, keeperNumber)
-				if response:
-					return response
-				else:
-					return sendResponse("Sorry, I didn't find anything for %s" % label)
-
+				sendItemFromNote(note, keeperNumber)
 			except Note.DoesNotExist:
-				return sendResponse("Sorry, I didn't find anything for %s" % label)
-
-		elif hasList(msg):
-			text, label, media = getData(msg, numMedia, request)
-			note, created = Note.objects.get_or_create(user=user, label=label)
-
-			entry = NoteEntry(note=note)
-			if text:
-				entry.text = text
-			if media:
-				entry.img_urls_json = json.dumps(media)
-			entry.save()
-			return sendResponse("Got it")
+				sendNotFoundMessage(user, label, keeperNumber)
+		elif hasLabel(msg):
+			dealWithAddMessage(user, msg, numMedia, keeperNumber, request)
+			if not user.completed_tutorial:
+				time.sleep(1)
+				if looksLikeTutorialMsg(user, msg):
+					dealWithTutorial(user, msg, keeperNumber)
+				else:
+					user.completed_tutorial = True
+					user.save()
 		elif isHelpCommand(msg):
-			return sendResponse("You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.")
+			sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 		elif isSendContactCommand(msg):
-                        return sendContactCard(user, keeperNumber)
-                else:
-			return sendResponse("Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'help' to find out more.")
+			sendContactCard(user, keeperNumber)
+		else:
+			sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
+
+		return sendNoResponse()
+
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
