@@ -239,8 +239,9 @@ def sendItemFromNote(note, keeperNumber):
 	entry = random.choice(entries)
 	if entry.img_urls_json:
 		sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
+		return sendResponse("Random item from %s:"%note.label)
 	else:
-		return sendResponse(entry.text)
+		return sendResponse("Random item from %s: %s"%(note.label, entry.text))
 
 
 @csrf_exempt
