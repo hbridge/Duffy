@@ -281,7 +281,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, request):
 			sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
-			sendContactCard()
+			sendContactCard(user, keeperNumber)
 			user.completed_tutorial = True
 		
 	user.save()
