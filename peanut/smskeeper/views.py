@@ -5,6 +5,8 @@ import boto
 import requests
 import cStringIO
 import random
+import math
+from PIL import Image
 
 from django.shortcuts import render
 
@@ -27,7 +29,6 @@ def sendResponse(msg):
 def sendMsg(user, msg, mediaUrls, keeperNumber):
 	print "Sending %s to %s" % (msg, user.phone_number)
 	if mediaUrls:
-		print mediaUrls[0]
 		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
 	else:
 		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
@@ -114,30 +115,121 @@ def moveMediaToS3(mediaUrlList):
 	return newUrlList
 
 def sendBackNote(note, keeperNumber):
-	clearMsg = "Send '%s clear' to clear this list."%(note.label)
+	clearMsg = "\n\nSend '%s clear' to clear this list."%(note.label)
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
-	hasImages = False
+	mediaUrls = list()
+
 	if len(entries) == 0:
 		return False
 
 	currentMsg = "%s:" % note.label
-	responseSent = False
 
+	count = 1
 	for entry in entries:
 		if not entry.img_urls_json:
-			currentMsg = currentMsg + "\n" + entry.text
+			currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
+			count += 1
 		else:
-			hasImages = True
+			mediaUrls.extend(json.loads(entry.img_urls_json))
 
-	if hasImages:
-		sendMsg(note.user, currentMsg, None, keeperNumber)
 
-		for entry in entries:
-			if entry.img_urls_json:
-				sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
+	if len(mediaUrls) > 0:
+		if (len(mediaUrls) > 1):
+			photoPhrase = " photos"
+		else:
+			photoPhrase = " photo"
+
+		currentMsg = currentMsg + "\n +" + str(len(mediaUrls)) + photoPhrase + " coming separately"
+
+		sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
+		gridImageUrl = generateImageGridUrl(mediaUrls)
+		sendMsg(note.user, '', gridImageUrl, keeperNumber)
 		return sendNoResponse()
 	else:
-		return sendResponse(currentMsg)
+		return sendResponse(currentMsg + clearMsg)
+
+'''
+	Gets a list of urls and generates a grid image to send back.
+'''
+def generateImageGridUrl(imageURLs):
+	# if one url, just return that
+	if len(imageURLs) == 1:
+		return imageURLs[0]
+
+	# if more than one, now setup the grid system
+	imageList = list()
+
+	imageSize = 300
+
+	# fetch all images and resize them into imageSize x imageSize
+	for imageUrl in imageURLs:
+		resp = requests.get(imageUrl)
+		img = Image.open(cStringIO.StringIO(resp.content))
+		imageList.append(resizeImage(img, imageSize, True))
+
+
+	if len(imageURLs) < 5:
+		# generate an 2xn grid
+		rows = int(math.ceil(float(len(imageURLs))/2.0))
+		newImage = Image.new("RGB", (2*imageSize, imageSize*rows), "white")
+	
+		for i,image in enumerate(imageList):
+			x = imageSize*(i % 2)
+			y = imageSize*(i/2 % 2)
+			newImage.paste(image, (x,y,x+imageSize,y+imageSize))
+	else:
+		# generate a 3xn grid
+		rows = int(math.ceil(float(len(imageURLs))/3.0))
+		newImage = Image.new("RGB", (3*imageSize, imageSize*rows), "white")
+
+		for i,image in enumerate(imageList):
+			x = imageSize*(i % 3)
+			y = imageSize*(i/3 % 3)
+			newImage.paste(image, (x,y,x+imageSize,y+imageSize))
+
+	return saveImageToS3(newImage)
+
+	
+
+def saveImageToS3(img):
+	conn = boto.connect_s3('AKIAJBSV42QT6SWHHGBA', '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL')
+	bucket = conn.get_bucket('smskeeper')
+	
+	outIm = cStringIO.StringIO()
+	img.save(outIm, 'JPEG')
+
+	# Upload to S3 
+	keyStr = "grid-" + str(uuid.uuid4())
+	key = bucket.new_key(keyStr)
+	key.set_contents_from_string(outIm.getvalue())
+	return 'https://s3.amazonaws.com/smskeeper/'+ str(keyStr)
+
+"""
+	Does image resizes and creates a new file (JPG) of the specified size
+"""
+def resizeImage(im, size, crop):
+
+	#calc ratios and new min size
+	wratio = (size/float(im.size[0])) #width check
+	hratio = (size/float(im.size[1])) #height check
+
+	if (hratio > wratio):
+		newSize = hratio*im.size[0], hratio*im.size[1]
+	else:
+		newSize = wratio*im.size[0], wratio*im.size[1]
+	im.thumbnail(newSize, Image.ANTIALIAS)
+
+	# setup the crop to size x size image
+	if (crop):
+		if (hratio > wratio):
+			buffer = int((im.size[0]-size)/2)
+			im = im.crop((buffer, 0, (im.size[0]-buffer), size))			
+		else:
+			buffer = int((im.size[1]-size)/2)
+			im = im.crop((0, buffer, size, (im.size[1] - buffer)))
+	
+	im.load()
+	return im
 
 def sendItemFromNote(note, keeperNumber):
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
