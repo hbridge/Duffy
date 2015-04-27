@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib import admin
+import json
 
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
@@ -36,6 +37,40 @@ class Message(models.Model):
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+	
+	# calculated attributes
+	messageDict = None
+	def getMessageAttribute(self, attribute):
+		if self.messageDict is None:
+			self.messageDict = json.loads(self.msg_json)
+		return self.messageDict.get(attribute, None)
+	
+	def getBody(self):
+		return self.getMessageAttribute("Body")
+		
+	def getMedia(self):
+		media = []
+		mediaUrls = self.getMessageAttribute("MediaUrls")
+		if mediaUrls:
+			media.append(MessageMedia(mediaUrls, None))
+			
+		if not self.getMessageAttribute("NumMedia"):
+			return media
+		for n in range(int(self.getMessageAttribute("NumMedia"))):
+			urlParam = 'MediaUrl' + str(n)
+			typeParam = 'MediaContentType' + str(n)
+			
+			media.append(MessageMedia(self.getMessageAttribute(urlParam), self.getMessageAttribute(typeParam)))
+			
+		return media
+		
+class MessageMedia:
+	url = None
+	mediaType = None
+	
+	def __init__(self, url, mediaType):
+		self.url = url
+		self.mediaType = mediaType
 
 admin.site.register(User)
 admin.site.register(Note)

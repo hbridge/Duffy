@@ -11,5 +11,9 @@ class SmsContentForm(forms.Form):
 	NumMedia = forms.IntegerField(required=False)
 
 class AllNotesForm(forms.Form):
-        PhoneNum = forms.CharField(required=True)
-        KeeperNum = forms.CharField(required=True)
+	PhoneNum = forms.CharField(required=True)
+	KeeperNum = forms.CharField(required=True)
+	
+class HistoryForm(forms.Form):
+	UserPhone = forms.CharField(required=True)
+	KeeperPhone = forms.CharField(required=True)

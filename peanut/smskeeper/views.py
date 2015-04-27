@@ -21,8 +21,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from smskeeper.forms import UserIdForm, SmsContentForm, AllNotesForm
-from smskeeper.models import User, Note, NoteEntry, Message
+from smskeeper.forms import UserIdForm, SmsContentForm, AllNotesForm, HistoryForm
+from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
 
 from strand import notifications_util
 from common import api_util
@@ -191,8 +191,8 @@ def generateImageGridUrl(imageURLs):
 
 	return saveImageToS3(newImage)
 
-def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendResponse):
-	text, label, media = getData(msg, numMedia, requestDict)
+def dealWithAddMessage(user, msg, numMedia, keeperNumber, request, sendResponse):
+	text, label, media = dealWithAdd(msg, numMedia, request)
 	note, created = Note.objects.get_or_create(user=user, label=label)
 
 	entry = NoteEntry(note=note)
@@ -459,6 +459,42 @@ def all_notes(request):
 			html = ""
 			for note in Note.objects.filter(user=user):
 				html += htmlForNote(note)
+			return HttpResponse(html, content_type="text/html", status=200)
+		except User.DoesNotExist:
+			return sendResponse("Phone number not found")
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+def getHTMLForMessage(message):
+	html = "<span title='%s'>" % (message.msg_json)
+	html += message.getBody().replace("\n", "<br>")
+	
+	for messageMedia in message.getMedia():
+		if messageMedia.mediaType and "jpeg" in messageMedia.mediaType:
+			html += "<br><img src=\"%s\" / width=200 height=200>" % (messageMedia.url)
+		else :
+			html += "<br>  <a href=\"%s\">%s</a>" % (messageMedia.url, messageMedia.url)
+			
+	html += "</span>"
+	return html
+
+def history(request):
+	form = HistoryForm(api_util.getRequestData(request))
+	
+	if (form.is_valid()):
+		phoneNumber = str(form.cleaned_data['UserPhone'])
+		keeperNumber = str(form.cleaned_data['KeeperPhone'])
+		try:
+			user = User.objects.get(phone_number=phoneNumber)
+			html = ""
+			messages = Message.objects.filter(user=user).order_by("added")
+			print "returning %s messages" % (messages.count())
+			for message in messages:
+				message_html = getHTMLForMessage(message)
+				sender = "Keeper"
+				if message.incoming:
+					sender = user.phone_number
+				html += "<p><strong>%s</strong> (%s) <br> %s </p>" % (sender, message.added, message_html)
 			return HttpResponse(html, content_type="text/html", status=200)
 		except User.DoesNotExist:
 			return sendResponse("Phone number not found")
