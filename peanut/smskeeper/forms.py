@@ -9,3 +9,7 @@ class SmsContentForm(forms.Form):
 	To = forms.CharField(required=False)
 	Body = forms.CharField(required=False)
 	NumMedia = forms.IntegerField(required=False)
+
+class AllNotesForm(forms.Form):
+        PhoneNum = forms.CharField(required=True)
+        KeeperNum = forms.CharField(required=True)
