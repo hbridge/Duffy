@@ -118,7 +118,6 @@ def moveMediaToS3(mediaUrlList):
 
 	return newUrlList
 
-<<<<<<< HEAD
 def htmlForNote(note):
 	html = "%s:\n"%(note.label)
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
@@ -172,9 +171,6 @@ def sendBackNote(note, keeperNumber):
 	else:
 		return sendResponse(currentMsg + clearMsg)
 
-
-=======
->>>>>>> 4514cd03794b59335ab935e23888ed47affab406
 def sendContactCard(user, keeperNumber):
 		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 		sendMsg(user, '', cardURL, keeperNumber)
@@ -450,18 +446,12 @@ def incoming_sms(request):
 		elif isHelpCommand(msg):
 			sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 		elif isSendContactCommand(msg):
-<<<<<<< HEAD
-			return sendContactCard(user, keeperNumber)
-		else:
-			return sendResponse("Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'help' to find out more.")
-=======
 			sendContactCard(user, keeperNumber)
 		else:
 			sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
 
 		return sendNoResponse()
-
->>>>>>> 4514cd03794b59335ab935e23888ed47affab406
+		
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
