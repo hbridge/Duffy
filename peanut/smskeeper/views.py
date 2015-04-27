@@ -191,8 +191,8 @@ def generateImageGridUrl(imageURLs):
 
 	return saveImageToS3(newImage)
 
-def dealWithAddMessage(user, msg, numMedia, keeperNumber, request, sendResponse):
-	text, label, media = dealWithAdd(msg, numMedia, request)
+def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendResponse):
+	text, label, media = getData(msg, numMedia, requestDict)
 	note, created = Note.objects.get_or_create(user=user, label=label)
 
 	entry = NoteEntry(note=note)
