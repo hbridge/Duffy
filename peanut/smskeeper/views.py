@@ -137,40 +137,6 @@ def htmlForNote(note):
 
 	return html
 
-def sendBackNote(note, keeperNumber):
-	clearMsg = "\n\nSend '%s clear' to clear this list."%(note.label)
-	entries = NoteEntry.objects.filter(note=note).order_by("added")
-	mediaUrls = list()
-
-	if len(entries) == 0:
-		return False
-
-	currentMsg = "%s:" % note.label
-
-	count = 1
-	for entry in entries:
-		if not entry.img_urls_json:
-			currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
-			count += 1
-		else:
-			mediaUrls.extend(json.loads(entry.img_urls_json))
-
-
-	if len(mediaUrls) > 0:
-		if (len(mediaUrls) > 1):
-			photoPhrase = " photos"
-		else:
-			photoPhrase = " photo"
-
-		currentMsg = currentMsg + "\n +" + str(len(mediaUrls)) + photoPhrase + " coming separately"
-
-		sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
-		gridImageUrl = generateImageGridUrl(mediaUrls)
-		sendMsg(note.user, '', gridImageUrl, keeperNumber)
-		return sendNoResponse()
-	else:
-		return sendResponse(currentMsg + clearMsg)
-
 def sendContactCard(user, keeperNumber):
 		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 		sendMsg(user, '', cardURL, keeperNumber)
