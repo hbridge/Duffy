@@ -21,7 +21,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from smskeeper.forms import UserIdForm, SmsContentForm, AllNotesForm, HistoryForm
+from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
 
 from strand import notifications_util
@@ -449,11 +449,10 @@ def incoming_sms(requestDict):
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 def all_notes(request):
-	form = AllNotesForm(api_util.getRequestData(request))
+	form = PhoneNumberForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		phoneNumber = str(form.cleaned_data['PhoneNum'])
-		keeperNumber = str(form.cleaned_data['KeeperNum'])
+		phoneNumber = str(form.cleaned_data['PhoneNumber'])
 		try:
 			user = User.objects.get(phone_number=phoneNumber)
 			html = ""
@@ -479,11 +478,10 @@ def getHTMLForMessage(message):
 	return html
 
 def history(request):
-	form = HistoryForm(api_util.getRequestData(request))
+	form = PhoneNumberForm(api_util.getRequestData(request))
 	
 	if (form.is_valid()):
-		phoneNumber = str(form.cleaned_data['UserPhone'])
-		keeperNumber = str(form.cleaned_data['KeeperPhone'])
+		phoneNumber = str(form.cleaned_data['PhoneNumber'])
 		try:
 			user = User.objects.get(phone_number=phoneNumber)
 			html = ""
