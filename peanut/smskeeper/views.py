@@ -8,6 +8,13 @@ import cStringIO
 import random
 import math
 from PIL import Image
+import os, sys
+
+parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
+if parentPath not in sys.path:
+	sys.path.insert(0, parentPath)
+import django
+django.setup()
 
 from django.shortcuts import render
 
@@ -22,14 +29,18 @@ from common import api_util
 from peanut.settings import constants
 
 def sendMsg(user, msg, mediaUrls, keeperNumber):
-	print "Sending %s to %s" % (msg, user.phone_number)
 	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
 	Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
 	
-	if mediaUrls:
-		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
+	if keeperNumber == "test":
+		# This is used for command line interface commands
+		print msg
 	else:
-		notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
+		print "Sending %s to %s" % (msg, user.phone_number)
+		if mediaUrls:
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
+		else:
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
 
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -75,7 +86,7 @@ def getLabel(msg):
 			return word
 	return None
 
-def getData(msg, numMedia, request):
+def getData(msg, numMedia, requestDict):
 	# process text
 	nonLabels = list()
 	label = None
@@ -87,8 +98,6 @@ def getData(msg, numMedia, request):
 
 	# process media
 	mediaUrlList = list()
-
-	requestDict = api_util.getRequestData(request)
 
 	for n in range(numMedia):
 		param = 'MediaUrl' + str(n)
@@ -107,7 +116,7 @@ def moveMediaToS3(mediaUrlList):
 	newUrlList = list()
 	
 	for mediaUrl in mediaUrlList:
-		resp = requests.get(mediaUrl)
+		resp = requestDicts.get(mediaUrl)
 		media = cStringIO.StringIO(resp.content)
 
 		# Upload to S3 
@@ -156,7 +165,7 @@ def generateImageGridUrl(imageURLs):
 
 	# fetch all images and resize them into imageSize x imageSize
 	for imageUrl in imageURLs:
-		resp = requests.get(imageUrl)
+		resp = requestDicts.get(imageUrl)
 		img = Image.open(cStringIO.StringIO(resp.content))
 		imageList.append(resizeImage(img, imageSize, True))
 
@@ -182,8 +191,8 @@ def generateImageGridUrl(imageURLs):
 
 	return saveImageToS3(newImage)
 
-def dealWithAddMessage(user, msg, numMedia, keeperNumber, request, sendResponse):
-	text, label, media = getData(msg, numMedia, request)
+def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendResponse):
+	text, label, media = getData(msg, numMedia, requestDict)
 	note, created = Note.objects.get_or_create(user=user, label=label)
 
 	entry = NoteEntry(note=note)
@@ -196,7 +205,7 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, request, sendResponse)
 	if sendResponse:
 		sendMsg(user, "Got it", None, keeperNumber)
 
-def dealWithFetchMessage(user, msg, numMedia, keeperNumber, request):
+def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 	# This is a label fetch.  See if a note with that label exists then return
 	label = msg
 	try:
@@ -257,7 +266,7 @@ def getFirstNote(user):
 	else:
 		return None
 
-def dealWithTutorial(user, msg, numMedia, keeperNumber, request):
+def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	if user.tutorial_step == 0:
 		sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
@@ -269,7 +278,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, request):
 			sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.")
 		else:
 			# They sent in something with a label, have them add to it
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, request, False)
+			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
 			sendMsg(user, "Now let's add another item to your list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 2:
@@ -281,7 +290,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, request):
 				return
 			sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, request, False)
+			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
 			sendMsg(user, "You can add items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
@@ -299,7 +308,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, request):
 			sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
 			return
 		else:	
-			dealWithFetchMessage(user, msg, numMedia, keeperNumber, request)
+			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
 			sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
@@ -360,62 +369,80 @@ def sendItemFromNote(note, keeperNumber):
 	else:
 		return sendResponse("My pick from %s: %s"%(note.label, entry.text))
 
+"""
+	Helper method for command line interface input.  Use by:
+	python
+	>> from smskeeper import views
+	>> views.cliMsg("+16508158274", "blah #test")
+"""
+def cliMsg(phoneNumber, msg):
+	processMessage(phoneNumber, msg, 0, {}, "test")
+
+
+
+"""
+	Main logic for processing a message
+	Pulled out so it can be called either from sms code or command line
+"""
+def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
+	try:
+		user = User.objects.get(phone_number=phoneNumber)
+	except User.DoesNotExist:
+		user = User.objects.create(phone_number=phoneNumber)
+
+		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+		return
+	finally:
+		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
+
+		
+	if numMedia == 0 and isLabel(msg):
+		if user.completed_tutorial:
+			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
+		else:
+			time.sleep(1)
+			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+	elif numMedia == 0 and isClearLabel(msg):
+		try:
+			label = getLabel(msg)
+			note = Note.objects.get(user=user, label=label)
+			note.delete()
+			sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+		except Note.DoesNotExist:
+			sendNotFoundMessage(user, label, keeperNumber)
+	elif numMedia == 0 and isPickFromLabel(msg):
+		label = getLabel(msg)
+		try:
+			note = Note.objects.get(user=user, label=label)
+			sendItemFromNote(note, keeperNumber)
+		except Note.DoesNotExist:
+			sendNotFoundMessage(user, label, keeperNumber)
+	elif hasLabel(msg):
+		if user.completed_tutorial:
+			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
+		else:
+			time.sleep(1)
+			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+	elif isHelpCommand(msg):
+		sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
+	elif isSendContactCommand(msg):
+		sendContactCard(user, keeperNumber)
+	else:
+		sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
+
 
 @csrf_exempt
-def incoming_sms(request):
-	form = SmsContentForm(api_util.getRequestData(request))
+def incoming_sms(requestDict):
+	form = SmsContentForm(api_util.getRequestData(requestDict))
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
 		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
+		requestDict = api_util.getRequestData(requestDict)
 
-		try:
-			user = User.objects.get(phone_number=phoneNumber)
-		except User.DoesNotExist:
-			user = User.objects.create(phone_number=phoneNumber)
-
-			dealWithTutorial(user, msg, numMedia, keeperNumber, request)
-			return sendNoResponse()
-		finally:
-			Message.objects.create(user=user, msg_json=json.dumps(api_util.getRequestData(request)), incoming=True)
-
-			
-		if numMedia == 0 and isLabel(msg):
-			if user.completed_tutorial:
-				dealWithFetchMessage(user, msg, numMedia, keeperNumber, request)
-			else:
-				time.sleep(1)
-				dealWithTutorial(user, msg, numMedia, keeperNumber, request)
-		elif numMedia == 0 and isClearLabel(msg):
-			try:
-				label = getLabel(msg)
-				note = Note.objects.get(user=user, label=label)
-				note.delete()
-				sendMsg(user, "%s cleared"% (label), None, keeperNumber)
-			except Note.DoesNotExist:
-				sendNotFoundMessage(user, label, keeperNumber)
-		elif numMedia == 0 and isPickFromLabel(msg):
-			label = getLabel(msg)
-			try:
-				note = Note.objects.get(user=user, label=label)
-				sendItemFromNote(note, keeperNumber)
-			except Note.DoesNotExist:
-				sendNotFoundMessage(user, label, keeperNumber)
-		elif hasLabel(msg):
-			if user.completed_tutorial:
-				dealWithAddMessage(user, msg, numMedia, keeperNumber, request, True)
-			else:
-				time.sleep(1)
-				dealWithTutorial(user, msg, numMedia, keeperNumber, request)
-		elif isHelpCommand(msg):
-			sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
-		elif isSendContactCommand(msg):
-			sendContactCard(user, keeperNumber)
-		else:
-			sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
-
+		processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber)
 		return sendNoResponse()
 		
 	else:
