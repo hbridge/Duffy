@@ -357,18 +357,6 @@ def resizeImage(im, size, crop):
 	im.load()
 	return im
 
-def sendItemFromNote(note, keeperNumber):
-	entries = NoteEntry.objects.filter(note=note).order_by("added")
-	if len(entries) == 0:
-		return False
-		
-	entry = random.choice(entries)
-	if entry.img_urls_json:
-		sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
-		return sendResponse("My pick from %s:"%note.label)
-	else:
-		return sendResponse("My pick from %s: %s"%(note.label, entry.text))
-
 """
 	Helper method for command line interface input.  Use by:
 	python
