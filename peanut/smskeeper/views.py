@@ -139,11 +139,11 @@ def htmlForNote(note):
 	count = 1
 	html += "<ol>\n"
 	for entry in entries:
-		if not entry.img_urls_json:
+		if not entry.img_url:
 			html += "<li>%s</li>"%(entry.text)
 			count += 1
 		else:
-			html += "<img src=\"%s\" />"%s(json.loads(entry.img_urls_json))
+			html += "<img src=\"%s\" />"%(entry.img_url))
 	html+= "</ol>"
 
 	return html
@@ -226,7 +226,7 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 		count = 1
 		for entry in entries:
 			if entry.img_url:
-				mediaUrls.extend(json.loads(entry.img_urls_json))
+				mediaUrls.extend(entry.img_url)
 			else:
 				currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
 				count += 1
@@ -256,9 +256,9 @@ def sendItemFromNote(note, keeperNumber):
 		return
 		
 	entry = random.choice(entries)
-	if entry.img_urls_json:
+	if entry.img_url:
 		sendMsg(note.user, "My pick for %s:"%note.label, None, keeperNumber)
-		sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
+		sendMsg(note.user, entry.text, entry.img_url, keeperNumber)
 	else:
 		sendMsg(note.user, "My pick for %s: %s"%(note.label, entry.text), None, keeperNumber)
 
