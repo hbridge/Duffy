@@ -1,3 +1,60 @@
 from django.test import TestCase
+import sys
+from cStringIO import StringIO
+from contextlib import contextmanager
 
-# Create your tests here.
+from smskeeper import views
+from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
+
+
+
+@contextmanager
+def capture(command, *args, **kwargs):
+	out, sys.stdout = sys.stdout, StringIO()
+	command(*args, **kwargs)
+	sys.stdout.seek(0)
+	yield sys.stdout.read()
+	sys.stdout = out
+
+
+class SMSKeeperCase(TestCase):
+	testPhoneNumber = "+16505555550"
+	user = None
+
+	def setUp(self):
+		try:
+			user = User.objects.get(phone_number=self.testPhoneNumber)
+			user.delete()
+		except User.DoesNotExist:
+			pass
+
+	def setupUser(self, tutorialComplete):
+		user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
+		user.completed_tutorial = tutorialComplete
+		user.save()
+
+	def test_tutorial(self):
+		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
+			self.assertTrue("Hi. I'm Keeper." in output)
+			self.assertTrue("Let's try creating a list" in output)
+			self.assertTrue(User.objects.filter(phone_number=self.testPhoneNumber).exists())
+
+		with capture(views.cliMsg, self.testPhoneNumber, "new #test") as output:
+			self.assertTrue("Now let's add another item to your list" in output)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "new2 #test") as output:
+			self.assertTrue("You can add items to this list" in output)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
+			self.assertTrue("That should get you started" in output)
+
+	def test_get_label_doesnt_exist(self):
+		self.setupUser(True)
+		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
+			self.assertTrue("Sorry, I don't" in output)
+
+	def test_get_label(self):
+		self.setupUser(True)
+		views.cliMsg(self.testPhoneNumber, "new #test")
+		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
+			self.assertTrue("new" in output)
