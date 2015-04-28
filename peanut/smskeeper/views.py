@@ -457,7 +457,10 @@ def all_notes(request):
 
 def getHTMLForMessage(message):
 	html = "<span title='%s'>" % (message.msg_json)
-	html += message.getBody().replace("\n", "<br>")
+
+	body = message.getBody()
+	if body:
+		html += body.replace("\n", "<br>")
 	
 	for messageMedia in message.getMedia():
 		if messageMedia.mediaType and "jpeg" in messageMedia.mediaType:
