@@ -143,7 +143,7 @@ def htmlForNote(note):
 			html += "<li>%s</li>"%(entry.text)
 			count += 1
 		else:
-			html += "<img src=\"%s\" />"%(entry.img_url))
+			html += "<img src=\"%s\" />"%(entry.img_url)
 	html+= "</ol>"
 
 	return html
