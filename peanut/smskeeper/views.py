@@ -86,6 +86,8 @@ def getLabel(msg):
 			return word
 	return None
 
+# Returns back (textWithoutLabel, label, listOfUrls)
+# Text could have comma's in it, that is dealt with later
 def getData(msg, numMedia, requestDict):
 	# process text
 	nonLabels = list()
@@ -195,12 +197,13 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	text, label, media = getData(msg, numMedia, requestDict)
 	note, created = Note.objects.get_or_create(user=user, label=label)
 
-	entry = NoteEntry(note=note)
-	if text:
-		entry.text = text
-	if media:
-		entry.img_urls_json = json.dumps(media)
-	entry.save()
+	# Text comes back without label but still has commas. Split on those here
+	for entryText in text.split(','):
+		entryText = entryText.strip()
+		noteEntry = NoteEntry.objects.create(note=note, text=entryText)
+
+	for entryMediaUrl in media:
+		noteEntry = NoteEntry.objects.create(note=note, img_url=entryMediaUrl)
 
 	if sendResponse:
 		sendMsg(user, "Got it", None, keeperNumber)
@@ -222,11 +225,11 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 
 		count = 1
 		for entry in entries:
-			if not entry.img_urls_json:
+			if entry.img_url:
+				mediaUrls.extend(json.loads(entry.img_urls_json))
+			else:
 				currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
 				count += 1
-			else:
-				mediaUrls.extend(json.loads(entry.img_urls_json))
 
 		if len(mediaUrls) > 0:
 			if (len(mediaUrls) > 1):
