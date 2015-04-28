@@ -254,10 +254,10 @@ def sendItemFromNote(note, keeperNumber):
 		
 	entry = random.choice(entries)
 	if entry.img_urls_json:
-		sendMsg(note.user, "Random item from %s:"%note.label, None, keeperNumber)
+		sendMsg(note.user, "My pick for %s:"%note.label, None, keeperNumber)
 		sendMsg(note.user, entry.text, json.loads(entry.img_urls_json), keeperNumber)
 	else:
-		sendMsg(note.user, "Random item from %s: %s"%(note.label, entry.text), None, keeperNumber)
+		sendMsg(note.user, "My pick for %s: %s"%(note.label, entry.text), None, keeperNumber)
 
 def getFirstNote(user):
 	notes = Note.objects.filter(user=user)
