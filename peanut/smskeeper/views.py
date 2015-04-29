@@ -1,4 +1,5 @@
 import json
+from django.core.serializers.json import DjangoJSONEncoder
 from multiprocessing import Process
 import uuid
 import time
@@ -528,8 +529,11 @@ def message_feed(request):
 		for message in messages:
 			message_dict = json.loads(message.msg_json)
 			if len(message_dict.keys()) > 0:
-				messages_dicts.append(message_dict)
-		return HttpResponse(json.dumps({"messages" : messages_dicts}), content_type="text/json", status=200)
+				if not message_dict.get("From", None):
+					message_dict["From"] = user.phone_number
+				message_dict["added"] = message.added
+				messages_dicts.append(message_dict)	
+		return HttpResponse(json.dumps({"messages" : messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 	
