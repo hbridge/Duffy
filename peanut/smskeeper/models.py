@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib import admin
 import json
+from django.utils.html import format_html
+from common import api_util
 
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
@@ -11,8 +13,33 @@ class User(models.Model):
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 
+
+	def history(self):
+		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
+		
+	def last_msg_from(self):
+		lastMsg = Message.objects.filter(user=self).order_by("-added")[:1]
+
+		if len(lastMsg) > 0:
+			return format_html("%s" % api_util.prettyDate(lastMsg[0].added))
+		else:
+			return format_html("None")
+
+	def total_msgs_from(self):
+		messages = Message.objects.filter(user=self, incoming=True)
+
+		if len(messages) > 0:
+			return format_html("%s" % len(messages))
+		else:
+			return format_html("None")
+
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+	list_display = ('phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'last_msg_from', 'total_msgs_from', 'history')
 
 class Note(models.Model):
 	user = models.ForeignKey(User, db_index=True)
@@ -72,7 +99,6 @@ class MessageMedia:
 		self.url = url
 		self.mediaType = mediaType
 
-admin.site.register(User)
 admin.site.register(Note)
 admin.site.register(NoteEntry)
 admin.site.register(Message)
