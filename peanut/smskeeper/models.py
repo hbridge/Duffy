@@ -54,6 +54,9 @@ class NoteEntry(models.Model):
 	text = models.TextField(null=True)
 	img_url = models.TextField(null=True)
 
+	remind_timestamp = models.DateTimeField(null=True)
+	reminded = models.BooleanField(default=False)
+
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 

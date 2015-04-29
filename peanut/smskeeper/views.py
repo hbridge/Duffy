@@ -8,6 +8,9 @@ import requests
 import cStringIO
 import random
 import math
+import pytz
+import datetime
+from ago import human
 from PIL import Image
 import os, sys
 
@@ -26,8 +29,9 @@ from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMS
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
 
 from strand import notifications_util
-from common import api_util
+from common import api_util, natty_util
 from peanut.settings import constants
+
 
 def sendMsg(user, msg, mediaUrls, keeperNumber):
 	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
@@ -66,6 +70,9 @@ def isPickFromLabel(msg):
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower()=='pick'))
 
+def isRemindCommand(msg):
+	return '#remind' in msg.lower()
+	
 def isListsCommand(msg):
 	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
 
@@ -119,7 +126,7 @@ def moveMediaToS3(mediaUrlList):
 	newUrlList = list()
 	
 	for mediaUrl in mediaUrlList:
-		resp = requestDicts.get(mediaUrl)
+		resp = requests.get(mediaUrl)
 		media = cStringIO.StringIO(resp.content)
 
 		# Upload to S3 
@@ -168,7 +175,7 @@ def generateImageGridUrl(imageURLs):
 
 	# fetch all images and resize them into imageSize x imageSize
 	for imageUrl in imageURLs:
-		resp = requestDicts.get(imageUrl)
+		resp = requests.get(imageUrl)
 		img = Image.open(cStringIO.StringIO(resp.content))
 		imageList.append(resizeImage(img, imageSize, True))
 
@@ -209,6 +216,21 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	if sendResponse:
 		sendMsg(user, "Got it", None, keeperNumber)
 
+	return noteEntry
+
+def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
+	startDate, newQuery = natty_util.getNattyInfo(msg)
+		
+	noteEntry = dealWithAddMessage(user, newQuery, 0, keeperNumber, requestDict, False)
+
+	if startDate:
+		# Hack to assume Eastern time
+		startDate = startDate + datetime.timedelta(hours=4)
+
+		noteEntry.remind_timestamp = startDate
+		noteEntry.save()
+	
+
 def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 	# This is a label fetch.  See if a note with that label exists then return
 	label = msg
@@ -229,7 +251,12 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 			if entry.img_url:
 				mediaUrls.extend(entry.img_url)
 			else:
-				currentMsg = currentMsg + "\n " + str(count) + ". " + entry.text
+				newStr = str(count) + ". " + entry.text
+
+				if entry.remind_timestamp:
+					dt = entry.remind_timestamp.replace(tzinfo=None)
+					newStr = "%s %s" % (newStr, human(dt))
+				currentMsg = currentMsg + "\n " + newStr
 				count += 1
 
 		if len(mediaUrls) > 0:
@@ -410,16 +437,18 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			sendItemFromNote(note, keeperNumber)
 		except Note.DoesNotExist:
 			sendNotFoundMessage(user, label, keeperNumber)
+	elif isHelpCommand(msg):
+		sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
+	elif isSendContactCommand(msg):
+		sendContactCard(user, keeperNumber)
+	elif isRemindCommand(msg):
+		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
 	elif hasLabel(msg):
 		if user.completed_tutorial:
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
 		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-	elif isHelpCommand(msg):
-		sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
-	elif isSendContactCommand(msg):
-		sendContactCard(user, keeperNumber)
 	else:
 		sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
 
@@ -452,7 +481,7 @@ def send_sms(request):
 
 @csrf_exempt
 def incoming_sms(request):
-	form = SendSMSForm(api_util.getRequestData(request))
+	form = SmsContentForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		userId = str(form.cleaned_data['From'])
@@ -517,12 +546,12 @@ def history(request):
 		return HttpResponse(html, content_type="text/html", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
-		
+
 def message_feed(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		
+
 		messages = Message.objects.filter(user=user).order_by("added")
 		messages_dicts = []
 		
@@ -536,4 +565,3 @@ def message_feed(request):
 		return HttpResponse(json.dumps({"messages" : messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
-	
