@@ -58,3 +58,10 @@ class SMSKeeperCase(TestCase):
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
 			self.assertTrue("new" in output)
+	
+	def test_pick_label(self):
+		self.setupUser(True)
+		views.cliMsg(self.testPhoneNumber, "new #test")
+		with capture(views.cliMsg, self.testPhoneNumber, "pick #test") as output:
+			self.assertTrue("new" in output)		
+	
