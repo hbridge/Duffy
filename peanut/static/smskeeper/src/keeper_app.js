@@ -1,20 +1,23 @@
 var MessageListRow = React.createClass({
+  getInitialState: function() {
+    return {raw: false};
+  },
+	
   render: function() {
     var message = this.props.message;
 		var body = message.Body;
-		console.log(message);
+		if (this.state.raw) body = JSON.stringify(message);
+		
 		var cssclass = "outgoing";
 		if (message.incoming == true) cssclass = "incoming";
 		
 		var cssClasses = classNames({
 			'message': true,
+			'preformatted': !this.state.raw,
 			'incoming': message.incoming,
 			'outgoing': !message.incoming,
 		});
 		
-		var createLine = function(item, index) {
-			return <MessageLine body={ item }/>
-		}.bind(this);
 		
 		return (
 			<div id={ "message" + this.props.index } className={ cssClasses } onClick={ this.handleRowSelected }>
@@ -22,17 +25,18 @@ var MessageListRow = React.createClass({
 				<div className="clear"></div>
       </div>);   
     },
-
 		
   handleRowSelected: function(e) {
     e.preventDefault();
+		
+		this.setState({raw: !this.state.raw});
   }
 });
 
 
 var KeeperApp = React.createClass({
   getInitialState: function() {
-    return {messages: [], selectedPhoto: null, loggedIn: false};
+    return {messages: []};
   },
 
   componentWillMount: function() {

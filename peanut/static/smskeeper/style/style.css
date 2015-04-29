@@ -19,11 +19,15 @@
 .message
 {
 	padding: 1pt 4px;
-	white-space: pre;
 	clear:both;
 	width: 40%;
 	margin: 8px 8px;
 	border-radius: 4px;
+}
+
+.preformatted
+{
+	white-space: pre;
 }
 
 .incoming
