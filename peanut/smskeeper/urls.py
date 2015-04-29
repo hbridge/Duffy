@@ -9,4 +9,5 @@ urlpatterns = patterns(
 	url(r'^all_notes', 'smskeeper.views.all_notes'),
 	url(r'^history', 'smskeeper.views.history'),
 	url(r'^send_sms', 'smskeeper.views.send_sms'),
+	url(r'^message_feed', 'smskeeper.views.message_feed'),
 )

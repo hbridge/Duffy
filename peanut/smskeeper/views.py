@@ -515,3 +515,18 @@ def history(request):
 		return HttpResponse(html, content_type="text/html", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+		
+def message_feed(request):
+	form = UserIdForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		
+		messages = Message.objects.filter(user=user).order_by("added")
+		messages_json = []
+		
+		for message in messages:
+			messages_json.append(message.msg_json)
+		return HttpResponse(json.dumps({"messages" : messages_json}), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+	
