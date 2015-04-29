@@ -423,15 +423,15 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 
 
 @csrf_exempt
-def incoming_sms(requestDict):
-	form = SmsContentForm(api_util.getRequestData(requestDict))
+def incoming_sms(request):
+	form = SmsContentForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['From'])
 		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
-		requestDict = api_util.getRequestData(requestDict)
+		requestDict = api_util.getRequestData(request)
 
 		processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber)
 		return sendNoResponse()
@@ -472,12 +472,12 @@ def getHTMLForMessage(message):
 	return html
 
 def history(request):
-	form = PhoneNumberForm(api_util.getRequestData(request))
+	form = UserIdForm(api_util.getRequestData(request))
 	
 	if (form.is_valid()):
-		phoneNumber = str(form.cleaned_data['PhoneNumber'])
+		userId = str(form.cleaned_data['user_id'])
 		try:
-			user = User.objects.get(phone_number=phoneNumber)
+			user = User.objects.get(id=userId)
 			html = ""
 			messages = Message.objects.filter(user=user).order_by("added")
 			print "returning %s messages" % (messages.count())
@@ -489,6 +489,6 @@ def history(request):
 				html += "<p><strong>%s</strong> (%s) <br> %s </p>" % (sender, message.added, message_html)
 			return HttpResponse(html, content_type="text/html", status=200)
 		except User.DoesNotExist:
-			return sendResponse("Phone number not found")
+			return sendResponse("User not found")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
