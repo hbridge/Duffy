@@ -10,7 +10,7 @@ import random
 import math
 import pytz
 import datetime
-from ago import human
+import humanize
 from PIL import Image
 import os, sys
 
@@ -221,7 +221,7 @@ def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 
 		async.processReminder.apply_async([noteEntry.id], eta=startDate)
 
-		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, human(startDate)), None, keeperNumber)
+		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, humanize.naturaltime(startDate)), None, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "Got it", None, keeperNumber)
 	
@@ -250,7 +250,7 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 
 				if entry.remind_timestamp:
 					dt = entry.remind_timestamp.replace(tzinfo=None)
-					newStr = "%s %s" % (newStr, human(dt))
+					newStr = "%s %s" % (newStr, naturaltime.naturaltime(dt))
 				currentMsg = currentMsg + "\n " + newStr
 				count += 1
 
