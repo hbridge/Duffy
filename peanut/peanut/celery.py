@@ -13,7 +13,8 @@ app = Celery('peanut',
 					  'async.friending',
 					  'async.suggestion_notifications',
 					  'async.notifications',
-					  'async.internal'])
+					  'async.internal',
+					  'smskeeper.async'])
 
 app.config_from_object(settings.CELERY_CONFIG)
 

@@ -27,25 +27,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
+from smskeeper import sms_util
+from smskeeper import async
 
-from strand import notifications_util
 from common import api_util, natty_util
 from peanut.settings import constants
 
-
-def sendMsg(user, msg, mediaUrls, keeperNumber):
-	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
-	Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
-	
-	if keeperNumber == "test":
-		# This is used for command line interface commands
-		print msg
-	else:
-		print "Sending %s to %s" % (msg, user.phone_number)
-		if mediaUrls:
-			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
-		else:
-			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
 
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -54,7 +41,7 @@ def sendNoResponse():
 	return HttpResponse(content, content_type="text/xml")
 
 def sendNotFoundMessage(user, label, keeperNumber):
-	sendMsg(user, "Sorry, I don't have anything for %s" % label, None, keeperNumber)
+	sms_util.sendMsg(user, "Sorry, I don't have anything for %s" % label, None, keeperNumber)
 
 def isLabel(msg):
 	stripedMsg = msg.strip()
@@ -158,7 +145,7 @@ def htmlForNote(note):
 
 def sendContactCard(user, keeperNumber):
 		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
-		sendMsg(user, '', cardURL, keeperNumber)
+		sms_util.sendMsg(user, '', cardURL, keeperNumber)
 
 '''
 	Gets a list of urls and generates a grid image to send back.
@@ -214,7 +201,7 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 		noteEntry = NoteEntry.objects.create(note=note, img_url=entryMediaUrl)
 
 	if sendResponse:
-		sendMsg(user, "Got it", None, keeperNumber)
+		sms_util.sendMsg(user, "Got it", None, keeperNumber)
 
 	return noteEntry
 
@@ -229,11 +216,14 @@ def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 		startDate = startDate + datetime.timedelta(hours=4)
 
 		noteEntry.remind_timestamp = startDate
+		noteEntry.keeper_number = keeperNumber
 		noteEntry.save()
 
-		sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, human(startDate)), None, keeperNumber)
+		async.processReminder.apply_async([noteEntry.id], eta=startDate)
+
+		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, human(startDate)), None, keeperNumber)
 	else:
-		sendMsg(user, "Got it", None, keeperNumber)
+		sms_util.sendMsg(user, "Got it", None, keeperNumber)
 	
 
 def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
@@ -274,10 +264,10 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 
 			gridImageUrl = generateImageGridUrl(mediaUrls)
 
-			sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
-			sendMsg(note.user, '', gridImageUrl, keeperNumber)
+			sms_util.sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
+			sms_util.sendMsg(note.user, '', gridImageUrl, keeperNumber)
 		else:
-			sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
+			sms_util.sendMsg(note.user, currentMsg + clearMsg, None, keeperNumber)
 	except Note.DoesNotExist:
 		sendNotFoundMessage(user, label, keeperNumber)
 
@@ -290,10 +280,10 @@ def sendItemFromNote(note, keeperNumber):
 		
 	entry = random.choice(entries)
 	if entry.img_url:
-		sendMsg(note.user, "My pick for %s:"%note.label, None, keeperNumber)
-		sendMsg(note.user, entry.text, entry.img_url, keeperNumber)
+		sms_util.sendMsg(note.user, "My pick for %s:"%note.label, None, keeperNumber)
+		sms_util.sendMsg(note.user, entry.text, entry.img_url, keeperNumber)
 	else:
-		sendMsg(note.user, "My pick for %s: %s"%(note.label, entry.text), None, keeperNumber)
+		sms_util.sendMsg(note.user, "My pick for %s: %s"%(note.label, entry.text), None, keeperNumber)
 
 def getFirstNote(user):
 	notes = Note.objects.filter(user=user)
@@ -304,50 +294,50 @@ def getFirstNote(user):
 
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	if user.tutorial_step == 0:
-		sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		sms_util.sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
-		sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
+		sms_util.sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
 		user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 1:
 		if not hasLabel(msg):
 			# They didn't send in something with a label.
-			sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.")
+			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.")
 		else:
 			# They sent in something with a label, have them add to it
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sendMsg(user, "Now let's add another item to your list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "Now let's add another item to your list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 2:
 		# They should be sending in a second add command to an existing label
 		if not hasLabel(msg) or isLabel(msg):
 			existingLabel = getFirstNote(user).label
 			if not existingLabel:
-				sendMsg(user, "I'm borked, well done", None, keeperNumber)
+				sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
 				return
-			sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
+			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sendMsg(user, "You can add items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "You can add items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
 		# The should be sending in just a label
 		existingLabel = getFirstNote(user).label
 		if not existingLabel:
-			sendMsg(user, "I'm borked, well done", None, keeperNumber)
+			sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
 			return
 
 		if not isLabel(msg):
-			sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
+			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
 			return
 			
 		if not Note.objects.filter(user=user, label=msg).exists():
-			sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
+			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
 			return
 		else:	
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
-			sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
+			sms_util.sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
-			sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
+			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
 			sendContactCard(user, keeperNumber)
 			user.completed_tutorial = True
 		
@@ -432,7 +422,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			label = getLabel(msg)
 			note = Note.objects.get(user=user, label=label)
 			note.delete()
-			sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+			sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
 		except Note.DoesNotExist:
 			sendNotFoundMessage(user, label, keeperNumber)
 	elif numMedia == 0 and isPickFromLabel(msg):
@@ -443,7 +433,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		except Note.DoesNotExist:
 			sendNotFoundMessage(user, label, keeperNumber)
 	elif isHelpCommand(msg):
-		sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
+		sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 	elif isSendContactCommand(msg):
 		sendContactCard(user, keeperNumber)
 	elif isRemindCommand(msg):
@@ -455,7 +445,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 	else:
-		sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
+		sms_util.sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
 
 
 #
@@ -476,7 +466,7 @@ def send_sms(request):
 		if not keeperNumber:
 			keeperNumber = constants.TWILIO_SMSKEEPER_PHONE_NUM
 
-		sendMsg(user, msg, None, keeperNumber)
+		sms_util.sendMsg(user, msg, None, keeperNumber)
 
 		response["result"] = True
 		return HttpResponse(json.dumps(response), content_type="text/json", status=200)

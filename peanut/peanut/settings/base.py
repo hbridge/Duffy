@@ -389,7 +389,7 @@ class BASE_CELERY_CONFIG:
         'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'memfresh.async.evalAllUsersForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'memfresh.async.evalUserForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-
+        'smskeeper.async.processReminder': {'queue': 'independent', 'routing_key': 'independent'},
     }
 
     CELERYBEAT_SCHEDULE = {
