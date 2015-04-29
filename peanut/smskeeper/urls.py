@@ -8,4 +8,5 @@ urlpatterns = patterns(
 	url(r'^incoming_sms', 'smskeeper.views.incoming_sms'),
 	url(r'^all_notes', 'smskeeper.views.all_notes'),
 	url(r'^history', 'smskeeper.views.history'),
+	url(r'^send_sms', 'smskeeper.views.send_sms'),
 )

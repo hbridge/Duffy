@@ -18,7 +18,7 @@ class User(models.Model):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
 		
 	def last_msg_from(self):
-		lastMsg = Message.objects.filter(user=self).order_by("-added")[:1]
+		lastMsg = Message.objects.filter(user=self, incoming=True).order_by("-added")[:1]
 
 		if len(lastMsg) > 0:
 			return format_html("%s" % api_util.prettyDate(lastMsg[0].added))
@@ -39,7 +39,7 @@ class User(models.Model):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-	list_display = ('phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'last_msg_from', 'total_msgs_from', 'history')
+	list_display = ('id', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'last_msg_from', 'total_msgs_from', 'history')
 
 class Note(models.Model):
 	user = models.ForeignKey(User, db_index=True)

@@ -21,7 +21,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm
+from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
 
 from strand import notifications_util
@@ -367,10 +367,9 @@ def resizeImage(im, size, crop):
 	>> views.cliMsg("+16508158274", "blah #test")
 """
 def cliMsg(phoneNumber, msg):
-	jsonDict = {
-		"Body": msg,
-	}
-	processMessage(phoneNumber, msg, 0, jsonDict, "test")
+	processMessage(phoneNumber, msg, 0, {}, "test")
+
+
 
 """
 	Main logic for processing a message
@@ -422,13 +421,31 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	else:
 		sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
 
+def send_sms(request):
+	form = SendSMSForm(api_util.getRequestData(request))
+	response = dict()
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		msg = form.cleaned_data['msg']
+		keeperNumber = form.cleaned_data['from_num']
+
+		if not keeperNumber:
+			keeperNumber = constants.TWILIO_SMSKEEPER_PHONE_NUM
+
+		sendMsg(user, msg, None, keeperNumber)
+
+		response["result"] = True
+		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
 
 @csrf_exempt
 def incoming_sms(request):
-	form = SmsContentForm(api_util.getRequestData(request))
+	form = SendSMSForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		phoneNumber = str(form.cleaned_data['From'])
+		userId = str(form.cleaned_data['From'])
 		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
@@ -476,20 +493,17 @@ def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	
 	if (form.is_valid()):
-		userId = str(form.cleaned_data['user_id'])
-		try:
-			user = User.objects.get(id=userId)
-			html = ""
-			messages = Message.objects.filter(user=user).order_by("added")
-			print "returning %s messages" % (messages.count())
-			for message in messages:
-				message_html = getHTMLForMessage(message)
-				sender = "Keeper"
-				if message.incoming:
-					sender = user.phone_number
-				html += "<p><strong>%s</strong> (%s) <br> %s </p>" % (sender, message.added, message_html)
-			return HttpResponse(html, content_type="text/html", status=200)
-		except User.DoesNotExist:
-			return sendResponse("User not found")
+		user = form.cleaned_data['user']
+
+		html = ""
+		messages = Message.objects.filter(user=user).order_by("added")
+		print "returning %s messages" % (messages.count())
+		for message in messages:
+			message_html = getHTMLForMessage(message)
+			sender = "Keeper"
+			if message.incoming:
+				sender = user.phone_number
+			html += "<p><strong>%s</strong> (%s) <br> %s </p>" % (sender, message.added, message_html)
+		return HttpResponse(html, content_type="text/html", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
