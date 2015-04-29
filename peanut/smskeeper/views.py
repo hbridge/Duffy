@@ -421,6 +421,14 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	else:
 		sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
 
+
+#
+# Send a sms message to a user from a certain number
+# If from_num isn't specified, then defaults to prod
+#
+# Example url: 
+# http://dev.duffyapp.com:8000/smskeeper/send_sms?user_id=23&msg=Test&from_num=%2B12488178301
+#
 def send_sms(request):
 	form = SendSMSForm(api_util.getRequestData(request))
 	response = dict()
