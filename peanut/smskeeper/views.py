@@ -566,7 +566,9 @@ def message_feed(request):
 				if not message_dict.get("From", None):
 					message_dict["From"] = user.phone_number
 				message_dict["added"] = message.added
-				messages_dicts.append(message_dict)	
+				messages_dicts.append(message_dict)
+				if message_dict.get("From") == user.phone_number:
+					message_dict["incoming"] = True
 		return HttpResponse(json.dumps({"messages" : messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)

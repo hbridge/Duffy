@@ -3,13 +3,27 @@ var MessageListRow = React.createClass({
     var message = this.props.message;
 		var body = message.Body;
 		console.log(message);
-		var classes = [];
+		var cssclass = "outgoing";
+		if (message.incoming == true) cssclass = "incoming";
+		
+		var cssClasses = classNames({
+			'message': true,
+			'incoming': message.incoming,
+			'outgoing': !message.incoming,
+		});
+		
+		var createLine = function(item, index) {
+			return <MessageLine body={ item }/>
+		}.bind(this);
+		
 		return (
-			<div id={ "message" + this.props.index } className={ classes } onClick={ this.handleRowSelected }>
-			<p>{ body }</p>
+			<div id={ "message" + this.props.index } className={ cssClasses } onClick={ this.handleRowSelected }>
+				{ body }
 				<div className="clear"></div>
       </div>);   
     },
+		
+		
   handleRowSelected: function(e) {
     e.preventDefault();
   }
@@ -37,7 +51,7 @@ var KeeperApp = React.createClass({
 		}.bind(this);
 		
 		return (
-			<div className="message">
+			<div id="messages">
 			{ this.state.messages.map(createItem) }  
 			</div>
 		);
