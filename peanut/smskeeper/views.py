@@ -517,38 +517,13 @@ def all_notes(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
-def getHTMLForMessage(message):
-	html = "<span title='%s'>" % (message.msg_json)
-
-	body = message.getBody()
-	if body:
-		html += body.replace("\n", "<br>")
-	
-	for messageMedia in message.getMedia():
-		if messageMedia.mediaType and "jpeg" in messageMedia.mediaType:
-			html += "<br><img src=\"%s\" / width=200 height=200>" % (messageMedia.url)
-		else :
-			html += "<br>  <a href=\"%s\">%s</a>" % (messageMedia.url, messageMedia.url)
-			
-	html += "</span>"
-	return html
-
 def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	
 	if (form.is_valid()):
-		user = form.cleaned_data['user']
-
-		html = ""
-		messages = Message.objects.filter(user=user).order_by("added")
-		print "returning %s messages" % (messages.count())
-		for message in messages:
-			message_html = getHTMLForMessage(message)
-			sender = "Keeper"
-			if message.incoming:
-				sender = user.phone_number
-			html += "<p><strong>%s</strong> (%s) <br> %s </p>" % (sender, message.added, message_html)
-		return HttpResponse(html, content_type="text/html", status=200)
+		user = form.cleaned_data['user']			
+		context = {	'user_id': user.id }
+		return render(request, 'thread_view.html', context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 

@@ -22,7 +22,7 @@ var MessageListRow = React.createClass({
 				<div className="clear"></div>
       </div>);   
     },
-		
+
 		
   handleRowSelected: function(e) {
     e.preventDefault();
@@ -36,7 +36,7 @@ var KeeperApp = React.createClass({
   },
 
   componentWillMount: function() {
-		$.getJSON("/smskeeper/message_feed?user_id=1", this.messagesDataCallback);
+		$.getJSON("/smskeeper/message_feed?user_id=" + USER_ID, this.messagesDataCallback);
   },
 	
 	messagesDataCallback: function(data) {

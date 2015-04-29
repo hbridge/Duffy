@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="/static/smskeeper/style/style.css" />
     <!-- React JS -->
     <!-- <script src="https://fb.me/react-0.13.0.min.js"></script> -->
 		<script src="https://fb.me/react-0.13.0.js"></script>	
@@ -9,11 +9,14 @@
     <!-- JQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <!-- Class Names -->
-    <script src="src/node_modules/classnames/index.js"></script>
+    <script src="/static/smskeeper/src/node_modules/classnames/index.js"></script>
     
   </head>
   <body>
     <div id="keeper_app"></div>
-    <script type='text/jsx' src="src/keeper_app.js"></script>
+		<script type='text/javascript'>
+			USER_ID = {{ user_id }};
+		</script>
+    <script type='text/jsx' src="/static/smskeeper/src/keeper_app.js"></script>
   </body>
 </html>
