@@ -484,7 +484,7 @@ def incoming_sms(request):
 	form = SmsContentForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = str(form.cleaned_data['From'])
+		phoneNumber = str(form.cleaned_data['From'])
 		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
 		numMedia = int(form.cleaned_data['NumMedia'])
