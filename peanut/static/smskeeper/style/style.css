@@ -1,0 +1,247 @@
+/*main containers */
+
+
+#keeper_app
+{
+  background-color: #EEE;
+  width: 100vw;
+  height: 100vh;
+}
+
+#appDiv 
+{
+  display: block;
+  height: auto;
+  position: absolute;
+  bottom: 0;
+  top:0;
+  left:0;
+  right:0;
+  margin-top:20px;
+  margin-bottom:20px;
+  margin-right:40px;
+  margin-left:40px;
+}
+
+#appContent
+{
+  width:100%;
+  height: 95%;
+  border-radius: 4pt;
+  overflow: hidden;
+  margin-top:40px;
+}
+
+/* header */
+
+#headerBar
+{
+  position: absolute;
+  width: 100%;
+  height: 40px;
+}
+
+.appTitle
+{
+  font-family: Avenir-Light;
+  color: #FFF;
+  font-size: 20pt;
+  position: absolute;
+}
+
+.signOut
+{
+  text-align: right;
+  position: absolute;
+  right: 0pt;
+  margin-top: 10px;
+}
+
+.signOut a
+{
+  font-family: Avenir-Light;
+  font-size: 14pt;
+  color:#DDD;
+}
+
+/* login */
+
+.loginArea
+{
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 60pt; 
+  width: 250pt;
+  height: 250pt;
+  background-color: #FFF;
+  border-radius: 8px;
+}
+
+.loginAreaContent
+{
+  margin: 0px 50px;
+  transform: translate(0, 50%)    /* 4 */
+}
+
+.loginArea input
+{
+  font: 150% "Avenir-Light", Verdana, sans-serif;
+  margin-bottom: 10px;
+}
+
+.largeButton {
+  background: #3498db;
+  background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+  background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+  background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+  background-image: -o-linear-gradient(top, #3498db, #2980b9);
+  background-image: linear-gradient(to bottom, #3498db, #2980b9);
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 10px 20px 10px 20px;
+  text-decoration: none;
+}
+
+.largeButton:hover {
+  background: #3cb0fd;
+  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  text-decoration: none;
+}
+
+#loginErrorArea
+{
+  height: 40px;
+  margin-top: 20px;
+}
+
+.errorText
+{
+  color: #F00;
+  line-height: 1.0;
+}
+
+/* content */
+
+.photoList 
+{
+  float: left;
+  overflow-y: scroll;
+  height: 100vh;
+  width: 250px;
+  background: #EEE;
+}
+
+.detailView
+{
+  padding: 20px;
+  background-color: #FFF;
+  margin-left: 250px;
+  height: 100%;
+}
+
+.detailImageView
+{
+  width: auto;
+  height: 95%; 
+  display: block;
+}
+
+.row
+{
+  border-top: #DDD;
+  border-bottom: #DDD;
+  margin-bottom: 4px;
+}
+
+.selected
+{
+  background-color: #C1D6EE;
+}
+
+.rowThumbnail {
+  float: left;
+  max-width: 100%;
+  background:red;
+  overflow:hidden;
+  width: 50px;
+  height: 50px;
+  margin: 8pt;
+}
+
+.rowDetails {
+  padding-top: 4pt;
+}
+
+.clear {
+  clear: both;
+}
+
+/* base styles */
+
+
+body {
+  background: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+a {
+  color: #4183c4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-family: "Bitstream Vera Sans Mono", Consolas, Courier, monospace;
+  font-size: 12px;
+  margin: 0 2px;
+  padding: 0px 5px;
+}
+
+h1, h2, h3, h4 {
+  font-weight: bold;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+h1 {
+  border-bottom: 1px solid #ddd;
+  font-size: 2.5em;
+  font-weight: bold;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+h2 {
+  border-bottom: 1px solid #eee;
+  font-size: 2em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+h4 {
+  font-size: 1.2em;
+}
+
+p, ul {
+  margin: 15px 0;
+}
+
+ul {
+  padding-left: 30px;
+}
