@@ -219,16 +219,21 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	return noteEntry
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
-	startDate, newQuery = natty_util.getNattyInfo(msg)
+	text, label, media = getData(msg, 0, requestDict)
+	startDate, newQuery = natty_util.getNattyInfo(text)
 		
-	noteEntry = dealWithAddMessage(user, newQuery, 0, keeperNumber, requestDict, False)
-
+	msgWithLabel = newQuery + " " + label
+	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
 	if startDate:
 		# Hack to assume Eastern time
 		startDate = startDate + datetime.timedelta(hours=4)
 
 		noteEntry.remind_timestamp = startDate
 		noteEntry.save()
+
+		sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, human(startDate)), None, keeperNumber)
+	else:
+		sendMsg(user, "Got it", None, keeperNumber)
 	
 
 def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
