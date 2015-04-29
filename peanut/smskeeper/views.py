@@ -522,11 +522,13 @@ def message_feed(request):
 		user = form.cleaned_data['user']
 		
 		messages = Message.objects.filter(user=user).order_by("added")
-		messages_json = []
+		messages_dicts = []
 		
 		for message in messages:
-			messages_json.append(message.msg_json)
-		return HttpResponse(json.dumps({"messages" : messages_json}), content_type="text/json", status=200)
+			message_dict = json.loads(message.msg_json)
+			if len(message_dict.keys()) > 0:
+				messages_dicts.append(message_dict)
+		return HttpResponse(json.dumps({"messages" : messages_dicts}), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 	
