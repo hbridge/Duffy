@@ -367,9 +367,10 @@ def resizeImage(im, size, crop):
 	>> views.cliMsg("+16508158274", "blah #test")
 """
 def cliMsg(phoneNumber, msg):
-	processMessage(phoneNumber, msg, 0, {}, "test")
-
-
+	jsonDict = {
+		"Body": msg,
+	}
+	processMessage(phoneNumber, msg, 0, jsonDict, "test")
 
 """
 	Main logic for processing a message
