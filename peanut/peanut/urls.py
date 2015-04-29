@@ -15,16 +15,18 @@ urlpatterns = patterns('',
     url(r'^api/', include('arbus.api_urls')),
     url(r'^viz/', include('arbus.viz_urls')),
     
-    url(r'^strand/api/', include('strand.api_urls')),
-    url(r'^strand/viz/', include('strand.viz_urls')),
-
-    url(r'^strand/api/v1/', include('strand.api_urls')),
-    
     url(r'^memfresh/', include('memfresh.urls')),
     url(r'^smskeeper/', include('smskeeper.urls')),
 
     url(r'^ios-notifications/', include('ios_notifications.urls')),
 )
+
+if not settings.LOCAL:
+	urlpatterns += patterns('',
+	    url(r'^strand/api/', include('strand.api_urls')),
+	    url(r'^strand/viz/', include('strand.viz_urls')),
+	    url(r'^strand/api/v1/', include('strand.api_urls')),
+	)
 
 if settings.DEBUG:
     urlpatterns += patterns('',
