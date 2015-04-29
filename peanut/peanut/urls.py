@@ -21,12 +21,14 @@ urlpatterns = patterns('',
     url(r'^ios-notifications/', include('ios_notifications.urls')),
 )
 
-if not settings.LOCAL:
-	urlpatterns += patterns('',
-	    url(r'^strand/api/', include('strand.api_urls')),
-	    url(r'^strand/viz/', include('strand.viz_urls')),
-	    url(r'^strand/api/v1/', include('strand.api_urls')),
-	)
+# This is here to deal with weird local env issues
+# If local, don't bind these urls.  Don't know why need this
+if not hasattr(settings,"LOCAL"):
+    urlpatterns += patterns('',
+        url(r'^strand/api/', include('strand.api_urls')),
+        url(r'^strand/viz/', include('strand.viz_urls')),
+        url(r'^strand/api/v1/', include('strand.api_urls')),
+    )
 
 if settings.DEBUG:
     urlpatterns += patterns('',
