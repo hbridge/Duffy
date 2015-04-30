@@ -85,7 +85,9 @@ class SMSKeeperCase(TestCase):
 	def test_add_unassigned(self):
 		self.setupUser(True, True)
 		with capture(views.cliMsg, self.testPhoneNumber, "new") as output:
+			# ensure we tell the user we put it in unassigned
 			self.assertTrue(views.UNASSIGNED_LABEL in output)
 		with capture(views.cliMsg, self.testPhoneNumber, views.UNASSIGNED_LABEL) as output:
+			# ensure the user can get things from #unassigned
 			self.assertTrue("new" in output)
 		
