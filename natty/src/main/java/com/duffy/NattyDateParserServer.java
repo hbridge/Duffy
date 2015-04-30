@@ -19,6 +19,7 @@ public class NattyDateParserServer extends AbstractHandler
         private List<Date> dates;
         private List<Long> timestamps;
         private String matchingValue;
+	private String syntaxTree;
         private int column;
         
         public NattyResult( DateGroup dateGroup) {
@@ -31,6 +32,7 @@ public class NattyDateParserServer extends AbstractHandler
 
             this.matchingValue = dateGroup.getText();
             this.column = dateGroup.getPosition();
+	    this.syntaxTree = dateGroup.getSyntaxTree().toStringTree();
         }
         /*
             List<Date> dates = group.getDates();
