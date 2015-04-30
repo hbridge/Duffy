@@ -240,7 +240,7 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 	try:
 		note = Note.objects.get(user=user, label=label)
 		clearMsg = "\n\nSend '%s clear' to clear this list."%(note.label)
-		entries = NoteEntry.objects.filter(note=note).order_by("added")
+		entries = NoteEntry.objects.filter(note=note, hidden=False).order_by("added")
 		mediaUrls = list()
 
 		if len(entries) == 0:

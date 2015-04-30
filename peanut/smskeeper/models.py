@@ -55,7 +55,8 @@ class NoteEntry(models.Model):
 	img_url = models.TextField(null=True)
 
 	remind_timestamp = models.DateTimeField(null=True)
-	reminded = models.BooleanField(default=False)
+	
+	hidden = models.BooleanField(default=False)
 
 	keeper_number = models.CharField(max_length=100, null=True)
 

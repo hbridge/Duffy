@@ -26,5 +26,5 @@ def processReminder(entryId):
 
 	sms_util.sendMsg(entry.note.user, msg, None, entry.keeper_number)
 
-	entry.reminded = True
+	entry.hidden = True
 	entry.save()
