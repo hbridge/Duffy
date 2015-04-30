@@ -522,13 +522,13 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	elif isPrintHashtagsCommand(msg):
 		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 		dealWithPrintHashtags(user, keeperNumber)
-	elif numMedia == 0 and isLabel(msg):
+	elif isLabel(msg) and numMedia == 0:
 		if user.completed_tutorial:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
 		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-	elif numMedia == 0 and isClearLabel(msg):
+	elif isClearLabel(msg) and numMedia == 0:
 		try:
 			label = getLabel(msg)
 			note = Note.objects.get(user=user, label=label)
@@ -536,7 +536,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
 		except Note.DoesNotExist:
 			sendNotFoundMessage(user, label, keeperNumber)
-	elif numMedia == 0 and isPickFromLabel(msg):
+	elif isPickFromLabel(msg) and numMedia == 0:
 		label = getLabel(msg)
 		try:
 			note = Note.objects.get(user=user, label=label)
