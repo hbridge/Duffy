@@ -1,14 +1,10 @@
 package com.joestelmach.natty;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.debug.BlankDebugEventListener;
+
+import java.util.*;
 
 /**
  * Responsible for collecting parse information from the debug parser
@@ -36,7 +32,7 @@ public class ParseListener extends BlankDebugEventListener {
   }
   
   // don't add backtracking or cyclic DFA nodes 
-  public void enterDecision(int d) {
+  public void enterDecision(int d, boolean couldBacktrack) {
     backtracking++;
   }
 
@@ -69,7 +65,7 @@ public class ParseListener extends BlankDebugEventListener {
       }
       String text = builder.toString();
       int line = tokenList.get(0).getLine();
-      int start = tokenList.get(0).getCharPositionInLine();
+      int start = tokenList.get(0).getCharPositionInLine() + 1;
       int end = start + text.length();
         
       ParseLocation location = new ParseLocation();

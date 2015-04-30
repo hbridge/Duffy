@@ -3,12 +3,14 @@ lexer grammar DateLexer;
 @header { package com.joestelmach.natty.generated; }
 
 @members {
-  private java.util.logging.Logger _logger = java.util.logging.Logger.getLogger("com.joestelmach.natty");
-  
+  private org.slf4j.Logger _logger =
+    org.slf4j.LoggerFactory.getLogger(com.joestelmach.natty.generated.DateLexer.class);
+
+  @Override
   public void displayRecognitionError(String[] tokenNames, RecognitionException re) {
     String message = getErrorHeader(re);
     try { message += getErrorMessage(re, tokenNames); } catch(Exception e) {}
-    _logger.fine(message);
+    _logger.debug(message);
   }
 }
 
@@ -43,7 +45,7 @@ MONTH  : 'month'  | 'months';
 YEAR   : 'year'   | 'year' SINGLE_QUOTE? 's' | 'yrs' DOT?;
 
 TODAY     : 'today';
-TOMORROW  : 'tomorow'   | 'tomorrow'   | 'tommorow' | 'tommorrow';
+TOMORROW  : 'tomorow' | 'tomorrow' | 'tommorow' | 'tommorrow' | 'tmr';
 TONIGHT   : 'tonight'; 
 YESTERDAY : 'yesterday';
 
@@ -57,8 +59,8 @@ UNTIL : 'until';
 AT        : 'at' | '@';
 AFTER     : 'after';
 PAST      : 'past';
-AM : 'am' | 'a.m' DOT? | 'a';
-PM : 'pm' | 'p.m' DOT? | 'p';
+AM : 'am' | 'a.m' DOT? | 'a_m' | 'a';
+PM : 'pm' | 'p.m' DOT? | 'p_m' | 'p';
 T  : 't';
 
 MILITARY_HOUR_SUFFIX : 'h';
@@ -70,12 +72,12 @@ EVENING   : 'evening' | 'eve';
 NIGHT     : 'night'; 
 
 UTC  : 'utc'  | 'gmt'  | 'z';
-EST  : 'est'  | 'edt'  | 'et';
-PST  : 'pst'  | 'pdt'  | 'pt';
-CST  : 'cst'  | 'cdt'  | 'ct';
-MST  : 'mst'  | 'mdt'  | 'mt';
-AKST : 'akst' | 'akdt' | 'akt';
-HAST : 'hast' | 'hadt' | 'hat' | 'hst';
+EST  : 'est'  | 'edt'  | 'et'  | 'eastern';
+PST  : 'pst'  | 'pdt'  | 'pt'  | 'pacific';
+CST  : 'cst'  | 'cdt'  | 'ct'  | 'central';
+MST  : 'mst'  | 'mdt'  | 'mt'  | 'mountain';
+AKST : 'akst' | 'akdt' | 'akt' | 'alaska';
+HAST : 'hast' | 'hadt' | 'hat' | 'hst' | 'hawaii';
 
 // ********* numeric rules **********
 
@@ -250,6 +252,7 @@ DOT   : '.';
 PLUS  : '+';
 SINGLE_QUOTE : '\'';
 
+CURRENT   : 'current';
 FOR       : 'for';
 IN        : 'in';
 AN        : 'an';
@@ -295,7 +298,7 @@ INAUGURATION : 'inauguration' | 'inaugaration';
 INDEPENDENCE : 'independence' | 'independance';
 KWANZAA      : ('kwanza' 'a'?) 's'?;
 LABOR        : 'labor';
-MLK          : 'mlk' | 'martin' WHITE_SPACE 'luther' WHITE_SPACE 'king' SINGLE_QUOTE? 's'? ('jr' DOT? SINGLE_QUOTE? 's'?)?;
+MLK          : 'mlk' | 'martin' WHITE_SPACE 'luther' WHITE_SPACE 'king' (COMMA SPACE 'jr' DOT)?;
 MEMORIAL     : 'memorial';
 MOTHER       : 'mother' SINGLE_QUOTE? 's'?;
 NEW          : 'new';
@@ -330,4 +333,4 @@ fragment UNKNOWN_CHAR
   
 fragment DIGIT : '0'..'9';
   
-fragment SPACE : ' ' | '\t' | '\n' | '\r' ;
+fragment SPACE : ' ' | '\t' | '\n' | '\r' | '\u00A0';

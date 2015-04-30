@@ -2,7 +2,7 @@
 .settings
 .project
 .idea
-*.iml
+workspace.xml
 bin
 target
 src/main/java/com/joestelmach/natty/generated/*

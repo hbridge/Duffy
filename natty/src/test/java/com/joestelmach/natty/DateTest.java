@@ -1,21 +1,13 @@
 package com.joestelmach.natty;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.TimeZone;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import junit.framework.Assert;
-
+import org.apache.log4j.Level;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.text.DateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Runs the parser through the various date formats 
@@ -41,6 +33,10 @@ public class DateTest extends AbstractTest {
     validateDate("in october 2006", 10, 1, 2006);
     validateDate("feb 1979", 2, 1, 1979);
     validateDate("jan '80", 1, 1, 1980);
+    validateDate("2006-Jun-16", 6, 16, 2006);
+    validateDate("28-Feb-2010", 2, 28, 2010);
+    validateDate("9-Apr", 4, 9, Calendar.getInstance().get(Calendar.YEAR));
+    validateDate("jan 10, '00", 1, 10, 2000);
   }
   
   @Test
@@ -56,6 +52,8 @@ public class DateTest extends AbstractTest {
     validateDate("the second of february in the year 1980", 2, 2, 1980);
     validateDate("jan. 2nd", 1, 2, Calendar.getInstance().get(Calendar.YEAR));
     validateDate("sun, nov 21 2010", 11, 21, 2010);
+    validateDate("Second Monday in October 2017", 10, 9, 2017);
+    validateDate("2nd thursday in sept. '02", 9, 12, 2002);
   }
   
   @Test
@@ -75,6 +73,7 @@ public class DateTest extends AbstractTest {
     
     validateDate("yesterday", 2, 27, 2011);
     validateDate("tomorrow", 3, 1, 2011);
+    validateDate("tmr", 3, 1, 2011);
     validateDate("in 3 days", 3, 3, 2011);
     validateDate("3 days ago", 2, 25, 2011);
     validateDate("in 3 weeks", 3, 21, 2011);
@@ -85,6 +84,11 @@ public class DateTest extends AbstractTest {
     validateDate("seven years ago", 2, 28, 2004);
     validateDate("60 years ago", 2, 28, 1951);
     validateDate("32 days ago", 1, 27, 2011);
+    validateDate("320 days ago", 4, 14, 2010);
+    validateDate("1200 days ago", 11, 16, 2007);
+    validateDate("365 days from now", 2, 28, 2012);
+    validateDate("100 months now", 6, 28, 2019);
+    validateDate("100 years from now", 2, 28, 2111);
     validateDate("next monday", 3, 7, 2011);
     validateDate("next mon", 3, 7, 2011);
     validateDate("4 mondays from now", 3, 28, 2011);
@@ -114,6 +118,37 @@ public class DateTest extends AbstractTest {
     validateDate("next september", 9, 1, 2011);
     validateDate("in a year", 2, 28, 2012);
     validateDate("in a week", 3, 7, 2011);
+    validateDate("the saturday after next", 3, 19, 2011);
+    validateDate("the monday after next", 3, 14, 2011);
+    validateDate("the monday after next monday", 3, 14, 2011);
+    validateDate("the monday before May 25", 5, 23, 2011);
+    validateDate("the 2nd monday before May 25", 5, 16, 2011);
+    validateDate("3 mondays after May 25", 6, 13, 2011);
+    validateDate("tuesday before last", 2, 15, 2011);
+    validateDate("a week from now", 3, 7, 2011);
+    validateDate("a month from today", 3, 28, 2011);
+    validateDate("a week after this friday", 3, 11, 2011);
+    validateDate("a week from this friday", 3, 11, 2011);
+    validateDate("two weeks from this friday", 3, 18, 2011);
+    validateDate("the second week after this friday", 3, 18, 2011);
+    validateDate("It's gonna snow! How about skiing tomorrow", 3, 1, 2011);
+    validateDate("A week on tuesday", 3, 8, 2011);
+    validateDate("A month ago", 1, 28, 2011);
+    validateDate("A week ago", 2, 21, 2011);
+    validateDate("A year ago", 2, 28, 2010);
+    validateDate("this month", 2, 28, 2011);
+    validateDate("current month", 2, 28, 2011);
+    validateDate("current year", 2, 28, 2011);
+    validateDate("first monday in 1 month", 3, 7, 2011);
+    validateDate("first monday of month in 1 month", 3, 7, 2011);
+    validateDate("first monday of 1 month", 3, 7, 2011);
+    validateDate("first monday in 2 months", 4, 4, 2011);
+    validateDate("first monday of 2 months", 4, 4, 2011);
+    validateDate("first monday of month 2 months", 4, 4, 2011);
+    validateDate("first monday of month in 2 months", 4, 4, 2011);
+    validateDate("first monday in 3 months", 5, 2, 2011);
+    validateDate("first monday of 3 months", 5, 2, 2011);
+    validateDate("first monday of month in 3 months", 5, 2, 2011);
   }
   
   @Test
@@ -220,17 +255,73 @@ public class DateTest extends AbstractTest {
     Assert.assertEquals(2, dates.size());
     validateDate(dates.get(0), 1, 2, 2011);
     validateDate(dates.get(1), 1, 2, 2036);
-    
-    dates = parseCollection("I want to go shopping in Knoxville, TN in the next five to six months.");
-    Assert.assertEquals(2, dates.size());
-    validateDate(dates.get(0), 6, 2, 2011);
-    validateDate(dates.get(1), 7, 2, 2011);
-    
-    dates = parseCollection("I want to watch the fireworks in the next two to three months.");
+
+    dates = parseCollection("2 and 4 months");
     Assert.assertEquals(2, dates.size());
     validateDate(dates.get(0), 3, 2, 2011);
-    validateDate(dates.get(1), 4, 2, 2011);
-    
+    validateDate(dates.get(1), 5, 2, 2011);
+
+    dates = parseCollection("in 2 to 4 months");
+    Assert.assertEquals(2, dates.size());
+    validateDate(dates.get(0), 3, 2, 2011);
+    validateDate(dates.get(1), 5, 2, 2011);
+
+    dates = parseCollection("for 2 to 4 months");
+    Assert.assertEquals(3, dates.size());
+    validateDate(dates.get(0), 1, 2, 2011);
+    validateDate(dates.get(1), 3, 2, 2011);
+    validateDate(dates.get(2), 5, 2, 2011);
+
+    dates = parseCollection("next 2 to 4 months");
+    Assert.assertEquals(3, dates.size());
+    validateDate(dates.get(0), 1, 2, 2011);
+    validateDate(dates.get(1), 3, 2, 2011);
+    validateDate(dates.get(2), 5, 2, 2011);
+
+    dates = parseCollection("2 to 4 months from now");
+    Assert.assertEquals(2, dates.size());
+    validateDate(dates.get(0), 3, 2, 2011);
+    validateDate(dates.get(1), 5, 2, 2011);
+
+    dates = parseCollection("last 2 to 4 months");
+    Assert.assertEquals(3, dates.size());
+    validateDate(dates.get(0), 1, 2, 2011);
+    validateDate(dates.get(1), 11, 2, 2010);
+    validateDate(dates.get(2), 9, 2, 2010);
+
+    dates = parseCollection("past 2 to 4 months");
+    Assert.assertEquals(3, dates.size());
+    validateDate(dates.get(0), 1, 2, 2011);
+    validateDate(dates.get(1), 11, 2, 2010);
+    validateDate(dates.get(2), 9, 2, 2010);
+
+    dates = parseCollection("2 to 4 months ago");
+    Assert.assertEquals(2, dates.size());
+    validateDate(dates.get(0), 11, 2, 2010);
+    validateDate(dates.get(1), 9, 2, 2010);
+
+    dates = parseCollection("2 or 3 days ago");
+    Assert.assertEquals(2, dates.size());
+    validateDate(dates.get(0), 12, 31, 2010);
+    validateDate(dates.get(1), 12, 30, 2010);
+
+    dates = parseCollection("1 to 2 days");
+    Assert.assertEquals(2, dates.size());
+    validateDate(dates.get(0), 1, 3, 2011);
+    validateDate(dates.get(1), 1, 4, 2011);
+
+    dates = parseCollection("I want to go shopping in Knoxville, TN in the next five to six months.");
+    Assert.assertEquals(3, dates.size());
+    validateDate(dates.get(0), 1, 2, 2011);
+    validateDate(dates.get(1), 6, 2, 2011);
+    validateDate(dates.get(2), 7, 2, 2011);
+
+    dates = parseCollection("I want to watch the fireworks in the next two to three months.");
+    Assert.assertEquals(3, dates.size());
+    validateDate(dates.get(0), 1, 2, 2011);
+    validateDate(dates.get(1), 3, 2, 2011);
+    validateDate(dates.get(2), 4, 2, 2011);
+
     dates = parseCollection("september 7th something");
     Assert.assertEquals(1, dates.size());
     validateDate(dates.get(0), 9, 7, 2011);
@@ -266,15 +357,14 @@ public class DateTest extends AbstractTest {
 
     TimeZone.setDefault(TimeZone.getTimeZone("US/Eastern"));
   }
-  
+
   public static void main(String[] args) {
-    ConsoleHandler handler = new ConsoleHandler();
-    handler.setLevel(Level.ALL);
-    Logger logger = Logger.getLogger("com.joestelmach.natty");
-    logger.setLevel(Level.FINEST);
-    logger.addHandler(handler);
-    
-    String value = "clinton";
+
+    String value="5.30pm";
+    value = "this friday.";
+    value = "I want to plan a get-together with my friends for this Friday.";
+
+    org.apache.log4j.Logger.getRootLogger().setLevel(Level.INFO);
 
     Parser parser = new Parser();
     List<DateGroup> groups = parser.parse(value);
@@ -291,7 +381,7 @@ public class DateTest extends AbstractTest {
       System.out.println("\n** Parse Locations **");
       for(Entry<String, List<ParseLocation>> entry:group.getParseLocations().entrySet()) {
         for(ParseLocation loc:entry.getValue()) {
-          System.out.println(loc.getRuleName());
+          System.out.println(loc.getRuleName() + ": " + loc.getText());
         }
       }
       

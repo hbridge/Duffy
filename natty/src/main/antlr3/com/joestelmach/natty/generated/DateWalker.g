@@ -9,21 +9,27 @@ options {
 
 @members {
   private com.joestelmach.natty.WalkerState _walkerState = new com.joestelmach.natty.WalkerState();
-  private java.util.logging.Logger _logger = java.util.logging.Logger.getLogger("com.joestelmach.natty");
-  
-  public void displayRecognitionError(String[] tokenNames, RecognitionException re) {
-    String message = getErrorHeader(re);
-    try { message += getErrorMessage(re, tokenNames); } catch(Exception e) {}
-    _logger.fine(message);
+
+  @Override
+  protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow)
+      throws RecognitionException {
+    throw new MismatchedTokenException(ttype, input);
   }
-  
-  public void recover(IntStream input, RecognitionException re) {
-    reportError(re);
-    _walkerState.clearDateGroup();
+
+  @Override
+  public Object recoverFromMismatchedSet(IntStream Input, RecognitionException e, BitSet follow)
+      throws RecognitionException {
+    throw e;
   }
-  
+
   public com.joestelmach.natty.WalkerState getState() {
     return _walkerState;
+  }
+}
+
+@rulecatch {
+  catch(RecognitionException e) {
+    throw e;
   }
 }
 
@@ -75,7 +81,7 @@ time
   ;
   
 explicit_time
-  : ^(EXPLICIT_TIME ^(HOURS_OF_DAY hours=INT) ^(MINUTES_OF_HOUR minutes=INT) 
+  : ^(EXPLICIT_TIME ^(HOURS_OF_DAY hours=INT) (^(MINUTES_OF_HOUR minutes=INT))?
         (^(SECONDS_OF_MINUTE seconds=INT))? AM_PM? (zone=ZONE | zone=ZONE_OFFSET)?)
     {_walkerState.setExplicitTime($hours.text, $minutes.text, $seconds.text, $AM_PM.text, $zone.text);}
   ;

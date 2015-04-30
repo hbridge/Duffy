@@ -53,7 +53,7 @@ public class NattyDateParserServer extends AbstractHandler
                        HttpServletResponse response) 
         throws IOException, ServletException
     {
-        Parser parser = new Parser();
+        Parser parser = new Parser(TimeZone.getTimeZone("US/Eastern"));
         Gson gson = new Gson();
         String query = request.getParameter("q");
 
@@ -82,7 +82,7 @@ public class NattyDateParserServer extends AbstractHandler
  
     public static void main(String[] args) throws Exception
     {
-        Server server = new Server(7990);
+        Server server = new Server(7991);
         server.setHandler(new NattyDateParserServer());
 
         System.out.println("Hello World!");
