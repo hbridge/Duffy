@@ -152,6 +152,7 @@ def sendContactCard(user, keeperNumber):
 '''
 def generateImageGridUrl(imageURLs):
 	# if one url, just return that
+	print imageURLs
 	if len(imageURLs) == 1:
 		return imageURLs[0]
 
@@ -195,7 +196,8 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	# Text comes back without label but still has commas. Split on those here
 	for entryText in text.split(','):
 		entryText = entryText.strip()
-		noteEntry = NoteEntry.objects.create(note=note, text=entryText)
+		if len(entryText) > 0:
+			noteEntry = NoteEntry.objects.create(note=note, text=entryText)
 
 	for entryMediaUrl in media:
 		noteEntry = NoteEntry.objects.create(note=note, img_url=entryMediaUrl)
@@ -251,8 +253,9 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 
 		count = 1
 		for entry in entries:
+			print entry
 			if entry.img_url:
-				mediaUrls.extend(entry.img_url)
+				mediaUrls.append(entry.img_url)
 			else:
 				newStr = str(count) + ". " + entry.text
 
