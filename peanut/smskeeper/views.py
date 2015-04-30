@@ -59,7 +59,10 @@ def isPickFromLabel(msg):
 
 def isRemindCommand(msg):
 	return '#remind' in msg.lower()
-	
+
+def isActivateCommand(msg):
+	return '#activate' in msg.lower()
+		
 def isListsCommand(msg):
 	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
 
@@ -324,6 +327,16 @@ def dealWithNonActivatedUser(user, firstTime, keeperNumber):
 	else:
 		sms_util.sendMsg(user, "Thanks for the message, but I'll let you know when you're account has been activated.", None, keeperNumber)
 
+def dealWithActivation(user, msg, keeperNumber):
+	text, label, media = getData(msg, 0, {})
+
+	try:
+		userToActivate = User.objects.get(phone_number=text)
+		userToActivate.activated = True
+		userToActivate.save()
+		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
+	except User.DoesNotExist:
+		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	if user.tutorial_step == 0:
@@ -446,6 +459,8 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		dealWithNonActivatedUser(user, False, keeperNumber)
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+	elif isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
+		dealWithActivation(user, msg, keeperNumber)
 	elif isPrintHashtagsCommand(msg):
 		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 		dealWithPrintHashtags(user, keeperNumber)
