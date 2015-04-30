@@ -336,9 +336,15 @@ def getFirstNote(user):
 
 def dealWithNonActivatedUser(user, firstTime, keeperNumber):
 	if firstTime:
-		sms_util.sendMsg(user, "Hi, I'm Keeper.  Thanks for signing up, I'll let you know when you're account has been activated.", None, keeperNumber)
+		sms_util.sendMsg(user, "Hi. I'm Keeper.", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "I can help you remember things. But, I'm not quite ready for you yet. ", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "Stay tuned. I'll be in touch soon.", None, keeperNumber)		
 	else:
-		sms_util.sendMsg(user, "Thanks for the message, but I'll let you know when you're account has been activated.", None, keeperNumber)
+		sms_util.sendMsg(user, "Oh hi. You're back!", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "I still need more time.", None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
 	text, label, media = getData(msg, 0, {})
