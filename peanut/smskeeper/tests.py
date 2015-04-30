@@ -69,19 +69,19 @@ class SMSKeeperCase(TestCase):
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
 			self.assertTrue("new" in output)
-	
+
 	def test_pick_label(self):
 		self.setupUser(True, True)
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "pick #test") as output:
-			self.assertTrue("new" in output)		
-			
+			self.assertTrue("new" in output)
+
 	def test_print_hashtags(self):
 		self.setupUser(True, True)
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#hashtag") as output:
 			self.assertTrue("(1)" in output)
-			
+
 	def test_add_unassigned(self):
 		self.setupUser(True, True)
 		with capture(views.cliMsg, self.testPhoneNumber, "new") as output:
@@ -90,4 +90,34 @@ class SMSKeeperCase(TestCase):
 		with capture(views.cliMsg, self.testPhoneNumber, views.UNASSIGNED_LABEL) as output:
 			# ensure the user can get things from #unassigned
 			self.assertTrue("new" in output)
-		
+
+	def test_absolute_delete(self):
+		self.setupUser(True, True)
+		# ensure deleting from an empty list doesn't crash
+		views.cliMsg(self.testPhoneNumber, "delete 1 #test")
+		views.cliMsg(self.testPhoneNumber, "old fashioned #cocktail")
+		views.cliMsg(self.testPhoneNumber, "delete 1 #cocktail") #test absolute delete
+		with capture(views.cliMsg, self.testPhoneNumber, "#cocktail") as output:
+			self.assertTrue("Sorry, I don't" in output)
+
+	def test_contextual_delete(self):
+		self.setupUser(True, True)
+		for i in range(1, 2):
+			views.cliMsg(self.testPhoneNumber, "foo%d #bar" % (i))
+
+		# ensure we don't delete when ambiguous
+		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
+			self.assertTrue("Sorry, I'm not sure" in output)
+
+		# ensure deletes right item
+		views.cliMsg(self.testPhoneNumber, "#bar")
+		with capture(views.cliMsg, self.testPhoneNumber, "delete 2") as output:
+			self.assertTrue("2. foo2" not in output)
+
+		# ensure can chain deletes
+		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
+			self.assertTrue("1. foo1" not in output)
+
+		# ensure deleting from empty doesn't crash
+		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
+			self.assertTrue("no item 1" in output)

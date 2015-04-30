@@ -12,7 +12,7 @@ import pytz
 import datetime
 import humanize
 from PIL import Image
-import os, sys
+import os, sys, re
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -65,15 +65,19 @@ def isPickFromLabel(msg):
 def isRemindCommand(msg):
 	return '#remind' in msg.lower()
 
+delete_re = re.compile('delete [0-9]+')
+def isDeleteCommand(msg):
+	return delete_re.match(msg) is not None
+
 def isActivateCommand(msg):
 	return '#activate' in msg.lower()
-		
+
 def isListsCommand(msg):
 	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
 
 def isHelpCommand(msg):
 	return msg.strip().lower() == 'huh?'
-	
+
 def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return  cleaned == '#hashtag' or cleaned == '#hashtags'
@@ -111,7 +115,7 @@ def getData(msg, numMedia, requestDict):
 	for n in range(numMedia):
 		param = 'MediaUrl' + str(n)
 		mediaUrlList.append(requestDict[param])
-		#TODO need to store mediacontenttype as well. 
+		#TODO need to store mediacontenttype as well.
 
 	#TODO use a separate process but probably this is not the right place to do it.
 	if numMedia > 0:
@@ -123,12 +127,12 @@ def moveMediaToS3(mediaUrlList):
 	conn = boto.connect_s3('AKIAJBSV42QT6SWHHGBA', '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL')
 	bucket = conn.get_bucket('smskeeper')
 	newUrlList = list()
-	
+
 	for mediaUrl in mediaUrlList:
 		resp = requests.get(mediaUrl)
 		media = cStringIO.StringIO(resp.content)
 
-		# Upload to S3 
+		# Upload to S3
 		keyStr = uuid.uuid4()
 		key = bucket.new_key(keyStr)
 		key.set_contents_from_string(media.getvalue())
@@ -184,7 +188,7 @@ def generateImageGridUrl(imageURLs):
 		# generate an 2xn grid
 		rows = int(math.ceil(float(len(imageURLs))/2.0))
 		newImage = Image.new("RGB", (2*imageSize, imageSize*rows), "white")
-	
+
 		for i,image in enumerate(imageList):
 			x = imageSize*(i % 2)
 			y = imageSize*(i/2 % 2)
@@ -233,7 +237,7 @@ def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	if now.hour < TIME_ZONE_OFFSET:
 		startDate = startDate - datetime.timedelta(days=1)
-		
+
 	msgWithLabel = newQuery + " " + label
 	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
 	if startDate:
@@ -249,14 +253,58 @@ def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, humanize.naturaltime(startDate)), None, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "Got it", None, keeperNumber)
-	
+
+def getInferredLabel(user):
+	incoming_messages = Message.objects.filter(user=user, incoming=True).order_by("-added")
+	if len(incoming_messages) < 2:
+		return None
+
+	for i in range(1, len(incoming_messages)):
+		msg_body = incoming_messages[i].getBody()
+		print "message -%d: %s" % (i, msg_body)
+		if isLabel(msg_body):
+			return msg_body
+		elif isDeleteCommand(msg_body):
+			continue
+		else:
+			return None
+
+	return None
+
+def dealWithDelete(user, msg, keeperNumber):
+	words = msg.split(" ")
+	requested_index = int(words[1])
+	item_index = requested_index - 1
+	label = None
+	if hasLabel(msg):
+		text, label, media = getData(msg, 0, None)
+	else:
+		label = getInferredLabel(user)
+
+	if label:
+		try:
+			note = Note.objects.get(user=user, label=label)
+			entries = NoteEntry.objects.filter(note=note, hidden=False).order_by("added")
+			if item_index < 0 or item_index >= len(entries):
+				sms_util.sendMsg(user, 'There is no item %d in %s' % (requested_index, label), None, keeperNumber)
+				return
+			entry = entries[item_index]
+			entry.hidden = True
+			entry.save()
+			sms_util.sendMsg(user, 'Ok, I deleted "%s"' % (entry.text), None, keeperNumber)
+			dealWithFetchMessage(user, label, 0, keeperNumber, None)
+		except Note.DoesNotExist:
+			sendNotFoundMessage(user, label, keeperNumber)
+			return
+	else:
+		sms_util.sendMsg(user, 'Sorry, I\'m not sure which hashtag you\'re referring to. Try "delete [number] [hashtag]"', None, keeperNumber)
 
 def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 	# This is a label fetch.  See if a note with that label exists then return
 	label = msg
 	try:
 		note = Note.objects.get(user=user, label=label)
-		clearMsg = "\n\nSend '%s clear' to clear this list."%(note.label)
+		clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item."%(note.label)
 		entries = NoteEntry.objects.filter(note=note, hidden=False).order_by("added")
 		mediaUrls = list()
 
@@ -308,13 +356,13 @@ def dealWithPrintHashtags(user, keeperNumber):
 		sms_util.sendMsg(user, listText, None, keeperNumber)
 	except Note.DoesNotExist:
 		sms_util.sendMsg(user, "You don't have anything tagged. Yet.", None, keeperNumber)
-		
+
 def sendItemFromNote(note, keeperNumber):
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
 	if len(entries) == 0:
 		sendNotFoundMessage(user, label, keeperNumber)
 		return
-		
+
 	entry = random.choice(entries)
 	if entry.img_url:
 		sms_util.sendMsg(note.user, "My pick for %s:"%note.label, None, keeperNumber)
@@ -383,28 +431,28 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 		if not isLabel(msg):
 			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
 			return
-			
+
 		if not Note.objects.filter(user=user, label=msg).exists():
 			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
 			return
-		else:	
+		else:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
 			sms_util.sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
 			sendContactCard(user, keeperNumber)
 			user.completed_tutorial = True
-		
+
 	user.save()
-	
+
 def saveImageToS3(img):
 	conn = boto.connect_s3('AKIAJBSV42QT6SWHHGBA', '3DjvtP+HTzbDzCT1V1lQoAICeJz16n/2aKoXlyZL')
 	bucket = conn.get_bucket('smskeeper')
-	
+
 	outIm = cStringIO.StringIO()
 	img.save(outIm, 'JPEG')
 
-	# Upload to S3 
+	# Upload to S3
 	keyStr = "grid-" + str(uuid.uuid4())
 	key = bucket.new_key(keyStr)
 	key.set_contents_from_string(outIm.getvalue())
@@ -429,11 +477,11 @@ def resizeImage(im, size, crop):
 	if (crop):
 		if (hratio > wratio):
 			buffer = int((im.size[0]-size)/2)
-			im = im.crop((buffer, 0, (im.size[0]-buffer), size))			
+			im = im.crop((buffer, 0, (im.size[0]-buffer), size))
 		else:
 			buffer = int((im.size[1]-size)/2)
 			im = im.crop((0, buffer, size, (im.size[1] - buffer)))
-	
+
 	im.load()
 	return im
 
@@ -499,6 +547,8 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		sendContactCard(user, keeperNumber)
 	elif isRemindCommand(msg):
 		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
+	elif isDeleteCommand(msg):
+		dealWithDelete(user, msg, keeperNumber)
 	else: # treat this as an add command
 		if user.completed_tutorial:
 			if not hasLabel(msg):
@@ -513,7 +563,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 # Send a sms message to a user from a certain number
 # If from_num isn't specified, then defaults to prod
 #
-# Example url: 
+# Example url:
 # http://dev.duffyapp.com:8000/smskeeper/send_sms?user_id=23&msg=Test&from_num=%2B12488178301
 #
 def send_sms(request):
@@ -548,7 +598,7 @@ def incoming_sms(request):
 
 		processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber)
 		return sendNoResponse()
-		
+
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -570,9 +620,9 @@ def all_notes(request):
 
 def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
-	
+
 	if (form.is_valid()):
-		user = form.cleaned_data['user']			
+		user = form.cleaned_data['user']
 		context = {	'user_id': user.id }
 		return render(request, 'thread_view.html', context)
 	else:
@@ -585,7 +635,7 @@ def message_feed(request):
 
 		messages = Message.objects.filter(user=user).order_by("added")
 		messages_dicts = []
-		
+
 		for message in messages:
 			message_dict = json.loads(message.msg_json)
 			if len(message_dict.keys()) > 0:
