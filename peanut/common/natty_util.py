@@ -32,7 +32,10 @@ def getNattyInfo(query):
 			startDate = datetime.datetime.fromtimestamp(timestamp)
 
 			usedText = nattyJson[0]["matchingValue"]
-			newQuery = query.replace(usedText, '')
+			newQuery = query.replace(usedText, '').strip()
+			newQuery = newQuery.replace('  ', ' ')
+
+			relative = "RELATIVE_TIME" in nattyJson[0]["syntaxTree"]
 			
-			return (startDate, newQuery)
-	return (None, query)
+			return (startDate, newQuery, usedText, relative)
+	return (None, query, False)
