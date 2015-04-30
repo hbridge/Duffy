@@ -34,6 +34,11 @@ from common import api_util, natty_util
 from peanut.settings import constants
 
 
+'''
+Message constants
+'''
+UNASSIGNED_LABEL = '#unassigned'
+
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 	content += "<Response></Response>"
@@ -210,7 +215,10 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 		noteEntry = NoteEntry.objects.create(note=note, img_url=entryMediaUrl)
 
 	if sendResponse:
-		sms_util.sendMsg(user, "Got it", None, keeperNumber)
+		if label == UNASSIGNED_LABEL:
+			sms_util.sendMsg(user, "Filing that under " + UNASSIGNED_LABEL, None, keeperNumber)
+		else:
+			sms_util.sendMsg(user, "Got it", None, keeperNumber)
 
 	return noteEntry
 
@@ -491,15 +499,15 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		sendContactCard(user, keeperNumber)
 	elif isRemindCommand(msg):
 		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
-	elif hasLabel(msg):
+	else: # treat this as an add command
 		if user.completed_tutorial:
+			if not hasLabel(msg):
+				# if the user didn't add a label, throw it in #unassigned
+				msg += ' ' + UNASSIGNED_LABEL
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
 		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-	else:
-		sms_util.sendMsg(user, "Oops I need a label for that message. ex: #grocery, #tobuy, #toread. Send 'huh?' to find out more.", None, keeperNumber)
-
 
 #
 # Send a sms message to a user from a certain number

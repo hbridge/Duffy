@@ -81,3 +81,8 @@ class SMSKeeperCase(TestCase):
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#hashtag") as output:
 			self.assertTrue("(1)" in output)
+			
+	def test_add_unassigned(self):
+		self.setupUser(True, True)
+		with capture(views.cliMsg, self.testPhoneNumber, "new") as output:
+			self.assertTrue(views.UNASSIGNED_LABEL in output)
