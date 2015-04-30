@@ -223,27 +223,19 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	return noteEntry
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
-	TIME_ZONE_OFFSET = 4
-
 	text, label, media = getData(msg, 0, requestDict)
-	startDate, newQuery, usedText, relative = natty_util.getNattyInfo(text)
+	startDate, newQuery = natty_util.getNattyInfo(text)
 
 	# Hack is here to deal with the fact that natty does calculations based on UTC
 	# So after 8 pm, it does stuff in reference to tomorrow
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-	if now.hour < TIME_ZONE_OFFSET:
-		startDate = startDate - datetime.timedelta(days=1)
 		
 	msgWithLabel = newQuery + " " + label
 	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
 	if startDate:
-		if not relative:
-			# Hack to assume Eastern time
-			startDate = startDate + datetime.timedelta(hours=TIME_ZONE_OFFSET)
-			userMsg = humanize.naturaltime(startDate)
-		else:
-			userMsg = usedText
+		# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
+		# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
+		userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
 				
 		noteEntry.remind_timestamp = startDate
 		noteEntry.keeper_number = keeperNumber
