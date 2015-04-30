@@ -257,7 +257,6 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 
 		count = 1
 		for entry in entries:
-			print entry
 			if entry.img_url:
 				mediaUrls.append(entry.img_url)
 			else:
@@ -447,7 +446,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		dealWithNonActivatedUser(user, False, keeperNumber)
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-	if isPrintHashtagsCommand(msg):
+	elif isPrintHashtagsCommand(msg):
 		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 		dealWithPrintHashtags(user, keeperNumber)
 	elif numMedia == 0 and isLabel(msg):

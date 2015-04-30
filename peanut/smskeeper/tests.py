@@ -28,18 +28,29 @@ class SMSKeeperCase(TestCase):
 		except User.DoesNotExist:
 			pass
 
-	def setupUser(self, tutorialComplete):
+	def setupUser(self, activated, tutorialComplete):
 		user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		user.completed_tutorial = tutorialComplete
+		user.activated = activated
 		user.save()
 
+	def test_first_connect(self):
+		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
+			self.assertTrue("Thanks for signing up" in output)
+
+	def test_unactivated_connect(self):
+		self.setupUser(False, False)
+		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
+			self.assertTrue("Thanks for the message" in output)
+
 	def test_tutorial(self):
+		self.setupUser(True, False)
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
 			self.assertTrue("Hi. I'm Keeper." in output)
 			self.assertTrue("Let's try creating a list" in output)
 			self.assertTrue(User.objects.filter(phone_number=self.testPhoneNumber).exists())
 
-		with capture(views.cliMsg, self.testPhoneNumber, "new #test") as output:
+		with capture(views.cliMsg, self.testPhoneNumber, "new5 #test") as output:
 			self.assertTrue("Now let's add another item to your list" in output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new2 #test") as output:
@@ -49,25 +60,24 @@ class SMSKeeperCase(TestCase):
 			self.assertTrue("That should get you started" in output)
 
 	def test_get_label_doesnt_exist(self):
-		self.setupUser(True)
+		self.setupUser(True, True)
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
 			self.assertTrue("Sorry, I don't" in output)
 
 	def test_get_label(self):
-		self.setupUser(True)
+		self.setupUser(True, True)
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
 			self.assertTrue("new" in output)
 	
 	def test_pick_label(self):
-		self.setupUser(True)
+		self.setupUser(True, True)
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "pick #test") as output:
 			self.assertTrue("new" in output)		
 			
 	def test_print_hashtags(self):
-		self.setupUser(True)
+		self.setupUser(True, True)
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#hashtag") as output:
 			self.assertTrue("(1)" in output)
-	
