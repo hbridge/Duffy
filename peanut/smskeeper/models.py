@@ -9,6 +9,7 @@ class User(models.Model):
 	name = models.CharField(max_length=100)
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)
+	activated = models.BooleanField(default=False)
 	
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
