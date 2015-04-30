@@ -32,7 +32,8 @@ def getNattyInfo(query):
 			startDate = datetime.datetime.fromtimestamp(timestamp)
 
 			usedText = nattyJson[0]["matchingValue"]
-			newQuery = query.replace(usedText, '')
+			newQuery = query.replace(usedText, '').strip()
+			newQuery = newQuery.replace('  ', ' ')
 			
 			return (startDate, newQuery)
-	return (None, query)
+	return (None, query, False)

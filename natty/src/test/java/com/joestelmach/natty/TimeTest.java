@@ -1,14 +1,14 @@
 package com.joestelmach.natty;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * Runs the parser through the various time formats 
@@ -45,10 +45,12 @@ public class TimeTest extends AbstractTest {
     validateTime("10:00am", 10, 0, 0);
     validateTime("10a", 10, 0, 0);
     validateTime("10am", 10, 0, 0);
+    validateTime("10a_m", 10, 0, 0);
     validateTime("10", 10, 0, 0);
     validateTime("8p", 20, 0, 0);
     validateTime("8pm", 20, 0, 0);
     validateTime("8 pm", 20, 0, 0);
+    validateTime("8 p_m", 20, 0, 0);
   }
   
   @Test
@@ -56,6 +58,7 @@ public class TimeTest extends AbstractTest {
     Date reference = DateFormat.getDateInstance(DateFormat.SHORT).parse("1/02/2011");
     CalendarSource.setBaseDate(reference);
     validateTime("noon", 12, 0, 0);
+    validateTime("at noon", 12, 0, 0);
     validateTime("afternoon", 12, 0, 0);
     validateTime("midnight", 0, 0, 0);
     validateTime("mid-night", 0, 0, 0);
@@ -66,6 +69,7 @@ public class TimeTest extends AbstractTest {
     validateTime("10 hours before midnight", 14, 0, 0);
     validateTime("5 hours after noon", 17, 0, 0);
     validateTime("5 hours after midnight", 5, 0, 0);
+    validateTime("tonight", 20, 0, 0);
   }
   
   @Test
@@ -84,7 +88,32 @@ public class TimeTest extends AbstractTest {
     validateTime("this minute", 12, 0, 0);
     validateTime("this hour", 12, 0, 0);
   }
-  
+
+  @Test
+  public void testAlternatives() throws Exception {
+    CalendarSource.setBaseDate(DateFormat.getTimeInstance(DateFormat.SHORT).parse("12:00 pm"));
+
+    List<Date> dates = parseCollection("12 or 12:30");
+    Assert.assertEquals(2, dates.size());
+    validateTime(dates.get(0), 12, 0, 0);
+    validateTime(dates.get(1), 12, 30, 0);
+
+    dates = parseCollection("12pm or 12:30");
+    Assert.assertEquals(2, dates.size());
+    validateTime(dates.get(0), 12, 0, 0);
+    validateTime(dates.get(1), 12, 30, 0);
+
+    dates = parseCollection("noon or 12:30");
+    Assert.assertEquals(2, dates.size());
+    validateTime(dates.get(0), 12, 0, 0);
+    validateTime(dates.get(1), 12, 30, 0);
+
+    dates = parseCollection("12 or 12:30am");
+    Assert.assertEquals(2, dates.size());
+    validateTime(dates.get(0), 0, 0, 0);
+    validateTime(dates.get(1), 0, 30, 0);
+  }
+
   @Test
   public void testRange() throws Exception {
     CalendarSource.setBaseDate(DateFormat.getTimeInstance(DateFormat.SHORT).parse("12:00 pm"));
@@ -103,5 +132,24 @@ public class TimeTest extends AbstractTest {
     Assert.assertEquals(2, dates.size());
     validateTime(dates.get(0), 12, 0, 0);
     validateTime(dates.get(1), 12, 0, 10);
+  }
+
+  @Test
+  public void testText() throws Exception {
+    CalendarSource.setBaseDate(DateFormat.getTimeInstance(DateFormat.SHORT).parse("12:00 pm"));
+
+    List<DateGroup> groups = _parser.parse("5.30pm");
+    Assert.assertEquals(1, groups.size());
+    DateGroup group = groups.get(0);
+    Assert.assertEquals(1, group.getDates().size());
+    validateTime(group.getDates().get(0), 17, 30, 0);
+    Assert.assertEquals("5.30pm", group.getText());
+
+    groups = _parser.parse("5:30pm");
+    Assert.assertEquals(1, groups.size());
+    group = groups.get(0);
+    Assert.assertEquals(1, group.getDates().size());
+    validateTime(group.getDates().get(0), 17, 30, 0);
+    Assert.assertEquals("5:30pm", group.getText());
   }
 }

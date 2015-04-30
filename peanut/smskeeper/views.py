@@ -227,22 +227,18 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	return noteEntry
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
-	TIME_ZONE_OFFSET = 4
-
 	text, label, media = getData(msg, 0, requestDict)
 	startDate, newQuery = natty_util.getNattyInfo(text)
 
 	# Hack is here to deal with the fact that natty does calculations based on UTC
 	# So after 8 pm, it does stuff in reference to tomorrow
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	if now.hour < TIME_ZONE_OFFSET:
-		startDate = startDate - datetime.timedelta(days=1)
-
 	msgWithLabel = newQuery + " " + label
 	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
 	if startDate:
-		# Hack to assume Eastern time
-		startDate = startDate + datetime.timedelta(hours=TIME_ZONE_OFFSET)
+		# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
+		# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
+		userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
 
 		noteEntry.remind_timestamp = startDate
 		noteEntry.keeper_number = keeperNumber
@@ -250,7 +246,7 @@ def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 
 		async.processReminder.apply_async([noteEntry.id], eta=startDate)
 
-		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, humanize.naturaltime(startDate)), None, keeperNumber)
+		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, userMsg), None, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "Got it", None, keeperNumber)
 
@@ -379,9 +375,15 @@ def getFirstNote(user):
 
 def dealWithNonActivatedUser(user, firstTime, keeperNumber):
 	if firstTime:
-		sms_util.sendMsg(user, "Hi, I'm Keeper.  Thanks for signing up, I'll let you know when you're account has been activated.", None, keeperNumber)
+		sms_util.sendMsg(user, "Hi. I'm Keeper.", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "I can help you remember things. But, I'm not quite ready for you yet. ", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "Stay tuned. I'll be in touch soon.", None, keeperNumber)
 	else:
-		sms_util.sendMsg(user, "Thanks for the message, but I'll let you know when you're account has been activated.", None, keeperNumber)
+		sms_util.sendMsg(user, "Oh hi. You're back!", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "I still need more time.", None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
 	text, label, media = getData(msg, 0, {})

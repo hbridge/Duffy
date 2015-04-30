@@ -221,6 +221,8 @@ public class DateGrammarTest extends AbstractGrammarTest {
     assertAST("seven years ago", "(RELATIVE_DATE (SEEK < by_day 7 year))");
     assertAST("60 years ago", "(RELATIVE_DATE (SEEK < by_day 60 year))");
     assertAST("32 days ago", "(RELATIVE_DATE (SEEK < by_day 32 day))");
+    assertAST("150 days ago", "(RELATIVE_DATE (SEEK < by_day 150 day))");
+    assertAST("1500 days ago", "(RELATIVE_DATE (SEEK < by_day 1500 day))");
     assertAST("next monday", "(RELATIVE_DATE (SEEK > by_week 1 (DAY_OF_WEEK 2)))");
     assertAST("next mon", "(RELATIVE_DATE (SEEK > by_week 1 (DAY_OF_WEEK 2)))");
     assertAST("4 mondays from now", "(RELATIVE_DATE (SEEK > by_day 4 (DAY_OF_WEEK 2)))");
@@ -282,7 +284,7 @@ public class DateGrammarTest extends AbstractGrammarTest {
         "(RELATIVE_DATE (SEEK > by_day 0 (MONTH_OF_YEAR 11)) (EXPLICIT_SEEK 5 (DAY_OF_WEEK 5)))");
     
     assertAST("the last thursday in november 1999", 
-        "(RELATIVE_DATE (SEEK > by_day 0 (MONTH_OF_YEAR 11)) (EXPLICIT_SEEK 5 (DAY_OF_WEEK 5)) (EXPLICIT_SEEK (YEAR_OF 1999)))");
+        "(RELATIVE_DATE (SEEK > by_day 0 (MONTH_OF_YEAR 11)) (EXPLICIT_SEEK (YEAR_OF 1999)) (EXPLICIT_SEEK 5 (DAY_OF_WEEK 5)))");
     
     assertAST("3rd wed in next month",
         "(RELATIVE_DATE (SEEK > by_week 1 month) (EXPLICIT_SEEK 3 (DAY_OF_WEEK 4)))");
@@ -297,7 +299,7 @@ public class DateGrammarTest extends AbstractGrammarTest {
         "(RELATIVE_DATE (SEEK > by_day 0 (MONTH_OF_YEAR 2)) (EXPLICIT_SEEK (DAY_OF_MONTH 31)) (EXPLICIT_SEEK (YEAR_OF 1999)))");
     
     assertAST("the first wed. in january in the year 2004",
-        "(RELATIVE_DATE (SEEK > by_day 0 (MONTH_OF_YEAR 1)) (EXPLICIT_SEEK 1 (DAY_OF_WEEK 4)) (EXPLICIT_SEEK (YEAR_OF 2004)))");
+        "(RELATIVE_DATE (SEEK > by_day 0 (MONTH_OF_YEAR 1)) (EXPLICIT_SEEK (YEAR_OF 2004)) (EXPLICIT_SEEK 1 (DAY_OF_WEEK 4)))");
     
     assertAST("last monday of last month", 
         "(RELATIVE_DATE (SEEK < by_week 1 month) (EXPLICIT_SEEK 5 (DAY_OF_WEEK 2)))");

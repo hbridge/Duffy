@@ -1,26 +1,19 @@
 package com.joestelmach.natty;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.antlr.runtime.ANTLRInputStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.runtime.tree.Tree;
-
 import com.joestelmach.natty.generated.DateLexer;
 import com.joestelmach.natty.generated.DateParser;
 import com.joestelmach.natty.generated.DateWalker;
 import com.joestelmach.natty.generated.TreeRewrite;
+import org.antlr.runtime.*;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * 
@@ -29,8 +22,25 @@ import com.joestelmach.natty.generated.TreeRewrite;
 public class Parser {
   private TimeZone _defaultTimeZone;
   
-  private static final Logger _logger = Logger.getLogger("com.joestelmach.natty");
-  
+  private static final Logger _logger = LoggerFactory.getLogger(Parser.class);
+
+  /**
+   * Tokens that should be removed from the end any list of tokens before parsing. These are
+   * valid tokens, but could never add any meaningful parsing information when located at the
+   * end of a token stream.
+   */
+  private static final Set<Integer> IGNORED_TRAILING_TOKENS =
+      new HashSet<Integer>(Arrays.asList(new Integer[] {
+          DateLexer.DOT,
+          DateLexer.COLON,
+          DateLexer.COMMA,
+          DateLexer.DASH,
+          DateLexer.SLASH,
+          DateLexer.DOT,
+          DateLexer.PLUS,
+          DateLexer.SINGLE_QUOTE
+      }));
+
   /**
    * Creates a new parser using the given time zone as the default
    * @param defaultTimeZone
@@ -54,14 +64,14 @@ public class Parser {
    * @return
    */
   public List<DateGroup> parse(String value) {
-    
+
     // lex the input value to obtain our global token stream
     ANTLRInputStream input = null;
     try {
-      input = new ANTLRNoCaseInputStream(new ByteArrayInputStream(value.trim().getBytes()));
+      input = new ANTLRNoCaseInputStream(new ByteArrayInputStream(value.getBytes()));
       
     } catch (IOException e) {
-      _logger.log(Level.SEVERE, "could not lex input", e);
+      _logger.error("could not lex input", e);
     }
     DateLexer lexer = new DateLexer(input);
     
@@ -70,58 +80,86 @@ public class Parser {
     
     // and parse each of them
     List<DateGroup> groups = new ArrayList<DateGroup>();
+    TokenStream lastStream = null;
     for(TokenStream stream:streams) {
-    List<Token> tokens = ((NattyTokenSource) stream.getTokenSource()).getTokens();
-      DateGroup group = singleParse(stream);
+      lastStream = stream;
+      List<Token> tokens = ((NattyTokenSource) stream.getTokenSource()).getTokens();
+      DateGroup group = singleParse(stream, value);
       while((group == null || group.getDates().size() == 0) && tokens.size() > 0) {
         if(group == null || group.getDates().size() == 0) {
           
-          // if we're down to only two tokens in our token stream, we can't continue
-          if(tokens.size() <= 2) {
-            tokens.clear();
+          // we have two options:
+          // 1. Continuously remove tokens from the end of the stream and re-parse.  This will
+          //    recover from the case of an extraneous token at the end of the token stream.
+          //    For example: 'june 20th on'
+          List<Token> endRemovedTokens = new ArrayList<Token>(tokens);
+          while((group == null || group.getDates().isEmpty()) && !endRemovedTokens.isEmpty()) {
+            endRemovedTokens = endRemovedTokens.subList(0, endRemovedTokens.size() - 1);
+            TokenStream newStream = new CommonTokenStream(new NattyTokenSource(endRemovedTokens));
+            group = singleParse(newStream, value);
+            lastStream = newStream;
           }
-        
-          // otherwise, we have two options:
-          else {
-            
-            // 1. Continuously remove tokens from the end of the stream and re-parse.  This will
-            //    recover from the case of an extaneous token at the end of the token stream.
-            //    For example: 'june 20th on'
-            List<Token> endRemovedTokens = new ArrayList<Token>(tokens);
-            while((group == null || group.getDates().isEmpty()) && !endRemovedTokens.isEmpty()) {
-              endRemovedTokens = endRemovedTokens.subList(0, endRemovedTokens.size() - 1);
-              cleanupGroup(endRemovedTokens);
-              TokenStream newStream = new CommonTokenStream(new NattyTokenSource(endRemovedTokens));
-              group = singleParse(newStream);
-            }
-            
-            // 2. Continuously look for another possible starting point in the token 
-            //    stream and re-parse.
-            if(group == null || group.getDates().isEmpty()) {
-              tokens = tokens.subList(1, tokens.size());
-              Iterator<Token> iter = tokens.iterator();
-              while(iter.hasNext()) {
-                Token token = iter.next();
-                if(!DateParser.FOLLOW_empty_in_parse186.member(token.getType())) {
-                  iter.remove();
-                }
-                else {
-                  break;
-                }
+
+          // 2. Continuously look for another possible starting point in the token
+          //    stream and re-parse.
+          while((group == null || group.getDates().isEmpty()) && tokens.size() >= 1) {
+            tokens = tokens.subList(1, tokens.size());
+            Iterator<Token> iter = tokens.iterator();
+            while(iter.hasNext()) {
+              Token token = iter.next();
+              if(!DateParser.FOLLOW_empty_in_parse186.member(token.getType())) {
+                iter.remove();
               }
-              cleanupGroup(tokens);
-              TokenStream newStream = new CommonTokenStream(new NattyTokenSource(tokens));
-              group = singleParse(newStream);
+              else {
+                break;
+              }
             }
+            TokenStream newStream = new CommonTokenStream(new NattyTokenSource(tokens));
+            group = singleParse(newStream, value);
+            lastStream = newStream;
           }
         }
       }
-      // if a group with some date(s) was found, we add it
-      if(group != null && group.getDates().size() > 0) {
-        groups.add(group);
+
+      // If a group with at least one date was found, we'll most likely want to add it to our list,
+      // but not if multiple streams were found and the group contains only numeric time information.
+      // For example: A full text string of '1' should parse to 1 o'clock, but 'I need 1 hard drive'
+      // should result in no groups found.
+      if(group != null && !group.getDates().isEmpty() &&
+          (streams.size() == 1 || !group.isDateInferred() || !isAllNumeric(lastStream))) {
+
+        // Additionally, we'll only accept this group if the associated text does not have an
+        // alphabetic character to the immediate left or right, which would indicate a portion
+        // of a word was tokenized. For example, 'nightingale' will result in a 'NIGHT' token,
+        // but there's clearly no datetime information there.
+        group.setFullText(value);
+        String prefix = group.getPrefix(1);
+        String suffix = group.getSuffix(1);
+        if((prefix.isEmpty() || !Character.isLetter(prefix.charAt(0))) &&
+           (suffix.isEmpty() || !Character.isLetter(suffix.charAt(0)))) {
+
+          groups.add(group);
+        }
       }
     }
     return groups;
+  }
+
+  /**
+   * Determines if a token stream contains only numeric tokens
+   * @param stream
+   * @return true if all tokens in the given stream can be parsed as an integer
+   */
+  private boolean isAllNumeric(TokenStream stream) {
+    List<Token> tokens = ((NattyTokenSource) stream.getTokenSource()).getTokens();
+    for(Token token:tokens) {
+      try {
+        Integer.parseInt(token.getText());
+      } catch(NumberFormatException e) {
+        return false;
+      }
+    }
+    return true;
   }
   
   /**
@@ -132,15 +170,17 @@ public class Parser {
    * @param stream
    * @return
    */
-  private DateGroup singleParse(TokenStream stream) {
+  private DateGroup singleParse(TokenStream stream, String fullText) {
+	DateGroup group = null;
+	List<Token> tokens = ((NattyTokenSource) stream.getTokenSource()).getTokens();
+	if(tokens.isEmpty()) return group;
+		
     StringBuilder tokenString = new StringBuilder();
-    for(Token token:((NattyTokenSource) stream.getTokenSource()).getTokens()) {
+    for(Token token:tokens) {
       tokenString.append(DateParser.tokenNames[token.getType()]);
       tokenString.append(" ");
     }
-    _logger.fine("sub-token stream: " + tokenString.toString());
-    
-    DateGroup group = null;
+
     try {
       // parse 
       ParseListener listener = new ParseListener();
@@ -148,23 +188,24 @@ public class Parser {
       DateParser.parse_return parseReturn = parser.parse();
       
       Tree tree = (Tree) parseReturn.getTree();
-      _logger.fine("AST: " + tree.toStringTree());
-      
+
       // we only continue if a meaningful syntax tree has been built
       if(tree.getChildCount() > 0) {
-      
+        _logger.info("PARSE: " + tokenString.toString());
+
         // rewrite the tree (temporary fix for http://www.antlr.org/jira/browse/ANTLR-427)
         CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
         TreeRewrite s = new TreeRewrite(nodes);
         tree = (CommonTree)s.downup(tree);
-        
+
         // and walk it
         nodes = new CommonTreeNodeStream(tree);
         nodes.setTokenStream(stream);
         DateWalker walker = new DateWalker(nodes);
         walker.getState().setDefaultTimeZone(_defaultTimeZone);
         walker.parse();
-        
+        _logger.info("AST: " + tree.toStringTree());
+
         // run through the results and append the parse information
         group = walker.getState().getDateGroup();
         ParseLocation location = listener.getDateGroupLocation();
@@ -173,12 +214,24 @@ public class Parser {
         group.setPosition(location.getStart());
         group.setSyntaxTree(tree);
         group.setParseLocations(listener.getLocations());
+        group.setFullText(fullText);
+
+        // if the group's matching text has an immediate alphabetic prefix or suffix,
+        // we ignore this result
+        String prefix = group.getPrefix(1);
+        String suffix = group.getSuffix(1);
+        if((!prefix.isEmpty() && Character.isLetter(prefix.charAt(0))) ||
+            (!suffix.isEmpty() && Character.isLetter(suffix.charAt(0)))) {
+
+          group = null;
+        }
+
       }
-      
-    } catch(Exception e) {
-      _logger.log(Level.SEVERE, "Could not parse input", e);
+
+    } catch(RecognitionException e) {
+      _logger.debug("Could not parse input", e);
     }
-    
+
     return group;
   }
   
@@ -195,92 +248,87 @@ public class Parser {
     // walk through the token stream and build a collection 
     // of sub token streams that represent possible date locations
     List<Token> currentGroup = null;
-    List<TokenStream> groups = new ArrayList<TokenStream>();
+    List<List<Token>> groups = new ArrayList<List<Token>>();
     Token currentToken;
+    int currentTokenType;
     StringBuilder tokenString = new StringBuilder();
     while((currentToken = stream.getTokenSource().nextToken()).getType() != DateLexer.EOF) {
-      if(_logger.getLevel() != null && _logger.getLevel().intValue() <= Level.FINE.intValue()) {
-        tokenString.append(DateParser.tokenNames[currentToken.getType()]);
-        tokenString.append(" ");
-      }
-      
+      currentTokenType = currentToken.getType();
+      tokenString.append(DateParser.tokenNames[currentTokenType]).append(" ");
+
       // we're currently NOT collecting for a possible date group
       if(currentGroup == null) {
-        // ignore white space in-between possible rules
-        if(currentToken.getType() != DateLexer.WHITE_SPACE) {
-          // if the token is a possible date start token, we start a new collection
-          if(DateParser.FOLLOW_empty_in_parse186.member(currentToken.getType())) {
-            currentGroup = new ArrayList<Token>();
-            currentGroup.add(currentToken);
-          }
+        // skip over white space and known tokens that cannot be the start of a date
+        if(currentTokenType != DateLexer.WHITE_SPACE &&
+            DateParser.FOLLOW_empty_in_parse186.member(currentTokenType)) {
+
+          currentGroup = new ArrayList<Token>();
+          currentGroup.add(currentToken);
         }
       }
+
       // we're currently collecting
       else {
         // preserve white space
-        if(currentToken.getType() == DateLexer.WHITE_SPACE) {
+        if(currentTokenType == DateLexer.WHITE_SPACE) {
           currentGroup.add(currentToken);
         }
+
         else {
-          // if this is an unknown token, we need to end the current group
-          if(currentToken.getType() == DateLexer.UNKNOWN) {
-            if(currentGroup.size() > 0) {
-              cleanupGroup(currentGroup);
-              groups.add(new CommonTokenStream(new NattyTokenSource(currentGroup)));
-            }
+          // if this is an unknown token, we'll close out the current group
+          if(currentTokenType == DateLexer.UNKNOWN) {
+            addGroup(currentGroup, groups);
             currentGroup = null;
           }
           // otherwise, the token is known and we're currently collecting for
-          // a group, we add it if it's not a dot
-          else if(currentToken.getType() != DateLexer.DOT) {
+          // a group, so we'll add it to the current group
+          else {
             currentGroup.add(currentToken);
           }
         }
       }
     }
+
     if(currentGroup != null) {
-      cleanupGroup(currentGroup);
-      groups.add(new CommonTokenStream(new NattyTokenSource(currentGroup)));
+      addGroup(currentGroup, groups);
     }
     
-    _logger.fine("global token stream: " + tokenString.toString());
-    
-    return groups;
-  }
-  
-  /**
-   * Removes unwanted tokens from the given token group
-   * @param group
-   */
-  private void cleanupGroup(List<Token> group) {
-    
-    // remove contiguous white space
-    Iterator<Token> iter = group.iterator();
-    Token previousToken = null;
-    while(iter.hasNext()) {
-      Token token = iter.next();
-      if(previousToken != null && previousToken.getType() == DateParser.WHITE_SPACE) {
-        if(token.getType() == DateParser.WHITE_SPACE) {
-          iter.remove();
+    _logger.info("STREAM: " + tokenString.toString());
+    List<TokenStream> streams = new ArrayList<TokenStream>();
+    for(List<Token> group:groups) {
+      if(!group.isEmpty()) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("GROUP: ");
+        for (Token token : group) {
+          builder.append(DateParser.tokenNames[token.getType()]).append(" ");
         }
-      }
-      previousToken = token;
-    }
-    
-    // remove leading white space
-    if(group.size() > 0) {
-      Token firstToken = group.get(0);
-      if(firstToken.getType() == DateParser.WHITE_SPACE) {
-        group.remove(firstToken);
+        _logger.info(builder.toString());
+
+        streams.add(new CommonTokenStream(new NattyTokenSource(group)));
       }
     }
-    
-    // and trailing white space
-    if(group.size() > 0) {
-      Token lastToken = group.get(group.size() - 1);
-      if(lastToken.getType() == DateParser.WHITE_SPACE) {
-        group.remove(lastToken);
-      }
+
+    return streams;
+  }
+
+  /**
+   * Cleans up the given group and adds it to the list of groups if still valid
+   * @param group
+   * @param groups
+   */
+  private void addGroup(List<Token> group, List<List<Token>> groups) {
+
+    if(group.isEmpty()) return;
+
+    // remove trailing tokens that should be ignored
+    while(!group.isEmpty() && IGNORED_TRAILING_TOKENS.contains(
+        group.get(group.size() - 1).getType())) {
+      group.remove(group.size() - 1);
+    }
+
+    // if the group still has some tokens left, we'll add it to our list of groups
+    if(!group.isEmpty()) {
+      groups.add(group);
     }
   }
 }
