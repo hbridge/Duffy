@@ -250,7 +250,7 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 
 				if entry.remind_timestamp:
 					dt = entry.remind_timestamp.replace(tzinfo=None)
-					newStr = "%s %s" % (newStr, naturaltime.naturaltime(dt))
+					newStr = "%s %s" % (newStr, humanize.naturaltime(dt))
 				currentMsg = currentMsg + "\n " + newStr
 				count += 1
 
