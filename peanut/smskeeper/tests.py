@@ -36,12 +36,12 @@ class SMSKeeperCase(TestCase):
 
 	def test_first_connect(self):
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("Thanks for signing up" in output)
+			self.assertTrue("not quite ready" in output)
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False)
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("Thanks for the message" in output)
+			self.assertTrue("You're back!" in output)
 
 	def test_tutorial(self):
 		self.setupUser(True, False)
