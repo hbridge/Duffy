@@ -14,6 +14,7 @@ app = Celery('peanut',
 					  'async.suggestion_notifications',
 					  'async.notifications',
 					  'async.internal',
+					  'memfresh.async',
 					  'smskeeper.async'])
 
 app.config_from_object(settings.CELERY_CONFIG)
