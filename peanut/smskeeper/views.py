@@ -319,6 +319,13 @@ def getFirstNote(user):
 	else:
 		return None
 
+def dealWithNonActivatedUser(user, firstTime, keeperNumber):
+	if firstTime:
+		sms_util.sendMsg(user, "Hi, I'm Keeper.  Thanks for signing up, I'll let you know when you're account has been activated.", None, keeperNumber)
+	else:
+		sms_util.sendMsg(user, "Thanks for the message, but I'll let you know when you're account has been activated.", None, keeperNumber)
+
+
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	if user.tutorial_step == 0:
 		sms_util.sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
@@ -328,7 +335,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	elif user.tutorial_step == 1:
 		if not hasLabel(msg):
 			# They didn't send in something with a label.
-			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.")
+			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.", None, keeperNumber)
 		else:
 			# They sent in something with a label, have them add to it
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
@@ -431,12 +438,15 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		user = User.objects.get(phone_number=phoneNumber)
 	except User.DoesNotExist:
 		user = User.objects.create(phone_number=phoneNumber)
-
-		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+		dealWithNonActivatedUser(user, True, keeperNumber)
 		return
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
+	if not user.activated:
+		dealWithNonActivatedUser(user, False, keeperNumber)
+	elif not user.completed_tutorial:
+		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 	if isPrintHashtagsCommand(msg):
 		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 		dealWithPrintHashtags(user, keeperNumber)
