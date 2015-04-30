@@ -65,6 +65,10 @@ def isListsCommand(msg):
 
 def isHelpCommand(msg):
 	return msg.strip().lower() == 'huh?'
+	
+def isPrintHashtagsCommand(msg):
+	cleaned = msg.strip().lower()
+	return  cleaned == '#hashtag' or cleaned == '#hashtags'
 
 def isSendContactCommand(msg):
 	return msg.strip().lower() == 'vcard'
@@ -283,6 +287,18 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 		sendNotFoundMessage(user, label, keeperNumber)
 
 
+def dealWithPrintHashtags(user, keeperNumber):
+	#print out all of the active hashtags for the account
+	listText = ""
+	try:
+		for note in Note.objects.filter(user=user):
+			entries = NoteEntry.objects.filter(note=note)
+			if len(entries) > 0:
+				listText += "%s (%d)\n" % (note.label, len(entries))
+		sms_util.sendMsg(user, listText, None, keeperNumber)
+	except Note.DoesNotExist:
+		sms_util.sendMsg(user, "You don't have anything tagged. Yet.", None, keeperNumber)
+		
 def sendItemFromNote(note, keeperNumber):
 	entries = NoteEntry.objects.filter(note=note).order_by("added")
 	if len(entries) == 0:
@@ -421,8 +437,10 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
-		
-	if numMedia == 0 and isLabel(msg):
+	if isPrintHashtagsCommand(msg):
+		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
+		dealWithPrintHashtags(user, keeperNumber)
+	elif numMedia == 0 and isLabel(msg):
 		if user.completed_tutorial:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
 		else:
