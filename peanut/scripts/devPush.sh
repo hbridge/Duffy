@@ -4,8 +4,6 @@ cd /home/ubuntu/dev/Duffy
 git fetch
 git rebase origin/master
 sudo apachectl -k restart
-cd peanut
-python manage.py test
 EOF
 
 echo "Restarting scripts..."
