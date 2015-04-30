@@ -353,8 +353,8 @@ def dealWithPrintHashtags(user, keeperNumber):
 	except Note.DoesNotExist:
 		sms_util.sendMsg(user, "You don't have anything tagged. Yet.", None, keeperNumber)
 
-def sendItemFromNote(note, keeperNumber):
-	entries = NoteEntry.objects.filter(note=note).order_by("added")
+def pickItemFromNote(note, keeperNumber):
+	entries = NoteEntry.objects.filter(note=note, hidden=False).order_by("added")
 	if len(entries) == 0:
 		sendNotFoundMessage(user, label, keeperNumber)
 		return
@@ -540,7 +540,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		label = getLabel(msg)
 		try:
 			note = Note.objects.get(user=user, label=label)
-			sendItemFromNote(note, keeperNumber)
+			pickItemFromNote(note, keeperNumber)
 		except Note.DoesNotExist:
 			sendNotFoundMessage(user, label, keeperNumber)
 	elif isHelpCommand(msg):
