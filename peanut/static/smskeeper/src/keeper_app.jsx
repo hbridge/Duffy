@@ -1,3 +1,8 @@
+
+var formatDate = function(d){
+  return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();
+}
+
 var MessageListRow = React.createClass({
   getInitialState: function() {
     return {raw: false};
@@ -10,20 +15,20 @@ var MessageListRow = React.createClass({
   render: function() {
     var message = this.props.message;
 		var body = message.Body;
+    var date = new Date(message.added);
 		var cssclass = "outgoing";
 		if (message.incoming === true) cssclass = "incoming";
 
 		var cssClasses = classNames({
-			'message': true,
-			'preformatted': !this.state.raw,
+      'body' : true,
 			'incoming': message.incoming,
 			'outgoing': !message.incoming,
 		});
 
-
 		return (
-			<div id={ this.getId() } className={ cssClasses } onClick={ this.handleRowSelected }>
-				{ body }
+			<div id={ this.getId() } className="message" onClick={ this.handleRowSelected }>
+        <div className="messageDate">{ formatDate(date) }</div>
+        <div className={ cssClasses }>{ body }</div>
       </div>
     );
   },
@@ -51,7 +56,7 @@ var JsonView = React.createClass({
     console.log("componentDidUpdate. positioning to " + target_element)
     $( "#json_popup" ).position({
       my: "left top",
-      at: "right+4 top",
+      at: "right+4 top+18",
       of: target_element
     });
   }
@@ -59,7 +64,7 @@ var JsonView = React.createClass({
 
 var KeeperApp = React.createClass({
   getInitialState: function() {
-    return {messages: [], selectedMessage: null};
+    return {messages: [], selectedMessage: null };
   },
 
   componentWillMount: function() {
@@ -92,7 +97,15 @@ var KeeperApp = React.createClass({
           <JsonView message={ this.state.selectedMessage } selectedRowId={ this.state.selectedRowId } />
       </div>
 		);
-	}
+	},
+
+  componentDidUpdate: function() {
+    if (!this.props.firstLoadComplete) {
+      $("html,body").scrollTop($(document).height());
+      this.props.firstLoadComplete = true;
+    }
+  },
+
 });
 
 React.render(<KeeperApp />, document.getElementById("keeper_app"));
