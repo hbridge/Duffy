@@ -3,6 +3,7 @@ import datetime
 import dateutil.parser
 import urllib2
 import urllib
+import pytz
 
 
 
@@ -29,11 +30,11 @@ def getNattyInfo(query):
 		if (len(nattyJson) > 0):
 			timestamp = nattyJson[0]["timestamps"][0]
 
-			startDate = datetime.datetime.fromtimestamp(timestamp)
+			startDate = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.utc)
 
 			usedText = nattyJson[0]["matchingValue"]
 			newQuery = query.replace(usedText, '').strip()
 			newQuery = newQuery.replace('  ', ' ')
 			
-			return (startDate, newQuery)
-	return (None, query, False)
+			return (startDate, newQuery, usedText)
+	return (None, query, None)

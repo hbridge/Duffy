@@ -81,6 +81,12 @@ class Message(models.Model):
 	
 	def getBody(self):
 		return self.getMessageAttribute("Body")
+
+	def NumMedia(self):
+		numMedia = self.getMessageAttribute("NumMedia")
+		if not numMedia:
+			return 0
+		return int(numMedia)
 		
 	def getMedia(self):
 		media = []

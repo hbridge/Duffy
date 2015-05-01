@@ -38,6 +38,8 @@ from peanut.settings import constants
 Message constants
 '''
 UNASSIGNED_LABEL = '#unassigned'
+REMIND_LABEL = "#reminders"
+
 
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -63,7 +65,12 @@ def isPickFromLabel(msg):
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower()=='pick'))
 
 def isRemindCommand(msg):
-	return '#remind' in msg.lower()
+	text = msg.lower()
+	return ('#remind' in text or
+		   '#remindme' in text or
+		   '#reminder' in text or
+		   '#reminders' in text)
+
 
 delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
@@ -228,27 +235,67 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	text, label, media = getData(msg, 0, requestDict)
-	startDate, newQuery = natty_util.getNattyInfo(text)
+	startDate, newQuery, usedText = natty_util.getNattyInfo(text)
 
-	# Hack is here to deal with the fact that natty does calculations based on UTC
-	# So after 8 pm, it does stuff in reference to tomorrow
+	# See if the time that comes back is within a few seconds.
+	# If this happens, then we didn't get a time from the user
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	msgWithLabel = newQuery + " " + label
-	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
-	if startDate:
-		# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
-		# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
-		userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
-
-		noteEntry.remind_timestamp = startDate
-		noteEntry.keeper_number = keeperNumber
-		noteEntry.save()
-
-		async.processReminder.apply_async([noteEntry.id], eta=startDate)
-
-		sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (newQuery, userMsg), None, keeperNumber)
+	if startDate == None or abs((now - startDate).total_seconds()) < 10:
+		sms_util.sendMsg(user, "At what time?", None, keeperNumber)
+		return
 	else:
-		sms_util.sendMsg(user, "Got it", None, keeperNumber)
+		doRemindMessage(user, startDate, newQuery, keeperNumber, requestDict)
+
+def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
+	# Assuming this is the remind msg
+	prevMessage = getPreviousMessage(user)
+	text, label, media = getData(prevMessage.getBody(), prevMessage.NumMedia(), json.loads(prevMessage.msg_json))
+
+	# First get the used Text from the last message
+	startDate, newQuery, usedText = natty_util.getNattyInfo(text)
+
+	# Now append on the new 'time' to that message, then pass to Natty
+	if not usedText:
+		usedText = ""
+	newMsg = usedText + " " + msg
+
+	# We want to ignore the newQuery here since we're only sending in time related stuff
+	startDate, ignore, usedText = natty_util.getNattyInfo(newMsg)
+
+	if not startDate:
+		startDate = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+	doRemindMessage(user, startDate, newQuery, keeperNumber, requestDict)
+
+
+def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
+	# Need to do this so the add message correctly adds the label
+	msgWithLabel = query + " " + REMIND_LABEL
+	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
+
+	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
+	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
+	# Have to pass in cleanDate since humanize doesn't use utcnow
+	startDate = startDate.replace(tzinfo=None)
+	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
+
+	noteEntry.remind_timestamp = startDate
+	noteEntry.keeper_number = keeperNumber
+	noteEntry.save()
+
+	async.processReminder.apply_async([noteEntry.id], eta=startDate)
+
+	sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (query, userMsg), None, keeperNumber)
+
+def getPreviousMessage(user):
+	# Normally would sort by added but unit tests barf since they get added at same time
+	# Here, sorting by id should accomplish the same goal
+	msgs = Message.objects.filter(user=user, incoming=True).order_by("-id")[:2]
+
+	if len(msgs) == 2:
+		return msgs[1]
+	else:
+		return None
 
 def getInferredLabel(user):
 	incoming_messages = Message.objects.filter(user=user, incoming=True).order_by("-added")
@@ -299,6 +346,9 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 	# This is a label fetch.  See if a note with that label exists then return
 	label = msg
 	try:
+		# We support many different remind commands, but every one actually does REMIND_LABEL
+		if isRemindCommand(label):
+			label = REMIND_LABEL
 		note = Note.objects.get(user=user, label=label)
 		clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item."%(note.label)
 		entries = NoteEntry.objects.filter(note=note, hidden=False).order_by("added")
@@ -559,11 +609,18 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		dealWithDelete(user, msg, keeperNumber)
 	else: # treat this as an add command
 		if user.completed_tutorial:
-			if not hasLabel(msg):
+			# Hack until state machine.
+			# See if the last message was a remind and if if this doesn't have a label
+			prevMsg = getPreviousMessage(user)
+			if prevMsg and isRemindCommand(prevMsg.getBody()) and not hasLabel(msg):
+				dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict)
+			elif not hasLabel(msg):
 				# if the user didn't add a label, throw it in #unassigned
 				msg += ' ' + UNASSIGNED_LABEL
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
-		else:
+				dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
+			else:
+				dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
+		else:	
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 

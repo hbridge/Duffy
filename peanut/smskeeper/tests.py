@@ -2,6 +2,7 @@ from django.test import TestCase
 import sys
 from cStringIO import StringIO
 from contextlib import contextmanager
+import time
 
 from smskeeper import views
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
@@ -29,10 +30,10 @@ class SMSKeeperCase(TestCase):
 			pass
 
 	def setupUser(self, activated, tutorialComplete):
-		user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
-		user.completed_tutorial = tutorialComplete
-		user.activated = activated
-		user.save()
+		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
+		self.user.completed_tutorial = tutorialComplete
+		self.user.activated = activated
+		self.user.save()
 
 	def test_first_connect(self):
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
@@ -123,3 +124,28 @@ class SMSKeeperCase(TestCase):
 		# ensure deleting from empty doesn't crash
 		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
 			self.assertTrue("no item 1" in output)
+
+	def test_reminders_basic(self):
+		self.setupUser(True, True)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop tmr") as output:
+			self.assertTrue("poop a day from now" in output)
+
+	def test_reminders_remind_works(self):
+		self.setupUser(True, True)
+
+		views.cliMsg(self.testPhoneNumber, "#remind poop tmr")
+		self.assertTrue(Note.objects.filter(user=self.user, label="#reminders").count() == 1)
+
+	def test_reminders_followup(self):
+		self.setupUser(True, True)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+			self.assertTrue("what time?" in output)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
+			self.assertTrue("poop a day from now" in output)
+
+
+
+
