@@ -40,7 +40,7 @@ class User(models.Model):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-	list_display = ('id', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'last_msg_from', 'total_msgs_from', 'history')
+	list_display = ('id', 'activated', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'last_msg_from', 'total_msgs_from', 'history')
 
 class Note(models.Model):
 	user = models.ForeignKey(User, db_index=True)
