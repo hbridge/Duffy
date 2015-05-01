@@ -656,3 +656,37 @@ def message_feed(request):
 		return HttpResponse(json.dumps({"messages" : messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+def dashboard_feed(request):
+	users = User.objects.all().order_by("id");
+	user_dicts = []
+	for user in users:
+		dict = {
+			"id" : int(user.id),
+			"name" : user.name,
+			"activated" : user.activated,
+			"created" : user.added
+		}
+
+		dict["message_stats"] = {}
+		for direction in ["incoming", "outgoing"]:
+			incoming = (direction == "incoming")
+			messages = Message.objects.filter(user=user, incoming=incoming).order_by("-added")
+			count = messages.count()
+			last_message_date = None
+			if count > 0:
+				last_message_date = messages[0].added
+			dict["message_stats"][direction] = {
+				"count" : count,
+				"last_message_date" : last_message_date,
+			}
+
+		dict["history"] = "history?user_id=" + str(user.id)
+
+		user_dicts.append(dict)
+
+	return HttpResponse(json.dumps({"users" : user_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+
+def dashboard(request):
+	return render(request, 'dashboard.html', None)
