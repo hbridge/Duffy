@@ -377,7 +377,7 @@ def dealWithNonActivatedUser(user, firstTime, keeperNumber):
 	if firstTime:
 		sms_util.sendMsg(user, "Hi. I'm Keeper.", None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "I can help you remember things. But, I'm not quite ready for you yet. ", None, keeperNumber)
+		sms_util.sendMsg(user, "I can help you remember things. But, I'm not quite ready for you yet.", None, keeperNumber)
 		time.sleep(1)
 		sms_util.sendMsg(user, "Stay tuned. I'll be in touch soon.", None, keeperNumber)
 	else:
@@ -393,12 +393,18 @@ def dealWithActivation(user, msg, keeperNumber):
 		userToActivate.activated = True
 		userToActivate.save()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
+
+		sms_util.sendMsg(userToActivate, "Hi, I'm ready now! As a reminder, I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "Before I explain a bit more, what's your name?", None, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	if user.tutorial_step == 0:
-		sms_util.sendMsg(user, "Hi. I'm Keeper. I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		user.name = msg
+		user.save()
+		sms_util.sendMsg(user, "Great, nice to meet you %s" % user.name, None, keeperNumber)
 		time.sleep(1)
 		sms_util.sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
 		user.tutorial_step = user.tutorial_step + 1

@@ -45,10 +45,12 @@ class SMSKeeperCase(TestCase):
 
 	def test_tutorial(self):
 		self.setupUser(True, False)
-		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("Hi. I'm Keeper." in output)
+
+		# Activation message asks for their name
+		with capture(views.cliMsg, self.testPhoneNumber, "UnitTests") as output:
+			self.assertTrue("nice to meet you UnitTests" in output)
 			self.assertTrue("Let's try creating a list" in output)
-			self.assertTrue(User.objects.filter(phone_number=self.testPhoneNumber).exists())
+			self.assertTrue(User.objects.get(phone_number=self.testPhoneNumber).name == "UnitTests")
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new5 #test") as output:
 			self.assertTrue("Now let's add another item to your list" in output)
