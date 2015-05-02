@@ -2,7 +2,7 @@ var HeaderRow = React.createClass({
   render: function() {
 		return (
       <tr>
-        <th className="cell"> user_id </th>
+        <th className="cell"> user </th>
         <th className="cell"> name </th>
         <th className="cell"> created </th>
         <th className="cell"> activated </th>
@@ -27,7 +27,7 @@ var UserRow = React.createClass({
 		});
 		return (
       <tr className= {rowClasses}>
-        <td className="cell"> { this.props.user.id }</td>
+        <td className="cell"> { this.props.user.id } ({ this.props.user.phone_number })</td>
         <td className="cell"> { this.props.user.name }</td>
         <td className="cell"> { this.props.user.created }</td>
         <td className="cell"> { activated_text }</td>

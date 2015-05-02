@@ -620,7 +620,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 				dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
 			else:
 				dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
-		else:	
+		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 
@@ -721,6 +721,7 @@ def dashboard_feed(request):
 	for user in users:
 		dict = {
 			"id" : int(user.id),
+			"phone_number" : user.phone_number,
 			"name" : user.name,
 			"activated" : user.activated,
 			"created" : user.added
