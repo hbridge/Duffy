@@ -446,7 +446,7 @@ def dealWithActivation(user, msg, keeperNumber):
 
 		sms_util.sendMsg(userToActivate, "Hi, I'm ready now! As a reminder, I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "Before I explain a bit more, what's your name?", None, keeperNumber)
+		sms_util.sendMsg(userToActivate, "Before I explain a bit more, what's your name?", None, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
