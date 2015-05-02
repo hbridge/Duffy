@@ -74,7 +74,7 @@ def isRemindCommand(msg):
 
 delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
-	return delete_re.match(msg) is not None
+	return delete_re.match(msg.lower()) is not None
 
 def isActivateCommand(msg):
 	return '#activate' in msg.lower()
