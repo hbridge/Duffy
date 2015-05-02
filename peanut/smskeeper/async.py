@@ -22,9 +22,10 @@ from smskeeper import sms_util
 def processReminder(entryId):
 	entry = NoteEntry.objects.get(id=entryId)
 
-	msg = "Hi, friendly reminder to %s" % entry.text
+	if not entry.hidden:
+		msg = "Hi, friendly reminder to %s" % entry.text
 
-	sms_util.sendMsg(entry.note.user, msg, None, entry.keeper_number)
+		sms_util.sendMsg(entry.note.user, msg, None, entry.keeper_number)
 
-	entry.hidden = True
-	entry.save()
+		entry.hidden = True
+		entry.save()
