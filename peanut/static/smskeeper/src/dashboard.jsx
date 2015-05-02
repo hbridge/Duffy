@@ -1,32 +1,40 @@
 var HeaderRow = React.createClass({
   render: function() {
 		return (
-      <div>
-        <div className="cell"> user_id </div>
-        <div className="cell"> name </div>
-        <div className="cell"> created </div>
-        <div className="cell"> activated </div>
-        <div className="cell"> incoming </div>
-        <div className="cell"> outgoing </div>
-        <div className="cell"> history </div>
-      </div>
+      <tr>
+        <th className="cell"> user_id </th>
+        <th className="cell"> name </th>
+        <th className="cell"> created </th>
+        <th className="cell"> activated </th>
+        <th className="cell"> msgs (in/out) </th>
+          <th className="cell"> last </th>
+        <th className="cell"> history </th>
+      </tr>
     );
   },
 });
 
 var UserRow = React.createClass({
   render: function() {
-    activated_text = this.props.user.activated ? "active" : "inactive";
+    activated_text = this.props.user.activated ? "√" : "";
+    in_date = new Date(this.props.user.message_stats.incoming.last);
+    out_date = new Date(this.props.user.message_stats.outgoing.last);
+    last = in_date > out_date ? in_date : out_date;
+    timeago_text = jQuery.timeago(last);
+
+    var rowClasses = classNames({
+      'oddrow' : this.props.index % 2 == 1,
+		});
 		return (
-      <div>
-        <div className="cell"> { this.props.user.id }</div>
-        <div className="cell"> { this.props.user.name }</div>
-        <div className="cell"> { this.props.user.created }</div>
-        <div className="cell"> { activated_text }</div>
-        <div className="cell"> { this.props.user.message_stats.incoming.count }</div>
-        <div className="cell"> { this.props.user.message_stats.outgoing.count }</div>
-        <div className="cell"> <a href={ this.props.user.history }>history</a></div>
-      </div>
+      <tr className= {rowClasses}>
+        <td className="cell"> { this.props.user.id }</td>
+        <td className="cell"> { this.props.user.name }</td>
+        <td className="cell"> { this.props.user.created }</td>
+        <td className="cell"> { activated_text }</td>
+        <td className="cell"> { this.props.user.message_stats.incoming.count }/{ this.props.user.message_stats.outgoing.count }</td>
+        <td className="cell"> { timeago_text } </td>
+        <td className="cell"> <a href={ this.props.user.history }>history</a></td>
+      </tr>
     );
   },
 });
@@ -51,12 +59,10 @@ var DashboardApp = React.createClass({
 		}.bind(this);
 
 		return (
-      <div>
+      <table>
         <HeaderRow />
-  			<div id="users">
-  			   { this.state.users.map(createRow) }
-        </div>
-      </div>
+		    { this.state.users.map(createRow) }
+      </table>
 		);
 	},
 

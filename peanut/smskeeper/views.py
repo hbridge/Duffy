@@ -736,7 +736,7 @@ def dashboard_feed(request):
 				last_message_date = messages[0].added
 			dict["message_stats"][direction] = {
 				"count" : count,
-				"last_message_date" : last_message_date,
+				"last" : last_message_date,
 			}
 
 		dict["history"] = "history?user_id=" + str(user.id)

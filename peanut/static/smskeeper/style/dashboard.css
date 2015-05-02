@@ -3,6 +3,23 @@
 }
 
 .cell {
-  display: inline;
-  margin: 0px 10px;
+  /*margin: 0px 10px;*/
+}
+
+table {
+  width: 100%;
+  border: 1px solid black;
+}
+
+th {
+  text-align: left;
+}
+
+td {
+  padding: 2px;
+}
+
+.oddrow
+{
+  background-color: #DDD;
 }
