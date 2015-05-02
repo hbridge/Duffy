@@ -1,15 +1,22 @@
-var HeaderRow = React.createClass({
+var UserTable = React.createClass({
   render: function() {
+    var createRow = function(item, index) {
+			return <UserRow user={ item } index= { index } />
+		}.bind(this);
+
 		return (
-      <tr>
-        <th className="cell"> user </th>
-        <th className="cell"> name </th>
-        <th className="cell"> created </th>
-        <th className="cell"> activated </th>
-        <th className="cell"> msgs (in/out) </th>
-          <th className="cell"> last </th>
-        <th className="cell"> history </th>
-      </tr>
+      <table>
+        <tr>
+          <th className="cell"> user </th>
+          <th className="cell"> name </th>
+          <th className="cell"> created </th>
+          <th className="cell"> activated </th>
+          <th className="cell"> msgs (in/out) </th>
+            <th className="cell"> last </th>
+          <th className="cell"> history </th>
+        </tr>
+        { this.props.users.map(createRow) }
+      </table>
     );
   },
 });
@@ -54,22 +61,12 @@ var DashboardApp = React.createClass({
 	},
 
 	render: function() {
-		var createRow = function(item, index) {
-			return <UserRow user={ item } index= { index } />
-		}.bind(this);
-
 		return (
-      <table>
-        <HeaderRow />
-		    { this.state.users.map(createRow) }
-      </table>
+      <div>
+        <UserTable users={ this.state.users }/>
+      </div>
 		);
 	},
-
-  componentDidUpdate: function() {
-
-  },
-
 });
 
 React.render(<DashboardApp />, document.getElementById("app"));
