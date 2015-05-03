@@ -10,6 +10,7 @@ import random
 import math
 import pytz
 import datetime
+from datetime import date, timedelta
 import humanize
 from PIL import Image
 import os, sys, re
@@ -739,12 +740,26 @@ def dashboard_feed(request):
 				"count" : count,
 				"last" : last_message_date,
 			}
-
 		dict["history"] = "history?user_id=" + str(user.id)
 
 		user_dicts.append(dict)
 
-	return HttpResponse(json.dumps({"users" : user_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+	daily_stats = {}
+	for days_ago in [1, 3, 7, 30]:
+		date_filter = date.today() - timedelta(days=days_ago)
+		daily_stats[days_ago] = {}
+		for direction in ["incoming", "outgoing"]:
+			incoming = (direction == "incoming")
+			messages = Message.objects.filter(incoming=incoming, added__gt=date_filter)
+			message_count = messages.count()
+			user_count = messages.values('user').distinct().count()
+			daily_stats[days_ago][direction] = {
+				"messages" : message_count,
+				"user_count" : user_count
+			}
+
+	responseJson = json.dumps({"users" : user_dicts, "daily_stats" : daily_stats}, cls=DjangoJSONEncoder)
+	return HttpResponse(responseJson, content_type="text/json", status=200)
 
 def dashboard(request):
 	return render(request, 'dashboard.html', None)

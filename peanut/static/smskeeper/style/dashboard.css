@@ -6,9 +6,18 @@
   /*margin: 0px 10px;*/
 }
 
+body {
+  font-family: helvetica, arial;
+}
+
+h1 {
+  font-size: 18pt;
+}
+
 table {
-  width: 100%;
+  /*width: 100%;*/
   border: 1px solid black;
+  margin: 10px 10px;
 }
 
 th {

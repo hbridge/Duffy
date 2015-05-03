@@ -1,24 +1,75 @@
+var DailyTable = React.createClass({
+  render: function() {
+    headerValues = ["days", "users (in/out)", "msgs (in/out)"];
+    var createRow = function(days, index) {
+			return <DailyStatsRow days={days} stats={ this.props.stats[days] } index= { index } />
+		}.bind(this);
+
+    if (this.props.stats) {
+      day_keys = Object.keys(this.props.stats);
+    } else {
+      day_keys = [];
+    }
+    console.log(day_keys);
+
+    return (
+      <div>
+        <h1>Daily Stats</h1>
+        <table>
+          <HeaderRow headerValues={ headerValues } />
+          { day_keys.map(createRow) }
+        </table>
+      </div>
+    );
+  }
+});
+
+var DailyStatsRow = React.createClass({
+  render: function() {
+    var rowClasses = classNames({
+      'oddrow' : this.props.index % 2 == 1,
+		});
+    return (
+      <tr className={ rowClasses }>
+        <th className="cell"> {this.props.days} </th>
+        <td> { this.props.stats.incoming.user_count }/{ this.props.stats.outgoing.user_count }</td>
+        <td> { this.props.stats.incoming.messages }/{ this.props.stats.outgoing.messages }</td>
+      </tr>
+    );
+  }
+});
+
 var UserTable = React.createClass({
   render: function() {
     var createRow = function(item, index) {
 			return <UserRow user={ item } index= { index } />
 		}.bind(this);
+    headerValues = ["user", "name", "created", "activated", "msgs (in/out)", "last", "history"];
 
 		return (
-      <table>
-        <tr>
-          <th className="cell"> user </th>
-          <th className="cell"> name </th>
-          <th className="cell"> created </th>
-          <th className="cell"> activated </th>
-          <th className="cell"> msgs (in/out) </th>
-            <th className="cell"> last </th>
-          <th className="cell"> history </th>
-        </tr>
-        { this.props.users.map(createRow) }
-      </table>
+      <div>
+        <h1>Users</h1>
+        <table>
+          <HeaderRow headerValues={ headerValues } />
+          { this.props.users.map(createRow) }
+        </table>
+      </div>
     );
   },
+});
+
+var HeaderRow = React.createClass({
+  render: function() {
+    var createHeaderCell = function(item, index){
+      return (<th className="cell"> { item } </th>);
+    }.bind(this);
+
+    return (
+      <tr>
+        { this.props.headerValues.map(createHeaderCell)}
+      </tr>
+    );
+  }
 });
 
 var UserRow = React.createClass({
@@ -48,7 +99,7 @@ var UserRow = React.createClass({
 
 var DashboardApp = React.createClass({
   getInitialState: function() {
-    return {users: [] };
+    return {users: [], daily_stats: {}};
   },
 
   componentWillMount: function() {
@@ -57,12 +108,16 @@ var DashboardApp = React.createClass({
 
 	dataCallback: function(data) {
 	  console.log(data);
-    this.setState( {users : data.users});
+    this.setState( {
+      users : data.users,
+      daily_stats : data.daily_stats
+    });
 	},
 
 	render: function() {
 		return (
       <div>
+        <DailyTable stats={ this.state.daily_stats} />
         <UserTable users={ this.state.users }/>
       </div>
 		);
