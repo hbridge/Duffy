@@ -44,7 +44,7 @@ var UserTable = React.createClass({
     var createRow = function(item, index) {
 			return <UserRow user={ item } index= { index } />
 		}.bind(this);
-    headerValues = ["user", "name", "joined", "activated", "msgs (in/out)", "last", "history"];
+    headerValues = ["user", "name", "joined", "activated", "tutorial", "msgs (in/out)", "last", "history"];
 
 		return (
       <div>
@@ -75,12 +75,15 @@ var HeaderRow = React.createClass({
 var UserRow = React.createClass({
   render: function() {
     accountAge = jQuery.timeago(new Date(this.props.user.created));
+    tutorial_text = this.props.user.tutorial_step.toString();
+    if (this.props.user.completed_tutorial) tutorial_text += " √";
     activated_text = this.props.user.activated ? "√" : "";
     in_date = new Date(this.props.user.message_stats.incoming.last);
     out_date = new Date(this.props.user.message_stats.outgoing.last);
     last = in_date > out_date ? in_date : out_date;
     timeago_text = jQuery.timeago(last);
 
+    console.log(tutorial_text);
 
     var rowClasses = classNames({
       'oddrow' : this.props.index % 2 == 1,
@@ -91,6 +94,7 @@ var UserRow = React.createClass({
         <td className="cell"> { this.props.user.name }</td>
         <td className="cell"> { accountAge }</td>
         <td className="cell"> { activated_text }</td>
+        <td className="cell"> { tutorial_text }</td>
         <td className="cell"> { this.props.user.message_stats.incoming.count }/{ this.props.user.message_stats.outgoing.count }</td>
         <td className="cell"> { timeago_text } </td>
         <td className="cell"> <a href={ this.props.user.history }>history</a></td>

@@ -725,7 +725,9 @@ def dashboard_feed(request):
 			"phone_number" : user.phone_number,
 			"name" : user.name,
 			"activated" : user.activated,
-			"created" : user.added
+			"created" : user.added,
+			"tutorial_step" : user.tutorial_step,
+			"completed_tutorial" : user.completed_tutorial
 		}
 
 		dict["message_stats"] = {}
