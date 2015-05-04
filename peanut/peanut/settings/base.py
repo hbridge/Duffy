@@ -210,62 +210,6 @@ LOGGING = {
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
         },
-        'two_fishes': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/twofishes.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'stranding': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/stranding.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'similarity': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/similarity.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'popcaches': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/popcaches.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'neighboring': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/neighboring.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'friending': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/friending.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'suggestion-notifications': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/suggestion-notifications.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'notifications': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/mnt/log/notifications.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        }
         #'console': {
         #   'level': 'DEBUG',
         #   'class': 'logging.StreamHandler',
@@ -305,45 +249,15 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'async.two_fishes': {
-            'handlers': ['two_fishes', 'mail_admins'],
-            'propagate': True,
+        'smskeeper': {
+            'handlers': ['duffyfile', 'mail_admins'],
             'level': 'DEBUG',
+            'propagate': True,
         },
-        'async.stranding': {
-            'handlers': ['stranding', 'mail_admins'],
-            'propagate': True,
+        'common': {
+            'handlers': ['duffyfile', 'mail_admins'],
             'level': 'DEBUG',
-        },
-        'async.similarity': {
-            'handlers': ['similarity', 'mail_admins'],
             'propagate': True,
-            'level': 'DEBUG',
-        },
-        'async.popcaches': {
-            'handlers': ['popcaches', 'mail_admins'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'async.neighboring': {
-            'handlers': ['neighboring', 'mail_admins'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'async.friending': {
-            'handlers': ['friending', 'mail_admins'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'async.suggestion_notifications': {
-            'handlers': ['suggestion-notifications', 'mail_admins'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'async.notifications': {
-            'handlers': ['notifications', 'mail_admins'],
-            'propagate': True,
-            'level': 'DEBUG',
         },
     }
 }

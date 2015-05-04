@@ -3,10 +3,14 @@ import datetime
 import dateutil.parser
 import urllib2
 import urllib
+import logging
 from urllib2 import URLError
 import pytz
 #from peanut.settings import constants
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
 
 """
 	Helper method to get a startDate and a new filtered query from Natty.
@@ -24,14 +28,17 @@ def getNattyInfo(query, timezone):
 
 	if timezone:
 		nattyParams["tz"] = timezone
+
 	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
+
+	# TODO: Move this to a cleaner solution
 	if hasattr(settings,"LOCAL"):
 		nattyUrl = "http://dev.duffyapp.com:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
 
 	try:
 		nattyResult = urllib2.urlopen(nattyUrl).read()
 	except URLError as e:
-		print "Could not connect to Natty: %s" % (e.strerror)
+		logger.error("Could not connect to Natty: %s" % (e.strerror))
 		nattyResult = None
 
 	if (nattyResult):
