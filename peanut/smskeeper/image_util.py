@@ -47,7 +47,7 @@ def generateImageGridUrl(imageURLs):
 
 def generateBorderOnText(image, text):
 	draw = ImageDraw.Draw(image)
-	font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
+	font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 35)
 
 	textColor = (255, 255, 255)
 	shadowColor = (0,0,0)
