@@ -51,6 +51,9 @@ def sendNoResponse():
 def sendNotFoundMessage(user, label, keeperNumber):
 	sms_util.sendMsg(user, "Sorry, I don't have anything for %s" % label, None, keeperNumber)
 
+
+def isNicety(msg):
+	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you"]
 def isLabel(msg):
 	stripedMsg = msg.strip()
 	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
@@ -170,6 +173,13 @@ def htmlForNote(note):
 def sendContactCard(user, keeperNumber):
 		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 		sms_util.sendMsg(user, '', cardURL, keeperNumber)
+
+def dealWithNicety(user, msg, keeperNumber):
+	cleaned = msg.strip().lower()
+	if "thank" in cleaned:
+		sms_util.sendMsg(user, "You're welcome.", None, keeperNumber)
+	if "hello" in cleaned or "hi" in cleaned:
+		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
 
 '''
 	Gets a list of urls and generates a grid image to send back.
@@ -630,6 +640,9 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			if prevMsg and isRemindCommand(prevMsg.getBody()) and not hasLabel(msg):
 				dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict)
 			elif not hasLabel(msg):
+				if isNicety(msg):
+					dealWithNicety(user, msg, keeperNumber)
+					return
 				# if the user didn't add a label, throw it in #unassigned
 				msg += ' ' + UNASSIGNED_LABEL
 				dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
