@@ -512,7 +512,7 @@ def saveImageToS3(img):
 	img.save(outIm, 'JPEG')
 
 	# Upload to S3
-	keyStr = "grid-" + str(uuid.uuid4())
+	keyStr = "grid-" + str(uuid.uuid4()) + '.jpeg'
 	key = bucket.new_key(keyStr)
 	key.set_contents_from_string(outIm.getvalue())
 	return 'https://s3.amazonaws.com/smskeeper/'+ str(keyStr)
