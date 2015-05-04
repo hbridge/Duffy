@@ -66,6 +66,28 @@ class NoteEntry(models.Model):
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 
+class Entry(models.Model):
+	creator = models.ForeignKey(User)
+	text = models.TextField(null=True)
+	img_url = models.TextField(null=True)
+
+	remind_timestamp = models.DateTimeField(null=True)
+
+	hidden = models.BooleanField(default=False)
+
+	keeper_number = models.CharField(max_length=100, null=True)
+
+	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
+	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+
+class EntryLink(models.Model):
+	users = models.ManyToManyField(User, db_index=True)
+	label = models.CharField(max_length=100, db_index=True)
+	entry = models.ForeignKey(Entry, db_index=True)
+
+	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
+	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+
 class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	msg_json = models.TextField(null=True)
@@ -114,6 +136,9 @@ class MessageMedia:
 		self.url = url
 		self.mediaType = mediaType
 
-admin.site.register(Note)
-admin.site.register(NoteEntry)
+class Contact(models.Model):
+	user = models.ForeignKey(User, db_index=True)
+	target = models.ForeignKey(User, db_index=True, related_name="contact_target")
+	handle = models.CharField(max_length=30, db_index=True)
+
 admin.site.register(Message)
