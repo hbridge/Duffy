@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 import requests
 import math
 import cStringIO
@@ -19,11 +19,14 @@ def generateImageGridUrl(imageURLs):
 	imageSize = 300 #in pixels
 	spacing = 3 #in pixels
 
+
 	# fetch all images and resize them into imageSize x imageSize
-	for imageUrl in imageURLs:
+	for index, imageUrl in enumerate(imageURLs):
 		resp = requests.get(imageUrl)
 		img = Image.open(cStringIO.StringIO(resp.content))
-		imageList.append(resizeImage(img, imageSize, True))
+		resizedImage = resizeImage(img, imageSize, True)
+		resizedImage = generateBorderOnText(resizedImage, str(index+1))
+		imageList.append(resizedImage)
 
 	if len(imageURLs) < 5:
 		# generate an 2xn grid
@@ -41,6 +44,25 @@ def generateImageGridUrl(imageURLs):
 		newImage.paste(image, (x,y,x+imageSize,y+imageSize))
 
 	return saveImageToS3(newImage)
+
+def generateBorderOnText(image, text):
+	draw = ImageDraw.Draw(image)
+	font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
+
+	textColor = (255, 255, 255)
+	shadowColor = (0,0,0)
+	x = 270
+	y = 0
+
+	# thin border
+	draw.text((x-1, y), text, font=font, fill=shadowColor)
+	draw.text((x+1, y), text, font=font, fill=shadowColor)
+	draw.text((x, y-1), text, font=font, fill=shadowColor)
+	draw.text((x, y+1), text, font=font, fill=shadowColor)
+
+	# now draw text over
+	draw.text((270,0), text, textColor, font=font)
+	return image
 
 
 def moveMediaToS3(mediaUrlList):
