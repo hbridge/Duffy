@@ -5,7 +5,7 @@ var formatDate = function(d){
 
 var MessageListRow = React.createClass({
   getInitialState: function() {
-    return {raw: false};
+    return {};
   },
 
   getId: function(){
@@ -28,8 +28,12 @@ var MessageListRow = React.createClass({
 		});
 
 		return (
-			<div id={ this.getId() } className="message" onClick={ this.handleRowSelected }>
-        <div className="messageDate">{ formatDate(date) }</div>
+			<div id={ this.getId() } className="message">
+        <div className="messageHeader">
+          <span className="messageDate">{ formatDate(date) }</span>
+          <span> </span>
+          <ShowJSONView json={ JSON.stringify(this.props.message) } />
+        </div>
         <div className={ cssClasses }>
           { body }
           <div>
@@ -40,8 +44,7 @@ var MessageListRow = React.createClass({
     );
   },
 
-  handleRowSelected: function(e) {
-    e.preventDefault();
+  handleClick: function(e) {
 		this.props.onMessageClicked(this.props.message, this.getId());
   }
 });
@@ -63,26 +66,27 @@ var AttachmentView = React.createClass({
   },
 });
 
-var JsonView = React.createClass({
+var ShowJSONView = React.createClass({
+  getInitialState: function() {
+    return {expanded : false};
+  },
+
   render: function() {
-    if (!this.props.message) return (<div></div>);
-    var json = JSON.stringify(this.props.message);
+    if (!this.state.expanded) return (
+      <a href="#" onClick={this.handleClick}>Show JSON</a>
+    );
 
     return (
-      <div id="json_popup">
-        { json }
-      </div>
+      <span>
+        <a href="#" onClick={this.handleClick}>Hide JSON</a><br />
+        { this.props.json }
+      </span>
     );
   },
-  componentDidUpdate: function() {
-    if (!this.props.selectedRowId) return;
-    target_element = "#" + this.props.selectedRowId;
-    console.log("componentDidUpdate. positioning to " + target_element)
-    $( "#json_popup" ).position({
-      my: "left top",
-      at: "right+4 top+18",
-      of: target_element
-    });
+
+  handleClick: function(e) {
+    e.preventDefault();
+		this.setState({expanded : !this.state.expanded});
   }
 });
 
@@ -103,7 +107,6 @@ var KeeperApp = React.createClass({
 
   onMessageClicked: function(message, rowId) {
     console.log("selectedRowId" + rowId);
-    this.setState({selectedMessage : message, selectedRowId : rowId });
   },
 
 	render: function() {
@@ -118,7 +121,6 @@ var KeeperApp = React.createClass({
   			<div id="messages">
   			   { this.state.messages.map(createItem) }
         </div>
-          <JsonView message={ this.state.selectedMessage } selectedRowId={ this.state.selectedRowId } />
       </div>
 		);
 	},
