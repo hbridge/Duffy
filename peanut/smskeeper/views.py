@@ -335,7 +335,12 @@ def dealWithDelete(user, msg, keeperNumber):
 			entry = entries[item_index]
 			entry.hidden = True
 			entry.save()
-			sms_util.sendMsg(user, 'Ok, I deleted "%s"' % (entry.text), None, keeperNumber)
+			if entry.text:
+				retMsg = entry.text
+			else:
+				retMsg = "item " + str(item_index+1)
+			sms_util.sendMsg(user, 'Ok, I deleted "%s"' % (retMsg), None, keeperNumber)
+
 			dealWithFetchMessage(user, label, 0, keeperNumber, None)
 		except Note.DoesNotExist:
 			sendNotFoundMessage(user, label, keeperNumber)
