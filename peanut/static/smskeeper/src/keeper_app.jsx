@@ -16,8 +16,10 @@ var MessageListRow = React.createClass({
     var message = this.props.message;
 		var body = message.Body;
     var date = new Date(message.added);
-		var cssclass = "outgoing";
-		if (message.incoming === true) cssclass = "incoming";
+    var mediaUrl = message.MediaUrls;
+    if (!mediaUrl && message.MediaUrl0) {
+      mediaUrl = message.MediaUrl0;
+    }
 
 		var cssClasses = classNames({
       'body' : true,
@@ -28,7 +30,12 @@ var MessageListRow = React.createClass({
 		return (
 			<div id={ this.getId() } className="message" onClick={ this.handleRowSelected }>
         <div className="messageDate">{ formatDate(date) }</div>
-        <div className={ cssClasses }>{ body }</div>
+        <div className={ cssClasses }>
+          { body }
+          <div>
+            <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
+          </div>
+        </div>
       </div>
     );
   },
@@ -37,6 +44,23 @@ var MessageListRow = React.createClass({
     e.preventDefault();
 		this.props.onMessageClicked(this.props.message, this.getId());
   }
+});
+
+var AttachmentView = React.createClass({
+  render: function() {
+    var url = this.props.mediaUrl;
+    var type = this.props.mediaType;
+
+    if (url == null) return null;
+
+    if (type == "image/jpeg") return (
+      <a href={url}><img src={url} width="300" height="300"></img></a>
+    );
+
+    return (
+      <a href={url}>{url}</a>
+    )
+  },
 });
 
 var JsonView = React.createClass({
