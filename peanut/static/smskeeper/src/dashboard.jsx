@@ -77,7 +77,9 @@ var UserRow = React.createClass({
     accountAge = jQuery.timeago(new Date(this.props.user.created));
     tutorial_text = this.props.user.tutorial_step.toString();
     if (this.props.user.completed_tutorial) tutorial_text += " √";
-    activated_text = this.props.user.activated ? "√" : "";
+    activated_text = null;
+    if (this.props.user.activated)
+      activated_text = jQuery.timeago(new Date(this.props.user.activated));
     in_date = new Date(this.props.user.message_stats.incoming.last);
     out_date = new Date(this.props.user.message_stats.outgoing.last);
     last = in_date > out_date ? in_date : out_date;
