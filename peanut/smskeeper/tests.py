@@ -130,7 +130,7 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop tmr") as output:
-			self.assertTrue("poop a day from now" in output)
+			self.assertTrue("poop a day from now" in output, output)
 
 	def test_reminders_remind_works(self):
 		self.setupUser(True, True)
@@ -142,7 +142,7 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
-			self.assertTrue("what time?" in output)
+			self.assertTrue("what time?" in output, output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
-			self.assertTrue("poop a day from now" in output)
+			self.assertTrue("poop a day from now" in output, output)
