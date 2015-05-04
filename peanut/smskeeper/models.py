@@ -11,6 +11,8 @@ class User(models.Model):
 	tutorial_step = models.IntegerField(default=0)
 	activated = models.DateTimeField(null=True)
 
+	timezone = models.CharField(max_length=100, null=True)
+
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 

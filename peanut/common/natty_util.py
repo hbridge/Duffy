@@ -17,11 +17,13 @@ from django.conf import settings
 	Returns: Tuple of (startDate, newQuery)
 
 """
-def getNattyInfo(query):
+def getNattyInfo(query, timezone):
 	# get startDate from Natty
 	nattyPort = "7990"
 	nattyParams = { "q" : query }
 
+	if timezone:
+		nattyParams["tz"] = timezone
 	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
 	if hasattr(settings,"LOCAL"):
 		nattyUrl = "http://dev.duffyapp.com:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))

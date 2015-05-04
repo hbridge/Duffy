@@ -236,7 +236,7 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	text, label, media = getData(msg, 0, requestDict)
-	startDate, newQuery, usedText = natty_util.getNattyInfo(text)
+	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
 
 	# See if the time that comes back is within a few seconds.
 	# If this happens, then we didn't get a time from the user
@@ -253,7 +253,7 @@ def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
 	text, label, media = getData(prevMessage.getBody(), prevMessage.NumMedia(), json.loads(prevMessage.msg_json))
 
 	# First get the used Text from the last message
-	startDate, newQuery, usedText = natty_util.getNattyInfo(text)
+	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
 
 	# Now append on the new 'time' to that message, then pass to Natty
 	if not usedText:
@@ -261,7 +261,7 @@ def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
 	newMsg = usedText + " " + msg
 
 	# We want to ignore the newQuery here since we're only sending in time related stuff
-	startDate, ignore, usedText = natty_util.getNattyInfo(newMsg)
+	startDate, ignore, usedText = natty_util.getNattyInfo(newMsg, user.timezone)
 
 	if not startDate:
 		startDate = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)

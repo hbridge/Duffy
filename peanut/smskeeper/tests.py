@@ -146,3 +146,29 @@ class SMSKeeperCase(TestCase):
 
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
 			self.assertTrue("poop a day from now" in output, output)
+
+
+	"""
+		Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
+		Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
+	"""
+	def test_natty_timezone(self):
+		self.setupUser(True, True)
+		self.user.timezone = "US/Eastern" # This is the default
+		self.user.save()
+
+		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
+
+		entry = Note.objects.get(user=self.user, label="#reminders").noteentry_set.all()[0]
+
+		self.assertEqual(entry.remind_timestamp.hour, 19) # 3 pm Eastern in UTC
+
+		views.cliMsg(self.testPhoneNumber, "clear #reminders")
+
+		self.user.timezone = "US/Pacific" # This is the default
+		self.user.save()
+		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
+
+		entry = Note.objects.get(user=self.user, label="#reminders").noteentry_set.filter(hidden=False)[0]
+
+		self.assertEqual(entry.remind_timestamp.hour, 22) # 3 pm Pactific in UTC
