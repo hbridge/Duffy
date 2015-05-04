@@ -6,8 +6,8 @@ import time
 
 from smskeeper import views
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
-
-
+import datetime
+import pytz
 
 @contextmanager
 def capture(command, *args, **kwargs):
@@ -32,7 +32,7 @@ class SMSKeeperCase(TestCase):
 	def setupUser(self, activated, tutorialComplete):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		self.user.completed_tutorial = tutorialComplete
-		self.user.activated = activated
+		self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		self.user.save()
 
 	def test_first_connect(self):
@@ -145,7 +145,3 @@ class SMSKeeperCase(TestCase):
 
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
 			self.assertTrue("poop a day from now" in output)
-
-
-
-

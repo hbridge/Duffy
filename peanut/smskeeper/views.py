@@ -441,7 +441,7 @@ def dealWithActivation(user, msg, keeperNumber):
 
 	try:
 		userToActivate = User.objects.get(phone_number=text)
-		userToActivate.activated = True
+		userToActivate.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		userToActivate.save()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
 
@@ -570,7 +570,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
-	if not user.activated:
+	if user.activated == None:
 		dealWithNonActivatedUser(user, False, keeperNumber)
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
