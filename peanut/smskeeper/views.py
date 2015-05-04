@@ -183,7 +183,8 @@ def generateImageGridUrl(imageURLs):
 	# if more than one, now setup the grid system
 	imageList = list()
 
-	imageSize = 300
+	imageSize = 300 #in pixels
+	spacing = 3 #in pixels
 
 	# fetch all images and resize them into imageSize x imageSize
 	for imageUrl in imageURLs:
@@ -191,24 +192,23 @@ def generateImageGridUrl(imageURLs):
 		img = Image.open(cStringIO.StringIO(resp.content))
 		imageList.append(resizeImage(img, imageSize, True))
 
-
 	if len(imageURLs) < 5:
 		# generate an 2xn grid
 		rows = int(math.ceil(float(len(imageURLs))/2.0))
-		newImage = Image.new("RGB", (2*imageSize, imageSize*rows), "white")
+		newImage = Image.new("RGB", (2*imageSize+spacing, imageSize*rows+spacing), "white")
 
 		for i,image in enumerate(imageList):
-			x = imageSize*(i % 2)
-			y = imageSize*(i/2 % 2)
+			x = imageSize*(i % 2)+(i%2)*spacing
+			y = imageSize*(i/2 % 2)+(i/2 %2)*spacing
 			newImage.paste(image, (x,y,x+imageSize,y+imageSize))
 	else:
 		# generate a 3xn grid
 		rows = int(math.ceil(float(len(imageURLs))/3.0))
-		newImage = Image.new("RGB", (3*imageSize, imageSize*rows), "white")
+		newImage = Image.new("RGB", (3*imageSize+spacing*2, imageSize*rows+(rows-1)*spacing), "white")
 
 		for i,image in enumerate(imageList):
-			x = imageSize*(i % 3)
-			y = imageSize*(i/3 % 3)
+			x = imageSize*(i % 3)+(i%3)*spacing
+			y = imageSize*(i/3 % 3)+(i/3 %3)*spacing
 			newImage.paste(image, (x,y,x+imageSize,y+imageSize))
 
 	return saveImageToS3(newImage)
