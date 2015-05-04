@@ -32,7 +32,8 @@ class SMSKeeperCase(TestCase):
 	def setupUser(self, activated, tutorialComplete):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		self.user.completed_tutorial = tutorialComplete
-		self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		if (activated):
+			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		self.user.save()
 
 	def test_first_connect(self):
