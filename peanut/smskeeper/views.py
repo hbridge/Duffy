@@ -550,11 +550,20 @@ def resizeImage(im, size, crop):
 	>> from smskeeper import views
 	>> views.cliMsg("+16508158274", "blah #test")
 """
-def cliMsg(phoneNumber, msg):
+def cliMsg(phoneNumber, msg, mediaURL=None, mediaType=None):
+	numMedia = 0
 	jsonDict = {
 		"Body": msg,
 	}
-	processMessage(phoneNumber, msg, 0, jsonDict, "test")
+
+	if mediaURL is not None:
+		numMedia = 1
+		jsonDict["MediaUrl0"] = mediaURL
+		if mediaType is not None:
+			jsonDict["MediaContentType0"] = mediaType
+		jsonDict["NumMedia"] = 1
+
+	processMessage(phoneNumber, msg, numMedia, jsonDict, "test")
 
 """
 	Main logic for processing a message
