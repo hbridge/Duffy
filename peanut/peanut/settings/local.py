@@ -1,6 +1,7 @@
 from peanut.settings.dev import *
 
 LOCAL=True
+DEBUG=True
 
 STATICFILES_DIRS = (
 	# Put strings here, like "/home/html/static" or "C:/www/django/static".

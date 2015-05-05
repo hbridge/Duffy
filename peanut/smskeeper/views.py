@@ -706,7 +706,7 @@ def dashboard(request):
 
 @receiver(post_save, sender=Message)
 def sendLiveFeed(sender, **kwargs):
-	if settings.DEBUG == False:
+	if not hasattr(settings,"DEBUG"):
 		message = kwargs.get('instance')
 		msgContent = json.loads(message.msg_json)
 
