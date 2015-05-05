@@ -11,8 +11,8 @@ def sendMsg(user, msg, mediaUrls, keeperNumber):
 		# This is used for command line interface commands
 		print msg
 	else:
-		print "Sending %s to %s" % (msg, user.phone_number)
 		if mediaUrls:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
 		else:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
+		print "Sending %s to %s" % (msg, user.phone_number)
