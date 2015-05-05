@@ -49,3 +49,4 @@ class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	ADMINS = [('Admins', 'server-errors@duffytech.co')]
 	BROKER_URL = "amqp://duffy:du44y@172.31.21.173:5672/swap"
 
+SLACKBOT_ENABLED = True

@@ -739,7 +739,8 @@ def dashboard(request):
 
 @receiver(post_save, sender=Message)
 def sendLiveFeed(sender, **kwargs):
-	if not hasattr(settings,"DEBUG"):
+
+	if hasattr(settings, 'SLACKBOT_ENABLED'):
 		message = kwargs.get('instance')
 		msgContent = json.loads(message.msg_json)
 

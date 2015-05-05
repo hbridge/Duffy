@@ -8,6 +8,7 @@ from smskeeper import views
 from smskeeper.models import User, Entry, Message, MessageMedia
 import datetime
 import pytz
+from django.conf import settings
 
 @contextmanager
 def capture(command, *args, **kwargs):
@@ -38,12 +39,17 @@ class SMSKeeperCase(TestCase):
 
 	def test_first_connect(self):
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("not quite ready" in output, output)
+			self.assertTrue("magic phrase" in output, output)
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False)
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("You're back!" in output, output)
+			self.assertTrue("Nope." in output, output)
+
+	def test_magicphrase(self):
+		self.setupUser(False, False)
+		with capture(views.cliMsg, self.testPhoneNumber, "trapper keeper") as output:
+			self.assertTrue("Let's get started" in output, output)
 
 	def test_tutorial(self):
 		self.setupUser(True, False)
@@ -51,17 +57,17 @@ class SMSKeeperCase(TestCase):
 		# Activation message asks for their name
 		with capture(views.cliMsg, self.testPhoneNumber, "UnitTests") as output:
 			self.assertTrue("nice to meet you UnitTests" in output, output)
-			self.assertTrue("Let's try creating a list" in output, output)
+			self.assertTrue("I can help you create a list" in output, output)
 			self.assertTrue(User.objects.get(phone_number=self.testPhoneNumber).name == "UnitTests")
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new5 #test") as output:
-			self.assertTrue("Now let's add another item to your list" in output, output)
+			self.assertTrue("Now send me another item for the same list" in output, output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new2 #test") as output:
-			self.assertTrue("You can add items to this list" in output, output)
+			self.assertTrue("You can send items to this list" in output, output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
-			self.assertTrue("That should get you started" in output, output)
+			self.assertTrue("That's all you need to know for now" in output, output)
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
