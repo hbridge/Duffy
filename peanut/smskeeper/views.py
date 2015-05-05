@@ -624,7 +624,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 	elif isSendContactCommand(msg):
 		sendContactCard(user, keeperNumber)
-	elif isCreateHandleCommand:
+	elif isCreateHandleCommand(msg):
 		dealWithCreateHandle(user, msg, keeperNumber)
 	elif isRemindCommand(msg):
 		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
