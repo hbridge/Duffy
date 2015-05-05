@@ -97,6 +97,9 @@ def isPrintHashtagsCommand(msg):
 def isSendContactCommand(msg):
 	return msg.strip().lower() == 'vcard'
 
+def isMagicPhrase(msg):
+	return 'trapper keeper' in msg.lower()
+
 def hasLabel(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
@@ -372,13 +375,32 @@ def dealWithNonActivatedUser(user, firstTime, keeperNumber):
 	if firstTime:
 		sms_util.sendMsg(user, "Hi. I'm Keeper.", None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "I can help you remember things. But, I'm not quite ready for you yet.", None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "Stay tuned. I'll be in touch soon.", None, keeperNumber)
+		sms_util.sendMsg(user, "I can help you remember things. But, first I need the magic phrase to get you started.", None, keeperNumber)
+	elif user.tutorial_step == 0:
+		incorrectPhraseResponses = ["Nope. That's not it. :p"]
+		sms_util.sendMsg(user, random.choice(incorrectPhraseResponses), None, keeperNumber)
+		user.tutorial_step = -1
+		user.save()
+	elif user.tutorial_step == -1:
+		incorrectPhraseResponses = ["Nice try. Except it didn't work. \xF0\x9F\x98\x88"]
+		sms_util.sendMsg(user, random.choice(incorrectPhraseResponses), None, keeperNumber)
+		user.tutorial_step = -2
+		user.save()
 	else:
-		sms_util.sendMsg(user, "Oh hi. You're back!", None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "I still need more time.", None, keeperNumber)
+		incorrectPhraseResponses = ["They don't make magic phrases like they used to",
+									"Who gave you my number?!? I'm going to report you",
+									"You know there are laws against this kind of thing",
+									"Quantity is not the same thing as quality"]
+		sms_util.sendMsg(user, random.choice(incorrectPhraseResponses), None, keeperNumber)
+
+def dealWithMagicPhrase(user, keeperNumber):
+	user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	user.save()
+	sms_util.sendMsg(user, "That's the magic phrase. Let's get started", None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "Before I explain a bit more, what's your name?", None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
 	text, label, media = getData(msg, 0, {})
@@ -389,19 +411,25 @@ def dealWithActivation(user, msg, keeperNumber):
 		userToActivate.save()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
 
-		sms_util.sendMsg(userToActivate, "Hi, I'm ready now! As a reminder, I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		sms_util.sendMsg(userToActivate, "Oh hello. You are a lucky one. Someone else entered your magic phrase.", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(userToActivate, "I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
 		sms_util.sendMsg(userToActivate, "Before I explain a bit more, what's your name?", None, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
+	# this is to deal with magic phrase
+	if user.tutorial_step < 0:
+		user.tutorial_step = 0
+
 	if user.tutorial_step == 0:
 		user.name = msg
 		user.save()
 		sms_util.sendMsg(user, "Great, nice to meet you %s" % user.name, None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
+		sms_util.sendMsg(user, "I can help you create a list. Send me an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
 		user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 1:
 		if not hasLabel(msg):
@@ -410,7 +438,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 		else:
 			# They sent in something with a label, have them add to it
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "Now let's add another item to your list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "Now send me another item for the same list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 2:
 		# They should be sending in a second add command to an existing label
@@ -422,7 +450,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "You can add items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "You can send items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
 		# The should be sending in just a label
@@ -440,9 +468,10 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			return
 		else:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
-			sms_util.sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
+			sms_util.sendMsg(user, "That's all you need to know for now. Send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
+			time.sleep(1)
 			sendContactCard(user, keeperNumber)
 			user.completed_tutorial = True
 
@@ -484,7 +513,11 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
 	if user.activated == None:
-		dealWithNonActivatedUser(user, False, keeperNumber)
+		text, label, media = getData(msg, 0, {})
+		if isMagicPhrase(text):
+			dealWithMagicPhrase(user, keeperNumber)
+		else:
+			dealWithNonActivatedUser(user, False, keeperNumber)
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 	elif isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
