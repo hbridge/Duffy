@@ -27,9 +27,10 @@ def main(argv):
         for noteEntry in NoteEntry.objects.filter(note=note):
             #print(noteEntry.__dict__)
             #create a new entry object
-            entry = Entry.createEntry(note.user, noteEntry.keeper_number, note.label, noteEntry.text, noteEntry.img_url, remind_timestamp):
+            entry = Entry.createEntry(note.user, noteEntry.keeper_number, note.label, noteEntry.text, noteEntry.img_url, remind_timestamp)
 
-            async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
+            if entry.remind_timestamp:
+                async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
