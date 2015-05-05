@@ -12,30 +12,28 @@ import os, sys, re
 import requests
 import phonenumbers
 
-
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 import django
 django.setup()
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-
 from django.shortcuts import render
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm
 from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 
-from smskeeper import sms_util, image_util
+from smskeeper import sms_util, image_util, processing_util
 from smskeeper import async
 
 from common import api_util, natty_util
 from peanut.settings import constants
-from django.conf import settings
+from peanut import settings
 
 
 '''
@@ -54,94 +52,7 @@ def sendNoResponse():
 def sendNotFoundMessage(user, label, keeperNumber):
 	sms_util.sendMsg(user, "Sorry, I don't have anything for %s" % label, None, keeperNumber)
 
-
-def isNicety(msg):
-	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you"]
-
-handle_re = re.compile('@[a-zA-Z0-9]+\Z')
-def isHandle(msg):
-	return handle_re.match(msg) is not None
-
-def hasPhoneNumber(msg):
-	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
-	return matches.has_next()
-    # foundMatch = True
-    # obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
-
-def extractPhoneNumbers(msg):
-	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
-	phone_numbers = []
-	for match in matches:
-		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
-		if formatted: phone_numbers.append(formatted)
-	return phone_numbers
-
-def isLabel(msg):
-	stripedMsg = msg.strip()
-	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
-
-def isClearLabel(msg):
-	stripedMsg = msg.strip()
-	tokens = msg.split(' ')
-	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower()=='clear'))
-
-def isPickFromLabel(msg):
-	stripedMsg = msg.strip()
-	tokens = msg.split(' ')
-	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower()=='pick'))
-
-def isRemindCommand(msg):
-	text = msg.lower()
-	return ('#remind' in text or
-		   '#remindme' in text or
-		   '#reminder' in text or
-		   '#reminders' in text)
-
-delete_re = re.compile('delete [0-9]+')
-def isDeleteCommand(msg):
-	return delete_re.match(msg.lower()) is not None
-
-def isActivateCommand(msg):
-	return '#activate' in msg.lower()
-
-def isListsCommand(msg):
-	return msg.strip().lower() == 'show lists' or msg.strip().lower() == 'show all'
-
-def isHelpCommand(msg):
-	return msg.strip().lower() == 'huh?'
-
-def isPrintHashtagsCommand(msg):
-	cleaned = msg.strip().lower()
-	return  cleaned == '#hashtag' or cleaned == '#hashtags'
-
-def isSendContactCommand(msg):
-	return msg.strip().lower() == 'vcard'
-
-def isCreateHandleCommand(msg):
-	words = msg.strip().split(' ')
-
-	hasHandle = False
-	for word in words:
-		if isHandle(word): hasHandle = True
-
-	return len(words) == 2 and hasHandle and hasPhoneNumber(msg)
-
-def isMagicPhrase(msg):
-	return 'trapper keeper' in msg.lower()
-
-def hasLabel(msg):
-	for word in msg.split(' '):
-		if isLabel(word):
-			return True
-	return False
-
-def getLabel(msg):
-	for word in msg.split(' '):
-		if isLabel(word):
-			return word
-	return None
-
-# Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
+#  Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
 # Text could have comma's in it, that is dealt with later
 def getData(msg, numMedia, requestDict):
 	# process text
@@ -149,9 +60,9 @@ def getData(msg, numMedia, requestDict):
 	handleList = list()
 	label = None
 	for word in msg.split(' '):
-		if isLabel(word):
+		if processing_util.isLabel(word):
 			label = word
-		elif isHandle(word):
+		elif processing_util.isHandle(word):
 			handleList.append(word)
 		else:
 			nonLabels.append(word)
@@ -326,9 +237,9 @@ def getInferredLabel(user):
 	for i in range(1, len(incoming_messages)):
 		msg_body = incoming_messages[i].getBody()
 		print "message -%d: %s" % (i, msg_body)
-		if isLabel(msg_body):
+		if processing_util.isLabel(msg_body):
 			return msg_body
-		elif isDeleteCommand(msg_body):
+		elif processing_util.isDeleteCommand(msg_body):
 			continue
 		else:
 			return None
@@ -340,7 +251,7 @@ def dealWithDelete(user, msg, keeperNumber):
 	requested_index = int(words[1])
 	item_index = requested_index - 1
 	label = None
-	if hasLabel(msg):
+	if processing_util.hasLabel(msg):
 		text, label, media, handles = getData(msg, 0, None)
 	else:
 		label = getInferredLabel(user)
@@ -370,7 +281,7 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 	# This is a label fetch.  See if a note with that label exists then return
 	label = msg
 	# We support many different remind commands, but every one actually does REMIND_LABEL
-	if isRemindCommand(label):
+	if processing_util.isRemindCommand(label):
 		label = REMIND_LABEL
 	entries = Entry.fetchEntries(user=user, label=label)
 	clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item."%(label)
@@ -512,17 +423,17 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 		sms_util.sendMsg(user, "I can help you create a list. Send me an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
 		user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 1:
-		if not hasLabel(msg):
+		if not processing_util.hasLabel(msg):
 			# They didn't send in something with a label.
 			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.", None, keeperNumber)
 		else:
 			# They sent in something with a label, have them add to it
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "Now send me another item for the same list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "Now send me another item for the same list. Don't forget to add the same hashtag '%s'" % processing_util.getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 2:
 		# They should be sending in a second add command to an existing label
-		if not hasLabel(msg) or isLabel(msg):
+		if not processing_util.hasLabel(msg) or processing_util.isLabel(msg):
 			existingLabel = Entry.fetchFirstLabel(user)
 			if not existingLabel:
 				sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
@@ -530,7 +441,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "You can send items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "You can send items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % processing_util.getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
 		# The should be sending in just a label
@@ -539,7 +450,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
 			return
 
-		if not isLabel(msg):
+		if not processing_util.isLabel(msg):
 			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
 			return
 
@@ -587,11 +498,11 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 	words = msg.strip().split(' ')
 	handle = None
 	for word in words:
-		if isHandle(word):
+		if processing_util.isHandle(word):
 			handle = word
 			break
 
-	phoneNumbers = extractPhoneNumbers(msg)
+	phoneNumbers = processing_util.extractPhoneNumbers(msg)
 	phoneNumber = phoneNumbers[0]
 
 	oldUser = createHandle(user, handle, phoneNumber)
@@ -641,25 +552,26 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 
 	if user.activated == None:
 		text, label, media, handles = getData(msg, 0, {})
-		if isMagicPhrase(text):
+		if processing_util.isMagicPhrase(text):
 			dealWithMagicPhrase(user, keeperNumber)
 		else:
 			dealWithNonActivatedUser(user, False, keeperNumber)
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-	elif isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
+	elif processing_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
 		dealWithActivation(user, msg, keeperNumber)
-	elif isPrintHashtagsCommand(msg):
+	elif processing_util.isPrintHashtagsCommand(msg):
 		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 		dealWithPrintHashtags(user, keeperNumber)
-	elif isLabel(msg) and numMedia == 0:
+	elif processing_util.isFetchCommand(msg) and numMedia == 0:
 		if user.completed_tutorial:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
 		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-	elif isClearLabel(msg) and numMedia == 0:
-		label = getLabel(msg)
+
+	elif processing_util.isClearCommand(msg) and numMedia == 0:
+		label = processing_util.getLabel(msg)
 		entries = Entry.fetchEntries(user=user, label=label)
 		if len(entries) == 0:
 			sendNotFoundMessage(user, label, keeperNumber)
@@ -668,28 +580,26 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 				entry.hidden = True
 				entry.save()
 			sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
-	elif isPickFromLabel(msg) and numMedia == 0:
-		label = getLabel(msg)
+	elif processing_util.isPickCommand(msg) and numMedia == 0:
+		label = processing_util.getLabel(msg)
 		pickItemForUserLabel(user, label, keeperNumber)
-	elif isHelpCommand(msg):
+	elif processing_util.isHelpCommand(msg):
 		sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
-	elif isSendContactCommand(msg):
-		sendContactCard(user, keeperNumber)
-	elif isCreateHandleCommand(msg):
+	elif processing_util.isCreateHandleCommand(msg):
 		dealWithCreateHandle(user, msg, keeperNumber)
-	elif isRemindCommand(msg):
+	elif processing_util.isRemindCommand(msg):
 		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
-	elif isDeleteCommand(msg):
+	elif processing_util.isDeleteCommand(msg):
 		dealWithDelete(user, msg, keeperNumber)
 	else: # treat this as an add command
 		if user.completed_tutorial:
 			# Hack until state machine.
 			# See if the last message was a remind and if if this doesn't have a label
 			prevMsg = getPreviousMessage(user)
-			if prevMsg and isRemindCommand(prevMsg.getBody()) and not hasLabel(msg):
+			if prevMsg and processing_util.isRemindCommand(prevMsg.getBody()) and not processing_util.hasLabel(msg):
 				dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict)
-			elif not hasLabel(msg):
-				if isNicety(msg):
+			elif not processing_util.hasLabel(msg):
+				if processing_util.isNicety(msg):
 					dealWithNicety(user, msg, keeperNumber)
 					return
 				# if the user didn't add a label, throw it in #unassigned
@@ -700,6 +610,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+
 
 #
 # Send a sms message to a user from a certain number
