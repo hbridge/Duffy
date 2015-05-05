@@ -188,7 +188,7 @@ class SMSKeeperCase(TestCase):
 
 
 
-class SMSKeeperContactsCase(TestCase):
+class SMSKeeperSharingCase(TestCase):
 	testPhoneNumber = "+16505555550"
 	handle = "@test"
 	targetNum = "6505551111"

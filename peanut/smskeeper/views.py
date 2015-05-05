@@ -387,7 +387,22 @@ def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
 		if entry.img_url:
 			mediaUrls.append(entry.img_url)
 		else:
-			newStr = str(count) + ". " + entry.text
+			otherUsers = list(entry.users.all())
+			otherUsers.remove(user)
+			otherUserHandles = list()
+			for otherUser in otherUsers:
+				# see if the user has a contact, if so use the handle
+				try:
+					contact = Contact.objects.get(user=user, target=otherUser)
+					otherUserHandles.append(contact.handle)
+				except Contact.DoesNotExist:
+					otherUserHandles.append(otherUser.phone_number)
+
+			otherUsersString = ""
+			if len(otherUserHandles) > 0:
+				otherUsersString = "(%s)" % (", ".join(otherUserHandles))
+
+			newStr = str(count) + ". " + entry.text + " " + otherUsersString
 
 			if entry.remind_timestamp:
 				dt = entry.remind_timestamp.replace(tzinfo=None)
