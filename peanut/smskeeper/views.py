@@ -173,10 +173,10 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	for entryText in text.split(','):
 		entryText = entryText.strip()
 		if len(entryText) > 0:
-			noteEntry = Entry.createEntry(user, keeperNumber, label, entryText)
+			entry = Entry.createEntry(user, keeperNumber, label, entryText)
 
 	for entryMediaUrl in media:
-		noteEntry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
+		entry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
 
 	if sendResponse:
 		if label == UNASSIGNED_LABEL:
@@ -184,7 +184,7 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 		else:
 			sms_util.sendMsg(user, "Got it", None, keeperNumber)
 
-	return noteEntry
+	return entry
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	text, label, media = getData(msg, 0, requestDict)
@@ -224,7 +224,7 @@ def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
 def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + REMIND_LABEL
-	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
+	entry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
 
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
 	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
@@ -232,13 +232,13 @@ def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 	startDate = startDate.replace(tzinfo=None)
 	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
 
-	noteEntry.remind_timestamp = startDate
-	noteEntry.keeper_number = keeperNumber
-	noteEntry.save()
+	entry.remind_timestamp = startDate
+	entry.keeper_number = keeperNumber
+	entry.save()
 
-	async.processReminder.apply_async([noteEntry.id], eta=startDate)
+	async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
 
-	sms_util.sendMsg(user, "Got it. I'll remind you %s." % (userMsg), None, keeperNumber)
+	sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (query, userMsg), None, keeperNumber)
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
