@@ -29,7 +29,7 @@ def main(argv):
             #create a new entry object
             entry = Entry.createEntry(note.user, noteEntry.keeper_number, note.label, noteEntry.text, noteEntry.img_url, noteEntry.remind_timestamp)
 
-            if entry.remind_timestamp:
+            if entry.remind_timestamp and not hidden:
                 async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
 
 if __name__ == "__main__":
