@@ -126,6 +126,9 @@ def isCreateHandleCommand(msg):
 
 	return len(words) == 2 and hasHandle and hasPhoneNumber(msg)
 
+def isMagicPhrase(msg):
+	return 'trapper keeper' in msg.lower()
+
 def hasLabel(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
@@ -202,10 +205,10 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	for entryText in text.split(','):
 		entryText = entryText.strip()
 		if len(entryText) > 0:
-			noteEntry, entryLink = Entry.createEntry(user, keeperNumber, label, entryText)
+			entry = Entry.createEntry(user, keeperNumber, label, entryText)
 
 	for entryMediaUrl in media:
-		noteEntry, entryLink = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
+		entry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
 
 	if sendResponse:
 		if label == UNASSIGNED_LABEL:
@@ -213,7 +216,7 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 		else:
 			sms_util.sendMsg(user, "Got it", None, keeperNumber)
 
-	return noteEntry
+	return entry
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	text, label, media = getData(msg, 0, requestDict)
@@ -253,7 +256,7 @@ def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
 def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + REMIND_LABEL
-	noteEntry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
+	entry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
 
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
 	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
@@ -261,13 +264,13 @@ def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 	startDate = startDate.replace(tzinfo=None)
 	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
 
-	noteEntry.remind_timestamp = startDate
-	noteEntry.keeper_number = keeperNumber
-	noteEntry.save()
+	entry.remind_timestamp = startDate
+	entry.keeper_number = keeperNumber
+	entry.save()
 
-	async.processReminder.apply_async([noteEntry.id], eta=startDate)
+	async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
 
-	sms_util.sendMsg(user, "Got it. I'll remind you %s." % (userMsg), None, keeperNumber)
+	sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (query, userMsg), None, keeperNumber)
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
@@ -401,13 +404,32 @@ def dealWithNonActivatedUser(user, firstTime, keeperNumber):
 	if firstTime:
 		sms_util.sendMsg(user, "Hi. I'm Keeper.", None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "I can help you remember things. But, I'm not quite ready for you yet.", None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "Stay tuned. I'll be in touch soon.", None, keeperNumber)
+		sms_util.sendMsg(user, "I can help you remember things. But, first I need the magic phrase to get you started.", None, keeperNumber)
+	elif user.tutorial_step == 0:
+		incorrectPhraseResponses = ["Nope. That's not it. :p"]
+		sms_util.sendMsg(user, random.choice(incorrectPhraseResponses), None, keeperNumber)
+		user.tutorial_step = -1
+		user.save()
+	elif user.tutorial_step == -1:
+		incorrectPhraseResponses = ["Nice try. Except it didn't work. \xF0\x9F\x98\x88"]
+		sms_util.sendMsg(user, random.choice(incorrectPhraseResponses), None, keeperNumber)
+		user.tutorial_step = -2
+		user.save()
 	else:
-		sms_util.sendMsg(user, "Oh hi. You're back!", None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "I still need more time.", None, keeperNumber)
+		incorrectPhraseResponses = ["They don't make magic phrases like they used to",
+									"Who gave you my number?!? I'm going to report you",
+									"You know there are laws against this kind of thing",
+									"Quantity is not the same thing as quality"]
+		sms_util.sendMsg(user, random.choice(incorrectPhraseResponses), None, keeperNumber)
+
+def dealWithMagicPhrase(user, keeperNumber):
+	user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	user.save()
+	sms_util.sendMsg(user, "That's the magic phrase. Let's get started", None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "Before I explain a bit more, what's your name?", None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
 	text, label, media = getData(msg, 0, {})
@@ -418,19 +440,25 @@ def dealWithActivation(user, msg, keeperNumber):
 		userToActivate.save()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
 
-		sms_util.sendMsg(userToActivate, "Hi, I'm ready now! As a reminder, I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		sms_util.sendMsg(userToActivate, "Oh hello. You are a lucky one. Someone else entered your magic phrase.", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(userToActivate, "I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
 		sms_util.sendMsg(userToActivate, "Before I explain a bit more, what's your name?", None, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
+	# this is to deal with magic phrase
+	if user.tutorial_step < 0:
+		user.tutorial_step = 0
+
 	if user.tutorial_step == 0:
 		user.name = msg
 		user.save()
 		sms_util.sendMsg(user, "Great, nice to meet you %s" % user.name, None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "Let's try creating a list. Send an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
+		sms_util.sendMsg(user, "I can help you create a list. Send me an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
 		user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 1:
 		if not hasLabel(msg):
@@ -439,7 +467,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 		else:
 			# They sent in something with a label, have them add to it
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "Now let's add another item to your list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "Now send me another item for the same list. Don't forget to add the same hashtag '%s'" % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 2:
 		# They should be sending in a second add command to an existing label
@@ -451,7 +479,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "You can add items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "You can send items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
 		# The should be sending in just a label
@@ -469,9 +497,10 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			return
 		else:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
-			sms_util.sendMsg(user, "That should get you started. Send 'huh?' anytime to get help.", None, keeperNumber)
+			sms_util.sendMsg(user, "That's all you need to know for now. Send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
+			time.sleep(1)
 			sendContactCard(user, keeperNumber)
 			user.completed_tutorial = True
 
@@ -560,7 +589,11 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
 	if user.activated == None:
-		dealWithNonActivatedUser(user, False, keeperNumber)
+		text, label, media = getData(msg, 0, {})
+		if isMagicPhrase(text):
+			dealWithMagicPhrase(user, keeperNumber)
+		else:
+			dealWithNonActivatedUser(user, False, keeperNumber)
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 	elif isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
@@ -784,7 +817,8 @@ def dashboard(request):
 
 @receiver(post_save, sender=Message)
 def sendLiveFeed(sender, **kwargs):
-	if not hasattr(settings,"DEBUG"):
+
+	if hasattr(settings, 'SLACKBOT_ENABLED'):
 		message = kwargs.get('instance')
 		msgContent = json.loads(message.msg_json)
 

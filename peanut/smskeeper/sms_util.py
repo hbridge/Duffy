@@ -15,4 +15,4 @@ def sendMsg(user, msg, mediaUrls, keeperNumber):
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
 		else:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
-		print "Sending %s to %s" % (msg, user.phone_number)
+		print "Sending %s to %s" % (msg.decode('utf-8'), user.phone_number)

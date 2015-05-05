@@ -15,17 +15,18 @@ from peanut.celery import app
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
-from smskeeper.models import NoteEntry
+from smskeeper.models import Entry
 from smskeeper import sms_util
 
 @app.task
 def processReminder(entryId):
-	entry = NoteEntry.objects.get(id=entryId)
+	entry = Entry.objects.get(id=entryId)
 
 	if not entry.hidden:
-		msg = "Hi, friendly reminder: %s" % entry.text
+		msg = "Hi! Friendly reminder: %s" % entry.text
 
-		sms_util.sendMsg(entry.note.user, msg, None, entry.keeper_number)
+		for user in entry.users.all():
+			sms_util.sendMsg(user, msg, None, entry.keeper_number)
 
 		entry.hidden = True
 		entry.save()

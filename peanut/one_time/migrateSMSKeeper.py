@@ -8,12 +8,14 @@ django.setup()
 import smskeeper
 from django.db.models.query import QuerySet
 from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm
-from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia, Entry, EntryLink
+from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia, Entry
 from peanut.settings import constants
 from pprint import PrettyPrinter
-
-
 import json
+
+
+from smskeeper import async
+
 from django.core.serializers.json import DjangoJSONEncoder
 
 def printDjango(obj):
@@ -25,23 +27,10 @@ def main(argv):
         for noteEntry in NoteEntry.objects.filter(note=note):
             #print(noteEntry.__dict__)
             #create a new entry object
-            entry = Entry.objects.create(creator=note.user)
-            for attribute in ["text", "img_url", "remind_timestamp", "hidden", "keeper_number", "added", "updated"]:
-                setattr(entry, attribute, getattr(noteEntry, attribute))
-            entry.save()
+            entry = Entry.createEntry(note.user, noteEntry.keeper_number, note.label, noteEntry.text, noteEntry.img_url, noteEntry.remind_timestamp)
 
-            entryLink = EntryLink.objects.create(
-                label=note.label,
-                entry=entry,
-                added=entry.added,
-                updated=entry.updated
-            )
-
-            entryLink.users.add(note.user)
-            entryLink.save()
-
-
-
+            if entry.remind_timestamp and not hidden:
+                async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
