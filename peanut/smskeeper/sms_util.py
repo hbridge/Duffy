@@ -11,7 +11,9 @@ def sendMsg(user, msg, mediaUrls, keeperNumber):
 	
 	if keeperNumber == "test":
 		# This is used for command line interface commands
-		logger.info(msg)
+		# If you change this, all tests will fail.
+		# TODO: figure out how to pipe this with logger
+		print msg
 	else:
 		if mediaUrls:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
