@@ -232,7 +232,9 @@ def getPreviousMessage(user):
 		return None
 
 def getInferredLabel(user):
-	incoming_messages = Message.objects.filter(user=user, incoming=True).order_by("-added")
+	# Normally would sort by added but unit tests barf since they get added at same time
+	# Here, sorting by id should accomplish the same goal
+	incoming_messages = Message.objects.filter(user=user, incoming=True).order_by("-id")
 	if len(incoming_messages) < 2:
 		return None
 
