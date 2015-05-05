@@ -10,6 +10,8 @@ from datetime import date, timedelta
 import humanize
 import os, sys, re
 import requests
+import phonenumbers
+
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -26,7 +28,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm
-from smskeeper.models import User, Entry, EntryLink, Message, MessageMedia
+from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 
 from smskeeper import sms_util, image_util
 from smskeeper import async
@@ -55,6 +57,25 @@ def sendNotFoundMessage(user, label, keeperNumber):
 
 def isNicety(msg):
 	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you"]
+
+handle_re = re.compile('@[a-zA-Z0-9]+\Z')
+def isHandle(msg):
+	return handle_re.match(msg) is not None
+
+def hasPhoneNumber(msg):
+	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
+	return matches.has_next()
+    # foundMatch = True
+    # obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+
+def extractPhoneNumbers(msg):
+	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
+	phone_numbers = []
+	for match in matches:
+		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+		if formatted: phone_numbers.append(formatted)
+	return phone_numbers
+
 def isLabel(msg):
 	stripedMsg = msg.strip()
 	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
@@ -76,7 +97,6 @@ def isRemindCommand(msg):
 		   '#reminder' in text or
 		   '#reminders' in text)
 
-
 delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
 	return delete_re.match(msg.lower()) is not None
@@ -96,6 +116,15 @@ def isPrintHashtagsCommand(msg):
 
 def isSendContactCommand(msg):
 	return msg.strip().lower() == 'vcard'
+
+def isCreateHandleCommand(msg):
+	words = msg.strip().split(' ')
+
+	hasHandle = False
+	for word in words:
+		if isHandle(word): hasHandle = True
+
+	return len(words) == 2 and hasHandle and hasPhoneNumber(msg)
 
 def hasLabel(msg):
 	for word in msg.split(' '):
@@ -448,6 +477,53 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 
 	user.save()
 
+def createHandle(user, handle, targetNumber):
+	# see if there's an existing contact for that handle
+	oldUser = None
+	try:
+		contact = Contact.objects.get(user=user, handle=handle)
+		oldUser = contact.target
+		if (oldUser.phone_number == targetNumber):
+			return oldUser
+	except Contact.DoesNotExist:
+		contact = None
+
+	# get and set the new target user, creating if necessary
+	try:
+		target_user = User.objects.get(phone_number=targetNumber)
+	except User.DoesNotExist:
+		target_user = User.objects.create(phone_number=targetNumber)
+		target_user.save()
+
+	if contact is not None:
+		contact.target = target_user
+	else:
+		contact = Contact.objects.create(user=user, handle=handle, target=target_user)
+	contact.save()
+
+	return oldUser
+
+def dealWithCreateHandle(user, msg, keeperNumber):
+	words = msg.strip().split(' ')
+	handle = None
+	for word in words:
+		if isHandle(word):
+			handle = word
+			break
+
+	phoneNumbers = extractPhoneNumbers(msg)
+	phoneNumber = phoneNumbers[0]
+
+	oldUser = createHandle(user, handle, phoneNumber)
+
+	if oldUser is not None:
+		if oldUser.phone_number == phoneNumber: 
+			sms_util.sendMsg(user, "%s is already set to %s" % (handle, phoneNumber), None, keeperNumber)
+		else:
+			sms_util.sendMsg(user, "%s is now set to %s (used to be %s)" % (handle, phoneNumber, oldUser.phone_number), None, keeperNumber)
+	else:
+		sms_util.sendMsg(user, "%s is now set to %s" % (handle, phoneNumber), None, keeperNumber)
+
 """
 	Helper method for command line interface input.  Use by:
 	python
@@ -515,6 +591,8 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 	elif isSendContactCommand(msg):
 		sendContactCard(user, keeperNumber)
+	elif isCreateHandleCommand:
+		dealWithCreateHandle(user, msg, keeperNumber)
 	elif isRemindCommand(msg):
 		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
 	elif isDeleteCommand(msg):

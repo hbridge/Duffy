@@ -5,7 +5,7 @@ from contextlib import contextmanager
 import time
 
 from smskeeper import views
-from smskeeper.models import User, Entry, Message, MessageMedia
+from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 import datetime
 import pytz
 
@@ -172,3 +172,66 @@ class SMSKeeperCase(TestCase):
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 22) # 3 pm Pactific in UTC
+
+
+
+class SMSKeeperContactsCase(TestCase):
+	testPhoneNumber = "+16505555550"
+	handle = "@test"
+	targetNum = "6505551111"
+	user = None
+
+
+	def normalizeNumber(self, number):
+		return "+1" + number;
+
+	def setUp(self):
+		try:
+			user = User.objects.get(phone_number=self.testPhoneNumber)
+			user.delete()
+		except User.DoesNotExist:
+			pass
+
+	def setupUser(self, activated, tutorialComplete):
+		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
+		self.user.completed_tutorial = tutorialComplete
+		if (activated):
+			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		self.user.save()
+
+	def testCreateContact(self):
+		self.setupUser(True, True)
+
+		# make sure the output contains the normalized number
+		with capture(views.cliMsg, self.testPhoneNumber, "%s %s" % (self.handle, self.targetNum)) as output:
+			self.assertTrue(self.normalizeNumber(self.targetNum) in output)
+
+		# ensure the contact has the right number
+		contact = Contact.objects.get(user=self.user, handle=self.handle)
+		self.assertEqual(contact.target.phone_number, self.normalizeNumber(self.targetNum))
+
+		# make sure there's a user for the new contact
+		targetUser = User.objects.get(phone_number=self.normalizeNumber(self.targetNum))
+		self.assertNotEqual(targetUser, None)
+
+	def testReassignContact(self):
+		self.setupUser(True, True)
+
+		# create a user
+		with capture(views.cliMsg, self.testPhoneNumber, "%s %s" % (self.handle, "9175555555")) as output:
+			pass
+
+		#change it 
+		with capture(views.cliMsg, self.testPhoneNumber, "%s %s" % (self.handle, self.targetNum)) as output:
+			self.assertTrue(self.normalizeNumber(self.targetNum) in output)
+
+		# ensure the contact has the right number
+		contact = Contact.objects.get(user=self.user, handle=self.handle)
+		self.assertEqual(contact.target.phone_number, self.normalizeNumber(self.targetNum))
+
+
+
+
+
+
+
