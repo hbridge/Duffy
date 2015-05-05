@@ -23,7 +23,7 @@ def processReminder(entryId):
 	entry = NoteEntry.objects.get(id=entryId)
 
 	if not entry.hidden:
-		msg = "Hi, friendly reminder to %s" % entry.text
+		msg = "Hi, friendly reminder: %s" % entry.text
 
 		sms_util.sendMsg(entry.note.user, msg, None, entry.keeper_number)
 

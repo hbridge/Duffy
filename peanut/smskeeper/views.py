@@ -238,7 +238,7 @@ def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 
 	async.processReminder.apply_async([noteEntry.id], eta=startDate)
 
-	sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (query, userMsg), None, keeperNumber)
+	sms_util.sendMsg(user, "Got it. I'll remind you %s." % (userMsg), None, keeperNumber)
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
