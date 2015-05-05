@@ -1,5 +1,4 @@
 import json
-from django.core.serializers.json import DjangoJSONEncoder
 from multiprocessing import Process
 import time
 import random
@@ -24,9 +23,12 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.core.serializers.json import DjangoJSONEncoder
 
 from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm
+
 from smskeeper.models import User, Entry, Message, MessageMedia, Contact
+
 
 from smskeeper import sms_util, image_util, processing_util
 from smskeeper import async

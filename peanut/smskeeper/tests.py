@@ -4,7 +4,7 @@ from cStringIO import StringIO
 from contextlib import contextmanager
 import time
 
-from smskeeper import views
+from smskeeper import views, processing_util
 from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 import datetime
 import pytz
@@ -186,7 +186,9 @@ class SMSKeeperCase(TestCase):
 
 		self.assertEqual(entry.remind_timestamp.hour, 22) # 3 pm Pactific in UTC
 
-
+	def test_state_machine(self):
+		commands = processing_util.getPossibleCommands("#test this is a test")
+		print "HERE: %s" % commands
 
 class SMSKeeperSharingCase(TestCase):
 	testPhoneNumber = "+16505555550"
