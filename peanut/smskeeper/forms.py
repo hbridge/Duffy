@@ -21,6 +21,11 @@ class SendSMSForm(UserIdMixin):
 	msg = forms.CharField(required=True)
 	from_num = forms.CharField(required=False)
 
+class ResendMsgForm(UserIdMixin):
+	msg_id = forms.IntegerField(required=True)
+	from_num = forms.CharField(required=False)
+
+
 class SmsContentForm(forms.Form):
 	From = forms.CharField(required=True)
 	To = forms.CharField(required=False)
