@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm
-from smskeeper.models import User, Entry, EntryLink, Message, MessageMedia
+from smskeeper.models import User, Entry, Message, MessageMedia
 
 from smskeeper import sms_util, image_util
 from smskeeper import async
@@ -173,10 +173,10 @@ def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendRespo
 	for entryText in text.split(','):
 		entryText = entryText.strip()
 		if len(entryText) > 0:
-			noteEntry, entryLink = Entry.createEntry(user, keeperNumber, label, entryText)
+			noteEntry = Entry.createEntry(user, keeperNumber, label, entryText)
 
 	for entryMediaUrl in media:
-		noteEntry, entryLink = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
+		noteEntry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
 
 	if sendResponse:
 		if label == UNASSIGNED_LABEL:

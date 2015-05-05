@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
             name='Entry',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('label', models.CharField(max_length=100, db_index=True)),
                 ('text', models.TextField(null=True)),
                 ('img_url', models.TextField(null=True)),
                 ('remind_timestamp', models.DateTimeField(null=True)),
@@ -35,20 +36,7 @@ class Migration(migrations.Migration):
                 ('added', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(db_index=True, auto_now=True, null=True)),
                 ('creator', models.ForeignKey(to='smskeeper.User')),
-            ],
-            options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='EntryLink',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('label', models.CharField(max_length=100, db_index=True)),
-                ('added', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
-                ('updated', models.DateTimeField(db_index=True, auto_now=True, null=True)),
-                ('entry', models.ForeignKey(to='smskeeper.Entry')),
-                ('users', models.ManyToManyField(to='smskeeper.User', db_index=True)),
+                ('users', models.ManyToManyField(related_name=b'entry_users', to='smskeeper.User', db_index=True)),
             ],
             options={
             },
