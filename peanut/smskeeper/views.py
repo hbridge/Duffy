@@ -25,7 +25,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm
+from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm
 from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
 from smskeeper import sms_util, image_util
 from smskeeper import async
@@ -578,6 +578,31 @@ def send_sms(request):
 		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+#
+# Send a sms message to a user from a certain number
+# If from_num isn't specified, then defaults to prod
+#
+# Example url:
+# http://dev.duffyapp.com:8000/smskeeper/send_sms?user_id=23&msg=Test&from_num=%2B12488178301
+#
+def resend_msg(request):
+	form = ResendMsgForm(api_util.getRequestData(request))
+	response = dict()
+	if (form.is_valid()):
+		msgId = form.cleaned_data['msg_id']
+		keeperNumber = form.cleaned_data['from_num']
+
+		message = Message.objects.get(id=msgId)
+		data = json.loads(message.msg_json)
+		
+		sms_util.sendMsg(message.user, data["Body"], None, keeperNumber)
+
+		response["result"] = True
+		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
 
 
 @csrf_exempt
