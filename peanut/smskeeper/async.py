@@ -23,7 +23,7 @@ def processReminder(entryId):
 	entry = Entry.objects.get(id=entryId)
 
 	if not entry.hidden:
-		msg = "Hi, friendly reminder: %s" % entry.text
+		msg = "Hi! Friendly reminder: %s" % entry.text
 
 		for user in entry.users.all():
 			sms_util.sendMsg(user, msg, None, entry.keeper_number)
