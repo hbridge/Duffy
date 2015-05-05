@@ -3,6 +3,8 @@ from django.contrib import admin
 import json
 from django.utils.html import format_html
 from common import api_util
+import logging
+logger = logging.getLogger(__name__)
 
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)

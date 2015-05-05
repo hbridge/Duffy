@@ -4,6 +4,8 @@ import math
 import cStringIO
 import boto
 import uuid
+import logging
+logger = logging.getLogger(__name__)
 
 '''
 	Gets a list of urls and generates a grid image to send back.

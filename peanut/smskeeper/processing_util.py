@@ -1,7 +1,9 @@
 import re
 import phonenumbers
+import logging
 
 from smskeeper import keeper_constants
+logger = logging.getLogger(__name__)
 
 def hasLabel(msg):
 	for word in msg.split(' '):

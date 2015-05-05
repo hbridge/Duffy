@@ -1,7 +1,9 @@
 import json
+import logging
 
 from smskeeper.models import Message
 from strand import notifications_util
+logger = logging.getLogger(__name__)
 
 def sendMsg(user, msg, mediaUrls, keeperNumber):
 	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
@@ -9,10 +11,10 @@ def sendMsg(user, msg, mediaUrls, keeperNumber):
 	
 	if keeperNumber == "test":
 		# This is used for command line interface commands
-		print msg
+		logger.info(msg)
 	else:
 		if mediaUrls:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
 		else:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
-		print "Sending %s to %s" % (msg.decode('utf-8'), user.phone_number)
+		logger.info("Sending %s to %s" % (msg.decode('utf-8'), user.phone_number))

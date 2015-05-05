@@ -10,6 +10,7 @@ import humanize
 import os, sys, re
 import requests
 import phonenumbers
+import logging
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -37,6 +38,8 @@ from common import api_util, natty_util
 from peanut.settings import constants
 from peanut import settings
 
+logger = logging.getLogger(__name__)
+
 
 '''
 Message constants
@@ -48,7 +51,7 @@ REMIND_LABEL = "#reminders"
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 	content += "<Response></Response>"
-	print "Sending blank response"
+	logger.info("Sending blank response")
 	return HttpResponse(content, content_type="text/xml")
 
 def sendNotFoundMessage(user, label, keeperNumber):
@@ -240,7 +243,7 @@ def getInferredLabel(user):
 
 	for i in range(1, len(incoming_messages)):
 		msg_body = incoming_messages[i].getBody()
-		print "message -%d: %s" % (i, msg_body)
+		logger.info("message -%d: %s" % (i, msg_body))
 		if processing_util.isLabel(msg_body):
 			return msg_body
 		elif processing_util.isDeleteCommand(msg_body):
@@ -783,8 +786,9 @@ def dashboard(request):
 
 @receiver(post_save, sender=Message)
 def sendLiveFeed(sender, **kwargs):
-
+	logger.debug("SLACKBOT_ENABLED: " + str(hasattr(settings, 'SLACKBOT_ENABLED')))
 	if hasattr(settings, 'SLACKBOT_ENABLED'):
+
 		message = kwargs.get('instance')
 		msgContent = json.loads(message.msg_json)
 
