@@ -9,12 +9,16 @@ import datetime
 from datetime import date, timedelta
 import humanize
 import os, sys, re
+import requests
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 import django
 django.setup()
+
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from django.shortcuts import render
 
@@ -28,6 +32,7 @@ from smskeeper import async
 
 from common import api_util, natty_util
 from peanut.settings import constants
+from django.conf import settings
 
 
 '''
@@ -689,3 +694,38 @@ def dashboard_feed(request):
 
 def dashboard(request):
 	return render(request, 'dashboard.html', None)
+
+@receiver(post_save, sender=Message)
+def sendLiveFeed(sender, **kwargs):
+	if settings.DEBUG == False:
+		message = kwargs.get('instance')
+		msgContent = json.loads(message.msg_json)
+
+		url = 'https://hooks.slack.com/services/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'
+		channel = "#livesmskeeperfeed"
+		params = dict()
+		text = msgContent['Body']
+
+		if message.incoming:
+			userName = message.user.name + ' (' + message.user.phone_number + ')'
+
+			numMedia = int(msgContent['NumMedia'])
+
+			if numMedia > 0:
+				for n in range(numMedia):
+					param = 'MediaUrl' + str(n)
+					text += "\n<" + requestDict[param] + "|" + param + ">"
+			params['icon_emoji'] = ':raising_hand:'
+
+		else:
+			userName = "Keeper" + " (to: " + message.user.name + ")"
+			if msgContent['MediaUrls']:
+				text += " <" + str(msgContent['MediaUrls']) + "|Attachment>"
+			params['icon_emoji'] = ':rabbit:'
+
+
+		params['username'] = userName
+		params['text'] = text
+		params['channel'] = channel
+
+		resp = requests.post(url, data=json.dumps(params))
