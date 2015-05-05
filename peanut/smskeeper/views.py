@@ -255,7 +255,7 @@ def shareEntries(user, entries, handles, keeperNumber):
 	return sharedHandles, notFoundHandles
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
-	text, label, media = getData(msg, 0, requestDict)
+	text, label, media, handles = getData(msg, 0, requestDict)
 	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
 
 	# See if the time that comes back is within a few seconds.
@@ -270,7 +270,7 @@ def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
 	# Assuming this is the remind msg
 	prevMessage = getPreviousMessage(user)
-	text, label, media = getData(prevMessage.getBody(), prevMessage.NumMedia(), json.loads(prevMessage.msg_json))
+	text, label, media, handles = getData(prevMessage.getBody(), prevMessage.NumMedia(), json.loads(prevMessage.msg_json))
 
 	# First get the used Text from the last message
 	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
@@ -341,7 +341,7 @@ def dealWithDelete(user, msg, keeperNumber):
 	item_index = requested_index - 1
 	label = None
 	if hasLabel(msg):
-		text, label, media = getData(msg, 0, None)
+		text, label, media, handles = getData(msg, 0, None)
 	else:
 		label = getInferredLabel(user)
 
@@ -468,7 +468,7 @@ def dealWithMagicPhrase(user, keeperNumber):
 	sms_util.sendMsg(user, "Before I explain a bit more, what's your name?", None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
-	text, label, media = getData(msg, 0, {})
+	text, label, media, handles = getData(msg, 0, {})
 
 	try:
 		userToActivate = User.objects.get(phone_number=text)
@@ -625,7 +625,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
 	if user.activated == None:
-		text, label, media = getData(msg, 0, {})
+		text, label, media, handles = getData(msg, 0, {})
 		if isMagicPhrase(text):
 			dealWithMagicPhrase(user, keeperNumber)
 		else:
