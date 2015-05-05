@@ -5,7 +5,7 @@ from contextlib import contextmanager
 import time
 
 from smskeeper import views
-from smskeeper.models import User, Note, NoteEntry, Message, MessageMedia
+from smskeeper.models import User, Entry, Message, MessageMedia
 import datetime
 import pytz
 
@@ -136,7 +136,7 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 
 		views.cliMsg(self.testPhoneNumber, "#remind poop tmr")
-		self.assertTrue(Note.objects.filter(user=self.user, label="#reminders").count() == 1)
+		self.assertTrue("#reminders" in Entry.fetchAllLabels(self.user))
 
 	def test_reminders_followup(self):
 		self.setupUser(True, True)
@@ -159,7 +159,7 @@ class SMSKeeperCase(TestCase):
 
 		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
-		entry = Note.objects.get(user=self.user, label="#reminders").noteentry_set.all()[0]
+		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 19) # 3 pm Eastern in UTC
 
@@ -169,6 +169,6 @@ class SMSKeeperCase(TestCase):
 		self.user.save()
 		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
-		entry = Note.objects.get(user=self.user, label="#reminders").noteentry_set.filter(hidden=False)[0]
+		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 22) # 3 pm Pactific in UTC

@@ -80,6 +80,40 @@ class Entry(models.Model):
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 
+	@classmethod
+	def fetchAllLabels(cls, user):
+		try:
+			entryLinks = EntryLink.objects.filter(users__in=[user.id], entry__hidden=False)
+			labels = entryLinks.values_list("label", flat=True).distinct()
+			return labels
+		except EntryLink.DoesNotExist:
+			return []
+
+	@classmethod
+	def fetchFirstLabel(cls, user):
+		try:
+			entryLinks = EntryLink.objects.filter(users__in=[user.id], entry__hidden=False).order_by("added")
+			return entryLinks[0].label
+		except EntryLink.DoesNotExist:
+			return None
+		
+	@classmethod
+	def fetchEntries(cls, user, label=None, hidden=False):
+		try:
+			links = EntryLink.objects.filter(users=user, label=label, entry__hidden=hidden).order_by("added")
+			return map(lambda link: link.entry, links)
+		except EntryLink.DoesNotExist:
+			return []
+
+	@classmethod
+	def createEntry(cls, user, keeper_number, label, text, img_url=None, remind_timestamp=None):
+		entry = Entry.objects.create(creator=user, keeper_number=keeper_number, text=text, img_url=img_url, remind_timestamp=remind_timestamp)
+		entry.save()
+		entryLink = EntryLink.objects.create(label=label, entry=entry)
+		entryLink.users.add(user)
+		entryLink.save()
+		return entry, entryLink
+
 class EntryLink(models.Model):
 	users = models.ManyToManyField(User, db_index=True)
 	label = models.CharField(max_length=100, db_index=True)
