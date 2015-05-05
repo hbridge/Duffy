@@ -36,6 +36,11 @@ class User(models.Model):
 		else:
 			return format_html("None")
 
+	def nameOrPhone(self):
+		if self.name is not None and len(self.name) > 0:
+			return self.name
+		return self.phone_number
+
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
 
@@ -165,5 +170,13 @@ class Contact(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	target = models.ForeignKey(User, db_index=True, related_name="contact_target")
 	handle = models.CharField(max_length=30, db_index=True)
+
+	@classmethod
+	def fetchByHandle(cls, user, handle):
+		try:
+			contact = Contact.objects.get(user=user, handle=handle)
+			return contact
+		except Contact.DoesNotExist:
+			return None
 
 admin.site.register(Message)

@@ -141,15 +141,18 @@ def getLabel(msg):
 			return word
 	return None
 
-# Returns back (textWithoutLabel, label, listOfUrls)
+# Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
 # Text could have comma's in it, that is dealt with later
 def getData(msg, numMedia, requestDict):
 	# process text
 	nonLabels = list()
+	handleList = list()
 	label = None
 	for word in msg.split(' '):
 		if isLabel(word):
 			label = word
+		elif isHandle(word):
+			handleList.append(word)
 		else:
 			nonLabels.append(word)
 
@@ -164,7 +167,7 @@ def getData(msg, numMedia, requestDict):
 	#TODO use a separate process but probably this is not the right place to do it.
 	if numMedia > 0:
 		mediaUrlList = image_util.moveMediaToS3(mediaUrlList)
-	return (' '.join(nonLabels), label, mediaUrlList)
+	return (' '.join(nonLabels), label, mediaUrlList, handleList)
 
 
 
@@ -199,24 +202,57 @@ def dealWithNicety(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
 
 def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendResponse):
-	text, label, media = getData(msg, numMedia, requestDict)
+	text, label, media, handles = getData(msg, numMedia, requestDict)
+
+	createdEntries = list()
 
 	# Text comes back without label but still has commas. Split on those here
 	for entryText in text.split(','):
 		entryText = entryText.strip()
 		if len(entryText) > 0:
 			entry = Entry.createEntry(user, keeperNumber, label, entryText)
+			createdEntries.append(entry)
 
 	for entryMediaUrl in media:
 		entry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
+		createdEntries.append(entry)
+
+	sharedHandles = list()
+	notFoundHandles = list()
+	shareString = ""
+	if len(handles) > 0: 
+		sharedHandles, notFoundHandles = shareEntries(user, createdEntries, handles, keeperNumber)
+	if len(sharedHandles) > 0:
+			shareString = "  I also shared that with %s" % ", ".join(sharedHandles)
 
 	if sendResponse:
 		if label == UNASSIGNED_LABEL:
-			sms_util.sendMsg(user, "Filing that under " + UNASSIGNED_LABEL, None, keeperNumber)
+			sms_util.sendMsg(user, "Filing that under " + UNASSIGNED_LABEL + shareString, None, keeperNumber)
 		else:
-			sms_util.sendMsg(user, "Got it", None, keeperNumber)
+			sms_util.sendMsg(user, "Got it." + shareString, None, keeperNumber)
+
+		if len(notFoundHandles) > 0:
+			sms_util.sendMsg(user, "I don't know %s. Send @[name] [phone number] to introduce us." % ", ".join(notFoundHandles), None, keeperNumber)
 
 	return entry
+
+def shareEntries(user, entries, handles, keeperNumber):
+	sharedHandles = list()
+	notFoundHandles = list()
+	for handle in handles:
+		contact = Contact.fetchByHandle(user, handle)
+		if contact is None: 
+			notFoundHandles.append(handle)
+		else:
+			# add the target user to the entry and send them a message
+			sharedHandles.append(handle)
+			for entry in entries:
+				entry.users.add(contact.target)
+			if len(entries) == 1:
+				sms_util.sendMsg(contact.target, "Ding ding! %s shared \"%s %s\" with you." % (user.nameOrPhone(), entry.text, entry.label), None, keeperNumber)
+			else:
+				sms_util.sendMsg(contact.target, "Ding ding! %s shared %d items under %s with you." % (user.nameOrPhone(), len(entries), entry.label), None, keeperNumber)
+	return sharedHandles, notFoundHandles
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	text, label, media = getData(msg, 0, requestDict)
