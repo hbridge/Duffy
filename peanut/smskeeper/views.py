@@ -396,7 +396,7 @@ def dealWithMagicPhrase(user, keeperNumber):
 	user.save()
 	sms_util.sendMsg(user, "That's the magic phrase. Let's get started", None, keeperNumber)
 	time.sleep(1)
-	sms_util.sendMsg(user, "I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+	sms_util.sendMsg(user, "I'm Keeper and I can keep track of your lists, reminders, notes, photos, etc.", None, keeperNumber)
 	time.sleep(1)
 	sms_util.sendMsg(user, "Before I explain a bit more, what's your name?", None, keeperNumber)
 
@@ -411,7 +411,7 @@ def dealWithActivation(user, msg, keeperNumber):
 
 		sms_util.sendMsg(userToActivate, "Oh hello. You are a lucky one. Someone else entered your magic phrase.", None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(userToActivate, "I'm Keeper and I can keep track of your lists, notes, photos, etc.", None, keeperNumber)
+		sms_util.sendMsg(userToActivate, "I'm Keeper and I can keep track of your lists, reminders, notes, photos, etc.", None, keeperNumber)
 		time.sleep(1)
 		sms_util.sendMsg(userToActivate, "Before I explain a bit more, what's your name?", None, keeperNumber)
 	except User.DoesNotExist:
