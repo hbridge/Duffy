@@ -322,7 +322,7 @@ class BASE_CELERY_CONFIG:
         },
         'smskeeper-tips': {
             'task': 'smskeeper.async.sendTips',
-            'schedule': crontab(minute=5),
+            'schedule': crontab(hour=16, minute=5),
             'args': None,
         }
     }
