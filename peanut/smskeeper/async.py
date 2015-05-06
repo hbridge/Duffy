@@ -1,8 +1,6 @@
 from __future__ import absolute_import
-import sys, os
-import time, datetime
-import logging
-import pytz
+import sys
+import os
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -17,6 +15,7 @@ logger = get_task_logger(__name__)
 
 from smskeeper.models import Entry
 from smskeeper import sms_util
+
 
 @app.task
 def processReminder(entryId):
