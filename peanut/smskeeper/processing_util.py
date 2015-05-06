@@ -157,11 +157,11 @@ def processAddState(user, msg, numMedia, requestDict, keeperNumber):
 	pass
 
 stateCallbacks = {
-					'normal': processNormalState,
-					'tutorial': processTutorialState,
-					'not-activated': processNotActivatedState,
-					'remind': processRemindState,
-					'delete': processDeleteState,
-					'add': processAddState,
+					keeper_constants.STATE_NORMAL: processNormalState,
+					keeper_constants.STATE_TUTORIAL: processTutorialState,
+					keeper_constants.STATE_NOT_ACTIVATED: processNotActivatedState,
+					keeper_constants.STATE_REMIND: processRemindState,
+					keeper_constants.STATE_DELETE: processDeleteState,
+					keeper_constants.STATE_ADD: processAddState,
 }
 

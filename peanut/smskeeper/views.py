@@ -557,26 +557,31 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
+	# STATE_NOT_ACTIVATED
 	if user.activated == None:
 		text, label, media, handles = getData(msg, 0, {})
 		if processing_util.isMagicPhrase(text):
 			dealWithMagicPhrase(user, keeperNumber)
 		else:
 			dealWithNonActivatedUser(user, False, keeperNumber)
+	# STATE_TUTORIAL
 	elif not user.completed_tutorial:
 		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+	# STATE_NORMAL
 	elif processing_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
 		dealWithActivation(user, msg, keeperNumber)
+	# STATE_NORMAL
 	elif processing_util.isPrintHashtagsCommand(msg):
 		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 		dealWithPrintHashtags(user, keeperNumber)
+	# STATE_NORMAL
 	elif processing_util.isFetchCommand(msg) and numMedia == 0:
 		if user.completed_tutorial:
 			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
 		else:
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
-
+	# STATE_NORMAL
 	elif processing_util.isClearCommand(msg) and numMedia == 0:
 		label = processing_util.getLabel(msg)
 		entries = Entry.fetchEntries(user=user, label=label)
@@ -587,19 +592,27 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 				entry.hidden = True
 				entry.save()
 			sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+	# STATE_NORMAL
 	elif processing_util.isPickCommand(msg) and numMedia == 0:
 		label = processing_util.getLabel(msg)
 		pickItemForUserLabel(user, label, keeperNumber)
+	# STATE_NORMAL
 	elif processing_util.isHelpCommand(msg):
 		sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
+	# STATE_ADD
 	elif processing_util.isCreateHandleCommand(msg):
 		dealWithCreateHandle(user, msg, keeperNumber)
+	# STATE_REMIND
 	elif processing_util.isRemindCommand(msg):
 		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
+	# STATE_DELETE
 	elif processing_util.isDeleteCommand(msg):
 		dealWithDelete(user, msg, keeperNumber)
 	else: # treat this as an add command
 		if user.completed_tutorial:
+			# STATE_REMIND
+			# STATE_NORMAL
+			# STATE_ADD
 			# Hack until state machine.
 			# See if the last message was a remind and if if this doesn't have a label
 			prevMsg = getPreviousMessage(user)
@@ -615,6 +628,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			else:
 				dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
 		else:
+			# STATE_TUTORIAL
 			time.sleep(1)
 			dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
 

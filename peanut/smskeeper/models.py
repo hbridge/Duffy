@@ -7,12 +7,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+from smskeeper import keeper_constants
+
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
 	name = models.CharField(max_length=100)
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)
 	activated = models.DateTimeField(null=True)
+
+	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
 
 	timezone = models.CharField(max_length=100, null=True)
 
