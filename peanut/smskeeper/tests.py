@@ -198,23 +198,21 @@ class SMSKeeperSharingCase(TestCase):
 	def normalizeNumber(self, number):
 		return "+1" + number
 
+	def createHandle(self, user_phone, handle, number):
+		with capture(views.cliMsg, user_phone, "%s %s" % (handle, number)):
+			pass
+
 	def setUp(self):
-		print "users at start setup: %s" % (self.users)
 		for user in User.objects.all():
-			print "deleting %s" % (user)
 			user.delete()
 		self.users = []
-		print "users after clear: %s" % (self.users)
 
 		for phoneNumber in self.testPhoneNumbers:
-			print "creating: %s" % phoneNumber
 			user, created = User.objects.get_or_create(phone_number=phoneNumber)
-			print "returned user: %s" % (user)
 			user.completed_tutorial = True
 			user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 			user.save()
 			self.users.append(user)
-		print "users: %s" % (self.users)
 
 	def testCreateContact(self):
 		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1])) as output:
@@ -240,11 +238,45 @@ class SMSKeeperSharingCase(TestCase):
 
 		# change it
 		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[2])) as output:
-			self.assertTrue(self.testPhoneNumbers[2] in output)
+			self.assertIn(self.testPhoneNumbers[2], output)
 
 		# ensure the contact has the right number
 		contact = Contact.objects.get(user=self.users[0], handle=self.handle)
 		self.assertEqual(contact.target.phone_number, self.testPhoneNumbers[2])
 
+	def testShareWithExsitingUser(self):
+		self.createHandle(self.testPhoneNumbers[0], "@test", self.testPhoneNumbers[1])
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "item #list @test") as output:
+			self.assertIn("@test", output)
+
+		# ensure that the phone number for user 0 is listed in #list for user 1
+		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
+			self.assertIn(self.testPhoneNumbers[0], output)
+
+		# ensure that if user 1 creates a handle for user 0 that's used instead
+		self.createHandle(self.testPhoneNumbers[1], "@user0", self.testPhoneNumbers[0])
+		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
+			self.assertIn("@user0", output)
+
 	def testShareWithNewUser(self):
-		return
+		self.createHandle(self.testPhoneNumbers[0], "@test", "6505551111")
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "item #list @test") as output:
+			self.assertIn("@test", output)
+
+		# make sure the item is in @test's lists
+		# do an actual entry fetch because the text responses for the user will be unactivated stuff etc
+		newUser = User.objects.get(phone_number=self.normalizeNumber("6505551111"))
+		entries = Entry.fetchEntries(newUser, "#list")
+		self.assertEqual(len(entries), 1)
+
+	'''
+	Ensure that shared items are deleted from all users lists
+	'''
+	def testShareDelete(self):
+		self.createHandle(self.testPhoneNumbers[0], "@test", self.testPhoneNumbers[1])
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "poop #list @test"):
+			pass
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "delete 1 #list"):
+			pass
+		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
+			self.assertNotIn("poop", output)
