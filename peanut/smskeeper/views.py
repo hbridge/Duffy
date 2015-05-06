@@ -32,7 +32,7 @@ from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 
 
 from smskeeper import sms_util, image_util, msg_util, processing_util, helper_util
-from smskeeper import async
+from smskeeper import async, actions, keeper_constants
 
 from common import api_util, natty_util
 from peanut.settings import constants
@@ -41,21 +41,11 @@ from peanut import settings
 logger = logging.getLogger(__name__)
 
 
-'''
-Message constants
-'''
-UNASSIGNED_LABEL = '#unassigned'
-REMIND_LABEL = "#reminders"
-
-
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 	content += "<Response></Response>"
 	logger.info("Sending blank response")
 	return HttpResponse(content, content_type="text/xml")
-
-def sendNotFoundMessage(user, label, keeperNumber):
-	sms_util.sendMsg(user, "Sorry, I don't have anything for %s" % label, None, keeperNumber)
 
 #  Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
 # Text could have comma's in it, that is dealt with later
@@ -106,69 +96,12 @@ def htmlForUserLabel(user, label):
 
 	return html
 
-def sendContactCard(user, keeperNumber):
-		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
-		sms_util.sendMsg(user, '', cardURL, keeperNumber)
-
 def dealWithNicety(user, msg, keeperNumber):
 	cleaned = msg.strip().lower()
 	if "thank" in cleaned:
 		sms_util.sendMsg(user, "You're welcome.", None, keeperNumber)
 	if "hello" in cleaned or "hi" in cleaned:
 		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
-
-def dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, sendResponse):
-	text, label, media, handles = getData(msg, numMedia, requestDict)
-
-	createdEntries = list()
-
-	# Text comes back without label but still has commas. Split on those here
-	for entryText in text.split(','):
-		entryText = entryText.strip()
-		if len(entryText) > 0:
-			entry = Entry.createEntry(user, keeperNumber, label, entryText)
-			createdEntries.append(entry)
-
-	for entryMediaUrl in media:
-		entry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
-		createdEntries.append(entry)
-
-	sharedHandles = list()
-	notFoundHandles = list()
-	shareString = ""
-	if len(handles) > 0: 
-		sharedHandles, notFoundHandles = shareEntries(user, createdEntries, handles, keeperNumber)
-	if len(sharedHandles) > 0:
-			shareString = "  I also shared that with %s" % ", ".join(sharedHandles)
-
-	if sendResponse:
-		if label == UNASSIGNED_LABEL:
-			sms_util.sendMsg(user, "Filing that under " + UNASSIGNED_LABEL + shareString, None, keeperNumber)
-		else:
-			sms_util.sendMsg(user, "Got it." + shareString, None, keeperNumber)
-
-		if len(notFoundHandles) > 0:
-			sms_util.sendMsg(user, "I don't know %s. Send @[name] [phone number] to introduce us." % ", ".join(notFoundHandles), None, keeperNumber)
-
-	return entry
-
-def shareEntries(user, entries, handles, keeperNumber):
-	sharedHandles = list()
-	notFoundHandles = list()
-	for handle in handles:
-		contact = Contact.fetchByHandle(user, handle)
-		if contact is None: 
-			notFoundHandles.append(handle)
-		else:
-			# add the target user to the entry and send them a message
-			sharedHandles.append(handle)
-			for entry in entries:
-				entry.users.add(contact.target)
-			if len(entries) == 1:
-				sms_util.sendMsg(contact.target, "Ding ding! %s shared \"%s %s\" with you." % (user.nameOrPhone(), entry.text, entry.label), None, keeperNumber)
-			else:
-				sms_util.sendMsg(contact.target, "Ding ding! %s shared %d items under %s with you." % (user.nameOrPhone(), len(entries), entry.label), None, keeperNumber)
-	return sharedHandles, notFoundHandles
 
 def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
 	text, label, media, handles = getData(msg, 0, requestDict)
@@ -207,8 +140,8 @@ def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
 
 def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 	# Need to do this so the add message correctly adds the label
-	msgWithLabel = query + " " + REMIND_LABEL
-	entry = dealWithAddMessage(user, msgWithLabel, 0, keeperNumber, requestDict, False)
+	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
+	entry = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
 
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
 	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
@@ -266,7 +199,7 @@ def dealWithDelete(user, msg, keeperNumber):
 	if label:
 		entries = Entry.fetchEntries(user=user, label=label)
 		if entries is None:
-			sendNotFoundMessage(user, label, keeperNumber)
+			helper_util.sendNotFoundMessage(user, label, keeperNumber)
 			return
 		if item_index < 0 or item_index >= len(entries):
 			sms_util.sendMsg(user, 'There is no item %d in %s' % (requested_index, label), None, keeperNumber)
@@ -280,68 +213,9 @@ def dealWithDelete(user, msg, keeperNumber):
 			retMsg = "item " + str(item_index+1)
 		sms_util.sendMsg(user, 'Ok, I deleted "%s"' % (retMsg), None, keeperNumber)
 
-		dealWithFetchMessage(user, label, 0, keeperNumber, None)
+		actions.fetch(user, label, keeperNumber)
 	else:
 		sms_util.sendMsg(user, 'Sorry, I\'m not sure which hashtag you\'re referring to. Try "delete [number] [hashtag]"', None, keeperNumber)
-
-def dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict):
-	# This is a label fetch.  See if a note with that label exists then return
-	label = msg
-	# We support many different remind commands, but every one actually does REMIND_LABEL
-	if msg_util.isRemindCommand(label):
-		label = REMIND_LABEL
-	entries = Entry.fetchEntries(user=user, label=label)
-	clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item."%(label)
-	mediaUrls = list()
-
-	if len(entries) == 0:
-		sendNotFoundMessage(user, label, keeperNumber)
-		return
-
-	currentMsg = "%s:" % label
-
-	count = 1
-	for entry in entries:
-		if entry.img_url:
-			mediaUrls.append(entry.img_url)
-		else:
-			otherUsers = list(entry.users.all())
-			otherUsers.remove(user)
-			otherUserHandles = list()
-			for otherUser in otherUsers:
-				# see if the user has a contact, if so use the handle
-				try:
-					contact = Contact.objects.get(user=user, target=otherUser)
-					otherUserHandles.append(contact.handle)
-				except Contact.DoesNotExist:
-					otherUserHandles.append(otherUser.phone_number)
-
-			otherUsersString = ""
-			if len(otherUserHandles) > 0:
-				otherUsersString = "(%s)" % (", ".join(otherUserHandles))
-
-			newStr = str(count) + ". " + entry.text + " " + otherUsersString
-
-			if entry.remind_timestamp:
-				dt = entry.remind_timestamp.replace(tzinfo=None)
-				newStr = "%s %s" % (newStr, humanize.naturaltime(dt))
-			currentMsg = currentMsg + "\n " + newStr
-			count += 1
-
-	if len(mediaUrls) > 0:
-		if (len(mediaUrls) > 1):
-			photoPhrase = " photos"
-		else:
-			photoPhrase = " photo"
-
-		currentMsg = currentMsg + "\n +" + str(len(mediaUrls)) + photoPhrase + " coming separately"
-
-		gridImageUrl = image_util.generateImageGridUrl(mediaUrls)
-
-		sms_util.sendMsg(user, currentMsg + clearMsg, None, keeperNumber)
-		sms_util.sendMsg(user, '', gridImageUrl, keeperNumber)
-	else:
-		sms_util.sendMsg(user, currentMsg + clearMsg, None, keeperNumber)
 
 def dealWithPrintHashtags(user, keeperNumber):
 	#print out all of the active hashtags for the account
@@ -359,7 +233,7 @@ def dealWithPrintHashtags(user, keeperNumber):
 def pickItemForUserLabel(user, label, keeperNumber):
 	entries = Entry.fetchEntries(user=user, label=label)
 	if len(entries) == 0:
-		sendNotFoundMessage(user, label, keeperNumber)
+		helper_util.sendNotFoundMessage(user, label, keeperNumber)
 		return
 
 	entry = random.choice(entries)
@@ -384,64 +258,6 @@ def dealWithActivation(user, msg, keeperNumber):
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
-
-def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
-	# this is to deal with magic phrase
-	if user.tutorial_step < 0:
-		user.tutorial_step = 0
-
-	if user.tutorial_step == 0:
-		user.name = msg
-		user.save()
-		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "Let me show you the basics. Send me an item you want to buy and add a hashtag. Like 'bread #shopping'", None, keeperNumber)
-		user.tutorial_step = user.tutorial_step + 1
-	elif user.tutorial_step == 1:
-		if not msg_util.hasLabel(msg):
-			# They didn't send in something with a label.
-			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #shopping'.", None, keeperNumber)
-		else:
-			# They sent in something with a label, have them add to it
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "Now send me another item for the same list. Don't forget to add the same hashtag '%s'" % msg_util.getLabel(msg), None, keeperNumber)
-			user.tutorial_step = user.tutorial_step + 1
-	elif user.tutorial_step == 2:
-		# They should be sending in a second add command to an existing label
-		if not msg_util.hasLabel(msg) or msg_util.isLabel(msg):
-			existingLabel = Entry.fetchFirstLabel(user)
-			if not existingLabel:
-				sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
-				return
-			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
-		else:
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "You can send items to this hashtag anytime (including photos). To see your items, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
-			user.tutorial_step = user.tutorial_step + 1
-	elif user.tutorial_step == 3:
-		# The should be sending in just a label
-		existingLabel = Entry.fetchFirstLabel(user)
-		if not existingLabel:
-			sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
-			return
-
-		if not msg_util.isLabel(msg):
-			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
-			return
-
-		if not msg in Entry.fetchAllLabels(user):
-			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
-			return
-		else:
-			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
-			sms_util.sendMsg(user, "That's all you need to know for now. Send 'huh?' anytime to get help.", None, keeperNumber)
-			time.sleep(1)
-			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
-			time.sleep(1)
-			sendContactCard(user, keeperNumber)
-			user.completed_tutorial = True
-
-	user.save()
 
 def createHandle(user, handle, targetNumber):
 	# see if there's an existing contact for that handle
@@ -508,7 +324,9 @@ def cliMsg(phoneNumber, msg, mediaURL=None, mediaType=None):
 		if mediaType is not None:
 			jsonDict["MediaContentType0"] = mediaType
 		jsonDict["NumMedia"] = 1
-
+	else:
+		jsonDict["NumMedia"] = 0
+		
 	processMessage(phoneNumber, msg, numMedia, jsonDict, "test")
 
 """
@@ -530,10 +348,10 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 
 
 	if user.activated == None:
-		processing_util.processMessage(user, msg, numMedia, requestDict, keeperNumber)
+		processing_util.processMessage(user, msg, requestDict, keeperNumber)
 	# STATE_TUTORIAL
 	elif not user.completed_tutorial:
-		dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict)
+		processing_util.processMessage(user, msg, requestDict, keeperNumber)
 	# STATE_NORMAL
 	elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
 		dealWithActivation(user, msg, keeperNumber)
@@ -543,13 +361,13 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		dealWithPrintHashtags(user, keeperNumber)
 	# STATE_NORMAL
 	elif msg_util.isFetchCommand(msg) and numMedia == 0:
-			dealWithFetchMessage(user, msg, numMedia, keeperNumber, requestDict)
+			actions.fetch(user, msg, keeperNumber)
 	# STATE_NORMAL
 	elif msg_util.isClearCommand(msg) and numMedia == 0:
 		label = msg_util.getLabel(msg)
 		entries = Entry.fetchEntries(user=user, label=label)
 		if len(entries) == 0:
-			sendNotFoundMessage(user, label, keeperNumber)
+			helper_util.sendNotFoundMessage(user, label, keeperNumber)
 		else:
 			for entry in entries:
 				entry.hidden = True
@@ -585,10 +403,10 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 				dealWithNicety(user, msg, keeperNumber)
 				return
 			# if the user didn't add a label, throw it in #unassigned
-			msg += ' ' + UNASSIGNED_LABEL
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
+			msg += ' ' + keeper_constants.UNASSIGNED_LABEL
+			actions.add(user, msg, requestDict, keeperNumber, True)
 		else:
-			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, True)
+			actions.add(user, msg, requestDict, keeperNumber, True)
 
 #
 # Send a sms message to a user from a certain number

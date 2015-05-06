@@ -3,7 +3,7 @@ import sys
 from cStringIO import StringIO
 from contextlib import contextmanager
 
-from smskeeper import views, processing_util
+from smskeeper import views, processing_util, keeper_constants
 from smskeeper.models import User, Entry, Contact
 import datetime
 import pytz
@@ -31,50 +31,52 @@ class SMSKeeperCase(TestCase):
 		except User.DoesNotExist:
 			pass
 
-	def setupUser(self, activated, tutorialComplete):
+	# TODO(Derek): Eventually activated and tutorialComplete should go away
+	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		self.user.completed_tutorial = tutorialComplete
 		if (activated):
 			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		self.user.state = state
 		self.user.save()
 
 	def test_first_connect(self):
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("magic phrase" in output, output)
+			self.assertIn("magic phrase", output)
 
 	def test_unactivated_connect(self):
-		self.setupUser(False, False)
+		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
 		views.cliMsg(self.testPhoneNumber, "hi")
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
 			self.assertIn("Nope.", output)
 
 	def test_magicphrase(self):
-		self.setupUser(False, False)
+		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
 		with capture(views.cliMsg, self.testPhoneNumber, "trapper keeper") as output:
-			self.assertTrue("That's the magic phrase" in output, output)
+			self.assertIn("That's the magic phrase", output)
 
 	def test_tutorial(self):
-		self.setupUser(True, False)
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL)
 
 		# Activation message asks for their name
 		with capture(views.cliMsg, self.testPhoneNumber, "UnitTests") as output:
-			self.assertTrue("nice to meet you UnitTests!" in output, output)
-			self.assertTrue("Let me show you the basics" in output, output)
-			self.assertTrue(User.objects.get(phone_number=self.testPhoneNumber).name == "UnitTests")
+			self.assertIn("nice to meet you UnitTests!", output)
+			self.assertIn("Let me show you the basics", output)
+			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new5 #test") as output:
-			self.assertTrue("Now send me another item for the same list" in output, output)
+			self.assertIn("Now send me another item for the same list", output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new2 #test") as output:
-			self.assertTrue("You can send items to this" in output, output)
+			self.assertIn("You can send items to this", output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
-			self.assertTrue("That's all you need to know for now" in output, output)
+			self.assertIn("That's all you need to know for now", output)
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
-			self.assertTrue("Sorry, I don't" in output, output)
+			self.assertIn("Sorry, I don't", output)
 
 	def test_get_label(self):
 		self.setupUser(True, True)
@@ -99,10 +101,10 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 		with capture(views.cliMsg, self.testPhoneNumber, "new") as output:
 			# ensure we tell the user we put it in unassigned
-			self.assertTrue(views.UNASSIGNED_LABEL in output)
-		with capture(views.cliMsg, self.testPhoneNumber, views.UNASSIGNED_LABEL) as output:
+			self.assertIn(keeper_constants.UNASSIGNED_LABEL, output)
+		with capture(views.cliMsg, self.testPhoneNumber, keeper_constants.UNASSIGNED_LABEL) as output:
 			# ensure the user can get things from #unassigned
-			self.assertTrue("new" in output, output)
+			self.assertIn("new", output)
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)
@@ -112,12 +114,12 @@ class SMSKeeperCase(TestCase):
 
 		# First make sure that the entry is there
 		with capture(views.cliMsg, self.testPhoneNumber, "#cocktail") as output:
-			self.assertTrue("old fashioned" in output, output)
+			self.assertIn("old fashioned", output)
 
 		# Next make sure we delete and the list is clear
 		views.cliMsg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
 		with capture(views.cliMsg, self.testPhoneNumber, "#cocktail") as output:
-			self.assertTrue("Sorry, I don't" in output, output)
+			self.assertIn("Sorry, I don't", output)
 
 	def test_contextual_delete(self):
 		self.setupUser(True, True)
@@ -126,41 +128,41 @@ class SMSKeeperCase(TestCase):
 
 		# ensure we don't delete when ambiguous
 		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertTrue("Sorry, I'm not sure" in output, output)
+			self.assertIn("Sorry, I'm not sure", output)
 
 		# ensure deletes right item
 		views.cliMsg(self.testPhoneNumber, "#bar")
 		with capture(views.cliMsg, self.testPhoneNumber, "delete 2") as output:
-			self.assertTrue("2. foo2" not in output, output)
+			self.assertNotIn("2. foo2", output)
 
 		# ensure can chain deletes
 		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertTrue("1. foo1" not in output, output)
+			self.assertNotIn("1. foo1", output)
 
 		# ensure deleting from empty doesn't crash
 		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertTrue("no item 1" in output, output)
+			self.assertIn("no item 1", output)
 
 	def test_reminders_basic(self):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop tmr") as output:
-			self.assertTrue("a day from now" in output, output)
+			self.assertIn("a day from now", output)
 
 	def test_reminders_remind_works(self):
 		self.setupUser(True, True)
 
 		views.cliMsg(self.testPhoneNumber, "#remind poop tmr")
-		self.assertTrue("#reminders" in Entry.fetchAllLabels(self.user), Entry.fetchAllLabels(self.user))
+		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
 	def test_reminders_followup(self):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
-			self.assertTrue("what time?" in output, output)
+			self.assertIn("what time?", output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
-			self.assertTrue("a day from now" in output, output)
+			self.assertIn("a day from now", output)
 
 	"""
 		Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
@@ -196,7 +198,7 @@ class SMSKeeperCase(TestCase):
 
 		with capture(views.cliMsg, self.testPhoneNumber, u'#remind poop\u2019s tmr') as output:
 			self.assertIn(u'poop\u2019s', output.decode('utf-8'))
-		self.assertTrue("#reminders" in Entry.fetchAllLabels(self.user), Entry.fetchAllLabels(self.user))
+		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
 
 class SMSKeeperSharingCase(TestCase):

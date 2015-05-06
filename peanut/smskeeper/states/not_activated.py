@@ -32,7 +32,7 @@ def dealWithNonActivatedUser(user, keeperNumber):
 
 def dealWithMagicPhrase(user, keeperNumber):
 	user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	user.state = keeper_constants.STATE_TUTORIAL
+	user.setState(keeper_constants.STATE_TUTORIAL)
 	user.save()
 
 	sms_util.sendMsg(user, "That's the magic phrase. Welcome!", None, keeperNumber)
@@ -40,7 +40,7 @@ def dealWithMagicPhrase(user, keeperNumber):
 	helper_util.firstRunIntro(user, keeperNumber)
 
 
-def process(user, msg, numMedia, requestDict, keeperNumber):
+def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
 
 	# If the user enters the magic phrase then they get activated

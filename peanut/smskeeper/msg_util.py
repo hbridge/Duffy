@@ -92,12 +92,12 @@ def isMagicPhrase(msg):
 
 # Returns back (textWithoutLabel, label, listOfHandles)
 def getMessagePieces(msg):
-	textWithoutLabel, label, listOfUrls, listOfHandles = getMessagePiecesWithMedia(msg, 0, {})
+	textWithoutLabel, label, listOfUrls, listOfHandles = getMessagePiecesWithMedia(msg, {})
 	return (textWithoutLabel, label, listOfHandles)
 
 # Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
 # Text could have comma's in it, that is dealt with later
-def getMessagePiecesWithMedia(msg, numMedia, requestDict):
+def getMessagePiecesWithMedia(msg, requestDict):
 	# process text
 	nonLabels = list()
 	handleList = list()
@@ -113,14 +113,16 @@ def getMessagePiecesWithMedia(msg, numMedia, requestDict):
 	# process media
 	mediaUrlList = list()
 
+	if 'NumMedia' in requestDict:
+		numMedia = int(requestDict['NumMedia'])
+	else:
+		numMedia = 0
+		
 	for n in range(numMedia):
 		param = 'MediaUrl' + str(n)
 		mediaUrlList.append(requestDict[param])
 		#TODO need to store mediacontenttype as well.
 
-	#TODO use a separate process but probably this is not the right place to do it.
-	#if numMedia > 0:
-	#	mediaUrlList = image_util.moveMediaToS3(mediaUrlList)
 	return (' '.join(nonLabels), label, mediaUrlList, handleList)
 
 

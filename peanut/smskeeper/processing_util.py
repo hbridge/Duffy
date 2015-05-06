@@ -2,7 +2,7 @@ import json
 
 from smskeeper import keeper_constants
 
-from smskeeper.states import not_activated
+from smskeeper.states import not_activated, tutorial
 from smskeeper import msg_util
 
 from smskeeper.models import User, Message
@@ -25,12 +25,13 @@ def getPossibleCommands(msg):
 			commandList.append(key)
 	return commandList
 
-def processMessage(user, msg, numMedia, requestDict, keeperNumber):
+def processMessage(user, msg, requestDict, keeperNumber):
 	stateModule = stateCallbacks[user.state]
-	stateModule.process(user, msg, numMedia, requestDict, keeperNumber)
+	stateModule.process(user, msg, requestDict, keeperNumber)
 
 stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED : not_activated,
+	keeper_constants.STATE_TUTORIAL : tutorial,
 }
 
 

@@ -1,14 +1,17 @@
+import logging
+import json
+import copy
+
 from django.db import models
 from django.contrib import admin
-import json
 from django.utils.html import format_html
+
+from fysom import Fysom
+
 from common import api_util
-import logging
-logger = logging.getLogger(__name__)
-
-
 from smskeeper import keeper_constants
 
+logger = logging.getLogger(__name__)
 
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
@@ -49,6 +52,10 @@ class User(models.Model):
 		if self.name is not None and len(self.name) > 0:
 			return self.name
 		return self.phone_number
+
+	def setState(self, state):
+		self.state = state
+		self.state_data = None
 
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
