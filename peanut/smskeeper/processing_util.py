@@ -22,7 +22,7 @@ def isLabel(msg):
 	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
 
 def isNicety(msg):
-	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you", "ok"]
+	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you", "ok", "okay"]
 
 def isClearCommand(msg):
 	stripedMsg = msg.strip()
