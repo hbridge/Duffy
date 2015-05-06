@@ -44,28 +44,29 @@ class SMSKeeperCase(TestCase):
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False)
+		views.cliMsg(self.testPhoneNumber, "hi")
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("Nope." in output, output)
+			self.assertIn("Nope.", output)
 
 	def test_magicphrase(self):
 		self.setupUser(False, False)
 		with capture(views.cliMsg, self.testPhoneNumber, "trapper keeper") as output:
-			self.assertTrue("Let's get started" in output, output)
+			self.assertTrue("That's the magic phrase" in output, output)
 
 	def test_tutorial(self):
 		self.setupUser(True, False)
 
 		# Activation message asks for their name
 		with capture(views.cliMsg, self.testPhoneNumber, "UnitTests") as output:
-			self.assertTrue("nice to meet you UnitTests" in output, output)
-			self.assertTrue("I can help you create a list" in output, output)
+			self.assertTrue("nice to meet you UnitTests!" in output, output)
+			self.assertTrue("Let me show you the basics" in output, output)
 			self.assertTrue(User.objects.get(phone_number=self.testPhoneNumber).name == "UnitTests")
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new5 #test") as output:
 			self.assertTrue("Now send me another item for the same list" in output, output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "new2 #test") as output:
-			self.assertTrue("You can send items to this list" in output, output)
+			self.assertTrue("You can send items to this" in output, output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
 			self.assertTrue("That's all you need to know for now" in output, output)

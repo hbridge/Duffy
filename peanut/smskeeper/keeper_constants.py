@@ -8,3 +8,9 @@ COMMAND_ACTIVATE = 6
 COMMAND_LIST = 7
 COMMAND_HELP = 8
 
+STATE_NORMAL = 'normal'
+STATE_TUTORIAL = 'tutorial'
+STATE_NOT_ACTIVATED = 'not-activated'
+STATE_REMIND = 'remind'
+STATE_DELETE = 'delete'
+STATE_ADD = 'add'
