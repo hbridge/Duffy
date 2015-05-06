@@ -7,6 +7,8 @@ from smskeeper import views, processing_util
 from smskeeper.models import User, Entry, Contact
 import datetime
 import pytz
+from testfixtures import Replacer
+from testfixtures import test_datetime
 
 
 @contextmanager
@@ -287,3 +289,46 @@ class SMSKeeperSharingCase(TestCase):
 			pass
 		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
 			self.assertNotIn("poop", output)
+
+from smskeeper import async
+from smskeeper import tips
+
+
+class SMSKeeperAsyncCase(TestCase):
+	testPhoneNumber = "+16505555550"
+	user = None
+
+	def setUp(self):
+		try:
+			user = User.objects.get(phone_number=self.testPhoneNumber)
+			user.delete()
+		except User.DoesNotExist:
+			pass
+		self.setupUser(True, True)
+
+	def setupUser(self, activated, tutorialComplete):
+		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
+		self.user.completed_tutorial = tutorialComplete
+		if (activated):
+			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		self.user.save()
+
+	def testSendTips(self):
+		with capture(async.sendTips) as output:
+			self.assertIn(tips.SMSKEEPER_TIPS[0]["messages"][0], output)
+
+		# set datetime to return a full day ahead after each call
+		with Replacer() as r:
+			r.replace('smskeeper.async.datetime.datetime', test_datetime(2020, 01, 01))
+			# check that tip 2 got sent out
+			with capture(async.sendTips) as output:
+				self.assertIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
+			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
+
+
+	def testTipThrottling(self):
+		with capture(async.sendTips):
+			pass
+		with capture(async.sendTips) as output:
+			self.assertNotIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
+

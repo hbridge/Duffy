@@ -306,6 +306,7 @@ class BASE_CELERY_CONFIG:
         'memfresh.async.evalAllUsersForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'memfresh.async.evalUserForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'smskeeper.async.processReminder': {'queue': 'independent', 'routing_key': 'independent'},
+        'smskeeper.async.sendTips': {'queue': 'independent', 'routing_key': 'independent'},
     }
 
     CELERYBEAT_SCHEDULE = {
@@ -317,6 +318,11 @@ class BASE_CELERY_CONFIG:
         'memfresh-followup': {
             'task': 'memfresh.async.evalAllUsersForFollowUp',
             'schedule': crontab(minute=15),
+            'args': None,
+        },
+        'smskeeper-tips': {
+            'task': 'smskeeper.async.sendTips',
+            'schedule': crontab(minute=5),
             'args': None,
         }
     }

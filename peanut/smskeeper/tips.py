@@ -22,7 +22,7 @@ SMSKEEPER_TIPS = [
 		"identifier": "sharing",
 		"messages": [
 			"Did you know that you can share items with friends?",
-			"For example: “Avengers #movie @tessa” to share with Tessa"
+			"For example: 'Avengers #movie @tessa' to share with Tessa"
 		]
 	},
 	{

@@ -13,9 +13,9 @@ class User(models.Model):
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)
 	activated = models.DateTimeField(null=True)
-
 	timezone = models.CharField(max_length=100, null=True)
-
+	sent_tips = models.TextField(null=True, db_index=False)
+	last_tip_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 

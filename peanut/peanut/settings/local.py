@@ -9,3 +9,5 @@ STATICFILES_DIRS = (
 	# Don't forget to use absolute paths, not relative paths.
    '/Users/hbridge/Documents/Repos/Duffy/peanut/static',
 )
+
+KEEPER_NUMBER = "test"

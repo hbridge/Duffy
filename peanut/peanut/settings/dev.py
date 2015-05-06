@@ -10,7 +10,7 @@ codecs.register(lambda name: codecs.lookup('utf8') if name == 'utf8mb4' else Non
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.contrib.gis.db.backends.mysql', 
+		'ENGINE': 'django.contrib.gis.db.backends.mysql',
 		'NAME': 'duffy',
 		'USER': 'djangouser',
 		'PASSWORD': 'djangopass',
@@ -56,3 +56,5 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	BROKER_URL = "amqp://duffy:du44y@dev.duffyapp.com:5672/swap"
+
+KEEPER_NUMBER = "+18452088586"
