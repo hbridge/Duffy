@@ -42,8 +42,9 @@ class SMSKeeperCase(TestCase):
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False)
+		views.cliMsg(self.testPhoneNumber, "hi")
 		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertTrue("Nope." in output, output)
+			self.assertIn("Nope.", output)
 
 	def test_magicphrase(self):
 		self.setupUser(False, False)

@@ -17,6 +17,7 @@ class User(models.Model):
 	activated = models.DateTimeField(null=True)
 
 	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
+	state_data = models.CharField(max_length=100, null=True)
 
 	timezone = models.CharField(max_length=100, null=True)
 
