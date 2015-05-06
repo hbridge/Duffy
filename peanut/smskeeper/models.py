@@ -6,6 +6,7 @@ from common import api_util
 import logging
 logger = logging.getLogger(__name__)
 
+
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
 	name = models.CharField(max_length=100)
@@ -17,7 +18,6 @@ class User(models.Model):
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
-
 
 	def history(self):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
@@ -51,6 +51,7 @@ class User(models.Model):
 class UserAdmin(admin.ModelAdmin):
 	list_display = ('id', 'activated', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'last_msg_from', 'total_msgs_from', 'history')
 
+
 class Note(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	label = models.CharField(max_length=100)
@@ -72,6 +73,7 @@ class NoteEntry(models.Model):
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+
 
 class Entry(models.Model):
 	creator = models.ForeignKey(User, related_name="creator")
@@ -131,6 +133,7 @@ class Message(models.Model):
 
 	# calculated attributes
 	messageDict = None
+
 	def getMessageAttribute(self, attribute):
 		if self.messageDict is None:
 			self.messageDict = json.loads(self.msg_json)
@@ -161,6 +164,7 @@ class Message(models.Model):
 
 		return media
 
+
 class MessageMedia:
 	url = None
 	mediaType = None
@@ -168,6 +172,7 @@ class MessageMedia:
 	def __init__(self, url, mediaType):
 		self.url = url
 		self.mediaType = mediaType
+
 
 class Contact(models.Model):
 	user = models.ForeignKey(User, db_index=True)
