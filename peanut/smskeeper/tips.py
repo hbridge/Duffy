@@ -7,7 +7,7 @@ SMSKEEPER_TIPS = [
 	{
 		"identifier": "reminders",
 		"messages": [
-			"FYI, did you know that I can also help you set reminders?",
+			"FYI, did you know that I can help you set reminders?",
 			"For example: '#reminder call mom tomorrow at 5pm' or '#reminder pickup wine tomorrow'"
 		]
 	},
@@ -15,14 +15,14 @@ SMSKEEPER_TIPS = [
 		"identifier": "photos",
 		"messages": [
 			"Did you know that you can send me photos too?",
-			"Send a photo with a hash tag, and I'll send them back with other items with the same hashtag"
+			"Send me a photo with a hash tag, and I'll send it back whenever you ask for that hashtag."
 		]
 	},
 	{
 		"identifier": "sharing",
 		"messages": [
-			"Did you know that you can share items with friends?",
-			"For example: 'Avengers #movie @tessa' to share with Tessa"
+			"Hey there. I'm also great for sharing stuff with friends.",
+			"For example, you could type: 'Avengers #movie @tessa' to add to keep track of movies to watch together."
 		]
 	},
 	{
