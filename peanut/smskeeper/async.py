@@ -20,6 +20,7 @@ from smskeeper import tips
 import datetime
 from django.conf import settings
 import pytz
+import time
 
 
 @app.task
@@ -65,6 +66,7 @@ def sendTips():
 					print "sending %s to %s" % (tip["identifier"], user.phone_number)
 					for msg in tip["messages"]:
 						sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
+						time.sleep(1)
 					sentTips.append(tip["identifier"])
 					user.sent_tips = ",".join(sentTips)
 					user.last_tip_sent = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
