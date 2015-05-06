@@ -1,14 +1,17 @@
-from django.test import TestCase
+import datetime
+import pytz
 import sys
 from cStringIO import StringIO
 from contextlib import contextmanager
 
-from smskeeper import views, processing_util, keeper_constants
-from smskeeper.models import User, Entry, Contact
-import datetime
-import pytz
 from testfixtures import Replacer
 from testfixtures import test_datetime
+
+from django.test import TestCase
+
+from peanut.settings import constants
+from smskeeper import views, processing_util, keeper_constants
+from smskeeper.models import User, Entry, Contact
 
 
 @contextmanager
@@ -317,21 +320,21 @@ class SMSKeeperAsyncCase(TestCase):
 		self.user.save()
 
 	def testSendTips(self):
-		with capture(async.sendTips) as output:
+		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
 			self.assertIn(tips.SMSKEEPER_TIPS[0]["messages"][0], output)
 
 		# set datetime to return a full day ahead after each call
 		with Replacer() as r:
 			r.replace('smskeeper.async.datetime.datetime', test_datetime(2020, 01, 01))
 			# check that tip 2 got sent out
-			with capture(async.sendTips) as output:
+			with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
 				self.assertIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
 			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
 
 
 	def testTipThrottling(self):
-		with capture(async.sendTips):
+		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM):
 			pass
-		with capture(async.sendTips) as output:
+		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
 			self.assertNotIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
 

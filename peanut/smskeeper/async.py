@@ -1,6 +1,9 @@
 from __future__ import absolute_import
 import sys
 import os
+import datetime
+import pytz
+import time
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -8,19 +11,19 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from peanut.celery import app
-
-from celery.utils.log import get_task_logger
-logger = get_task_logger(__name__)
+from django.conf import settings
 
 from smskeeper.models import Entry
 from smskeeper.models import User
 from smskeeper import sms_util
 from smskeeper import tips
-import datetime
-from django.conf import settings
-import pytz
-import time
+
+from peanut.settings import constants
+from peanut.celery import app
+
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
+
 
 
 @app.task
@@ -52,20 +55,20 @@ def shouldSendUserTip(user):
 
 
 @app.task
-def sendTips():
-	print "sending tips"
+def sendTips(keeperNumber=None):
+	if not keeperNumber:
+		keeperNumber = settings.KEEPER_NUMBER
+
 	users = User.objects.all()
 	for user in users:
 		if shouldSendUserTip(user):
-			print "evaling tips to send to user: %s" % (user.phone_number)
 			sentTips = list()
 			if user.sent_tips:
 				sentTips = user.sent_tips.split(",")
 			for tip in tips.SMSKEEPER_TIPS:
 				if tip["identifier"] not in sentTips:
-					print "sending %s to %s" % (tip["identifier"], user.phone_number)
 					for msg in tip["messages"]:
-						sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
+						sms_util.sendMsg(user, msg, None, keeperNumber)
 						time.sleep(1)
 					sentTips.append(tip["identifier"])
 					user.sent_tips = ",".join(sentTips)

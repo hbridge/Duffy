@@ -6,8 +6,6 @@ from django.db import models
 from django.contrib import admin
 from django.utils.html import format_html
 
-from fysom import Fysom
-
 from common import api_util
 from smskeeper import keeper_constants
 

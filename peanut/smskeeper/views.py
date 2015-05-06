@@ -327,7 +327,7 @@ def cliMsg(phoneNumber, msg, mediaURL=None, mediaType=None):
 	else:
 		jsonDict["NumMedia"] = 0
 		
-	processMessage(phoneNumber, msg, numMedia, jsonDict, "test")
+	processMessage(phoneNumber, msg, numMedia, jsonDict, constants.SMSKEEPER_TEST_NUM)
 
 """
 	Main logic for processing a message
