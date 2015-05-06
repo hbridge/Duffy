@@ -188,6 +188,13 @@ class SMSKeeperCase(TestCase):
 		commands = processing_util.getPossibleCommands("#test this is a test")
 		print "HERE: %s" % commands
 
+	def test_unicode_natty(self):
+		self.setupUser(True, True)
+
+		with capture(views.cliMsg, self.testPhoneNumber, u'#remind poop\u2019s tmr') as output:
+			self.assertIn(u'poop\u2019s', output.decode('utf-8'))
+		self.assertTrue("#reminders" in Entry.fetchAllLabels(self.user), Entry.fetchAllLabels(self.user))
+
 
 class SMSKeeperSharingCase(TestCase):
 	testPhoneNumbers = ["+16505555550", "+16505555551", "+16505555552"]

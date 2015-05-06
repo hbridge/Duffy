@@ -13,7 +13,7 @@ def sendMsg(user, msg, mediaUrls, keeperNumber):
 		# This is used for command line interface commands
 		# If you change this, all tests will fail.
 		# TODO: figure out how to pipe this with logger
-		print msg
+		print unicode(msg).encode('utf-8')
 	else:
 		if mediaUrls:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
