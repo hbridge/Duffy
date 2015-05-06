@@ -31,7 +31,7 @@ from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMS
 from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 
 
-from smskeeper import sms_util, image_util, msg_util, processing_util
+from smskeeper import sms_util, image_util, msg_util, processing_util, helper_util
 from smskeeper import async
 
 from common import api_util, natty_util
@@ -378,13 +378,12 @@ def dealWithActivation(user, msg, keeperNumber):
 		userToActivate.save()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
 
-		sms_util.sendMsg(userToActivate, "Oh hello. You are a lucky one. Someone else entered your magic phrase.", None, keeperNumber)
+		sms_util.sendMsg(userToActivate, "Oh hello. Someone else entered your magic phrase. Welcome!", None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(userToActivate, "I'm Keeper and I can keep track of your lists, reminders, notes, photos, etc.", None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(userToActivate, "Before I explain a bit more, what's your name?", None, keeperNumber)
+		helper_util.firstRunIntro(userToActivate, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
+
 
 def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	# this is to deal with magic phrase
@@ -394,14 +393,14 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 	if user.tutorial_step == 0:
 		user.name = msg
 		user.save()
-		sms_util.sendMsg(user, "Great, nice to meet you %s" % user.name, None, keeperNumber)
+		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "I can help you create a list. Send me an item you want to buy and add a hashtag. Like 'bread #grocery'", None, keeperNumber)
+		sms_util.sendMsg(user, "Let me show you the basics. Send me an item you want to buy and add a hashtag. Like 'bread #shopping'", None, keeperNumber)
 		user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 1:
 		if not msg_util.hasLabel(msg):
 			# They didn't send in something with a label.
-			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #grocery'.", None, keeperNumber)
+			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #shopping'.", None, keeperNumber)
 		else:
 			# They sent in something with a label, have them add to it
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
@@ -417,7 +416,7 @@ def dealWithTutorial(user, msg, numMedia, keeperNumber, requestDict):
 			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
 			dealWithAddMessage(user, msg, numMedia, keeperNumber, requestDict, False)
-			sms_util.sendMsg(user, "You can send items to this list anytime (including photos). To see your list, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "You can send items to this hashtag anytime (including photos). To see your items, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
 			user.tutorial_step = user.tutorial_step + 1
 	elif user.tutorial_step == 3:
 		# The should be sending in just a label
@@ -523,9 +522,9 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		try:
 			user = User.objects.create(phone_number=phoneNumber)
 		except Exception as e:
-			print "Got Exception in user creation: %s" % e
+			logger.error("Got Exception in user creation: %s" % e)
 	except Exception as e:
-		print "Got Exception in user creation: %s" % e
+		logger.error("Got Exception in user creation: %s" % e)
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
