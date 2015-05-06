@@ -45,7 +45,7 @@ MONTH  : 'month'  | 'months';
 YEAR   : 'year'   | 'year' SINGLE_QUOTE? 's' | 'yrs' DOT?;
 
 TODAY     : 'today';
-TOMORROW  : 'tomorow' | 'tomorrow' | 'tommorow' | 'tommorrow' | 'tmr';
+TOMORROW  : 'tomorow' | 'tomorrow' | 'tommorow' | 'tommorrow' | 'tmr' | 'tmrw';
 TONIGHT   : 'tonight'; 
 YESTERDAY : 'yesterday';
 
