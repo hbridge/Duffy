@@ -78,7 +78,7 @@ class Entry(models.Model):
 
 	# creator will be in this list
 	users = models.ManyToManyField(User, db_index=True, related_name="users")
-	
+
 	label = models.CharField(max_length=100, db_index=True)
 
 	text = models.TextField(null=True)
@@ -106,7 +106,7 @@ class Entry(models.Model):
 			return entries[0].label
 		else:
 			return None
-		
+
 	@classmethod
 	def fetchEntries(cls, user, label=None, hidden=False):
 		entries = Entry.objects.filter(users__in=[user], hidden=hidden).order_by("added")
@@ -119,6 +119,7 @@ class Entry(models.Model):
 		entry = Entry.objects.create(creator=user, label=label, keeper_number=keeper_number, text=text, img_url=img_url, remind_timestamp=remind_timestamp)
 		entry.users.add(user)
 		return entry
+
 
 class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)
