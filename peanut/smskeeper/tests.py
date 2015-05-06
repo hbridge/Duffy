@@ -2,13 +2,12 @@ from django.test import TestCase
 import sys
 from cStringIO import StringIO
 from contextlib import contextmanager
-import time
 
 from smskeeper import views, processing_util
-from smskeeper.models import User, Entry, Message, MessageMedia, Contact
+from smskeeper.models import User, Entry, Contact
 import datetime
 import pytz
-from django.conf import settings
+
 
 @contextmanager
 def capture(command, *args, **kwargs):
@@ -76,7 +75,7 @@ class SMSKeeperCase(TestCase):
 
 	def test_get_label(self):
 		self.setupUser(True, True)
-		
+
 		views.cliMsg(self.testPhoneNumber, "new #test")
 		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
 			self.assertTrue("new" in output, output)
@@ -113,7 +112,7 @@ class SMSKeeperCase(TestCase):
 			self.assertTrue("old fashioned" in output, output)
 
 		# Next make sure we delete and the list is clear
-		views.cliMsg(self.testPhoneNumber, "delete 1 #cocktail") #test absolute delete
+		views.cliMsg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
 		with capture(views.cliMsg, self.testPhoneNumber, "#cocktail") as output:
 			self.assertTrue("Sorry, I don't" in output, output)
 
@@ -160,93 +159,92 @@ class SMSKeeperCase(TestCase):
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
 			self.assertTrue("a day from now" in output, output)
 
-
 	"""
 		Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
 		Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
 	"""
 	def test_natty_timezone(self):
 		self.setupUser(True, True)
-		self.user.timezone = "US/Eastern" # This is the default
+		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
 		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
-		self.assertEqual(entry.remind_timestamp.hour, 19) # 3 pm Eastern in UTC
+		self.assertEqual(entry.remind_timestamp.hour, 19)  # 3 pm Eastern in UTC
 
 		views.cliMsg(self.testPhoneNumber, "clear #reminders")
 
-		self.user.timezone = "US/Pacific" # This is the default
+		self.user.timezone = "US/Pacific"  # This is the default
 		self.user.save()
 		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 
-		self.assertEqual(entry.remind_timestamp.hour, 22) # 3 pm Pactific in UTC
+		self.assertEqual(entry.remind_timestamp.hour, 22)  # 3 pm Pactific in UTC
 
 	def test_state_machine(self):
 		commands = processing_util.getPossibleCommands("#test this is a test")
 		print "HERE: %s" % commands
 
-class SMSKeeperSharingCase(TestCase):
-	testPhoneNumber = "+16505555550"
-	handle = "@test"
-	targetNum = "6505551111"
-	user = None
 
+class SMSKeeperSharingCase(TestCase):
+	testPhoneNumbers = ["+16505555550", "+16505555551", "+16505555552"]
+	users = []
+	handle = "@test"
+	nonUserNumber = "6505551111"
 
 	def normalizeNumber(self, number):
-		return "+1" + number;
+		return "+1" + number
 
 	def setUp(self):
-		try:
-			user = User.objects.get(phone_number=self.testPhoneNumber)
+		print "users at start setup: %s" % (self.users)
+		for user in User.objects.all():
+			print "deleting %s" % (user)
 			user.delete()
-		except User.DoesNotExist:
-			pass
+		self.users = []
+		print "users after clear: %s" % (self.users)
 
-	def setupUser(self, activated, tutorialComplete):
-		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
-		self.user.completed_tutorial = tutorialComplete
-		if (activated):
-			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		self.user.save()
+		for phoneNumber in self.testPhoneNumbers:
+			print "creating: %s" % phoneNumber
+			user, created = User.objects.get_or_create(phone_number=phoneNumber)
+			print "returned user: %s" % (user)
+			user.completed_tutorial = True
+			user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+			user.save()
+			self.users.append(user)
+		print "users: %s" % (self.users)
 
 	def testCreateContact(self):
-		self.setupUser(True, True)
-
-		# make sure the output contains the normalized number
-		with capture(views.cliMsg, self.testPhoneNumber, "%s %s" % (self.handle, self.targetNum)) as output:
-			self.assertTrue(self.normalizeNumber(self.targetNum) in output)
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1])) as output:
+			self.assertTrue(self.testPhoneNumbers[1] in output)
 
 		# ensure the contact has the right number
-		contact = Contact.objects.get(user=self.user, handle=self.handle)
-		self.assertEqual(contact.target.phone_number, self.normalizeNumber(self.targetNum))
+		contact = Contact.objects.get(user=self.users[0], handle=self.handle)
+		self.assertEqual(contact.target.phone_number, self.testPhoneNumbers[1])
+
+	def testCreateNonUserContact(self):
+		# make sure the output contains the normalized number
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.nonUserNumber)) as output:
+			self.assertTrue(self.normalizeNumber(self.nonUserNumber) in output)
 
 		# make sure there's a user for the new contact
-		targetUser = User.objects.get(phone_number=self.normalizeNumber(self.targetNum))
+		targetUser = User.objects.get(phone_number=self.normalizeNumber(self.nonUserNumber))
 		self.assertNotEqual(targetUser, None)
 
 	def testReassignContact(self):
-		self.setupUser(True, True)
-
-		# create a user
-		with capture(views.cliMsg, self.testPhoneNumber, "%s %s" % (self.handle, "9175555555")) as output:
+		# create a contact
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1])) as output:
 			pass
 
-		#change it 
-		with capture(views.cliMsg, self.testPhoneNumber, "%s %s" % (self.handle, self.targetNum)) as output:
-			self.assertTrue(self.normalizeNumber(self.targetNum) in output)
+		# change it
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[2])) as output:
+			self.assertTrue(self.testPhoneNumbers[2] in output)
 
 		# ensure the contact has the right number
-		contact = Contact.objects.get(user=self.user, handle=self.handle)
-		self.assertEqual(contact.target.phone_number, self.normalizeNumber(self.targetNum))
+		contact = Contact.objects.get(user=self.users[0], handle=self.handle)
+		self.assertEqual(contact.target.phone_number, self.testPhoneNumbers[2])
 
-
-
-
-
-
-
+	def testShareWithNewUser(self):
+		return
