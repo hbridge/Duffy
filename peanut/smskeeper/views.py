@@ -788,7 +788,7 @@ def dashboard(request):
 def sendLiveFeed(sender, **kwargs):
 	message = kwargs.get('instance')
 	msgContent = json.loads(message.msg_json)
-	if msgContent['To'] in constants.KEEPER_PROD_PHONE_NUMBERS or msgContent['From'] in constants.KEEPER_PROD_PHONE_NUMBERS:
+	if ('To' in msgContent and msgContent['To'] in constants.KEEPER_PROD_PHONE_NUMBERS) or ('From' in msgContent and msgContent['From'] in constants.KEEPER_PROD_PHONE_NUMBERS):
 		url = 'https://hooks.slack.com/services/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'
 		channel = "#livesmskeeperfeed"
 		params = dict()
