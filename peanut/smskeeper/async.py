@@ -18,12 +18,10 @@ from smskeeper.models import User
 from smskeeper import sms_util
 from smskeeper import tips
 
-from peanut.settings import constants
 from peanut.celery import app
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
-
 
 
 @app.task
@@ -44,6 +42,8 @@ TIP_FREQUENCY_SECS = 60 * 60 * 23  # 23 hours in seconds
 
 
 def shouldSendUserTip(user):
+	if not user.completed_tutorial:
+		return False
 	if not user.last_tip_sent:
 		return True
 	else:

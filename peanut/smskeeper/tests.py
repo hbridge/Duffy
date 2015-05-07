@@ -345,7 +345,6 @@ class SMSKeeperAsyncCase(TestCase):
 			user.delete()
 		except User.DoesNotExist:
 			pass
-		self.setupUser(True, True)
 
 	def setupUser(self, activated, tutorialComplete):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
@@ -355,6 +354,7 @@ class SMSKeeperAsyncCase(TestCase):
 		self.user.save()
 
 	def testSendTips(self):
+		self.setupUser(True, True)
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
 			self.assertIn(tips.SMSKEEPER_TIPS[0]["messages"][0], output)
 
@@ -366,10 +366,14 @@ class SMSKeeperAsyncCase(TestCase):
 				self.assertIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
 			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
 
-
 	def testTipThrottling(self):
+		self.setupUser(True, True)
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM):
 			pass
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
 			self.assertNotIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
 
+	def testTipsSkipIneligibleUsers(self):
+		self.setupUser(True, False)
+		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
+			self.assertNotIn(tips.SMSKEEPER_TIPS[0]["messages"][0], output)
