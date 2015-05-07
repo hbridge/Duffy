@@ -1,0 +1,260 @@
+header {
+	position:								relative;
+	border:									1px solid rgba(255,255,255,0);
+}
+
+	#hp_intro {
+		max-width:							320px;
+		position:							absolute;
+		top:								40px;
+		left:								40px;
+
+		h2 {
+			margin-left:					40px;
+		}
+	}
+
+	#hp_signup_top {
+		position:							absolute;
+		top:								40px;
+		right:								40px;
+
+		@media (max-width: 850px){
+			@include border-box-sizing;
+
+			position:						relative;
+			//border:							1px solid red;
+			right:							0px;
+			top:							0px;
+			padding-left:					80px;
+			padding-top:					160px;
+			//top:							200px;
+			//right:							0px;
+			//left:							20px;
+			width:							100%;
+		}
+	}
+
+	#hp_signup_middle {
+		@include clearfix;
+		margin:								50px 0px 50px 0px;
+	}
+
+	.input_num {
+		-webkit-border-radius: 10px 0 0 10px;
+		border-radius: 10px 0 0 10px;
+		margin-right: 0px;
+		padding-left:						10px;
+		padding-right:						10px;
+		@include border-box-sizing;
+		border: 							2px solid $color-input-border;
+
+		@media (max-width: 575px){
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			width:	70%;
+			text-align:						center;
+			display:	block;
+		}
+
+	}
+	.submit_btn {
+		-webkit-border-radius: 0px 10px 10px 0px;
+		border-radius: 0px 10px 10px 0px;
+		margin-left: 0px;
+		@include border-box-sizing;
+		width:								220px;
+		border:								0px;
+		background-color:					$color-button;
+		color:								$color-button-text;
+
+		&:focus{
+			color:							$color-button;
+			background-color:				$color-button-text;
+			border:							5px solid $color-button;
+			border-left:					3px solid $color-button;
+		}
+
+		@media (max-width: 575px){
+			display:	block;
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			width:	70%;
+			margin-top:						10px;
+		}
+	}
+
+	.form_error_msg {
+		margin-left:						10px;
+		margin-top:							10px;
+		color: 								$color-error;
+		display:							none;
+
+		@media(max-width: 575px){
+			width: 70%;
+		}
+	}
+
+	.form_error {
+		.input_num {
+			color:							$color-error;
+		}
+
+		.form_error_msg {
+			display: 						block;
+		}
+	}
+
+	.form_success {
+		.input_num {
+			color:							$color-success;
+			border-color:					$color-success;
+		}
+		.submit_btn {
+			background-color:				$color-success;
+		}
+	}
+
+
+
+#hp_convo {
+	margin-top:								185px;
+//	margin-top:										60px;	
+
+	@media (max-width: 850px){
+		margin-top:							40px;
+	}
+}
+
+	//wrapper for each message
+	.msg {
+		@include border-box-sizing;
+		@include clearfix;
+		//border: 1px solid red;
+		display:								block;
+		height:									auto;
+	//	min-height:								60px;
+		position:								relative;
+		margin-bottom:							20px;
+		padding-left:							50px;
+		}
+
+	.user_msg {
+		@include border-box-sizing;
+		display:								inline-block;
+		float:									right;
+		-webkit-border-radius: 					40px;
+		border-radius: 							40px;
+
+		padding:								20px;
+
+		background-color:						$color-msg-bg;
+
+
+		color:									$color-user-msg-text;
+
+		.msg_text {
+			color:									$color-user-msg-text;
+		}
+
+	}
+	.user_tab {
+		z-index:								19;
+		position:								absolute;
+		bottom:									0px;
+		right:									-10px;
+		
+	//	border: 1px solid red;
+		//display: none;
+	}
+	.keeper_avatar {
+
+			display:							inline-block;
+			height:								50px;
+			width:								50px;
+			//float:								left;
+			background-color:					$color-keeper-msg-bg;
+			-webkit-border-radius: 					25px;
+			border-radius: 							25px;
+			text-align:							center;
+			font-size:							32px;
+			line-height:						48px;
+			color:							$color-keeper-avi-text;
+			//margin-left:						-75px;
+			//margin-top:							10px;
+			position:							absolute;
+			bottom:								2px;
+			left:								0px;
+		}
+
+	.keeper_msg {
+		@extend .user_msg;
+
+		background-color:						$color-keeper-msg-bg;
+		
+		text-align:								left;
+		float:									left;
+		max-width:								400px;
+		margin-left:							10px;
+		display:								inline-block;
+		z-index:								20;
+		color:									$color-keeper-msg-text;
+
+		.msg_text {
+			color:									$color-keeper-msg-text;
+		}
+	}
+
+	.keeper_tab {
+		z-index:								19;
+		position:								absolute;
+		bottom:									-5px;
+		left:									48px;
+		//display: none;
+	}
+
+	.msg_text {
+		display:								inline-block;
+	}
+	.msg_text_preload {
+		color:									inherit;
+		display:								inline-block;
+	}
+
+	#msg01, #msg02, #msg03, #msg04, #msg05, #msg06, #msg07, #msg08,
+	#msg09, #msg10, #msg11, #msg12, #msg13, #msg14, #msg15 {
+		display:	none;
+	}
+	#hp_signup_middle { display: none;}
+
+/*#hp_intro {
+	@include border-box-sizing;
+	text-align:						center;
+	height:							500px;
+	padding-top:						200px;
+
+
+	input {
+		height:						60px;
+		width:						300px;
+		text-align:					center;
+		border:						1px solid $color-input-border;
+
+		font-size:					1.5em;
+
+		&:focus {
+			border:					1px solid $color-input-border-focus;
+		}
+	}
+}
+
+
+#hp_details {
+	text-align:						center;
+
+	p {
+		margin-left:				auto;
+		margin-right:				auto;
+		text-align: 				left;
+	}
+}*/

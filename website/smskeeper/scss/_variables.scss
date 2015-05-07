@@ -1,0 +1,35 @@
+/* Main Colors ===================================================================== */
+$color-purple:									rgba(49,49,172,1);//#3131AC;
+$color-purple-lighter:							rgba(49,49,172,.25);
+$color-grey:									#5D5D5D;
+$color-darker-grey:								#E5E5EA;
+$color-gold:									#FFE95D;
+$color-green:									#4CD964;
+$color-white:									#ffffff;
+$color-red:										#E75C6D;
+
+$color-html-background:							$color-gold;
+$color-body-background:							#fefefe;
+$color-html-border:								$color-gold;
+$color-body-font-headers:						$color-purple;
+$color-button:									$color-purple;
+$color-button-text:								#fefefe;
+//
+$color-msg-bg:									$color-green;
+$color-keeper-msg-bg:							$color-darker-grey;
+$color-keeper-avi-text:							$color-white;
+$color-user-msg-text:							$color-white;
+$color-keeper-msg-text:							$color-grey;
+
+$color-link:									#ff0000;
+$color-body-font:								$color-grey;
+
+$color-input-border:							$color-purple;
+$color-input-border-focus:						#999;
+$color-error:									$color-red;
+$color-success:									$color-green;
+
+// Z=indexes
+$z-index-preloader:								9999;
+
+/* Borders ========================================================================== */
