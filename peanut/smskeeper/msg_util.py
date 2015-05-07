@@ -17,8 +17,15 @@ def isLabel(msg):
 	stripedMsg = msg.strip()
 	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
 
+
 def isNicety(msg):
-	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you"]
+	cleaned_msg = msg.strip().lower()
+	if cleaned_msg in ["hi", "hello", "thanks", "thank you"]:
+		return True
+	if "thanks keeper" in cleaned_msg or "thank you keeper" in cleaned_msg:
+		return True
+	return False
+
 
 def isYesNo(msg):
 	return msg.strip().lower() in ["yes", "y", "no", "n"]
