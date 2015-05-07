@@ -28,6 +28,9 @@ def saveStateData(user, iteration, originalMsg):
 	user.state_data = json.dumps(data)
 	user.save()
 
+#def canProcessMessag(user, msg):
+
+
 def process(user, msg, requestDict, keeperNumber):
 	iteration, originalMsg = getStateData(user)
 

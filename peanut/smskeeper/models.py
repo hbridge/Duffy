@@ -1,6 +1,7 @@
 import logging
 import json
 import copy
+import datetime
 
 from django.db import models
 from django.contrib import admin
@@ -20,6 +21,7 @@ class User(models.Model):
 
 	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
 	state_data = models.CharField(max_length=100, null=True)
+	last_state_change = models.DateTimeField(null=True)
 
 	timezone = models.CharField(max_length=100, null=True)
 	sent_tips = models.TextField(null=True, db_index=False)
@@ -54,6 +56,7 @@ class User(models.Model):
 	def setState(self, state):
 		self.state = state
 		self.state_data = None
+		self.last_state_change = datetime.datetime.now(pytz.utc)
 
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
