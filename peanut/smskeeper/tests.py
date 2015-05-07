@@ -109,6 +109,13 @@ class SMSKeeperCase(TestCase):
 			# ensure the user can get things from #unassigned
 			self.assertIn("new", output)
 
+	def test_no_add_dumb_stuff(self):
+		self.setupUser(True, True)
+		dumb_phrases = ["hi", "thanks", "no", "yes"]
+		for phrase in dumb_phrases:
+			with capture(views.cliMsg, self.testPhoneNumber, phrase) as output:
+				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, output)
+
 	def test_absolute_delete(self):
 		self.setupUser(True, True)
 		# ensure deleting from an empty list doesn't crash

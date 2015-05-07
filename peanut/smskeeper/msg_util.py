@@ -20,6 +20,9 @@ def isLabel(msg):
 def isNicety(msg):
 	return msg.strip().lower() in ["hi", "hello", "thanks", "thank you"]
 
+def isYesNo(msg):
+	return msg.strip().lower() in ["yes", "y", "no", "n"]
+
 def isClearCommand(msg):
 	stripedMsg = msg.strip()
 	tokens = msg.split(' ')
@@ -32,7 +35,7 @@ def isPickCommand(msg):
 
 def isFetchCommand(msg):
 	return isLabel(msg)
-	
+
 def isRemindCommand(msg):
 	text = msg.lower()
 	return ('#remind' in text or
@@ -76,7 +79,7 @@ def extractPhoneNumbers(msg):
 		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 		if formatted: phone_numbers.append(formatted)
 	return phone_numbers
-	
+
 def isCreateHandleCommand(msg):
 	words = msg.strip().split(' ')
 
@@ -117,7 +120,7 @@ def getMessagePiecesWithMedia(msg, requestDict):
 		numMedia = int(requestDict['NumMedia'])
 	else:
 		numMedia = 0
-		
+
 	for n in range(numMedia):
 		param = 'MediaUrl' + str(n)
 		mediaUrlList.append(requestDict[param])

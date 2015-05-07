@@ -102,6 +102,9 @@ def dealWithNicety(user, msg, keeperNumber):
 	if "hello" in cleaned or "hi" in cleaned:
 		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
 
+def dealWithYesNo(user, msg, keeperNumber):
+	sms_util.sendMsg(user, u"\xF0\x9F\x98\xB3 I'm not smart enough to know what you mean yet.  Try 'huh?' if you're stuck.", None, keeperNumber)
+
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
 	# Here, sorting by id should accomplish the same goal
@@ -358,6 +361,9 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		if not msg_util.hasLabel(msg):
 			if msg_util.isNicety(msg):
 				dealWithNicety(user, msg, keeperNumber)
+				return
+			elif msg_util.isYesNo(msg):
+				dealWithYesNo(user, msg, keeperNumber)
 				return
 			# if the user didn't add a label, throw it in #unassigned
 			msg += ' ' + keeper_constants.UNASSIGNED_LABEL
