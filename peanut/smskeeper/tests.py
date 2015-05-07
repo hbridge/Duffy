@@ -11,8 +11,9 @@ from django.test import TestCase
 
 from peanut.settings import constants
 from smskeeper import views, processing_util, keeper_constants
-from smskeeper.models import User, Entry, Contact
+from smskeeper.models import User, Entry, Contact, Message
 from smskeeper import msg_util
+import string
 
 
 @contextmanager
@@ -245,6 +246,19 @@ class SMSKeeperCase(TestCase):
 			self.assertIn(u'poop\u2019s', output.decode('utf-8'))
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
+	def test_exception_error_message(self):
+		self.setupUser(True, True)
+		with self.assertRaises(NameError):
+			with capture(views.cliMsg, self.testPhoneNumber, 'yippee ki yay motherfucker'):
+				pass
+
+		# we have to dig into messages as ouput would never get returned from capture
+		messages = Message.objects.filter(user=self.user, incoming=False).all()
+		self.assertIn(removeNonAscii(keeper_constants.GENERIC_ERROR_MESSAGE), messages[0].msg_json)
+
+
+def removeNonAscii(mystr):
+	return filter(lambda x: x in string.printable, mystr)
 
 class SMSKeeperSharingCase(TestCase):
 	testPhoneNumbers = ["+16505555550", "+16505555551", "+16505555552"]

@@ -294,55 +294,60 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
-
-	if user.state != keeper_constants.STATE_NORMAL:
-		processing_util.processMessage(user, msg, requestDict, keeperNumber)
-	# STATE_REMIND
-	elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg):
-		# TODO  Fix this state so the logic isn't so complex
-		user.setState(keeper_constants.STATE_REMIND)
-		processing_util.processMessage(user, msg, requestDict, keeperNumber)
-	elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
-		dealWithActivation(user, msg, keeperNumber)
-	# STATE_NORMAL
-	elif msg_util.isPrintHashtagsCommand(msg):
-		# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
-		dealWithPrintHashtags(user, keeperNumber)
-	# STATE_NORMAL
-	elif msg_util.isFetchCommand(msg) and numMedia == 0:
-			actions.fetch(user, msg, keeperNumber)
-	# STATE_NORMAL
-	elif msg_util.isClearCommand(msg) and numMedia == 0:
-		actions.clear(user, msg, keeperNumber)
-	# STATE_NORMAL
-	elif msg_util.isPickCommand(msg) and numMedia == 0:
-		label = msg_util.getLabel(msg)
-		pickItemForUserLabel(user, label, keeperNumber)
-	# STATE_NORMAL
-	elif msg_util.isHelpCommand(msg):
-		sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
-	# STATE_ADD
-	elif msg_util.isCreateHandleCommand(msg):
-		dealWithCreateHandle(user, msg, keeperNumber)
-
-	# STATE_DELETE
-	elif msg_util.isDeleteCommand(msg):
-		dealWithDelete(user, msg, keeperNumber)
-	else: # treat this as an add command
+	try:
+		if user.state != keeper_constants.STATE_NORMAL:
+			processing_util.processMessage(user, msg, requestDict, keeperNumber)
+		elif re.match("yippee ki yay motherfucker", msg):
+			raise NameError("intentional exception")
+		# STATE_REMIND
+		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg):
+			# TODO  Fix this state so the logic isn't so complex
+			user.setState(keeper_constants.STATE_REMIND)
+			processing_util.processMessage(user, msg, requestDict, keeperNumber)
+		elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
+			dealWithActivation(user, msg, keeperNumber)
 		# STATE_NORMAL
+		elif msg_util.isPrintHashtagsCommand(msg):
+			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
+			dealWithPrintHashtags(user, keeperNumber)
+		# STATE_NORMAL
+		elif msg_util.isFetchCommand(msg) and numMedia == 0:
+				actions.fetch(user, msg, keeperNumber)
+		# STATE_NORMAL
+		elif msg_util.isClearCommand(msg) and numMedia == 0:
+			actions.clear(user, msg, keeperNumber)
+		# STATE_NORMAL
+		elif msg_util.isPickCommand(msg) and numMedia == 0:
+			label = msg_util.getLabel(msg)
+			pickItemForUserLabel(user, label, keeperNumber)
+		# STATE_NORMAL
+		elif msg_util.isHelpCommand(msg):
+			sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
 		# STATE_ADD
-		if not msg_util.hasLabel(msg):
-			if msg_util.isNicety(msg):
-				dealWithNicety(user, msg, keeperNumber)
-				return
-			elif msg_util.isYesNo(msg):
-				dealWithYesNo(user, msg, keeperNumber)
-				return
-			# if the user didn't add a label, throw it in #unassigned
-			msg += ' ' + keeper_constants.UNASSIGNED_LABEL
-			actions.add(user, msg, requestDict, keeperNumber, True)
-		else:
-			actions.add(user, msg, requestDict, keeperNumber, True)
+		elif msg_util.isCreateHandleCommand(msg):
+			dealWithCreateHandle(user, msg, keeperNumber)
+
+		# STATE_DELETE
+		elif msg_util.isDeleteCommand(msg):
+			dealWithDelete(user, msg, keeperNumber)
+		else:  # treat this as an add command
+			# STATE_NORMAL
+			# STATE_ADD
+			if not msg_util.hasLabel(msg):
+				if msg_util.isNicety(msg):
+					dealWithNicety(user, msg, keeperNumber)
+					return
+				elif msg_util.isYesNo(msg):
+					dealWithYesNo(user, msg, keeperNumber)
+					return
+				# if the user didn't add a label, throw it in #unassigned
+				msg += ' ' + keeper_constants.UNASSIGNED_LABEL
+				actions.add(user, msg, requestDict, keeperNumber, True)
+			else:
+				actions.add(user, msg, requestDict, keeperNumber, True)
+	except:
+		sms_util.sendMsg(user, keeper_constants.GENERIC_ERROR_MESSAGE, None, keeperNumber)
+		raise
 
 #
 # Send a sms message to a user from a certain number
