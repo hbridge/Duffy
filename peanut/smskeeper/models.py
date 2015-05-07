@@ -24,6 +24,8 @@ class User(models.Model):
 	state_data = models.CharField(max_length=100, null=True)
 	last_state_change = models.DateTimeField(null=True)
 
+	signup_data_json = models.TextField(null=True)
+
 	timezone = models.CharField(max_length=100, null=True)
 	sent_tips = models.TextField(null=True, db_index=False)
 	last_tip_sent = models.DateTimeField(null=True)
