@@ -1,7 +1,4 @@
-import time
-import random
-import datetime
-import pytz
+import humanize
 
 from smskeeper import sms_util, msg_util, helper_util, image_util
 from smskeeper import keeper_constants
@@ -14,7 +11,7 @@ def shareEntries(user, entries, handles, keeperNumber):
 	notFoundHandles = list()
 	for handle in handles:
 		contact = Contact.fetchByHandle(user, handle)
-		if contact is None: 
+		if contact is None:
 			notFoundHandles.append(handle)
 		else:
 			# add the target user to the entry and send them a message
@@ -30,7 +27,7 @@ def shareEntries(user, entries, handles, keeperNumber):
 def add(user, msg, requestDict, keeperNumber, sendResponse):
 	text, label, media, handles = msg_util.getMessagePiecesWithMedia(msg, requestDict)
 
-	#TODO use a separate process but probably this is not the right place to do it.
+	# TODO use a separate process but probably this is not the right place to do it.
 	if len(media) > 0:
 		media = image_util.moveMediaToS3(media)
 
@@ -50,7 +47,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 	sharedHandles = list()
 	notFoundHandles = list()
 	shareString = ""
-	if len(handles) > 0: 
+	if len(handles) > 0:
 		sharedHandles, notFoundHandles = shareEntries(user, createdEntries, handles, keeperNumber)
 	if len(sharedHandles) > 0:
 			shareString = "  I also shared that with %s" % ", ".join(sharedHandles)
@@ -136,5 +133,3 @@ def clear(user, msg, keeperNumber):
 			entry.hidden = True
 			entry.save()
 		sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
-
-		
