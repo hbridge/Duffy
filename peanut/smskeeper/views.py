@@ -46,35 +46,6 @@ def sendNoResponse():
 	logger.info("Sending blank response")
 	return HttpResponse(content, content_type="text/xml")
 
-#  Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
-# Text could have comma's in it, that is dealt with later
-def getData(msg, numMedia, requestDict):
-	# process text
-	nonLabels = list()
-	handleList = list()
-	label = None
-	for word in msg.split(' '):
-		if msg_util.isLabel(word):
-			label = word
-		elif msg_util.isHandle(word):
-			handleList.append(word)
-		else:
-			nonLabels.append(word)
-
-	# process media
-	mediaUrlList = list()
-
-	for n in range(numMedia):
-		param = 'MediaUrl' + str(n)
-		mediaUrlList.append(requestDict[param])
-		#TODO need to store mediacontenttype as well.
-
-	#TODO use a separate process but probably this is not the right place to do it.
-	if numMedia > 0:
-		mediaUrlList = image_util.moveMediaToS3(mediaUrlList)
-	return (' '.join(nonLabels), label, mediaUrlList, handleList)
-
-
 
 def htmlForUserLabel(user, label):
 	html = "%s:\n"%(label)
@@ -156,7 +127,7 @@ def dealWithDelete(user, msg, keeperNumber):
 
 	label = None
 	if msg_util.hasLabel(msg):
-		text, label, media, handles = getData(msg, 0, None)
+		text, label, handles = msg_util.getMessagePieces(msg)
 	else:
 		label = getInferredLabel(user)
 
@@ -219,7 +190,7 @@ def pickItemForUserLabel(user, label, keeperNumber):
 		sms_util.sendMsg(user, "My pick for %s: %s"%(label, entry.text), None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
-	text, label, media, handles = getData(msg, 0, {})
+	text, label, handles = msg_util.getMessagePieces(msg)
 
 	try:
 		userToActivate = User.objects.get(phone_number=text)
