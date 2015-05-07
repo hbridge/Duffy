@@ -67,9 +67,7 @@ def sendTips(keeperNumber=None):
 				sentTips = user.sent_tips.split(",")
 			for tip in tips.SMSKEEPER_TIPS:
 				if tip["identifier"] not in sentTips:
-					for msg in tip["messages"]:
-						sms_util.sendMsg(user, msg, None, keeperNumber)
-						time.sleep(1)
+					sms_util.sendMsg(user, tips.renderTip(tip, user.name), None, keeperNumber)
 					sentTips.append(tip["identifier"])
 					user.sent_tips = ",".join(sentTips)
 					user.last_tip_sent = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)

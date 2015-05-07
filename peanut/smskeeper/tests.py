@@ -351,19 +351,20 @@ class SMSKeeperAsyncCase(TestCase):
 		self.user.completed_tutorial = tutorialComplete
 		if (activated):
 			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		self.user.name = "Bob"
 		self.user.save()
 
 	def testSendTips(self):
 		self.setupUser(True, True)
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-			self.assertIn(tips.SMSKEEPER_TIPS[0]["messages"][0], output)
+			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), output)
 
 		# set datetime to return a full day ahead after each call
 		with Replacer() as r:
 			r.replace('smskeeper.async.datetime.datetime', test_datetime(2020, 01, 01))
 			# check that tip 2 got sent out
 			with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-				self.assertIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
+				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), output)
 			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
 
 	def testTipThrottling(self):
@@ -371,9 +372,9 @@ class SMSKeeperAsyncCase(TestCase):
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM):
 			pass
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-			self.assertNotIn(tips.SMSKEEPER_TIPS[1]["messages"][0], output)
+			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), output)
 
 	def testTipsSkipIneligibleUsers(self):
 		self.setupUser(True, False)
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-			self.assertNotIn(tips.SMSKEEPER_TIPS[0]["messages"][0], output)
+			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), output)
