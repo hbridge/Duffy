@@ -167,6 +167,18 @@ class SMSKeeperCase(TestCase):
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
 			self.assertIn("a day from now", output)
 
+	def test_reminders_double_followup(self):
+		self.setupUser(True, True)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+			self.assertIn("what time?", output)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "I'm not sure") as output:
+			self.assertIn("Sorry", output)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
+			self.assertIn("a day from now", output)
+
 	"""
 		Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
 		Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
@@ -176,13 +188,15 @@ class SMSKeeperCase(TestCase):
 		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
-		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
+		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop 3pm tomorrow") as output:
+			self.assertIn("poop", output)
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 19)  # 3 pm Eastern in UTC
 
-		views.cliMsg(self.testPhoneNumber, "clear #reminders")
+		with capture(views.cliMsg, self.testPhoneNumber, "clear #reminders") as output:
+			self.assertIn("cleared", output)
 
 		self.user.timezone = "US/Pacific"  # This is the default
 		self.user.save()
@@ -226,6 +240,7 @@ class SMSKeeperSharingCase(TestCase):
 			user, created = User.objects.get_or_create(phone_number=phoneNumber)
 			user.completed_tutorial = True
 			user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+			user.state = keeper_constants.STATE_NORMAL
 			user.save()
 			self.users.append(user)
 

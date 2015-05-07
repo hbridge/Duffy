@@ -2,7 +2,7 @@ import json
 
 from smskeeper import keeper_constants
 
-from smskeeper.states import not_activated, tutorial
+from smskeeper.states import not_activated, tutorial, remind
 from smskeeper import msg_util
 
 from smskeeper.models import User, Message
@@ -32,6 +32,7 @@ def processMessage(user, msg, requestDict, keeperNumber):
 stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED : not_activated,
 	keeper_constants.STATE_TUTORIAL : tutorial,
+	keeper_constants.STATE_REMIND : remind,
 }
 
 

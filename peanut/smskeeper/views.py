@@ -6,7 +6,6 @@ import math
 import pytz
 import datetime
 from datetime import date, timedelta
-import humanize
 import os, sys, re
 import requests
 import phonenumbers
@@ -34,7 +33,7 @@ from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 from smskeeper import sms_util, image_util, msg_util, processing_util, helper_util
 from smskeeper import async, actions, keeper_constants
 
-from common import api_util, natty_util
+from common import api_util
 from peanut.settings import constants
 from peanut import settings
 
@@ -102,60 +101,6 @@ def dealWithNicety(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "You're welcome.", None, keeperNumber)
 	if "hello" in cleaned or "hi" in cleaned:
 		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
-
-def dealWithRemindMessage(user, msg, keeperNumber, requestDict):
-	text, label, media, handles = getData(msg, 0, requestDict)
-	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
-
-	# See if the time that comes back is within a few seconds.
-	# If this happens, then we didn't get a time from the user
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	if startDate == None or abs((now - startDate).total_seconds()) < 10:
-		sms_util.sendMsg(user, "At what time?", None, keeperNumber)
-		return
-	else:
-		doRemindMessage(user, startDate, newQuery, keeperNumber, requestDict)
-
-def dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict):
-	# Assuming this is the remind msg
-	prevMessage = getPreviousMessage(user)
-	text, label, media, handles = getData(prevMessage.getBody(), prevMessage.NumMedia(), json.loads(prevMessage.msg_json))
-
-	# First get the used Text from the last message
-	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
-
-	# Now append on the new 'time' to that message, then pass to Natty
-	if not usedText:
-		usedText = ""
-	newMsg = usedText + " " + msg
-
-	# We want to ignore the newQuery here since we're only sending in time related stuff
-	startDate, ignore, usedText = natty_util.getNattyInfo(newMsg, user.timezone)
-
-	if not startDate:
-		startDate = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-	doRemindMessage(user, startDate, newQuery, keeperNumber, requestDict)
-
-
-def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
-	# Need to do this so the add message correctly adds the label
-	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
-	entry = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
-
-	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
-	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
-	# Have to pass in cleanDate since humanize doesn't use utcnow
-	startDate = startDate.replace(tzinfo=None)
-	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
-
-	entry.remind_timestamp = startDate
-	entry.keeper_number = keeperNumber
-	entry.save()
-
-	async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
-
-	sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (query, userMsg), None, keeperNumber)
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
@@ -347,12 +292,13 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
 
-	if user.activated == None:
+	if user.state != keeper_constants.STATE_NORMAL:
 		processing_util.processMessage(user, msg, requestDict, keeperNumber)
-	# STATE_TUTORIAL
-	elif not user.completed_tutorial:
+	# STATE_REMIND
+	elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg):
+		# TODO
+		user.setState(keeper_constants.STATE_REMIND)
 		processing_util.processMessage(user, msg, requestDict, keeperNumber)
-	# STATE_NORMAL
 	elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
 		dealWithActivation(user, msg, keeperNumber)
 	# STATE_NORMAL
@@ -364,15 +310,7 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 			actions.fetch(user, msg, keeperNumber)
 	# STATE_NORMAL
 	elif msg_util.isClearCommand(msg) and numMedia == 0:
-		label = msg_util.getLabel(msg)
-		entries = Entry.fetchEntries(user=user, label=label)
-		if len(entries) == 0:
-			helper_util.sendNotFoundMessage(user, label, keeperNumber)
-		else:
-			for entry in entries:
-				entry.hidden = True
-				entry.save()
-			sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+		actions.clear(user, msg, keeperNumber)
 	# STATE_NORMAL
 	elif msg_util.isPickCommand(msg) and numMedia == 0:
 		label = msg_util.getLabel(msg)
@@ -383,22 +321,14 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	# STATE_ADD
 	elif msg_util.isCreateHandleCommand(msg):
 		dealWithCreateHandle(user, msg, keeperNumber)
-	# STATE_REMIND
-	elif msg_util.isRemindCommand(msg):
-		dealWithRemindMessage(user, msg, keeperNumber, requestDict)
+
 	# STATE_DELETE
 	elif msg_util.isDeleteCommand(msg):
 		dealWithDelete(user, msg, keeperNumber)
 	else: # treat this as an add command
-		# STATE_REMIND
 		# STATE_NORMAL
 		# STATE_ADD
-		# Hack until state machine.
-		# See if the last message was a remind and if if this doesn't have a label
-		prevMsg = getPreviousMessage(user)
-		if prevMsg and msg_util.isRemindCommand(prevMsg.getBody()) and not msg_util.hasLabel(msg):
-			dealWithRemindMessageFollowup(user, msg, keeperNumber, requestDict)
-		elif not msg_util.hasLabel(msg):
+		if not msg_util.hasLabel(msg):
 			if msg_util.isNicety(msg):
 				dealWithNicety(user, msg, keeperNumber)
 				return

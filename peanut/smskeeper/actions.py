@@ -126,3 +126,15 @@ def fetch(user, msg, keeperNumber):
 	else:
 		sms_util.sendMsg(user, currentMsg + clearMsg, None, keeperNumber)
 
+def clear(user, msg, keeperNumber):
+	label = msg_util.getLabel(msg)
+	entries = Entry.fetchEntries(user=user, label=label)
+	if len(entries) == 0:
+		helper_util.sendNotFoundMessage(user, label, keeperNumber)
+	else:
+		for entry in entries:
+			entry.hidden = True
+			entry.save()
+		sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+
+		
