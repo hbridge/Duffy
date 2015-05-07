@@ -295,8 +295,8 @@ def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
 	if user.state != keeper_constants.STATE_NORMAL:
 		processing_util.processMessage(user, msg, requestDict, keeperNumber)
 	# STATE_REMIND
-	elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg):
-		# TODO
+	elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg):
+		# TODO  Fix this state so the logic isn't so complex
 		user.setState(keeper_constants.STATE_REMIND)
 		processing_util.processMessage(user, msg, requestDict, keeperNumber)
 	elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:

@@ -158,6 +158,12 @@ class SMSKeeperCase(TestCase):
 		views.cliMsg(self.testPhoneNumber, "#remind poop tmr")
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
+	def test_reminders_fetch(self):
+		self.setupUser(True, True)
+
+		with capture(views.cliMsg, self.testPhoneNumber, "#reminders") as output:
+			self.assertIn("#reminders", output)
+
 	def test_reminders_followup(self):
 		self.setupUser(True, True)
 
