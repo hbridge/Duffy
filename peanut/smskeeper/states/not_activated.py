@@ -19,7 +19,7 @@ def dealWithNonActivatedUser(user, keeperNumber):
 		user.state_data = "2"
 		user.save()
 	elif user.state_data == "2":
-		reply = [u"Nice try. Except it didn't work. \xF0\x9F\x98\x88"]
+		reply = ["Nice try. Except it didn't work. \xF0\x9F\x98\x88"]
 		sms_util.sendMsg(user, random.choice(reply), None, keeperNumber)
 		user.state_data = "3"
 		user.save()

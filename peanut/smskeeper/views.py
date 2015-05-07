@@ -74,7 +74,7 @@ def dealWithNicety(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
 
 def dealWithYesNo(user, msg, keeperNumber):
-	sms_util.sendMsg(user, u"\xF0\x9F\x98\xB3 I'm not smart enough to know what you mean yet.  Try 'huh?' if you're stuck.", None, keeperNumber)
+	sms_util.sendMsg(user, "\xF0\x9F\x98\xB3 I'm not smart enough to know what you mean yet.  Try 'huh?' if you're stuck.", None, keeperNumber)
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
