@@ -1,17 +1,14 @@
-import time
-import random
 import datetime
 import pytz
 import humanize
 import json
+import re
 
 from common import natty_util
 
-from smskeeper import sms_util, msg_util, helper_util
+from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
 from smskeeper import actions, async
-
-from smskeeper.models import Entry
 
 def getStateData(user):
 	iteration = None
@@ -60,6 +57,10 @@ def process(user, msg, requestDict, keeperNumber):
 			# We want to ignore the newQuery here since we're only sending in time related stuff
 			startDate, ignore, usedText = natty_util.getNattyInfo(newMsg, user.timezone)
 
+		# if the user typed reminder as remind me to, we shoudl remove it from the text
+		match = re.match('remind me( to)?', newQuery, re.I)
+		if match is not None:
+			newQuery = newQuery[match.end():].strip()
 		doRemindMessage(user, startDate, newQuery, keeperNumber, requestDict)
 		user.setState(keeper_constants.STATE_NORMAL)
 

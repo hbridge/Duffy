@@ -43,12 +43,16 @@ def isPickCommand(msg):
 def isFetchCommand(msg):
 	return isLabel(msg)
 
+
 def isRemindCommand(msg):
 	text = msg.lower()
-	return ('#remind' in text or
-		   '#remindme' in text or
-		   '#reminder' in text or
-		   '#reminders' in text)
+	return (
+		'#remind' in text or
+		'#remindme' in text or
+		'#reminder' in text or
+		'#reminders' in text or
+		re.match('remind me', text) is not None
+	)
 
 delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
