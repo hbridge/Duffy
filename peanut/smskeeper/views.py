@@ -131,10 +131,26 @@ def getInferredLabel(user):
 
 	return None
 
+
 def dealWithDelete(user, msg, keeperNumber):
-	words = msg.split(" ")
-	requested_index = int(words[1])
-	item_index = requested_index - 1
+	words = msg.strip().lower().split(" ")
+	words.remove("delete")
+	# what remains in words could be ["1"], ["1,2"], ["1,", "2"] etc.
+	requested_indices = set()
+	for word in words:
+		subwords = word.split(",")
+		print "word, subwords: %s, %s" % (word, subwords)
+		for subword in subwords:
+			try:
+				requested_indices.add(int(subword))
+			except:
+				pass
+	print "requested indices: %s" % requested_indices
+	item_indices = map(lambda x: x - 1, requested_indices)
+
+	item_indices = sorted(item_indices, reverse=True)
+	print item_indices
+
 	label = None
 	if msg_util.hasLabel(msg):
 		text, label, media, handles = getData(msg, 0, None)
@@ -143,21 +159,32 @@ def dealWithDelete(user, msg, keeperNumber):
 
 	if label:
 		entries = Entry.fetchEntries(user=user, label=label)
+		out_of_range = list()
+		deleted_texts = list()
 		if entries is None:
 			helper_util.sendNotFoundMessage(user, label, keeperNumber)
 			return
-		if item_index < 0 or item_index >= len(entries):
-			sms_util.sendMsg(user, 'There is no item %d in %s' % (requested_index, label), None, keeperNumber)
-			return
-		entry = entries[item_index]
-		entry.hidden = True
-		entry.save()
-		if entry.text:
-			retMsg = entry.text
-		else:
-			retMsg = "item " + str(item_index+1)
-		sms_util.sendMsg(user, 'Ok, I deleted "%s"' % (retMsg), None, keeperNumber)
+		for item_index in item_indices:
+			if item_index < 0 or item_index >= len(entries):
+				out_of_range.append(item_index)
+				continue
+			entry = entries[item_index]
+			entry.hidden = True
+			entry.save()
+			if entry.text:
+				deleted_texts.append(entry.text)
+			else:
+				deleted_texts.append("item " + str(item_index+1))
 
+		if len(deleted_texts) > 0:
+			if len(deleted_texts) > 1:
+				retMsg = "%d items" % len(deleted_texts)
+			else:
+				retMsg = "'%s'" % (deleted_texts[0])
+			sms_util.sendMsg(user, 'Ok, I deleted %s' % (retMsg), None, keeperNumber)
+		if len(out_of_range) > 0:
+			out_of_range_string = ", ".join(map(lambda x: str(x + 1), out_of_range))
+			sms_util.sendMsg(user, 'Can\'t delete %s in %s' % (out_of_range_string, label), None, keeperNumber)
 		actions.fetch(user, label, keeperNumber)
 	else:
 		sms_util.sendMsg(user, 'Sorry, I\'m not sure which hashtag you\'re referring to. Try "delete [number] [hashtag]"', None, keeperNumber)
@@ -244,7 +271,7 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 	oldUser = createHandle(user, handle, phoneNumber)
 
 	if oldUser is not None:
-		if oldUser.phone_number == phoneNumber: 
+		if oldUser.phone_number == phoneNumber:
 			sms_util.sendMsg(user, "%s is already set to %s" % (handle, phoneNumber), None, keeperNumber)
 		else:
 			sms_util.sendMsg(user, "%s is now set to %s (used to be %s)" % (handle, phoneNumber, oldUser.phone_number), None, keeperNumber)
@@ -271,7 +298,7 @@ def cliMsg(phoneNumber, msg, mediaURL=None, mediaType=None):
 		jsonDict["NumMedia"] = 1
 	else:
 		jsonDict["NumMedia"] = 0
-		
+
 	processMessage(phoneNumber, msg, numMedia, jsonDict, constants.SMSKEEPER_TEST_NUM)
 
 """
@@ -379,7 +406,7 @@ def resend_msg(request):
 
 		message = Message.objects.get(id=msgId)
 		data = json.loads(message.msg_json)
-		
+
 		sms_util.sendMsg(message.user, data["Body"], None, keeperNumber)
 
 		response["result"] = True

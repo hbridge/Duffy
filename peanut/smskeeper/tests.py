@@ -144,7 +144,21 @@ class SMSKeeperCase(TestCase):
 
 		# ensure deleting from empty doesn't crash
 		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertIn("no item 1", output)
+			self.assertNotIn("I deleted", output)
+
+	def test_multi_delete(self):
+		self.setupUser(True, True)
+		for i in range(1, 5):
+			views.cliMsg(self.testPhoneNumber, "foo%d #bar" % (i))
+
+		# ensure we can delete with or without spaces
+		with capture(views.cliMsg, self.testPhoneNumber, "delete 3, 5,2 #bar"):
+			pass
+
+		with capture(views.cliMsg, self.testPhoneNumber, "#bar") as output:
+			self.assertNotIn("foo2", output)
+			self.assertNotIn("foo3", output)
+			self.assertNotIn("foo5", output)
 
 	def test_reminders_basic(self):
 		self.setupUser(True, True)
