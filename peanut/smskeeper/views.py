@@ -552,7 +552,11 @@ def sendLiveFeed(sender, **kwargs):
 			params['icon_emoji'] = ':raising_hand:'
 
 		else:
-			userName = "Keeper" + " (to: " + message.user.name + ")"
+			if message.user.name:
+				name = message.user.name
+			else:
+				name = message.user.phone_number
+			userName = "Keeper" + " (to: " + name + ")"
 			if msgContent['MediaUrls']:
 				text += " <" + str(msgContent['MediaUrls']) + "|Attachment>"
 			params['icon_emoji'] = ':rabbit:'
