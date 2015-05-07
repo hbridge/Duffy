@@ -13,4 +13,5 @@ urlpatterns = patterns(
 	url(r'^dashboard_feed', 'smskeeper.views.dashboard_feed'),
 	url(r'^dashboard', 'smskeeper.views.dashboard'),
 	url(r'^resend_msg', 'smskeeper.views.resend_msg'),
+	url(r'^signup_from_website', 'smskeeper.views.signup_from_website')
 )

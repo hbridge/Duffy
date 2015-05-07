@@ -34,3 +34,7 @@ class SmsContentForm(forms.Form):
 
 class PhoneNumberForm(forms.Form):
 	PhoneNumber = forms.CharField(required=True)
+
+class WebsiteRegistrationForm(forms.Form):
+	phone_number = forms.CharField(min_length=1, max_length=100)
+	source = forms.CharField(min_length=1, max_length=100)

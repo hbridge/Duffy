@@ -10,6 +10,7 @@ import os, sys, re
 import requests
 import phonenumbers
 import logging
+import string
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -25,7 +26,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.serializers.json import DjangoJSONEncoder
 
-from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm
+from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 
 from smskeeper.models import User, Entry, Message, MessageMedia, Contact
 
@@ -36,6 +37,7 @@ from smskeeper import async, actions, keeper_constants
 from common import api_util
 from peanut.settings import constants
 from peanut import settings
+from django.conf import settings as djangosettings
 
 logger = logging.getLogger(__name__)
 
@@ -507,6 +509,44 @@ def dashboard_feed(request):
 def dashboard(request):
 	return render(request, 'dashboard.html', None)
 
+def signup_from_website(request):
+	response = dict({'result': True})
+	form = WebsiteRegistrationForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		source = form.cleaned_data['source']
+
+		# clean phone number
+		region_code = 'US'
+		phoneNumberStr = filter(lambda x: x in string.printable, form.cleaned_data['phone_number'].encode('utf-8'))
+		phoneNum = None
+
+		for match in phonenumbers.PhoneNumberMatcher(phoneNumberStr, region_code):
+			phoneNum = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+
+		if phoneNum:
+			# create account in database
+			try:
+				target_user = User.objects.get(phone_number=phoneNum)
+
+				bodyText = "You are already on the list. Hang tight... unless you know the magic phrase?"
+				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
+
+			except User.DoesNotExist:
+				target_user = User.objects.create(phone_number=phoneNum, state_data=1)
+				target_user.save()
+
+				bodyText = "Hi. I'm Keeper. I can help you remember things quickly."
+				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
+				time.sleep(1)
+				bodyText = "I'll let you know when I'm ready for you. Unless you know the magic phrase to skip the line?"
+				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
+		else:
+			response['result'] = False
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 @receiver(post_save, sender=Message)
 def sendLiveFeed(sender, **kwargs):
 	message = kwargs.get('instance')
@@ -525,7 +565,7 @@ def sendLiveFeed(sender, **kwargs):
 			if numMedia > 0:
 				for n in range(numMedia):
 					param = 'MediaUrl' + str(n)
-					text += "\n<" + requestDict[param] + "|" + param + ">"
+					text += "\n<" + msgContent[param] + "|" + param + ">"
 			params['icon_emoji'] = ':raising_hand:'
 
 		else:
