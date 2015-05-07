@@ -67,10 +67,10 @@ def isPrintHashtagsCommand(msg):
 def isAddCommand(msg):
 	return hasLabel(msg) and not isLabel(msg)
 
+
 handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 def isHandle(msg):
 	return handle_re.match(msg) is not None
-
 
 
 def hasPhoneNumber(msg):
@@ -79,22 +79,25 @@ def hasPhoneNumber(msg):
 	# foundMatch = True
 	# obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
+
 def extractPhoneNumbers(msg):
 	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
+	remaining_str = str(msg)
 	phone_numbers = []
 	for match in matches:
 		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
-		if formatted: phone_numbers.append(formatted)
-	return phone_numbers
+		if formatted:
+			phone_numbers.append(formatted)
+			print "removing %s in %s" % (match.raw_string, remaining_str)
+			remaining_str = remaining_str.replace(match.raw_string, "")
+
+	return phone_numbers, remaining_str
+
 
 def isCreateHandleCommand(msg):
-	words = msg.strip().split(' ')
+	phoneNumbers, remaining_str = extractPhoneNumbers(msg)
+	return isHandle(remaining_str.strip())
 
-	hasHandle = False
-	for word in words:
-		if isHandle(word): hasHandle = True
-
-	return len(words) == 2 and hasHandle and hasPhoneNumber(msg)
 
 def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower()

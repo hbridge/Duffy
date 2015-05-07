@@ -12,6 +12,7 @@ from django.test import TestCase
 from peanut.settings import constants
 from smskeeper import views, processing_util, keeper_constants
 from smskeeper.models import User, Entry, Contact
+from smskeeper import msg_util
 
 
 @contextmanager
@@ -271,12 +272,31 @@ class SMSKeeperSharingCase(TestCase):
 			user.save()
 			self.users.append(user)
 
+	def testExtractPhoneNumbers(self):
+		numbers, remaining_str = msg_util.extractPhoneNumbers("9172827255")
+		self.assertEqual(numbers, ["+19172827255"])
+		self.assertEqual(remaining_str, "")
+		numbers, remaining_str = msg_util.extractPhoneNumbers("9172827255 @henry")
+		self.assertEqual(numbers, ["+19172827255"])
+		self.assertEqual(remaining_str.strip(), "@henry")
+		numbers, remaining_str = msg_util.extractPhoneNumbers("(917) 282-7255 @henry")
+		self.assertEqual(numbers, ["+19172827255"])
+		self.assertEqual(remaining_str.strip(), "@henry")
+
 	def testCreateContact(self):
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1])) as output:
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "@test +16505555551") as output:
 			self.assertTrue(self.testPhoneNumbers[1] in output)
 
 		# ensure the contact has the right number
 		contact = Contact.objects.get(user=self.users[0], handle=self.handle)
+		self.assertEqual(contact.target.phone_number, self.testPhoneNumbers[1])
+
+		# try more complicated formatting
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "@test2 (650) 555-5551"):
+			pass
+
+		# ensure the contact has the right number
+		contact = Contact.objects.get(user=self.users[0], handle="@test2")
 		self.assertEqual(contact.target.phone_number, self.testPhoneNumbers[1])
 
 	def testCreateNonUserContact(self):

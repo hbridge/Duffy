@@ -232,15 +232,15 @@ def createHandle(user, handle, targetNumber):
 	return oldUser
 
 def dealWithCreateHandle(user, msg, keeperNumber):
-	words = msg.strip().split(' ')
+	phoneNumbers, remaining_str = msg_util.extractPhoneNumbers(msg)
+	phoneNumber = phoneNumbers[0]
+
+	words = remaining_str.strip().split(' ')
 	handle = None
 	for word in words:
 		if msg_util.isHandle(word):
 			handle = word
 			break
-
-	phoneNumbers = msg_util.extractPhoneNumbers(msg)
-	phoneNumber = phoneNumbers[0]
 
 	oldUser = createHandle(user, handle, phoneNumber)
 
