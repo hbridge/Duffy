@@ -2,6 +2,7 @@ import logging
 import json
 import copy
 import datetime
+
 import pytz
 
 from django.db import models
@@ -60,6 +61,32 @@ class User(models.Model):
 		self.state = state
 		self.state_data = None
 		self.last_state_change = datetime.datetime.now(pytz.utc)
+
+
+	def getStateData(self, key):
+		if self.state_data:
+			data = json.loads(self.state_data)
+			if key in data:
+				return data[key]
+
+		return None
+
+	def setStateData(self, key, value):
+		if self.state_data:
+			data = json.loads(self.state_data)
+		else:
+			data = dict()
+		data[key] = value
+
+		self.state_data = json.dumps(data)
+
+	def getTimezone(self):
+		if self.timezone:
+			tz = pytz.timezone(self.timezone)
+		else:
+			tz = pytz.timezone('US/Eastern')
+
+		return tz
 
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number

@@ -27,8 +27,12 @@ logger = get_task_logger(__name__)
 @app.task
 def processReminder(entryId):
 	entry = Entry.objects.get(id=entryId)
+	now = datetime.datetime.now(pytz.utc)
 
-	if not entry.hidden:
+	# See if this entry is valid for reminder
+	# It needs to not be hidden
+	# As well as the remind_timestamp be within a few seconds of now
+	if not entry.hidden and abs((now - entry.remind_timestamp).total_seconds()) < 10:
 		msg = "Hi! Friendly reminder: %s" % entry.text
 
 		for user in entry.users.all():

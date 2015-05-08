@@ -10,81 +10,8 @@ from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
 from smskeeper import actions, async
 
-def getStateData(user):
-	iteration = None
-	originalMsg = None
-	if user.state_data:
-		data = json.loads(user.state_data)
-		iteration = int(data['iteration'])
-		originalMsg = data['originalMsg']
+from smskeeper.models import Entry
 
-	return (iteration, originalMsg)
-
-def saveStateData(user, iteration, originalMsg):
-	data = {'iteration': iteration, 'originalMsg': originalMsg}
-	user.state_data = json.dumps(data)
-	user.save()
-
-#def canProcessMessag(user, msg):
-
-
-def process(user, msg, requestDict, keeperNumber):
-	iteration, originalMsg = getStateData(user)
-
-	text, label, handles = msg_util.getMessagePieces(msg)
-	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
-
-	# See if the time that comes back is within a few seconds.
-	# If this happens, then we didn't get a time from the user
-	if not validTime(startDate):
-		if not iteration:
-			# TODO(Derek): Update this to pick a default time and let the user know
-			sms_util.sendMsg(user, "At what time?", None, keeperNumber)
-			saveStateData(user, 1, msg)
-		elif iteration == 1:
-			sms_util.sendMsg(user, "Sorry, I still didn't understand that.  At what time?", None, keeperNumber)
-	else:
-		# If we were in a loop, grab the original msg to use text from that
-		if originalMsg:
-			# First get the used Text from the last message
-			startDate, newQuery, usedText = natty_util.getNattyInfo(originalMsg, user.timezone)
-
-			# Now append on the new 'time' (msg) to that message, then pass to Natty
-			if not usedText:
-				usedText = ""
-			newMsg = usedText + " " + msg
-
-			# We want to ignore the newQuery here since we're only sending in time related stuff
-			startDate, ignore, usedText = natty_util.getNattyInfo(newMsg, user.timezone)
-
-		# if the user typed reminder as remind me to, we shoudl remove it from the text
-		match = re.match('remind me( to)?', newQuery, re.I)
-		if match is not None:
-			newQuery = newQuery[match.end():].strip()
-		doRemindMessage(user, startDate, newQuery, keeperNumber, requestDict)
-		user.setState(keeper_constants.STATE_NORMAL)
-
-def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
-	# Need to do this so the add message correctly adds the label
-	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
-	entry = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
-
-	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
-	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
-	# Have to pass in cleanDate since humanize doesn't use utcnow
-	startDate = startDate.replace(tzinfo=None)
-	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
-
-	entry.remind_timestamp = startDate
-	entry.keeper_number = keeperNumber
-	entry.save()
-
-	async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
-
-	sms_util.sendMsg(user, "Got it. Will remind you to %s %s" % (query, userMsg), None, keeperNumber)
-
-	user.setState(keeper_constants.STATE_NORMAL)
-	user.save()
 
 """
 	Returns True if the time exists and isn't within 10 seconds of now.
@@ -93,3 +20,98 @@ def doRemindMessage(user, startDate, query, keeperNumber, requestDict):
 def validTime(startDate):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	return not (startDate == None or abs((now - startDate).total_seconds()) < 10)
+
+"""
+	Returns True if this message has a valid time and it doesn't look like another command (like another #remind)
+	Otherwise False
+"""
+def isFollowup(startDate, msg):
+	return validTime(startDate) and not msg_util.hasLabel(msg)
+
+def process(user, msg, requestDict, keeperNumber):
+	text, label, handles = msg_util.getMessagePieces(msg)
+	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
+
+	# If we have an entry id, then that means we just created one.
+	# See if what they entered is a valid time and if so, assign it.
+	# If not, kick out to normal mode and re-process
+	if user.getStateData("entryId"):
+		if isFollowup(startDate, msg):
+			entry = Entry.objects.get(id=int(user.getStateData("entryId")))
+			doRemindMessage(user, startDate, entry.text, False, entry, keeperNumber, requestDict)
+
+			user.setState(keeper_constants.STATE_NORMAL)
+			user.save()
+			return True
+		else:
+			# Send back for reprocessing
+			user.setState(keeper_constants.STATE_NORMAL)
+			user.save()
+			return False
+
+	# We don't have an entryId so this is the first time we've been put into this state
+	else:
+		sendFollowup = False
+		if not validTime(startDate):
+			startDate = getDefaultTime(user)
+			sendFollowup = True
+		entry = doRemindMessage(user, startDate, newQuery, sendFollowup, None, keeperNumber, requestDict)
+
+		if sendFollowup:
+			user.setStateData("entryId", entry.id)
+		else:
+			user.setState(keeper_constants.STATE_NORMAL)
+		user.save()
+
+	return True
+
+"""
+	Update or create the Entry for the reminder entry and send message to user
+"""
+def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, requestDict):
+	# Need to do this so the add message correctly adds the label
+	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
+	if not entry:
+		entry = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
+
+	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
+	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
+	# Have to pass in cleanDate since humanize doesn't use utcnow.  To set to utc then kill the tz
+	startDate = startDate.astimezone(pytz.utc)
+	startDate = startDate.replace(tzinfo=None)
+	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
+
+	entry.remind_timestamp = startDate
+	entry.keeper_number = keeperNumber
+	entry.save()
+
+	# If we're updating an existing entry we don't need to cancel the other celery task since the processReminder
+	# task will make sure the current time is correct for the entry
+	async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
+
+	toSend = "Got it. Will remind you to %s %s" % (query, userMsg)
+
+	if sendFollowup:
+		toSend = toSend + "\n\n"
+		toSend = toSend + "If that time doesn't work, tell me what time is better"
+
+	sms_util.sendMsg(user, toSend, None, keeperNumber)
+
+	return entry
+
+def getDefaultTime(user):
+	tz = user.getTimezone()
+	userNow = datetime.datetime.now(tz)
+
+	# If before 2 pm, remind at 6 pm
+	if userNow.hour < 14:
+		replaceTime = userNow.replace(hour = 18, minute=0, second=0)
+	# If between 2 pm and 5 pm, remind at 9 pm
+	elif userNow.hour >= 14 and userNow.hour < 17:
+		replaceTime = userNow.replace(hour = 21, minute=0, second=0)
+	else:
+	# If after 5 pm, remind 9 am next day
+		replaceTime = userNow + datetime.timedelta(days=1)
+		replaceTime = replaceTime.replace(hour = 9, minute=0, second=0)
+
+	return replaceTime

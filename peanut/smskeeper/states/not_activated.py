@@ -50,3 +50,5 @@ def process(user, msg, requestDict, keeperNumber):
 	# If not, then give them back some fun remarks
 	else:
 		dealWithNonActivatedUser(user, keeperNumber)
+
+	return True

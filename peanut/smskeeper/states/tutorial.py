@@ -40,7 +40,7 @@ def process(user, msg, requestDict, keeperNumber):
 			existingLabel = Entry.fetchFirstLabel(user)
 			if not existingLabel:
 				sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
-				return
+				return True
 			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
 		else:
 			actions.add(user, msg, requestDict, keeperNumber, False)
@@ -55,11 +55,11 @@ def process(user, msg, requestDict, keeperNumber):
 
 		if not msg_util.isLabel(msg):
 			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
-			return
+			return True
 
 		if not msg in Entry.fetchAllLabels(user):
 			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
-			return
+			return True
 		else:
 			actions.fetch(user, msg, keeperNumber)
 			sms_util.sendMsg(user, "That's all you need to know for now. Send 'huh?' anytime to get help.", None, keeperNumber)
@@ -72,3 +72,4 @@ def process(user, msg, requestDict, keeperNumber):
 			user.setState(keeper_constants.STATE_NORMAL)
 
 	user.save()
+	return True

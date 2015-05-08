@@ -68,192 +68,6 @@ def htmlForUserLabel(user, label):
 
 	return html
 
-def dealWithNicety(user, msg, keeperNumber):
-	cleaned = msg.strip().lower()
-	if "thank" in cleaned:
-		sms_util.sendMsg(user, "You're welcome.", None, keeperNumber)
-	if "hello" in cleaned or "hi" in cleaned:
-		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
-
-def dealWithYesNo(user, msg, keeperNumber):
-	sms_util.sendMsg(user, "\xF0\x9F\x98\xB3 I'm not smart enough to know what you mean yet.  Try 'huh?' if you're stuck.", None, keeperNumber)
-
-def getPreviousMessage(user):
-	# Normally would sort by added but unit tests barf since they get added at same time
-	# Here, sorting by id should accomplish the same goal
-	msgs = Message.objects.filter(user=user, incoming=True).order_by("-id")[:2]
-
-	if len(msgs) == 2:
-		return msgs[1]
-	else:
-		return None
-
-def getInferredLabel(user):
-	# Normally would sort by added but unit tests barf since they get added at same time
-	# Here, sorting by id should accomplish the same goal
-	incoming_messages = Message.objects.filter(user=user, incoming=True).order_by("-id")
-	if len(incoming_messages) < 2:
-		return None
-
-	for i in range(1, len(incoming_messages)):
-		msg_body = incoming_messages[i].getBody()
-		logger.info("message -%d: %s" % (i, msg_body))
-		if msg_util.isLabel(msg_body):
-			return msg_body
-		elif msg_util.isDeleteCommand(msg_body):
-			continue
-		else:
-			return None
-
-	return None
-
-
-def dealWithDelete(user, msg, keeperNumber):
-	words = msg.strip().lower().split(" ")
-	words.remove("delete")
-	# what remains in words could be ["1"], ["1,2"], ["1,", "2"] etc.
-	requested_indices = set()
-	for word in words:
-		subwords = word.split(",")
-		print "word, subwords: %s, %s" % (word, subwords)
-		for subword in subwords:
-			try:
-				requested_indices.add(int(subword))
-			except:
-				pass
-	print "requested indices: %s" % requested_indices
-	item_indices = map(lambda x: x - 1, requested_indices)
-
-	item_indices = sorted(item_indices, reverse=True)
-	print item_indices
-
-	label = None
-	if msg_util.hasLabel(msg):
-		text, label, handles = msg_util.getMessagePieces(msg)
-	else:
-		label = getInferredLabel(user)
-
-	if label:
-		entries = Entry.fetchEntries(user=user, label=label)
-		out_of_range = list()
-		deleted_texts = list()
-		if entries is None:
-			helper_util.sendNotFoundMessage(user, label, keeperNumber)
-			return
-		for item_index in item_indices:
-			if item_index < 0 or item_index >= len(entries):
-				out_of_range.append(item_index)
-				continue
-			entry = entries[item_index]
-			entry.hidden = True
-			entry.save()
-			if entry.text:
-				deleted_texts.append(entry.text)
-			else:
-				deleted_texts.append("item " + str(item_index+1))
-
-		if len(deleted_texts) > 0:
-			if len(deleted_texts) > 1:
-				retMsg = "%d items" % len(deleted_texts)
-			else:
-				retMsg = "'%s'" % (deleted_texts[0])
-			sms_util.sendMsg(user, 'Ok, I deleted %s' % (retMsg), None, keeperNumber)
-		if len(out_of_range) > 0:
-			out_of_range_string = ", ".join(map(lambda x: str(x + 1), out_of_range))
-			sms_util.sendMsg(user, 'Can\'t delete %s in %s' % (out_of_range_string, label), None, keeperNumber)
-		actions.fetch(user, label, keeperNumber)
-	else:
-		sms_util.sendMsg(user, 'Sorry, I\'m not sure which hashtag you\'re referring to. Try "delete [number] [hashtag]"', None, keeperNumber)
-
-def dealWithPrintHashtags(user, keeperNumber):
-	#print out all of the active hashtags for the account
-	listText = ""
-	labels = Entry.fetchAllLabels(user)
-	if len(labels) == 0:
-		listText = "You don't have anything tagged. Yet."
-	for label in labels:
-		entries = Entry.fetchEntries(user=user, label=label)
-		if len(entries) > 0:
-			listText += "%s (%d)\n" % (label, len(entries))
-
-	sms_util.sendMsg(user, listText, None, keeperNumber)
-
-def pickItemForUserLabel(user, label, keeperNumber):
-	entries = Entry.fetchEntries(user=user, label=label)
-	if len(entries) == 0:
-		helper_util.sendNotFoundMessage(user, label, keeperNumber)
-		return
-
-	entry = random.choice(entries)
-	if entry.img_url:
-		sms_util.sendMsg(user, "My pick for %s:"%label, None, keeperNumber)
-		sms_util.sendMsg(user, entry.text, entry.img_url, keeperNumber)
-	else:
-		sms_util.sendMsg(user, "My pick for %s: %s"%(label, entry.text), None, keeperNumber)
-
-def dealWithActivation(user, msg, keeperNumber):
-	text, label, handles = msg_util.getMessagePieces(msg)
-
-	try:
-		userToActivate = User.objects.get(phone_number=text)
-		userToActivate.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		userToActivate.save()
-		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
-
-		sms_util.sendMsg(userToActivate, "Oh hello. Someone else entered your magic phrase. Welcome!", None, keeperNumber)
-		time.sleep(1)
-		helper_util.firstRunIntro(userToActivate, keeperNumber)
-	except User.DoesNotExist:
-		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
-
-
-def createHandle(user, handle, targetNumber):
-	# see if there's an existing contact for that handle
-	oldUser = None
-	try:
-		contact = Contact.objects.get(user=user, handle=handle)
-		oldUser = contact.target
-		if (oldUser.phone_number == targetNumber):
-			return oldUser
-	except Contact.DoesNotExist:
-		contact = None
-
-	# get and set the new target user, creating if necessary
-	try:
-		target_user = User.objects.get(phone_number=targetNumber)
-	except User.DoesNotExist:
-		target_user = User.objects.create(phone_number=targetNumber)
-		target_user.save()
-
-	if contact is not None:
-		contact.target = target_user
-	else:
-		contact = Contact.objects.create(user=user, handle=handle, target=target_user)
-	contact.save()
-
-	return oldUser
-
-def dealWithCreateHandle(user, msg, keeperNumber):
-	phoneNumbers, remaining_str = msg_util.extractPhoneNumbers(msg)
-	phoneNumber = phoneNumbers[0]
-
-	words = remaining_str.strip().split(' ')
-	handle = None
-	for word in words:
-		if msg_util.isHandle(word):
-			handle = word
-			break
-
-	oldUser = createHandle(user, handle, phoneNumber)
-
-	if oldUser is not None:
-		if oldUser.phone_number == phoneNumber:
-			sms_util.sendMsg(user, "%s is already set to %s" % (handle, phoneNumber), None, keeperNumber)
-		else:
-			sms_util.sendMsg(user, "%s is now set to %s (used to be %s)" % (handle, phoneNumber, oldUser.phone_number), None, keeperNumber)
-	else:
-		sms_util.sendMsg(user, "%s is now set to %s" % (handle, phoneNumber), None, keeperNumber)
-
 """
 	Helper method for command line interface input.  Use by:
 	python
@@ -275,79 +89,7 @@ def cliMsg(phoneNumber, msg, mediaURL=None, mediaType=None):
 	else:
 		jsonDict["NumMedia"] = 0
 
-	processMessage(phoneNumber, msg, numMedia, jsonDict, constants.SMSKEEPER_TEST_NUM)
-
-"""
-	Main logic for processing a message
-	Pulled out so it can be called either from sms code or command line
-"""
-def processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber):
-	try:
-		user = User.objects.get(phone_number=phoneNumber)
-	except User.DoesNotExist:
-		try:
-			user = User.objects.create(phone_number=phoneNumber)
-		except Exception as e:
-			logger.error("Got Exception in user creation: %s" % e)
-	except Exception as e:
-		logger.error("Got Exception in user creation: %s" % e)
-	finally:
-		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
-
-	try:
-		if user.state != keeper_constants.STATE_NORMAL:
-			processing_util.processMessage(user, msg, requestDict, keeperNumber)
-		elif re.match("yippee ki yay motherfucker", msg):
-			raise NameError("intentional exception")
-		# STATE_REMIND
-		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg):
-			# TODO  Fix this state so the logic isn't so complex
-			user.setState(keeper_constants.STATE_REMIND)
-			processing_util.processMessage(user, msg, requestDict, keeperNumber)
-		elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
-			dealWithActivation(user, msg, keeperNumber)
-		# STATE_NORMAL
-		elif msg_util.isPrintHashtagsCommand(msg):
-			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
-			dealWithPrintHashtags(user, keeperNumber)
-		# STATE_NORMAL
-		elif msg_util.isFetchCommand(msg) and numMedia == 0:
-				actions.fetch(user, msg, keeperNumber)
-		# STATE_NORMAL
-		elif msg_util.isClearCommand(msg) and numMedia == 0:
-			actions.clear(user, msg, keeperNumber)
-		# STATE_NORMAL
-		elif msg_util.isPickCommand(msg) and numMedia == 0:
-			label = msg_util.getLabel(msg)
-			pickItemForUserLabel(user, label, keeperNumber)
-		# STATE_NORMAL
-		elif msg_util.isHelpCommand(msg):
-			sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
-		# STATE_ADD
-		elif msg_util.isCreateHandleCommand(msg):
-			dealWithCreateHandle(user, msg, keeperNumber)
-
-		# STATE_DELETE
-		elif msg_util.isDeleteCommand(msg):
-			dealWithDelete(user, msg, keeperNumber)
-		else:  # treat this as an add command
-			# STATE_NORMAL
-			# STATE_ADD
-			if not msg_util.hasLabel(msg):
-				if msg_util.isNicety(msg):
-					dealWithNicety(user, msg, keeperNumber)
-					return
-				elif msg_util.isYesNo(msg):
-					dealWithYesNo(user, msg, keeperNumber)
-					return
-				# if the user didn't add a label, throw it in #unassigned
-				msg += ' ' + keeper_constants.UNASSIGNED_LABEL
-				actions.add(user, msg, requestDict, keeperNumber, True)
-			else:
-				actions.add(user, msg, requestDict, keeperNumber, True)
-	except:
-		sms_util.sendMsg(user, keeper_constants.GENERIC_ERROR_MESSAGE, None, keeperNumber)
-		raise
+	processing_util.processMessage(phoneNumber, msg, jsonDict, constants.SMSKEEPER_TEST_NUM)
 
 #
 # Send a sms message to a user from a certain number
@@ -411,7 +153,7 @@ def incoming_sms(request):
 		numMedia = int(form.cleaned_data['NumMedia'])
 		requestDict = api_util.getRequestData(request)
 
-		processMessage(phoneNumber, msg, numMedia, requestDict, keeperNumber)
+		process_util.processMessage(phoneNumber, msg, requestDict, keeperNumber)
 		return sendNoResponse()
 
 	else:
@@ -465,7 +207,7 @@ def message_feed(request):
 
 
 def dashboard_feed(request):
-	users = User.objects.all().order_by("id");
+	users = User.objects.all().order_by("id")
 	user_dicts = []
 	for user in users:
 		dict = {

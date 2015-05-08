@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import sys
+from mock import patch
 from cStringIO import StringIO
 from contextlib import contextmanager
 
@@ -161,7 +162,7 @@ class SMSKeeperCase(TestCase):
 			views.cliMsg(self.testPhoneNumber, "foo%d #bar" % (i))
 
 		# ensure we can delete with or without spaces
-		with capture(views.cliMsg, self.testPhoneNumber, "delete 3, 5,2 #bar"):
+		with capture(views.cliMsg, self.testPhoneNumber, "delete 3, 5,2 #bar") as output:
 			pass
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#bar") as output:
@@ -175,38 +176,69 @@ class SMSKeeperCase(TestCase):
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop tmr") as output:
 			self.assertIn("a day from now", output)
 
-	def test_reminders_remind_works(self):
-		self.setupUser(True, True)
-
-		views.cliMsg(self.testPhoneNumber, "#remind poop tmr")
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
+	# This test is here to make sure the ordering of fetch vs reminders is correct
 	def test_reminders_fetch(self):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#reminders") as output:
 			self.assertIn("#reminders", output)
 
-	def test_reminders_followup(self):
+	def test_reminders_followup_change(self):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
-			self.assertIn("what time?", output)
+			self.assertIn("If that time doesn't work", output)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
 			self.assertIn("a day from now", output)
 
-	def test_reminders_double_followup(self):
+	def test_reminders_two_in_row(self):
 		self.setupUser(True, True)
 
 		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
-			self.assertIn("what time?", output)
+			self.assertIn("If that time doesn't work", output)
 
-		with capture(views.cliMsg, self.testPhoneNumber, "I'm not sure") as output:
-			self.assertIn("Sorry", output)
+		with capture(views.cliMsg, self.testPhoneNumber, "#remind pee tomorrow") as output:
+			self.assertIn("pee", output)
 
-		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
-			self.assertIn("a day from now", output)
+	def test_reminders_defaults(self):
+		self.setupUser(True, True)
+
+		# Emulate the user sending in a reminder without a time for 9am, 3 pm and 10 pm
+		with Replacer() as r:
+			with patch('humanize.time._now') as mocked:
+				tz = pytz.timezone('US/Eastern')
+				# Try with 9 am EST
+				testDt = test_datetime(2020, 01, 01, 9, 0, 0, tzinfo=tz)
+				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
+
+				# humanize.time._now should always return utcnow because that's what the
+				# server's time is set in
+				mocked.return_value = testDt.utcnow()
+				with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+					# Should be 6 pm, so 9 hours
+					self.assertIn("9 hours", output)
+
+				# Try with 3 pm EST
+				testDt = test_datetime(2020, 01, 01, 15, 0, 0, tzinfo=tz)
+				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
+				mocked.return_value = testDt.utcnow()
+				with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+					# Should be 9 pm, so 6 hours
+					self.assertIn("6 hours", output)
+
+				# Try with 10 pm EST
+				testDt = test_datetime(2020, 01, 01, 22, 0, 0, tzinfo=tz)
+				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
+				mocked.return_value = testDt.utcnow()
+				with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+					# Should be 9 am next day, so in 11 hours
+					self.assertIn("11 hours", output)
+
+			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
+
 
 	"""
 		Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
@@ -235,9 +267,6 @@ class SMSKeeperCase(TestCase):
 
 		self.assertEqual(entry.remind_timestamp.hour, 22)  # 3 pm Pactific in UTC
 
-	def test_state_machine(self):
-		commands = processing_util.getPossibleCommands("#test this is a test")
-		print "HERE: %s" % commands
 
 	def test_unicode_natty(self):
 		self.setupUser(True, True)
@@ -249,8 +278,7 @@ class SMSKeeperCase(TestCase):
 	def test_exception_error_message(self):
 		self.setupUser(True, True)
 		with self.assertRaises(NameError):
-			with capture(views.cliMsg, self.testPhoneNumber, 'yippee ki yay motherfucker'):
-				pass
+			views.cliMsg(self.testPhoneNumber, 'yippee ki yay motherfucker')
 
 		# we have to dig into messages as ouput would never get returned from capture
 		messages = Message.objects.filter(user=self.user, incoming=False).all()
@@ -365,9 +393,9 @@ class SMSKeeperSharingCase(TestCase):
 	'''
 	def testShareDelete(self):
 		self.createHandle(self.testPhoneNumbers[0], "@test", self.testPhoneNumbers[1])
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "poop #list @test"):
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "poop #list @test") as output:
 			pass
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "delete 1 #list"):
+		with capture(views.cliMsg, self.testPhoneNumbers[0], "delete 1 #list") as output:
 			pass
 		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
 			self.assertNotIn("poop", output)
@@ -419,3 +447,4 @@ class SMSKeeperAsyncCase(TestCase):
 		self.setupUser(True, False)
 		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
 			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), output)
+
