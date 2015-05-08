@@ -72,7 +72,8 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
 	if not entry:
-		entry = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
+		entries, notFoundHandles = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
+		entry = entries[0]
 
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
 	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down

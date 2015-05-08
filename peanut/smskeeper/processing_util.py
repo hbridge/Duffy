@@ -3,30 +3,35 @@ import logging
 
 from smskeeper import keeper_constants
 
-from smskeeper.states import not_activated, tutorial, remind, normal
+from smskeeper.states import not_activated, tutorial, remind, normal, unresolved_handles
 from smskeeper import msg_util
 
 from smskeeper.models import User, Message
 
 logger = logging.getLogger(__name__)
 
-COMMAND_FUNCS = {keeper_constants.COMMAND_PICK: msg_util.isPickCommand,
-				 keeper_constants.COMMAND_CLEAR: msg_util.isClearCommand,
-				 keeper_constants.COMMAND_FETCH: msg_util.isFetchCommand,
-				 keeper_constants.COMMAND_ADD: msg_util.isAddCommand,
-				 keeper_constants.COMMAND_REMIND: msg_util.isRemindCommand,
-				 keeper_constants.COMMAND_DELETE: msg_util.isDeleteCommand,
-				 keeper_constants.COMMAND_ACTIVATE: msg_util.isActivateCommand,
-				 keeper_constants.COMMAND_LIST: msg_util.isPrintHashtagsCommand,
-				 keeper_constants.COMMAND_HELP: msg_util.isHelpCommand,
-				}
+# This is not used yet
+# COMMAND_FUNCS = {
+# 	keeper_constants.COMMAND_PICK: msg_util.isPickCommand,
+# 	keeper_constants.COMMAND_CLEAR: msg_util.isClearCommand,
+# 	keeper_constants.COMMAND_FETCH: msg_util.isFetchCommand,
+# 	keeper_constants.COMMAND_ADD: msg_util.isAddCommand,
+# 	keeper_constants.COMMAND_REMIND: msg_util.isRemindCommand,
+# 	keeper_constants.COMMAND_DELETE: msg_util.isDeleteCommand,
+# 	keeper_constants.COMMAND_ACTIVATE: msg_util.isActivateCommand,
+# 	keeper_constants.COMMAND_LIST: msg_util.isPrintHashtagsCommand,
+# 	keeper_constants.COMMAND_HELP: msg_util.isHelpCommand,
+# 	keeper_constants.COMMAND_ADD_SHARE: msg_util.isAddShareCommand,
+# }
 
-def getPossibleCommands(msg):
-	commandList = list()
-	for key, func in COMMAND_FUNCS.iteritems():
-		if func(msg):
-			commandList.append(key)
-	return commandList
+
+# def getPossibleCommands(msg):
+# 	commandList = list()
+# 	for key, func in COMMAND_FUNCS.iteritems():
+# 		if func(msg):
+# 			commandList.append(key)
+# 	return commandList
+
 
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	try:
@@ -51,12 +56,11 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	if count == 10:
 		logger.error("Hit endless loop for msg %s" % msg)
 
+
 stateCallbacks = {
-	keeper_constants.STATE_NOT_ACTIVATED : not_activated,
-	keeper_constants.STATE_TUTORIAL : tutorial,
-	keeper_constants.STATE_NORMAL : normal,
-	keeper_constants.STATE_REMIND : remind,
+	keeper_constants.STATE_NOT_ACTIVATED: not_activated,
+	keeper_constants.STATE_TUTORIAL: tutorial,
+	keeper_constants.STATE_NORMAL: normal,
+	keeper_constants.STATE_REMIND: remind,
+	keeper_constants.STATE_UNRESOLVED_HANDLES: unresolved_handles,
 }
-
-
-

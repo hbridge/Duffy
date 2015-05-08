@@ -2,13 +2,18 @@ import humanize
 
 from smskeeper import sms_util, msg_util, helper_util, image_util
 from smskeeper import keeper_constants
+import django
 
-from smskeeper.models import Entry, Contact
+from smskeeper.models import Entry, Contact, User
 
 
 def shareEntries(user, entries, handles, keeperNumber):
 	sharedHandles = list()
 	notFoundHandles = list()
+	if not isinstance(entries, django.db.models.query.QuerySet) and not isinstance(entries, list):
+		raise TypeError("entries must be list or django.db.models.query.QuerySet, actual type: %s" % (type(entries)))
+	if not isinstance(handles, list):
+		raise TypeError("handles must be a list, actual type: %s" % (type(handles)))
 	for handle in handles:
 		contact = Contact.fetchByHandle(user, handle)
 		if contact is None:
@@ -50,7 +55,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 	if len(handles) > 0:
 		sharedHandles, notFoundHandles = shareEntries(user, createdEntries, handles, keeperNumber)
 	if len(sharedHandles) > 0:
-			shareString = "  I also shared that with %s" % ", ".join(sharedHandles)
+		shareString = "  I also shared that with %s" % ", ".join(sharedHandles)
 
 	if sendResponse:
 		if label == keeper_constants.UNASSIGNED_LABEL:
@@ -58,10 +63,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 		else:
 			sms_util.sendMsg(user, "Got it." + shareString, None, keeperNumber)
 
-		if len(notFoundHandles) > 0:
-			sms_util.sendMsg(user, "I don't know %s. Send @[name] [phone number] to introduce us." % ", ".join(notFoundHandles), None, keeperNumber)
-
-	return entry
+	return createdEntries, notFoundHandles
 
 
 def fetch(user, msg, keeperNumber):
@@ -133,3 +135,29 @@ def clear(user, msg, keeperNumber):
 			entry.hidden = True
 			entry.save()
 		sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+
+def createHandle(user, handle, targetNumber):
+	# see if there's an existing contact for that handle
+	oldUser = None
+	try:
+		contact = Contact.objects.get(user=user, handle=handle)
+		oldUser = contact.target
+		if (oldUser.phone_number == targetNumber):
+			return oldUser
+	except Contact.DoesNotExist:
+		contact = None
+
+	# get and set the new target user, creating if necessary
+	try:
+		target_user = User.objects.get(phone_number=targetNumber)
+	except User.DoesNotExist:
+		target_user = User.objects.create(phone_number=targetNumber)
+		target_user.save()
+
+	if contact is not None:
+		contact.target = target_user
+	else:
+		contact = Contact.objects.create(user=user, handle=handle, target=target_user)
+	contact.save()
+
+	return oldUser

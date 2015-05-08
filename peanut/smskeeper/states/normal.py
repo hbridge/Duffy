@@ -158,32 +158,6 @@ def dealWithActivation(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
 
-def createHandle(user, handle, targetNumber):
-	# see if there's an existing contact for that handle
-	oldUser = None
-	try:
-		contact = Contact.objects.get(user=user, handle=handle)
-		oldUser = contact.target
-		if (oldUser.phone_number == targetNumber):
-			return oldUser
-	except Contact.DoesNotExist:
-		contact = None
-
-	# get and set the new target user, creating if necessary
-	try:
-		target_user = User.objects.get(phone_number=targetNumber)
-	except User.DoesNotExist:
-		target_user = User.objects.create(phone_number=targetNumber)
-		target_user.save()
-
-	if contact is not None:
-		contact.target = target_user
-	else:
-		contact = Contact.objects.create(user=user, handle=handle, target=target_user)
-	contact.save()
-
-	return oldUser
-
 def dealWithCreateHandle(user, msg, keeperNumber):
 	phoneNumbers, remaining_str = msg_util.extractPhoneNumbers(msg)
 	phoneNumber = phoneNumbers[0]
@@ -195,7 +169,7 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 			handle = word
 			break
 
-	oldUser = createHandle(user, handle, phoneNumber)
+	oldUser = actions.createHandle(user, handle, phoneNumber)
 
 	if oldUser is not None:
 		if oldUser.phone_number == phoneNumber:
@@ -222,7 +196,7 @@ def process(user, msg, requestDict, keeperNumber):
 			user.save()
 			# Reprocess
 			return False
-		elif msg_util.isActivateCommand(msg) and phoneNumber in constants.DEV_PHONE_NUMBERS:
+		elif msg_util.isActivateCommand(msg) and user.phone_number in constants.DEV_PHONE_NUMBERS:
 			dealWithActivation(user, msg, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isPrintHashtagsCommand(msg):
@@ -260,9 +234,14 @@ def process(user, msg, requestDict, keeperNumber):
 					return
 				# if the user didn't add a label, throw it in #unassigned
 				msg += ' ' + keeper_constants.UNASSIGNED_LABEL
-				actions.add(user, msg, requestDict, keeperNumber, True)
-			else:
-				actions.add(user, msg, requestDict, keeperNumber, True)
+			entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)
+			if len(unresolvedHandles) > 0:
+				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
+				user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, map(lambda entry: entry.id, entries))
+				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
+				user.save()
+				return False
+
 		return True
 	except:
 		sms_util.sendMsg(user, keeper_constants.GENERIC_ERROR_MESSAGE, None, keeperNumber)

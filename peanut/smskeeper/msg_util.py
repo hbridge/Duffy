@@ -83,6 +83,14 @@ def hasPhoneNumber(msg):
 	# foundMatch = True
 	# obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
+def isPhoneNumber(msg):
+	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
+	if not matches.has_next():
+		return False
+	match = matches.next()
+	return match.start == 0 and match.end == len(msg)
+
+	return matches.has_next()
 
 def extractPhoneNumbers(msg):
 	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
@@ -92,7 +100,6 @@ def extractPhoneNumbers(msg):
 		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 		if formatted:
 			phone_numbers.append(formatted)
-			print "removing %s in %s" % (match.raw_string, remaining_str)
 			remaining_str = remaining_str.replace(match.raw_string, "")
 
 	return phone_numbers, remaining_str
