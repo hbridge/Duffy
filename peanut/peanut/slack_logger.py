@@ -13,19 +13,22 @@ class SlackLogHandler(Handler):
         self.stack_trace = stack_trace
 
     def emit(self, record):
-        print "slack logger called"
+        # print "slack logger called"
         if not hasattr(settings, "SLACK_LOGGING_URL"):
             return
         message = '%s' % (record.getMessage())
         if self.stack_trace:
             if record.exc_info:
                 message += '\n'.join(traceback.format_exception(*record.exc_info))
-                requests.post(
-                    self.logging_url,
-                    data=json.dumps({
-                        "channel": "#errors",
-                        "username": "webhookbot",
-                        "icon_emoji": ":bomb:",
-                        "text": message,
-                    })
-                )
+        payload = json.dumps(
+            {
+                "channel": "#errors",
+                "username": "webhookbot",
+                "icon_emoji": ":bomb:",
+                "text": message,
+            })
+        # print "posting to %s: %s" % (self.logging_url, payload)
+        requests.post(
+            self.logging_url,
+            data=payload
+        )
