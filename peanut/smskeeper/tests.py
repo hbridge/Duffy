@@ -14,17 +14,18 @@ from peanut.settings import constants
 from smskeeper import views, processing_util, keeper_constants
 from smskeeper.models import User, Entry, Contact, Message
 from smskeeper import msg_util
+
+from smskeeper import cliMsg
+
 import string
 
+def getOutput(mock):
+	output = ""
+	for call in mock.call_args_list:
+		arg, kargs = call
+		output += str(arg[0])
 
-@contextmanager
-def capture(command, *args, **kwargs):
-	out, sys.stdout = sys.stdout, StringIO()
-	command(*args, **kwargs)
-	sys.stdout.seek(0)
-	yield sys.stdout.read()
-	sys.stdout = out
-
+	return output
 
 class SMSKeeperCase(TestCase):
 	testPhoneNumber = "+16505555550"
@@ -47,161 +48,193 @@ class SMSKeeperCase(TestCase):
 		self.user.save()
 
 	def test_first_connect(self):
-		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertIn("magic phrase", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "hi")
+			self.assertIn("magic phrase", getOutput(mock))
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
-		views.cliMsg(self.testPhoneNumber, "hi")
-		with capture(views.cliMsg, self.testPhoneNumber, "hi") as output:
-			self.assertIn("Nope.", output)
+		cliMsg.msg(self.testPhoneNumber, "hi")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "hi")
+			self.assertIn("Nope.", getOutput(mock))
 
 	def test_magicphrase(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
-		with capture(views.cliMsg, self.testPhoneNumber, "trapper keeper") as output:
-			self.assertIn("That's the magic phrase", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "trapper keeper")
+			self.assertIn("That's the magic phrase", getOutput(mock))
 
 	def test_tutorial(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL)
 
 		# Activation message asks for their name
-		with capture(views.cliMsg, self.testPhoneNumber, "UnitTests") as output:
-			self.assertIn("nice to meet you UnitTests!", output)
-			self.assertIn("Let me show you the basics", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("nice to meet you UnitTests!", getOutput(mock))
+			self.assertIn("Let me show you the basics", getOutput(mock))
 			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
 
-		with capture(views.cliMsg, self.testPhoneNumber, "new5 #test") as output:
-			self.assertIn("Now send me another item for the same list", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "new5 #test")
+			self.assertIn("Now send me another item for the same list", getOutput(mock))
 
-		with capture(views.cliMsg, self.testPhoneNumber, "new2 #test") as output:
-			self.assertIn("You can send items to this", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "new2 #test")
+			self.assertIn("You can send items to this", getOutput(mock))
 
-		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
-			self.assertIn("That's all you need to know for now", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#test")
+			self.assertIn("That's all you need to know for now", getOutput(mock))
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
-		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
-			self.assertIn("Sorry, I don't", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#test")
+			self.assertIn("Sorry, I don't", getOutput(mock))
 
 	def test_get_label(self):
 		self.setupUser(True, True)
 
-		views.cliMsg(self.testPhoneNumber, "new #test")
-		with capture(views.cliMsg, self.testPhoneNumber, "#test") as output:
-			self.assertTrue("new" in output, output)
+		cliMsg.msg(self.testPhoneNumber, "new #test")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#test")
+			self.assertIn("new", getOutput(mock))
 
 	def test_pick_label(self):
 		self.setupUser(True, True)
-		views.cliMsg(self.testPhoneNumber, "new #test")
-		with capture(views.cliMsg, self.testPhoneNumber, "pick #test") as output:
-			self.assertTrue("new" in output, output)
+		cliMsg.msg(self.testPhoneNumber, "new #test")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "pick #test")
+			self.assertTrue("new", getOutput(mock))
 
 	def test_print_hashtags(self):
 		self.setupUser(True, True)
-		views.cliMsg(self.testPhoneNumber, "new #test")
-		with capture(views.cliMsg, self.testPhoneNumber, "#hashtag") as output:
-			self.assertTrue("(1)" in output, output)
+		cliMsg.msg(self.testPhoneNumber, "new #test")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#hashtag")
+			self.assertIn("(1)", getOutput(mock))
 
 	def test_add_unassigned(self):
 		self.setupUser(True, True)
-		with capture(views.cliMsg, self.testPhoneNumber, "new") as output:
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "new")
 			# ensure we tell the user we put it in unassigned
-			self.assertIn(keeper_constants.UNASSIGNED_LABEL, output)
-		with capture(views.cliMsg, self.testPhoneNumber, keeper_constants.UNASSIGNED_LABEL) as output:
+			self.assertIn(keeper_constants.UNASSIGNED_LABEL, getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, keeper_constants.UNASSIGNED_LABEL)
 			# ensure the user can get things from #unassigned
-			self.assertIn("new", output)
+			self.assertIn("new", getOutput(mock))
 
 	def test_no_add_dumb_stuff(self):
 		self.setupUser(True, True)
 		dumb_phrases = ["hi", "thanks", "no", "yes"]
+
 		for phrase in dumb_phrases:
-			with capture(views.cliMsg, self.testPhoneNumber, phrase) as output:
-				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, output)
+			with patch('smskeeper.sms_util.recordOutput') as mock:
+				cliMsg.msg(self.testPhoneNumber, phrase)
+				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, getOutput(mock))
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)
 		# ensure deleting from an empty list doesn't crash
-		views.cliMsg(self.testPhoneNumber, "delete 1 #test")
-		views.cliMsg(self.testPhoneNumber, "old fashioned #cocktail")
+		cliMsg.msg(self.testPhoneNumber, "delete 1 #test")
+		cliMsg.msg(self.testPhoneNumber, "old fashioned #cocktail")
 
 		# First make sure that the entry is there
-		with capture(views.cliMsg, self.testPhoneNumber, "#cocktail") as output:
-			self.assertIn("old fashioned", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#cocktail")
+			self.assertIn("old fashioned", getOutput(mock))
 
-		# Next make sure we delete and the list is clear
-		views.cliMsg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
-		with capture(views.cliMsg, self.testPhoneNumber, "#cocktail") as output:
-			self.assertIn("Sorry, I don't", output)
+				# Next make sure we delete and the list is clear
+		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#cocktail")
+			self.assertIn("Sorry, I don't", getOutput(mock))
 
 	def test_contextual_delete(self):
 		self.setupUser(True, True)
 		for i in range(1, 2):
-			views.cliMsg(self.testPhoneNumber, "foo%d #bar" % (i))
+			cliMsg.msg(self.testPhoneNumber, "foo%d #bar" % (i))
 
 		# ensure we don't delete when ambiguous
-		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertIn("Sorry, I'm not sure", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 1")
+			self.assertIn("Sorry, I'm not sure", getOutput(mock))
 
-		# ensure deletes right item
-		views.cliMsg(self.testPhoneNumber, "#bar")
-		with capture(views.cliMsg, self.testPhoneNumber, "delete 2") as output:
-			self.assertNotIn("2. foo2", output)
+				# ensure deletes right item
+		cliMsg.msg(self.testPhoneNumber, "#bar")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 2")
+			self.assertNotIn("2. foo2", getOutput(mock))
 
 		# ensure can chain deletes
-		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertNotIn("1. foo1", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 1")
+			self.assertNotIn("1. foo1", getOutput(mock))
 
 		# ensure deleting from empty doesn't crash
-		with capture(views.cliMsg, self.testPhoneNumber, "delete 1") as output:
-			self.assertNotIn("I deleted", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 1")
+			self.assertNotIn("I deleted", getOutput(mock))
 
 	def test_multi_delete(self):
 		self.setupUser(True, True)
 		for i in range(1, 5):
-			views.cliMsg(self.testPhoneNumber, "foo%d #bar" % (i))
+			cliMsg.msg(self.testPhoneNumber, "foo%d #bar" % (i))
 
 		# ensure we can delete with or without spaces
-		with capture(views.cliMsg, self.testPhoneNumber, "delete 3, 5,2 #bar") as output:
-			pass
+		cliMsg.msg(self.testPhoneNumber, "delete 3, 5,2 #bar")
 
-		with capture(views.cliMsg, self.testPhoneNumber, "#bar") as output:
-			self.assertNotIn("foo2", output)
-			self.assertNotIn("foo3", output)
-			self.assertNotIn("foo5", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#bar")
+
+			self.assertNotIn("foo2", getOutput(mock))
+			self.assertNotIn("foo3", getOutput(mock))
+			self.assertNotIn("foo5", getOutput(mock))
 
 	def test_reminders_basic(self):
 		self.setupUser(True, True)
-
-		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop tmr") as output:
-			self.assertIn("a day from now", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop tmr")
+			self.assertIn("a day from now", getOutput(mock))
 
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
 	# This test is here to make sure the ordering of fetch vs reminders is correct
 	def test_reminders_fetch(self):
 		self.setupUser(True, True)
-
-		with capture(views.cliMsg, self.testPhoneNumber, "#reminders") as output:
-			self.assertIn("#reminders", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#reminders")
+			self.assertIn("#reminders", getOutput(mock))
 
 	def test_reminders_followup_change(self):
 		self.setupUser(True, True)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop")
+			self.assertIn("If that time doesn't work", getOutput(mock))
 
-		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
-			self.assertIn("If that time doesn't work", output)
-
-		with capture(views.cliMsg, self.testPhoneNumber, "tomorrow") as output:
-			self.assertIn("a day from now", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tomorrow")
+			self.assertIn("a day from now", getOutput(mock))
 
 	def test_reminders_two_in_row(self):
 		self.setupUser(True, True)
 
-		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
-			self.assertIn("If that time doesn't work", output)
+		#	cliMsg.msg(self.testPhoneNumber, "#remind poop")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop")
+			self.assertIn("If that time doesn't work", getOutput(mock))
 
-		with capture(views.cliMsg, self.testPhoneNumber, "#remind pee tomorrow") as output:
-			self.assertIn("pee", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind pee tomorrow")
+			self.assertIn("pee", getOutput(mock))
 
 	def test_reminders_defaults(self):
 		self.setupUser(True, True)
@@ -217,25 +250,28 @@ class SMSKeeperCase(TestCase):
 				# humanize.time._now should always return utcnow because that's what the
 				# server's time is set in
 				mocked.return_value = testDt.utcnow()
-				with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+				with patch('smskeeper.sms_util.recordOutput') as mock:
+					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 6 pm, so 9 hours
-					self.assertIn("9 hours", output)
+					self.assertIn("9 hours", getOutput(mock))
 
 				# Try with 3 pm EST
 				testDt = test_datetime(2020, 01, 01, 15, 0, 0, tzinfo=tz)
 				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
 				mocked.return_value = testDt.utcnow()
-				with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+				with patch('smskeeper.sms_util.recordOutput') as mock:
+					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 9 pm, so 6 hours
-					self.assertIn("6 hours", output)
+					self.assertIn("6 hours", getOutput(mock))
 
 				# Try with 10 pm EST
 				testDt = test_datetime(2020, 01, 01, 22, 0, 0, tzinfo=tz)
 				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
 				mocked.return_value = testDt.utcnow()
-				with capture(views.cliMsg, self.testPhoneNumber, "#remind poop") as output:
+				with patch('smskeeper.sms_util.recordOutput') as mock:
+					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 9 am next day, so in 11 hours
-					self.assertIn("11 hours", output)
+					self.assertIn("11 hours", getOutput(mock))
 
 			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
@@ -249,19 +285,21 @@ class SMSKeeperCase(TestCase):
 		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
-		with capture(views.cliMsg, self.testPhoneNumber, "#remind poop 3pm tomorrow") as output:
-			self.assertIn("poop", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
+			self.assertIn("poop", getOutput(mock))
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 19)  # 3 pm Eastern in UTC
 
-		with capture(views.cliMsg, self.testPhoneNumber, "clear #reminders") as output:
-			self.assertIn("cleared", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "clear #reminders")
+			self.assertIn("cleared", getOutput(mock))
 
 		self.user.timezone = "US/Pacific"  # This is the default
 		self.user.save()
-		views.cliMsg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 
@@ -271,16 +309,17 @@ class SMSKeeperCase(TestCase):
 	def test_unicode_natty(self):
 		self.setupUser(True, True)
 
-		with capture(views.cliMsg, self.testPhoneNumber, u'#remind poop\u2019s tmr') as output:
-			self.assertIn(u'poop\u2019s', output.decode('utf-8'))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
+			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
 	def test_exception_error_message(self):
 		self.setupUser(True, True)
 		with self.assertRaises(NameError):
-			views.cliMsg(self.testPhoneNumber, 'yippee ki yay motherfucker')
+			cliMsg.msg(self.testPhoneNumber, 'yippee ki yay motherfucker')
 
-		# we have to dig into messages as ouput would never get returned from capture
+		# we have to dig into messages as ouput would never get returned from the mock
 		messages = Message.objects.filter(user=self.user, incoming=False).all()
 		self.assertIn(removeNonAscii(keeper_constants.GENERIC_ERROR_MESSAGE), messages[0].msg_json)
 
@@ -298,8 +337,7 @@ class SMSKeeperSharingCase(TestCase):
 		return "+1" + number
 
 	def createHandle(self, user_phone, handle, number):
-		with capture(views.cliMsg, user_phone, "%s %s" % (handle, number)):
-			pass
+		cliMsg.msg(user_phone, "%s %s" % (handle, number))
 
 	def setUp(self):
 		for user in User.objects.all():
@@ -326,16 +364,16 @@ class SMSKeeperSharingCase(TestCase):
 		self.assertEqual(remaining_str.strip(), "@henry")
 
 	def testCreateContact(self):
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "@test +16505555551") as output:
-			self.assertTrue(self.testPhoneNumbers[1] in output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[0], "@test +16505555551")
+			self.assertIn(self.testPhoneNumbers[1], getOutput(mock))
 
 		# ensure the contact has the right number
 		contact = Contact.objects.get(user=self.users[0], handle=self.handle)
 		self.assertEqual(contact.target.phone_number, self.testPhoneNumbers[1])
 
 		# try more complicated formatting
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "@test2 (650) 555-5551"):
-			pass
+		cliMsg.msg(self.testPhoneNumbers[0], "@test2 (650) 555-5551")
 
 		# ensure the contact has the right number
 		contact = Contact.objects.get(user=self.users[0], handle="@test2")
@@ -343,8 +381,9 @@ class SMSKeeperSharingCase(TestCase):
 
 	def testCreateNonUserContact(self):
 		# make sure the output contains the normalized number
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.nonUserNumber)) as output:
-			self.assertTrue(self.normalizeNumber(self.nonUserNumber) in output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[0], "%s %s" % (self.handle, self.nonUserNumber))
+			self.assertIn(self.normalizeNumber(self.nonUserNumber), getOutput(mock))
 
 		# make sure there's a user for the new contact
 		targetUser = User.objects.get(phone_number=self.normalizeNumber(self.nonUserNumber))
@@ -352,12 +391,12 @@ class SMSKeeperSharingCase(TestCase):
 
 	def testReassignContact(self):
 		# create a contact
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1])) as output:
-			pass
+		cliMsg.msg(self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1]))
 
 		# change it
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[2])) as output:
-			self.assertIn(self.testPhoneNumbers[2], output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[2]))
+			self.assertIn(self.testPhoneNumbers[2], getOutput(mock))
 
 		# ensure the contact has the right number
 		contact = Contact.objects.get(user=self.users[0], handle=self.handle)
@@ -365,22 +404,26 @@ class SMSKeeperSharingCase(TestCase):
 
 	def testShareWithExsitingUser(self):
 		self.createHandle(self.testPhoneNumbers[0], "@test", self.testPhoneNumbers[1])
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "item #list @test") as output:
-			self.assertIn("@test", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[0], "item #list @test")
+			self.assertIn("@test", getOutput(mock))
 
 		# ensure that the phone number for user 0 is listed in #list for user 1
-		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
-			self.assertIn(self.testPhoneNumbers[0], output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[1], "#list")
+			self.assertIn(self.testPhoneNumbers[0], getOutput(mock))
 
 		# ensure that if user 1 creates a handle for user 0 that's used instead
 		self.createHandle(self.testPhoneNumbers[1], "@user0", self.testPhoneNumbers[0])
-		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
-			self.assertIn("@user0", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[1], "#list")
+			self.assertIn("@user0", getOutput(mock))
 
 	def testShareWithNewUser(self):
 		self.createHandle(self.testPhoneNumbers[0], "@test", "6505551111")
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "item #list @test") as output:
-			self.assertIn("@test", output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[0], "item #list @test")
+			self.assertIn("@test", getOutput(mock))
 
 		# make sure the item is in @test's lists
 		# do an actual entry fetch because the text responses for the user will be unactivated stuff etc
@@ -393,12 +436,12 @@ class SMSKeeperSharingCase(TestCase):
 	'''
 	def testShareDelete(self):
 		self.createHandle(self.testPhoneNumbers[0], "@test", self.testPhoneNumbers[1])
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "poop #list @test") as output:
-			pass
-		with capture(views.cliMsg, self.testPhoneNumbers[0], "delete 1 #list") as output:
-			pass
-		with capture(views.cliMsg, self.testPhoneNumbers[1], "#list") as output:
-			self.assertNotIn("poop", output)
+		cliMsg.msg(self.testPhoneNumbers[0], "poop #list @test")
+		cliMsg.msg(self.testPhoneNumbers[0], "delete 1 #list")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[1], "#list")
+			self.assertNotIn("poop", getOutput(mock))
 
 from smskeeper import async
 from smskeeper import tips
@@ -425,26 +468,30 @@ class SMSKeeperAsyncCase(TestCase):
 
 	def testSendTips(self):
 		self.setupUser(True, True)
-		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 
 		# set datetime to return a full day ahead after each call
 		with Replacer() as r:
 			r.replace('smskeeper.async.datetime.datetime', test_datetime(2020, 01, 01))
 			# check that tip 2 got sent out
-			with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), output)
+			with patch('smskeeper.sms_util.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
 			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
 
 	def testTipThrottling(self):
 		self.setupUser(True, True)
-		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM):
-			pass
-		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), output)
+		async.sendTips(constants.SMSKEEPER_TEST_NUM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
 
 	def testTipsSkipIneligibleUsers(self):
 		self.setupUser(True, False)
-		with capture(async.sendTips, constants.SMSKEEPER_TEST_NUM) as output:
-			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), output)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 

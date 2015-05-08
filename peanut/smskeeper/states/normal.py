@@ -66,17 +66,17 @@ def dealWithDelete(user, msg, keeperNumber):
 	requested_indices = set()
 	for word in words:
 		subwords = word.split(",")
-		print "word, subwords: %s, %s" % (word, subwords)
+		logger.debug("word, subwords: %s, %s" % (word, subwords))
 		for subword in subwords:
 			try:
 				requested_indices.add(int(subword))
 			except:
 				pass
-	print "requested indices: %s" % requested_indices
+	logger.debug("requested indices: %s" % requested_indices)
 	item_indices = map(lambda x: x - 1, requested_indices)
 
 	item_indices = sorted(item_indices, reverse=True)
-	print item_indices
+	logger.debug(item_indices)
 
 	label = None
 	if msg_util.hasLabel(msg):

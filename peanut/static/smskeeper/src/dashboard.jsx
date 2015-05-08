@@ -44,7 +44,7 @@ var UserTable = React.createClass({
     var createRow = function(item, index) {
 			return <UserRow user={ item } index= { index } />
 		}.bind(this);
-    headerValues = ["user", "name", "joined", "activated", "tutorial", "msgs (in/out)", "last", "history"];
+    headerValues = ["user", "name", "joined", "activated", "tutorial", "msgs (in/out)", "last in", "history"];
 
 		return (
       <div>
@@ -82,7 +82,8 @@ var UserRow = React.createClass({
       activated_text = jQuery.timeago(new Date(this.props.user.activated));
     in_date = new Date(this.props.user.message_stats.incoming.last);
     out_date = new Date(this.props.user.message_stats.outgoing.last);
-    last = in_date > out_date ? in_date : out_date;
+    //last = in_date > out_date ? in_date : out_date;
+    last = in_date
     timeago_text = jQuery.timeago(last);
 
     console.log(tutorial_text);

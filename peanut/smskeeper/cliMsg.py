@@ -4,6 +4,36 @@
 import sys
 import argparse
 
+from smskeeper import processing_util
+from peanut.settings import constants
+
+"""
+	Helper method for command line interface input.  Use by:
+	python
+	>> from smskeeper import views
+	>> views.cliMsg("+16508158274", "blah #test")
+"""
+def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False):
+	numMedia = 0
+	jsonDict = {
+		"Body": msg,
+	}
+
+	if mediaURL is not None:
+		numMedia = 1
+		jsonDict["MediaUrl0"] = mediaURL
+		if mediaType is not None:
+			jsonDict["MediaContentType0"] = mediaType
+		jsonDict["NumMedia"] = 1
+	else:
+		jsonDict["NumMedia"] = 0
+
+	keeperNumber = constants.SMSKEEPER_TEST_NUM
+	if cli:
+		keeperNumber = constants.SMSKEEPER_CLI_NUM
+
+	processing_util.processMessage(phoneNumber, msg, jsonDict, keeperNumber)
+
 
 def main():
 	parser = argparse.ArgumentParser(description='Simulate a text message')
@@ -14,8 +44,7 @@ def main():
 	args = parser.parse_args()
 	print "%s: '%s'" % (args.phone, args.text)
 
-	import views
-	views.cliMsg(args.phone, args.text, args.media_url, args.media_type)
+	msg(args.phone, args.text, args.media_url, args.media_type, True)
 
 if __name__ == "__main__":
 	sys.exit(main())
