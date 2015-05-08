@@ -186,7 +186,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler',
         },
         'slackerror': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'peanut.slack_logger.SlackLogHandler',
             'stack_trace': True
         },

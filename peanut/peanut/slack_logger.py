@@ -2,7 +2,7 @@
 
 from logging import Handler
 from django.conf import settings
-import requests, json, traceback
+import requests, json, traceback, re
 
 
 class SlackLogHandler(Handler):
@@ -17,14 +17,25 @@ class SlackLogHandler(Handler):
             return
         message = '%s' % (record.getMessage())
         if self.stack_trace:
+            attachments = []
             if record.exc_info:
-                message += '\n'.join(traceback.format_exception(*record.exc_info))
+                traceback_lines = traceback.format_exception(*record.exc_info)
+                traceback_lines = traceback_lines[1:]
+                traceback_lines.reverse()
+                print "traceback_lines %s" % (traceback_lines)
+                attachments = [{
+                    "pretext": "Traceback (most recent first)",
+                    "fallback": "traceback",
+                    "text": '\n'.join(traceback_lines),
+                    "color": "danger", 
+                }]
         payload = json.dumps(
             {
                 "channel": "#errors",
-                "username": "webhookbot",
+                "username": "Error Bot",
                 "icon_emoji": ":bomb:",
                 "text": message,
+                "attachments": attachments
             })
         # print "posting to %s: %s" % (settings.SLACK_LOGGING_URL, payload)
         requests.post(
