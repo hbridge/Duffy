@@ -228,10 +228,10 @@ def process(user, msg, requestDict, keeperNumber):
 			if not msg_util.hasLabel(msg):
 				if msg_util.isNicety(msg):
 					dealWithNicety(user, msg, keeperNumber)
-					return
+					return True
 				elif msg_util.isYesNo(msg):
 					dealWithYesNo(user, msg, keeperNumber)
-					return
+					return True
 				# if the user didn't add a label, throw it in #unassigned
 				msg += ' ' + keeper_constants.UNASSIGNED_LABEL
 			entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)

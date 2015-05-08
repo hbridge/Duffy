@@ -51,6 +51,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	while not processed and count < 10:
 		stateModule = stateCallbacks[user.state]
 		processed = stateModule.process(user, msg, requestDict, keeperNumber)
+		if processed is None:
+			raise TypeError("modules must return True or False for processed")
 		count += 1
 
 	if count == 10:
