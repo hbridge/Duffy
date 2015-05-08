@@ -75,7 +75,7 @@ jQuery(document).ready(function ($){
 			alert("Please enter a valid 10-digit phone number");
 		}
 		else {
-			url = 'http://dev.duffyapp.com:7000/smskeeper/signup_from_website';
+			url = 'http://prod.strand.duffyapp.com/smskeeper/signup_from_website';
 			sourceVal = getUrlParameter('source');
 			if (sourceVal.length == 0) {
 				sourceVal = 'default';
