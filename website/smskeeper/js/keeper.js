@@ -5,6 +5,14 @@ jQuery(document).ready(function ($){
 		// display stuff	
 		add_msg_tab_keeper();
 		add_msg_tab_user();
+		$("#hp_signup_top").one('submit', function(){
+			event.preventDefault();
+			submitClicked(form_top_success);
+		});
+		$("#hp_signup_middle").one('submit', function(){
+			event.preventDefault();
+			submitClicked(form_middle_success);
+		});
 	}
 
 	/* MESSAGE STYLE ================================== */
@@ -59,6 +67,44 @@ jQuery(document).ready(function ($){
 	});
 
 	// SET COOKIE SO DON'T SHOW CONVO AGAIN
+
+	function submitClicked(FuncOnSuccess){
+
+		value = $('#tel-number').val();
+		if (value.length < 10 || value.indexOf("5555") != -1) {
+			alert("Please enter a valid 10-digit phone number");
+		}
+		else {
+			url = 'http://dev.duffyapp.com:7000/smskeeper/signup_from_website';
+			sourceVal = getUrlParameter('source');
+			if (sourceVal.length == 0) {
+				sourceVal = 'default';
+			}
+			$.ajax({
+     			url: url,
+     			type: 'get',
+     			dataType: 'jsonp',
+     			jsonpCallback: 'jsonCallback',
+     			data: { phone_number: $('#tel-number').val(), source: sourceVal},
+     			success: function(data) {
+     				FuncOnSuccess();
+     			}
+ 			});	
+		}
+	}
+
+	function getUrlParameter(sParam){
+	    var sPageURL = window.location.search.substring(1);
+	    var sURLVariables = sPageURL.split('&');
+
+	    for (var i = 0; i < sURLVariables.length; i++){
+	        var sParameterName = sURLVariables[i].split('=');
+	        if (sParameterName[0] == sParam){
+	            return sParameterName[1];
+	        }
+	    }
+	    return ''
+	}          
 
 
 

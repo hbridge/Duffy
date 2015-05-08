@@ -17,8 +17,6 @@
 
 	<link rel="stylesheet" href="style.css"/>
 
-
-
 </head>
 <body>
 
@@ -28,7 +26,8 @@
 		<h2>Txt me and I’ll remember things for you. It’s that easy.</h2>
 	</div>
 	<form id="hp_signup_top" action="#0">
-		<input type="text" name="tel-number" class="input_num" id="tel-number" placeholder="555 555 5555" required><input type="submit" value="Request Invite" id="submit-button" class="submit_btn">
+		<input type="text" name="tel-number" class="input_num" id="tel-number" placeholder="555 555 5555" required>
+		<input type="submit" value="Request Invite" id="submit-button" class="submit_btn">
 	</form>
 </header>
 
@@ -114,7 +113,8 @@
 	</div>
 
 	<form id="hp_signup_middle" action="#1" id="msg13" class="convo">
-		<input type="text" name="tel-number" class="input_num" id="tel-number" placeholder="555 555 5555" required><input type="submit" value="Request Invite" id="submit-button" class="submit_btn">
+		<input type="text" name="tel-number" class="input_num" id="tel-number" placeholder="555 555 5555" required>
+		<input type="submit" value="Request Invite" id="submit-button" class="submit_btn">
 	</form>
 
 
@@ -140,9 +140,8 @@
 
 
 <script src="/js/jquery-1.11.2.min.js"></script>
-
 <script src="/js/typewriter.js"></script>
-<script src="/js/keeper-min.js"></script>
+<script src="/js/keeper.js"></script>
 
 
 
