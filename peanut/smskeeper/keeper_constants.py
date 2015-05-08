@@ -18,4 +18,4 @@ STATE_ADD = 'add'
 
 UNASSIGNED_LABEL = '#unassigned'
 REMIND_LABEL = "#reminders"
-GENERIC_ERROR_MESSAGE = '\xF0\x9F\x98\xB2 something went wrong.  My overlords have been notified.'
+GENERIC_ERROR_MESSAGE = '\xF0\x9F\x98\xB2 something went wrong.  My minions have been notified.'
