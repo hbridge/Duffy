@@ -185,7 +185,7 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 	Pulled out so it can be called either from sms code or command line
 """
 def process(user, msg, requestDict, keeperNumber):
-	numMedia = requestDict["NumMedia"]
+	numMedia = int(requestDict["NumMedia"])
 	try:
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")
