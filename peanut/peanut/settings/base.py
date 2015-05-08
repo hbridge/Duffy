@@ -185,6 +185,11 @@ LOGGING = {
             'filters': ['skip_unreadable_posts'],
             'class': 'django.utils.log.AdminEmailHandler',
         },
+        'slackerror': {
+            'level': 'ERROR',
+            'class': 'peanut.slack_logger.SlackLogHandler',
+            'stack_trace': True
+        },
         'djangofile': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -225,37 +230,37 @@ LOGGING = {
             'propagate': False,
         },
         'django': {
-            'handlers': ['djangofile', 'djangoerror', 'mail_admins'],  # , 'console'],
+            'handlers': ['djangofile', 'djangoerror', 'mail_admins', 'slackerror'],  # , 'console'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'photos': {
-            'handlers': ['duffyfile', 'mail_admins'],
+            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'arbus': {
-            'handlers': ['duffyfile', 'mail_admins'],
+            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'strand': {
-            'handlers': ['duffyfile', 'mail_admins'],
+            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'celery': {
-            'handlers': ['celery', 'mail_admins'],
+            'handlers': ['celery', 'mail_admins', 'slackerror'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'smskeeper': {
-            'handlers': ['duffyfile', 'mail_admins'],
+            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'common': {
-            'handlers': ['duffyfile', 'mail_admins'],
+            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
             'level': 'DEBUG',
             'propagate': True,
         },
