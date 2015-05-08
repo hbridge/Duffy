@@ -92,10 +92,10 @@ def fetch(user, msg, keeperNumber):
 			otherUserHandles = list()
 			for otherUser in otherUsers:
 				# see if the user has a contact, if so use the handle
-				try:
-					contact = Contact.objects.get(user=user, target=otherUser)
-					otherUserHandles.append(contact.handle)
-				except Contact.DoesNotExist:
+				contacts = Contact.objects.filter(user=user, target=otherUser)
+				if len(contacts) > 0:
+					otherUserHandles.append(contacts[0].handle)
+				else:
 					otherUserHandles.append(otherUser.phone_number)
 
 			otherUsersString = ""
