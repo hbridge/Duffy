@@ -19,6 +19,8 @@ from smskeeper import processing_util
 	python
 	>> from smskeeper import views
 	>> views.cliMsg("+16508158274", "blah #test")
+
+	NOTE:  Make sure all values here are strings instead of ints so it accuratly reflects what comes in on the web
 """
 def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False):
 	numMedia = 0
@@ -27,13 +29,13 @@ def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False):
 	}
 
 	if mediaURL is not None:
-		numMedia = 1
+		numMedia = "1"
 		jsonDict["MediaUrl0"] = mediaURL
 		if mediaType is not None:
 			jsonDict["MediaContentType0"] = mediaType
-		jsonDict["NumMedia"] = 1
+		jsonDict["NumMedia"] = "1"
 	else:
-		jsonDict["NumMedia"] = 0
+		jsonDict["NumMedia"] = "0"
 
 	keeperNumber = constants.SMSKEEPER_TEST_NUM
 	if cli:
