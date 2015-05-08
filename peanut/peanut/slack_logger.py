@@ -9,7 +9,6 @@ class SlackLogHandler(Handler):
 
     def __init__(self, logging_url="", stack_trace=False):
         Handler.__init__(self)
-        self.logging_url = logging_url
         self.stack_trace = stack_trace
 
     def emit(self, record):
@@ -27,8 +26,8 @@ class SlackLogHandler(Handler):
                 "icon_emoji": ":bomb:",
                 "text": message,
             })
-        # print "posting to %s: %s" % (self.logging_url, payload)
+        # print "posting to %s: %s" % (settings.SLACK_LOGGING_URL, payload)
         requests.post(
-            self.logging_url,
+            settings.SLACK_LOGGING_URL,
             data=payload
         )
