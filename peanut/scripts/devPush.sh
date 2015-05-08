@@ -3,6 +3,8 @@ sudo su ubuntu <<'EOF'
 cd /home/ubuntu/dev/Duffy
 git fetch
 git rebase origin/master
+cd peanut
+DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test
 sudo apachectl -k restart
 EOF
 

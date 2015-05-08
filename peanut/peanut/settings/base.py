@@ -340,3 +340,4 @@ INBOUND_EMAIL_LOG_REQUESTS = True
 
 # the max size (in Bytes) of any attachment to process - defaults to 10MB
 INBOUND_EMAIL_ATTACHMENT_SIZE_MAX = 10000000
+
