@@ -1,5 +1,8 @@
 import re
 import phonenumbers
+import logging
+
+logger = logging.getLogger(__name__)
 
 def hasLabel(msg):
 	for word in msg.split(' '):
@@ -92,7 +95,7 @@ def extractPhoneNumbers(msg):
 		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 		if formatted:
 			phone_numbers.append(formatted)
-			print "removing %s in %s" % (match.raw_string, remaining_str)
+			logger.debug("removing %s in %s" % (match.raw_string, remaining_str))
 			remaining_str = remaining_str.replace(match.raw_string, "")
 
 	return phone_numbers, remaining_str

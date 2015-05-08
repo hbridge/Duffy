@@ -103,29 +103,6 @@ def htmlForUserLabel(user, label):
 
 	return html
 
-"""
-	Helper method for command line interface input.  Use by:
-	python
-	>> from smskeeper import views
-	>> views.cliMsg("+16508158274", "blah #test")
-"""
-def cliMsg(phoneNumber, msg, mediaURL=None, mediaType=None):
-	numMedia = 0
-	jsonDict = {
-		"Body": msg,
-	}
-
-	if mediaURL is not None:
-		numMedia = 1
-		jsonDict["MediaUrl0"] = mediaURL
-		if mediaType is not None:
-			jsonDict["MediaContentType0"] = mediaType
-		jsonDict["NumMedia"] = 1
-	else:
-		jsonDict["NumMedia"] = 0
-
-	processing_util.processMessage(phoneNumber, msg, jsonDict, constants.SMSKEEPER_TEST_NUM)
-
 #
 # Send a sms message to a user from a certain number
 # If from_num isn't specified, then defaults to prod
