@@ -431,6 +431,9 @@ class SMSKeeperSharingCase(TestCase):
 		entries = Entry.fetchEntries(newUser, "#list")
 		self.assertEqual(len(entries), 1)
 
+	# TODO(Henry) add test case for sharing with handle resolution
+	# TODO(Henry) add test cases for having multiple contacts for the same target user
+
 	'''
 	Ensure that shared items are deleted from all users lists
 	'''
