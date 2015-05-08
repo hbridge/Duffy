@@ -153,7 +153,7 @@ def incoming_sms(request):
 		numMedia = int(form.cleaned_data['NumMedia'])
 		requestDict = api_util.getRequestData(request)
 
-		process_util.processMessage(phoneNumber, msg, requestDict, keeperNumber)
+		processing_util.processMessage(phoneNumber, msg, requestDict, keeperNumber)
 		return sendNoResponse()
 
 	else:
