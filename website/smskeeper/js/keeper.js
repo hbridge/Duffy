@@ -35,12 +35,13 @@ jQuery(document).ready(function ($){
 
 	function form_top_success(){
 		$('#hp_signup_top').addClass('form_success');
-		$("#hp_signup_top .submit_btn").prop('value', 'Check Your Phone!');	
+		$("#hp_signup_top .submit_btn").prop('value', 'Check Your Phone!');
+		fbpixel();
 	}
 	function form_middle_success(){
 		$('#hp_signup_middle').addClass('form_success');	
 		$("#hp_signup_middle .submit_btn").prop('value', 'Check Your Phone!');	
-
+		fbpixel();
 	}
 
 
@@ -62,9 +63,23 @@ jQuery(document).ready(function ($){
 
 			$(this).find('.msg_text').delay(0).delay(300).slideDown(300);
 		});
-
-
 	});
+
+	function fbpixel() {
+  		var _fbq = window._fbq || (window._fbq = []);
+  		if (!_fbq.loaded) {
+    		var fbds = document.createElement('script');
+    		fbds.async = true;
+    		fbds.src = '//connect.facebook.net/en_US/fbds.js';
+    		var s = document.getElementsByTagName('script')[0];
+    		s.parentNode.insertBefore(fbds, s);
+    		_fbq.loaded = true;
+  		}
+  		window._fbq = window._fbq || [];
+		window._fbq.push(['track', '6027664081971', {'value':'0.00','currency':'USD'}]);
+  	}
+
+
 
 	// SET COOKIE SO DON'T SHOW CONVO AGAIN
 
@@ -104,9 +119,6 @@ jQuery(document).ready(function ($){
 	        }
 	    }
 	    return ''
-	}          
-
-
-
+	}
 }); // end jQuery
 
