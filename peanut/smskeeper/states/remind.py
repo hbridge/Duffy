@@ -12,6 +12,7 @@ from smskeeper import keeper_constants
 from smskeeper import actions, async
 
 from smskeeper.models import Entry
+from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
 
@@ -90,9 +91,12 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 
 	# If we're updating an existing entry we don't need to cancel the other celery task since the processReminder
 	# task will make sure the current time is correct for the entry
-	ret = async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
+	if keeperNumber != constants.SMSKEEPER_TEST_NUM:
+		ret = async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
 
-	logger.info("Just registered task %s for user %s and entryId %s" % (str(ret), user.id, entry.id))
+		logger.info("Just registered task %s for user %s and entryId %s" % (str(ret), user.id, entry.id))
+	else:
+		logger.debug("Not registering task due to it being a test number")
 
 	toSend = "Got it. Will remind you to %s %s" % (query, userMsg)
 
