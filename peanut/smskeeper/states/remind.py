@@ -3,6 +3,7 @@ import pytz
 import humanize
 import json
 import re
+import logging
 
 from common import natty_util
 
@@ -12,6 +13,7 @@ from smskeeper import actions, async
 
 from smskeeper.models import Entry
 
+logger = logging.getLogger(__name__)
 
 """
 	Returns True if the time exists and isn't within 10 seconds of now.
