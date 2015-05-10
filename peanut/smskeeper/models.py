@@ -29,6 +29,8 @@ class User(models.Model):
 
 	timezone = models.CharField(max_length=100, null=True)
 	sent_tips = models.TextField(null=True, db_index=False)
+	disable_tips = models.BooleanField(default=False)
+
 	last_tip_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)

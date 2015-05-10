@@ -50,6 +50,8 @@ TIP_FREQUENCY_SECS = 60 * 60 * 23  # 23 hours in seconds
 def shouldSendUserTip(user):
 	if not user.completed_tutorial:
 		return False
+	if user.disable_tips:
+		return False
 	if not user.last_tip_sent:
 		return True
 	else:
