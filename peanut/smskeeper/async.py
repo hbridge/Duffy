@@ -44,7 +44,7 @@ def processReminder(entryId):
 		entry.save()
 
 
-TIP_FREQUENCY_SECS = 60 * 60 * 23  # 23 hours in seconds
+TIP_FREQUENCY_SECS = 60 * 60 * 71  # 71 hours in seconds
 
 
 def shouldSendUserTip(user):
