@@ -513,7 +513,8 @@ header {
   background-color: #4CD964; }
 
 #hp_convo {
-  margin-top: 185px; }
+  margin-top: 185px;
+  padding-bottom: 80vh; }
   @media (max-width: 850px) {
     #hp_convo {
       margin-top: 40px; } }

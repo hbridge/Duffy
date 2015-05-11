@@ -47,7 +47,6 @@ jQuery(document).ready(function ($){
 	showNextConvo();
 	function showNextConvo() {
 		$('.convo').each(function(i){
-			console.log(this);
 			if ($(this).is(":visible")) return;
 
 			// first hide the text
@@ -80,11 +79,20 @@ jQuery(document).ready(function ($){
 		});
 	}
 
+
+	disable_autoscroll = true;
+	// $(window).scroll(function(e) {
+	// 	console.log(e);
+	//     if (e.offset < 0) {
+	//     	console.log("scroll up");
+	//     	disable_autoscroll = true;
+	//     }
+	// });
+
 	function scrollToConvo(element){
+		if (disable_autoscroll) return;
 	    var offset = element.offset().top - 20;
-
 	    $('html,body').animate({scrollTop: offset}, 1000);
-
 	}
 
 	function fbpixel() {
