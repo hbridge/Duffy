@@ -2,7 +2,7 @@ jQuery(document).ready(function ($){
 	init();
 
 	function init(){
-		// display stuff	
+		// display stuff
 		add_msg_tab_keeper();
 		add_msg_tab_user();
 		$("#hp_signup_top").one('submit', function(){
@@ -39,31 +39,53 @@ jQuery(document).ready(function ($){
 		fbpixel();
 	}
 	function form_middle_success(){
-		$('#hp_signup_middle').addClass('form_success');	
-		$("#hp_signup_middle .submit_btn").prop('value', 'Check Your Phone!');	
+		$('#hp_signup_middle').addClass('form_success');
+		$("#hp_signup_middle .submit_btn").prop('value', 'Check Your Phone!');
 		fbpixel();
 	}
 
+	showNextConvo();
+	function showNextConvo() {
+		$('.convo').each(function(i){
+			console.log(this);
+			if ($(this).is(":visible")) return;
 
-	// ANIMATE THE CONVERSATION
-	$('.convo').each(function(i){
-		// first hide the text
-		
-		$(this).find('.msg_text').parent().prepend('<div class="msg_text_preload">...</div>');
-		$(this).find('.msg_text').hide();
+			// first hide the text
+			$(this).find('.msg_text').parent().prepend('<div class="msg_text_preload">...</div>');
+			$(this).find('.msg_text').hide();
+
+			$(this).delay(500).fadeIn("fast",function(){
+				scrollToConvo($(this));
+				//when fadeIn completes fadeOut the preloader elipses
+				// show the text
+
+				// calculate the typing time
+				animation_time = 300;
+				html = $(this).find('.msg_text').html();
+				if (html)
+					typing_time = 20 * html.length;
+
+				//$(this).find('.msg_text_preload').delay(typing_time).fadeOut(300);
+
+				setTimeout(function(convo){
+					$(convo).find('.msg_text_preload').delay(typing_time).html(html);
+				}, typing_time, this);
 
 
-
-		// then fade in the message
-		$(this).delay((i++) * 1800).fadeIn("fast",function(){
-			// when fadeIn completes fadeOut the preloader elipses 
-			// show the text
-			$(this).find('.msg_text_preload').delay(300).fadeOut(10);
-			//$(this).find('.msg_text').delay(300).typewriter({'speed':300});
-
-			$(this).find('.msg_text').delay(0).delay(300).slideDown(300);
+				setTimeout(function(){
+					showNextConvo();
+				}, typing_time + 500);
+			});
+			return false;
 		});
-	});
+	}
+
+	function scrollToConvo(element){
+	    var offset = element.offset().top - 20;
+
+	    $('html,body').animate({scrollTop: offset}, 1000);
+
+	}
 
 	function fbpixel() {
   		var _fbq = window._fbq || (window._fbq = []);
@@ -104,7 +126,7 @@ jQuery(document).ready(function ($){
      			success: function(data) {
      				FuncOnSuccess();
      			}
- 			});	
+ 			});
 		}
 	}
 

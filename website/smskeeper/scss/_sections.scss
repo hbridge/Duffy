@@ -119,7 +119,7 @@ header {
 
 #hp_convo {
 	margin-top:								185px;
-//	margin-top:										60px;	
+//	margin-top:										60px;
 
 	@media (max-width: 850px){
 		margin-top:							40px;
@@ -163,7 +163,7 @@ header {
 		position:								absolute;
 		bottom:									0px;
 		right:									-10px;
-		
+
 	//	border: 1px solid red;
 		//display: none;
 	}
@@ -191,7 +191,7 @@ header {
 		@extend .user_msg;
 
 		background-color:						$color-keeper-msg-bg;
-		
+
 		text-align:								left;
 		float:									left;
 		max-width:								400px;
