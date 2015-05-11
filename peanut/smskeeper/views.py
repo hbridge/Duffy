@@ -1,12 +1,8 @@
 import json
-from multiprocessing import Process
 import time
-import random
-import math
-import pytz
-import datetime
 from datetime import date, timedelta
-import os, sys, re
+import os
+import sys
 import requests
 import phonenumbers
 import logging
@@ -26,54 +22,52 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.serializers.json import DjangoJSONEncoder
 
-from smskeeper.forms import UserIdForm, SmsContentForm, PhoneNumberForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
+from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 
-from smskeeper.models import User, Entry, Message, MessageMedia, Contact
+from smskeeper.models import User, Entry, Message
 
-
-from smskeeper import sms_util, image_util, msg_util, processing_util, helper_util
-from smskeeper import async, actions, keeper_constants
+from smskeeper import sms_util, processing_util
 
 from common import api_util
 from peanut.settings import constants
-from peanut import settings
 from django.conf import settings as djangosettings
 
 logger = logging.getLogger(__name__)
 
 
 def jsonp(f):
-	"""Wrap a json response in a callback, and set the mimetype (Content-Type) header accordingly 
-	(will wrap in text/javascript if there is a callback). If the "callback" or "jsonp" paramters 
+	"""Wrap a json response in a callback, and set the mimetype (Content-Type) header accordingly
+	(will wrap in text/javascript if there is a callback). If the "callback" or "jsonp" paramters
 	are provided, will wrap the json output in callback({thejson})
-	
+
 	Usage:
-	
+
 	@jsonp
 	def my_json_view(request):
 		d = { 'key': 'value' }
 		return HTTPResponse(json.dumps(d), content_type='application/json')
-	
+
 	"""
 	from functools import wraps
+
 	@wraps(f)
 	def jsonp_wrapper(request, *args, **kwargs):
 		resp = f(request, *args, **kwargs)
 		if resp.status_code != 200:
 			return resp
 		if 'callback' in request.GET:
-			callback= request.GET['callback']
-			resp['Content-Type']='text/javascript; charset=utf-8'
+			callback = request.GET['callback']
+			resp['Content-Type'] = 'text/javascript; charset=utf-8'
 			resp.content = "%s(%s)" % (callback, resp.content)
 			return resp
 		elif 'jsonp' in request.GET:
-			callback= request.GET['jsonp']
-			resp['Content-Type']='text/javascript; charset=utf-8'
+			callback = request.GET['jsonp']
+			resp['Content-Type'] = 'text/javascript; charset=utf-8'
 			resp.content = "%s(%s)" % (callback, resp.content)
 			return resp
 		else:
-			return resp                
-				
+			return resp
+
 	return jsonp_wrapper
 
 
@@ -85,7 +79,7 @@ def sendNoResponse():
 
 
 def htmlForUserLabel(user, label):
-	html = "%s:\n"%(label)
+	html = "%s:\n" % (label)
 	entries = Entry.fetchEntries(user, label)
 	if len(entries) == 0:
 		html += "(empty)<br><br>"
@@ -95,13 +89,14 @@ def htmlForUserLabel(user, label):
 	html += "<ol>\n"
 	for entry in entries:
 		if not entry.img_url:
-			html += "<li>%s</li>"%(entry.text)
+			html += "<li>%s</li>" % (entry.text)
 			count += 1
 		else:
-			html += "<img src=\"%s\" />"%(entry.img_url)
-	html+= "</ol>"
+			html += "<img src=\"%s\" />" % (entry.img_url)
+	html += "</ol>"
 
 	return html
+
 
 #
 # Send a sms message to a user from a certain number
@@ -127,6 +122,7 @@ def send_sms(request):
 		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
 
 #
 # Send a sms message to a user from a certain number
@@ -171,6 +167,7 @@ def incoming_sms(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+
 def all_notes(request):
 	form = UserIdForm(api_util.getRequestData(request))
 
@@ -186,15 +183,17 @@ def all_notes(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+
 def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		context = {	'user_id': user.id }
+		context = {	'user_id': user.id}
 		return render(request, 'thread_view.html', context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
 
 def message_feed(request):
 	form = UserIdForm(api_util.getRequestData(request))
@@ -213,7 +212,7 @@ def message_feed(request):
 				messages_dicts.append(message_dict)
 				if message_dict.get("From") == user.phone_number:
 					message_dict["incoming"] = True
-		return HttpResponse(json.dumps({"messages" : messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps({"messages": messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -223,13 +222,13 @@ def dashboard_feed(request):
 	user_dicts = []
 	for user in users:
 		dict = {
-			"id" : int(user.id),
-			"phone_number" : user.phone_number,
-			"name" : user.name,
-			"activated" : user.activated,
-			"created" : user.added,
-			"tutorial_step" : user.tutorial_step,
-			"completed_tutorial" : user.completed_tutorial
+			"id": int(user.id),
+			"phone_number": user.phone_number,
+			"name": user.name,
+			"activated": user.activated,
+			"created": user.added,
+			"tutorial_step": user.tutorial_step,
+			"completed_tutorial": user.completed_tutorial
 		}
 
 		dict["message_stats"] = {}
@@ -241,8 +240,8 @@ def dashboard_feed(request):
 			if count > 0:
 				last_message_date = messages[0].added
 			dict["message_stats"][direction] = {
-				"count" : count,
-				"last" : last_message_date,
+				"count": count,
+				"last": last_message_date,
 			}
 		dict["history"] = "history?user_id=" + str(user.id)
 
@@ -258,15 +257,17 @@ def dashboard_feed(request):
 			message_count = messages.count()
 			user_count = messages.values('user').distinct().count()
 			daily_stats[days_ago][direction] = {
-				"messages" : message_count,
-				"user_count" : user_count
+				"messages": message_count,
+				"user_count": user_count
 			}
 
-	responseJson = json.dumps({"users" : user_dicts, "daily_stats" : daily_stats}, cls=DjangoJSONEncoder)
+	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats}, cls=DjangoJSONEncoder)
 	return HttpResponse(responseJson, content_type="text/json", status=200)
+
 
 def dashboard(request):
 	return render(request, 'dashboard.html', None)
+
 
 @jsonp
 def signup_from_website(request):
@@ -307,6 +308,7 @@ def signup_from_website(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+
 @receiver(post_save, sender=Message)
 def sendLiveFeed(sender, **kwargs):
 	message = kwargs.get('instance')
@@ -338,9 +340,8 @@ def sendLiveFeed(sender, **kwargs):
 				text += " <" + str(msgContent['MediaUrls']) + "|Attachment>"
 			params['icon_emoji'] = ':rabbit:'
 
-
 		params['username'] = userName
 		params['text'] = text
 		params['channel'] = channel
 
-		resp = requests.post(url, data=json.dumps(params))
+		requests.post(url, data=json.dumps(params))
