@@ -32,109 +32,126 @@
 </header>
 
 <div id="hp_convo" class="wrapper">
-	<div class="convo msg" id="msg01">
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
-			<div class="msg_text">Hi!️ I’m Keeper.</div>
+			<div class="msg_text">Hi! I’m Keeper.</div>
 		</div>
 	</div>
-	<div class="convo msg" id="msg02">
+	<div class="convo msg">
 		<div class="user_msg">
 			<div class="msg_text">Hey Keeper! What can you do?</div>
 		</div>
 	</div>
-	<div class="convo msg" id="msg03">
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
-			<div class="msg_text">I’ll store anything you text me with a #hashtag 😎</div>
-		</div>	
-		
+			<div class="msg_text">I can store anything you text me with a #hashtag 😎</div>
+		</div>
 	</div>
 
-	<div class="convo msg" id="msg04">
-		<div class="keeper_avatar">K</div>
-		<div class="keeper_msg">
-			<div class="msg_text">Text me again with more stuff to store with the same #hashtag. Like…</div>
-		</div>	
-	</div>
-
-	<div class="convo msg" id="msg05">
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
 			<div class="msg_text">shasta cola #groceries</div>
-		</div>	
+		</div>
 	</div>
 
-	<div class="convo msg" id="msg06">
-		<div class="keeper_avatar">K</div>		
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
 			<div class="msg_text">eggos #groceries</div>
-		</div>	
+		</div>
 	</div>
 
-	<div class="convo msg" id="msg07">	
-		<div class="keeper_avatar">K</div>	
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
 			<div class="msg_text">Or send me lots of stuff at the same time with a hashtag:</div>
-		</div>	
+		</div>
 	</div>
 
-	<div class="convo msg" id="msg08">		
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
 			<div class="msg_text">mom, keeper #favpeeps</div>
-		</div>	
+		</div>
 	</div>
 
-	<div class="convo msg" id="msg09">	
-		<div class="keeper_avatar">K</div>	
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
 			<div class="msg_text">Send just the #hashtag &amp; I’ll send everything back!</div>
-		</div>	
+		</div>
 	</div>
 
-	<div class="convo msg" id="msg10">		
+	<div class="convo msg">
 		<div class="user_msg">
 			<div class="msg_text">Wait, I just text you stuff with a hashtag?</div>
 		</div>
 	</div>
 
-	<div class="convo msg" id="msg11">		
+	<div class="convo msg">
 		<div class="user_msg">
 			<div class="msg_text">I don’t have to download an app?</div>
 		</div>
 	</div>
 
-	<div class="convo msg" id="msg12">
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
-			<div class="msg_text">Yep. 👍 Request an invite and I’ll text you when I’m ready for you to use. I’m free to try for 30 days. After that I’m just $2/month.</div>
+			<div class="msg_text">There's no app. 👍 Request an invite and I’ll text you when I’m ready for you.</div>
 		</div>
 	</div>
 
-	<form id="hp_signup_middle" action="#1" id="msg13" class="convo">
+	<center>
+	<form id="hp_signup_middle" action="#1" class="convo">
 		<input type="text" name="tel-number" class="input_num" id="tel-number" placeholder="555 555 5555" required>
 		<input type="submit" value="Request Invite" id="submit-button" class="submit_btn">
 	</form>
+	</center>
 
-
-
-	<div class="convo msg" id="msg14">
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
-			<div class="msg_text">Still not convinced? Well, you can also send me pics with a #hashtag and I’ll store them, just like text.</div>
+			<div class="msg_text">Still not convinced? Well, there's some other cool stuff I can do. 🌟</div>
 		</div>
 	</div>
 
-	<div class="convo msg" id="msg15">		
+	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
-			<div class="msg_text">And that’s not all.. 🌟
-			You can also use me to remind you of things to do.</div>
-		</div>	
+			<div class="msg_text">I can send you reminders when you tag stuff with #reminder:</div>
+		</div>
 	</div>
 
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
+		<div class="keeper_msg">
+			<div class="msg_text">book a flight tomorrow #reminder</div>
+		</div>
+	</div>
 
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
+		<div class="keeper_msg">
+			<div class="msg_text">And I can help keep track of things to do with friends, like: </div>
+		</div>
+	</div>
+
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
+		<div class="keeper_msg">
+			<div class="msg_text">Avengers #movie @steve</div>
+		</div>
+	</div>
+
+	<div class="convo msg">
+		<div class="keeper_avatar">K</div>
+		<div class="keeper_msg">
+			<div class="msg_text">Your friends won't need to download an app to contribute something either! 🎉</div>
+		</div>
+	</div>
 </div>
 
 

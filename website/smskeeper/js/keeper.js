@@ -44,6 +44,14 @@ jQuery(document).ready(function ($){
 		fbpixel();
 	}
 
+
+	if (!getUrlParameter("showall") == true) {
+			$('.msg').each(function(){
+			$(this).hide();
+		});
+	}
+
+
 	showNextConvo();
 	function showNextConvo() {
 		$('.convo').each(function(i){
