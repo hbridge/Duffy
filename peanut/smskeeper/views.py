@@ -138,6 +138,7 @@ def history(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		context = {	'user_id': user.id}
+		context["development"] = settings.DEBUG
 		if form.cleaned_data['development']:
 			context["development"] = form.cleaned_data['development']
 
