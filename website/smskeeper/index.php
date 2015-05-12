@@ -36,7 +36,7 @@
 	<div class="convo msg">
 		<div class="keeper_avatar">K</div>
 		<div class="keeper_msg">
-			<div class="msg_text">Hi!️ I’m Keeper.</div>
+			<div class="msg_text">Hi! I’m Keeper.</div>
 		</div>
 	</div>
 	<div class="convo msg">
