@@ -51,11 +51,14 @@ var MessageListRow = React.createClass({
 
 var MessageBody = React.createClass({
   render: function() {
-    lines = this.props.text.split("\n");
-    result = [];
-    for (line of lines) {
-      result.push(line);
-      result.push(<br />);
+    var lines = this.props.text.split("\n");
+    var result = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      var linekey = "l" + i;
+      var brkey = "b" + i;
+      result.push(<span key= { linekey }>{ line }</span>);
+      result.push(<br key={ brkey } />);
     }
     return (
       <span> {result} </span>
@@ -126,6 +129,7 @@ var KeeperApp = React.createClass({
 	render: function() {
 		var createItem = function(item, index) {
 			return <MessageListRow message={ item }
+        key= { index }
         index= { index }
         onMessageClicked = { this.onMessageClicked }/>
 		}.bind(this);
