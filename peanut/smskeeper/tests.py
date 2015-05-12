@@ -207,6 +207,15 @@ class SMSKeeperCase(TestCase):
 
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
+	def test_reminders_no_hashtag(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me to poop tmr")
+			self.assertNotIn("remind me to", getOutput(mock))
+			self.assertIn("a day from now", getOutput(mock))
+
+		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
+
 	# This test is here to make sure the ordering of fetch vs reminders is correct
 	def test_reminders_fetch(self):
 		self.setupUser(True, True)
