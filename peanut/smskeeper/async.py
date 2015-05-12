@@ -3,7 +3,6 @@ import sys
 import os
 import datetime
 import pytz
-import time
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -30,8 +29,7 @@ def processReminder(entryId):
 	entry = Entry.objects.get(id=entryId)
 	now = datetime.datetime.now(pytz.utc)
 
-
-	#  See if this entry is valid for reminder
+	# See if this entry is valid for reminder
 	# It needs to not be hidden
 	# As well as the remind_timestamp be within a few seconds of now
 	if not entry.hidden and abs((now - entry.remind_timestamp).total_seconds()) < 10:
@@ -42,6 +40,16 @@ def processReminder(entryId):
 
 		entry.hidden = True
 		entry.save()
+
+
+@app.task
+def processAllReminders():
+	entries = Entry.objects.filter(remind_timestamp__isnull=False, hidden=False)
+
+	now = datetime.datetime.now(pytz.utc)
+	for entry in entries:
+		if entry.remind_timestamp < now and entry.remind_timestamp > now - datetime.timedelta(minute=5):
+			processReminder(entry.id)
 
 
 TIP_FREQUENCY_SECS = 60 * 60 * 71  # 71 hours in seconds

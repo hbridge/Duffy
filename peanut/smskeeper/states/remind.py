@@ -9,7 +9,7 @@ from common import natty_util
 
 from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
-from smskeeper import actions, async
+from smskeeper import actions
 
 from smskeeper.models import Entry
 from peanut.settings import constants
@@ -30,6 +30,7 @@ def validTime(startDate):
 """
 def isFollowup(startDate, msg):
 	return validTime(startDate) and not msg_util.hasLabel(msg)
+
 
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
@@ -68,9 +69,8 @@ def process(user, msg, requestDict, keeperNumber):
 
 	return True
 
-"""
-	Update or create the Entry for the reminder entry and send message to user
-"""
+
+#  Update or create the Entry for the reminder entry and send message to user
 def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, requestDict):
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
@@ -89,15 +89,6 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 	entry.keeper_number = keeperNumber
 	entry.save()
 
-	# If we're updating an existing entry we don't need to cancel the other celery task since the processReminder
-	# task will make sure the current time is correct for the entry
-	if keeperNumber != constants.SMSKEEPER_TEST_NUM:
-		ret = async.processReminder.apply_async([entry.id], eta=entry.remind_timestamp)
-
-		logger.info("Just registered task %s for user %s and entryId %s" % (str(ret), user.id, entry.id))
-	else:
-		logger.debug("Not registering task due to it being a test number")
-
 	toSend = "Got it. Will remind you to %s %s" % (query, userMsg)
 
 	if sendFollowup:
@@ -107,6 +98,7 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 	sms_util.sendMsg(user, toSend, None, keeperNumber)
 
 	return entry
+
 
 def getDefaultTime(user):
 	tz = user.getTimezone()
