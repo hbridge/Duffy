@@ -1,9 +1,7 @@
 import datetime
 import pytz
-import sys
+import string
 from mock import patch
-from cStringIO import StringIO
-from contextlib import contextmanager
 
 from testfixtures import Replacer
 from testfixtures import test_datetime
@@ -11,13 +9,11 @@ from testfixtures import test_datetime
 from django.test import TestCase
 
 from peanut.settings import constants
-from smskeeper import views, processing_util, keeper_constants
 from smskeeper.models import User, Entry, Contact, Message
-from smskeeper import msg_util
+from smskeeper import msg_util, cliMsg, keeper_constants
 
-from smskeeper import cliMsg
+from common import natty_util
 
-import string
 
 def getOutput(mock):
 	output = ""
@@ -26,6 +22,7 @@ def getOutput(mock):
 		output += str(arg[0])
 
 	return output
+
 
 class SMSKeeperCase(TestCase):
 	testPhoneNumber = "+16505555550"
@@ -45,6 +42,7 @@ class SMSKeeperCase(TestCase):
 		if (activated):
 			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		self.user.state = state
+		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
 	def test_first_connect(self):
@@ -152,7 +150,7 @@ class SMSKeeperCase(TestCase):
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertIn("old fashioned", getOutput(mock))
 
-				# Next make sure we delete and the list is clear
+		# Next make sure we delete and the list is clear
 		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
@@ -236,7 +234,6 @@ class SMSKeeperCase(TestCase):
 	def test_reminders_two_in_row(self):
 		self.setupUser(True, True)
 
-		#	cliMsg.msg(self.testPhoneNumber, "#remind poop")
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop")
 			self.assertIn("If that time doesn't work", getOutput(mock))
@@ -285,14 +282,37 @@ class SMSKeeperCase(TestCase):
 
 			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
+	def test_exception_error_message(self):
+		self.setupUser(True, True)
+		with self.assertRaises(NameError):
+			cliMsg.msg(self.testPhoneNumber, 'yippee ki yay motherfucker')
 
-	"""
-		Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
-		Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
-	"""
+		# we have to dig into messages as ouput would never get returned from the mock
+		messages = Message.objects.filter(user=self.user, incoming=False).all()
+		self.assertIn(removeNonAscii(keeper_constants.GENERIC_ERROR_MESSAGE), messages[0].msg_json)
+
+	def test_unicode_msg(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
+			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
+
+
+class SMSKeeperNattyCase(SMSKeeperCase):
+
+	def test_unicode_natty(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
+			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
+		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
+
+	# Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
+	# Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
 	def test_natty_timezone(self):
 		self.setupUser(True, True)
-		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -314,35 +334,61 @@ class SMSKeeperCase(TestCase):
 
 		self.assertEqual(entry.remind_timestamp.hour, 22)  # 3 pm Pactific in UTC
 
-
-	def test_unicode_natty(self):
+	def test_natty_two_times_by_words(self):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
-			cliMsg.msg(self.testPhoneNumber, u'#remind')
-			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
-		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
+			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tues morning in two hours")
+			self.assertIn("2 hours from now", getOutput(mock))
 
-	def test_unicode_msg(self):
+	def test_natty_two_times_by_number(self):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
-			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
+			cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 2 in 4 hours")
+			self.assertIn("4 hours from now", getOutput(mock))
 
-	def test_exception_error_message(self):
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind change bobby grade to 10 in 4 hours")
+			self.assertIn("4 hours from now", getOutput(mock))
+
+	# If its 12:30 and I say "change grade to 12 at 12", it should return back midnight
+	def test_natty_just_number_behind_now(self):
 		self.setupUser(True, True)
-		with self.assertRaises(NameError):
-			cliMsg.msg(self.testPhoneNumber, 'yippee ki yay motherfucker')
 
-		# we have to dig into messages as ouput would never get returned from the mock
-		messages = Message.objects.filter(user=self.user, incoming=False).all()
-		self.assertIn(removeNonAscii(keeper_constants.GENERIC_ERROR_MESSAGE), messages[0].msg_json)
+		with patch('smskeeper.async.recordOutput') as mock:
+			now = datetime.datetime.now(pytz.timezone(self.user.timezone))
+			correctTime = now + datetime.timedelta(hours=12)
+			query = "#remind change susie grade to 12 at %s" % now.hour
+
+			cliMsg.msg(self.testPhoneNumber, query)
+
+			entries = Entry.fetchEntries(self.user, "#reminders")
+			self.assertEqual(len(entries), 1)
+			entry = entries[0]
+
+			remindTime = entry.remind_timestamp.astimezone(pytz.timezone(self.user.timezone))
+			self.assertEqual(remindTime.hour, correctTime.hour)
+
+			self.assertIn("change susie grade to 12", getOutput(mock))
+
+	def test_natty_get_new_query(self):
+		ret = natty_util.getNewQuery("at 10", "at 10", 1)
+		self.assertEqual(ret, "")
+
+		ret = natty_util.getNewQuery("blah at 10", "at 10", 6)
+		self.assertEqual(ret, "blah")
+
+		ret = natty_util.getNewQuery("at 10 I want pizza", "at 10", 1)
+		self.assertEqual(ret, "I want pizza")
+
+		ret = natty_util.getNewQuery("I want pizza at 10 so yummy", "at 10", 14)
+		self.assertEqual(ret, "I want pizza so yummy")
 
 
 def removeNonAscii(mystr):
 	return filter(lambda x: x in string.printable, mystr)
+
 
 class SMSKeeperSharingCase(TestCase):
 	testPhoneNumbers = ["+16505555550", "+16505555551", "+16505555552"]

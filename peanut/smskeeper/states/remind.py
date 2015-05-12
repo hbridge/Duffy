@@ -1,8 +1,6 @@
 import datetime
 import pytz
 import humanize
-import json
-import re
 import logging
 
 from common import natty_util
@@ -13,29 +11,32 @@ from smskeeper import actions
 from smskeeper import helper_util
 
 from smskeeper.models import Entry
-from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
 
-"""
-	Returns True if the time exists and isn't within 10 seconds of now.
-	We check for the 10 seconds to deal with natty phrases that don't really tell us a time (like "today")
-"""
+
+# Returns True if the time exists and isn't within 10 seconds of now.
+# We check for the 10 seconds to deal with natty phrases that don't really tell us a time (like "today")
 def validTime(startDate):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	return not (startDate == None or abs((now - startDate).total_seconds()) < 10)
+	return not (startDate is None or abs((now - startDate).total_seconds()) < 10)
 
-"""
-	Returns True if this message has a valid time and it doesn't look like another command (like another #remind)
-	Otherwise False
-"""
+
+# Returns True if this message has a valid time and it doesn't look like another command (like another #remind)
+# Otherwise False
 def isFollowup(startDate, msg):
 	return validTime(startDate) and not msg_util.hasLabel(msg)
 
 
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
-	startDate, newQuery, usedText = natty_util.getNattyInfo(text, user.timezone)
+	nattyResults = natty_util.getNattyInfo(text, user.timezone)
+
+	if len(nattyResults) > 0:
+		startDate, newQuery, usedText = nattyResults[0]
+	else:
+		startDate = None
+		newQuery = text
 
 	# If we have an entry id, then that means we just created one.
 	# See if what they entered is a valid time and if so, assign it.
