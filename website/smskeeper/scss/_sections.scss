@@ -121,7 +121,7 @@ header {
 	margin-top:								185px;
 //	margin-top:										60px;
 	padding-bottom: 						80vh;
-
+	visibility:								none;
 	@media (max-width: 850px){
 		margin-top:							40px;
 	}
@@ -223,7 +223,6 @@ header {
 	}
 
 	#hp_signup_middle { display: none;}
-
 /*#hp_intro {
 	@include border-box-sizing;
 	text-align:						center;

@@ -68,9 +68,14 @@ jQuery(document).ready(function ($){
 
 				// calculate the typing time
 				animation_time = 300;
+				typing_time_multiplier = 20;
+				next_message_multiplier = 200;
 				html = $(this).find('.msg_text').html();
+				word_count = 1;
 				if (html)
-					typing_time = 20 * html.length;
+					words = html.split(" ")
+					word_count = words.length
+					typing_time = typing_time_multiplier * word_count;
 
 				//$(this).find('.msg_text_preload').delay(typing_time).fadeOut(300);
 
@@ -81,7 +86,7 @@ jQuery(document).ready(function ($){
 
 				setTimeout(function(){
 					showNextConvo();
-				}, typing_time + 500);
+				}, typing_time + next_message_multiplier * word_count);
 			});
 			return false;
 		});
