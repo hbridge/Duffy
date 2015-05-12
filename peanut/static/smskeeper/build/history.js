@@ -1,20 +1,9 @@
 
-/*
-Note this file is only used in its raw form if ?development=True is passed in
-It should be compiled to js by running from the outer directory
-
-jsx --watch --extension jsx src/ build/
-
-See: https://facebook.github.io/react/docs/tooling-integration.html for info on installing
-
-*/
-
-
 var formatDate = function(d){
   return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();
 }
 
-var MessageListRow = React.createClass({
+var MessageListRow = React.createClass({displayName: "MessageListRow",
   getInitialState: function() {
     return {};
   },
@@ -39,19 +28,19 @@ var MessageListRow = React.createClass({
 		});
 
 		return (
-			<div id={ this.getId() } className="message">
-        <div className="messageHeader">
-          <span className="messageDate">{ formatDate(date) }</span>
-          <span> </span>
-          <ShowJSONView json={ JSON.stringify(this.props.message) } />
-        </div>
-        <div className={ cssClasses }>
-          <MessageBody text={body} />
-          <div>
-            <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
-          </div>
-        </div>
-      </div>
+			React.createElement("div", {id:  this.getId(), className: "message"}, 
+        React.createElement("div", {className: "messageHeader"}, 
+          React.createElement("span", {className: "messageDate"},  formatDate(date) ), 
+          React.createElement("span", null, " "), 
+          React.createElement(ShowJSONView, {json:  JSON.stringify(this.props.message) })
+        ), 
+        React.createElement("div", {className:  cssClasses }, 
+          React.createElement(MessageBody, {text: body}), 
+          React.createElement("div", null, 
+            React.createElement(AttachmentView, {mediaUrl: mediaUrl, mediaType: message.MediaContentType0})
+          )
+        )
+      )
     );
   },
 
@@ -60,7 +49,7 @@ var MessageListRow = React.createClass({
   }
 });
 
-var MessageBody = React.createClass({
+var MessageBody = React.createClass({displayName: "MessageBody",
   render: function() {
     var lines = this.props.text.split("\n");
     var result = [];
@@ -68,16 +57,16 @@ var MessageBody = React.createClass({
       var line = lines[i];
       var linekey = "l" + i;
       var brkey = "b" + i;
-      result.push(<span key= { linekey }>{ line }</span>);
-      result.push(<br key={ brkey } />);
+      result.push(React.createElement("span", {key:  linekey },  line ));
+      result.push(React.createElement("br", {key:  brkey }));
     }
     return (
-      <span> {result} </span>
+      React.createElement("span", null, " ", result, " ")
       );
   }
 });
 
-var AttachmentView = React.createClass({
+var AttachmentView = React.createClass({displayName: "AttachmentView",
   render: function() {
     var url = this.props.mediaUrl;
     var type = this.props.mediaType;
@@ -85,30 +74,30 @@ var AttachmentView = React.createClass({
     if (url == null) return null;
 
     if (type == "image/jpeg" || url.match(".+\.jpeg")) return (
-      <a href={url}><img src={url} width="300" height="300"></img></a>
+      React.createElement("a", {href: url}, React.createElement("img", {src: url, width: "300", height: "300"}))
     );
 
     return (
-      <a href={url}>{url}</a>
+      React.createElement("a", {href: url}, url)
     )
   },
 });
 
-var ShowJSONView = React.createClass({
+var ShowJSONView = React.createClass({displayName: "ShowJSONView",
   getInitialState: function() {
     return {expanded : false};
   },
 
   render: function() {
     if (!this.state.expanded) return (
-      <a href="#" onClick={this.handleClick}>Show JSON</a>
+      React.createElement("a", {href: "#", onClick: this.handleClick}, "Show JSON")
     );
 
     return (
-      <span>
-        <a href="#" onClick={this.handleClick}>Hide JSON</a><br />
-        { this.props.json }
-      </span>
+      React.createElement("span", null, 
+        React.createElement("a", {href: "#", onClick: this.handleClick}, "Hide JSON"), React.createElement("br", null), 
+         this.props.json
+      )
     );
   },
 
@@ -118,7 +107,7 @@ var ShowJSONView = React.createClass({
   }
 });
 
-var KeeperApp = React.createClass({
+var KeeperApp = React.createClass({displayName: "KeeperApp",
   getInitialState: function() {
     return {messages: [], selectedMessage: null };
   },
@@ -139,18 +128,18 @@ var KeeperApp = React.createClass({
 
 	render: function() {
 		var createItem = function(item, index) {
-			return <MessageListRow message={ item }
-        key= { index }
-        index= { index }
-        onMessageClicked = { this.onMessageClicked }/>
+			return React.createElement(MessageListRow, {message:  item, 
+        key:  index, 
+        index:  index, 
+        onMessageClicked:  this.onMessageClicked})
 		}.bind(this);
 
 		return (
-      <div>
-  			<div id="messages">
-  			   { this.state.messages.map(createItem) }
-        </div>
-      </div>
+      React.createElement("div", null, 
+  			React.createElement("div", {id: "messages"}, 
+  			    this.state.messages.map(createItem) 
+        )
+      )
 		);
 	},
 
@@ -163,4 +152,4 @@ var KeeperApp = React.createClass({
 
 });
 
-React.render(<KeeperApp />, document.getElementById("keeper_app"));
+React.render(React.createElement(KeeperApp, null), document.getElementById("keeper_app"));

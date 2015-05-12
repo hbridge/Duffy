@@ -184,13 +184,14 @@ def all_notes(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
-
 def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
-
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		context = {	'user_id': user.id}
+		if form.cleaned_data['development']:
+			context["development"] = form.cleaned_data['development']
+
 		return render(request, 'thread_view.html', context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)

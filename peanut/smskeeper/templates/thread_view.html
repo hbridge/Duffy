@@ -3,9 +3,13 @@
   <head>
     <link rel="stylesheet" href="/static/smskeeper/style/style.css" />
     <!-- React JS -->
-    <!-- <script src="https://fb.me/react-0.13.0.min.js"></script> -->
-		<script src="https://fb.me/react-0.13.0.js"></script>
+
+    {% if development %}
+    <script src="https://fb.me/react-0.13.0.js"></script>
     <script src="https://fb.me/JSXTransformer-0.13.0.js"></script>
+    {% else %}
+      <script src="https://fb.me/react-0.13.0.min.js"></script>
+    {% endif %}
     <!-- JQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -18,6 +22,10 @@
 		<script type='text/javascript'>
 			USER_ID = {{ user_id }};
 		</script>
-    <script type='text/jsx' src="/static/smskeeper/src/history.jsx"></script>
+    {% if development %}
+      <script type='text/jsx' src="/static/smskeeper/src/history.jsx"></script>
+    {% else %}
+      <script type='text/javascript' src="/static/smskeeper/build/history.js"></script>
+    {% endif %}
   </body>
 </html>

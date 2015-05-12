@@ -10,11 +10,12 @@ class UserIdMixin(forms.Form):
 
 		except User.DoesNotExist:
 			raise forms.ValidationError("User not found")
-	
+
 		return self.cleaned_data['user_id']
 
 class UserIdForm(UserIdMixin):
 	user_id = forms.IntegerField(required=True)
+	development = forms.BooleanField(required=False)
 
 class SendSMSForm(UserIdMixin):
 	user_id = forms.IntegerField(required=True)
