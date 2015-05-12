@@ -35,7 +35,7 @@ var MessageListRow = React.createClass({
           <ShowJSONView json={ JSON.stringify(this.props.message) } />
         </div>
         <div className={ cssClasses }>
-          { body }
+          <MessageBody text={body} />
           <div>
             <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
           </div>
@@ -46,6 +46,20 @@ var MessageListRow = React.createClass({
 
   handleClick: function(e) {
 		this.props.onMessageClicked(this.props.message, this.getId());
+  }
+});
+
+var MessageBody = React.createClass({
+  render: function() {
+    lines = this.props.text.split("\n");
+    result = [];
+    for (line of lines) {
+      result.push(line);
+      result.push(<br />);
+    }
+    return (
+      <span> {result} </span>
+      );
   }
 });
 
