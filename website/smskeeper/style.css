@@ -514,8 +514,7 @@ header {
 
 #hp_convo {
   margin-top: 185px;
-  padding-bottom: 80vh;
-  visibility: none; }
+  padding-bottom: 80vh; }
   @media (max-width: 850px) {
     #hp_convo {
       margin-top: 40px; } }
@@ -531,7 +530,8 @@ header {
   height: auto;
   position: relative;
   margin-bottom: 20px;
-  padding-left: 50px; }
+  padding-left: 50px;
+  display: none; }
   .msg:before, .msg:after {
     display: table;
     content: "";
@@ -603,6 +603,18 @@ header {
 
 #hp_signup_middle {
   display: none; }
+
+#hp_skip {
+  text-align: center; }
+  #hp_skip a {
+    display: inline-block;
+    margin: 4em auto;
+    text-align: center;
+    color: #ddd; }
+    #hp_skip a:hover {
+      color: #5D5D5D; }
+    #hp_skip a:before {
+      display: none; }
 
 /*#hp_intro {
 	@include border-box-sizing;

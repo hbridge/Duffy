@@ -115,13 +115,10 @@ header {
 		}
 	}
 
-
-
 #hp_convo {
 	margin-top:								185px;
 //	margin-top:										60px;
 	padding-bottom: 						80vh;
-	visibility:								none;
 	@media (max-width: 850px){
 		margin-top:							40px;
 	}
@@ -138,6 +135,7 @@ header {
 		position:								relative;
 		margin-bottom:							20px;
 		padding-left:							50px;
+		display: none;
 		}
 
 	.user_msg {
@@ -223,6 +221,26 @@ header {
 	}
 
 	#hp_signup_middle { display: none;}
+
+
+	#hp_skip {
+		text-align:	center;
+
+		a {
+			display: inline-block;
+			margin: 4em auto;
+			text-align:	center;
+			color: #ddd;
+
+			&:hover {
+				color: $color-grey;
+			}
+			&:before {
+				display: none;
+			}
+		}
+	}
+
 /*#hp_intro {
 	@include border-box-sizing;
 	text-align:						center;

@@ -13,6 +13,11 @@ jQuery(document).ready(function ($){
 			event.preventDefault();
 			submitClicked(form_middle_success);
 		});
+		$("#hp_skip").one('click', function() {
+			event.preventDefault();
+			showAll();
+			$("#hp_skip").hide();
+		});
 	}
 
 	/* MESSAGE STYLE ================================== */
@@ -44,18 +49,24 @@ jQuery(document).ready(function ($){
 		fbpixel();
 	}
 
-
-	if (!getUrlParameter("showall") == true) {
-			$('.msg').each(function(){
-			$(this).hide();
+	ShowAllClicked = false;
+	function showAll(){
+		console.log("Showing all");
+		ShowAllClicked = true;
+		$('.msg').each(function(){
+			$(this).show();
 		});
 	}
 
+	if (getUrlParameter("showall") == true) {
+		showAll();
+	}
 
 	showNextConvo();
 	function showNextConvo() {
 		$('.convo').each(function(i){
-			if ($(this).is(":visible")) return;
+			console.log("showall " + ShowAllClicked)
+			if ($(this).is(":visible") || ShowAllClicked == true) return;
 
 			// first hide the text
 			$(this).find('.msg_text').parent().prepend('<div class="msg_text_preload">...</div>');
@@ -72,10 +83,11 @@ jQuery(document).ready(function ($){
 				next_message_multiplier = 200;
 				html = $(this).find('.msg_text').html();
 				word_count = 1;
-				if (html)
+				if (html) {
 					words = html.split(" ")
 					word_count = words.length
-					typing_time = typing_time_multiplier * word_count;
+				}
+				typing_time = typing_time_multiplier * word_count;
 
 				//$(this).find('.msg_text_preload').delay(typing_time).fadeOut(300);
 

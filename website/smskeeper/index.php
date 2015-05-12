@@ -153,6 +153,10 @@
 			<div class="msg_text">Your friends won't need to download an app to contribute something either! 🎉</div>
 		</div>
 	</div>
+
+	<div id="hp_skip">
+		<a href="#">Skip</a>
+	</div>
 </div>
 
 
