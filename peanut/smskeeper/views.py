@@ -242,7 +242,7 @@ def dashboard_feed(request):
 				last_message_date = messages[0].added
 			else:
 				# for new users, setting it to beginning of 2015
-				last_message_date = datetime.utcnow().replace(tzinfo = pytz.utc) - timedelta(days=132)
+				last_message_date = user.added
 			dict["message_stats"][direction] = {
 				"count": count,
 				"last": last_message_date,
