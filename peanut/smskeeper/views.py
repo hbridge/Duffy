@@ -1,12 +1,13 @@
 import json
 import time
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import os
 import sys
 import requests
 import phonenumbers
 import logging
 import string
+import pytz
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -239,6 +240,9 @@ def dashboard_feed(request):
 			last_message_date = None
 			if count > 0:
 				last_message_date = messages[0].added
+			else:
+				# for new users, setting it to beginning of 2015
+				last_message_date = datetime.utcnow().replace(tzinfo = pytz.utc) - timedelta(days=132)
 			dict["message_stats"][direction] = {
 				"count": count,
 				"last": last_message_date,
@@ -246,6 +250,8 @@ def dashboard_feed(request):
 		dict["history"] = "history?user_id=" + str(user.id)
 
 		user_dicts.append(dict)
+
+	user_dicts = sorted(user_dicts, key=lambda k: k['message_stats']['incoming']['last'], reverse=True)
 
 	daily_stats = {}
 	for days_ago in [1, 3, 7, 30]:
