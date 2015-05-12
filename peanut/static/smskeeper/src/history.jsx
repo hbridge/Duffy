@@ -56,7 +56,7 @@ var AttachmentView = React.createClass({
 
     if (url == null) return null;
 
-    if (type == "image/jpeg" || url.endsWith(".jpeg")) return (
+    if (type == "image/jpeg" || url.match(".+\.jpeg")) return (
       <a href={url}><img src={url} width="300" height="300"></img></a>
     );
 
