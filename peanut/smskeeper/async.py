@@ -32,7 +32,7 @@ def processReminder(entryId):
 	# See if this entry is valid for reminder
 	# It needs to not be hidden
 	# As well as the remind_timestamp be within a few seconds of now
-	if not entry.hidden and abs((now - entry.remind_timestamp).total_seconds()) < 10:
+	if not entry.hidden and abs((now - entry.remind_timestamp).total_seconds()) < 300:
 		msg = "Hi! Friendly reminder: %s" % entry.text
 
 		for user in entry.users.all():
