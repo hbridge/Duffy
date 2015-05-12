@@ -181,12 +181,14 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "%s is now set to %s" % (handle, phoneNumber), None, keeperNumber)
 
 
-"""
-	Main logic for processing a message
-	Pulled out so it can be called either from sms code or command line
-"""
+#   Main logic for processing a message
+#   Pulled out so it can be called either from sms code or command line
 def process(user, msg, requestDict, keeperNumber):
-	numMedia = int(requestDict["NumMedia"])
+	if "NumMedia" in requestDict:
+		numMedia = int(requestDict["NumMedia"])
+	else:
+		numMedia = 0
+
 	try:
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")

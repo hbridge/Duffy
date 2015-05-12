@@ -44,9 +44,11 @@ var MessageListRow = React.createClass({
           <span className="messageDate">{ formatDate(date) }</span>
           <span> </span>
           <ShowJSONView json={ JSON.stringify(this.props.message) } />
+          <span> </span>
+          <ShowActionsView message = {this.props.message} />
         </div>
         <div className={ cssClasses }>
-          <MessageBody text={body} />
+           <MessageBody text={body} />
           <div>
             <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
           </div>
@@ -118,20 +120,118 @@ var ShowJSONView = React.createClass({
   }
 });
 
+var ShowActionsView = React.createClass({
+  getInitialState: function() {
+    return {expanded : false};
+  },
+
+  render: function() {
+    if (!this.state.expanded) return (
+      <a href="#" onClick={this.handleClick}>Show Actions</a>
+    );
+
+    return (
+      <span>
+        <a href="#" onClick={this.handleClick}>Hide Actions</a><br />
+        <ResendMessageView message = {this.props.message} />
+      </span>
+    );
+  },
+
+  handleClick: function(e) {
+    e.preventDefault();
+    this.setState({expanded : !this.state.expanded});
+  }
+});
+
+var ResendMessageView = React.createClass({
+  handleResendMessage: function(data) {
+    $.ajax({
+      url: "/smskeeper/resend_msg",
+      dataType: 'json',
+      type: 'POST',
+      data: data,
+      success: function(data) {
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    this.handleResendMessage({msg_id: this.props.message.id});
+    return;
+  },
+  render: function() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <input type="submit" value="Resend" />
+      </form>
+    );
+  }
+});
+
+var CommentForm = React.createClass({
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var text = React.findDOMNode(this.refs.text).value.trim();
+    if (!text) {
+      return;
+    }
+    this.props.onCommentSubmit({msg: text, user_id: USER_ID});
+    React.findDOMNode(this.refs.text).value = '';
+    return;
+  },
+  render: function() {
+    return (
+      <form className="commentForm" onSubmit={this.handleSubmit}>
+        <input type="text" placeholder="Say something..." ref="text" className="commentBox"/>
+        <input type="submit" value="Post" className="largeButton" />
+      </form>
+    );
+  }
+});
+
 var KeeperApp = React.createClass({
   getInitialState: function() {
     return {messages: [], selectedMessage: null };
   },
 
-  componentWillMount: function() {
-		$.getJSON("/smskeeper/message_feed?user_id=" + USER_ID, this.messagesDataCallback);
+  loadCommentsFromServer: function() {
+    $.ajax({
+      url: "/smskeeper/message_feed?user_id=" + USER_ID,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        console.log(data);
+        console.log(this);
+        this.setState({messages : data.messages});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("message_feed", status, err.toString());
+      }.bind(this)
+    });
   },
 
-	messagesDataCallback: function(data) {
-	  console.log(data);
-		console.log(this);
-		this.setState({messages : data.messages});
-	},
+  componentDidMount: function() {
+    this.loadCommentsFromServer();
+  },
+
+  handleCommentSubmit: function(comment) {
+    $.ajax({
+      url: "/smskeeper/send_sms",
+      dataType: 'json',
+      type: 'POST',
+      data: comment,
+      success: function(data) {
+        this.setState({messages: data.messages});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("send_sms", status, err.toString());
+      }.bind(this)
+    });
+  },
 
   onMessageClicked: function(message, rowId) {
     console.log("selectedRowId" + rowId);
@@ -150,6 +250,7 @@ var KeeperApp = React.createClass({
   			<div id="messages">
   			   { this.state.messages.map(createItem) }
         </div>
+        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
       </div>
 		);
 	},

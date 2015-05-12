@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 from celery.schedules import crontab
+import datetime
 
 from kombu import Exchange, Queue
 
@@ -311,6 +312,7 @@ class BASE_CELERY_CONFIG:
         'memfresh.async.evalAllUsersForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'memfresh.async.evalUserForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
         'smskeeper.async.processReminder': {'queue': 'independent', 'routing_key': 'independent'},
+        'smskeeper.async.processAllReminders': {'queue': 'independent', 'routing_key': 'independent'},
         'smskeeper.async.sendTips': {'queue': 'independent', 'routing_key': 'independent'},
     }
 
@@ -328,6 +330,11 @@ class BASE_CELERY_CONFIG:
         'smskeeper-tips': {
             'task': 'smskeeper.async.sendTips',
             'schedule': crontab(hour=16, minute=5),
+            'args': None,
+        },
+        'smskeeper-reminders': {
+            'task': 'smskeeper.async.processAllReminders',
+            "schedule": datetime.timedelta(seconds=30),
             'args': None,
         }
     }

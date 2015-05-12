@@ -1,6 +1,7 @@
 from django import forms
 from smskeeper.models import User
 
+
 class UserIdMixin(forms.Form):
 	def clean_user_id(self):
 		userId = self.cleaned_data['user_id']
@@ -13,14 +14,17 @@ class UserIdMixin(forms.Form):
 
 		return self.cleaned_data['user_id']
 
+
 class UserIdForm(UserIdMixin):
 	user_id = forms.IntegerField(required=True)
 	development = forms.BooleanField(required=False)
+
 
 class SendSMSForm(UserIdMixin):
 	user_id = forms.IntegerField(required=True)
 	msg = forms.CharField(required=True)
 	from_num = forms.CharField(required=False)
+
 
 class ResendMsgForm(UserIdMixin):
 	msg_id = forms.IntegerField(required=True)
@@ -33,8 +37,10 @@ class SmsContentForm(forms.Form):
 	Body = forms.CharField(required=False)
 	NumMedia = forms.IntegerField(required=False)
 
+
 class PhoneNumberForm(forms.Form):
 	PhoneNumber = forms.CharField(required=True)
+
 
 class WebsiteRegistrationForm(forms.Form):
 	phone_number = forms.CharField(min_length=1, max_length=100)

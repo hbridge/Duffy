@@ -117,10 +117,10 @@ def resizeImage(im, size, crop):
 	if (crop):
 		if (hratio > wratio):
 			buffer = int((im.size[0]-size)/2)
-			im = im.crop((buffer, 0, (im.size[0]-buffer), size))
+			im = im.crop((buffer, 0, (buffer+size), size))
 		else:
 			buffer = int((im.size[1]-size)/2)
-			im = im.crop((0, buffer, size, (im.size[1] - buffer)))
+			im = im.crop((0, buffer, size, (buffer+size)))
 
 	im.load()
 	return im

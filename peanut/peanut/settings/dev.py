@@ -24,14 +24,14 @@ DATABASES = {
 SECRET_KEY = 'f(*vzc)x9!1-5nis+uinolh=$*&#z@&2n!7)x9#x@&n2s=-)vb'
 
 
-STATIC_ROOT = '' # uncomment for static files for dev servers
+STATIC_ROOT = ''  # uncomment for static files for dev servers
 
 # Additional locations of static files
 STATICFILES_DIRS = (
 	# Put strings here, like "/home/html/static" or "C:/www/django/static".
 	# Always use forward slashes, even on Windows.
 	# Don't forget to use absolute paths, not relative paths.
-   '/home/ubuntu/dev/Duffy/peanut/static',
+	'/home/ubuntu/dev/Duffy/peanut/static',
 )
 
 DEFAULT_FROM_EMAIL = 'swap-stats@duffytech.co'
@@ -53,6 +53,7 @@ AWS_STORAGE_BUCKET_NAME = 'strand-dev'
 AWS_IMAGE_HOST = "https://s3-external-1.amazonaws.com/" + AWS_STORAGE_BUCKET_NAME
 
 CELERYD_HIJACK_ROOT_LOGGER = False
+
 
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	BROKER_URL = "amqp://duffy:du44y@dev.duffyapp.com:5672/swap"
