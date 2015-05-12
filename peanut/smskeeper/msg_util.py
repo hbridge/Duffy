@@ -97,7 +97,7 @@ def isPhoneNumber(msg):
 
 def extractPhoneNumbers(msg):
 	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
-	remaining_str = str(msg)
+	remaining_str = unicode(msg)
 	phone_numbers = []
 	for match in matches:
 		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)

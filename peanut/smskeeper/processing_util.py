@@ -46,6 +46,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	finally:
 		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
 
+	# convert message to unicode
+	if type(msg) == str:
+		msg = msg.decode('utf-8')
+
 	processed = False
 	count = 0
 	while not processed and count < 10:

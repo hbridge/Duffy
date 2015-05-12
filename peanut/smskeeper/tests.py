@@ -314,6 +314,13 @@ class SMSKeeperCase(TestCase):
 			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
+	def test_unicode_msg(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
+			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
+
 	def test_exception_error_message(self):
 		self.setupUser(True, True)
 		with self.assertRaises(NameError):

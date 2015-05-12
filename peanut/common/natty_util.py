@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 def getNattyInfo(query, timezone):
 	# get startDate from Natty
 	nattyPort = "7990"
+
+	# converting back to utf-8 for urllib
 	nattyParams = { "q" : unicode(query).encode('utf-8') }
 
 	if timezone:
