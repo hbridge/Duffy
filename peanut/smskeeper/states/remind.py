@@ -10,6 +10,7 @@ from common import natty_util
 from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
 from smskeeper import actions
+from smskeeper import helper_util
 
 from smskeeper.models import Entry
 from peanut.settings import constants
@@ -94,7 +95,7 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 	entry.keeper_number = keeperNumber
 	entry.save()
 
-	toSend = "Got it. Will remind you to %s %s" % (query, userMsg)
+	toSend = "%s I'll remind you %s." % (helper_util.randomAcknowledgement(), userMsg)
 
 	if sendFollowup:
 		toSend = toSend + "\n\n"
@@ -111,13 +112,13 @@ def getDefaultTime(user):
 
 	# If before 2 pm, remind at 6 pm
 	if userNow.hour < 14:
-		replaceTime = userNow.replace(hour = 18, minute=0, second=0)
+		replaceTime = userNow.replace(hour=18, minute=0, second=0)
 	# If between 2 pm and 5 pm, remind at 9 pm
 	elif userNow.hour >= 14 and userNow.hour < 17:
-		replaceTime = userNow.replace(hour = 21, minute=0, second=0)
+		replaceTime = userNow.replace(hour=21, minute=0, second=0)
 	else:
-	# If after 5 pm, remind 9 am next day
+		# If after 5 pm, remind 9 am next day
 		replaceTime = userNow + datetime.timedelta(days=1)
-		replaceTime = replaceTime.replace(hour = 9, minute=0, second=0)
+		replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
 
 	return replaceTime

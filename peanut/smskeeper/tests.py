@@ -243,6 +243,7 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind pee tomorrow")
+			cliMsg.msg(self.testPhoneNumber, "#remind")
 			self.assertIn("pee", getOutput(mock))
 
 	def test_reminders_defaults(self):
@@ -296,7 +297,6 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
-			self.assertIn("poop", getOutput(mock))
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
@@ -320,6 +320,7 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
+			cliMsg.msg(self.testPhoneNumber, u'#remind')
 			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 

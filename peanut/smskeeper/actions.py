@@ -62,7 +62,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 		if label == keeper_constants.UNASSIGNED_LABEL:
 			sms_util.sendMsg(user, "Filing that under " + keeper_constants.UNASSIGNED_LABEL + shareString, None, keeperNumber)
 		else:
-			sms_util.sendMsg(user, "Got it." + shareString, None, keeperNumber)
+			sms_util.sendMsg(user, helper_util.randomAcknowledgement() + shareString, None, keeperNumber)
 
 	return createdEntries, notFoundHandles
 
@@ -166,7 +166,6 @@ def createHandle(user, handle, targetNumber):
 
 def setTipFrequency(user, msg, keeperNumber):
 	words = msg.strip().lower().split(" ")
-	print words[3]
 	if words[3] == "weekly":
 		user.tip_frequency_days = 7
 		user.save()

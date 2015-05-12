@@ -22,3 +22,6 @@ GENERIC_ERROR_MESSAGE = '\xF0\x9F\x98\xB2 something went wrong.  My minions have
 
 UNRESOLVED_HANDLES_DATA_KEY = "unresolvedHandles"
 ENTRY_IDS_DATA_KEY = "entryIDs"
+
+ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger." "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
+
