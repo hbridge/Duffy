@@ -1,4 +1,5 @@
 import humanize
+import time
 
 from smskeeper import sms_util, msg_util, helper_util, image_util
 from smskeeper import keeper_constants
@@ -161,3 +162,14 @@ def createHandle(user, handle, targetNumber):
 	contact.save()
 
 	return oldUser
+
+def help(user, msg, keeperNumber):
+	sms_util.sendMsg(user, 'There are a few things I can help you with.', None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "I can remember anything you send me with a hashtag. Like '#cocktails old fashioned, mojito, margarita ", None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "I can set reminders for you. Like 'Remind me to call Mom tonight'", None, keeperNumber)
+	time.sleep(1)
+	sms_util.sendMsg(user, "I can also keep a shared list with your friends. Like 'Avengers #MoviesToWatch @beth' to share a move with Beth.", None, keeperNumber)
+	#time.sleep(1)
+	#sms_util.sendMsg(user, 'You can also send feedback to my minions. Use hashtag #minions.')

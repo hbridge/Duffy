@@ -214,7 +214,7 @@ def process(user, msg, requestDict, keeperNumber):
 			pickItemForUserLabel(user, label, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isHelpCommand(msg):
-			sms_util.sendMsg(user, "You can create a list by adding #listname to any msg.\n You can retrieve all items in a list by typing just '#listname' in a message.", None, keeperNumber)
+			actions.help(user, msg, keeperNumber)
 		# STATE_ADD
 		elif msg_util.isCreateHandleCommand(msg):
 			dealWithCreateHandle(user, msg, keeperNumber)
