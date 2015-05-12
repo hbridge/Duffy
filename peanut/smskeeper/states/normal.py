@@ -137,10 +137,10 @@ def pickItemForUserLabel(user, label, keeperNumber):
 
 	entry = random.choice(entries)
 	if entry.img_url:
-		sms_util.sendMsg(user, "My pick for %s:"%label, None, keeperNumber)
+		sms_util.sendMsg(user, "My pick for %s:" % label, None, keeperNumber)
 		sms_util.sendMsg(user, entry.text, entry.img_url, keeperNumber)
 	else:
-		sms_util.sendMsg(user, "My pick for %s: %s"%(label, entry.text), None, keeperNumber)
+		sms_util.sendMsg(user, "My pick for %s: %s" % (label, entry.text), None, keeperNumber)
 
 def dealWithActivation(user, msg, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
@@ -148,6 +148,7 @@ def dealWithActivation(user, msg, keeperNumber):
 	try:
 		userToActivate = User.objects.get(phone_number=text)
 		userToActivate.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		userToActivate.setState(keeper_constants.STATE_TUTORIAL)
 		userToActivate.save()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
 
