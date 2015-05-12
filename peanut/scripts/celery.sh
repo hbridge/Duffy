@@ -11,9 +11,9 @@ fi
 
 if [ "$1" == "start" ]
 then
-	/home/ubuntu/env/bin/python manage.py celeryd_multi start independent stranding popcaches ordered_low --logfile=/mnt/log/celery-%N.log --pidfile=/mnt/run/celery-%N.pid -c 1 -c:independent 5 -Q:independent independent -Q:stranding stranding -Q:popcaches popcaches -Q:ordered_low ordered_low
+	/home/ubuntu/env/bin/python manage.py celeryd_multi start keeper --logfile=/mnt/log/celery-%N.log --pidfile=/mnt/run/celery-%N.pid -c 1 -c:keeper 5 -Q:keeper keeper
 else
-	/home/ubuntu/env/bin/python manage.py celeryd_multi stop independent stranding popcaches ordered_low --logfile=/mnt/log/celery-%N.log --pidfile=/mnt/run/celery-%N.pid
+	/home/ubuntu/env/bin/python manage.py celeryd_multi stop keeper --logfile=/mnt/log/celery-%N.log --pidfile=/mnt/run/celery-%N.pid
 fi
 
 if [ "$1" == "killall" ]

@@ -271,49 +271,18 @@ LOGGING = {
 
 class BASE_CELERY_CONFIG:
     CELERY_TASK_RESULT_EXPIRES = 3600
-    CELERYD_NODES = "independent stranding popcaches ordered_low"
+    CELERYD_NODES = "keeper"
     CELERY_QUEUES = (
         Queue('default', Exchange('default'), routing_key='default'),
-        # 10 threads
-        Queue('independent', Exchange('independent'), routing_key='independent'),
-        # 1 thread
-        Queue('stranding', Exchange('stranding'), routing_key='stranding'),
-        Queue('popcaches', Exchange('popcaches'), routing_key='popcaches'),
-        Queue('ordered_low', Exchange('ordered_low'), routing_key='ordered_low'),
+        # 5 threads
+        Queue('keeper', Exchange('keeper'), routing_key='keeper'),
     )
     CELERY_ROUTES = {
-        # 'async.two_fishes.processAll': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.two_fishes.processIds': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.stranding.processAll': {'queue': 'stranding', 'routing_key': 'stranding'},
-        # 'async.stranding.processIds': {'queue': 'stranding', 'routing_key': 'stranding'},
-        # 'async.stranding.processUserIdsForFriendGPSInfoAppTask': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        # 'async.popcaches.processPrivateStrandsAll': {'queue': 'popcaches', 'routing_key': 'popcaches'},
-        # 'async.popcaches.processPrivateStrandIds': {'queue': 'popcaches', 'routing_key': 'popcaches'},
-        # 'async.popcaches.processPrivateStrandFull': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        # 'async.popcaches.processInboxAll': {'queue': 'popcaches', 'routing_key': 'popcaches'},
-        # 'async.popcaches.processInboxIds': {'queue': 'popcaches', 'routing_key': 'popcaches'},
-        # 'async.popcaches.processInboxFull': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        # 'async.similarity.processAll': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.similarity.processIds': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.neighboring.processAllStrands': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.neighboring.processStrandIds': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.neighboring.processAllLocationRecords': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.neighboring.processLocationRecordIds': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.friending.processIds': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.friending.processAll': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.suggestion_notifications.processIds': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        # 'async.suggestion_notifications.processUserId': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        # 'async.notifications.sendRefreshFeedToUserIds': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.notifications.sendNewPhotoNotificationBatch': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.notifications.sendAddFriendNotificationFromActions': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.notifications.sendUnactivatedAccountFS': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.notifications.sendRequestPhotosNotification': {'queue': 'independent', 'routing_key': 'independent'},
-        # 'async.internal.sendEmailForIncomingSMS': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        'memfresh.async.evalAllUsersForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        'memfresh.async.evalUserForFollowUp': {'queue': 'ordered_low', 'routing_key': 'ordered_low'},
-        'smskeeper.async.processReminder': {'queue': 'independent', 'routing_key': 'independent'},
-        'smskeeper.async.processAllReminders': {'queue': 'independent', 'routing_key': 'independent'},
-        'smskeeper.async.sendTips': {'queue': 'independent', 'routing_key': 'independent'},
+        'memfresh.async.evalAllUsersForFollowUp': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'memfresh.async.evalUserForFollowUp': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.processReminder': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.processAllReminders': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.sendTips': {'queue': 'keeper', 'routing_key': 'keeper'},
     }
 
     CELERYBEAT_SCHEDULE = {
