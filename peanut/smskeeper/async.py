@@ -54,20 +54,18 @@ def processAllReminders():
 			processReminder(entry.id)
 
 
-TIP_FREQUENCY_SECS = 60 * 60 * 71  # 71 hours in seconds
-
-
 def shouldSendUserTip(user):
 	if not user.completed_tutorial:
 		return False
-	if user.disable_tips:
+	if user.disable_tips or user.tip_frequency_days == 0:
 		return False
 	if not user.last_tip_sent:
 		return True
 	else:
 		# must use datetime.datetime.now and not utcnow as the test mocks datetime.now
 		dt = datetime.datetime.now(pytz.utc) - user.last_tip_sent
-		if dt.total_seconds() > TIP_FREQUENCY_SECS:
+		tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
+		if dt.total_seconds() >= tip_frequency_seconds:
 			return True
 	return False
 

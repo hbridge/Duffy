@@ -470,9 +470,11 @@ class SMSKeeperAsyncCase(TestCase):
 
 	def setupUser(self, activated, tutorialComplete):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
-		self.user.completed_tutorial = tutorialComplete
-		if (activated):
-			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		if activated:
+			self.user.activate()
+		if tutorialComplete:
+			self.user.setTutorialComplete()
+
 		self.user.name = "Bob"
 		self.user.save()
 
@@ -505,3 +507,31 @@ class SMSKeeperAsyncCase(TestCase):
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 
+	def testSetTipFrequency(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "send me tips monthly")
+			# must reload the user or get a stale value for tip_frequency_days
+			self.user = User.objects.get(id=self.user.id)
+			self.assertEqual(self.user.tip_frequency_days, 30, "%s \n user.tip_frequency_days: %d" % (getOutput(mock), self.user.tip_frequency_days))
+
+		# make sure we send tips now
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
+
+		with Replacer() as r:
+			weekAhead = datetime.datetime.now() + datetime.timedelta(7)
+			r.replace('smskeeper.async.datetime.datetime', test_datetime(weekAhead.year, weekAhead.month, weekAhead.day))
+			# make sure we don't send them in 7 days
+			with patch('smskeeper.sms_util.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
+
+			# make sure we do send them in 31 days
+			monthAhead = datetime.datetime.now() + datetime.timedelta(32)
+			r.replace('smskeeper.async.datetime.datetime', test_datetime(monthAhead.year, monthAhead.month, monthAhead.day))
+			with patch('smskeeper.sms_util.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
+			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)

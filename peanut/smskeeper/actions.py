@@ -163,6 +163,26 @@ def createHandle(user, handle, targetNumber):
 
 	return oldUser
 
+
+def setTipFrequency(user, msg, keeperNumber):
+	words = msg.strip().lower().split(" ")
+	print words[3]
+	if words[3] == "weekly":
+		user.tip_frequency_days = 7
+		user.save()
+		sms_util.sendMsg(user, "Ok, I'll send you tips weekly.", None, keeperNumber)
+	elif words[3] == "monthly":
+		user.tip_frequency_days = 30
+		user.save()
+		sms_util.sendMsg(user, "Ok, I'll send you tips monthly.", None, keeperNumber)
+	elif words[3] == "never":
+		user.tip_frequency_days = 0
+		user.save()
+		sms_util.sendMsg(user, "Ok, I'll stop sending you tips.", None, keeperNumber)
+	else:
+		sms_util.sendMsg(user, "Sorry, I didn't get that. You can type 'send me tips weekly/monthly/never' to change how often I send you tips.", None, keeperNumber)
+
+
 def help(user, msg, keeperNumber):
 	sms_util.sendMsg(user, 'There are a few things I can help you with.', None, keeperNumber)
 	time.sleep(1)
@@ -171,5 +191,6 @@ def help(user, msg, keeperNumber):
 	sms_util.sendMsg(user, "I can set reminders for you. Like 'Remind me to call Mom tonight'", None, keeperNumber)
 	time.sleep(1)
 	sms_util.sendMsg(user, "I can also keep a shared list with your friends. Like 'Avengers #MoviesToWatch @beth' to share a move with Beth.", None, keeperNumber)
-	#time.sleep(1)
-	#sms_util.sendMsg(user, 'You can also send feedback to my minions. Use hashtag #minions.')
+
+	# time.sleep(1)
+	# sms_util.sendMsg(user, 'You can also send feedback to my minions. Use hashtag #minions.')

@@ -31,6 +31,7 @@ class User(models.Model):
 	sent_tips = models.TextField(null=True, db_index=False)
 	disable_tips = models.BooleanField(default=False)
 
+	tip_frequency_days = models.IntegerField(default=3)
 	last_tip_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
@@ -89,6 +90,35 @@ class User(models.Model):
 			tz = pytz.timezone('US/Eastern')
 
 		return tz
+
+	def isActivated(self):
+		return self.activatedDate is not None
+
+	def activate(self, activatedDate=datetime.datetime.now(pytz.utc)):
+		self.activated = activatedDate
+		if activatedDate:
+			if self.isTutorialComplete():
+				self.setState(keeper_constants.STATE_NORMAL)
+			else:
+				self.setState(keeper_constants.STATE_TUTORIAL)
+		else:
+			self.setState(keeper_constants.STATE_NOT_ACTIVATED)
+		self.save()
+
+	def isTutorialComplete(self):
+		return self.completed_tutorial
+
+	def setTutorialComplete(self, completeDate=datetime.datetime.now(pytz.utc)):
+		if self.state == keeper_constants.STATE_NOT_ACTIVATED or not self.activated:
+			raise NameError("Trying to set unactivated user to tutorial passed")
+
+		if completeDate is not None:
+			self.completed_tutorial = True
+			self.setState(keeper_constants.STATE_NORMAL)
+		else:
+			self.completed_tutorial = False
+			self.setState(keeper_constants.STATE_TUTORIAL)
+		self.save()
 
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number

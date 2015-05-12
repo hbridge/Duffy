@@ -218,6 +218,8 @@ def process(user, msg, requestDict, keeperNumber):
 		# STATE_NORMAL
 		elif msg_util.isHelpCommand(msg):
 			actions.help(user, msg, keeperNumber)
+		elif msg_util.isSetTipFrequencyCommand(msg):
+			actions.setTipFrequency(user, msg, keeperNumber)
 		# STATE_ADD
 		elif msg_util.isCreateHandleCommand(msg):
 			dealWithCreateHandle(user, msg, keeperNumber)

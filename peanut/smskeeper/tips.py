@@ -22,6 +22,8 @@ SMSKEEPER_TIPS = [
 	}
 ]
 
+SMSKEEPER_TIP_FOOTER = "Want fewer tips? Type 'send me tips weekly/monthly/never'"
+
 
 def renderTip(tip, name):
-	return tip["message"].replace(":NAME:", name)
+	return tip["message"].replace(":NAME:", name) + "\n\n" + SMSKEEPER_TIP_FOOTER

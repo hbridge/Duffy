@@ -46,6 +46,10 @@ def isPickCommand(msg):
 def isFetchCommand(msg):
 	return isLabel(msg)
 
+tipRE = re.compile('send me tips')
+def isSetTipFrequencyCommand(msg):
+	return not hasLabel(msg) and tipRE.match(msg.strip().lower())
+
 
 def isRemindCommand(msg):
 	text = msg.lower()
