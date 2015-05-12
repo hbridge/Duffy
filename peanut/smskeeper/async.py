@@ -48,7 +48,7 @@ def processAllReminders():
 
 	now = datetime.datetime.now(pytz.utc)
 	for entry in entries:
-		if entry.remind_timestamp < now and entry.remind_timestamp > now - datetime.timedelta(minute=5):
+		if entry.remind_timestamp < now and entry.remind_timestamp > now - datetime.timedelta(minutes=5):
 			processReminder(entry.id)
 
 
