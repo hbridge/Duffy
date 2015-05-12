@@ -69,7 +69,7 @@ def isHelpCommand(msg):
 
 def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
-	return  cleaned == '#hashtag' or cleaned == '#hashtags'
+	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
 def isAddCommand(msg):
 	return hasLabel(msg) and not isLabel(msg)
