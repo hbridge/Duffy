@@ -22,6 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
 
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 
@@ -99,58 +100,6 @@ def htmlForUserLabel(user, label):
 	return html
 
 
-#
-# Send a sms message to a user from a certain number
-# If from_num isn't specified, then defaults to prod
-#
-# Example url:
-# http://dev.duffyapp.com:8000/smskeeper/send_sms?user_id=23&msg=Test&from_num=%2B12488178301
-#
-def send_sms(request):
-	form = SendSMSForm(api_util.getRequestData(request))
-	response = dict()
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		msg = form.cleaned_data['msg']
-		keeperNumber = form.cleaned_data['from_num']
-
-		if not keeperNumber:
-			keeperNumber = constants.TWILIO_SMSKEEPER_PHONE_NUM
-
-		sms_util.sendMsg(user, msg, None, keeperNumber)
-
-		response["result"] = True
-		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
-
-
-#
-# Send a sms message to a user from a certain number
-# If from_num isn't specified, then defaults to prod
-#
-# Example url:
-# http://dev.duffyapp.com:8000/smskeeper/send_sms?user_id=23&msg=Test&from_num=%2B12488178301
-#
-def resend_msg(request):
-	form = ResendMsgForm(api_util.getRequestData(request))
-	response = dict()
-	if (form.is_valid()):
-		msgId = form.cleaned_data['msg_id']
-		keeperNumber = form.cleaned_data['from_num']
-
-		message = Message.objects.get(id=msgId)
-		data = json.loads(message.msg_json)
-
-		sms_util.sendMsg(message.user, data["Body"], None, keeperNumber)
-
-		response["result"] = True
-		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
-
-
-
 @csrf_exempt
 def incoming_sms(request):
 	form = SmsContentForm(api_util.getRequestData(request))
@@ -159,7 +108,6 @@ def incoming_sms(request):
 		phoneNumber = str(form.cleaned_data['From'])
 		keeperNumber = str(form.cleaned_data['To'])
 		msg = form.cleaned_data['Body']
-		numMedia = int(form.cleaned_data['NumMedia'])
 		requestDict = api_util.getRequestData(request)
 
 		processing_util.processMessage(phoneNumber, msg, requestDict, keeperNumber)
@@ -167,6 +115,7 @@ def incoming_sms(request):
 
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
 
 
 def all_notes(request):
@@ -180,7 +129,7 @@ def all_notes(request):
 				html += htmlForUserLabel(user, label)
 			return HttpResponse(html, content_type="text/html", status=200)
 		except User.DoesNotExist:
-			return sendResponse("Phone number not found")
+			return HttpResponse(json.dumps({'phone_number': "Not Found"}), content_type="text/json", status=400)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -190,30 +139,99 @@ def history(request):
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		context = {	'user_id': user.id}
+		context = {
+			'user_id': user.id,
+		}
 		return render(request, 'thread_view.html', context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 
+def getMessagesForUser(user):
+	messages = Message.objects.filter(user=user).order_by("added")
+	messages_dicts = []
+
+	for message in messages:
+		message_dict = json.loads(message.msg_json)
+		if len(message_dict.keys()) > 0:
+			message_dict["id"] = message.id
+			if not message_dict.get("From", None):
+				message_dict["From"] = user.phone_number
+			message_dict["added"] = message.added
+			messages_dicts.append(message_dict)
+			if message_dict.get("From") == user.phone_number:
+				message_dict["incoming"] = True
+
+	return messages_dicts
+
+
+# External
 def message_feed(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		messages = Message.objects.filter(user=user).order_by("added")
-		messages_dicts = []
-
-		for message in messages:
-			message_dict = json.loads(message.msg_json)
-			if len(message_dict.keys()) > 0:
-				if not message_dict.get("From", None):
-					message_dict["From"] = user.phone_number
-				message_dict["added"] = message.added
-				messages_dicts.append(message_dict)
-				if message_dict.get("From") == user.phone_number:
-					message_dict["incoming"] = True
+		messages_dicts = getMessagesForUser(user)
 		return HttpResponse(json.dumps({"messages": messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+#
+# Send a sms message to a user from a certain number
+# If from_num isn't specified, then defaults to prod
+#
+# Example url:
+# http://dev.duffyapp.com:8000/smskeeper/send_sms?user_id=23&msg=Test&from_num=%2B12488178301
+#
+@csrf_exempt
+def send_sms(request):
+	form = SendSMSForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		msg = form.cleaned_data['msg']
+		keeperNumber = form.cleaned_data['from_num']
+
+		if not keeperNumber:
+			keeperNumber = settings.KEEPER_NUMBER
+
+		sms_util.sendMsg(user, msg, None, keeperNumber)
+
+		messages_dicts = getMessagesForUser(user)
+		return HttpResponse(json.dumps({"messages": messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+#
+# Send a sms message to a user from a certain number
+# If from_num isn't specified, then defaults to prod
+#
+# Example url:
+# http://dev.duffyapp.com:8000/smskeeper/resend_sms?msg_id=12345
+#
+@csrf_exempt
+def resend_msg(request):
+	form = ResendMsgForm(api_util.getRequestData(request))
+	response = dict()
+	if (form.is_valid()):
+		msgId = form.cleaned_data['msg_id']
+		keeperNumber = form.cleaned_data['from_num']
+
+		if not keeperNumber:
+			keeperNumber = settings.KEEPER_NUMBER
+
+		message = Message.objects.get(id=msgId)
+		data = json.loads(message.msg_json)
+
+		if (message.incoming):
+			requestDict = json.loads(message.msg_json)
+			processing_util.processMessage(message.user.phone_number, requestDict["Body"], requestDict, keeperNumber)
+		else:
+			sms_util.sendMsg(message.user, data["Body"], None, keeperNumber)
+
+		response["result"] = True
+		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 

@@ -29,6 +29,26 @@
   display: table-row;
 }
 
+.commentForm
+{
+  margin-bottom: 20px;
+  margin-top: 10px;
+  width:100%;
+  padding: 15px;
+  border-radius:5px;
+  border:1px solid #7ac9b7;
+}
+
+.commentBox
+{
+  width:50%;
+  padding: 15px;
+  margin-top: 10px;
+  border:1px solid #7ac9b7;
+  border-radius:5px;
+  margin-bottom: 20px;
+  resize:none;
+}
 .incoming
 {
 	background-color: #7D7;
