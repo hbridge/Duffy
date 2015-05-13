@@ -170,7 +170,7 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 			handle = word
 			break
 
-	oldUser = actions.createHandle(user, handle, phoneNumber)
+	contact, didCreateUser, oldUser = actions.createHandle(user, handle, phoneNumber)
 
 	if oldUser is not None:
 		if oldUser.phone_number == phoneNumber:

@@ -25,7 +25,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	if handleToResolve:
 		if msg_util.isPhoneNumber(msg):  # valid input, create the handle and share the entries
-			actions.createHandle(user, handleToResolve, phoneNumbers[0])
+			contact, didCreateUser, oldUser = actions.createHandle(user, handleToResolve, phoneNumbers[0])
 			if entryIds:
 				entries = Entry.objects.filter(id__in=entryIds)
 				actions.shareEntries(user, entries, [handleToResolve], keeperNumber)

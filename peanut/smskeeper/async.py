@@ -3,6 +3,8 @@ import sys
 import os
 import datetime
 import pytz
+import json
+import logging
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -12,14 +14,15 @@ django.setup()
 
 from django.conf import settings
 
-from smskeeper.models import Entry
-from smskeeper.models import User
-from smskeeper import sms_util
-from smskeeper import tips
-
-from peanut.celery import app
-
 from celery.utils.log import get_task_logger
+from peanut.celery import app
+from peanut.settings import constants
+from smskeeper import tips
+from smskeeper.models import Entry
+from smskeeper.models import Message
+from smskeeper.models import User
+from strand import notifications_util
+
 logger = get_task_logger(__name__)
 
 
@@ -36,7 +39,7 @@ def processReminder(entryId):
 		msg = "Hi! Friendly reminder: %s" % entry.text
 
 		for user in entry.users.all():
-			sms_util.sendMsg(user, msg, None, entry.keeper_number)
+			sendMsg(user, msg, None, entry.keeper_number)
 
 		entry.hidden = True
 		entry.save()
@@ -83,7 +86,7 @@ def sendTips(keeperNumber=None):
 				sentTips = user.sent_tips.split(",")
 			for tip in tips.SMSKEEPER_TIPS:
 				if tip["identifier"] not in sentTips:
-					sms_util.sendMsg(user, tips.renderTip(tip, user.name), None, keeperNumber)
+					sendMsg(user, tips.renderTip(tip, user.name), None, keeperNumber)
 					sentTips.append(tip["identifier"])
 					user.sent_tips = ",".join(sentTips)
 					user.last_tip_sent = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -93,3 +96,32 @@ def sendTips(keeperNumber=None):
 
 def str_now_1():
 	return str(datetime.now())
+
+
+@app.task
+def sendMsg(user, msg, mediaUrls, keeperNumber):
+	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
+	Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
+
+	if type(msg) == unicode:
+		msg = msg.encode('utf-8')
+
+	if keeperNumber == constants.SMSKEEPER_CLI_NUM:
+		# This is used for command line interface commands
+		recordOutput(msg, True)
+	elif keeperNumber == constants.SMSKEEPER_TEST_NUM:
+		recordOutput(msg, False)
+	else:
+		if mediaUrls:
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
+		else:
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
+		logger.info("Sending %s to %s" % (msg, str(user.phone_number)))
+
+"""
+	This is used for testing, it gets mocked out
+	The sendMsg method calls it as well for us in the command line interface
+"""
+def recordOutput(msg, doPrint=False):
+	if doPrint:
+		print msg

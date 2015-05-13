@@ -24,10 +24,22 @@ def shareEntries(user, entries, handles, keeperNumber):
 			sharedHandles.append(handle)
 			for entry in entries:
 				entry.users.add(contact.target)
+
+			shareText = None
 			if len(entries) == 1:
-				sms_util.sendMsg(contact.target, "Ding ding! %s shared \"%s %s\" with you." % (user.nameOrPhone(), entry.text, entry.label), None, keeperNumber)
+				shareText = "%s shared \"%s %s\" with you." % (user.nameOrPhone(), entry.text, entry.label)
 			else:
-				sms_util.sendMsg(contact.target, "Ding ding! %s shared %d items under %s with you." % (user.nameOrPhone(), len(entries), entry.label), None, keeperNumber)
+				shareText = "%s shared %d items tagged %s with you." % (user.nameOrPhone(), len(entries), entry.label)
+
+			if len(contact.target.lastMessage(incoming=False)) == 0:  # this is a new user, send them special text.
+				messages = [
+					"Hi there. %s" % (user.nameOrPhone(), entry.text, entry.label),
+					"Allow me to introduce myself, I'm Keeper."
+				]
+				sms_util.sendMsgs(contact.target, messages, keeperNumber)
+				contact.target.activate()
+			else:
+				sms_util.sendMsg(contact.target, "Ding ding! %s" % (shareText), None, keeperNumber)
 	return sharedHandles, notFoundHandles
 
 def add(user, msg, requestDict, keeperNumber, sendResponse):
@@ -140,6 +152,7 @@ def clear(user, msg, keeperNumber):
 def createHandle(user, handle, targetNumber):
 	# see if there's an existing contact for that handle
 	oldUser = None
+	createdUser = False
 	try:
 		contact = Contact.objects.get(user=user, handle=handle)
 		oldUser = contact.target
@@ -154,6 +167,7 @@ def createHandle(user, handle, targetNumber):
 	except User.DoesNotExist:
 		target_user = User.objects.create(phone_number=targetNumber)
 		target_user.save()
+		createdUser = True
 
 	if contact is not None:
 		contact.target = target_user
@@ -161,7 +175,7 @@ def createHandle(user, handle, targetNumber):
 		contact = Contact.objects.create(user=user, handle=handle, target=target_user)
 	contact.save()
 
-	return oldUser
+	return contact, createdUser, oldUser
 
 
 def setTipFrequency(user, msg, keeperNumber):

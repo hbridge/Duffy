@@ -48,7 +48,7 @@ class SMSKeeperCase(TestCase):
 		self.user.save()
 
 	def test_first_connect(self):
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
 			self.assertIn("magic phrase", getOutput(mock))
 
@@ -56,13 +56,13 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
 		cliMsg.msg(self.testPhoneNumber, "hi")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
 			self.assertIn("Nope.", getOutput(mock))
 
 	def test_magicphrase(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "trapper keeper")
 			self.assertIn("That's the magic phrase", getOutput(mock))
 
@@ -70,27 +70,27 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL)
 
 		# Activation message asks for their name
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("nice to meet you UnitTests!", getOutput(mock))
 			self.assertIn("Let me show you the basics", getOutput(mock))
 			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new5 #test")
 			self.assertIn("Now send me another item for the same list", getOutput(mock))
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new2 #test")
 			self.assertIn("You can send items to this", getOutput(mock))
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("That's all you need to know for now", getOutput(mock))
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("Sorry, I don't", getOutput(mock))
 
@@ -99,7 +99,7 @@ class SMSKeeperCase(TestCase):
 
 		cliMsg.msg(self.testPhoneNumber, "new #test")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("new", getOutput(mock))
 
@@ -107,7 +107,7 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 		cliMsg.msg(self.testPhoneNumber, "new #test")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "pick #test")
 			self.assertTrue("new", getOutput(mock))
 
@@ -115,19 +115,19 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 		cliMsg.msg(self.testPhoneNumber, "new #test")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#hashtag")
 			self.assertIn("(1)", getOutput(mock))
 
 	def test_add_unassigned(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new")
 			# ensure we tell the user we put it in unassigned
 			self.assertIn(keeper_constants.UNASSIGNED_LABEL, getOutput(mock))
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, keeper_constants.UNASSIGNED_LABEL)
 			# ensure the user can get things from #unassigned
 			self.assertIn("new", getOutput(mock))
@@ -137,7 +137,7 @@ class SMSKeeperCase(TestCase):
 		dumb_phrases = ["hi", "thanks", "no", "yes"]
 
 		for phrase in dumb_phrases:
-			with patch('smskeeper.sms_util.recordOutput') as mock:
+			with patch('smskeeper.async.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, phrase)
 				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, getOutput(mock))
 
@@ -148,13 +148,13 @@ class SMSKeeperCase(TestCase):
 		cliMsg.msg(self.testPhoneNumber, "old fashioned #cocktail")
 
 		# First make sure that the entry is there
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertIn("old fashioned", getOutput(mock))
 
 				# Next make sure we delete and the list is clear
 		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertIn("Sorry, I don't", getOutput(mock))
 
@@ -164,23 +164,23 @@ class SMSKeeperCase(TestCase):
 			cliMsg.msg(self.testPhoneNumber, "foo%d #bar" % (i))
 
 		# ensure we don't delete when ambiguous
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertIn("Sorry, I'm not sure", getOutput(mock))
 
-				# ensure deletes right item
+		# ensure deletes right item
 		cliMsg.msg(self.testPhoneNumber, "#bar")
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 2")
 			self.assertNotIn("2. foo2", getOutput(mock))
 
 		# ensure can chain deletes
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertNotIn("1. foo1", getOutput(mock))
 
 		# ensure deleting from empty doesn't crash
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertNotIn("I deleted", getOutput(mock))
 
@@ -192,7 +192,7 @@ class SMSKeeperCase(TestCase):
 		# ensure we can delete with or without spaces
 		cliMsg.msg(self.testPhoneNumber, "delete 3, 5,2 #bar")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#bar")
 
 			self.assertNotIn("foo2", getOutput(mock))
@@ -201,7 +201,7 @@ class SMSKeeperCase(TestCase):
 
 	def test_reminders_basic(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop tmr")
 			self.assertIn("a day from now", getOutput(mock))
 
@@ -209,7 +209,7 @@ class SMSKeeperCase(TestCase):
 
 	def test_reminders_no_hashtag(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind me to poop tmr")
 			self.assertNotIn("remind me to", getOutput(mock))
 			self.assertIn("a day from now", getOutput(mock))
@@ -219,17 +219,17 @@ class SMSKeeperCase(TestCase):
 	# This test is here to make sure the ordering of fetch vs reminders is correct
 	def test_reminders_fetch(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminders")
 			self.assertIn("#reminders", getOutput(mock))
 
 	def test_reminders_followup_change(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop")
 			self.assertIn("If that time doesn't work", getOutput(mock))
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tomorrow")
 			self.assertIn("a day from now", getOutput(mock))
 
@@ -237,11 +237,11 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 
 		#	cliMsg.msg(self.testPhoneNumber, "#remind poop")
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop")
 			self.assertIn("If that time doesn't work", getOutput(mock))
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind pee tomorrow")
 			cliMsg.msg(self.testPhoneNumber, "#remind")
 			self.assertIn("pee", getOutput(mock))
@@ -260,7 +260,7 @@ class SMSKeeperCase(TestCase):
 				# humanize.time._now should always return utcnow because that's what the
 				# server's time is set in
 				mocked.return_value = testDt.utcnow()
-				with patch('smskeeper.sms_util.recordOutput') as mock:
+				with patch('smskeeper.async.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 6 pm, so 9 hours
 					self.assertIn("9 hours", getOutput(mock))
@@ -269,7 +269,7 @@ class SMSKeeperCase(TestCase):
 				testDt = test_datetime(2020, 01, 01, 15, 0, 0, tzinfo=tz)
 				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
 				mocked.return_value = testDt.utcnow()
-				with patch('smskeeper.sms_util.recordOutput') as mock:
+				with patch('smskeeper.async.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 9 pm, so 6 hours
 					self.assertIn("6 hours", getOutput(mock))
@@ -278,7 +278,7 @@ class SMSKeeperCase(TestCase):
 				testDt = test_datetime(2020, 01, 01, 22, 0, 0, tzinfo=tz)
 				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
 				mocked.return_value = testDt.utcnow()
-				with patch('smskeeper.sms_util.recordOutput') as mock:
+				with patch('smskeeper.async.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 9 am next day, so in 11 hours
 					self.assertIn("11 hours", getOutput(mock))
@@ -295,14 +295,14 @@ class SMSKeeperCase(TestCase):
 		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 19)  # 3 pm Eastern in UTC
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "clear #reminders")
 			self.assertIn("cleared", getOutput(mock))
 
@@ -318,7 +318,7 @@ class SMSKeeperCase(TestCase):
 	def test_unicode_natty(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
 			cliMsg.msg(self.testPhoneNumber, u'#remind')
 			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
@@ -327,7 +327,7 @@ class SMSKeeperCase(TestCase):
 	def test_unicode_msg(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
 			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
 
@@ -381,7 +381,7 @@ class SMSKeeperSharingCase(TestCase):
 		self.assertEqual(remaining_str.strip(), "@henry")
 
 	def testCreateContact(self):
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[0], "@test +16505555551")
 			self.assertIn(self.testPhoneNumbers[1], getOutput(mock))
 
@@ -398,7 +398,7 @@ class SMSKeeperSharingCase(TestCase):
 
 	def testCreateNonUserContact(self):
 		# make sure the output contains the normalized number
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[0], "%s %s" % (self.handle, self.nonUserNumber))
 			self.assertIn(self.normalizeNumber(self.nonUserNumber), getOutput(mock))
 
@@ -411,7 +411,7 @@ class SMSKeeperSharingCase(TestCase):
 		cliMsg.msg(self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[1]))
 
 		# change it
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[0], "%s %s" % (self.handle, self.testPhoneNumbers[2]))
 			self.assertIn(self.testPhoneNumbers[2], getOutput(mock))
 
@@ -421,24 +421,24 @@ class SMSKeeperSharingCase(TestCase):
 
 	def testShareWithExsitingUser(self):
 		self.createHandle(self.testPhoneNumbers[0], "@test", self.testPhoneNumbers[1])
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[0], "item #list @test")
 			self.assertIn("@test", getOutput(mock))
 
 		# ensure that the phone number for user 0 is listed in #list for user 1
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[1], "#list")
 			self.assertIn(self.testPhoneNumbers[0], getOutput(mock))
 
 		# ensure that if user 1 creates a handle for user 0 that's used instead
 		self.createHandle(self.testPhoneNumbers[1], "@user0", self.testPhoneNumbers[0])
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[1], "#list")
 			self.assertIn("@user0", getOutput(mock))
 
 	def testShareWithNewUser(self):
 		self.createHandle(self.testPhoneNumbers[0], "@test", "6505551111")
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[0], "item #list @test")
 			self.assertIn("@test", getOutput(mock))
 
@@ -459,7 +459,7 @@ class SMSKeeperSharingCase(TestCase):
 		cliMsg.msg(self.testPhoneNumbers[0], "poop #list @test")
 		cliMsg.msg(self.testPhoneNumbers[0], "delete 1 #list")
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[1], "#list")
 			self.assertNotIn("poop", getOutput(mock))
 
@@ -490,7 +490,7 @@ class SMSKeeperAsyncCase(TestCase):
 
 	def testSendTips(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 
@@ -498,7 +498,7 @@ class SMSKeeperAsyncCase(TestCase):
 		with Replacer() as r:
 			r.replace('smskeeper.async.datetime.datetime', test_datetime(2020, 01, 01))
 			# check that tip 2 got sent out
-			with patch('smskeeper.sms_util.recordOutput') as mock:
+			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
 			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
@@ -507,26 +507,26 @@ class SMSKeeperAsyncCase(TestCase):
 		self.setupUser(True, True)
 		async.sendTips(constants.SMSKEEPER_TEST_NUM)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
 
 	def testTipsSkipIneligibleUsers(self):
 		self.setupUser(True, False)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 
 	def testSetTipFrequency(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "send me tips monthly")
 			# must reload the user or get a stale value for tip_frequency_days
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.tip_frequency_days, 30, "%s \n user.tip_frequency_days: %d" % (getOutput(mock), self.user.tip_frequency_days))
 
 		# make sure we send tips now
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 
@@ -534,14 +534,14 @@ class SMSKeeperAsyncCase(TestCase):
 			weekAhead = datetime.datetime.now() + datetime.timedelta(7)
 			r.replace('smskeeper.async.datetime.datetime', test_datetime(weekAhead.year, weekAhead.month, weekAhead.day))
 			# make sure we don't send them in 7 days
-			with patch('smskeeper.sms_util.recordOutput') as mock:
+			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
 
 			# make sure we do send them in 31 days
 			monthAhead = datetime.datetime.now() + datetime.timedelta(32)
 			r.replace('smskeeper.async.datetime.datetime', test_datetime(monthAhead.year, monthAhead.month, monthAhead.day))
-			with patch('smskeeper.sms_util.recordOutput') as mock:
+			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
 			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
