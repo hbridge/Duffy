@@ -202,7 +202,7 @@ def help(user, msg, keeperNumber):
 	time.sleep(1)
 	sms_util.sendMsg(user, "I can set reminders for you. Like 'Remind me to call Mom tonight'", None, keeperNumber)
 	time.sleep(1)
-	sms_util.sendMsg(user, "I can also keep a shared list with your friends. Like 'Avengers #MoviesToWatch @beth' to share a move with Beth.", None, keeperNumber)
+	sms_util.sendMsg(user, "I can also keep a shared list with your friends. Like 'Avengers #movies @beth' to share a movie with Beth.", None, keeperNumber)
 
 	# time.sleep(1)
 	# sms_util.sendMsg(user, 'You can also send feedback to my minions. Use hashtag #minions.')
