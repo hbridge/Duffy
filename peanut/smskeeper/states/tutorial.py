@@ -63,9 +63,6 @@ def process(user, msg, requestDict, keeperNumber):
 			actions.fetch(user, msg, keeperNumber)
 			sms_util.sendMsg(user, "You got it. You can also send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
-			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
-			sendContactCard(user, keeperNumber)
-			time.sleep(3)
 			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)
 			time.sleep(1)
 
