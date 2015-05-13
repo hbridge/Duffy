@@ -143,7 +143,7 @@ def dealWithActivation(user, msg, keeperNumber):
 		userToActivate = User.objects.get(phone_number=text)
 		userToActivate.activate()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
-		sms_util.sendMsg(userToActivate, ["Oh hello. Someone else entered your magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, None, keeperNumber)
+		sms_util.sendMsgs(userToActivate, ["Oh hello. Someone else entered your magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, None, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
