@@ -23,16 +23,18 @@ def process(user, msg, requestDict, keeperNumber):
 		user.save()
 		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "Let me show you the basics. Send me an item you want to buy and add a hashtag. Like 'bread #shopping'", None, keeperNumber)
+		sms_util.sendMsg(user, "Let me show you the basics. I remember anything you send me with a hashtag.", None, keeperNumber)
+		time.sleep(1)
+		sms_util.sendMsg(user, "Let's make your shopping list. Just type 'pasta #shopping'. Try it now.", None, keeperNumber)
 		user.state_data = 1
 	elif stateData == 1:
 		if not msg_util.hasLabel(msg):
 			# They didn't send in something with a label.
-			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'bread #shopping'.", None, keeperNumber)
+			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'pasta #shopping'.", None, keeperNumber)
 		else:
 			# They sent in something with a label, have them add to it
 			actions.add(user, msg, requestDict, keeperNumber, False)
-			sms_util.sendMsg(user, "Now send me another item for the same list. Don't forget to add the same hashtag '%s'" % msg_util.getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "Now let's add other items to your list. Don't forget to add your hashtag again. '%s'" % msg_util.getLabel(msg), None, keeperNumber)
 			user.state_data = stateData + 1
 	elif stateData == 2:
 		# They should be sending in a second add command to an existing label
@@ -41,10 +43,10 @@ def process(user, msg, requestDict, keeperNumber):
 			if not existingLabel:
 				sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
 				return True
-			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'foobar %s'." % existingLabel, None, keeperNumber)
+			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'visit atm %s'." % existingLabel, None, keeperNumber)
 		else:
 			actions.add(user, msg, requestDict, keeperNumber, False)
-			sms_util.sendMsg(user, "You can send items to this hashtag anytime (including photos). To see your items, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
+			sms_util.sendMsg(user, "Got it. You can send items to this hashtag anytime (including photos). To see your items, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
 			user.state_data = stateData + 1
 	elif stateData == 3:
 		# The should be sending in just a label
@@ -62,13 +64,15 @@ def process(user, msg, requestDict, keeperNumber):
 			return True
 		else:
 			actions.fetch(user, msg, keeperNumber)
-			sms_util.sendMsg(user, "That's all you need to know for now. Send 'huh?' anytime to get help.", None, keeperNumber)
+			sms_util.sendMsg(user, "You got it. You can also send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
-			time.sleep(1)
 			sendContactCard(user, keeperNumber)
-			user.completed_tutorial = True
+			time.sleep(3)
+			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)			
+			time.sleep(1)
 
+			user.completed_tutorial = True
 			user.setState(keeper_constants.STATE_NORMAL)
 
 	user.save()
