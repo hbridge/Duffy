@@ -1,6 +1,5 @@
 """Main project URL definitions."""
-from django.conf.urls import patterns, include, url
-from smskeeper import views
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
 	'',

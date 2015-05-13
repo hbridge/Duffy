@@ -3,11 +3,9 @@ import time
 from datetime import date, timedelta, datetime
 import os
 import sys
-import requests
 import phonenumbers
 import logging
 import string
-import pytz
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -15,24 +13,21 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from django.shortcuts import render
-
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-from django.core.serializers.json import DjangoJSONEncoder
+from common import api_util
 from django.conf import settings
-
+from django.conf import settings as djangosettings
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from peanut.settings import constants
+from smskeeper import sms_util, processing_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
-
 from smskeeper.models import User, Entry, Message
 
-from smskeeper import sms_util, processing_util
-
-from common import api_util
-from peanut.settings import constants
-from django.conf import settings as djangosettings
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +112,7 @@ def incoming_sms(request):
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 
-
+@login_required(login_url='/admin/login/')
 def all_notes(request):
 	form = UserIdForm(api_util.getRequestData(request))
 
@@ -133,6 +128,7 @@ def all_notes(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+@login_required(login_url='/admin/login/')
 def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
@@ -166,6 +162,7 @@ def getMessagesForUser(user):
 
 
 # External
+@login_required(login_url='/admin/login/')
 def message_feed(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
@@ -235,7 +232,7 @@ def resend_msg(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
-
+@login_required(login_url='/admin/login/')
 def dashboard_feed(request):
 	users = User.objects.all().order_by("id")
 	user_dicts = []
@@ -288,10 +285,9 @@ def dashboard_feed(request):
 	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats}, cls=DjangoJSONEncoder)
 	return HttpResponse(responseJson, content_type="text/json", status=200)
 
-
+@login_required(login_url='/admin/login/')
 def dashboard(request):
-	return render(request, 'dashboard.html', None)
-
+	return render(request, "dashboard.html", None)
 
 @jsonp
 def signup_from_website(request):
