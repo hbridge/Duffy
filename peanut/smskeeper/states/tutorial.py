@@ -6,9 +6,11 @@ from smskeeper import actions
 
 from smskeeper.models import Entry
 
+
 def sendContactCard(user, keeperNumber):
 		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 		sms_util.sendMsg(user, '', cardURL, keeperNumber)
+
 
 def process(user, msg, requestDict, keeperNumber):
 	stateData = None
@@ -56,7 +58,7 @@ def process(user, msg, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
 			return True
 
-		if not msg in Entry.fetchAllLabels(user):
+		if msg not in Entry.fetchAllLabels(user):
 			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
 			return True
 		else:
@@ -64,7 +66,6 @@ def process(user, msg, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "You got it. You can also send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)
-			time.sleep(1)
 
 			user.completed_tutorial = True
 			user.setState(keeper_constants.STATE_NORMAL)

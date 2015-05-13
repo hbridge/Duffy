@@ -314,7 +314,6 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 	# Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
 	def test_natty_timezone(self):
 		self.setupUser(True, True)
-		self.user.save()
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
@@ -391,6 +390,19 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 
 		ret = natty_util.getNewQuery("I want pizza at 10 so yummy", "at 10", 14)
 		self.assertEqual(ret, "I want pizza so yummy")
+
+	def test_natty_user_queries(self):
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "#remind to cancel Saturday, 5/30 class this Friday at 2pm")
+		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
+		self.assertEqual(entry.remind_timestamp.hour, 18)  # 2pm Eastern in UTC
+
+		cliMsg.msg(self.testPhoneNumber, "clear #reminders")
+
+		cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 23 at 8pm tonight")
+		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
+		self.assertEqual(entry.remind_timestamp.hour, 0)  # 8pm Eastern in UTC
 
 
 def removeNonAscii(mystr):
