@@ -196,7 +196,7 @@
 <script src="/js/typewriter.js"></script>
 <script src="/js/keeper.js"></script>
 
-<!-- Facebook Conversion Code for Getkeeper.com visited -->
+<!-- Facebook Audience Pixel for Getkeeper.com visited -->
 <script>(function() {
   var _fbq = window._fbq || (window._fbq = []);
   if (!_fbq.loaded) {
@@ -207,12 +207,12 @@
     s.parentNode.insertBefore(fbds, s);
     _fbq.loaded = true;
   }
+  _fbq.push(['addPixelId', '860571030678308']);
 })();
 window._fbq = window._fbq || [];
-window._fbq.push(['track', '6025340077571', {'value':'0.00','currency':'USD'}]);
+window._fbq.push(['track', 'PixelInitialized', {}]);
 </script>
-<noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?ev=6025340077571&amp;cd[value]=0.00&amp;cd[currency]=USD&amp;noscript=1" /></noscript>
-
+<noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?id=860571030678308&amp;ev=PixelInitialized" /></noscript>
 
 </body>
 </html>
