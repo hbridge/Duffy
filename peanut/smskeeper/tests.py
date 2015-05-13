@@ -294,7 +294,7 @@ class SMSKeeperCase(TestCase):
 	def test_unicode_msg(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
+		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
 			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
 
@@ -304,10 +304,10 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 	def test_unicode_natty(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
-			self.assertIn(u'poop\u2019s', getOutput(mock).decode('utf-8'))
-		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
+		cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
+
+		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
+		self.assertIn(u'poop\u2019s', entry.text)
 
 	# Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
 	# Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC
@@ -348,29 +348,35 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 			cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 2 in 4 hours")
 			self.assertIn("4 hours from now", getOutput(mock))
 
+			entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
+			self.assertIn("change archie grade to 2", entry.text)
+
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "#remind change bobby grade to 10 in 4 hours")
-			self.assertIn("4 hours from now", getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "#remind change bobby grade to 10 in 5 hours")
+			self.assertIn("5 hours from now", getOutput(mock))
+
+			entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[1]
+			self.assertIn("change bobby grade to 10", entry.text)
 
 	# If its 12:30 and I say "change grade to 12 at 12", it should return back midnight
 	def test_natty_just_number_behind_now(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
-			now = datetime.datetime.now(pytz.timezone(self.user.timezone))
-			correctTime = now + datetime.timedelta(hours=12)
-			query = "#remind change susie grade to 12 at %s" % now.hour
+		now = datetime.datetime.now(pytz.timezone(self.user.timezone))
+		correctTime = now + datetime.timedelta(hours=12)
+		query = "#remind change susie grade to 12 at %s" % now.hour
 
-			cliMsg.msg(self.testPhoneNumber, query)
+		cliMsg.msg(self.testPhoneNumber, query)
 
-			entries = Entry.fetchEntries(self.user, "#reminders")
-			self.assertEqual(len(entries), 1)
-			entry = entries[0]
+		entries = Entry.fetchEntries(self.user, "#reminders")
+		self.assertEqual(len(entries), 1)
+		entry = entries[0]
 
-			remindTime = entry.remind_timestamp.astimezone(pytz.timezone(self.user.timezone))
-			self.assertEqual(remindTime.hour, correctTime.hour)
+		remindTime = entry.remind_timestamp.astimezone(pytz.timezone(self.user.timezone))
+		self.assertEqual(remindTime.hour, correctTime.hour)
 
-			self.assertIn("change susie grade to 12", getOutput(mock))
+		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
+		self.assertIn("change susie grade to 12", entry.text)
 
 	def test_natty_get_new_query(self):
 		ret = natty_util.getNewQuery("at 10", "at 10", 1)
