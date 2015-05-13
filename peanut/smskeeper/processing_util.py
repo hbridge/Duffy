@@ -7,6 +7,7 @@ from smskeeper.states import not_activated, tutorial, remind, normal, unresolved
 from smskeeper import msg_util
 
 from smskeeper.models import User, Message
+from common import slack_logger
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	except Exception as e:
 		logger.error("Got Exception in user creation: %s" % e)
 	finally:
-		Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
+		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
+		slack_logger.postMessage(messageObject)
 
 	# convert message to unicode
 	if type(msg) == str:

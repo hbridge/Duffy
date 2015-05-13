@@ -22,6 +22,7 @@ from smskeeper.models import Entry
 from smskeeper.models import Message
 from smskeeper.models import User
 from strand import notifications_util
+from common import slack_logger
 
 logger = get_task_logger(__name__)
 
@@ -99,29 +100,30 @@ def str_now_1():
 
 
 @app.task
-def sendMsg(user, msg, mediaUrls, keeperNumber):
-	msgJson = {"Body": msg, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
-	Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
+def sendMsg(user, msgText, mediaUrls, keeperNumber):
+	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
+	msg = Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
 
-	if type(msg) == unicode:
-		msg = msg.encode('utf-8')
+	if type(msgText) == unicode:
+		msgText = msgText.encode('utf-8')
 
 	if keeperNumber == constants.SMSKEEPER_CLI_NUM:
 		# This is used for command line interface commands
-		recordOutput(msg, True)
+		recordOutput(msgText, True)
 	elif keeperNumber == constants.SMSKEEPER_TEST_NUM:
-		recordOutput(msg, False)
+		recordOutput(msgText, False)
 	else:
 		if mediaUrls:
-			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, mediaUrls, keeperNumber)
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrls, keeperNumber)
 		else:
-			notifications_util.sendSMSThroughTwilio(user.phone_number, msg, None, keeperNumber)
-		logger.info("Sending %s to %s" % (msg, str(user.phone_number)))
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, None, keeperNumber)
+		logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
+		slack_logger.postMessage(msg)
 
 """
 	This is used for testing, it gets mocked out
-	The sendMsg method calls it as well for us in the command line interface
+	The sendmsg method calls it as well for us in the command line interface
 """
-def recordOutput(msg, doPrint=False):
+def recordOutput(msgText, doPrint=False):
 	if doPrint:
-		print msg
+		print msgText

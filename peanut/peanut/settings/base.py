@@ -188,7 +188,7 @@ LOGGING = {
         },
         'slackerror': {
             'level': 'ERROR',
-            'class': 'peanut.slack_logger.SlackLogHandler',
+            'class': 'common.slack_logger.SlackLogHandler',
             'stack_trace': True
         },
         'djangofile': {
