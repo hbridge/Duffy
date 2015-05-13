@@ -28,7 +28,5 @@ ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger." "Copy that.", "Sure thing.", u"\U
 INTRO_MESSAGES = [
 	"I'm Keeper and I can help you remember those small things like a shopping list, movies to watch, or wines you liked.",
 	"Instead of writing them down somewhere (or forgetting to), just txt me.",
-	"I'll show you how to I work. First, what's your name?"
+	"I'll show you how I work. First, what's your name?"
 ]
-
-
