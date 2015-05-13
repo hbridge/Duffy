@@ -78,7 +78,7 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new5 #test")
-			self.assertIn("Now send me another item for the same list", getOutput(mock))
+			self.assertIn("Now let's add other items to your list", getOutput(mock))
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new2 #test")
@@ -86,7 +86,7 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
-			self.assertIn("That's all you need to know for now", getOutput(mock))
+			self.assertIn("You got it", getOutput(mock))
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
