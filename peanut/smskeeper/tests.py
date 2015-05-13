@@ -62,7 +62,8 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "trapper keeper")
-			self.assertIn("That's the magic phrase", getOutput(mock))
+			user = User.objects.get(phone_number=self.testPhoneNumber)
+			self.assertNotEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
 
 	def test_tutorial(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL)
@@ -489,9 +490,13 @@ class SMSKeeperSharingCase(TestCase):
 			self.assertIn("@user0", getOutput(mock))
 
 	def testShareWithNewUser(self):
-		self.createHandle(self.testPhoneNumbers[0], "@test", "6505551111")
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumbers[0], "item #list @test")
+			self.assertIn("@test", getOutput(mock))
+			cliMsg.msg(self.testPhoneNumbers[0], "6505551111")
+		with patch('smskeeper.async.recordOutput') as mock:
+			# make sure that the entry was actually shared with @test
+			cliMsg.msg(self.testPhoneNumbers[0], "#list")
 			self.assertIn("@test", getOutput(mock))
 
 		# make sure the item is in @test's lists

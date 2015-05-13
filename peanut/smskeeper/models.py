@@ -39,7 +39,7 @@ class User(models.Model):
 	def history(self):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
 
-	def lastMessage(self, incoming=True):
+	def print_last_message_date(self, incoming=True):
 		lastMsg = Message.objects.filter(user=self, incoming=incoming).order_by("-added")[:1]
 
 		if len(lastMsg) > 0:
@@ -91,6 +91,9 @@ class User(models.Model):
 
 		return tz
 
+	def getMessages(self, incoming):
+		return Message.objects.filter(user=self, incoming=incoming).order_by("added")
+
 	def isActivated(self):
 		return self.activatedDate is not None
 
@@ -126,7 +129,7 @@ class User(models.Model):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-	list_display = ('id', 'activated', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'lastMessage', 'total_msgs_from', 'history')
+	list_display = ('id', 'activated', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'print_last_message_date', 'total_msgs_from', 'history')
 
 
 class Note(models.Model):

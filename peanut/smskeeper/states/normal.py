@@ -1,17 +1,11 @@
-import json
-import time
 import random
-import math
-import pytz
-import datetime
-import os, sys, re
-import phonenumbers
+import re
 import logging
-import string
 
-from smskeeper.models import User, Entry, Message, MessageMedia, Contact
+from smskeeper.models import User, Entry, Message
 
 from smskeeper import sms_util, msg_util, helper_util
+from smskeeper.states import tutorial
 from smskeeper import actions, keeper_constants
 
 from peanut.settings import constants
@@ -147,14 +141,9 @@ def dealWithActivation(user, msg, keeperNumber):
 
 	try:
 		userToActivate = User.objects.get(phone_number=text)
-		userToActivate.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		userToActivate.setState(keeper_constants.STATE_TUTORIAL)
-		userToActivate.save()
+		userToActivate.activate()
 		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
-
-		sms_util.sendMsg(userToActivate, "Oh hello. Someone else entered your magic phrase. Welcome!", None, keeperNumber)
-		time.sleep(1)
-		helper_util.firstRunIntro(userToActivate, keeperNumber)
+		sms_util.sendMsg(userToActivate, ["Oh hello. Someone else entered your magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, keeperNumber)
 	except User.DoesNotExist:
 		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 

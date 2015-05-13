@@ -265,6 +265,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'smskeeper.async': {
+            'handlers': ['celery'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
     }
 }
 
@@ -283,6 +288,8 @@ class BASE_CELERY_CONFIG:
         'smskeeper.async.processReminder': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.processAllReminders': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.sendTips': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.sendMsg': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.testCelery': {'queue': 'keeper', 'routing_key': 'keeper'},
     }
 
     CELERYBEAT_SCHEDULE = {

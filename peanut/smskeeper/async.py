@@ -40,7 +40,7 @@ def processReminder(entryId):
 		msg = "Hi! Friendly reminder: %s" % entry.text
 
 		for user in entry.users.all():
-			sendMsg(user, msg, None, entry.keeper_number)
+			sendMsg(user.id, msg, None, entry.keeper_number)
 
 		entry.hidden = True
 		entry.save()
@@ -87,7 +87,7 @@ def sendTips(keeperNumber=None):
 				sentTips = user.sent_tips.split(",")
 			for tip in tips.SMSKEEPER_TIPS:
 				if tip["identifier"] not in sentTips:
-					sendMsg(user, tips.renderTip(tip, user.name), None, keeperNumber)
+					sendMsg(user.id, tips.renderTip(tip, user.name), None, keeperNumber)
 					sentTips.append(tip["identifier"])
 					user.sent_tips = ",".join(sentTips)
 					user.last_tip_sent = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -100,7 +100,13 @@ def str_now_1():
 
 
 @app.task
-def sendMsg(user, msgText, mediaUrls, keeperNumber):
+def sendMsg(userId, msgText, mediaUrls, keeperNumber):
+	try:
+		user = User.objects.get(id=userId)
+	except User.DoesNotExist:
+		logger.error("Tried to send message to nonexistent user with id: %d", userId)
+		return
+
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
 	msg = Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
 
@@ -127,3 +133,8 @@ def sendMsg(user, msgText, mediaUrls, keeperNumber):
 def recordOutput(msgText, doPrint=False):
 	if doPrint:
 		print msgText
+
+
+@app.task
+def testCelery():
+	logger.debug("Celery task ran.")

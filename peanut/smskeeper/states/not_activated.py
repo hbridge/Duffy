@@ -3,8 +3,9 @@ import random
 import datetime
 import pytz
 
-from smskeeper import sms_util, msg_util, helper_util
+from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
+import tutorial
 
 def dealWithNonActivatedUser(user, keeperNumber):
 	if user.state_data == None:
@@ -24,21 +25,18 @@ def dealWithNonActivatedUser(user, keeperNumber):
 		user.state_data = "3"
 		user.save()
 	else:
-		reply = ["They don't make magic phrases like they used to",
-									"Who gave you my number?!? I'm going to report you",
-									"You know there are laws against this kind of thing",
-									"Quantity is not the same thing as quality"]
+		reply = [
+			"They don't make magic phrases like they used to",
+			"Who gave you my number?!? I'm going to report you",
+			"You know there are laws against this kind of thing",
+			"Quantity is not the same thing as quality"
+		]
 		sms_util.sendMsg(user, random.choice(reply), None, keeperNumber)
 
+
 def dealWithMagicPhrase(user, keeperNumber):
-	user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	user.setState(keeper_constants.STATE_TUTORIAL)
-	user.save()
-
-	sms_util.sendMsg(user, "That's the magic phrase. Welcome!", None, keeperNumber)
-	time.sleep(1)
-	helper_util.firstRunIntro(user, keeperNumber)
-
+	user.activate()
+	sms_util.sendMsgs(user, ["That's the magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, keeperNumber)
 
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)

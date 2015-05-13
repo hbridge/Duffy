@@ -1,9 +1,6 @@
 import time
-import random
-import datetime
-import pytz
 
-from smskeeper import sms_util, msg_util, helper_util
+from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
 from smskeeper import actions
 
@@ -69,7 +66,7 @@ def process(user, msg, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "Btw, here's an easy way to add me to your contacts.", None, keeperNumber)
 			sendContactCard(user, keeperNumber)
 			time.sleep(3)
-			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)			
+			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)
 			time.sleep(1)
 
 			user.completed_tutorial = True

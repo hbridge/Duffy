@@ -7,7 +7,6 @@ import django
 
 from smskeeper.models import Entry, Contact, User
 
-
 def shareEntries(user, entries, handles, keeperNumber):
 	sharedHandles = list()
 	notFoundHandles = list()
@@ -31,13 +30,13 @@ def shareEntries(user, entries, handles, keeperNumber):
 			else:
 				shareText = "%s shared %d items tagged %s with you." % (user.nameOrPhone(), len(entries), entry.label)
 
-			if len(contact.target.lastMessage(incoming=False)) == 0:  # this is a new user, send them special text.
-				messages = [
-					"Hi there. %s" % (user.nameOrPhone(), entry.text, entry.label),
-					"Allow me to introduce myself, I'm Keeper."
-				]
-				sms_util.sendMsgs(contact.target, messages, keeperNumber)
+			if len(contact.target.getMessages(incoming=False)) == 0:  # this is a new user, send them special text.
 				contact.target.activate()
+				messages = [
+					"Hi there. %s" % (shareText),
+				]
+				messages = messages + keeper_constants.INTRO_MESSAGES
+				sms_util.sendMsgs(contact.target, messages, keeperNumber)
 			else:
 				sms_util.sendMsg(contact.target, "Ding ding! %s" % (shareText), None, keeperNumber)
 	return sharedHandles, notFoundHandles
