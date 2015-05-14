@@ -5,6 +5,7 @@ from smskeeper import keeper_constants
 from smskeeper import actions
 
 from smskeeper.models import Entry
+from smskeeper.states import remind
 
 
 def sendContactCard(user, keeperNumber):
@@ -67,8 +68,7 @@ def process(user, msg, requestDict, keeperNumber):
 			time.sleep(1)
 			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)
 
-			user.completed_tutorial = True
-			user.setState(keeper_constants.STATE_NORMAL)
+			user.setTutorialComplete()
 
 	user.save()
 	return True

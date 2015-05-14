@@ -63,13 +63,12 @@ class SMSKeeperCase(TestCase):
 
 	def test_magicphrase(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "trapper keeper")
-			user = User.objects.get(phone_number=self.testPhoneNumber)
-			self.assertNotEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
+		cliMsg.msg(self.testPhoneNumber, "trapper keeper")
+		user = User.objects.get(phone_number=self.testPhoneNumber)
+		self.assertNotEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
 
-	def test_tutorial(self):
-		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL)
+	def test_tutorial_list(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
 		# Activation message asks for their name
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -89,6 +88,35 @@ class SMSKeeperCase(TestCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("You got it", getOutput(mock))
+
+	def test_tutorial_remind_normal(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		# Activation message asks for their name
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("nice to meet you UnitTests!", getOutput(mock))
+			self.assertIn("Let me show you the basics. To set a reminder", getOutput(mock))
+			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
+			self.assertIn("a day from now", getOutput(mock))
+			self.assertIn("I can also help you with other things", getOutput(mock))
+
+	def test_tutorial_remind_no_time_given(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
+			# Since there was no time given, should have picked a time in the near future
+			self.assertIn("hours from now", getOutput(mock))
+
+			# This is the key here, make sure we have the extra message
+			self.assertIn("In the future, you can", getOutput(mock))
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)

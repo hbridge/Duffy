@@ -14,6 +14,7 @@ from smskeeper import keeper_constants
 
 logger = logging.getLogger(__name__)
 
+
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
 	name = models.CharField(max_length=100)
@@ -23,6 +24,11 @@ class User(models.Model):
 
 	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
 	state_data = models.TextField(null=True)
+
+	# Used by states to say "goto this state, but come back to me afterwards"
+	next_state = models.CharField(max_length=100, null=True)
+	next_state_data = models.TextField(null=True)
+
 	last_state_change = models.DateTimeField(null=True)
 
 	signup_data_json = models.TextField(null=True)
@@ -60,11 +66,24 @@ class User(models.Model):
 			return self.name
 		return self.phone_number
 
-	def setState(self, state):
-		self.state = state
-		self.state_data = None
+	def setState(self, state, override=False):
+		# next state means that we want to override the wishes of the current state and do something different
+		# it should all be configured already
+		if not override and self.next_state:
+			self.state = self.next_state
+			self.state_data = self.next_state_data
+		else:
+			# Normal flow, if there's no next state already defined
+			self.state = state
+			self.state_data = None
+
+		self.next_state = None
+		self.next_state_data = None
+
 		self.last_state_change = datetime.datetime.now(pytz.utc)
 
+	def setNextState(self, nextState):
+		self.next_state = nextState
 
 	def getStateData(self, key):
 		if self.state_data:
@@ -82,6 +101,15 @@ class User(models.Model):
 		data[key] = value
 
 		self.state_data = json.dumps(data)
+
+	def setNextStateData(self, key, value):
+		if self.next_state_data:
+			data = json.loads(self.next_state_data)
+		else:
+			data = dict()
+		data[key] = value
+
+		self.next_state_data = json.dumps(data)
 
 	def getTimezone(self):
 		if self.timezone:
@@ -103,7 +131,7 @@ class User(models.Model):
 			if self.isTutorialComplete():
 				self.setState(keeper_constants.STATE_NORMAL)
 			else:
-				self.setState(keeper_constants.STATE_TUTORIAL)
+				self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
 		else:
 			self.setState(keeper_constants.STATE_NOT_ACTIVATED)
 		self.save()
@@ -120,7 +148,7 @@ class User(models.Model):
 			self.setState(keeper_constants.STATE_NORMAL)
 		else:
 			self.completed_tutorial = False
-			self.setState(keeper_constants.STATE_TUTORIAL)
+			self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
 		self.save()
 
 	def __unicode__(self):

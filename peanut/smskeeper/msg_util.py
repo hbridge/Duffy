@@ -6,17 +6,20 @@ import sys
 
 logger = logging.getLogger(__name__)
 
+
 def hasLabel(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
 			return True
 	return False
 
+
 def getLabel(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
 			return word
 	return None
+
 
 def isLabel(msg):
 	stripedMsg = msg.strip()
@@ -42,18 +45,20 @@ def isNicety(msg):
 def isYesNo(msg):
 	return msg.strip().lower() in ["yes", "y", "no", "n"]
 
+
 def isClearCommand(msg):
-	stripedMsg = msg.strip()
 	tokens = msg.split(' ')
-	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower()=='clear'))
+	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower() == 'clear'))
+
 
 def isPickCommand(msg):
-	stripedMsg = msg.strip()
 	tokens = msg.split(' ')
-	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower()=='pick'))
+	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower() == 'pick'))
+
 
 def isFetchCommand(msg):
 	return isLabel(msg)
+
 
 tipRE = re.compile('send me tips')
 def isSetTipFrequencyCommand(msg):
@@ -70,19 +75,24 @@ def isRemindCommand(msg):
 		re.match('remind me', text) is not None
 	)
 
+
 delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
 	return delete_re.match(msg.lower()) is not None
 
+
 def isActivateCommand(msg):
 	return '#activate' in msg.lower()
+
 
 def isHelpCommand(msg):
 	return msg.strip().lower() == 'huh?'
 
+
 def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
+
 
 def isAddCommand(msg):
 	return hasLabel(msg) and not isLabel(msg)
@@ -99,6 +109,7 @@ def hasPhoneNumber(msg):
 	# foundMatch = True
 	# obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
+
 def isPhoneNumber(msg):
 	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
 	if not matches.has_next():
@@ -107,6 +118,7 @@ def isPhoneNumber(msg):
 	return match.start == 0 and match.end == len(msg)
 
 	return matches.has_next()
+
 
 def extractPhoneNumbers(msg):
 	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
@@ -128,13 +140,14 @@ def isCreateHandleCommand(msg):
 
 
 def isMagicPhrase(msg):
-	return 'trapper keeper' in msg.lower()
+	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()
 
 
 # Returns back (textWithoutLabel, label, listOfHandles)
 def getMessagePieces(msg):
 	textWithoutLabel, label, listOfUrls, listOfHandles = getMessagePiecesWithMedia(msg, {})
 	return (textWithoutLabel, label, listOfHandles)
+
 
 # Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
 # Text could have comma's in it, that is dealt with later
@@ -162,9 +175,6 @@ def getMessagePiecesWithMedia(msg, requestDict):
 	for n in range(numMedia):
 		param = 'MediaUrl' + str(n)
 		mediaUrlList.append(requestDict[param])
-		#TODO need to store mediacontenttype as well.
+		# TODO need to store mediacontenttype as well.
 
 	return (' '.join(nonLabels), label, mediaUrlList, handleList)
-
-
-
