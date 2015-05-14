@@ -29,10 +29,12 @@ def isLabel(msg):
 punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
 	if unicodedata.category(unichr(i)).startswith('P'))
 
+
 def cleanMsgText(msg):
 	cleaned = msg.strip().lower()
 	cleaned = cleaned.translate(punctuation_tbl)
 	return cleaned
+
 
 def isNicety(msg):
 	cleaned_msg = cleanMsgText(msg)
@@ -41,6 +43,7 @@ def isNicety(msg):
 	if "thanks keeper" in cleaned_msg or "thank you keeper" in cleaned_msg:
 		return True
 	return False
+
 
 def isYesNo(msg):
 	return msg.strip().lower() in ["yes", "y", "no", "n"]
@@ -79,11 +82,6 @@ def isRemindCommand(msg):
 delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
 	return delete_re.match(msg.lower()) is not None
-
-
-def isActivateCommand(msg):
-	return '#activate' in msg.lower()
-
 
 def isHelpCommand(msg):
 	return msg.strip().lower() == 'huh?'

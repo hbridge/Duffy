@@ -1,12 +1,10 @@
 import logging
 import json
-import copy
 import datetime
 
 import pytz
 
 from django.db import models
-from django.contrib import admin
 from django.utils.html import format_html
 
 from common import api_util
@@ -20,6 +18,8 @@ class User(models.Model):
 	name = models.CharField(max_length=100)
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)
+
+	# TODO(Derek): Rename this to activated_timestamp
 	activated = models.DateTimeField(null=True)
 
 	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
@@ -123,9 +123,11 @@ class User(models.Model):
 		return Message.objects.filter(user=self, incoming=incoming).order_by("added")
 
 	def isActivated(self):
-		return self.activatedDate is not None
+		return self.activated is not None
 
-	def activate(self, activatedDate=datetime.datetime.now(pytz.utc), tutorialState=keeper_constants.STATE_TUTORIAL_REMIND):
+	# Used only by user_util
+	# Meant to double check data
+	def setActivated(self, activatedDate=datetime.datetime.now(pytz.utc), tutorialState=keeper_constants.STATE_TUTORIAL_REMIND):
 		self.activated = activatedDate
 		if activatedDate:
 			if self.isTutorialComplete():
@@ -153,24 +155,6 @@ class User(models.Model):
 
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
-
-
-def activate_to_remind(modeladmin, request, users):
-	for user in users:
-		user.activate(tutorialState=keeper_constants.STATE_TUTORIAL_REMIND)
-activate_to_remind.short_description = "Activate to Remind Tutorial"
-
-
-def activate_to_list(modeladmin, request, users):
-	for user in users:
-		user.activate(tutorialState=keeper_constants.STATE_TUTORIAL_LIST)
-activate_to_list.short_description = "Activate to List Tutorial"
-
-
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-	list_display = ('id', 'activated', 'phone_number', 'name', 'state', 'completed_tutorial', 'state_data', 'print_last_message_date', 'total_msgs_from', 'history')
-	actions = [activate_to_remind, activate_to_list]
 
 
 class Note(models.Model):

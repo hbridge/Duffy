@@ -1,7 +1,7 @@
 import time
 import random
 
-from smskeeper import sms_util, msg_util
+from smskeeper import sms_util, msg_util, user_util
 from smskeeper import keeper_constants
 
 
@@ -31,18 +31,12 @@ def dealWithNonActivatedUser(user, keeperNumber):
 		]
 		sms_util.sendMsg(user, random.choice(reply), None, keeperNumber)
 
-
-def dealWithMagicPhrase(user, keeperNumber):
-	user.activate()
-	sms_util.sendMsgs(user, ["That's the magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, keeperNumber)
-
-
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
 
 	# If the user enters the magic phrase then they get activated
 	if msg_util.isMagicPhrase(text):
-		dealWithMagicPhrase(user, keeperNumber)
+		user_util.activate(user, True, keeper_constants.STATE_TUTORIAL_REMIND, keeperNumber)
 
 	# If not, then give them back some fun remarks
 	else:

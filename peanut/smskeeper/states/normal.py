@@ -4,8 +4,7 @@ import logging
 
 from smskeeper.models import User, Entry, Message
 
-from smskeeper import sms_util, msg_util, helper_util
-from smskeeper.states import tutorial
+from smskeeper import sms_util, msg_util, helper_util, user_util
 from smskeeper import actions, keeper_constants
 
 from peanut.settings import constants
@@ -20,8 +19,10 @@ def dealWithNicety(user, msg, keeperNumber):
 	if "hello" in cleaned or "hi" in cleaned:
 		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
 
+
 def dealWithYesNo(user, msg, keeperNumber):
 	sms_util.sendMsg(user, "\xF0\x9F\x98\xB3 I'm not smart enough to know what you mean yet.  Try 'huh?' if you're stuck.", None, keeperNumber)
+
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
@@ -32,6 +33,7 @@ def getPreviousMessage(user):
 		return msgs[1]
 	else:
 		return None
+
 
 def getInferredLabel(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
@@ -110,6 +112,7 @@ def dealWithDelete(user, msg, keeperNumber):
 	else:
 		sms_util.sendMsg(user, 'Sorry, I\'m not sure which hashtag you\'re referring to. Try "delete [number] [hashtag]"', None, keeperNumber)
 
+
 def dealWithPrintHashtags(user, keeperNumber):
 	#print out all of the active hashtags for the account
 	listText = ""
@@ -123,6 +126,7 @@ def dealWithPrintHashtags(user, keeperNumber):
 
 	sms_util.sendMsg(user, listText, None, keeperNumber)
 
+
 def pickItemForUserLabel(user, label, keeperNumber):
 	entries = Entry.fetchEntries(user=user, label=label)
 	if len(entries) == 0:
@@ -135,17 +139,6 @@ def pickItemForUserLabel(user, label, keeperNumber):
 		sms_util.sendMsg(user, entry.text, entry.img_url, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "My pick for %s: %s" % (label, entry.text), None, keeperNumber)
-
-def dealWithActivation(user, msg, keeperNumber):
-	text, label, handles = msg_util.getMessagePieces(msg)
-
-	try:
-		userToActivate = User.objects.get(phone_number=text)
-		userToActivate.activate()
-		sms_util.sendMsg(user, "Done. %s is now activated" % text, None, keeperNumber)
-		sms_util.sendMsgs(userToActivate, ["Oh hello. Someone else entered your magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, keeperNumber)
-	except User.DoesNotExist:
-		sms_util.sendMsg(user, "Sorry, couldn't find a user with phone number %s" % text, None, keeperNumber)
 
 
 def dealWithCreateHandle(user, msg, keeperNumber):
@@ -188,8 +181,6 @@ def process(user, msg, requestDict, keeperNumber):
 			user.save()
 			# Reprocess
 			return False
-		elif msg_util.isActivateCommand(msg) and user.phone_number in constants.DEV_PHONE_NUMBERS:
-			dealWithActivation(user, msg, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isPrintHashtagsCommand(msg):
 			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
