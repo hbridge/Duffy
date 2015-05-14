@@ -16,6 +16,10 @@ from smskeeper.models import Entry
 logger = logging.getLogger(__name__)
 
 
+# Might need to move these to common constants file at some point.
+FROM_TUTORIAL_KEY = "fromtutorial"
+
+
 # Returns True if the time exists and isn't within 10 seconds of now.
 # We check for the 10 seconds to deal with natty phrases that don't really tell us a time (like "today")
 def validTime(startDate):
@@ -56,13 +60,22 @@ def process(user, msg, requestDict, keeperNumber):
 			user.save()
 			return False
 
-	# We don't have an entryId so this is the first time we've been put into this state
+	# We don't have an entryId so this is the first time we've been run in this state
 	else:
 		sendFollowup = False
 		if not validTime(startDate):
 			startDate = getDefaultTime(user)
 			sendFollowup = True
+
 		entry = doRemindMessage(user, startDate, newQuery, sendFollowup, None, keeperNumber, requestDict)
+
+		# If we came from the tutorial, then set state and return False so we go back for reprocessing
+		if user.getStateData(FROM_TUTORIAL_KEY):
+			# Note, some behind the scene magic sets the state and state_data for us.  So this call
+			# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
+			user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
+			user.save()
+			return False
 
 		if sendFollowup:
 			user.setStateData("entryId", entry.id)
@@ -100,8 +113,12 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 	toSend = "%s I'll remind you %s." % (helper_util.randomAcknowledgement(), userMsg)
 
 	if sendFollowup:
-		toSend = toSend + "\n\n"
-		toSend = toSend + "If that time doesn't work, tell me what time is better"
+		if user.getStateData(FROM_TUTORIAL_KEY):
+			toSend = toSend + "\n\n"
+			toSend = toSend + "In the future, you can also include a specific time like 'tomorrow morning' or 'Saturday at 3pm'"
+		else:
+			toSend = toSend + "\n\n"
+			toSend = toSend + "If that time doesn't work, tell me what time is better"
 
 	sms_util.sendMsg(user, toSend, None, keeperNumber)
 

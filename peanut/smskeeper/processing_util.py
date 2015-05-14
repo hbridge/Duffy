@@ -3,8 +3,7 @@ import logging
 
 from smskeeper import keeper_constants
 
-from smskeeper.states import not_activated, tutorial, remind, normal, unresolved_handles, unknown_command
-from smskeeper import msg_util
+from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command
 
 from smskeeper.models import User, Message
 from common import slack_logger
@@ -67,7 +66,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED: not_activated,
-	keeper_constants.STATE_TUTORIAL: tutorial,
+	keeper_constants.STATE_TUTORIAL_LIST: tutorial_list,
+	keeper_constants.STATE_TUTORIAL_REMIND: tutorial_reminders,
 	keeper_constants.STATE_NORMAL: normal,
 	keeper_constants.STATE_REMIND: remind,
 	keeper_constants.STATE_UNRESOLVED_HANDLES: unresolved_handles,

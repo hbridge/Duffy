@@ -9,7 +9,8 @@ COMMAND_LIST = 7
 COMMAND_HELP = 8
 
 STATE_NOT_ACTIVATED = 'not-activated'
-STATE_TUTORIAL = 'tutorial'
+STATE_TUTORIAL_LIST = 'tutorial'
+STATE_TUTORIAL_REMIND = 'tutorial-remind'
 STATE_NORMAL = 'normal'
 STATE_REMIND = 'remind'
 STATE_DELETE = 'delete'

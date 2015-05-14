@@ -14,6 +14,7 @@ import django
 django.setup()
 
 from common import api_util
+from common.models import ContactEntry
 from django.conf import settings
 from django.conf import settings as djangosettings
 from django.contrib.auth import logout
@@ -27,6 +28,7 @@ from peanut.settings import constants
 from smskeeper import sms_util, processing_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
+
 
 
 logger = logging.getLogger(__name__)
@@ -236,11 +238,22 @@ def resend_msg(request):
 def dashboard_feed(request):
 	users = User.objects.all().order_by("id")
 	user_dicts = []
+	phoneNumList = list()
 	for user in users:
+		phoneNumList.append(user.phone_number)
+
+	phoneNumToContactDict = getNameFromContactsDB(phoneNumList)
+
+	for user in users:
+		if user.phone_number in phoneNumToContactDict:
+			full_name = phoneNumToContactDict[user.phone_number]
+		else:
+			full_name = ''
 		dict = {
 			"id": int(user.id),
 			"phone_number": user.phone_number,
 			"name": user.name,
+			"full_name": full_name,
 			"activated": user.activated,
 			"created": user.added,
 			"tutorial_step": user.tutorial_step,
@@ -284,6 +297,18 @@ def dashboard_feed(request):
 
 	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats}, cls=DjangoJSONEncoder)
 	return HttpResponse(responseJson, content_type="text/json", status=200)
+
+def getNameFromContactsDB(phoneNumList):
+	contacts = ContactEntry.objects.values('name', 'phone_number').filter(phone_number__in=phoneNumList).distinct()
+
+	#build a dictionary
+	phoneToNameDict = dict()
+	for contact in contacts:
+		if contact['phone_number'] not in phoneToNameDict:
+			phoneToNameDict[contact['phone_number']] = [contact['name']]
+		else:
+			phoneToNameDict[contact['phone_number']].append(contact['name'])
+	return phoneToNameDict
 
 @login_required(login_url='/admin/login/')
 def dashboard(request):

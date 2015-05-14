@@ -126,10 +126,9 @@ def sendMsg(userId, msgText, mediaUrls, keeperNumber):
 		logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
 		slack_logger.postMessage(msg)
 
-"""
-	This is used for testing, it gets mocked out
-	The sendmsg method calls it as well for us in the command line interface
-"""
+
+# This is used for testing, it gets mocked out
+# The sendmsg method calls it as well for us in the command line interface
 def recordOutput(msgText, doPrint=False):
 	if doPrint:
 		print msgText

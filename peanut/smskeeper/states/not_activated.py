@@ -1,11 +1,9 @@
 import time
 import random
-import datetime
-import pytz
 
 from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
-import tutorial
+
 
 def dealWithNonActivatedUser(user, keeperNumber):
 	if user.state_data == None:
@@ -37,6 +35,7 @@ def dealWithNonActivatedUser(user, keeperNumber):
 def dealWithMagicPhrase(user, keeperNumber):
 	user.activate()
 	sms_util.sendMsgs(user, ["That's the magic phrase. Welcome!"] + keeper_constants.INTRO_MESSAGES, keeperNumber)
+
 
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)

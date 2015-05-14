@@ -53,7 +53,7 @@ jQuery(document).ready(function ($){
 	function showAll(){
 		console.log("Showing all");
 		ShowAllClicked = true;
-		$('.msg').each(function(){
+		$('.convo').each(function(){
 			$(this).show();
 		});
 	}

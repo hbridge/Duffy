@@ -44,7 +44,7 @@ var UserTable = React.createClass({
     var createRow = function(item, index) {
 			return <UserRow user={ item } index= { index } />
 		}.bind(this);
-    headerValues = ["user", "name", "joined", "activated", "tutorial", "msgs (in/out)", "last in", "history"];
+    headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial", "msgs (in/out)", "last in", "history"];
 
 		return (
       <div>
@@ -95,6 +95,7 @@ var UserRow = React.createClass({
       <tr className= {rowClasses}>
         <td className="cell"> { this.props.user.id } ({ this.props.user.phone_number })</td>
         <td className="cell"> { this.props.user.name }</td>
+        <td className="cell" title={ this.props.user.full_name }> { this.props.user.full_name[0] }</td>
         <td className="cell"> { accountAge }</td>
         <td className="cell"> { activated_text }</td>
         <td className="cell"> { tutorial_text }</td>
