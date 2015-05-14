@@ -102,7 +102,7 @@ class SMSKeeperCase(TestCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("nice to meet you UnitTests!", getOutput(mock))
-			self.assertIn("Let me show you the basics. To set a reminder", getOutput(mock))
+			self.assertIn("Let me show how to set a reminder. Just say", getOutput(mock))
 			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
 
 		with patch('smskeeper.async.recordOutput') as mock:
