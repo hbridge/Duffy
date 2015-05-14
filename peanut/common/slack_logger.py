@@ -6,6 +6,9 @@ from django.conf import settings
 from peanut.settings import constants
 import requests
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SlackLogHandler(Handler):
     # from http://www.pythian.com/blog/logging-for-slackers/
@@ -80,3 +83,34 @@ def postMessage(message):
         params['channel'] = channel
 
         requests.post(url, data=json.dumps(params))
+
+
+def postUserReport(uid, recentMessages):
+    if not hasattr(settings, "SLACK_LOGGING_URL"):
+        print ("postUserReport: no slack URL, most likely debug env")
+        return
+    recentMessagesText = ""
+    for message in recentMessages:
+        mediaStr = ""
+        if message.NumMedia() > 0:
+            mediaStr = "(%d attachments)" % (message.NumMedia())
+        recentMessagesText += "%s: %s %s\n" % (message.getSenderName(), message.getBody(), mediaStr)
+
+    attachments = [{
+        "pretext": "Recent messages (newest first)",
+        "fallback": "recent messages",
+        "text": recentMessagesText,
+        "color": "warning",
+    }]
+    payload = json.dumps({
+        "channel": "#errors",
+        "username": "User Report",
+        "icon_emoji": ":raising_hand:",
+        "text": "Report from user (history: %s%d)" % (settings.USER_HISTORY_PATH, uid),
+        "attachments": attachments
+    })
+    # print "posting to %s: %s" % (settings.SLACK_LOGGING_URL, payload)
+    requests.post(
+        settings.SLACK_LOGGING_URL,
+        data=payload
+    )

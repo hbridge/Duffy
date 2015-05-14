@@ -19,10 +19,10 @@ from smskeeper import sms_util
 
 
 def getOutput(mock):
-	output = ""
+	output = u""
 	for call in mock.call_args_list:
 		arg, kargs = call
-		output += str(arg[0])
+		output += unicode(arg[0].decode('utf-8'))
 
 	return output
 
@@ -121,18 +121,17 @@ class SMSKeeperCase(TestCase):
 			cliMsg.msg(self.testPhoneNumber, "#hashtag")
 			self.assertIn("(1)", getOutput(mock))
 
-	def test_add_unassigned(self):
+	def test_unknown_command(self):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new")
 			# ensure we tell the user we put it in unassigned
-			self.assertIn(keeper_constants.UNASSIGNED_LABEL, getOutput(mock))
+			self.assertIn(getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, keeper_constants.UNASSIGNED_LABEL)
-			# ensure the user can get things from #unassigned
-			self.assertIn("new", getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, keeper_constants.REPORT_ISSUE_KEYWORD)
+			self.assertIn(keeper_constants.REPORT_ISSUE_CONFIRMATION, getOutput(mock))
 
 	def test_no_add_dumb_stuff(self):
 		self.setupUser(True, True)
@@ -142,7 +141,7 @@ class SMSKeeperCase(TestCase):
 			with patch('smskeeper.async.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, phrase)
 				output = getOutput(mock)
-				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, output, "nicety not detected: %s" % (phrase))
+				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)
@@ -300,8 +299,9 @@ class SMSKeeperCase(TestCase):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
-			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
+			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr #unitest')
+			cliMsg.msg(self.testPhoneNumber, u'#unitest')
+			self.assertIn(u'poop\u2019s tmr', getOutput(mock))
 
 	def testSendMsgs(self):
 		self.setupUser(True, True)

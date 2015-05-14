@@ -48,7 +48,7 @@ ADMINS = None
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "dev.duffyapp.com"]
 
-#S3 Dev server settings
+# S3 Dev server settings
 AWS_STORAGE_BUCKET_NAME = 'strand-dev'
 AWS_IMAGE_HOST = "https://s3-external-1.amazonaws.com/" + AWS_STORAGE_BUCKET_NAME
 

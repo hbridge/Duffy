@@ -219,6 +219,12 @@ class Message(models.Model):
 			self.messageDict = json.loads(self.msg_json)
 		return self.messageDict.get(attribute, None)
 
+	def getSenderName(self):
+		if not self.incoming:
+			return "Keeper"
+		else:
+			return self.user.nameOrPhone()
+
 	def getBody(self):
 		return self.getMessageAttribute("Body")
 

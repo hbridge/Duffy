@@ -15,10 +15,11 @@ STATE_REMIND = 'remind'
 STATE_DELETE = 'delete'
 STATE_ADD = 'add'
 STATE_UNRESOLVED_HANDLES = 'unresolved-handles'
+STATE_UNKNOWN_COMMAND = 'unknown-command'
 
 UNASSIGNED_LABEL = '#unassigned'
 REMIND_LABEL = "#reminders"
-GENERIC_ERROR_MESSAGE = '\xF0\x9F\x98\xB2 something went wrong.  My minions have been notified.'
+GENERIC_ERROR_MESSAGE = u'\U0001F635 something went wrong.  My minions have been notified.'
 
 UNRESOLVED_HANDLES_DATA_KEY = "unresolvedHandles"
 ENTRY_IDS_DATA_KEY = "entryIDs"
@@ -30,3 +31,7 @@ INTRO_MESSAGES = [
 	"Instead of writing them down somewhere (or forgetting to), just txt me.",
 	"I'll show you how I work. First, what's your name?"
 ]
+
+UNKNOWN_COMMAND_PHRASES = [u"Sorry, I'm not sure what you mean \U0001F633\nIf you're trying to add something, try adding a hashtag.  To notify my minions, type 'report' now."]
+REPORT_ISSUE_KEYWORD = "report"
+REPORT_ISSUE_CONFIRMATION = "My minions have been notified."

@@ -226,8 +226,12 @@ def process(user, msg, requestDict, keeperNumber):
 				elif msg_util.isYesNo(msg):
 					dealWithYesNo(user, msg, keeperNumber)
 					return True
-				# if the user didn't add a label, throw it in #unassigned
-				msg += ' ' + keeper_constants.UNASSIGNED_LABEL
+				# there's no label, and we don't know what to do with this, send generic info and put user in unknown state
+				else:
+					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
+					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
+					user.save()
+					return True
 			entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)
 			if len(unresolvedHandles) > 0:
 				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
@@ -240,5 +244,3 @@ def process(user, msg, requestDict, keeperNumber):
 	except:
 		sms_util.sendMsg(user, keeper_constants.GENERIC_ERROR_MESSAGE, None, keeperNumber)
 		raise
-
-
