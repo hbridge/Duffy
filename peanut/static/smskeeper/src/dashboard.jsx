@@ -41,17 +41,30 @@ var DailyStatsRow = React.createClass({
 
 var UserTable = React.createClass({
   render: function() {
-    var createRow = function(item, index) {
-			return <UserRow user={ item } index= { index } />
+    var createRows = function(users) {
+      count = 0;
+      result = [];
+      for (index in users) {
+        user = users[index];
+
+        if ((this.props.showActivated && user.activated) ||
+           (!this.props.showActivated && !user.activated)) {
+          count++;
+          result.push(<UserRow user={ user } highlighted={ count % 2 == 0 } />)
+        }
+      }
+      return (
+        {result}
+      );
 		}.bind(this);
     headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial", "msgs (in/out)", "last in", "history"];
 
 		return (
       <div>
-        <h1>Users</h1>
+        <h1>{ this.props.title }</h1>
         <table>
           <HeaderRow headerValues={ headerValues } />
-          { this.props.users.map(createRow) }
+          { createRows(this.props.users) }
         </table>
       </div>
     );
@@ -75,8 +88,7 @@ var HeaderRow = React.createClass({
 var UserRow = React.createClass({
   render: function() {
     accountAge = jQuery.timeago(new Date(this.props.user.created));
-    tutorial_text = this.props.user.tutorial_step.toString();
-    if (this.props.user.completed_tutorial) tutorial_text += " √";
+    tutorial_text = this.props.user.completed_tutorial ? "√" : "";
     activated_text = null;
     if (this.props.user.activated)
       activated_text = jQuery.timeago(new Date(this.props.user.activated));
@@ -86,10 +98,8 @@ var UserRow = React.createClass({
     last = in_date
     timeago_text = jQuery.timeago(last);
 
-    console.log(tutorial_text);
-
     var rowClasses = classNames({
-      'oddrow' : this.props.index % 2 == 1,
+      'oddrow' : this.props.highlighted == true,
 		});
 		return (
       <tr className= {rowClasses}>
@@ -128,7 +138,8 @@ var DashboardApp = React.createClass({
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />
-        <UserTable users={ this.state.users }/>
+        <UserTable users={ this.state.users } showActivated={ true } title={ "Activated" }/>
+        <UserTable users={ this.state.users } showActivated={ false } title={ "Not activated"}/>
       </div>
 		);
 	},
