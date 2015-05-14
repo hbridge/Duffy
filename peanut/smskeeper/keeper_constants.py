@@ -18,7 +18,9 @@ STATE_ADD = 'add'
 STATE_UNRESOLVED_HANDLES = 'unresolved-handles'
 STATE_UNKNOWN_COMMAND = 'unknown-command'
 
-UNASSIGNED_LABEL = '#unassigned'
+PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
+PHOTO_LABEL = '#photo'
+ATTACHMENTS_LABEL = '#attachments'
 REMIND_LABEL = "#reminders"
 GENERIC_ERROR_MESSAGE = u'\U0001F635 something went wrong.  My minions have been notified.'
 

@@ -26,6 +26,13 @@ def getOutput(mock):
 	return output
 
 
+'''
+Set this on a mock's side_effect and it will return the same args that were inputted for any function
+'''
+def mock_return_input(*args):
+	return args[1:]
+
+
 class SMSKeeperCase(TestCase):
 	testPhoneNumber = "+16505555550"
 	user = None
@@ -153,7 +160,7 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new")
-			# ensure we tell the user we put it in unassigned
+			# ensure we tell the user we don't understand
 			self.assertIn(getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -336,6 +343,22 @@ class SMSKeeperCase(TestCase):
 			sms_util.sendMsgs(self.user, "hello", constants.SMSKEEPER_TEST_NUM)
 		with self.assertRaises(TypeError):
 			sms_util.sendMsg(self.user, ["hello", "this is the wrong type"], None, constants.SMSKEEPER_TEST_NUM)
+
+	def testPhotoWithoutTag(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
+			# moveMediaMock.return_value = ["hello"]
+			moveMediaMock.side_effect = mock_return_input
+			with patch('smskeeper.async.recordOutput') as mock:
+				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.png", mediaType="image/png")
+				# ensure we don't treat photos without a hashtag as a bad command
+				output = getOutput(mock)
+				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+				self.assertIn(keeper_constants.PHOTO_LABEL, output)
+
+		# make sure the entry got created
+		Entry.objects.get(label=keeper_constants.PHOTO_LABEL)
 
 
 class SMSKeeperNattyCase(SMSKeeperCase):

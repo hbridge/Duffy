@@ -143,11 +143,11 @@ def isMagicPhrase(msg):
 
 # Returns back (textWithoutLabel, label, listOfHandles)
 def getMessagePieces(msg):
-	textWithoutLabel, label, listOfUrls, listOfHandles = getMessagePiecesWithMedia(msg, {})
+	textWithoutLabel, label, listOfHandles, listOfUrls, dictOfUrlTypes = getMessagePiecesWithMedia(msg, {})
 	return (textWithoutLabel, label, listOfHandles)
 
 
-# Returns back (textWithoutLabel, label, listOfUrls, listOfHandles)
+# Returns back (textWithoutLabel, label, listOfHandles, listOfUrls, dictOfURLsToTypes)
 # Text could have comma's in it, that is dealt with later
 def getMessagePiecesWithMedia(msg, requestDict):
 	# process text
@@ -164,6 +164,7 @@ def getMessagePiecesWithMedia(msg, requestDict):
 
 	# process media
 	mediaUrlList = list()
+	mediaUrlTypes = dict()
 
 	if 'NumMedia' in requestDict:
 		numMedia = int(requestDict['NumMedia'])
@@ -171,8 +172,11 @@ def getMessagePiecesWithMedia(msg, requestDict):
 		numMedia = 0
 
 	for n in range(numMedia):
-		param = 'MediaUrl' + str(n)
-		mediaUrlList.append(requestDict[param])
-		# TODO need to store mediacontenttype as well.
+		urlParam = 'MediaUrl' + str(n)
+		typeParam = 'MediaContentType' + str(n)
+		url = requestDict[urlParam]
+		urlType = requestDict[typeParam]
+		mediaUrlList.append(url)
+		mediaUrlTypes[url] = urlType
 
-	return (' '.join(nonLabels), label, mediaUrlList, handleList)
+	return (' '.join(nonLabels), label, handleList, mediaUrlList, mediaUrlTypes)

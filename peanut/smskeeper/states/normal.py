@@ -217,8 +217,8 @@ def process(user, msg, requestDict, keeperNumber):
 				elif msg_util.isYesNo(msg):
 					dealWithYesNo(user, msg, keeperNumber)
 					return True
-				# there's no label, and we don't know what to do with this, send generic info and put user in unknown state
-				else:
+				# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
+				elif numMedia == 0:
 					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
 					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
 					user.save()

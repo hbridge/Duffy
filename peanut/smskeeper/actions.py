@@ -39,11 +39,14 @@ def shareEntries(user, entries, handles, keeperNumber):
 
 
 def add(user, msg, requestDict, keeperNumber, sendResponse):
-	text, label, media, handles = msg_util.getMessagePiecesWithMedia(msg, requestDict)
+	text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
+	autoLabels = set()
+
+	print "text: %s label: %s" % (text, label)
 
 	# TODO use a separate process but probably this is not the right place to do it.
-	if len(media) > 0:
-		media = image_util.moveMediaToS3(media)
+	if len(originalMedia) > 0:
+		media = image_util.moveMediaToS3(originalMedia)
 
 	createdEntries = list()
 
@@ -51,11 +54,21 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 	for entryText in text.split(','):
 		entryText = entryText.strip()
 		if len(entryText) > 0:
+			if label is None:
+				raise NameError("Cannot add text without a label")
 			entry = Entry.createEntry(user, keeperNumber, label, entryText)
 			createdEntries.append(entry)
 
-	for entryMediaUrl in media:
-		entry = Entry.createEntry(user, keeperNumber, label, text=None, img_url=entryMediaUrl)
+	for i, entryMediaUrl in enumerate(originalMedia):
+		entry_label = label
+		if entry_label is None or label == "":
+			entry_label = "#attachment"
+			mediaType = mediaToTypes[originalMedia[i]]
+			if mediaType in keeper_constants.PHOTO_CONTENT_TYPES:
+				entry_label = "#photo"
+			autoLabels.add(entry_label)
+
+		entry = Entry.createEntry(user, keeperNumber, entry_label, text=None, img_url=entryMediaUrl)
 		createdEntries.append(entry)
 
 	sharedHandles = list()
@@ -67,8 +80,8 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 		shareString = "  I also shared that with %s" % ", ".join(sharedHandles)
 
 	if sendResponse:
-		if label == keeper_constants.UNASSIGNED_LABEL:
-			sms_util.sendMsg(user, "Filing that under " + keeper_constants.UNASSIGNED_LABEL + shareString, None, keeperNumber)
+		if len(autoLabels) > 0:
+			sms_util.sendMsg(user, "Filing that under " + ", ".join(autoLabels) + shareString, None, keeperNumber)
 		else:
 			sms_util.sendMsg(user, helper_util.randomAcknowledgement() + shareString, None, keeperNumber)
 
