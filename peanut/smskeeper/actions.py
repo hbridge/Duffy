@@ -214,5 +214,6 @@ def help(user, msg, keeperNumber):
 	time.sleep(1)
 	sms_util.sendMsg(user, "I can also keep a shared list with your friends. Like 'Avengers #movies @beth' to share a movie with Beth.", None, keeperNumber)
 
-	# time.sleep(1)
-	# sms_util.sendMsg(user, 'You can also send feedback to my minions. Use hashtag #minions.')
+
+def tellMeMore(user, msg, keeperNumber):
+	sms_util.sendMsg(user, "I can help you create lists. Just send me anything with a hashtag. Like 'Jurassic Park #movies' or 'pasta, sauce, cheese #shopping'.", None, keeperNumber)

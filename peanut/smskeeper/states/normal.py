@@ -200,10 +200,11 @@ def process(user, msg, requestDict, keeperNumber):
 			actions.help(user, msg, keeperNumber)
 		elif msg_util.isSetTipFrequencyCommand(msg):
 			actions.setTipFrequency(user, msg, keeperNumber)
+		elif msg_util.isTellMeMore(msg):
+			actions.tellMeMore(user, msg, keeperNumber)
 		# STATE_ADD
 		elif msg_util.isCreateHandleCommand(msg):
 			dealWithCreateHandle(user, msg, keeperNumber)
-
 		# STATE_DELETE
 		elif msg_util.isDeleteCommand(msg):
 			dealWithDelete(user, msg, keeperNumber)
@@ -223,7 +224,18 @@ def process(user, msg, requestDict, keeperNumber):
 					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
 					user.save()
 					return True
+
+			# if this is the first time they have added a label other than reminders, tell them about fetching it
+			if (Entry.objects.filter(creator=user).exclude(label=keeper_constants.REMIND_LABEL).count() == 0):
+				firstListItem = True
+			else:
+				firstListItem = False
 			entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)
+
+			if firstListItem:
+				text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
+				sms_util.sendMsg(user, "Just type %s to get these back"%(label), None, keeperNumber)
+
 			if len(unresolvedHandles) > 0:
 				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
 				user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, map(lambda entry: entry.id, entries))

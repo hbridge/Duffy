@@ -95,6 +95,10 @@ def isPrintHashtagsCommand(msg):
 def isAddCommand(msg):
 	return hasLabel(msg) and not isLabel(msg)
 
+def isTellMeMore(msg):
+	cleaned = msg.strip().lower()
+	return "tell me more" in cleaned or "what else can you do" in cleaned
+
 
 handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 def isHandle(msg):

@@ -18,7 +18,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.save()
 		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
 		time.sleep(1)
-		sms_util.sendMsg(user, "Let me show you the basics. To set a reminder, just say 'Remind me to call mom this weekend' or 'Remind me to pickup groceries at 7pm tonight'. Try creating a reminder now.", None, keeperNumber)
+		sms_util.sendMsg(user, "Let me show you how to set a reminder. Just say 'Remind me to call mom this weekend' or 'Remind me to pickup laundry at 7pm tonight'. Try creating one now.", None, keeperNumber)
 
 		# Setup the next state along with data saying we're going to it from the tutorial
 		user.setState(keeper_constants.STATE_REMIND)
