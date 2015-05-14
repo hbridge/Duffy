@@ -125,13 +125,13 @@ class User(models.Model):
 	def isActivated(self):
 		return self.activatedDate is not None
 
-	def activate(self, activatedDate=datetime.datetime.now(pytz.utc)):
+	def activate(self, activatedDate=datetime.datetime.now(pytz.utc), tutorialState=keeper_constants.STATE_TUTORIAL_REMIND):
 		self.activated = activatedDate
 		if activatedDate:
 			if self.isTutorialComplete():
 				self.setState(keeper_constants.STATE_NORMAL)
 			else:
-				self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
+				self.setState(tutorialState)
 		else:
 			self.setState(keeper_constants.STATE_NOT_ACTIVATED)
 		self.save()
@@ -155,9 +155,22 @@ class User(models.Model):
 		return str(self.id) + " - " + self.phone_number
 
 
+def activate_to_remind(modeladmin, request, users):
+	for user in users:
+		user.activate(tutorialState=keeper_constants.STATE_TUTORIAL_REMIND)
+activate_to_remind.short_description = "Activate to Remind Tutorial"
+
+
+def activate_to_list(modeladmin, request, users):
+	for user in users:
+		user.activate(tutorialState=keeper_constants.STATE_TUTORIAL_LIST)
+activate_to_list.short_description = "Activate to List Tutorial"
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-	list_display = ('id', 'activated', 'phone_number', 'name', 'completed_tutorial', 'tutorial_step', 'print_last_message_date', 'total_msgs_from', 'history')
+	list_display = ('id', 'activated', 'phone_number', 'name', 'state', 'completed_tutorial', 'state_data', 'print_last_message_date', 'total_msgs_from', 'history')
+	actions = [activate_to_remind, activate_to_list]
 
 
 class Note(models.Model):
@@ -294,5 +307,3 @@ class Contact(models.Model):
 			return contact
 		except Contact.DoesNotExist:
 			return None
-
-admin.site.register(Message)
