@@ -27,6 +27,9 @@ ENTRY_IDS_DATA_KEY = "entryIDs"
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger." "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
 
+FIRST_INTRO_MESSAGE_NO_MAGIC = "Oh hello. Someone else entered your magic phrase. Welcome!"
+FIRST_INTRO_MESSAGE_MAGIC = "That's the magic phrase. Welcome!"
+
 INTRO_MESSAGES = [
 	"I'm Keeper and I can help you remember those small things like a shopping list, movies to watch, or wines you liked.",
 	"Instead of writing them down somewhere (or forgetting to), just txt me.",

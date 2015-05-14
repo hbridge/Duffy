@@ -9,13 +9,13 @@ from smskeeper import user_util
 
 def activate_to_remind(modeladmin, request, users):
 	for user in users:
-		user_util.activate(user, False, keeper_constants.STATE_TUTORIAL_REMIND, settings.KEEPER_NUMBER)
+		user_util.activate(user, keeper_constants.FIRST_INTRO_MESSAGE_NO_MAGIC, keeper_constants.STATE_TUTORIAL_REMIND, settings.KEEPER_NUMBER)
 activate_to_remind.short_description = "Activate to Remind Tutorial"
 
 
 def activate_to_list(modeladmin, request, users):
 	for user in users:
-		user_util.activate(user, False, keeper_constants.STATE_TUTORIAL_LIST, settings.KEEPER_NUMBER)
+		user_util.activate(user, keeper_constants.FIRST_INTRO_MESSAGE_NO_MAGIC, False, keeper_constants.STATE_TUTORIAL_LIST, settings.KEEPER_NUMBER)
 activate_to_list.short_description = "Activate to List Tutorial"
 
 

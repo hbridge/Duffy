@@ -14,8 +14,7 @@ from smskeeper import msg_util, cliMsg, keeper_constants
 
 from common import natty_util
 
-from smskeeper import sms_util
-
+from smskeeper import sms_util, user_util
 
 
 def getOutput(mock):
@@ -545,6 +544,9 @@ class SMSKeeperSharingCase(TestCase):
 			cliMsg.msg(self.testPhoneNumbers[0], "item #list @test")
 			self.assertIn("@test", getOutput(mock))
 			cliMsg.msg(self.testPhoneNumbers[0], "6505551111")
+
+			# Make sure that the intro message was sent out to the new user
+			self.assertIn("Hi there.", getOutput(mock))
 		with patch('smskeeper.async.recordOutput') as mock:
 			# make sure that the entry was actually shared with @test
 			cliMsg.msg(self.testPhoneNumbers[0], "#list")
@@ -589,7 +591,7 @@ class SMSKeeperAsyncCase(TestCase):
 	def setupUser(self, activated, tutorialComplete):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		if activated:
-			self.user.activate()
+			user_util.activate(self.user, "", None, constants.SMSKEEPER_TEST_NUM)
 		if tutorialComplete:
 			self.user.setTutorialComplete()
 

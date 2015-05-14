@@ -87,7 +87,7 @@ def postMessage(message):
 
 def postUserReport(uid, recentMessages):
     if not hasattr(settings, "SLACK_LOGGING_URL"):
-        print ("postUserReport: no slack URL, most likely debug env")
+        logger.info("postUserReport: no slack URL, most likely debug env")
         return
     recentMessagesText = ""
     for message in recentMessages:

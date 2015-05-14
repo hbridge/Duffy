@@ -6,7 +6,7 @@ from smskeeper import keeper_constants
 
 
 def dealWithNonActivatedUser(user, keeperNumber):
-	if user.state_data == None:
+	if user.state_data is None:
 		sms_util.sendMsg(user, "Hi. I'm Keeper. I can help you remember things quickly.", None, keeperNumber)
 		time.sleep(1)
 		sms_util.sendMsg(user, "Hmm... you aren't on my guest list. What's the magic phrase?", None, keeperNumber)
@@ -31,13 +31,13 @@ def dealWithNonActivatedUser(user, keeperNumber):
 		]
 		sms_util.sendMsg(user, random.choice(reply), None, keeperNumber)
 
+
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
 
 	# If the user enters the magic phrase then they get activated
 	if msg_util.isMagicPhrase(text):
-		user_util.activate(user, True, keeper_constants.STATE_TUTORIAL_REMIND, keeperNumber)
-
+		user_util.activate(user, keeper_constants.FIRST_INTRO_MESSAGE_MAGIC, None, keeperNumber)
 	# If not, then give them back some fun remarks
 	else:
 		dealWithNonActivatedUser(user, keeperNumber)

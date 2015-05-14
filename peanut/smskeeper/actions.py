@@ -1,11 +1,12 @@
 import humanize
 import time
 
-from smskeeper import sms_util, msg_util, helper_util, image_util
+from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
 import django
 
 from smskeeper.models import Entry, Contact, User
+
 
 def shareEntries(user, entries, handles, keeperNumber):
 	sharedHandles = list()
@@ -31,15 +32,11 @@ def shareEntries(user, entries, handles, keeperNumber):
 				shareText = "%s shared %d items tagged %s with you." % (user.nameOrPhone(), len(entries), entry.label)
 
 			if len(contact.target.getMessages(incoming=False)) == 0:  # this is a new user, send them special text.
-				contact.target.activate()
-				messages = [
-					"Hi there. %s" % (shareText),
-				]
-				messages = messages + keeper_constants.INTRO_MESSAGES
-				sms_util.sendMsgs(contact.target, messages, keeperNumber)
+				user_util.activate(contact.target, "Hi there. %s" % (shareText), None, keeperNumber)
 			else:
 				sms_util.sendMsg(contact.target, "Ding ding! %s" % (shareText), None, keeperNumber)
 	return sharedHandles, notFoundHandles
+
 
 def add(user, msg, requestDict, keeperNumber, sendResponse):
 	text, label, media, handles = msg_util.getMessagePiecesWithMedia(msg, requestDict)
