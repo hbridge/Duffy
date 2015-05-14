@@ -14,6 +14,9 @@ from smskeeper import msg_util, cliMsg, keeper_constants
 
 from common import natty_util
 
+from smskeeper import sms_util
+
+
 
 def getOutput(mock):
 	output = ""
@@ -298,6 +301,13 @@ class SMSKeeperCase(TestCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr')
 			self.assertIn('#unassigned', getOutput(mock).decode('utf-8'))
+
+	def testSendMsgs(self):
+		self.setupUser(True, True)
+		with self.assertRaises(TypeError):
+			sms_util.sendMsgs(self.user, "hello", constants.SMSKEEPER_TEST_NUM)
+		with self.assertRaises(TypeError):
+			sms_util.sendMsg(self.user, ["hello", "this is the wrong type"], None, constants.SMSKEEPER_TEST_NUM)
 
 
 class SMSKeeperNattyCase(SMSKeeperCase):

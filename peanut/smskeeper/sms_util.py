@@ -15,6 +15,8 @@ def sendMsg(user, msg, mediaUrls, keeperNumber):
 
 
 def sendMsgs(user, msgList, keeperNumber):
+	if not isinstance(msgList, list):
+		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 	for i, msgTxt in enumerate(msgList):
 		scheduledTime = datetime.now(pytz.utc) + timedelta(seconds=i * SECONDS_BETWEEN_SEND)
 		logger.debug("scheduling %s at time %s" % (msgTxt, scheduledTime))
