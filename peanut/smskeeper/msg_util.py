@@ -29,7 +29,6 @@ punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
 def cleanMsgText(msg):
 	cleaned = msg.strip().lower()
 	cleaned = cleaned.translate(punctuation_tbl)
-	print cleaned
 	return cleaned
 
 def isNicety(msg):
