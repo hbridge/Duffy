@@ -351,7 +351,7 @@ class SMSKeeperCase(TestCase):
 			# moveMediaMock.return_value = ["hello"]
 			moveMediaMock.side_effect = mock_return_input
 			with patch('smskeeper.async.recordOutput') as mock:
-				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.png", mediaType="image/png")
+				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
 				# ensure we don't treat photos without a hashtag as a bad command
 				output = getOutput(mock)
 				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
@@ -359,6 +359,22 @@ class SMSKeeperCase(TestCase):
 
 		# make sure the entry got created
 		Entry.objects.get(label=keeper_constants.PHOTO_LABEL)
+
+	def testScreenshotWithoutTag(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
+			# moveMediaMock.return_value = ["hello"]
+			moveMediaMock.side_effect = mock_return_input
+			with patch('smskeeper.async.recordOutput') as mock:
+				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.png", mediaType="image/png")
+				# ensure we don't treat photos without a hashtag as a bad command
+				output = getOutput(mock)
+				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+				self.assertIn(keeper_constants.SCREENSHOT_LABEL, output)
+
+		# make sure the entry got created
+		Entry.objects.get(label=keeper_constants.SCREENSHOT_LABEL)
 
 
 class SMSKeeperNattyCase(SMSKeeperCase):

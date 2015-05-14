@@ -42,8 +42,6 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 	text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
 	autoLabels = set()
 
-	print "text: %s label: %s" % (text, label)
-
 	# TODO use a separate process but probably this is not the right place to do it.
 	if len(originalMedia) > 0:
 		media = image_util.moveMediaToS3(originalMedia)
@@ -64,8 +62,10 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 		if entry_label is None or label == "":
 			entry_label = "#attachment"
 			mediaType = mediaToTypes[originalMedia[i]]
-			if mediaType in keeper_constants.PHOTO_CONTENT_TYPES:
-				entry_label = "#photo"
+			if mediaType == "image/jpeg":
+				entry_label = keeper_constants.PHOTO_LABEL
+			elif mediaType == "image/png":
+				entry_label = keeper_constants.SCREENSHOT_LABEL
 			autoLabels.add(entry_label)
 
 		entry = Entry.createEntry(user, keeperNumber, entry_label, text=None, img_url=entryMediaUrl)

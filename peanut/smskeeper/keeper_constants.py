@@ -20,7 +20,8 @@ STATE_UNKNOWN_COMMAND = 'unknown-command'
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
 PHOTO_LABEL = '#photo'
-ATTACHMENTS_LABEL = '#attachments'
+SCREENSHOT_LABEL = '#screenshot'
+ATTACHMENTS_LABEL = '#attachment'
 REMIND_LABEL = "#reminders"
 GENERIC_ERROR_MESSAGE = u'\U0001F635 something went wrong.  My minions have been notified.'
 
