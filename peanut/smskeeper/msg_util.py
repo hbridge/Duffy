@@ -1,6 +1,8 @@
 import re
 import phonenumbers
 import logging
+import unicodedata
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -18,17 +20,25 @@ def getLabel(msg):
 
 def isLabel(msg):
 	stripedMsg = msg.strip()
-	return (' ' in stripedMsg) == False and stripedMsg.startswith("#")
+	return (' ' in stripedMsg) is False and stripedMsg.startswith("#")
 
+# from http://stackoverflow.com/questions/11066400/remove-punctuation-from-unicode-formatted-strings
+punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
+	if unicodedata.category(unichr(i)).startswith('P'))
+
+def cleanMsgText(msg):
+	cleaned = msg.strip().lower()
+	cleaned = cleaned.translate(punctuation_tbl)
+	print cleaned
+	return cleaned
 
 def isNicety(msg):
-	cleaned_msg = msg.strip().lower()
+	cleaned_msg = cleanMsgText(msg)
 	if cleaned_msg in ["hi", "hello", "thanks", "thank you"]:
 		return True
 	if "thanks keeper" in cleaned_msg or "thank you keeper" in cleaned_msg:
 		return True
 	return False
-
 
 def isYesNo(msg):
 	return msg.strip().lower() in ["yes", "y", "no", "n"]

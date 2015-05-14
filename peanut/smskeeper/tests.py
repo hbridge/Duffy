@@ -136,12 +136,13 @@ class SMSKeeperCase(TestCase):
 
 	def test_no_add_dumb_stuff(self):
 		self.setupUser(True, True)
-		dumb_phrases = ["hi", "thanks", "no", "yes"]
+		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!"]
 
 		for phrase in dumb_phrases:
 			with patch('smskeeper.async.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, phrase)
-				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, getOutput(mock))
+				output = getOutput(mock)
+				self.assertNotIn(keeper_constants.UNASSIGNED_LABEL, output, "nicety not detected: %s" % (phrase))
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)
