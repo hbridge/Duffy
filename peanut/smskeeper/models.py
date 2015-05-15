@@ -112,6 +112,7 @@ class User(models.Model):
 		self.next_state_data = json.dumps(data)
 
 	def getTimezone(self):
+		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
 		if self.timezone:
 			if self.timezone == "PST":
 				return pytz.timezone('US/Pacific')
