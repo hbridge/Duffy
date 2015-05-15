@@ -389,7 +389,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 		# we have to dig into messages as ouput would never get returned from the mock
 		messages = Message.objects.filter(user=self.user, incoming=False).all()
-		self.assertIn(removeNonAscii(keeper_constants.GENERIC_ERROR_MESSAGE), messages[0].msg_json)
+		self.assertIn(messages[0].getBody(), keeper_constants.GENERIC_ERROR_MESSAGES)
 
 	def test_unicode_msg(self):
 		self.setupUser(True, True)

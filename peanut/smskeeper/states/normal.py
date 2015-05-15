@@ -245,5 +245,5 @@ def process(user, msg, requestDict, keeperNumber):
 
 		return True
 	except:
-		sms_util.sendMsg(user, keeper_constants.GENERIC_ERROR_MESSAGE, None, keeperNumber)
+		sms_util.sendMsg(user, random.choice(keeper_constants.GENERIC_ERROR_MESSAGES), None, keeperNumber)
 		raise

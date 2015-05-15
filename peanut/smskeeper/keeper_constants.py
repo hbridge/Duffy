@@ -23,7 +23,10 @@ PHOTO_LABEL = '#photo'
 SCREENSHOT_LABEL = '#screenshot'
 ATTACHMENTS_LABEL = '#attachment'
 REMIND_LABEL = "#reminders"
-GENERIC_ERROR_MESSAGE = u'\U0001F635 something went wrong.  My minions have been notified.'
+GENERIC_ERROR_MESSAGES = [
+	u'\U0001F635 something went wrong.  My minions have been notified.',
+	u"Well \U0001F4A9 something happened.  Someone'll be along to clean up shortly.",
+]
 
 UNRESOLVED_HANDLES_DATA_KEY = "unresolvedHandles"
 ENTRY_IDS_DATA_KEY = "entryIDs"
@@ -39,7 +42,11 @@ INTRO_MESSAGES = [
 	"I'll show you how I work. First, what's your name?"
 ]
 
-UNKNOWN_COMMAND_PHRASES = [u"Sorry, I'm not sure what you mean \U0001F633\nIf you're trying to add something, try using a hashtag. To notify my minions, type 'report' now."]
+UNKNOWN_COMMAND_PHRASES = [
+	u"Sorry, I'm not sure what you mean \U0001F633\nIf you're trying to add something, try using a hashtag. To notify my minions, type 'report' now.",
+	u"I'm still pretty new \U0001F423 and I don't understand that.\n\n Say 'huh?' to see what I can do or 'report' and I'll poke one of my lackeys. \U0001F449",
+	u"Do you have a map?  'Cause I'm lost. \U0001F615 Say 'huh?' for instructions or 'report' to notify the stooges."
+]
 REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
