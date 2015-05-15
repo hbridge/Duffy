@@ -113,11 +113,23 @@ class User(models.Model):
 
 	def getTimezone(self):
 		if self.timezone:
-			tz = pytz.timezone(self.timezone)
+			if self.timezone == "PST":
+				return pytz.timezone('US/Pacific')
+			elif self.timezone == "EST":
+				return pytz.timezone('US/Pacific')
+			elif self.timezone == "CST":
+				return pytz.timezone('US/Central')
+			elif self.timezone == "MST":
+				return pytz.timezone('US/Mountain')
+			elif self.timezone == "PST-1":
+				return pytz.timezone('US/Alaska')
+			elif self.timezone == "PST-2":
+				return pytz.timezone('US/Hawaii')
+			else:
+				logger.error("Didn't find %s tz for user %s, defaulting to Eastern but you should map this in models.py" % self.timezone)
+				return pytz.timezone('US/Eastern')
 		else:
-			tz = pytz.timezone('US/Eastern')
-
-		return tz
+			return pytz.timezone('US/Eastern')
 
 	def getMessages(self, incoming):
 		return Message.objects.filter(user=self, incoming=incoming).order_by("added")

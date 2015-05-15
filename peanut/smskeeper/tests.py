@@ -11,6 +11,8 @@ from django.test import TestCase
 from peanut.settings import constants
 from smskeeper.models import User, Entry, Contact, Message, ZipData
 from smskeeper import msg_util, cliMsg, keeper_constants
+from smskeeper import async
+from smskeeper import tips
 
 from common import natty_util
 
@@ -33,7 +35,7 @@ def mock_return_input(*args):
 	return args[1:]
 
 
-class SMSKeeperCase(TestCase):
+class SMSKeeperBaseCase(TestCase):
 	testPhoneNumber = "+16505555550"
 	user = None
 
@@ -44,6 +46,15 @@ class SMSKeeperCase(TestCase):
 		except User.DoesNotExist:
 			pass
 
+		# Need to do this everytime otherwise if we're doing things in timezones in the code
+		# then the database will be empty and default to Eastern
+		self.setupZipCodeData()
+
+	def setupZipCodeData(self):
+		ZipData.objects.create(city="San Francisco", state="CA", zip_code="94117", timezone="PST", area_code="415")
+		ZipData.objects.create(city="Manhattan", state="NY", zip_code="10012", timezone="EST", area_code="212")
+		ZipData.objects.create(city="New York", state="NY", zip_code="10012", timezone="EST", area_code="212")
+
 	# TODO(Derek): Eventually activated and tutorialComplete should go away
 	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
@@ -51,13 +62,13 @@ class SMSKeeperCase(TestCase):
 		if (activated):
 			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		self.user.state = state
-		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
-	def setupZipCodeData(self):
-		ZipData.objects.create(city="San Francisco", state="CA", zip_code="94117", timezone="PST", area_code="415")
-		ZipData.objects.create(city="Manhattan", state="NY", zip_code="10012", timezone="EST", area_code="212")
-		ZipData.objects.create(city="New York", state="NY", zip_code="10012", timezone="EST", area_code="212")
+	def getTestUser(self):
+		return User.objects.get(id=self.user.id)
+
+
+class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 	def test_first_connect(self):
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -149,15 +160,30 @@ class SMSKeeperCase(TestCase):
 			# This is the key here, make sure we have the extra message
 			self.assertIn("In the future, you can", getOutput(mock))
 
-	def test_tutorial_zip_code(self):
-		self.setupZipCodeData()
+	def test_tutorial_remind_time_zones(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
-		user = User.objects.get(id=self.user.id)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
+
+			# Since there was no time given, should have picked a time in the near future
+			self.assertIn("hours from now", getOutput(mock))
+
+			# This is the key here, make sure we have the extra message
+			self.assertIn("In the future, you can", getOutput(mock))
+
+	def test_tutorial_zip_code(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "94117")
+
+		user = self.getTestUser()
 		self.assertEqual(user.timezone, "PST")
 
 	def test_get_label_doesnt_exist(self):
@@ -413,7 +439,7 @@ class SMSKeeperCase(TestCase):
 		Entry.objects.get(label=keeper_constants.SCREENSHOT_LABEL)
 
 
-class SMSKeeperNattyCase(SMSKeeperCase):
+class SMSKeeperNattyCase(SMSKeeperBaseCase):
 
 	def test_unicode_natty(self):
 		self.setupUser(True, True)
@@ -475,7 +501,7 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 	def test_natty_just_number_behind_now(self):
 		self.setupUser(True, True)
 
-		now = datetime.datetime.now(pytz.timezone(self.user.timezone))
+		now = datetime.datetime.now(self.user.getTimezone())
 		correctTime = now + datetime.timedelta(hours=12)
 		query = "#remind change susie grade to 12 at %s" % now.hour
 
@@ -485,7 +511,7 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 		self.assertEqual(len(entries), 1)
 		entry = entries[0]
 
-		remindTime = entry.remind_timestamp.astimezone(pytz.timezone(self.user.timezone))
+		remindTime = entry.remind_timestamp.astimezone(self.user.getTimezone())
 		self.assertEqual(remindTime.hour, correctTime.hour)
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
@@ -648,35 +674,13 @@ class SMSKeeperSharingCase(TestCase):
 			cliMsg.msg(self.testPhoneNumbers[1], "#list")
 			self.assertNotIn("poop", getOutput(mock))
 
-from smskeeper import async
-from smskeeper import tips
 
 def setMockDatetimeDaysAhead(mock, days):
 	mock.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta(days)
 	mock.date.side_effect = lambda *args, **kw: datetime.date(*args, **kw)
 	mock.datetime.side_effect = lambda *args, **kw: datetime.datetime(*args, **kw)
 
-class SMSKeeperAsyncCase(TestCase):
-	testPhoneNumber = "+16505555550"
-	user = None
-
-	def setUp(self):
-		try:
-			user = User.objects.get(phone_number=self.testPhoneNumber)
-			user.delete()
-		except User.DoesNotExist:
-			pass
-
-	def setupUser(self, activated, tutorialComplete):
-		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
-		if activated:
-			user_util.activate(self.user, "", None, constants.SMSKEEPER_TEST_NUM)
-		if tutorialComplete:
-			self.user.setTutorialComplete()
-
-		self.user.name = "Bob"
-		self.user.save()
-
+class SMSKeeperAsyncCase(SMSKeeperBaseCase):
 	def testSendTips(self):
 		self.setupUser(True, True)
 
