@@ -42,7 +42,7 @@ SMSKEEPER_TIPS = [
 ]
 
 SMSKEEPER_TIP_FOOTER = "Want fewer tips? Type 'send me tips weekly/monthly/never'"
-
+SMSKEEPER_TIP_HOUR = 18
 
 def isEligibleForTip(user):
 	if not user.completed_tutorial:
@@ -50,6 +50,15 @@ def isEligibleForTip(user):
 	if user.disable_tips or user.tip_frequency_days == 0:
 		return False
 
+	# figure out if it's the right local time for tips
+	now = datetime.datetime.now(pytz.utc)
+	localdt = now.astimezone(user.getTimezone())  # we do this to get around mocking, as tests mock datetime.now()
+	localHour = localdt.hour
+	# print "now: %s usernow: %s usertz: %s sendhour: %d" % (now, localdt, user.getTimezone(), SMSKEEPER_TIP_HOUR)
+	if localHour != SMSKEEPER_TIP_HOUR:
+		return
+
+	# only send tips if the user has been active or last tip was sent > their preference for days
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
 	if not user.last_tip_sent:
 		dt_activated = datetime.datetime.now(pytz.utc) - user.activated  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now

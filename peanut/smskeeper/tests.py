@@ -651,10 +651,20 @@ class SMSKeeperSharingCase(TestCase):
 from smskeeper import async
 from smskeeper import tips
 
-def setMockDatetimeDaysAhead(mock, days):
-	mock.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta(days)
+def setMockDatetimeDaysAhead(mock, days, customHour=None, customTimeZone=None):
+	dt = datetime.datetime.now(pytz.utc) + datetime.timedelta(days)
+	if customHour is not None:
+		dt = dt.replace(hour=customHour)
+	if customTimeZone is not None:
+		dt = dt.replace(tzinfo=customTimeZone)
+	mock.datetime.now.return_value = dt
 	mock.date.side_effect = lambda *args, **kw: datetime.date(*args, **kw)
 	mock.datetime.side_effect = lambda *args, **kw: datetime.datetime(*args, **kw)
+
+
+
+def setMockDatetimeToSendTip(mock):
+	setMockDatetimeDaysAhead(mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS, tips.SMSKEEPER_TIP_HOUR)
 
 class SMSKeeperAsyncCase(TestCase):
 	testPhoneNumber = "+16505555550"
@@ -673,23 +683,42 @@ class SMSKeeperAsyncCase(TestCase):
 			user_util.activate(self.user, "", None, constants.SMSKEEPER_TEST_NUM)
 		if tutorialComplete:
 			self.user.setTutorialComplete()
-
+		self.user.timezone = "UTC"  # put the user in UTC by default, makes most tests easier
 		self.user.name = "Bob"
 		self.user.save()
+
+
+	def testSendTipTimezones(self):
+		self.setupUser(True, True)
+		self.user.timezone = "EST"  # put the user in EST to test our tz conversion
+		self.user.save()
+
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			# make sure we don't send at the wrong time,
+			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS + 1, 0, self.user.getTimezone())
+			with patch('smskeeper.async.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			# make sure we do send at the right time!
+			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS + 1, tips.SMSKEEPER_TIP_HOUR, self.user.getTimezone())
+			with patch('smskeeper.async.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
+
 
 	def testSendTips(self):
 		self.setupUser(True, True)
 
-		# set datetime to return a future date
-
 		with patch('smskeeper.tips.datetime') as datetime_mock:
-			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
+			# make sure we don't send at the wrong time
+			setMockDatetimeToSendTip(datetime_mock)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
 
 			# ensure tip 2 gets sent out
-			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2)
+			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2, tips.SMSKEEPER_TIP_HOUR)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.SMSKEEPER_TIPS[1].render(self.user.name), getOutput(mock))
@@ -697,22 +726,25 @@ class SMSKeeperAsyncCase(TestCase):
 	def testTipThrottling(self):
 		self.setupUser(True, True)
 
-		# send a tip
-		with patch('smskeeper.tips.datetime') as mock_datetime:
-			mock_datetime.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta(keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			# send a tip
+			setMockDatetimeToSendTip(datetime_mock)
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 
-			mock_datetime.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta((keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2) - 1)
+			setMockDatetimeDaysAhead(datetime_mock, (keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2) - 1, tips.SMSKEEPER_TIP_HOUR)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertNotIn(tips.SMSKEEPER_TIPS[1].render(self.user.name), getOutput(mock))
 
 	def testTipsSkipIneligibleUsers(self):
-		# inactive users don't get tips
+		# unactivated users don't get tips
 		self.setupUser(True, False)
-		with patch('smskeeper.async.recordOutput') as mock:
-			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			# send a tip
+			setMockDatetimeToSendTip(datetime_mock)
+			with patch('smskeeper.async.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
 
 		self.setupUser(True, True)
 		# user just activated don't send tip
@@ -729,14 +761,14 @@ class SMSKeeperAsyncCase(TestCase):
 			self.assertEqual(self.user.tip_frequency_days, 30, "%s \n user.tip_frequency_days: %d" % (getOutput(mock), self.user.tip_frequency_days))
 
 		with patch('smskeeper.tips.datetime') as datetime_mock:
-			setMockDatetimeDaysAhead(datetime_mock, 7)
+			setMockDatetimeDaysAhead(datetime_mock, 7, tips.SMSKEEPER_TIP_HOUR)
 			# make sure we don't send them in 7 days
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
 
 			# make sure we do send them in 31 days
-			setMockDatetimeDaysAhead(datetime_mock, 31)
+			setMockDatetimeDaysAhead(datetime_mock, 31, tips.SMSKEEPER_TIP_HOUR)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
@@ -760,7 +792,7 @@ class SMSKeeperAsyncCase(TestCase):
 			cliMsg.msg(self.testPhoneNumber, "#reminder test tomorrow")  # set a reminder
 			self.assertTipIdNotSent(tips.REMINDER_TIP_ID)
 
-	def testReminderTipRelevance(self):
+	def testShareTipRelevance(self):
 		self.setupUser(True, True)
 		with patch('smskeeper.async.recordOutput'):
 			cliMsg.msg(self.testPhoneNumber, "foo #bar @baz")  # share something
@@ -770,7 +802,7 @@ class SMSKeeperAsyncCase(TestCase):
 	def assertTipIdNotSent(self, tipId):
 		for i, tip in enumerate(tips.SMSKEEPER_TIPS):
 			with patch('smskeeper.tips.datetime') as datetime_mock:
-				setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * (i + 1))
+				setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * (i + 1), tips.SMSKEEPER_TIP_HOUR)
 				tip = tips.selectNextTip(self.user)
 				if tip:
 					self.assertNotEqual(tip.id, tipId)

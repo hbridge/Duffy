@@ -153,6 +153,9 @@ class User(models.Model):
 			self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
 		self.save()
 
+	def getTimezone(self):
+		return pytz.timezone(self.timezone)
+
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
 
