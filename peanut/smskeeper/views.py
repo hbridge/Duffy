@@ -335,18 +335,14 @@ def signup_from_website(request):
 			try:
 				target_user = User.objects.get(phone_number=phoneNum)
 
-				bodyText = "You are already on the list. Hang tight... unless you know the magic phrase?"
+				bodyText = "You are already on the list. Hang tight and I'll be in touch soon."
 				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
 				target_user = User.objects.create(phone_number=phoneNum, state_data=1, signup_data_json=json.dumps(source))
 				target_user.save()
 
-				bodyText = "Hi. I'm Keeper. I can help you remember things quickly."
-				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
-				time.sleep(1)
-				bodyText = "I'll let you know when I'm ready for you. Unless you know the magic phrase to skip the line?"
-				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
+				not_activated.dealWithNonActivatedUser(target_user, djangosettings.KEEPER_NUMBER)
 		else:
 			response['result'] = False
 	else:
