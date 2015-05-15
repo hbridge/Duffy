@@ -53,11 +53,9 @@ var UserTable = React.createClass({
           result.push(<UserRow user={ user } highlighted={ count % 2 == 0 } />)
         }
       }
-      return (
-        {result}
-      );
+      return result;
 		}.bind(this);
-    headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial", "msgs (in/out)", "last in", "history"];
+    headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial (src)", "msgs (in/out)", "last in", "history"];
 
 		return (
       <div>
@@ -88,7 +86,7 @@ var HeaderRow = React.createClass({
 var UserRow = React.createClass({
   render: function() {
     accountAge = jQuery.timeago(new Date(this.props.user.created));
-    tutorial_text = this.props.user.completed_tutorial ? "√" : this.props.user.source;
+    tutorial_text = this.props.user.completed_tutorial ? "√ " + this.props.user.source : this.props.user.source;
     activated_text = null;
     if (this.props.user.activated)
       activated_text = jQuery.timeago(new Date(this.props.user.activated));

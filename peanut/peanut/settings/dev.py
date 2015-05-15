@@ -1,3 +1,6 @@
+import sys
+import logging
+
 from peanut.settings.base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -19,6 +22,19 @@ DATABASES = {
 		'OPTIONS': {'charset': 'utf8mb4'},
 	}
 }
+
+# Configuration for speeding up tests.
+if 'test' in sys.argv:
+	DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
+	logging.disable(logging.CRITICAL)
+
+	CELERY_ALWAYS_EAGER = True
+	CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+	BROKER_BACKEND = 'memory'
+
+	PASSWORD_HASHERS = (
+		'django.contrib.auth.hashers.MD5PasswordHasher',
+	)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'f(*vzc)x9!1-5nis+uinolh=$*&#z@&2n!7)x9#x@&n2s=-)vb'

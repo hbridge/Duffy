@@ -41,7 +41,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			user.timezone = zipDataResults[0].timezone
 
-		sms_util.sendMsg(user, "Thanks. let me show you how to set a reminder. Just say 'Remind me to call mom this weekend' or 'Remind me to pickup laundry at 7pm tonight'. Try creating one now.", None, keeperNumber)
+		sms_util.sendMsg(user, "Thanks. Let me show you how to set a reminder. Just say 'Remind me to call mom this weekend' or 'Remind me to pickup laundry at 7pm tonight'. Try creating one now.", None, keeperNumber)
 
 		# Setup the next state along with data saying we're going to it from the tutorial
 		user.setState(keeper_constants.STATE_REMIND)

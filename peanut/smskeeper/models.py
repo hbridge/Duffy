@@ -112,12 +112,27 @@ class User(models.Model):
 		self.next_state_data = json.dumps(data)
 
 	def getTimezone(self):
+		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
 		if self.timezone:
-			tz = pytz.timezone(self.timezone)
+			if self.timezone == "PST":
+				return pytz.timezone('US/Pacific')
+			elif self.timezone == "EST":
+				return pytz.timezone('US/Pacific')
+			elif self.timezone == "CST":
+				return pytz.timezone('US/Central')
+			elif self.timezone == "MST":
+				return pytz.timezone('US/Mountain')
+			elif self.timezone == "PST-1":
+				return pytz.timezone('US/Alaska')
+			elif self.timezone == "PST-2":
+				return pytz.timezone('US/Hawaii')
+			elif self.timezone == "UTC":
+				return pytz.utc
+			else:
+				logger.error("Didn't find %s tz for user %s, defaulting to Eastern but you should map this in models.py" % (self.timezone, self))
+				return pytz.timezone('US/Eastern')
 		else:
-			tz = pytz.timezone('US/Eastern')
-
-		return tz
+			return pytz.timezone('US/Eastern')
 
 	def getMessages(self, incoming):
 		return Message.objects.filter(user=self, incoming=incoming).order_by("added")
@@ -152,9 +167,6 @@ class User(models.Model):
 			self.completed_tutorial = False
 			self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
 		self.save()
-
-	def getTimezone(self):
-		return pytz.timezone(self.timezone)
 
 	def __unicode__(self):
 		return str(self.id) + " - " + self.phone_number
