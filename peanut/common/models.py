@@ -4,11 +4,12 @@ import datetime
 import logging
 import time
 
-from django.contrib.gis.db import models
+# from django.contrib.gis.db import models
+from django.db import models
 from django.template.defaultfilters import escape
 from django.db.models import Q
 from django.core.urlresolvers import reverse
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.db.models.query import QuerySet
 from django.db import IntegrityError, OperationalError, DatabaseError
@@ -22,7 +23,7 @@ from common import bulk_updater
 from ios_notifications.models import Notification
 
 logger = logging.getLogger(__name__)
-		
+
 
 class CompressedTextField(models.TextField):
 	"""
@@ -56,7 +57,7 @@ class CompressedTextField(models.TextField):
 					return value
 
 				return tmp
-				
+
 # Create your models here.
 class User(models.Model):
 	uuid = UUIDField(auto=True)
@@ -66,7 +67,7 @@ class User(models.Model):
 	auth_token = models.CharField(max_length=100, null=True)
 	product_id = models.IntegerField(default=2)
 	device_token = models.TextField(null=True)
-	last_location_point = models.PointField(null=True)
+	#last_location_point = models.PointField(null=True)
 	last_location_accuracy = models.IntegerField(null=True)
 	last_location_timestamp = models.DateTimeField(null=True)
 	last_photo_timestamp = models.DateTimeField(null=True)
@@ -91,7 +92,8 @@ class User(models.Model):
 		unique_together = (("phone_id", "product_id"), ("phone_number", "product_id"))
 
 	# You MUST use GeoManager to make Geo Queries
-	objects = models.GeoManager()
+	# TODO(Derek): Commented out to support in memory testing
+	# objects = models.GeoManager()
 
 	"""
 		Returns back the full localfile path where the user's photos are located
@@ -167,7 +169,7 @@ class User(models.Model):
 		if self.phone_number:
 			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_number)
 		else:
-			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)			
+			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)
 
 @receiver(pre_delete, sender=User, dispatch_uid='user_delete_signal')
 def delete_empty_strands(sender, instance, using, **kwargs):
@@ -185,20 +187,22 @@ class Photo(models.Model):
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
 	thumb_filename = models.CharField(max_length=100, null=True, db_index=True)
-	
+
 	full_width = models.IntegerField(null=True)
 	full_height = models.IntegerField(null=True)
-	
+
 	location_city =  models.CharField(max_length=1000, null=True)
-	location_point = models.PointField(null=True, db_index=True)
+
+	# TODO(Derek): Commented out to support in memory testing
+	#location_point = models.PointField(null=True, db_index=True)
 	location_accuracy_meters = models.IntegerField(null=True)
-	
-	
+
+
 	iphone_hash = models.CharField(max_length=100, null=True)
 	is_local = models.BooleanField(default=1)
 	classification_data = models.TextField(null=True)
 	overfeat_data = models.TextField(null=True)
-	
+
 	time_taken = models.DateTimeField(null=True, db_index=True)
 	local_time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
@@ -226,7 +230,8 @@ class Photo(models.Model):
 	location_data = models.TextField(null=True)
 
 	 # You MUST use GeoManager to make Geo Queries
-	objects = models.GeoManager()
+	 # TODO(Derek): Commented out to support in memory testing
+	# objects = models.GeoManager()
 
 	class Meta:
 		db_table = 'photos_photo'
@@ -238,7 +243,7 @@ class Photo(models.Model):
 
 	def getUserDataId(self):
 		return str(self.uuid)
-			
+
 	"""
 		Look to see from the iphone's location data if there's a city present
 		TODO(derek):  Should this be pulled out to its own table?
@@ -258,7 +263,7 @@ class Photo(models.Model):
 		city = self.getLocationCity(self.location_data)
 		if (city):
 			self.location_city = city
-		
+
 		models.Model.save(self, *args, **kwargs)
 
 	"""
@@ -326,7 +331,7 @@ class Photo(models.Model):
 	"""
 	def getFullUrlImagePath(self):
 		if self.full_filename:
-			return "/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
+			return "/%s/%s" % (self.user.getUserDataId(), self.full_filename)
 		else:
 			return ""
 
@@ -335,7 +340,7 @@ class Photo(models.Model):
 	"""
 	def getThumbUrlImagePath(self):
 		if self.thumb_filename:
-			return "/%s/%s" % (self.user.getUserDataId(), self.thumb_filename) 
+			return "/%s/%s" % (self.user.getUserDataId(), self.thumb_filename)
 		else:
 			return ""
 
@@ -353,7 +358,7 @@ class Photo(models.Model):
 		links = list()
 		for strand in self.strand_set.all():
 			links.append('<a href="%s">%s</a>' % (reverse("admin:common_strand_change", args=(strand.id,)) , escape(strand)))
-		return ', '.join(links)	
+		return ', '.join(links)
 
 	strandListHtml.allow_tags = True
 	strandListHtml.short_description = "Strands"
@@ -386,9 +391,9 @@ class Photo(models.Model):
 		for strand in strands:
 			if strand.photos.count() == 1 and strand.photos.all()[0].id == self.id:
 				strand.delete()
-				
+
 		super(Photo, self).delete()
-		
+
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		doBulkUpdate(cls, objs, attributesList)
@@ -404,7 +409,7 @@ class Photo(models.Model):
 	@classmethod
 	def getIds(cls, objs):
 		return [obj.id for obj in objs]
-	
+
 	def __eq__(self, other):
 		# Apparently django is sending different types of objects as 'other'.  Sometimes its an object
 		# and sometimes its an id
@@ -431,7 +436,7 @@ class SimplePhoto:
 		return {'id' : self.id,
 				'time_taken' : self.time_taken,
 				'user' : self.user}
-		
+
 	def isDbPhoto(self):
 		if self.dbPhoto:
 			return True
@@ -456,7 +461,7 @@ class SimplePhoto:
 			self.user = self.dbPhoto.user_id
 			#self.display_name = self.dbPhoto.user.display_name
 
-			
+
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
@@ -467,7 +472,7 @@ class Classification(models.Model):
 	class Meta:
 		db_table = 'photos_classification'
 
-	def __unicode__(self): 
+	def __unicode__(self):
 		return str(self.photo.id) + " " + self.class_name
 
 class Similarity(models.Model):
@@ -496,7 +501,7 @@ class NotificationLog(models.Model):
 	result = models.IntegerField(db_index=True, null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
-	
+
 
 	class Meta:
 		db_table = 'strand_notification_log'
@@ -505,7 +510,7 @@ class NotificationLog(models.Model):
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		doBulkUpdate(cls, objs, attributesList)
-		
+
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.user_id, self.id, self.device_token, self.apns)
 
@@ -540,10 +545,10 @@ class DuffyNotification(Notification):
 
 		if self.sound:
 			aps['sound'] = self.sound
-				
+
 		if self.content_available:
 			aps['content-available'] = self.content_available
-			
+
 		message = {'aps': aps}
 		extra = self.extra
 		if extra is not None:
@@ -576,12 +581,12 @@ class ContactEntry(models.Model):
 class Strand(models.Model):
 	first_photo_time = models.DateTimeField(db_index=True, null=True)
 	last_photo_time = models.DateTimeField(db_index=True, null=True)
-	
+
 	# These should come from the first photo
 	location_city =  models.CharField(max_length=1000, null=True)
-	location_point = models.PointField(null=True, db_index=True)
+	#location_point = models.PointField(null=True, db_index=True)
 	location_accuracy = models.IntegerField(null=True)
-	
+
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
 	private = models.BooleanField(db_index=True, default=False)
@@ -602,13 +607,13 @@ class Strand(models.Model):
 	swap_converted = models.BooleanField(default=False)
 
 	cache_dirty = models.BooleanField(default=True)
-	
+
 	added = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)	
+	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return str(self.id)
-		
+
 	def user_info(self):
 		names = [str(user) for user in self.users.all()]
 		return " & ".join(names)
@@ -620,7 +625,7 @@ class Strand(models.Model):
 			return "1 photo"
 		else:
 			return "%s photos" % (photoCount)
-		
+
 	def sharing_info(self):
 		if self.private:
 			return "Private"
@@ -633,7 +638,7 @@ class Strand(models.Model):
 		links = list()
 		for photo in photos:
 			links.append('<a href="%s">%s</a>' % (reverse("admin:common_photo_change", args=(photo.id,)) , escape(photo)))
-		return ', '.join(links)		
+		return ', '.join(links)
 	photos_link.allow_tags = True
 	photos_link.short_description = "Photos"
 
@@ -661,8 +666,8 @@ class Strand(models.Model):
 
 			if strand:
 				links.append('<a href="%s">%s</a>' % (reverse("admin:common_strand_change", args=(strand.id,)) , escape(strand)))
-			
-		return ', '.join(links)		
+
+		return ', '.join(links)
 	strand_neighbors_link.allow_tags = True
 	strand_neighbors_link.short_description = "Strand Neighbors"
 
@@ -673,15 +678,15 @@ class Strand(models.Model):
 			user = neighbor.strand_2_user
 			if user.id != self.user_id:
 				links.append('<a href="%s">%s</a>' % (reverse("admin:common_user_change", args=(user.id,)) , escape(user)))
-			
-		return ', '.join(links)		
+
+		return ', '.join(links)
 	user_neighbors_link.allow_tags = True
 	user_neighbors_link.short_description = "User Neighbors"
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		doBulkUpdate(cls, objs, attributesList)
-		
+
 	@classmethod
 	def getIds(cls, objs):
 		ids = list()
@@ -701,8 +706,9 @@ class Strand(models.Model):
 		db_table = 'strand_objects'
 
 	# You MUST use GeoManager to make Geo Queries
-	objects = models.GeoManager()
-	
+	# TODO(Derek): Commented out to support in memory testing
+	# objects = models.GeoManager()
+
 
 
 class ShareInstance(models.Model):
@@ -716,7 +722,7 @@ class ShareInstance(models.Model):
 	notification_sent = models.DateTimeField(null=True)
 
 	cache_dirty = models.BooleanField(default=True, db_index=True)
-	
+
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -730,7 +736,7 @@ class ShareInstance(models.Model):
 
 	def __unicode__(self):
 		return '%s | %s | %s | %s'%(self.id, self.user, self.photo, self.shared_at_timestamp)
-		
+
 	class Meta:
 		db_table = 'swap_share_instance'
 
@@ -744,13 +750,13 @@ class StrandNeighbor(models.Model):
 	strand_2_user = models.ForeignKey(User, db_index=True, null=True, related_name = "strand_2_user")
 
 	distance_in_meters = models.IntegerField(null=True)
-	
+
 	added = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)	
+	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return str(self.id)
-		
+
 	class Meta:
 		unique_together = ("strand_1", "strand_2")
 		db_table = 'strand_neighbor'
@@ -763,7 +769,7 @@ class StrandNeighbor(models.Model):
 class FriendConnection(models.Model):
 	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
 	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
-	bulk_batch_key = models.IntegerField(null=True, db_index=True)	
+	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -828,7 +834,7 @@ class FriendConnection(models.Model):
 		allUsers = list()
 		allUsers.extend(users)
 		allUsers.append(userToAddTo)
-		
+
 		existingFriendConnections = FriendConnection.objects.filter(Q(user_1__in=allUsers) | Q(user_2__in=allUsers))
 		for user in users:
 			if user.id == userToAddTo.id:
@@ -836,7 +842,7 @@ class FriendConnection(models.Model):
 			if not cls.friendFullConnectionExists(user, userToAddTo, existingFriendConnections):
 				cls.addForwardConnection(userToAddTo, user)
 				cls.addReverseConnection(userToAddTo, user)
-				
+
 		# TODO(Derek): If thie above loop gets bad, put back in the bulk calls
 		#FriendConnection.objects.bulk_create(newFriendConnections)
 
@@ -855,7 +861,7 @@ class Action(models.Model):
 
 	def getUserDisplayName(self):
 		return self.user.display_name
-	
+
 	def getUserPhoneNumber(self):
 		return self.user.phone_number
 
@@ -884,17 +890,17 @@ class ApiCache(models.Model):
 	inbox_data = CompressedTextField(null=True)
 	inbox_data_last_timestamp = models.DateTimeField(null=True)
 	inbox_full_last_timestamp = models.DateTimeField(null=True)
-	
+
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
-	
+
 	class Meta:
 		db_table = 'strand_api_cache'
 
 
 class LocationRecord(models.Model):
 	user = models.ForeignKey(User, db_index=True)
-	point = models.PointField(db_index=True)
+	#point = models.PointField(db_index=True)
 	accuracy = models.IntegerField(null=True)
 	timestamp = models.DateTimeField(null=True)
 	neighbor_evaluated = models.BooleanField(default=False)
@@ -905,7 +911,8 @@ class LocationRecord(models.Model):
 		db_table = 'strand_location_records'
 
 	# You MUST use GeoManager to make Geo Queries
-	objects = models.GeoManager()
+	# TODO(Derek): Commented out to support in memory testing
+	# objects = models.GeoManager()
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
@@ -923,7 +930,7 @@ def doBulkUpdate(cls, objs, attributesList):
 
 	if len(objs) == 0:
 		return
-		
+
 	for obj in objs:
 		obj.updated = datetime.datetime.now()
 
@@ -949,5 +956,5 @@ def doBulkUpdate(cls, objs, attributesList):
 				logger.warning("Got DatabaseError %s, for ids %s" % (e, ids))
 			else:
 				raise e
-			
+
 
