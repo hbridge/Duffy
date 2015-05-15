@@ -297,3 +297,11 @@ class Contact(models.Model):
 			return contact
 		except Contact.DoesNotExist:
 			return None
+
+
+class ZipData(models.Model):
+	city = models.CharField(max_length=100)
+	state = models.CharField(max_length=10)
+	zip_code = models.CharField(max_length=10, db_index=True)
+	area_code = models.CharField(max_length=10, db_index=True)
+	timezone = models.CharField(max_length=10)
