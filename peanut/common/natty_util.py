@@ -54,7 +54,7 @@ def processQuery(query, timezone):
 	nattyParams = {"q": unicode(query).encode('utf-8')}
 
 	if timezone:
-		nattyParams["tz"] = timezone
+		nattyParams["tz"] = str(timezone)
 
 	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
 

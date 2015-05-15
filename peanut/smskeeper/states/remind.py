@@ -35,7 +35,7 @@ def isFollowup(startDate, msg):
 
 def process(user, msg, requestDict, keeperNumber):
 	text, label, handles = msg_util.getMessagePieces(msg)
-	nattyResults = natty_util.getNattyInfo(text, user.timezone)
+	nattyResults = natty_util.getNattyInfo(text, user.getTimezone())
 
 	if len(nattyResults) > 0:
 		startDate, newQuery, usedText = nattyResults[0]
