@@ -53,9 +53,7 @@ var UserTable = React.createClass({
           result.push(<UserRow user={ user } highlighted={ count % 2 == 0 } />)
         }
       }
-      return (
-        {result}
-      );
+      return result;
 		}.bind(this);
     headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial (src)", "msgs (in/out)", "last in", "history"];
 
