@@ -1,6 +1,5 @@
 import json
-import time
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 import os
 import sys
 import phonenumbers
@@ -17,19 +16,16 @@ from common import api_util
 from common.models import ContactEntry
 from django.conf import settings
 from django.conf import settings as djangosettings
-from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from peanut.settings import constants
 from smskeeper import sms_util, processing_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
 
-
+from smskeeper.states import not_activated
 
 logger = logging.getLogger(__name__)
 
