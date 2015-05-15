@@ -37,7 +37,8 @@ def process(user, msg, requestDict, keeperNumber):
 
 		if len(zipDataResults) == 0:
 			logger.debug("Couldn't find db entry for %s" % zipCode)
-			sms_util.sendMsg(user, "Sorry, I don't know that zipcode, guessing Eastern", None, keeperNumber)
+			sms_util.sendMsg(user, "Sorry, I don't know that zipcode. Please try again", None, keeperNumber)
+			return True
 		else:
 			user.timezone = zipDataResults[0].timezone
 
