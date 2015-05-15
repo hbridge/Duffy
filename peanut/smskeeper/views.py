@@ -335,7 +335,7 @@ def signup_from_website(request):
 				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, state_data=1, signup_data_json=json.dumps(source))
+				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps(source))
 				target_user.save()
 
 				not_activated.dealWithNonActivatedUser(target_user, djangosettings.KEEPER_NUMBER)
