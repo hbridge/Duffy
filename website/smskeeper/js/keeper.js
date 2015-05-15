@@ -18,6 +18,14 @@ jQuery(document).ready(function ($){
 			showAll();
 			$("#hp_skip").hide();
 		});
+		
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  		ga('create', 'UA-53853203-2', 'auto');
+  		ga('send', 'pageview');
 	}
 
 	/* MESSAGE STYLE ================================== */
@@ -42,11 +50,13 @@ jQuery(document).ready(function ($){
 		$('#hp_signup_top').addClass('form_success');
 		$("#hp_signup_top .submit_btn").prop('value', 'Check Your Phone!');
 		fbpixel();
+		gaSignupCompleted('form_top');
 	}
 	function form_middle_success(){
 		$('#hp_signup_middle').addClass('form_success');
 		$("#hp_signup_middle .submit_btn").prop('value', 'Check Your Phone!');
 		fbpixel();
+		gaSignupCompleted('form_middle')
 	}
 
 	ShowAllClicked = false;
@@ -134,6 +144,9 @@ jQuery(document).ready(function ($){
 		window._fbq.push(['track', '6027664081971', {'value':'0.00','currency':'USD'}]);
   	}
 
+  	function gaSignupCompleted(label){
+  		ga('send','event','form_submit', label)
+  	}
 
 
 	// SET COOKIE SO DON'T SHOW CONVO AGAIN
