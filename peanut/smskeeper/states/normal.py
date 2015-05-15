@@ -6,23 +6,11 @@ from smskeeper.models import User, Entry, Message
 
 from smskeeper import sms_util, msg_util, helper_util, user_util
 from smskeeper import actions, keeper_constants
+from smskeeper import niceties
 
 from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
-
-
-def dealWithNicety(user, msg, keeperNumber):
-	cleaned = msg.strip().lower()
-	if "thank" in cleaned:
-		sms_util.sendMsg(user, "You're welcome.", None, keeperNumber)
-	if "hello" in cleaned or "hi" in cleaned:
-		sms_util.sendMsg(user, "Hi there.", None, keeperNumber)
-
-
-def dealWithYesNo(user, msg, keeperNumber):
-	sms_util.sendMsg(user, "\xF0\x9F\x98\xB3 I'm not smart enough to know what you mean yet.  Try 'huh?' if you're stuck.", None, keeperNumber)
-
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
@@ -212,12 +200,13 @@ def process(user, msg, requestDict, keeperNumber):
 			# STATE_NORMAL
 			# STATE_ADD
 			if not msg_util.hasLabel(msg):
-				if msg_util.isNicety(msg):
-					dealWithNicety(user, msg, keeperNumber)
+				nicety = niceties.getNicety(msg)
+				if nicety:
+					response = nicety.getResponse()
+					if response:
+						sms_util.sendMsg(user, nicety.getResponse(), None, keeperNumber)
 					return True
-				elif msg_util.isYesNo(msg):
-					dealWithYesNo(user, msg, keeperNumber)
-					return True
+
 				# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 				elif numMedia == 0:
 					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)

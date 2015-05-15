@@ -35,20 +35,6 @@ def cleanMsgText(msg):
 	cleaned = cleaned.translate(punctuation_tbl)
 	return cleaned
 
-
-def isNicety(msg):
-	cleaned_msg = cleanMsgText(msg)
-	if cleaned_msg in ["hi", "hello", "thanks", "thank you", "great", "ok"]:
-		return True
-	if "thanks keeper" in cleaned_msg or "thank you keeper" in cleaned_msg:
-		return True
-	return False
-
-
-def isYesNo(msg):
-	return msg.strip().lower() in ["yes", "y", "no", "n"]
-
-
 def isClearCommand(msg):
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower() == 'clear'))
