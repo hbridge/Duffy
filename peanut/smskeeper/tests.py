@@ -9,7 +9,7 @@ from testfixtures import test_datetime
 from django.test import TestCase
 
 from peanut.settings import constants
-from smskeeper.models import User, Entry, Contact, Message
+from smskeeper.models import User, Entry, Contact, Message, ZipData
 from smskeeper import msg_util, cliMsg, keeper_constants
 
 from common import natty_util
@@ -54,6 +54,11 @@ class SMSKeeperCase(TestCase):
 		self.user.timezone = "US/Eastern"  # This is the default
 		self.user.save()
 
+	def setupZipCodeData(self):
+		ZipData.objects.create(city="San Francisco", state="CA", zip_code="94117", timezone="PST", area_code="415")
+		ZipData.objects.create(city="Manhattan", state="NY", zip_code="10012", timezone="EST", area_code="212")
+		ZipData.objects.create(city="New York", state="NY", zip_code="10012", timezone="EST", area_code="212")
+
 	def test_first_connect(self):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
@@ -79,7 +84,6 @@ class SMSKeeperCase(TestCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tell me more")
 			self.assertIn("I can help you create lists", getOutput(mock))
-
 
 	def test_firstItemAdded(self):
 		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
@@ -117,7 +121,11 @@ class SMSKeeperCase(TestCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("nice to meet you UnitTests!", getOutput(mock))
-			self.assertIn("Let me show you how to set a reminder. Just say", getOutput(mock))
+
+		# Activation message asks for their zip
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "10012")
+			self.assertIn("Thanks. let me show you how to set a reminder. Just say", getOutput(mock))
 			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
 
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -130,14 +138,27 @@ class SMSKeeperCase(TestCase):
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
+
 			# Since there was no time given, should have picked a time in the near future
 			self.assertIn("hours from now", getOutput(mock))
 
 			# This is the key here, make sure we have the extra message
 			self.assertIn("In the future, you can", getOutput(mock))
+
+	def test_tutorial_zip_code(self):
+		self.setupZipCodeData()
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "94117")
+
+		user = User.objects.get(id=self.user.id)
+		self.assertEqual(user.timezone, "PST")
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
@@ -418,7 +439,7 @@ class SMSKeeperNattyCase(SMSKeeperCase):
 			cliMsg.msg(self.testPhoneNumber, "clear #reminders")
 			self.assertIn("cleared", getOutput(mock))
 
-		self.user.timezone = "US/Pacific"  # This is the default
+		self.user.timezone = "PST"  # This is not the default
 		self.user.save()
 		cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
