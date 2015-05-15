@@ -38,7 +38,7 @@ def cleanMsgText(msg):
 
 def isNicety(msg):
 	cleaned_msg = cleanMsgText(msg)
-	if cleaned_msg in ["hi", "hello", "thanks", "thank you"]:
+	if cleaned_msg in ["hi", "hello", "thanks", "thank you", "great"]:
 		return True
 	if "thanks keeper" in cleaned_msg or "thank you keeper" in cleaned_msg:
 		return True
