@@ -51,7 +51,7 @@ class SlackLogHandler(Handler):
 
 def postMessage(message):
     msgContent = json.loads(message.msg_json)
-    if ('To' in msgContent and msgContent['To'] in constants.KEEPER_PROD_PHONE_NUMBERS) or ('From' in msgContent and msgContent['From'] in constants.KEEPER_PROD_PHONE_NUMBERS):
+    if (isProdMessage(message)):
         url = 'https://hooks.slack.com/services/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'
         channel = "#livesmskeeperfeed"
         params = dict()
@@ -85,16 +85,27 @@ def postMessage(message):
         requests.post(url, data=json.dumps(params))
 
 
+def isProdMessage(message):
+    sender, recipient = message.getMessagePhoneNumbers()
+    if (sender in constants.KEEPER_PROD_PHONE_NUMBERS or
+            recipient in constants.KEEPER_PROD_PHONE_NUMBERS):
+        return True
+    return False
+
 def postUserReport(uid, recentMessages):
-    if not hasattr(settings, "SLACK_LOGGING_URL"):
+    if (not hasattr(settings, "SLACK_LOGGING_URL") or
+            not isProdMessage(recentMessages[0])):
         logger.info("postUserReport: no slack URL, most likely debug env")
         return
+
     recentMessagesText = ""
     for message in recentMessages:
         mediaStr = ""
         if message.NumMedia() > 0:
             mediaStr = "(%d attachments)" % (message.NumMedia())
         recentMessagesText += "%s: %s %s\n" % (message.getSenderName(), message.getBody(), mediaStr)
+        if isProdMessage(message):
+            foundProdNumber = True
 
     attachments = [{
         "pretext": "Recent messages (newest first)",

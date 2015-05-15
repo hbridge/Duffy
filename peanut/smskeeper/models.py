@@ -290,6 +290,14 @@ class Message(models.Model):
 
 		return media
 
+	def getMessagePhoneNumbers(self):
+		sender = None
+		recipient = None
+		msgInfo = json.loads(self.msg_json)
+		sender = msgInfo.get("From", None)
+		recipient = msgInfo.get("To", None)
+		return sender, recipient
+
 
 class MessageMedia:
 	url = None
