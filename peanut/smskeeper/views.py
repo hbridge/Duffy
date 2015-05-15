@@ -254,6 +254,7 @@ def dashboard_feed(request):
 			"phone_number": user.phone_number,
 			"name": user.name,
 			"full_name": full_name,
+			"source": user.signup_data_json if user.signup_data_json and "default" not in user.signup_data_json else '',
 			"activated": user.activated,
 			"created": user.added,
 			"tutorial_step": user.tutorial_step,

@@ -88,7 +88,7 @@ var HeaderRow = React.createClass({
 var UserRow = React.createClass({
   render: function() {
     accountAge = jQuery.timeago(new Date(this.props.user.created));
-    tutorial_text = this.props.user.completed_tutorial ? "√" : "";
+    tutorial_text = this.props.user.completed_tutorial ? "√" : this.props.user.source;
     activated_text = null;
     if (this.props.user.activated)
       activated_text = jQuery.timeago(new Date(this.props.user.activated));
