@@ -73,6 +73,21 @@ class SMSKeeperCase(TestCase):
 		user = User.objects.get(phone_number=self.testPhoneNumber)
 		self.assertNotEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
 
+	def test_tellmemore(self):
+		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tell me more")
+			self.assertIn("I can help you create lists", getOutput(mock))
+
+
+	def test_firstItemAdded(self):
+		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#groceries milk")
+			self.assertIn("Just type #groceries", getOutput(mock))
+
 	def test_tutorial_list(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
