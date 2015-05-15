@@ -24,4 +24,7 @@ class UserAdmin(admin.ModelAdmin):
 	list_display = ('id', 'activated', 'phone_number', 'name', 'state', 'completed_tutorial', 'state_data', 'print_last_message_date', 'total_msgs_from', 'history')
 	actions = [activate_to_remind, activate_to_list]
 
-admin.site.register(Entry)
+
+@admin.register(Entry)
+class EntryAdmin(admin.ModelAdmin):
+	list_display = ('id', 'text', 'remind_timestamp', 'hidden')
