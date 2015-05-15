@@ -58,9 +58,9 @@ class SMSKeeperBaseCase(TestCase):
 	# TODO(Derek): Eventually activated and tutorialComplete should go away
 	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
-		self.user.completed_tutorial = tutorialComplete
 		if (activated):
-			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+			user_util.activate(self.user, None, state, constants.SMSKEEPER_TEST_NUM)
+		self.user.completed_tutorial = tutorialComplete
 		self.user.state = state
 		self.user.save()
 
@@ -388,8 +388,14 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, 'yippee ki yay motherfucker')
 
 		# we have to dig into messages as ouput would never get returned from the mock
-		messages = Message.objects.filter(user=self.user, incoming=False).all()
-		self.assertIn(messages[0].getBody(), keeper_constants.GENERIC_ERROR_MESSAGES)
+		found = False
+		messageText = ""
+		for message in Message.objects.filter(user=self.user, incoming=False).all():
+			messageText += message.getBody() + "\n"
+			if message.getBody() in keeper_constants.GENERIC_ERROR_MESSAGES:
+				found = True
+				break
+		self.assertTrue(found, "error message not found in: %s" % messageText)
 
 	def test_unicode_msg(self):
 		self.setupUser(True, True)
@@ -693,6 +699,8 @@ class SMSKeeperAsyncCase(SMSKeeperBaseCase):
 	def setupUser(self, activated, tutorialComplete, timezoneString):
 		SMSKeeperBaseCase.setupUser(self, activated, tutorialComplete)
 		self.user.timezone = timezoneString  # put the user in UTC by default, makes most tests easier
+		# make sure the user was activated before the time of day when tips go out
+		self.user.activated = self.user.activated.replace(hour=tips.SMSKEEPER_TIP_HOUR - 1)
 		self.user.save()
 
 	def testSendTipTimezones(self):

@@ -9,7 +9,7 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	if not tutorialState:
 		tutorialState = keeper_constants.STATE_TUTORIAL_REMIND
 
-	userToActivate.setActivated(tutorialState=tutorialState)
+	userToActivate.setActivated(True, tutorialState=tutorialState)
 
 	msgsToSend = list()
 

@@ -62,10 +62,12 @@ def isEligibleForTip(user):
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
 	if not user.last_tip_sent:
 		dt_activated = datetime.datetime.now(pytz.utc) - user.activated  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
+		# print "user.activated %s dt_activated: %s" % (user.activated, dt_activated)
 		if dt_activated.total_seconds() >= tip_frequency_seconds:
 			return True
 	else:
 		dt_tip_sent = datetime.datetime.now(pytz.utc) - user.last_tip_sent  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
+		# print "dt_activated: %s" % dt_tip_sent
 		if dt_tip_sent.total_seconds() >= tip_frequency_seconds:
 			return True
 	return False

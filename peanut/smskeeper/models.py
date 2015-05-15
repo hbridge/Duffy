@@ -142,14 +142,15 @@ class User(models.Model):
 
 	# Used only by user_util
 	# Meant to double check data
-	def setActivated(self, activatedDate=datetime.datetime.now(pytz.utc), tutorialState=keeper_constants.STATE_TUTORIAL_REMIND):
-		self.activated = activatedDate
-		if activatedDate:
+	def setActivated(self, isActivated, customActivatedDate=None, tutorialState=keeper_constants.STATE_TUTORIAL_REMIND):
+		if isActivated:
+			self.activated = customActivatedDate if customActivatedDate is not None else datetime.datetime.now(pytz.utc)
 			if self.isTutorialComplete():
 				self.setState(keeper_constants.STATE_NORMAL)
 			else:
 				self.setState(tutorialState)
 		else:
+			self.activated = None
 			self.setState(keeper_constants.STATE_NOT_ACTIVATED)
 		self.save()
 
