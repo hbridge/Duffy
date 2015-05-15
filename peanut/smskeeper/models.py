@@ -37,7 +37,7 @@ class User(models.Model):
 	sent_tips = models.TextField(null=True, db_index=False)
 	disable_tips = models.BooleanField(default=False)
 
-	tip_frequency_days = models.IntegerField(default=3)
+	tip_frequency_days = models.IntegerField(default=keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
 	last_tip_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)

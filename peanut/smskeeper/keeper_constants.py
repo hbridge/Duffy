@@ -42,3 +42,4 @@ INTRO_MESSAGES = [
 UNKNOWN_COMMAND_PHRASES = [u"Sorry, I'm not sure what you mean \U0001F633\nIf you're trying to add something, try using a hashtag. To notify my minions, type 'report' now."]
 REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
+DEFAULT_TIP_FREQUENCY_DAYS = 3

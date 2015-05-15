@@ -65,22 +65,6 @@ def processAllReminders():
 			processReminder(entry.id)
 
 
-def shouldSendUserTip(user):
-	if not user.completed_tutorial:
-		return False
-	if user.disable_tips or user.tip_frequency_days == 0:
-		return False
-	if not user.last_tip_sent:
-		return True
-	else:
-		# must use datetime.datetime.now and not utcnow as the test mocks datetime.now
-		dt = datetime.datetime.now(pytz.utc) - user.last_tip_sent
-		tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
-		if dt.total_seconds() >= tip_frequency_seconds:
-			return True
-	return False
-
-
 @app.task
 def sendTips(keeperNumber=None):
 	if not keeperNumber:
@@ -88,18 +72,10 @@ def sendTips(keeperNumber=None):
 
 	users = User.objects.all()
 	for user in users:
-		if shouldSendUserTip(user):
-			sentTips = list()
-			if user.sent_tips:
-				sentTips = user.sent_tips.split(",")
-			for tip in tips.SMSKEEPER_TIPS:
-				if tip["identifier"] not in sentTips:
-					sendMsg(user.id, tips.renderTip(tip, user.name), None, keeperNumber)
-					sentTips.append(tip["identifier"])
-					user.sent_tips = ",".join(sentTips)
-					user.last_tip_sent = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-					user.save()
-					break
+		tip = tips.selectNextTip(user)
+		if tip:
+			sendMsg(user.id, tip.render(user.name), None, keeperNumber)
+			tips.markTipSent(user, tip)
 
 
 def str_now_1():

@@ -651,6 +651,10 @@ class SMSKeeperSharingCase(TestCase):
 from smskeeper import async
 from smskeeper import tips
 
+def setMockDatetimeDaysAhead(mock, days):
+	mock.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta(days)
+	mock.date.side_effect = lambda *args, **kw: datetime.date(*args, **kw)
+	mock.datetime.side_effect = lambda *args, **kw: datetime.datetime(*args, **kw)
 
 class SMSKeeperAsyncCase(TestCase):
 	testPhoneNumber = "+16505555550"
@@ -675,32 +679,46 @@ class SMSKeeperAsyncCase(TestCase):
 
 	def testSendTips(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.async.recordOutput') as mock:
-			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
 
-		# set datetime to return a full day ahead after each call
-		with Replacer() as r:
-			r.replace('smskeeper.async.datetime.datetime', test_datetime(2020, 01, 01))
-			# check that tip 2 got sent out
+		# set datetime to return a future date
+
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
-				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
-			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
+				self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
+
+			# ensure tip 2 gets sent out
+			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2)
+			with patch('smskeeper.async.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertIn(tips.SMSKEEPER_TIPS[1].render(self.user.name), getOutput(mock))
 
 	def testTipThrottling(self):
 		self.setupUser(True, True)
-		async.sendTips(constants.SMSKEEPER_TEST_NUM)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		# send a tip
+		with patch('smskeeper.tips.datetime') as mock_datetime:
+			mock_datetime.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta(keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
+
+			mock_datetime.datetime.now.return_value = datetime.datetime.now(pytz.utc) + datetime.timedelta((keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2) - 1)
+			with patch('smskeeper.async.recordOutput') as mock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				self.assertNotIn(tips.SMSKEEPER_TIPS[1].render(self.user.name), getOutput(mock))
 
 	def testTipsSkipIneligibleUsers(self):
+		# inactive users don't get tips
 		self.setupUser(True, False)
 		with patch('smskeeper.async.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
+			self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
+
+		self.setupUser(True, True)
+		# user just activated don't send tip
+		with patch('smskeeper.async.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
 
 	def testSetTipFrequency(self):
 		self.setupUser(True, True)
@@ -710,23 +728,50 @@ class SMSKeeperAsyncCase(TestCase):
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.tip_frequency_days, 30, "%s \n user.tip_frequency_days: %d" % (getOutput(mock), self.user.tip_frequency_days))
 
-		# make sure we send tips now
-		with patch('smskeeper.async.recordOutput') as mock:
-			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[0], self.user.name), getOutput(mock))
-
-		with Replacer() as r:
-			weekAhead = datetime.datetime.now() + datetime.timedelta(7)
-			r.replace('smskeeper.async.datetime.datetime', test_datetime(weekAhead.year, weekAhead.month, weekAhead.day))
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			setMockDatetimeDaysAhead(datetime_mock, 7)
 			# make sure we don't send them in 7 days
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
-				self.assertNotIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
+				self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
 
 			# make sure we do send them in 31 days
-			monthAhead = datetime.datetime.now() + datetime.timedelta(32)
-			r.replace('smskeeper.async.datetime.datetime', test_datetime(monthAhead.year, monthAhead.month, monthAhead.day))
+			setMockDatetimeDaysAhead(datetime_mock, 31)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
-				self.assertIn(tips.renderTip(tips.SMSKEEPER_TIPS[1], self.user.name), getOutput(mock))
-			r.replace('smskeeper.async.datetime.datetime', datetime.datetime)
+				self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
+
+	def testReminderTipRelevance(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput'):
+			cliMsg.msg(self.testPhoneNumber, "#reminder test tomorrow")  # set a reminder
+			self.assertTipIdNotSent(tips.REMINDER_TIP_ID)
+
+	def testPhotoTipRelevance(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
+			moveMediaMock.side_effect = mock_return_input
+			with patch('smskeeper.async.recordOutput'):
+				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")  # add a photo
+				self.assertTipIdNotSent(tips.PHOTOS_TIP_ID)
+
+		with patch('smskeeper.async.recordOutput'):
+			cliMsg.msg(self.testPhoneNumber, "#reminder test tomorrow")  # set a reminder
+			self.assertTipIdNotSent(tips.REMINDER_TIP_ID)
+
+	def testReminderTipRelevance(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput'):
+			cliMsg.msg(self.testPhoneNumber, "foo #bar @baz")  # share something
+			cliMsg.msg(self.testPhoneNumber, "9175551234")  # share something
+			self.assertTipIdNotSent(tips.SHARING_TIP_ID)
+
+	def assertTipIdNotSent(self, tipId):
+		for i, tip in enumerate(tips.SMSKEEPER_TIPS):
+			with patch('smskeeper.tips.datetime') as datetime_mock:
+				setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * (i + 1))
+				tip = tips.selectNextTip(self.user)
+				if tip:
+					self.assertNotEqual(tip.id, tipId)
+					tips.markTipSent(self.user, tip)
