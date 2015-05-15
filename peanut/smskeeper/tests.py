@@ -57,7 +57,7 @@ class SMSKeeperCase(TestCase):
 	def test_first_connect(self):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
-			self.assertIn("magic phrase", getOutput(mock))
+			self.assertIn("I'll be in touch", getOutput(mock))
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
@@ -65,7 +65,7 @@ class SMSKeeperCase(TestCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
-			self.assertIn("Nope.", getOutput(mock))
+			self.assertIn("", getOutput(mock))
 
 	def test_magicphrase(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
