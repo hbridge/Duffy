@@ -539,7 +539,7 @@ class SMSKeeperNattyCase(SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "clear #reminders")
 
-		cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 23 at 8pm tonight")
+		cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 23 at 8pm tomorrow")
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 		self.assertEqual(entry.remind_timestamp.hour, 0)  # 8pm Eastern in UTC
 
