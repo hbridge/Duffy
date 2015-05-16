@@ -251,22 +251,22 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'celery': {
-            'handlers': ['celery', 'mail_admins', 'slackerror'],
+            'handlers': ['celery', 'djangoerror', 'mail_admins', 'slackerror'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'smskeeper': {
-            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
+            'handlers': ['duffyfile', 'djangoerror', 'mail_admins', 'slackerror'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'common': {
-            'handlers': ['duffyfile', 'mail_admins', 'slackerror'],
+            'handlers': ['duffyfile', 'djangoerror', 'mail_admins', 'slackerror'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'smskeeper.async': {
-            'handlers': ['celery'],
+            'handlers': ['celery', 'djangoerror'],
             'propagate': True,
             'level': 'DEBUG',
         },

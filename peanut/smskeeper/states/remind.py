@@ -99,6 +99,10 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 		entries, notFoundHandles = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
 		entry = entries[0]
 
+	hourForUser = startDate.astimezone(user.getTimezone()).hour
+	if (hourForUser >= 0 and hourForUser <= 6):
+		logger.error("Scheduling an alert for %s am local time for user %s, might want to check entry id %s" % (hourForUser, user.id, entry.id))
+
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
 	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
 	# Have to pass in cleanDate since humanize doesn't use utcnow.  To set to utc then kill the tz
