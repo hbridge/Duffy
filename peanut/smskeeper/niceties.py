@@ -23,11 +23,11 @@ class Nicety():
 
 
 SMSKEEPER_NICETIES = [
-	Nicety("hi|hello|hey", ["Hi there."]),
+	Nicety("hi$|hello|hey", ["Hi there."]),
 	Nicety("thanks|thank you|many thanks|thanks keeper|thank you keeper|great thanks", ["You're welcome."]),
 	Nicety("no thanks|not now", None),
-	Nicety("yes|no|y|n", None),
-	Nicety("cool|ok|great", None),
+	Nicety("yes$|no$|y$|n$", None),
+	Nicety("cool$|ok$|great$", None),
 ]
 
 
