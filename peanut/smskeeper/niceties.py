@@ -30,7 +30,7 @@ SMSKEEPER_NICETIES = [
 	),
 	Nicety("no thanks|not now|maybe later", None),
 	Nicety("yes$|no$|y$|n$", None),
-	Nicety("cool$|ok$|great$", None),
+	Nicety("cool$|ok$|great$|k$|sweet$", None),
 	Nicety(
 		"how are you( today)?|how're you|hows it going",
 		["I'm good, thanks for asking!", "Can't complain!"]
@@ -54,6 +54,10 @@ SMSKEEPER_NICETIES = [
 	Nicety(
 		"hows the weather|whats the weather",
 		[u"It's always sunny in cyberspace \U0001F31E"]
+	),
+	Nicety(
+		"I(m| am) sorry|apologies|I apologize|sry",
+		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
 ]
 
