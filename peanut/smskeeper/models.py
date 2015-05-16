@@ -117,7 +117,7 @@ class User(models.Model):
 			if self.timezone == "PST":
 				return pytz.timezone('US/Pacific')
 			elif self.timezone == "EST":
-				return pytz.timezone('US/Pacific')
+				return pytz.timezone('US/Eastern')
 			elif self.timezone == "CST":
 				return pytz.timezone('US/Central')
 			elif self.timezone == "MST":
