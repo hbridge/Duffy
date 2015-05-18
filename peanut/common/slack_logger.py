@@ -79,7 +79,7 @@ def postMessage(message):
             params['icon_emoji'] = ':rabbit:'
 
         params['username'] = userName
-        params['text'] = text
+        params['text'] = text + " | <http://prod.strand.duffyapp.com/smskeeper/history?user_id=" + str(message.user.id) + "|history>"
         params['channel'] = channel
 
         requests.post(url, data=json.dumps(params))
