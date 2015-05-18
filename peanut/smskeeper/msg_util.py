@@ -3,6 +3,7 @@ import phonenumbers
 import logging
 import unicodedata
 import sys
+import datetime
 
 from models import Entry
 
@@ -217,3 +218,51 @@ def getMessagePiecesWithMedia(msg, requestDict):
 		mediaUrlTypes[url] = urlType
 
 	return (' '.join(nonLabels), label, handleList, mediaUrlList, mediaUrlTypes)
+
+
+# Creates basic time string like:
+#  9am
+#  10:15pm
+# This would be great to find a library to do
+def getNaturalTime(time):
+	after = before = ""
+	if time.hour < 12:
+		after = "am"
+	else:
+		after = "pm"
+
+	if time.hour == 0:
+		hourStr = "12"
+	elif time.hour < 13:
+		hourStr = str(time.hour)
+	else:
+		hourStr = str(time.hour - 12)
+
+	if time.minute == 0:
+		before = "%s" % hourStr
+	else:
+		before = "%s:%s" % (hourStr, time.strftime("%M"))
+
+	return before + after
+
+
+# Creates basic naturalized relative future time like:
+# tomorrow at 4:15pm
+# next Wed at 3pm
+# This would be great to find a library to do
+def naturalize(now, futureTime):
+	delta = futureTime - now
+	deltaHours = delta.seconds / 3600
+
+	# If the same day, then say "today at 5pm"
+	if deltaHours < 24 and futureTime.day == now.day:
+		return "today at %s" % getNaturalTime(futureTime)
+	# Tomorrow
+	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
+		return "tomorrow at %s" % getNaturalTime(futureTime)
+	elif delta.days < 6:
+		return "%s at %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
+	elif delta.days < 13:
+		return "next %s at %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
+
+	return "%s days from now" % delta.days

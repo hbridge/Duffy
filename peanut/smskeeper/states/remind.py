@@ -1,6 +1,5 @@
 import datetime
 import pytz
-import humanize
 import logging
 import re
 
@@ -106,9 +105,8 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
 	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
 	# Have to pass in cleanDate since humanize doesn't use utcnow.  To set to utc then kill the tz
-	startDate = startDate.astimezone(pytz.utc)
-	startDate = startDate.replace(tzinfo=None)
-	userMsg = humanize.naturaltime(startDate + datetime.timedelta(seconds=5))
+	startDate = startDate.astimezone(user.getTimezone())
+	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), startDate)
 
 	entry.remind_timestamp = startDate
 	entry.keeper_number = keeperNumber

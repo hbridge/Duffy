@@ -16,7 +16,7 @@ from smskeeper import tips
 
 from common import natty_util
 
-from smskeeper import sms_util, user_util
+from smskeeper import sms_util
 
 
 def getOutput(mock):
@@ -28,9 +28,7 @@ def getOutput(mock):
 	return output
 
 
-'''
-Set this on a mock's side_effect and it will return the same args that were inputted for any function
-'''
+# Set this on a mock's side_effect and it will return the same args that were inputted for any function
 def mock_return_input(*args):
 	return args[1:]
 
@@ -66,6 +64,11 @@ class SMSKeeperBaseCase(TestCase):
 
 	def getTestUser(self):
 		return User.objects.get(id=self.user.id)
+
+	def getUserNow(self):
+		now = datetime.datetime.now(pytz.utc)
+		# This could be sped up with caching
+		return now.astimezone(self.getTestUser().getTimezone())
 
 
 class SMSKeeperMainCase(SMSKeeperBaseCase):
@@ -128,7 +131,6 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			self.assertIn("spinach", output)
 			self.assertIn("bread", output)
 
-
 	def test_tutorial_list(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
@@ -167,7 +169,8 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
-			self.assertIn("a day from now", getOutput(mock))
+			correctString = msg_util.naturalize(self.getUserNow(), self.getUserNow() + datetime.timedelta(days=1))
+			self.assertIn(correctString, getOutput(mock))
 			self.assertIn("I can also help you with other things", getOutput(mock))
 
 	def test_tutorial_remind_no_time_given(self):
@@ -178,13 +181,17 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
+			with patch('smskeeper.states.remind.datetime') as datetimeMock:
+				# We set the time to be 10 am so we can check the default time later.
+				# But need to set early otherwise default could be tomorrow
+				datetimeMock.datetime.now.return_value = self.getUserNow().replace(hour=10)
+				cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
-			# Since there was no time given, should have picked a time in the near future
-			self.assertIn("hours from now", getOutput(mock))
+				# Since there was no time given, should have picked a time in the near future
+				self.assertIn("today at 6pm", getOutput(mock))
 
-			# This is the key here, make sure we have the extra message
-			self.assertIn("In the future, you can", getOutput(mock))
+				# This is the key here, make sure we have the extra message
+				self.assertIn("In the future, you can", getOutput(mock))
 
 	def test_tutorial_remind_time_zones(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
@@ -197,7 +204,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future
-			self.assertIn("hours from now", getOutput(mock))
+			self.assertIn("today", getOutput(mock))
 
 			# This is the key here, make sure we have the extra message
 			self.assertIn("In the future, you can", getOutput(mock))
@@ -327,7 +334,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop tmr")
-			self.assertIn("a day from now", getOutput(mock))
+			self.assertIn("tomorrow", getOutput(mock))
 
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
@@ -336,7 +343,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind me to poop tmr")
 			self.assertNotIn("remind me to", getOutput(mock))
-			self.assertIn("a day from now", getOutput(mock))
+			self.assertIn("tomorrow", getOutput(mock))
 
 		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
 
@@ -355,7 +362,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tomorrow")
-			self.assertIn("a day from now", getOutput(mock))
+			self.assertIn("tomorrow", getOutput(mock))
 
 	def test_reminders_two_in_row(self):
 		self.setupUser(True, True)
@@ -386,7 +393,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 				with patch('smskeeper.async.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 6 pm, so 9 hours
-					self.assertIn("9 hours", getOutput(mock))
+					self.assertIn("today at 6pm", getOutput(mock))
 
 				# Try with 3 pm EST
 				testDt = test_datetime(2020, 01, 01, 15, 0, 0, tzinfo=tz)
@@ -395,7 +402,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 				with patch('smskeeper.async.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 9 pm, so 6 hours
-					self.assertIn("6 hours", getOutput(mock))
+					self.assertIn("today at 9pm", getOutput(mock))
 
 				# Try with 10 pm EST
 				testDt = test_datetime(2020, 01, 01, 22, 0, 0, tzinfo=tz)
@@ -404,7 +411,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 				with patch('smskeeper.async.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "#remind poop")
 					# Should be 9 am next day, so in 11 hours
-					self.assertIn("11 hours", getOutput(mock))
+					self.assertIn("tomorrow at 9am", getOutput(mock))
 
 			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
@@ -416,6 +423,48 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 
 		self.assertIn("poop, then poop again", entry.text)
+
+	def test_naturalize(self):
+		# Sunday, May 31 at 8 am
+		now = datetime.datetime(2015, 05, 31, 8, 0, 0)
+
+		# Later today
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 9, 0, 0))
+		self.assertIn("today at 9am", ret)
+
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 0, 0))
+		self.assertIn("today at 3pm", ret)
+
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 5, 0))
+		self.assertIn("today at 3:05pm", ret)
+
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 45, 0))
+		self.assertIn("today at 3:45pm", ret)
+
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 23, 45, 0))
+		self.assertIn("today at 11:45pm", ret)
+
+		# Tomorrow
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 1, 2, 0, 0))
+		self.assertIn("tomorrow at 2am", ret)
+
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 1, 15, 0, 0))
+		self.assertIn("tomorrow at 3pm", ret)
+
+		# Day of week (this week)
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 2, 15, 0, 0))
+		self.assertIn("Tue at 3pm", ret)
+
+		# date of week (next week)
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 7, 15, 0, 0))
+		self.assertIn("next Sun at 3pm", ret)
+
+		# far out
+		with patch('humanize.time._now') as mocked:
+			mocked.return_value = now
+
+			ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 14, 15, 0, 0))
+			self.assertIn("14 days from now", ret)
 
 	def test_exception_error_message(self):
 		self.setupUser(True, True)
@@ -475,22 +524,19 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 	def testSetNameFirstTimeEasy(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Foo Bar")
+		cliMsg.msg(self.testPhoneNumber, "Foo Bar")
 		self.user = User.objects.get(id=self.user.id)
 		self.assertEqual(self.user.name, "Foo Bar")
 
 	def testSetNameFirstTimePhrase(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "My name is Foo Bar")
+		cliMsg.msg(self.testPhoneNumber, "My name is Foo Bar")
 		self.user = User.objects.get(id=self.user.id)
 		self.assertEqual(self.user.name, "Foo Bar")
 
 	def testSetNameLater(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "My name is Foo Bar")
+		cliMsg.msg(self.testPhoneNumber, "My name is Foo Bar")
 		self.user = User.objects.get(id=self.user.id)
 		self.assertEqual(self.user.name, "Foo Bar")
 
@@ -532,23 +578,32 @@ class SMSKeeperNattyCase(SMSKeeperBaseCase):
 	def test_natty_two_times_by_words(self):
 		self.setupUser(True, True)
 
+		inTwoHours = self.getUserNow() + datetime.timedelta(hours=2)
+
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tues morning in two hours")
-			self.assertIn("2 hours from now", getOutput(mock))
+			correctString = msg_util.naturalize(self.getUserNow(), inTwoHours)
+			self.assertIn(correctString, getOutput(mock))
 
 	def test_natty_two_times_by_number(self):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
+			inFourHours = self.getUserNow() + datetime.timedelta(hours=4)
+
 			cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 2 in 4 hours")
-			self.assertIn("4 hours from now", getOutput(mock))
+			correctString = msg_util.naturalize(self.getUserNow(), inFourHours)
+			self.assertIn(correctString, getOutput(mock))
 
 			entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 			self.assertIn("change archie grade to 2", entry.text)
 
 		with patch('smskeeper.async.recordOutput') as mock:
+			inFiveHours = self.getUserNow() + datetime.timedelta(hours=5)
+
 			cliMsg.msg(self.testPhoneNumber, "#remind change bobby grade to 10 in 5 hours")
-			self.assertIn("5 hours from now", getOutput(mock))
+			correctString = msg_util.naturalize(self.getUserNow(), inFiveHours)
+			self.assertIn(correctString, getOutput(mock))
 
 			entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[1]
 			self.assertIn("change bobby grade to 10", entry.text)
