@@ -109,7 +109,7 @@ var UserRow = React.createClass({
         <td className="cell"> { tutorial_text }</td>
         <td className="cell"> { this.props.user.message_stats.incoming.count }/{ this.props.user.message_stats.outgoing.count }</td>
         <td className="cell"> { timeago_text } </td>
-        <td className="cell"> <a target=_blank href={ this.props.user.history }>history</a></td>
+        <td className="cell"> <a target="_blank" href={ this.props.user.history }>history</a></td>
       </tr>
     );
   },
