@@ -47,12 +47,12 @@ def isPickCommand(msg):
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower() == 'pick'))
 
 freeform_fetch_res = [
-	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?"),
-	re.compile("#?(?P<label>[\S]+) list")
+	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
+	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 
 def labelInFreeformFetch(msg):
-	cleaned = msg.strip().lower()
+	cleaned = msg.strip()
 	for regex in freeform_fetch_res:
 		match = regex.match(cleaned)
 		if match:
@@ -102,7 +102,7 @@ def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
-freeform_add_re = re.compile("add (?P<item>[\S]+) to( my)? #?(?P<label>[\S]+)( list)?")
+freeform_add_re = re.compile("add (?P<item>[\S]+) to( my)? #?(?P<label>[\S]+)( list)?", re.I)
 def isAddCommand(msg):
 	if hasLabel(msg) and not isLabel(msg):
 		return True

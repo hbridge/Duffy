@@ -107,10 +107,10 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "add milk to groceries")
-			cliMsg.msg(self.testPhoneNumber, "groceries")
+			cliMsg.msg(self.testPhoneNumber, "Add milk to groceries")
+			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertIn("milk", getOutput(mock))
-			cliMsg.msg(self.testPhoneNumber, "add spinach to my groceries list")
+			cliMsg.msg(self.testPhoneNumber, "Add spinach to my groceries list")
 			cliMsg.msg(self.testPhoneNumber, "what's on my groceries list?")
 			self.assertIn("spinach", getOutput(mock))
 			cliMsg.msg(self.testPhoneNumber, "add tofu to groceries")
