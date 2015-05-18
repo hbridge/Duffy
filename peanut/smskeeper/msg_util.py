@@ -70,7 +70,8 @@ def isDeleteCommand(msg):
 	return delete_re.match(msg.lower()) is not None
 
 def isHelpCommand(msg):
-	return msg.strip().lower() == 'huh?'
+	cleaned = cleanMsgText(msg)
+	return re.match('huh$|what$|how do you work|what (can|do) you do', cleaned) is not None or msg == "?"
 
 
 def isPrintHashtagsCommand(msg):
