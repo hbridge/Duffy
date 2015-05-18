@@ -33,7 +33,7 @@ def process(user, msg, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'pasta #shopping'.", None, keeperNumber)
 		else:
 			# They sent in something with a label, have them add to it
-			actions.add(user, msg, requestDict, keeperNumber, False)
+			actions.add(user, msg, requestDict, keeperNumber, False, True)
 			sms_util.sendMsg(user, "Now let's add other items to your list. Don't forget to add your hashtag again. '%s'" % msg_util.getLabel(msg), None, keeperNumber)
 			user.state_data = stateData + 1
 	elif stateData == 2:
@@ -45,7 +45,7 @@ def process(user, msg, requestDict, keeperNumber):
 				return True
 			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'visit atm %s'." % existingLabel, None, keeperNumber)
 		else:
-			actions.add(user, msg, requestDict, keeperNumber, False)
+			actions.add(user, msg, requestDict, keeperNumber, False, True)
 			sms_util.sendMsg(user, "Got it. You can send items to this hashtag anytime (including photos). To see your items, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
 			user.state_data = stateData + 1
 	elif stateData == 3:

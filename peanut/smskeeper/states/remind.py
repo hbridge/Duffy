@@ -96,7 +96,7 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
 	if not entry:
-		entries, notFoundHandles = actions.add(user, msgWithLabel, requestDict, keeperNumber, False)
+		entries, notFoundHandles = actions.add(user, msgWithLabel, requestDict, keeperNumber, False, False)
 		entry = entries[0]
 
 	hourForUser = startDate.astimezone(user.getTimezone()).hour

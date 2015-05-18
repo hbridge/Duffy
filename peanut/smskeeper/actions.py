@@ -38,7 +38,7 @@ def shareEntries(user, entries, handles, keeperNumber):
 	return sharedHandles, notFoundHandles
 
 
-def add(user, msg, requestDict, keeperNumber, sendResponse):
+def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 	text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
 	autoLabels = set()
 
@@ -49,13 +49,17 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 	createdEntries = list()
 
 	# Text comes back without label but still has commas. Split on those here
-	for entryText in text.split(','):
-		entryText = entryText.strip()
-		if len(entryText) > 0:
-			if label is None:
-				raise NameError("Cannot add text without a label")
-			entry = Entry.createEntry(user, keeperNumber, label, entryText)
-			createdEntries.append(entry)
+	if parseCommas:
+		for entryText in text.split(','):
+			entryText = entryText.strip()
+			if len(entryText) > 0:
+				if label is None:
+					raise NameError("Cannot add text without a label")
+				entry = Entry.createEntry(user, keeperNumber, label, entryText)
+				createdEntries.append(entry)
+	else:
+		entry = Entry.createEntry(user, keeperNumber, label, text)
+		createdEntries.append(entry)
 
 	for i, entryMediaUrl in enumerate(originalMedia):
 		entry_label = label

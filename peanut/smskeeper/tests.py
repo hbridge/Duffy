@@ -397,6 +397,15 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
+	def test_reminders_commas(self):
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me to poop, then poop again")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		self.assertIn("poop, then poop again", entry.text)
+
 	def test_exception_error_message(self):
 		self.setupUser(True, True)
 		with self.assertRaises(NameError):

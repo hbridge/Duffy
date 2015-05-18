@@ -157,7 +157,7 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 		firstListItem = True
 	else:
 		firstListItem = False
-	entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)
+	entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True, True)
 
 	if firstListItem:
 		text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
