@@ -133,11 +133,21 @@ var DashboardApp = React.createClass({
 	},
 
 	render: function() {
+    var countActivated = function(users) {
+      result = 0;
+      for (i=0; i<users.length; i++) {
+        if (users[i].activated) {
+          result++;
+        }
+      }
+      return result
+    }.bind(this);
+    
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />
-        <UserTable users={ this.state.users } showActivated={ true } title={ "Activated" }/>
-        <UserTable users={ this.state.users } showActivated={ false } title={ "Not activated"}/>
+        <UserTable users={ this.state.users } showActivated={ true } title={"Activated (" + countActivated(this.state.users) + ")"}/>
+        <UserTable users={ this.state.users } showActivated={ false } title={ "Not activated (" + (this.state.users.length - countActivated(this.state.users)) + ")"}/>
       </div>
 		);
 	},
