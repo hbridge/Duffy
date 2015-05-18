@@ -599,6 +599,14 @@ class SMSKeeperNattyCase(SMSKeeperBaseCase):
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 		self.assertEqual(entry.remind_timestamp.hour, 0)  # 8pm Eastern in UTC
 
+	def testPausedState(self):
+		self.setupUser(True, True, keeper_constants.STATE_PAUSED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#reminders")
+			output = getOutput(mock)
+			self.assertIs(u'', output)
+
 
 def removeNonAscii(mystr):
 	return filter(lambda x: x in string.printable, mystr)

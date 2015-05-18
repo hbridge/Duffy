@@ -17,6 +17,7 @@ STATE_DELETE = 'delete'
 STATE_ADD = 'add'
 STATE_UNRESOLVED_HANDLES = 'unresolved-handles'
 STATE_UNKNOWN_COMMAND = 'unknown-command'
+STATE_PAUSED = 'paused'
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
 PHOTO_LABEL = '#photo'
