@@ -230,3 +230,12 @@ def help(user, msg, keeperNumber):
 
 def tellMeMore(user, msg, keeperNumber):
 	sms_util.sendMsg(user, "I can help you create lists. Just send me anything with a hashtag. Like 'Jurassic Park #movies' or 'pasta, sauce, cheese #shopping'.", None, keeperNumber)
+
+def setName(user, msg, keeperNumber):
+	name = msg_util.nameInSetName(msg)
+	if name and name != "":
+		user.name = name
+		user.save()
+		sms_util.sendMsg(user, "Great, I'll call you %s from now on." % name, None, keeperNumber)
+	else:
+		sms_util.sendMsg(user, "Sorry, I didn't catch that, try saying something like 'My name is Keeper'" % name, None, keeperNumber)

@@ -4,6 +4,7 @@ import logging
 
 from smskeeper import sms_util
 from smskeeper import keeper_constants
+from smskeeper import msg_util
 
 # Might need to get ride of this at some point due to circular dependencies
 # Its only using a few constants, easily moved
@@ -19,7 +20,11 @@ def process(user, msg, requestDict, keeperNumber):
 		step = int(step)
 
 	if not step:
-		user.name = msg
+		nameFromPhrase = msg_util.nameInSetName(msg)
+		if nameFromPhrase:
+			user.name = nameFromPhrase
+		else:
+			user.name = msg
 		user.save()
 		sms_util.sendMsgs(user, ["Great, nice to meet you %s!" % user.name, "What's your zipcode? (This will help me remind you of things at the right time)"], keeperNumber)
 		user.setStateData("step", 1)

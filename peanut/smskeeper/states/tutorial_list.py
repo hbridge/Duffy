@@ -1,11 +1,9 @@
 import time
 
 from smskeeper import sms_util, msg_util
-from smskeeper import keeper_constants
 from smskeeper import actions
 
 from smskeeper.models import Entry
-from smskeeper.states import remind
 
 
 def sendContactCard(user, keeperNumber):
@@ -19,7 +17,11 @@ def process(user, msg, requestDict, keeperNumber):
 		stateData = int(user.state_data)
 
 	if not stateData:
-		user.name = msg
+		nameFromPhrase = msg_util.nameInSetName(msg)
+		if nameFromPhrase:
+			user.name = nameFromPhrase
+		else:
+			user.name = msg
 		user.save()
 		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
 		time.sleep(1)

@@ -160,6 +160,15 @@ def isCreateHandleCommand(msg):
 def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()
 
+set_name_re = re.compile("(my name('| i)s|I('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
+
+
+def nameInSetName(msg):
+	match = set_name_re.match(msg.strip())
+	if match:
+		return match.group('name')
+	return None
+
 
 # Returns back (textWithoutLabel, label, listOfHandles)
 def getMessagePieces(msg):

@@ -462,6 +462,27 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		# make sure the entry got created
 		Entry.objects.get(label=keeper_constants.SCREENSHOT_LABEL)
 
+	def testSetNameFirstTimeEasy(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Foo Bar")
+		self.user = User.objects.get(id=self.user.id)
+		self.assertEqual(self.user.name, "Foo Bar")
+
+	def testSetNameFirstTimePhrase(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "My name is Foo Bar")
+		self.user = User.objects.get(id=self.user.id)
+		self.assertEqual(self.user.name, "Foo Bar")
+
+	def testSetNameLater(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "My name is Foo Bar")
+		self.user = User.objects.get(id=self.user.id)
+		self.assertEqual(self.user.name, "Foo Bar")
+
 
 class SMSKeeperNattyCase(SMSKeeperBaseCase):
 

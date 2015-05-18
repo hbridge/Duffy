@@ -218,6 +218,8 @@ def process(user, msg, requestDict, keeperNumber):
 		# STATE_DELETE
 		elif msg_util.isDeleteCommand(msg):
 			dealWithDelete(user, msg, keeperNumber)
+		elif msg_util.nameInSetName(msg):
+			actions.setName(user, msg, keeperNumber)
 		elif msg_util.isAddCommand(msg) or numMedia > 0:
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
 		else:  # catch all, it's a nicety or an error
