@@ -21,7 +21,7 @@ def process(user, msg, requestDict, keeperNumber):
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
-			user.name = msg.trim()
+			user.name = msg.strip()
 		user.save()
 		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
 		time.sleep(1)

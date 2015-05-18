@@ -24,7 +24,7 @@ def process(user, msg, requestDict, keeperNumber):
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
-			user.name = msg.trim()
+			user.name = msg.strip()
 		user.save()
 		sms_util.sendMsgs(user, ["Great, nice to meet you %s!" % user.name, "What's your zipcode? (This will help me remind you of things at the right time)"], keeperNumber)
 		user.setStateData("step", 1)
