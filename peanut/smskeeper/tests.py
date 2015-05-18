@@ -94,7 +94,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tell me more")
-			self.assertIn("I can help you create lists", getOutput(mock))
+			self.assertIn(keeper_constants.TELL_ME_MORE, getOutput(mock))
 
 	def test_firstItemAdded(self):
 		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
