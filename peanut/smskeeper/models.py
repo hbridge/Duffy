@@ -239,7 +239,7 @@ class Entry(models.Model):
 	def fetchEntries(cls, user, label=None, hidden=False):
 		entries = Entry.objects.filter(users__in=[user], hidden=hidden).order_by("added")
 		if label:
-			entries = entries.filter(label=label)
+			entries = entries.filter(label__iexact=label)
 		return entries
 
 	@classmethod

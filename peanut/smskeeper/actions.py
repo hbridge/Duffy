@@ -90,7 +90,16 @@ def add(user, msg, requestDict, keeperNumber, sendResponse):
 
 def fetch(user, msg, keeperNumber):
 	# This is a label fetch.  See if a note with that label exists then return
-	label = msg
+	cleaned = msg.strip().lower()
+	if len(cleaned.split(" ")) == 1:
+		label = msg
+		if "#" not in label:
+			label = "#" + msg
+	else:
+		label = msg_util.labelInFreeformFetch(msg)
+	if label is None or label == "":
+		raise NameError("label is blank")
+
 	# We support many different remind commands, but every one actually does REMIND_LABEL
 	if msg_util.isRemindCommand(label):
 		label = keeper_constants.REMIND_LABEL

@@ -4,6 +4,8 @@ import logging
 import unicodedata
 import sys
 
+from models import Entry
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,9 +46,31 @@ def isPickCommand(msg):
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower() == 'pick'))
 
+freeform_fetch_res = [
+	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?"),
+	re.compile("#?(?P<label>[\S]+) list")
+]
 
-def isFetchCommand(msg):
-	return isLabel(msg)
+def labelInFreeformFetch(msg):
+	cleaned = msg.strip().lower()
+	for regex in freeform_fetch_res:
+		match = regex.match(cleaned)
+		if match:
+			return "#" + match.group("label")  # the DB stores labels with the #
+	return None
+
+def isFetchCommand(msg, user):
+	cleaned = msg.strip().lower()
+	if isLabel(cleaned):
+		return True
+	elif len(msg.split(" ")) == 1:
+		labels = Entry.fetchAllLabels(user)
+		if "#%s" % cleaned in labels:
+			return True
+	elif labelInFreeformFetch(msg):
+		return True
+
+	return False
 
 
 tipRE = re.compile('send me tips')
@@ -78,7 +102,7 @@ def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
-freeform_add_re = re.compile("add (?P<item>[\S]+) to (my)? #?(?P<label>[\S]+)( list)?")
+freeform_add_re = re.compile("add (?P<item>[\S]+) to( my)? #?(?P<label>[\S]+)( list)?")
 def isAddCommand(msg):
 	if hasLabel(msg) and not isLabel(msg):
 		return True

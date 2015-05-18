@@ -185,7 +185,7 @@ def process(user, msg, requestDict, keeperNumber):
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")
 		# STATE_REMIND
-		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg):
+		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg, user):
 			# TODO  Fix this state so the logic isn't so complex
 			user.setState(keeper_constants.STATE_REMIND)
 			user.save()
@@ -196,7 +196,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 			dealWithPrintHashtags(user, keeperNumber)
 		# STATE_NORMAL
-		elif msg_util.isFetchCommand(msg) and numMedia == 0:
+		elif msg_util.isFetchCommand(msg, user) and numMedia == 0:
 			actions.fetch(user, msg, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isClearCommand(msg) and numMedia == 0:
