@@ -78,9 +78,14 @@ def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
-
+freeform_add_re = re.compile("add (?P<item>[\S]+) to (my)? #?(?P<label>[\S]+)( list)?")
 def isAddCommand(msg):
-	return hasLabel(msg) and not isLabel(msg)
+	if hasLabel(msg) and not isLabel(msg):
+		return True
+	elif freeform_add_re.match(cleanMsgText(msg)):
+		return True
+
+	return False
 
 def isTellMeMore(msg):
 	cleaned = msg.strip().lower()
@@ -145,13 +150,21 @@ def getMessagePiecesWithMedia(msg, requestDict):
 	nonLabels = list()
 	handleList = list()
 	label = None
-	for word in msg.split(' '):
-		if isLabel(word):
-			label = word
-		elif isHandle(word):
-			handleList.append(word)
-		else:
-			nonLabels.append(word)
+
+	# first check whether it maches our freeform add
+	match = freeform_add_re.match(msg)
+	if match:
+		label = "#" + match.group('label')
+		nonLabels = match.group('item').split(" ")
+	else:
+		# otherwise pick out pieces
+		for word in msg.split(' '):
+			if isLabel(word):
+				label = word
+			elif isHandle(word):
+				handleList.append(word)
+			else:
+				nonLabels.append(word)
 
 	# process media
 	mediaUrlList = list()

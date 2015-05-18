@@ -151,6 +151,28 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "%s is now set to %s" % (handle, phoneNumber), None, keeperNumber)
 
 
+def dealWithAdd(user, msg, requestDict, keeperNumber):
+	# if this is the first time they have added a label other than reminders, tell them about fetching it
+	if (Entry.objects.filter(creator=user).exclude(label=keeper_constants.REMIND_LABEL).count() == 0):
+		firstListItem = True
+	else:
+		firstListItem = False
+	entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)
+
+	if firstListItem:
+		text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
+		sms_util.sendMsg(user, "Just type %s to get these back"%(label), None, keeperNumber)
+
+	if len(unresolvedHandles) > 0:
+		user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
+		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, map(lambda entry: entry.id, entries))
+		user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
+		user.save()
+		return False
+
+	return True
+
+
 #   Main logic for processing a message
 #   Pulled out so it can be called either from sms code or command line
 def process(user, msg, requestDict, keeperNumber):
@@ -196,41 +218,20 @@ def process(user, msg, requestDict, keeperNumber):
 		# STATE_DELETE
 		elif msg_util.isDeleteCommand(msg):
 			dealWithDelete(user, msg, keeperNumber)
-		else:  # treat this as an add command
-			# STATE_NORMAL
-			# STATE_ADD
-			if not msg_util.hasLabel(msg):
-				nicety = niceties.getNicety(msg)
-				if nicety:
-					response = nicety.getResponse()
-					if response:
-						sms_util.sendMsg(user, nicety.getResponse(), None, keeperNumber)
-					return True
+		elif msg_util.isAddCommand(msg) or numMedia > 0:
+			return dealWithAdd(user, msg, requestDict, keeperNumber)
+		else:  # catch all, it's a nicety or an error
+			nicety = niceties.getNicety(msg)
+			if nicety:
+				response = nicety.getResponse()
+				if response:
+					sms_util.sendMsg(user, nicety.getResponse(), None, keeperNumber)
 
-				# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
-				elif numMedia == 0:
-					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
-					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
-					user.save()
-					return True
-
-			# if this is the first time they have added a label other than reminders, tell them about fetching it
-			if (Entry.objects.filter(creator=user).exclude(label=keeper_constants.REMIND_LABEL).count() == 0):
-				firstListItem = True
+			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
-				firstListItem = False
-			entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True)
-
-			if firstListItem:
-				text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
-				sms_util.sendMsg(user, "Just type %s to get these back"%(label), None, keeperNumber)
-
-			if len(unresolvedHandles) > 0:
-				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
-				user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, map(lambda entry: entry.id, entries))
-				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
+				sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
+				user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
 				user.save()
-				return False
 
 		return True
 	except:

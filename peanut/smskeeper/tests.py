@@ -103,6 +103,14 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "#groceries milk")
 			self.assertIn("Just type #groceries", getOutput(mock))
 
+	def test_freeform_add(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "add milk to my groceries list")
+			cliMsg.msg(self.testPhoneNumber, "#groceries")
+			self.assertIn("milk", getOutput(mock))
+
 	def test_tutorial_list(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
