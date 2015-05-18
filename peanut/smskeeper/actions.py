@@ -229,7 +229,7 @@ def help(user, msg, keeperNumber):
 
 
 def tellMeMore(user, msg, keeperNumber):
-	sms_util.sendMsg(user, "I can help you create lists. Just send me anything with a hashtag. Like 'Jurassic Park #movies' or 'pasta, sauce, cheese #shopping'.", None, keeperNumber)
+	sms_util.sendMsg(user, "I can help you remember lists of things. Send me anything like 'add Jurassic Park to my movies list' or 'add pasta, sauce, cheese to shopping'.", None, keeperNumber)
 
 def setName(user, msg, keeperNumber):
 	name = msg_util.nameInSetName(msg)
