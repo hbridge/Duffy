@@ -49,7 +49,7 @@ def process(user, msg, requestDict, keeperNumber):
 	if user.getStateData("entryId"):
 		if isFollowup(startDate, msg):
 			entry = Entry.objects.get(id=int(user.getStateData("entryId")))
-			doRemindMessage(user, startDate, entry.text, False, entry, keeperNumber, requestDict)
+			doRemindMessage(user, startDate, msg, entry.text, False, entry, keeperNumber, requestDict)
 
 			user.setState(keeper_constants.STATE_NORMAL)
 			user.save()
@@ -67,7 +67,7 @@ def process(user, msg, requestDict, keeperNumber):
 			startDate = getDefaultTime(user)
 			sendFollowup = True
 
-		entry = doRemindMessage(user, startDate, newQuery, sendFollowup, None, keeperNumber, requestDict)
+		entry = doRemindMessage(user, startDate, msg, newQuery, sendFollowup, None, keeperNumber, requestDict)
 
 		# If we came from the tutorial, then set state and return False so we go back for reprocessing
 		if user.getStateData(FROM_TUTORIAL_KEY):
@@ -87,7 +87,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 
 #  Update or create the Entry for the reminder entry and send message to user
-def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, requestDict):
+def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumber, requestDict):
 	# if the user created this reminder as "remind me to", we should remove it from the text
 	match = re.match('remind me( to)?', query, re.I)
 	if match is not None:
@@ -112,6 +112,7 @@ def doRemindMessage(user, startDate, query, sendFollowup, entry, keeperNumber, r
 
 	entry.remind_timestamp = startDate
 	entry.keeper_number = keeperNumber
+	entry.orig_text = msg
 	entry.save()
 
 	toSend = "%s I'll remind you %s." % (helper_util.randomAcknowledgement(), userMsg)

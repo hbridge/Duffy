@@ -1,5 +1,6 @@
-from django.conf import settings
+import pytz
 
+from django.conf import settings
 from django.contrib import admin
 
 from smskeeper.models import User, Entry
@@ -28,3 +29,37 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Entry)
 class EntryAdmin(admin.ModelAdmin):
 	list_display = ('id', 'text', 'remind_timestamp', 'hidden')
+
+
+class Reminder(Entry):
+	class Meta:
+		proxy = True
+
+
+@admin.register(Reminder)
+class ReminderAdmin(admin.ModelAdmin):
+
+	def queryset(self, request):
+		qs = super(ReminderAdmin, self).queryset(request)
+		return qs.filter(remind_timestamp__isnull=False)
+
+	def added_tz_aware(self, obj):
+		return obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
+
+	def remind_timestamp_tz_aware(self, obj):
+		return obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+
+	def get_object(self, request, object_id):
+		obj = super(ReminderAdmin, self).get_object(request, object_id)
+		if obj is not None:
+			obj.remind_timestamp = obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+		return obj
+
+	def save_model(self, request, obj, form, chage):
+		# Time comes in as utc, so we need to convert back to user's timezone
+		tz = obj.creator.getTimezone()
+		obj.remind_timestamp = tz.localize(obj.remind_timestamp.replace(tzinfo=None))
+		obj.save()
+
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'hidden')
+	readonly_fields = ['added_tz_aware']

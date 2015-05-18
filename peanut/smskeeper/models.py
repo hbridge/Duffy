@@ -170,6 +170,8 @@ class User(models.Model):
 		self.save()
 
 	def __unicode__(self):
+		if self.name:
+			return str(self.id) + " - " + self.name
 		return str(self.id) + " - " + self.phone_number
 
 
@@ -205,7 +207,10 @@ class Entry(models.Model):
 	label = models.CharField(max_length=100, db_index=True)
 
 	text = models.TextField(null=True)
-	img_url = models.TextField(null=True)
+
+	# Used by reminders.  Text from the user, without the timing words removed
+	orig_text = models.TextField(null=True)
+	img_url = models.TextField(null=True, blank=True)
 
 	remind_timestamp = models.DateTimeField(null=True)
 
