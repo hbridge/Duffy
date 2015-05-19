@@ -6,6 +6,7 @@ import sys
 import datetime
 
 from models import Entry
+from smskeeper import keeper_constants
 
 logger = logging.getLogger(__name__)
 
@@ -72,12 +73,23 @@ def isFetchCommand(msg, user):
 		return True
 	elif labelInFreeformFetch(msg):
 		return True
+	elif isCommonListName(msg):
+		return True
 	else:
 		entries = Entry.fetchEntries(user, "#%s" % cleaned, hidden=None)
 		if entries.count() > 0:
 			return True
 
 	return False
+
+
+def isCommonListName(msg):
+	for reString in keeper_constants.COMMON_LIST_RES:
+		if re.match(reString, msg) is not None:
+			return True
+
+	return False
+
 
 
 tipRE = re.compile('send me tips')

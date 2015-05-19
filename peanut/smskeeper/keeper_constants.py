@@ -62,3 +62,17 @@ HELP_MESSAGES = [
 
 SLACK_CHANNEL_FEED = "#livesmskeeperfeed"
 SLACK_CHANNEL_MANUAL_ALERTS = "#manual-alerts"
+
+COMMON_LIST_RES = [
+	"grocer(y|ies)",
+	"movies?",
+	"books?",
+	"wines?",
+	"cocktails?",
+	"shopping",
+	"pharmacy",
+	"buy",
+	"errands",
+	"todo",
+	"(to)?read",
+]
