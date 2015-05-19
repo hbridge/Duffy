@@ -12,6 +12,8 @@ from smskeeper import niceties
 
 from common import slack_logger
 
+from peanut.settings import constants
+
 logger = logging.getLogger(__name__)
 
 
@@ -236,10 +238,11 @@ def process(user, msg, requestDict, keeperNumber):
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
 				now = datetime.datetime.now(pytz.timezone("US/Eastern"))
-				if now.hour >= 9 and now.hour <= 22:
+				if now.hour >= 9 and now.hour <= 22 and keeperNumber != constants.SMSKEEPER_TEST_NUM:
 					user.setState(keeper_constants.STATE_PAUSED)
 					user.save()
 					slack_logger.postManualAlert(user, msg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
+					logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
 					return True
 				else:
 					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
