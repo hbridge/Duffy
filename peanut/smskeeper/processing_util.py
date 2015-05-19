@@ -50,6 +50,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	# convert message to unicode
 	if type(msg) == str:
 		msg = msg.decode('utf-8')
+	msg = msg.strip()
 
 	processed = False
 	count = 0
