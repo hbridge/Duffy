@@ -28,6 +28,8 @@ from smskeeper import tips
 from smskeeper.models import Entry
 from smskeeper.models import Message
 from smskeeper.models import User
+from smskeeper import keeper_constants
+
 from strand import notifications_util
 from common import slack_logger
 
@@ -107,7 +109,7 @@ def sendMsg(userId, msgText, mediaUrls, keeperNumber):
 		else:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, None, keeperNumber)
 		logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
-		slack_logger.postMessage(msg)
+		slack_logger.postMessage(msg, keeper_constants.SLACK_CHANNEL_FEED)
 
 
 # This is used for testing, it gets mocked out

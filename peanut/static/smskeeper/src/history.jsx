@@ -3,6 +3,7 @@
 Note this file is only used in its raw form if ?development=True is passed in
 It should be compiled to js by running from the outer directory
 
+from static/smskeeper:
 jsx --watch --extension jsx src/ build/
 
 See: https://facebook.github.io/react/docs/tooling-integration.html for info on installing
@@ -173,7 +174,7 @@ var ResendMessageView = React.createClass({
 });
 
 var CommentForm = React.createClass({
-  handleSubmit: function(e) {
+  handlePostMsgSubmit: function(e) {
     e.preventDefault();
     var text = React.findDOMNode(this.refs.text).value.trim();
     if (!text) {
@@ -183,12 +184,23 @@ var CommentForm = React.createClass({
     React.findDOMNode(this.refs.text).value = '';
     return;
   },
+  handleTogglePause: function(e) {
+    e.preventDefault();
+    this.props.onTogglePaused({user_id: USER_ID});
+    return;
+  },
   render: function() {
+    var pausedText = this.props.paused ? "Unpause" : "Pause"
     return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
+      <span>
+      <form className="commentForm" onSubmit={this.handlePostMsgSubmit}>
         <input type="text" placeholder="Say something..." ref="text" className="commentBox"/>
         <input type="submit" value="Post" className="largeButton" />
       </form>
+      <form onSubmit={this.handleTogglePause}>
+        <input type="submit" value={pausedText} className="largeButton" />
+      </form>
+      </span>
     );
   }
 });
@@ -198,15 +210,19 @@ var KeeperApp = React.createClass({
     return {messages: [], selectedMessage: null };
   },
 
-  loadCommentsFromServer: function() {
+  processDataFromServer: function(data) {
+    console.log("Got data from the server:");
+    console.log(data);
+    this.setState({messages : data.messages, paused : data.paused});
+  },
+
+  loadDataFromServer: function() {
     $.ajax({
       url: "/smskeeper/message_feed?user_id=" + USER_ID,
       dataType: 'json',
       cache: false,
       success: function(data) {
-        console.log(data);
-        console.log(this);
-        this.setState({messages : data.messages});
+        this.processDataFromServer(data);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("message_feed", status, err.toString());
@@ -215,20 +231,35 @@ var KeeperApp = React.createClass({
   },
 
   componentDidMount: function() {
-    this.loadCommentsFromServer();
+    this.loadDataFromServer();
   },
 
-  handleCommentSubmit: function(comment) {
+  handleCommentSubmit: function(data) {
     $.ajax({
       url: "/smskeeper/send_sms",
       dataType: 'json',
       type: 'POST',
-      data: comment,
+      data: data,
       success: function(data) {
-        this.setState({messages: data.messages});
+        this.processDataFromServer(data);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("send_sms", status, err.toString());
+      }.bind(this)
+    });
+  },
+
+  handleTogglePause: function(data) {
+    $.ajax({
+      url: "/smskeeper/toggle_paused",
+      dataType: 'json',
+      type: 'POST',
+      data: data,
+      success: function(data) {
+        this.processDataFromServer(data);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("toggle_paused", status, err.toString());
       }.bind(this)
     });
   },
@@ -250,7 +281,7 @@ var KeeperApp = React.createClass({
   			<div id="messages">
   			   { this.state.messages.map(createItem) }
         </div>
-        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+        <CommentForm onCommentSubmit={this.handleCommentSubmit} onTogglePaused={this.handleTogglePause} paused={this.state.paused}/>
       </div>
 		);
 	},

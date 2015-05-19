@@ -59,3 +59,6 @@ HELP_MESSAGES = [
 	u"\U0001F4DD You can tell me to remember lists\nFor example 'add martini to my cocktails list'",
 	u"\U0001F514 You can tell me to remind you of something at a specific time\nFor example 'Remind me to call Mom tonight'",
 ]
+
+SLACK_CHANNEL_FEED = "#livesmskeeperfeed"
+SLACK_CHANNEL_MANUAL_ALERTS = "#manual-alerts"

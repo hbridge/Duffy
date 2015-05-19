@@ -21,7 +21,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from smskeeper import sms_util, processing_util
+from smskeeper import sms_util, processing_util, keeper_constants
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
 
@@ -126,6 +126,7 @@ def all_notes(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+
 @login_required(login_url='/admin/login/')
 def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
@@ -159,6 +160,15 @@ def getMessagesForUser(user):
 	return messages_dicts
 
 
+def getResponseForUser(user):
+	response = dict()
+	messages_dicts = getMessagesForUser(user)
+	response['messages'] = messages_dicts
+	response['paused'] = user.isPaused()
+
+	return response
+
+
 # External
 @login_required(login_url='/admin/login/')
 def message_feed(request):
@@ -166,8 +176,7 @@ def message_feed(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		messages_dicts = getMessagesForUser(user)
-		return HttpResponse(json.dumps({"messages": messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -192,8 +201,24 @@ def send_sms(request):
 
 		sms_util.sendMsg(user, msg, None, keeperNumber)
 
-		messages_dicts = getMessagesForUser(user)
-		return HttpResponse(json.dumps({"messages": messages_dicts}, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+@csrf_exempt
+def toggle_paused(request):
+	form = UserIdForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+
+		if user.isPaused():
+			user.setState(keeper_constants.STATE_NORMAL)
+		else:
+			user.setState(keeper_constants.STATE_PAUSED)
+		user.save()
+
+		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -229,6 +254,7 @@ def resend_msg(request):
 		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
 
 @login_required(login_url='/admin/login/')
 def dashboard_feed(request):
@@ -295,6 +321,7 @@ def dashboard_feed(request):
 	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats}, cls=DjangoJSONEncoder)
 	return HttpResponse(responseJson, content_type="text/json", status=200)
 
+
 def getNameFromContactsDB(phoneNumList):
 	contacts = ContactEntry.objects.values('name', 'phone_number').filter(phone_number__in=phoneNumList).distinct()
 
@@ -307,9 +334,11 @@ def getNameFromContactsDB(phoneNumList):
 			phoneToNameDict[contact['phone_number']].append(contact['name'])
 	return phoneToNameDict
 
+
 @login_required(login_url='/admin/login/')
 def dashboard(request):
 	return render(request, "dashboard.html", None)
+
 
 @jsonp
 def signup_from_website(request):

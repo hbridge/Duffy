@@ -169,6 +169,9 @@ class User(models.Model):
 			self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
 		self.save()
 
+	def isPaused(self):
+		return self.state == keeper_constants.STATE_PAUSED
+
 	def __unicode__(self):
 		if self.name:
 			return str(self.id) + " - " + self.name
