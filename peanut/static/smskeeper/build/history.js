@@ -3,6 +3,7 @@
 Note this file is only used in its raw form if ?development=True is passed in
 It should be compiled to js by running from the outer directory
 
+from static/smskeeper:
 jsx --watch --extension jsx src/ build/
 
 See: https://facebook.github.io/react/docs/tooling-integration.html for info on installing
@@ -173,7 +174,7 @@ var ResendMessageView = React.createClass({displayName: "ResendMessageView",
 });
 
 var CommentForm = React.createClass({displayName: "CommentForm",
-  handleSubmit: function(e) {
+  handlePostMsgSubmit: function(e) {
     e.preventDefault();
     var text = React.findDOMNode(this.refs.text).value.trim();
     if (!text) {
@@ -183,11 +184,22 @@ var CommentForm = React.createClass({displayName: "CommentForm",
     React.findDOMNode(this.refs.text).value = '';
     return;
   },
+  handleTogglePause: function(e) {
+    e.preventDefault();
+    this.props.onTogglePaused({user_id: USER_ID});
+    return;
+  },
   render: function() {
+    var pausedText = this.props.paused ? "Unpause" : "Pause"
     return (
-      React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
+      React.createElement("span", null, 
+      React.createElement("form", {className: "commentForm", onSubmit: this.handlePostMsgSubmit}, 
         React.createElement("input", {type: "text", placeholder: "Say something...", ref: "text", className: "commentBox"}), 
         React.createElement("input", {type: "submit", value: "Post", className: "largeButton"})
+      ), 
+      React.createElement("form", {onSubmit: this.handleTogglePause}, 
+        React.createElement("input", {type: "submit", value: pausedText, className: "largeButton"})
+      )
       )
     );
   }
@@ -198,15 +210,19 @@ var KeeperApp = React.createClass({displayName: "KeeperApp",
     return {messages: [], selectedMessage: null };
   },
 
-  loadCommentsFromServer: function() {
+  processDataFromServer: function(data) {
+    console.log("Got data from the server:");
+    console.log(data);
+    this.setState({messages : data.messages, paused : data.paused});
+  },
+
+  loadDataFromServer: function() {
     $.ajax({
       url: "/smskeeper/message_feed?user_id=" + USER_ID,
       dataType: 'json',
       cache: false,
       success: function(data) {
-        console.log(data);
-        console.log(this);
-        this.setState({messages : data.messages});
+        this.processDataFromServer(data);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("message_feed", status, err.toString());
@@ -215,20 +231,35 @@ var KeeperApp = React.createClass({displayName: "KeeperApp",
   },
 
   componentDidMount: function() {
-    this.loadCommentsFromServer();
+    this.loadDataFromServer();
   },
 
-  handleCommentSubmit: function(comment) {
+  handleCommentSubmit: function(data) {
     $.ajax({
       url: "/smskeeper/send_sms",
       dataType: 'json',
       type: 'POST',
-      data: comment,
+      data: data,
       success: function(data) {
-        this.setState({messages: data.messages});
+        this.processDataFromServer(data);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("send_sms", status, err.toString());
+      }.bind(this)
+    });
+  },
+
+  handleTogglePause: function(data) {
+    $.ajax({
+      url: "/smskeeper/toggle_paused",
+      dataType: 'json',
+      type: 'POST',
+      data: data,
+      success: function(data) {
+        this.processDataFromServer(data);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("toggle_paused", status, err.toString());
       }.bind(this)
     });
   },
@@ -250,7 +281,7 @@ var KeeperApp = React.createClass({displayName: "KeeperApp",
   			React.createElement("div", {id: "messages"}, 
   			    this.state.messages.map(createItem) 
         ), 
-        React.createElement(CommentForm, {onCommentSubmit: this.handleCommentSubmit})
+        React.createElement(CommentForm, {onCommentSubmit: this.handleCommentSubmit, onTogglePaused: this.handleTogglePause, paused: this.state.paused})
       )
 		);
 	},

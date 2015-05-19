@@ -41,17 +41,28 @@ var DailyStatsRow = React.createClass({displayName: "DailyStatsRow",
 
 var UserTable = React.createClass({displayName: "UserTable",
   render: function() {
-    var createRow = function(item, index) {
-			return React.createElement(UserRow, {user:  item, index:  index })
+    var createRows = function(users) {
+      count = 0;
+      result = [];
+      for (index in users) {
+        user = users[index];
+
+        if ((this.props.showActivated && user.activated) ||
+           (!this.props.showActivated && !user.activated)) {
+          count++;
+          result.push(React.createElement(UserRow, {user:  user, highlighted:  count % 2 == 0}))
+        }
+      }
+      return result;
 		}.bind(this);
-    headerValues = ["user", "name", "joined", "activated", "tutorial", "msgs (in/out)", "last in", "history"];
+    headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial (src)", "msgs (in/out)", "last in", "history"];
 
 		return (
       React.createElement("div", null, 
-        React.createElement("h1", null, "Users"), 
+        React.createElement("h1", null,  this.props.title), 
         React.createElement("table", null, 
           React.createElement(HeaderRow, {headerValues:  headerValues }), 
-           this.props.users.map(createRow) 
+           createRows(this.props.users) 
         )
       )
     );
@@ -75,8 +86,7 @@ var HeaderRow = React.createClass({displayName: "HeaderRow",
 var UserRow = React.createClass({displayName: "UserRow",
   render: function() {
     accountAge = jQuery.timeago(new Date(this.props.user.created));
-    tutorial_text = this.props.user.tutorial_step.toString();
-    if (this.props.user.completed_tutorial) tutorial_text += " √";
+    tutorial_text = this.props.user.completed_tutorial ? "√ " + this.props.user.source : this.props.user.source;
     activated_text = null;
     if (this.props.user.activated)
       activated_text = jQuery.timeago(new Date(this.props.user.activated));
@@ -86,21 +96,20 @@ var UserRow = React.createClass({displayName: "UserRow",
     last = in_date
     timeago_text = jQuery.timeago(last);
 
-    console.log(tutorial_text);
-
     var rowClasses = classNames({
-      'oddrow' : this.props.index % 2 == 1,
+      'oddrow' : this.props.highlighted == true,
 		});
 		return (
       React.createElement("tr", {className: rowClasses}, 
         React.createElement("td", {className: "cell"}, " ",  this.props.user.id, " (",  this.props.user.phone_number, ")"), 
         React.createElement("td", {className: "cell"}, " ",  this.props.user.name), 
+        React.createElement("td", {className: "cell", title:  this.props.user.full_name}, " ",  this.props.user.full_name[0] ), 
         React.createElement("td", {className: "cell"}, " ",  accountAge ), 
         React.createElement("td", {className: "cell"}, " ",  activated_text ), 
         React.createElement("td", {className: "cell"}, " ",  tutorial_text ), 
         React.createElement("td", {className: "cell"}, " ",  this.props.user.message_stats.incoming.count, "/",  this.props.user.message_stats.outgoing.count), 
         React.createElement("td", {className: "cell"}, " ",  timeago_text, " "), 
-        React.createElement("td", {className: "cell"}, " ", React.createElement("a", {href:  this.props.user.history}, "history"))
+        React.createElement("td", {className: "cell"}, " ", React.createElement("a", {target: "_blank", href:  this.props.user.history}, "history"))
       )
     );
   },
@@ -124,10 +133,21 @@ var DashboardApp = React.createClass({displayName: "DashboardApp",
 	},
 
 	render: function() {
+    var countActivated = function(users) {
+      result = 0;
+      for (i=0; i<users.length; i++) {
+        if (users[i].activated) {
+          result++;
+        }
+      }
+      return result
+    }.bind(this);
+    
 		return (
       React.createElement("div", null, 
         React.createElement(DailyTable, {stats:  this.state.daily_stats}), 
-        React.createElement(UserTable, {users:  this.state.users})
+        React.createElement(UserTable, {users:  this.state.users, showActivated:  true, title: "Activated (" + countActivated(this.state.users) + ")"}), 
+        React.createElement(UserTable, {users:  this.state.users, showActivated:  false, title:  "Not activated (" + (this.state.users.length - countActivated(this.state.users)) + ")"})
       )
 		);
 	},
