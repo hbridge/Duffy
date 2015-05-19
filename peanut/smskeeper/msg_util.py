@@ -73,8 +73,8 @@ def isFetchCommand(msg, user):
 	elif labelInFreeformFetch(msg):
 		return True
 	else:
-		labels = Entry.fetchAllLabels(user)
-		if "#%s" % cleaned in labels:
+		entries = Entry.fetchEntries(user, "#%s" % cleaned, hidden=None)
+		if entries.count() > 0:
 			return True
 
 	return False
@@ -85,6 +85,7 @@ def isSetTipFrequencyCommand(msg):
 	return not hasLabel(msg) and tipRE.match(msg.strip().lower())
 
 
+get_reminders_re = re.compile("#?remind( me|me|er|ers)?( to)?(: )?", re.I)
 def isRemindCommand(msg):
 	text = msg.lower()
 	return (
@@ -92,7 +93,7 @@ def isRemindCommand(msg):
 		'#remindme' in text or
 		'#reminder' in text or
 		'#reminders' in text or
-		re.match('remind me', text) is not None
+		get_reminders_re.match(text) is not None
 	)
 
 

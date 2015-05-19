@@ -364,7 +364,14 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			self.assertNotIn("remind me to", getOutput(mock))
 			self.assertIn("tomorrow", getOutput(mock))
 
-		self.assertIn("#reminders", Entry.fetchAllLabels(self.user))
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "reminders")
+			self.assertIn("poop", getOutput(mock))
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "clear reminders")
+			cliMsg.msg(self.testPhoneNumber, "reminders")
+			self.assertNotIn("poop", getOutput(mock))
 
 	# This test is here to make sure the ordering of fetch vs reminders is correct
 	def test_reminders_fetch(self):
