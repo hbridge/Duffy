@@ -21,12 +21,12 @@ def sendMsg(user, msg, mediaUrls, keeperNumber, eta=None):
 		async.sendMsg.apply_async((user.id, msg, mediaUrls, keeperNumber), eta=eta)
 
 
-def sendMsgs(user, msgList, keeperNumber):
+def sendMsgs(user, msgList, keeperNumber, delay=SECONDS_BETWEEN_SEND):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 
 	for i, msgTxt in enumerate(msgList):
-		scheduledTime = datetime.now(pytz.utc) + timedelta(seconds=i * SECONDS_BETWEEN_SEND)
+		scheduledTime = datetime.now(pytz.utc) + timedelta(seconds=i * delay)
 		logger.debug("scheduling %s at time %s" % (msgTxt, scheduledTime))
 
 		# Call the single method above so it does the right async logic

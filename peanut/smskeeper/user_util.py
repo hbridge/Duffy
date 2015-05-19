@@ -18,4 +18,4 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 
 	msgsToSend.extend(keeper_constants.INTRO_MESSAGES)
 
-	sms_util.sendMsgs(userToActivate, msgsToSend, keeperNumber)
+	sms_util.sendMsgs(userToActivate, msgsToSend, keeperNumber, delay=1)
