@@ -27,10 +27,10 @@ SMSKEEPER_TIPS = [
 		REMINDER_TIP_ID,
 		"Hey there, :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')"
 	),
-	# KeeperTip(
-	# 	PHOTOS_TIP_ID,
-	# 	"Another tip for you :NAME:: send me a photo with a hash tag, and get it back by sending me the same hashtag - just like text!"
-	# ),
+	KeeperTip(
+		PHOTOS_TIP_ID,
+		u"I \U0001F499 pics!  Try sending me a selfie with 'add to selifes' and I'll store it for you.  It's a fast way to save documents and receipts, too!"
+	),
 	# KeeperTip(
 	# 	SHARING_TIP_ID,
 	# 	"Hey :NAME:! I can help you keep track of stuff with friends. For example, type: 'Avengers #movie @Bob' to start a list of movies to watch with Bob."
