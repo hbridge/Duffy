@@ -3,6 +3,8 @@ import pytz
 import logging
 import re
 
+from peanut.settings import constants
+
 from common import natty_util
 
 from smskeeper import sms_util, msg_util
@@ -99,7 +101,7 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 		entry = entries[0]
 
 	hourForUser = startDate.astimezone(user.getTimezone()).hour
-	if (hourForUser >= 0 and hourForUser <= 6):
+	if (hourForUser >= 0 and hourForUser <= 6 and keeperNumber != constants.SMSKEEPER_TEST_NUM):
 		logger.error("Scheduling an alert for %s am local time for user %s, might want to check entry id %s" % (hourForUser, user.id, entry.id))
 
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"

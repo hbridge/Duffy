@@ -12,6 +12,8 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
+from peanut.settings import constants
+
 from common import api_util
 from common.models import ContactEntry
 from django.conf import settings
@@ -213,6 +215,8 @@ def toggle_paused(request):
 
 		if user.isPaused():
 			user.setState(keeper_constants.STATE_NORMAL)
+			msg = "User %s just got unpaused" % (user.id)
+			slack_logger.postManualAlert(user, msg, constants.KEEPER_PROD_PHONE_NUMBERS[0], keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 		else:
 			user.setState(keeper_constants.STATE_PAUSED)
 		user.save()
