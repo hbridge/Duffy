@@ -863,6 +863,7 @@ class SMSKeeperAsyncCase(SMSKeeperBaseCase):
 	def setupUser(self, activated, tutorialComplete, timezoneString):
 		SMSKeeperBaseCase.setupUser(self, activated, tutorialComplete)
 		self.user.timezone = timezoneString  # put the user in UTC by default, makes most tests easier
+		self.user.activated = self.user.activated.replace(hour=0, minute=0, second=0) # need to make sure
 		self.user.save()
 
 	def testSendTipTimezones(self):
