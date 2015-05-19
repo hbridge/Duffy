@@ -204,8 +204,14 @@ def isCreateHandleCommand(msg):
 def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()
 
-set_name_re = re.compile("(my name('| i)s|I('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 
+def nameInTutorialPrompt(msg):
+	match = re.match("(my name('| i)s|i('| a)m) (?P<name>[a-zA-Z\s]+)", msg, re.I)
+	if match:
+		return match.group('name')
+	return None
+
+set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
 
 def nameInSetName(msg):
 	match = set_name_re.match(msg.strip())

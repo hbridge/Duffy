@@ -183,7 +183,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 		# Activation message asks for their name
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			cliMsg.msg(self.testPhoneNumber, "I'm UnitTests")
 			self.assertIn("nice to meet you UnitTests!", getOutput(mock))
 			self.assertIn("Let me show you the basics", getOutput(mock))
 			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")

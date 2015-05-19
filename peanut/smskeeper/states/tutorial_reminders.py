@@ -9,7 +9,6 @@ from smskeeper import msg_util
 # Might need to get ride of this at some point due to circular dependencies
 # Its only using a few constants, easily moved
 from smskeeper.states import remind
-from smskeeper.models import ZipData
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +19,7 @@ def process(user, msg, requestDict, keeperNumber):
 		step = int(step)
 
 	if not step:
-		nameFromPhrase = msg_util.nameInSetName(msg)
+		nameFromPhrase = msg_util.nameInTutorialPrompt(msg)
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
