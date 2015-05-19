@@ -305,7 +305,7 @@ class BASE_CELERY_CONFIG:
         },
         'smskeeper-tips': {
             'task': 'smskeeper.async.sendTips',
-            'schedule': crontab(hour=16, minute=5),
+            'schedule': crontab(minute=5),
             'args': None,
         },
         'smskeeper-reminders': {
@@ -323,4 +323,3 @@ INBOUND_EMAIL_LOG_REQUESTS = True
 
 # the max size (in Bytes) of any attachment to process - defaults to 10MB
 INBOUND_EMAIL_ATTACHMENT_SIZE_MAX = 10000000
-
