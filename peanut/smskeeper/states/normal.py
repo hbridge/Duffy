@@ -4,6 +4,8 @@ import logging
 import datetime
 import pytz
 
+from django.conf import settings
+
 from smskeeper.models import Entry, Message
 
 from smskeeper import sms_util, msg_util, helper_util
@@ -238,7 +240,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
 				now = datetime.datetime.now(pytz.timezone("US/Eastern"))
-				if now.hour >= 9 and now.hour <= 22 and keeperNumber != constants.SMSKEEPER_TEST_NUM:
+				if now.hour >= 9 and now.hour <= 22 and keeperNumber != constants.SMSKEEPER_TEST_NUM and not settings.DEBUG:
 					user.setState(keeper_constants.STATE_PAUSED)
 					user.save()
 					slack_logger.postManualAlert(user, msg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)

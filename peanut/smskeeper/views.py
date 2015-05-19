@@ -15,7 +15,6 @@ django.setup()
 from common import api_util
 from common.models import ContactEntry
 from django.conf import settings
-from django.conf import settings as djangosettings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
@@ -362,13 +361,13 @@ def signup_from_website(request):
 				target_user = User.objects.get(phone_number=phoneNum)
 
 				bodyText = "You are already on the list. Hang tight and I'll be in touch soon."
-				sms_util.sendMsg(target_user, bodyText, None, djangosettings.KEEPER_NUMBER)
+				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
 				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps(source))
 				target_user.save()
 
-				not_activated.dealWithNonActivatedUser(target_user, djangosettings.KEEPER_NUMBER)
+				not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
 		else:
 			response['result'] = False
 	else:
