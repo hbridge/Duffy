@@ -111,7 +111,6 @@ def timezoneForMsg(msg):
 		logger.debug("Couldn't find db entry for %s" % zipCode)
 		return None, "Sorry, I don't know that zipcode. Please try again"
 	else:
-		print "zip data results %s" % zipDataResults[0].timezone
 		return zipDataResults[0].timezone, None
 
 tipRE = re.compile('send me tips')

@@ -25,19 +25,19 @@ VOICE_TIP_ID = "voice"
 SMSKEEPER_TIPS = [
 	KeeperTip(
 		REMINDER_TIP_ID,
-		"Hey there, :NAME:. Just an FYI that I can set reminders for you. For example: '#reminder call mom tomorrow at 5pm')"
+		"Hey there, :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')"
 	),
-	KeeperTip(
-		PHOTOS_TIP_ID,
-		"Another tip for you :NAME:: send me a photo with a hash tag, and get it back by sending me the same hashtag - just like text!"
-	),
-	KeeperTip(
-		SHARING_TIP_ID,
-		"Hey :NAME:! I can help you keep track of stuff with friends. For example, type: 'Avengers #movie @Bob' to start a list of movies to watch with Bob."
-	),
+	# KeeperTip(
+	# 	PHOTOS_TIP_ID,
+	# 	"Another tip for you :NAME:: send me a photo with a hash tag, and get it back by sending me the same hashtag - just like text!"
+	# ),
+	# KeeperTip(
+	# 	SHARING_TIP_ID,
+	# 	"Hey :NAME:! I can help you keep track of stuff with friends. For example, type: 'Avengers #movie @Bob' to start a list of movies to watch with Bob."
+	# ),
 	KeeperTip(
 		VOICE_TIP_ID,
-		"Hate typing, :NAME:? Text me without without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper speak more type less hashtag resolutions'"
+		"Hate typing, :NAME:? Text me without without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper add speak more type less to resolutions'"
 	),
 ]
 
