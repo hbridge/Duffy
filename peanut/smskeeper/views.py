@@ -14,7 +14,7 @@ django.setup()
 
 from peanut.settings import constants
 
-from common import api_util
+from common import api_util, slack_logger
 from common.models import ContactEntry
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
