@@ -7,6 +7,8 @@ import datetime
 
 from models import Entry
 from smskeeper import keeper_constants
+from models import ZipData
+
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +93,26 @@ def isCommonListName(msg):
 	return False
 
 
+def isSetZipcodeCommand(msg):
+	return re.match("my zipcode is (\d{5}(\-\d{4})?)", msg, re.I) is not None
+
+def timezoneForMsg(msg):
+	postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
+
+	if postalCodes is None:
+		logger.debug("postalCodes were none for: %s" % msg)
+		return None, "Sorry, I didn't understand that, what's your zipcode?"
+
+	zipCode = str(postalCodes.groups()[0])
+	logger.debug("Found zipcode: %s   from groups:  %s   and user entry: %s" % (zipCode, postalCodes.groups(), msg))
+	zipDataResults = ZipData.objects.filter(zip_code=zipCode)
+
+	if len(zipDataResults) == 0:
+		logger.debug("Couldn't find db entry for %s" % zipCode)
+		return None, "Sorry, I don't know that zipcode. Please try again"
+	else:
+		print "zip data results %s" % zipDataResults[0].timezone
+		return zipDataResults[0].timezone, None
 
 tipRE = re.compile('send me tips')
 def isSetTipFrequencyCommand(msg):

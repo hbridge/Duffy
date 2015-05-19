@@ -231,3 +231,13 @@ def setName(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "Great, I'll call you %s from now on." % name, None, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "Sorry, I didn't catch that, try saying something like 'My name is Keeper'" % name, None, keeperNumber)
+
+def setZipcode(user, msg, keeperNumber):
+	timezone, user_error = msg_util.timezoneForMsg(msg)
+	if timezone is None:
+		sms_util.sendMsg(user, user_error, None, keeperNumber)
+		return True
+
+	user.timezone = timezone
+	user.save()
+	sms_util.sendMsg(user, helper_util.randomAcknowledgement(), None, keeperNumber)

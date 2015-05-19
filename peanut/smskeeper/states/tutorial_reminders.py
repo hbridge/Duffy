@@ -29,23 +29,13 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(user, ["Great, nice to meet you %s!" % user.name, "What's your zipcode? (This will help me remind you of things at the right time)"], keeperNumber)
 		user.setStateData("step", 1)
 	elif step == 1:
-		postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
+		timezone, user_error = msg_util.timezoneForMsg(msg)
 
-		if postalCodes is None:
-			logger.debug("postalCodes were none for: %s" % msg)
-			sms_util.sendMsg(user, "Sorry, I didn't understand that, what's your zipcode?", None, keeperNumber)
-			return True
-		zipCode = str(postalCodes.groups()[0])
-
-		logger.debug("Found zipcode: %s   from groups:  %s   and user entry: %s" % (zipCode, postalCodes.groups(), msg))
-		zipDataResults = ZipData.objects.filter(zip_code=zipCode)
-
-		if len(zipDataResults) == 0:
-			logger.debug("Couldn't find db entry for %s" % zipCode)
-			sms_util.sendMsg(user, "Sorry, I don't know that zipcode. Please try again", None, keeperNumber)
+		if timezone is None:
+			sms_util.sendMsg(user, user_error, None, keeperNumber)
 			return True
 		else:
-			user.timezone = zipDataResults[0].timezone
+			user.timezone = timezone
 
 		sms_util.sendMsg(user, "Thanks. Let me show you how to set a reminder. Just say 'Remind me to call mom this weekend' or 'Remind me to pickup laundry at 7pm tonight'. Try creating one now.", None, keeperNumber)
 
