@@ -242,7 +242,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
-			self.assertIn("Sorry, I don't", getOutput(mock))
+			self.assertIn("don't have anything", getOutput(mock))
 
 	def test_get_label(self):
 		self.setupUser(True, True)
@@ -306,7 +306,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
-			self.assertIn("Sorry, I don't", getOutput(mock))
+			self.assertNotIn("old fashioned", getOutput(mock))
 
 	def test_contextual_delete(self):
 		self.setupUser(True, True)
@@ -378,7 +378,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminders")
-			self.assertIn("#reminders", getOutput(mock))
+			self.assertIn("reminders", getOutput(mock))
 
 	def test_reminders_followup_change(self):
 		self.setupUser(True, True)
