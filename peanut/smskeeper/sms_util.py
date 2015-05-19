@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from peanut.settings import constants
 
-SECONDS_BETWEEN_SEND = 3
+SECONDS_BETWEEN_SEND = 2
 
 
 def sendMsg(user, msg, mediaUrls, keeperNumber, eta=None):

@@ -222,8 +222,8 @@ class Entry(models.Model):
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 
 	@classmethod
-	def fetchAllLabels(cls, user):
-		entries = Entry.objects.filter(users__in=[user], hidden=False)
+	def fetchAllLabels(cls, user, hidden=False):
+		entries = Entry.objects.filter(users__in=[user], hidden=hidden)
 		labels = entries.values_list("label", flat=True).distinct()
 		return labels
 

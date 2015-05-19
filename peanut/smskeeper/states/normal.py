@@ -160,8 +160,7 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 	entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True, True)
 
 	if firstListItem:
-		text, label, handles, originalMedia, mediaToTypes = msg_util.getMessagePiecesWithMedia(msg, requestDict)
-		sms_util.sendMsg(user, "Just type %s to get these back"%(label), None, keeperNumber)
+		sms_util.sendMsg(user, "Just type '%s' to get these back" % (entries[0].label.replace("#", "")), None, keeperNumber)
 
 	if len(unresolvedHandles) > 0:
 		user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)

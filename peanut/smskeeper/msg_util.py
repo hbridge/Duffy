@@ -38,10 +38,16 @@ def cleanMsgText(msg):
 	cleaned = cleaned.translate(punctuation_tbl)
 	return cleaned
 
+clear_re = re.compile("clear (?P<label>.*)", re.I)
 def isClearCommand(msg):
-	tokens = msg.split(' ')
-	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'clear') or (isLabel(tokens[1]) and tokens[0].lower() == 'clear'))
+	return clear_re.match(msg) is not None
 
+def getLabelToClear(msg):
+	match = clear_re.match(msg)
+	label = match.group("label").strip()
+	if label[0] != ("#"):
+		label = "#" + label
+	return label
 
 def isPickCommand(msg):
 	tokens = msg.split(' ')
@@ -64,12 +70,12 @@ def isFetchCommand(msg, user):
 	cleaned = msg.strip().lower()
 	if isLabel(cleaned):
 		return True
-	elif len(msg.split(" ")) == 1:
+	elif labelInFreeformFetch(msg):
+		return True
+	else:
 		labels = Entry.fetchAllLabels(user)
 		if "#%s" % cleaned in labels:
 			return True
-	elif labelInFreeformFetch(msg):
-		return True
 
 	return False
 
@@ -103,7 +109,7 @@ def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
-freeform_add_re = re.compile("add (?P<item>.+) to( my)? #?(?P<label>[\S]+)( list)?", re.I)
+freeform_add_re = re.compile("add (?P<item>.+) to( my)? #?(?P<label>.+)( list)?", re.I)
 def isAddCommand(msg):
 	if hasLabel(msg) and not isLabel(msg):
 		return True
@@ -189,6 +195,8 @@ def getMessagePiecesWithMedia(msg, requestDict):
 	match = freeform_add_re.match(msg)
 	if match:
 		label = "#" + match.group('label')
+		if label.endswith(" list"):
+			label = label[:-len(" list")]
 		nonLabels = match.group('item').split(" ")
 	else:
 		# otherwise pick out pieces

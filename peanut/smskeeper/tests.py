@@ -104,7 +104,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#groceries milk")
-			self.assertIn("Just type #groceries", getOutput(mock))
+			self.assertIn("Just type 'groceries'", getOutput(mock))
 
 	def test_freeform_add_fetch(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
@@ -130,6 +130,25 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			self.assertIn("milk", output)
 			self.assertIn("spinach", output)
 			self.assertIn("bread", output)
+
+	def test_add_multi_word_label(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Add foo to my bar baz list")
+			cliMsg.msg(self.testPhoneNumber, "bar baz")
+			output = getOutput(mock)
+			self.assertIn("foo", output)
+
+	def test_freeform_clear(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
+			cliMsg.msg(self.testPhoneNumber, "Clear groceries")
+			cliMsg.msg(self.testPhoneNumber, "Groceries")
+			output = getOutput(mock)
+			self.assertNotIn("milk", output)
 
 	def test_tutorial_list(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)

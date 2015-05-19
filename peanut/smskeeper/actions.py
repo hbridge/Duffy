@@ -94,13 +94,12 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 
 def fetch(user, msg, keeperNumber):
 	# This is a label fetch.  See if a note with that label exists then return
-	cleaned = msg.strip().lower()
-	if len(cleaned.split(" ")) == 1:
+	label = msg_util.labelInFreeformFetch(msg)
+	if not label:
 		label = msg
 		if "#" not in label:
 			label = "#" + msg
-	else:
-		label = msg_util.labelInFreeformFetch(msg)
+
 	if label is None or label == "":
 		raise NameError("label is blank")
 
@@ -108,14 +107,14 @@ def fetch(user, msg, keeperNumber):
 	if msg_util.isRemindCommand(label):
 		label = keeper_constants.REMIND_LABEL
 	entries = Entry.fetchEntries(user=user, label=label)
-	clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item."%(label)
+	clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item." % (label.replace("#", ""))
 	mediaUrls = list()
 
 	if len(entries) == 0:
 		helper_util.sendNotFoundMessage(user, label, keeperNumber)
 		return
 
-	currentMsg = "%s:" % label
+	currentMsg = "%s:" % label.replace("#", "")
 
 	count = 1
 	for entry in entries:
@@ -161,7 +160,7 @@ def fetch(user, msg, keeperNumber):
 		sms_util.sendMsg(user, currentMsg + clearMsg, None, keeperNumber)
 
 def clear(user, msg, keeperNumber):
-	label = msg_util.getLabel(msg)
+	label = msg_util.getLabelToClear(msg)
 	entries = Entry.fetchEntries(user=user, label=label)
 	if len(entries) == 0:
 		helper_util.sendNotFoundMessage(user, label, keeperNumber)
@@ -169,7 +168,7 @@ def clear(user, msg, keeperNumber):
 		for entry in entries:
 			entry.hidden = True
 			entry.save()
-		sms_util.sendMsg(user, "%s cleared"% (label), None, keeperNumber)
+		sms_util.sendMsg(user, "%s cleared" % (label.replace("#", "")), None, keeperNumber)
 
 def createHandle(user, handle, targetNumber):
 	# see if there's an existing contact for that handle
@@ -219,14 +218,7 @@ def setTipFrequency(user, msg, keeperNumber):
 
 
 def help(user, msg, keeperNumber):
-	sms_util.sendMsg(user, 'There are a few things I can help you with.', None, keeperNumber)
-	time.sleep(1)
-	sms_util.sendMsg(user, "I can remember anything you send me with a hashtag. Like '#cocktails old fashioned, mojito, margarita ", None, keeperNumber)
-	time.sleep(1)
-	sms_util.sendMsg(user, "I can set reminders for you. Like 'Remind me to call Mom tonight'", None, keeperNumber)
-	time.sleep(1)
-	sms_util.sendMsg(user, "I can also keep a shared list with your friends. Like 'Avengers #movies @beth' to share a movie with Beth.", None, keeperNumber)
-
+	sms_util.sendMsgs(user, keeper_constants.HELP_MESSAGES, keeperNumber)
 
 def tellMeMore(user, msg, keeperNumber):
 	sms_util.sendMsg(user, keeper_constants.TELL_ME_MORE, None, keeperNumber)

@@ -53,3 +53,9 @@ REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
 
 TELL_ME_MORE = "I can help you remember lists of things. Send me anything like 'add Jurassic Park to my movies list' or 'add pasta, sauce, cheese to shopping'."
+
+HELP_MESSAGES = [
+	u'There are a few things I can help you with. \U0001F4AA',
+	u"\U0001F4DD You can tell me to remember lists\nFor example 'add martini to my cocktails list'",
+	u"\U0001F514 You can tell me to remind you of something at a specific time\nFor example 'Remind me to call Mom tonight'",
+]
