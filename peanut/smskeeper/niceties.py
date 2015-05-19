@@ -30,7 +30,7 @@ SMSKEEPER_NICETIES = [
 	),
 	Nicety("no thanks|not now|maybe later|great to meet you too|nice to meet you too", None),
 	Nicety("yes$|no$|y$|n$|nope$", None),
-	Nicety("cool$|ok$|great$|k$|sweet$|hah(a)?|lol$|okay$", None),
+	Nicety(u"cool$|ok$|great$|k$|sweet$|hah(a)?|lol$|okay$|\U0001F44D", None),
 	Nicety(
 		"how are you( today)?|how're you|hows it going",
 		["I'm good, thanks for asking!", "Can't complain!"]

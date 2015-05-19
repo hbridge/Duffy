@@ -343,7 +343,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 
 	def test_no_add_dumb_stuff(self):
 		self.setupUser(True, True)
-		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!", "cool", "OK"]
+		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!", "cool", "OK", u"\U0001F44D"]
 
 		for phrase in dumb_phrases:
 			with patch('smskeeper.async.recordOutput') as mock:
