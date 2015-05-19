@@ -65,7 +65,7 @@ def postManualAlert(user, msg, keeperNumber, channel):
         historyLink = "<http://prod.strand.duffyapp.com/smskeeper/history?user_id=" + str(user.id) + "|history>"
 
         params['username'] = name
-        params['text'] = "User %s paused after: %s | %s" % (user.id, msg, historyLink)
+        params['text'] = "%s | %s" % (msg, historyLink)
         params['channel'] = channel
 
         requests.post(SLACK_URL, data=json.dumps(params))

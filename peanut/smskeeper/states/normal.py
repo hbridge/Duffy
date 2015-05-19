@@ -243,7 +243,8 @@ def process(user, msg, requestDict, keeperNumber):
 				if now.hour >= 9 and now.hour <= 22 and keeperNumber != constants.SMSKEEPER_TEST_NUM and not settings.DEBUG:
 					user.setState(keeper_constants.STATE_PAUSED)
 					user.save()
-					slack_logger.postManualAlert(user, msg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
+					postMsg = "User %s paused after: %s" % (user.id, msg)
+					slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 					logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
 					return True
 				else:
