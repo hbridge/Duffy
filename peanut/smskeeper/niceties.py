@@ -59,6 +59,14 @@ SMSKEEPER_NICETIES = [
 		"I(m| am) sorry|apologies|I apologize|sry",
 		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
+	Nicety(
+		"thats all( for now)?",
+		["Ok, I'm here if you need me."]
+	),
+	Nicety(
+		"are you( a)? real( person)?|are you human|are you an? (computer|machine)|are you an ai",
+		["Do you think I am?"]
+	)
 ]
 
 
