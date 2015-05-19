@@ -232,6 +232,8 @@ var KeeperApp = React.createClass({displayName: "KeeperApp",
 
   componentDidMount: function() {
     this.loadDataFromServer();
+    var loadFunc = this.loadDataFromServer;
+    setInterval(function () {loadFunc()}, 2000);
   },
 
   handleCommentSubmit: function(data) {
