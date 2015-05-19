@@ -2,15 +2,16 @@ import random
 import re
 import logging
 
-from smskeeper.models import User, Entry, Message
+from smskeeper.models import Entry, Message
 
-from smskeeper import sms_util, msg_util, helper_util, user_util
+from smskeeper import sms_util, msg_util, helper_util
 from smskeeper import actions, keeper_constants
 from smskeeper import niceties
 
-from peanut.settings import constants
+from common import slack_logger
 
 logger = logging.getLogger(__name__)
+
 
 def getPreviousMessage(user):
 	# Normally would sort by added but unit tests barf since they get added at same time
@@ -231,9 +232,15 @@ def process(user, msg, requestDict, keeperNumber):
 
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
-				sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
-				user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
-				user.save()
+				if user.signup_data_json and "fb" in user.signup_data_json:
+					user.setState(keeper_constants.STATE_PAUSED)
+					user.save()
+					slack_logger.postManualAlert(user, msg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
+					return True
+				else:
+					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
+					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
+					user.save()
 
 		return True
 	except:

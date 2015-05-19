@@ -45,7 +45,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		logger.error("Got Exception in user creation: %s" % e)
 	finally:
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True)
-		slack_logger.postMessage(messageObject)
+		slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
 
 	# convert message to unicode
 	if type(msg) == str:

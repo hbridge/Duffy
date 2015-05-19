@@ -3,12 +3,13 @@ from logging import Handler
 import traceback
 
 from django.conf import settings
-from peanut.settings import constants
 import requests
+from peanut.settings import constants
 
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class SlackLogHandler(Handler):
     # from http://www.pythian.com/blog/logging-for-slackers/
@@ -48,12 +49,31 @@ class SlackLogHandler(Handler):
             data=payload
         )
 
+SLACK_URL = 'https://hooks.slack.com/services/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'
 
-def postMessage(message):
+
+def postManualAlert(user, msg, keeperNumber, channel):
+    if (isProdNumber(keeperNumber)):
+        params = dict()
+        params['icon_emoji'] = ':raising_hand:'
+
+        if user.name:
+            name = user.name
+        else:
+            name = user.phone_number
+
+        historyLink = "<http://prod.strand.duffyapp.com/smskeeper/history?user_id=" + str(user.id) + "|history>"
+
+        params['username'] = name
+        params['text'] = "User %s paused after: %s | %s" % (user.id, msg, historyLink)
+        params['channel'] = channel
+
+        requests.post(SLACK_URL, data=json.dumps(params))
+
+
+def postMessage(message, channel):
     msgContent = json.loads(message.msg_json)
     if (isProdMessage(message)):
-        url = 'https://hooks.slack.com/services/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'
-        channel = "#livesmskeeperfeed"
         params = dict()
         text = msgContent['Body']
 
@@ -82,15 +102,19 @@ def postMessage(message):
         params['text'] = text + " | <http://prod.strand.duffyapp.com/smskeeper/history?user_id=" + str(message.user.id) + "|history>"
         params['channel'] = channel
 
-        requests.post(url, data=json.dumps(params))
+        requests.post(SLACK_URL, data=json.dumps(params))
 
 
 def isProdMessage(message):
     sender, recipient = message.getMessagePhoneNumbers()
-    if (sender in constants.KEEPER_PROD_PHONE_NUMBERS or
-            recipient in constants.KEEPER_PROD_PHONE_NUMBERS):
+    if (isProdNumber(sender) or isProdNumber(recipient)):
         return True
     return False
+
+
+def isProdNumber(number):
+    return number in constants.KEEPER_PROD_PHONE_NUMBERS
+
 
 def postUserReport(uid, recentMessages):
     if (not hasattr(settings, "SLACK_LOGGING_URL") or
@@ -104,8 +128,6 @@ def postUserReport(uid, recentMessages):
         if message.NumMedia() > 0:
             mediaStr = "(%d attachments)" % (message.NumMedia())
         recentMessagesText += "%s: %s %s\n" % (message.getSenderName(), message.getBody(), mediaStr)
-        if isProdMessage(message):
-            foundProdNumber = True
 
     attachments = [{
         "pretext": "Recent messages (newest first)",

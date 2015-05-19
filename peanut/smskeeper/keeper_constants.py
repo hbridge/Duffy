@@ -53,3 +53,6 @@ REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
 
 TELL_ME_MORE = "I can help you remember lists of things. Send me anything like 'add Jurassic Park to my movies list' or 'add pasta, sauce, cheese to shopping'."
+
+SLACK_CHANNEL_FEED = "#livesmskeeperfeed"
+SLACK_CHANNEL_MANUAL_ALERTS = "#manual-alerts"
