@@ -224,7 +224,7 @@ def process(user, msg, requestDict, keeperNumber):
 			actions.setName(user, msg, keeperNumber)
 		elif msg_util.isSetZipcodeCommand(msg):
 			actions.setZipcode(user, msg, keeperNumber)
-		elif msg_util.isAddCommand(msg) or numMedia > 0:
+		elif msg_util.isAddTextCommand(msg) or numMedia > 0:
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
 		else:  # catch all, it's a nicety or an error
 			nicety = niceties.getNicety(msg)

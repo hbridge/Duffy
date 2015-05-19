@@ -153,7 +153,30 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 	def test_freeform_fetch_common_list(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "groceries")
 			self.assertNotIn(getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+
+	def test_freeform_add_photo(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
+			# moveMediaMock.return_value = ["hello"]
+			moveMediaMock.side_effect = mock_return_input
+			with patch('smskeeper.async.recordOutput') as mock:
+				cliMsg.msg(self.testPhoneNumber, "add to foo", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
+				# ensure we don't treat photos without a hashtag as a bad command
+				output = getOutput(mock)
+				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+
+		# make sure the entry got created
+		Entry.objects.get(label="#foo")
+
+	def test_freeform_malformed_add(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "add to groceries")
+			self.assertNotIn(getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+
 
 	def test_tutorial_list(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)

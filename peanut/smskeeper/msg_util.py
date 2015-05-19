@@ -143,12 +143,15 @@ def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
-freeform_add_re = re.compile("add (?P<item>.+) to( my)? #?(?P<label>.+)( list)?", re.I)
-def isAddCommand(msg):
+# we allow items to be blank to support "add to myphotolist" with an attached photo
+freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>.+)( list)?", re.I)
+def isAddTextCommand(msg):
 	if hasLabel(msg) and not isLabel(msg):
 		return True
-	elif freeform_add_re.match(cleanMsgText(msg)):
-		return True
+	else:
+		match = freeform_add_re.match(cleanMsgText(msg))
+		if match and match.group('item'):
+			return True
 
 	return False
 
@@ -231,7 +234,8 @@ def getMessagePiecesWithMedia(msg, requestDict):
 		label = "#" + match.group('label')
 		if label.endswith(" list"):
 			label = label[:-len(" list")]
-		nonLabels = match.group('item').split(" ")
+		if match.group("item"):
+			nonLabels = match.group('item').split(" ")
 	else:
 		# otherwise pick out pieces
 		for word in msg.split(' '):
