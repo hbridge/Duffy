@@ -87,6 +87,8 @@ var UserRow = React.createClass({
   render: function() {
     accountAge = jQuery.timeago(new Date(this.props.user.created));
     tutorial_text = this.props.user.completed_tutorial ? "√ " + this.props.user.source : this.props.user.source;
+    if (this.props.user.state === "paused")
+      tutorial_text += " PAUSED"
     activated_text = null;
     if (this.props.user.activated)
       activated_text = jQuery.timeago(new Date(this.props.user.activated));
@@ -142,7 +144,7 @@ var DashboardApp = React.createClass({
       }
       return result
     }.bind(this);
-    
+
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />

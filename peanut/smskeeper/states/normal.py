@@ -1,6 +1,8 @@
 import random
 import re
 import logging
+import datetime
+import pytz
 
 from smskeeper.models import Entry, Message
 
@@ -231,7 +233,8 @@ def process(user, msg, requestDict, keeperNumber):
 
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
-				if user.signup_data_json and "fb" in user.signup_data_json:
+				now = datetime.datetime.now(pytz.timezone("US/Eastern"))
+				if now.hour >= 9 and now.hour <= 22:
 					user.setState(keeper_constants.STATE_PAUSED)
 					user.save()
 					slack_logger.postManualAlert(user, msg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)

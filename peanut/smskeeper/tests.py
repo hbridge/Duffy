@@ -273,13 +273,33 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "new")
-			# ensure we tell the user we don't understand
-			self.assertIn(getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			with patch('smskeeper.states.normal.datetime') as datetimeMock:
+				# Set us to middle of night so we get unknown command
+				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=3)
+				cliMsg.msg(self.testPhoneNumber, "new")
+				# ensure we tell the user we don't understand
+				self.assertIn(getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, keeper_constants.REPORT_ISSUE_KEYWORD)
 			self.assertIn(keeper_constants.REPORT_ISSUE_CONFIRMATION, getOutput(mock))
+
+	# See if we get into the paused state when we enter an invalid command during daytime hours
+	def test_set_paused_during_daytime(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			with patch('smskeeper.states.normal.datetime') as datetimeMock:
+				# Set us to middle of the day so we get paused
+				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
+				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=12)
+				cliMsg.msg(self.testPhoneNumber, "new")
+				# ensure we got paused
+				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_PAUSED)
+
+				# And that we got no response
+				self.assertEqual("", getOutput(mock))
+
 
 	def test_no_add_dumb_stuff(self):
 		self.setupUser(True, True)

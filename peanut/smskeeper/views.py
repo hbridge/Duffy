@@ -279,6 +279,7 @@ def dashboard_feed(request):
 			"source": "(" + user.signup_data_json + ")" if user.signup_data_json and "default" not in user.signup_data_json else '',
 			"activated": user.activated,
 			"created": user.added,
+			"state": user.state,
 			"tutorial_step": user.tutorial_step,
 			"completed_tutorial": user.completed_tutorial
 		}
