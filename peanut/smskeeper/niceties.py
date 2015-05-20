@@ -25,12 +25,12 @@ class Nicety():
 SMSKEEPER_NICETIES = [
 	Nicety("hi$|hello|hey", ["Hi there."]),
 	Nicety(
-		".*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?",
+		".*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|ty($| keeper)?",
 		["You're welcome.", "Happy to help.", "No problem.", "Sure thing."]
 	),
 	Nicety("no thanks|not now|maybe later|great to meet you too|nice to meet you too", None),
 	Nicety("yes$|no$|y$|n$|nope$", None),
-	Nicety(u"cool$|ok$|great$|k$|sweet$|hah(a)?|lol$|okay$|\U0001F44D", None),
+	Nicety(u"cool$|ok$|great$|k$|sweet$|hah(a)?|lol$|okay$|awesome|\U0001F44D", None),
 	Nicety(
 		"how are you( today)?|how're you|hows it going",
 		["I'm good, thanks for asking!", "Can't complain!"]
