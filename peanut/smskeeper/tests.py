@@ -634,6 +634,11 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			self.assertIn(getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "PST")
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "My zip code is 10012")
+			self.assertIn(getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.user = User.objects.get(id=self.user.id)
+			self.assertEqual(self.user.timezone, "EST")
 
 class SMSKeeperNattyCase(SMSKeeperBaseCase):
 

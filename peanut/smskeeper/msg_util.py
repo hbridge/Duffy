@@ -94,7 +94,7 @@ def isCommonListName(msg):
 
 
 def isSetZipcodeCommand(msg):
-	return re.match("my zipcode is (\d{5}(\-\d{4})?)", msg, re.I) is not None
+	return re.match("my zip ?code is (\d{5}(\-\d{4})?)", msg, re.I) is not None
 
 def timezoneForMsg(msg):
 	postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)

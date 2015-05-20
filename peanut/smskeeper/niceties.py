@@ -66,6 +66,10 @@ SMSKEEPER_NICETIES = [
 	Nicety(
 		"are you( a)? real( person)?|are you human|are you an? (computer|machine)|are you an ai",
 		["Do you think I am?"]
+	),
+	Nicety(
+		"whats the meaning of life",
+		["42"]
 	)
 ]
 
