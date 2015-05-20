@@ -78,3 +78,6 @@ COMMON_LIST_RES = [
 ]
 
 KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
+
+SHARE_UPSELL_FREQUENCY_DAYS = 3
+SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them to"

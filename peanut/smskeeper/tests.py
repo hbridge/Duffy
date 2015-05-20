@@ -338,7 +338,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 				self.assertNotEqual("", getOutput(mock))
 
 
-	def test_no_add_dumb_stuff(self):
+	def test_common_niceties(self):
 		self.setupUser(True, True)
 		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!", "cool", "OK", u"\U0001F44D"]
 
@@ -347,6 +347,31 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 				cliMsg.msg(self.testPhoneNumber, phrase)
 				output = getOutput(mock)
 				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
+
+	def test_thanks_upsell(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thanks")
+			output = getOutput(mock)
+			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+
+		# make sure we don't send it immediately after
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thanks")
+			output = getOutput(mock)
+			self.assertNotIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+
+		# make sure we do send if the last share date was more than SHARE_UPSELL_FREQ prior
+		self.user.last_share_upsell = datetime.datetime.now(pytz.utc) - datetime.timedelta(
+			days=keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS
+		)
+		self.user.save()
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thanks")
+			output = getOutput(mock)
+			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+
+
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)

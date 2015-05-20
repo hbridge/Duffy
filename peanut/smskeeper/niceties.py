@@ -1,5 +1,10 @@
-import re
+from datetime import datetime, timedelta
+from smskeeper import time_utils
 import random
+import re
+
+import pytz
+from smskeeper import keeper_constants
 from smskeeper import msg_util
 
 
@@ -96,7 +101,14 @@ def custom_nicety_for(regexp):
 
 @custom_nicety_for(r'.*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|ty($| keeper)?')
 def renderThankYouResponse(user, requestDict, keeperNumber):
-	return random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
+	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
+	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
+		user.last_share_upsell = datetime.now(pytz.utc)
+		user.save()
+		return "%s %s %s!" % (base, keeper_constants.SHARE_UPSELL_PHRASE, user.getInviteUrl())
+	else:
+		return base
+
 
 # for nicety in SMSKEEPER_NICETIES:
 # 	print nicety

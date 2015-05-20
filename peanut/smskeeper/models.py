@@ -175,6 +175,12 @@ class User(models.Model):
 	def isPaused(self):
 		return self.state == keeper_constants.STATE_PAUSED
 
+	def getInviteUrl(self):
+		url = "getkeeper.com"
+		if self.invite_code:
+			url += "/%s" % (self.invite_code)
+		return url
+
 	def __unicode__(self):
 		if self.name:
 			return str(self.id) + " - " + self.name
