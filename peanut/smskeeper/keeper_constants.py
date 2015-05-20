@@ -76,3 +76,5 @@ COMMON_LIST_RES = [
 	"todo",
 	"(to)?read",
 ]
+
+KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"

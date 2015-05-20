@@ -44,7 +44,11 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 
 	# TODO use a separate process but probably this is not the right place to do it.
 	if len(originalMedia) > 0:
-		media = image_util.moveMediaToS3(originalMedia)
+		# only move media if we're not running a test or using CLI
+		if sms_util.isTestKeeperNumber(keeperNumber):
+			s3mediaUrls = originalMedia
+		else:
+			s3mediaUrls = image_util.moveMediaToS3(originalMedia)
 
 	createdEntries = list()
 
@@ -72,7 +76,8 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 				entry_label = keeper_constants.SCREENSHOT_LABEL
 			autoLabels.add(entry_label)
 
-		entry = Entry.createEntry(user, keeperNumber, entry_label, text=None, img_url=entryMediaUrl)
+		# create the entry with the s3 url instead of
+		entry = Entry.createEntry(user, keeperNumber, entry_label, text=None, img_url=s3mediaUrls[i])
 		createdEntries.append(entry)
 
 	sharedHandles = list()

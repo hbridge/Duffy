@@ -76,8 +76,12 @@ def sendTips(keeperNumber=None):
 	for user in users:
 		tip = tips.selectNextTip(user)
 		if tip:
-			sendMsg(user.id, tip.render(user.name), None, keeperNumber)
-			tips.markTipSent(user, tip)
+			sendTipToUser(tip, user, keeperNumber)
+
+
+def sendTipToUser(tip, user, keeperNumber):
+	sendMsg(user.id, tip.render(user.name), tip.mediaUrl, keeperNumber)
+	tips.markTipSent(user, tip)
 
 
 def str_now_1():
@@ -85,14 +89,14 @@ def str_now_1():
 
 
 @app.task
-def sendMsg(userId, msgText, mediaUrls, keeperNumber):
+def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
 		logger.error("Tried to send message to nonexistent user with id: %d", userId)
 		return
 
-	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrls}
+	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
 	msg = Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
 
 	if type(msgText) == unicode:
@@ -104,8 +108,8 @@ def sendMsg(userId, msgText, mediaUrls, keeperNumber):
 	elif keeperNumber == constants.SMSKEEPER_TEST_NUM:
 		recordOutput(msgText, False)
 	else:
-		if mediaUrls:
-			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrls, keeperNumber)
+		if mediaUrl:
+			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)
 		else:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, None, keeperNumber)
 		logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))

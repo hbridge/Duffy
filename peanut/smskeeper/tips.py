@@ -1,6 +1,7 @@
 import datetime
 import pytz
 from smskeeper.models import Entry
+from smskeeper import keeper_constants
 
 '''
 Tips that will be sent daily to new users.
@@ -10,9 +11,10 @@ class KeeperTip():
 	id = None
 	message = None
 
-	def __init__(self, id, message):
+	def __init__(self, id, message, mediaUrl=None):
 		self.id = id
 		self.message = message
+		self.mediaUrl = mediaUrl
 
 	def render(self, name):
 		return self.message.replace(":NAME:", name) + "\n\n" + SMSKEEPER_TIP_FOOTER
@@ -21,11 +23,18 @@ REMINDER_TIP_ID = "reminders"
 PHOTOS_TIP_ID = "photos"
 SHARING_TIP_ID = "sharing"
 VOICE_TIP_ID = "voice"
+VCARD_TIP_ID = "vcard"
+
 
 SMSKEEPER_TIPS = [
 	KeeperTip(
+		VCARD_TIP_ID,
+		"Hey there, :NAME:. Tap this card and save me to your address book so it's easier to txt me!",
+		keeper_constants.KEEPER_VCARD_URL
+	),
+	KeeperTip(
 		REMINDER_TIP_ID,
-		"Hey there, :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')"
+		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')"
 	),
 	KeeperTip(
 		PHOTOS_TIP_ID,

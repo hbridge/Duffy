@@ -4,10 +4,11 @@ from smskeeper import sms_util, msg_util
 from smskeeper import actions
 
 from smskeeper.models import Entry
+from smskeeper import keeper_constants
 
 
 def sendContactCard(user, keeperNumber):
-		cardURL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
+		cardURL = keeper_constants.KEEPER_VCARD_URL
 		sms_util.sendMsg(user, '', cardURL, keeperNumber)
 
 

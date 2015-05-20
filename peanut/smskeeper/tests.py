@@ -159,14 +159,11 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 	def test_freeform_add_photo(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
-			# moveMediaMock.return_value = ["hello"]
-			moveMediaMock.side_effect = mock_return_input
-			with patch('smskeeper.async.recordOutput') as mock:
-				cliMsg.msg(self.testPhoneNumber, "add to foo", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
-				# ensure we don't treat photos without a hashtag as a bad command
-				output = getOutput(mock)
-				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "add to foo", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
+			# ensure we don't treat photos without a hashtag as a bad command
+			output = getOutput(mock)
+			self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
 		# make sure the entry got created
 		Entry.objects.get(label="#foo")
@@ -579,15 +576,12 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 	def testPhotoWithoutTag(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
-			# moveMediaMock.return_value = ["hello"]
-			moveMediaMock.side_effect = mock_return_input
-			with patch('smskeeper.async.recordOutput') as mock:
-				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
-				# ensure we don't treat photos without a hashtag as a bad command
-				output = getOutput(mock)
-				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
-				self.assertIn(keeper_constants.PHOTO_LABEL, output)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
+			# ensure we don't treat photos without a hashtag as a bad command
+			output = getOutput(mock)
+			self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			self.assertIn(keeper_constants.PHOTO_LABEL, output)
 
 		# make sure the entry got created
 		Entry.objects.get(label=keeper_constants.PHOTO_LABEL)
@@ -595,15 +589,12 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 	def testScreenshotWithoutTag(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
-			# moveMediaMock.return_value = ["hello"]
-			moveMediaMock.side_effect = mock_return_input
-			with patch('smskeeper.async.recordOutput') as mock:
-				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.png", mediaType="image/png")
-				# ensure we don't treat photos without a hashtag as a bad command
-				output = getOutput(mock)
-				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
-				self.assertIn(keeper_constants.SCREENSHOT_LABEL, output)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.png", mediaType="image/png")
+			# ensure we don't treat photos without a hashtag as a bad command
+			output = getOutput(mock)
+			self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			self.assertIn(keeper_constants.SCREENSHOT_LABEL, output)
 
 		# make sure the entry got created
 		Entry.objects.get(label=keeper_constants.SCREENSHOT_LABEL)
@@ -949,6 +940,16 @@ class SMSKeeperAsyncCase(SMSKeeperBaseCase):
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.SMSKEEPER_TIPS[1].render(self.user.name), getOutput(mock))
 
+	def testSendTipMedia(self):
+		self.setupUser(True, True, "UTC")
+
+		tip = tips.KeeperTip("testtip", "This is a tip", "http://www.getkeeper.com/favicon.png")
+		with patch('smskeeper.async.recordOutput') as mock:
+			async.sendTipToUser(tip, self.user, constants.SMSKEEPER_TEST_NUM)
+			self.assertIn("This is a tip", getOutput(mock))
+			message = Message.objects.filter(user=self.user, incoming=False).order_by("-added")[0]
+			self.assertEqual(message.getMedia()[0].url, u"http://www.getkeeper.com/favicon.png")
+
 	def testTipThrottling(self):
 		self.setupUser(True, True, "UTC")
 
@@ -1008,11 +1009,10 @@ class SMSKeeperAsyncCase(SMSKeeperBaseCase):
 	def testPhotoTipRelevance(self):
 		self.setupUser(True, True, "UTC")
 
-		with patch('smskeeper.image_util.moveMediaToS3') as moveMediaMock:
-			moveMediaMock.side_effect = mock_return_input
-			with patch('smskeeper.async.recordOutput'):
-				cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")  # add a photo
-				self.assertTipIdNotSent(tips.PHOTOS_TIP_ID)
+
+		with patch('smskeeper.async.recordOutput'):
+			cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")  # add a photo
+			self.assertTipIdNotSent(tips.PHOTOS_TIP_ID)
 
 		with patch('smskeeper.async.recordOutput'):
 			cliMsg.msg(self.testPhoneNumber, "#reminder test tomorrow")  # set a reminder

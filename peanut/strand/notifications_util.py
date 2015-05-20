@@ -43,8 +43,8 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			logger.warning("Was told to send a notification to user %s who has a device token but nothing in the Device table" % user.id)
 			logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
 			return [logEntry]
-		
-		logEntries = list()	
+
+		logEntries = list()
 
 		for device in devices:
 			try:
@@ -56,7 +56,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 
 				if customPayload:
 					payload.update(customPayload)
-					
+
 				notification.custom_payload = json.dumps(payload, cls=DuffyJsonEncoder)
 
 				if constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]:
@@ -85,7 +85,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 		return logEntries
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user.id)
-		
+
 		# check if this msgTypeId allows texting
 		if constants.NOTIFICATIONS_SMS_DICT[msgTypeId]:
 			logger.info("Sending txt instead %s" % user.id)
@@ -96,7 +96,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 					sendSMS(str(user.phone_number), msg, customPayload["mms_url"])
 				else:
 					sendSMS(str(user.phone_number), msg, None)
-					
+
 				logger.debug("SMS sent to %s: %s" % (user, msg))
 			else:
 				logger.debug("Nothing sent to %s: %s" % (user, msg))
@@ -128,11 +128,11 @@ def sendSMS(phoneNumber, msg, mmsUrl):
 	else:
 		sendSMSThroughTwilio(phoneNumber, msg, mmsUrl)
 
-def sendSMSThroughTwilio(phoneNumber, msg, mmsUrls, fromNumber=constants.TWILIO_PHONE_NUM):
+def sendSMSThroughTwilio(phoneNumber, msg, mediaUrl, fromNumber=constants.TWILIO_PHONE_NUM):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
-		
-	if mmsUrls:
-		twilioclient.messages.create(to=phoneNumber, from_=fromNumber, body=msg, media_url=mmsUrls)
+
+	if mediaUrl:
+		twilioclient.messages.create(to=phoneNumber, from_=fromNumber, body=msg, media_url=mediaUrl)
 	else:
 		twilioclient.messages.create(to=phoneNumber, from_=fromNumber, body=msg)
 
@@ -199,12 +199,12 @@ def threadedSendNotifications(userIds):
 	logger = logging.getLogger(__name__)
 
 	users = User.objects.filter(id__in=userIds)
-	
+
 	# This does only db writes so is fast.  This uses the socket server
 	sendRefreshFeedToUsers(users)
 
 	actionsCountByUserId = getUnreadActionsListCountByUserId(users)
-	
+
 	# Next send through push notifications
 	# This might take a while since we have to hit apple's api.  Ok since we're in a new thread.
 	for user in users:

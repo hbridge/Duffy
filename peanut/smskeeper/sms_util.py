@@ -10,15 +10,15 @@ from peanut.settings import constants
 SECONDS_BETWEEN_SEND = 2
 
 
-def sendMsg(user, msg, mediaUrls, keeperNumber, eta=None):
+def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
-	# If its CLI or TEST then keep it local and not async.
-	if keeperNumber == constants.SMSKEEPER_CLI_NUM or keeperNumber == constants.SMSKEEPER_TEST_NUM:
-		async.sendMsg(user.id, msg, mediaUrls, keeperNumber)
+	if isRealKeeperNumber(keeperNumber):
+		async.sendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber), eta=eta)
 	else:
-		async.sendMsg.apply_async((user.id, msg, mediaUrls, keeperNumber), eta=eta)
+		# If its CLI or TEST then keep it local and not async.
+		async.sendMsg(user.id, msg, mediaUrl, keeperNumber)
 
 
 def sendMsgs(user, msgList, keeperNumber, delay=SECONDS_BETWEEN_SEND):
@@ -31,3 +31,11 @@ def sendMsgs(user, msgList, keeperNumber, delay=SECONDS_BETWEEN_SEND):
 
 		# Call the single method above so it does the right async logic
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime)
+
+
+def isRealKeeperNumber(keeperNumber):
+	return keeperNumber != constants.SMSKEEPER_CLI_NUM and keeperNumber != constants.SMSKEEPER_TEST_NUM
+
+
+def isTestKeeperNumber(keeperNumber):
+	return keeperNumber == constants.SMSKEEPER_TEST_NUM
