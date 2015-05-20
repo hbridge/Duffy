@@ -29,7 +29,7 @@ VCARD_TIP_ID = "vcard"
 SMSKEEPER_TIPS = [
 	KeeperTip(
 		VCARD_TIP_ID,
-		"Hey there, :NAME:. Here's my card.  Tap it and save me to your address book so it's easier to txt me!",
+		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
 		keeper_constants.KEEPER_VCARD_URL
 	),
 	KeeperTip(
@@ -46,7 +46,7 @@ SMSKEEPER_TIPS = [
 	# ),
 	KeeperTip(
 		VOICE_TIP_ID,
-		"Hate typing, :NAME:? Text me without without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper add speak more type less to resolutions'"
+		"If you hate typing, :NAME:, you can text me without without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper add speak more type less to resolutions'"
 	),
 ]
 
