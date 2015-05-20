@@ -350,7 +350,7 @@ def signup_from_website(request):
 	form = WebsiteRegistrationForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		source = form.cleaned_data['source']
-		referrer = form.cleaned_data['referrer']
+		referrerCode = form.cleaned_data['referrer']
 
 		# clean phone number
 		region_code = 'US'
@@ -369,11 +369,24 @@ def signup_from_website(request):
 				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrer}))
+				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrerCode': referrerCode}))
 				target_user.save()
 
-				if referrer:
-					user_util.activate(target_user, "", keeper_constants.STATE_TUTORIAL_REMIND, settings.KEEPER_NUMBER)
+				if referrerCode:
+					# First, activate this new user.
+					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
+
+					# Next, activate the user who referred them, if they aren't activataed already
+					referrerCodeUsers = User.objects.filter(invite_code=referrerCode)
+					if len(referrerCodeUsers) == 1:
+						referrerCodeUser = referrerCodeUsers[0]
+						logger.debug("Found referring user %s" % (referrerCodeUser.id))
+						if referrerCodeUser.state == keeper_constants.STATE_NOT_ACTIVATED:
+							user_util.activate(referrerCodeUser, "You just jumped the line!", None, settings.KEEPER_NUMBER)
+					elif len(referrerCodeUser) > 1:
+						logger.error("Just found multiple users for referrerCode code %s" % referrerCode)
+					else:
+						logger.debug("Didn't find any referrerCodes for code %s" % referrerCode)
 				else:
 					not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
 		else:
