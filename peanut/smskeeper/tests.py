@@ -696,9 +696,14 @@ class SMSKeeperNattyCase(SMSKeeperBaseCase):
 		inTwoHours = self.getUserNow() + datetime.timedelta(hours=2)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tues morning in two hours")
+			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tuesday morning in two hours")
 			correctString = msg_util.naturalize(self.getUserNow(), inTwoHours)
 			self.assertIn(correctString, getOutput(mock))
+
+	"""
+	Commenting out these tests for now because we're explictly not supporting these cases right now.
+	If two times are picked out of a string, we're choosing the sooner one. These tests create a situation
+	where that is wrong.  If we want to change that, then can bring these tests back
 
 	def test_natty_two_times_by_number(self):
 		self.setupUser(True, True)
@@ -742,6 +747,7 @@ class SMSKeeperNattyCase(SMSKeeperBaseCase):
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 		self.assertIn("change susie grade to 12", entry.text)
+	"""
 
 	def test_natty_get_new_query(self):
 		ret = natty_util.getNewQuery("at 10", "at 10", 1)
@@ -765,9 +771,14 @@ class SMSKeeperNattyCase(SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "clear #reminders")
 
+		"""
+		Not supporting queries with two times where one could be sooner than the other and wrong
+		Look at comments above
+
 		cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 23 at 8pm tomorrow")
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 		self.assertEqual(entry.remind_timestamp.hour, 0)  # 8pm Eastern in UTC
+		"""
 
 	def testPausedState(self):
 		self.setupUser(True, True, keeper_constants.STATE_PAUSED)

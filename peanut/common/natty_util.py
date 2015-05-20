@@ -38,11 +38,8 @@ def getNattyInfo(query, timezone):
 
 			myResults.append((subDate, getNewQuery(query, subUsedText), subUsedText))
 
+	# Sort by the date, we want to soonest first
 	myResults = sorted(myResults, key=lambda x: x[0])
-
-	# Now, we want to handle it where if someone types in just a number, we prefer other times before then
-	# Here, we're sorting it so if the usedText represents an int, then make it a high number, otherwise 0
-	myResults = sorted(myResults, key=lambda x: len(x[2]), reverse=True)
 
 	return myResults
 
