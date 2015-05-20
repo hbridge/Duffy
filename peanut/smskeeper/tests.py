@@ -76,7 +76,7 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 	def test_first_connect(self):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
-			self.assertIn("I'll be in touch", getOutput(mock))
+			self.assertIn("Want seamless organization now", getOutput(mock))
 
 	def test_unactivated_connect(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
