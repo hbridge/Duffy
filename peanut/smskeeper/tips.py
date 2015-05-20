@@ -29,7 +29,7 @@ VCARD_TIP_ID = "vcard"
 SMSKEEPER_TIPS = [
 	KeeperTip(
 		VCARD_TIP_ID,
-		"Hey there, :NAME:. Tap this card and save me to your address book so it's easier to txt me!",
+		"Hey there, :NAME:. Here's my card.  Tap it and save me to your address book so it's easier to txt me!",
 		keeper_constants.KEEPER_VCARD_URL
 	),
 	KeeperTip(
