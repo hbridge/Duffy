@@ -369,7 +369,7 @@ def signup_from_website(request):
 				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrerCode': referrerCode}))
+				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode}))
 				target_user.save()
 
 				if referrerCode:
