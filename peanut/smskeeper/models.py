@@ -33,6 +33,8 @@ class User(models.Model):
 
 	signup_data_json = models.TextField(null=True)
 
+	invite_code = models.CharField(max_length=100, null=True)
+
 	timezone = models.CharField(max_length=100, null=True)
 	sent_tips = models.TextField(null=True, db_index=False)
 	disable_tips = models.BooleanField(default=False)

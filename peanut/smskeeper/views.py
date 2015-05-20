@@ -22,7 +22,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from smskeeper import sms_util, processing_util, keeper_constants
+from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
 
@@ -350,6 +350,7 @@ def signup_from_website(request):
 	form = WebsiteRegistrationForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		source = form.cleaned_data['source']
+		referrer = form.cleaned_data['referrer']
 
 		# clean phone number
 		region_code = 'US'
@@ -368,10 +369,13 @@ def signup_from_website(request):
 				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps(source))
+				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrer}))
 				target_user.save()
 
-				not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
+				if referrer:
+					user_util.activate(target_user, "", keeper_constants.STATE_TUTORIAL_REMIND, settings.KEEPER_NUMBER)
+				else:
+					not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
 		else:
 			response['result'] = False
 	else:
