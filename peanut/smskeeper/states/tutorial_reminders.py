@@ -5,6 +5,7 @@ import logging
 from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import msg_util
+from smskeeper import analytics
 
 # Might need to get ride of this at some point due to circular dependencies
 # Its only using a few constants, easily moved
@@ -15,8 +16,18 @@ logger = logging.getLogger(__name__)
 
 def process(user, msg, requestDict, keeperNumber):
 	step = user.getStateData("step")
+
 	if step:
 		step = int(step)
+
+	analytics.logUserEvent(
+		user,
+		"Reached Tutorial Step",
+		{
+			"Tutorial": "Reminders",
+			"Step": step if step is not None else 0
+		}
+	)
 
 	if not step:
 		nameFromPhrase = msg_util.nameInTutorialPrompt(msg)
@@ -50,6 +61,13 @@ def process(user, msg, requestDict, keeperNumber):
 		time.sleep(1)
 		sms_util.sendMsgs(user, ["What else do you want to be reminded about?", "FYI, I can also help you with other things. Just txt me 'Tell me more'"], keeperNumber)
 		user.setTutorialComplete()
+		analytics.logUserEvent(
+			user,
+			"Completed Tutorial",
+			{
+				"Tutorial": "Reminders"
+			}
+		)
 
 	user.save()
 	return True
