@@ -11,6 +11,7 @@ from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
 from smskeeper import actions
 from smskeeper import helper_util
+from smskeeper import analytics
 
 from smskeeper.models import Entry
 
@@ -94,6 +95,7 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 	if match is not None:
 		query = query[match.end():].strip()
 
+	isUpdate = entry is not None
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
 	if not entry:
@@ -101,7 +103,7 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 		entry = entries[0]
 
 	hourForUser = startDate.astimezone(user.getTimezone()).hour
-	if (hourForUser >= 0 and hourForUser <= 6 and keeperNumber != constants.SMSKEEPER_TEST_NUM):
+	if (isReminderHourSuspicious(hourForUser) and keeperNumber != constants.SMSKEEPER_TEST_NUM):
 		logger.error("Scheduling an alert for %s am local time for user %s, might want to check entry id %s" % (hourForUser, user.id, entry.id))
 
 	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
@@ -127,8 +129,20 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 
 	sms_util.sendMsg(user, toSend, None, keeperNumber)
 
+	analytics.logUserEvent(
+		user,
+		"Created Reminder",
+		{
+			"Was Update": isUpdate,
+			"Needed Followup": sendFollowup,
+			"Was Suspicious Hour": isReminderHourSuspicious(hourForUser)
+		}
+	)
+
 	return entry
 
+def isReminderHourSuspicious(hourForUser):
+	return hourForUser >= 0 and hourForUser <= 6
 
 def getDefaultTime(user):
 	tz = user.getTimezone()
