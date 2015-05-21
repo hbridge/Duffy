@@ -171,6 +171,16 @@ def fetch(user, msg, keeperNumber):
 	else:
 		sms_util.sendMsg(user, currentMsg + clearMsg, None, keeperNumber)
 
+	analytics.logUserEvent(
+		user,
+		"Fetched Label",
+		{
+			"Entry Count": len(entries),
+			"Label": label,
+			"Media Count": len(mediaUrls)
+		}
+	)
+
 def clear(user, msg, keeperNumber):
 	label = msg_util.getLabelToClear(msg)
 	entries = Entry.fetchEntries(user=user, label=label)
