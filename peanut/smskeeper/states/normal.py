@@ -220,6 +220,8 @@ def process(user, msg, requestDict, keeperNumber):
 		elif msg_util.isTellMeMore(msg):
 			actions.tellMeMore(user, msg, keeperNumber)
 		# STATE_ADD
+		elif msg_util.isFetchHandleCommand(msg):
+			actions.fetchHandle(user, msg, keeperNumber)
 		elif msg_util.isCreateHandleCommand(msg):
 			dealWithCreateHandle(user, msg, keeperNumber)
 		# STATE_DELETE

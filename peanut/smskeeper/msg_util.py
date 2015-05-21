@@ -198,8 +198,14 @@ def extractPhoneNumbers(msg):
 
 def isCreateHandleCommand(msg):
 	phoneNumbers, remaining_str = extractPhoneNumbers(msg)
-	return isHandle(remaining_str.strip())
+	return (
+		isHandle(remaining_str.strip())
+		and phoneNumbers is not None
+		and len(phoneNumbers) > 0
+	)
 
+def isFetchHandleCommand(msg):
+	return isHandle(msg.strip())
 
 def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()

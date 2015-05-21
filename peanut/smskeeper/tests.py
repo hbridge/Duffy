@@ -914,7 +914,15 @@ class SMSKeeperSharingCase(TestCase):
 		entries = Entry.fetchEntries(newUser, "#list")
 		self.assertEqual(len(entries), 1)
 
-	# TODO(Henry) add test case for sharing with handle resolution
+	def testFetchContact(self):
+		# make sure getting an undefined handle doesn't crash
+		cliMsg.msg(self.testPhoneNumbers[0], "@test")
+		cliMsg.msg(self.testPhoneNumbers[0], "@test +16505555551")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumbers[0], "@Test")
+			self.assertIn("6505555551", getOutput(mock))
+
 	# TODO(Henry) add test cases for having multiple contacts for the same target user
 
 	'''

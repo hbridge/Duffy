@@ -234,6 +234,19 @@ def createHandle(user, handle, targetNumber):
 
 	return contact, createdUser, oldUser
 
+def fetchHandle(user, msg, keeperNumber):
+	handle = msg.strip()
+	try:
+		contact = Contact.objects.get(user=user, handle__iexact=handle)
+		sms_util.sendMsg(user, "I have %s's number down as %s" % (handle, contact.target.phone_number), None, keeperNumber)
+	except Contact.DoesNotExist:
+		sms_util.sendMsg(
+			user,
+			"I don't have %s's phone number. To teach me, say %s with the phone number, like '%s (555) 555-5555'" % (handle, handle, handle),
+			None,
+			keeperNumber
+		)
+
 
 def setTipFrequency(user, msg, keeperNumber):
 	words = msg.strip().lower().split(" ")
