@@ -94,12 +94,17 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 		else:
 			sms_util.sendMsg(user, helper_util.randomAcknowledgement() + shareString, None, keeperNumber)
 
-	analytics.logUserEvent(user, "Added Entries", {
-		"Entry Count": len(createdEntries),
-		"Share Count": len(handles),
-		"Label": label,
-		"Media Count": len(originalMedia)
-	})
+	if label != keeper_constants.REMIND_LABEL:  # reminders logged separately
+		analytics.logUserEvent(
+			user,
+			"Added Entries",
+			{
+				"Entry Count": len(createdEntries),
+				"Share Count": len(handles),
+				"Label": label,
+				"Media Count": len(originalMedia)
+			}
+		)
 
 	return createdEntries, notFoundHandles
 
