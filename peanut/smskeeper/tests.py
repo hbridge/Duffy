@@ -7,6 +7,7 @@ from testfixtures import Replacer
 from testfixtures import test_datetime
 
 from django.test import TestCase
+from django.conf import settings
 
 from peanut.settings import constants
 from smskeeper.models import User, Entry, Contact, Message, ZipData
@@ -18,6 +19,8 @@ from common import natty_util
 
 from smskeeper import sms_util
 
+# turn off mixpanel for tests
+settings.MIXPANEL_TOKEN = None
 
 def getOutput(mock):
 	output = u""

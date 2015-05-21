@@ -6,4 +6,5 @@ mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
 
 def logUserEvent(user, eventName, parametersDict=None):
-	mp.track(user.id, eventName, parametersDict)
+	if settings.MIXPANEL_TOKEN is not None:
+		mp.track(user.id, eventName, parametersDict)
