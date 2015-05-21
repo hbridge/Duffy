@@ -78,7 +78,7 @@ def isFetchCommand(msg, user):
 	elif isCommonListName(msg):
 		return True
 	else:
-		entries = Entry.fetchEntries(user, "#%s" % cleaned, hidden=None)
+		entries = Entry.fetchEntries(user, "#%s" % cleanMsgText(msg), hidden=None)
 		if entries.count() > 0:
 			return True
 
@@ -144,7 +144,7 @@ def isPrintHashtagsCommand(msg):
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
 # we allow items to be blank to support "add to myphotolist" with an attached photo
-freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>.+)( list)?", re.I)
+freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
 def isAddTextCommand(msg):
 	if hasLabel(msg) and not isLabel(msg):
 		return True

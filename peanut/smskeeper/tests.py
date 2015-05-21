@@ -123,6 +123,13 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "groceries list")
 			self.assertIn("tofu", getOutput(mock))
 
+	def test_freeform_add_punctuation(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Add milk to groceries.")
+			cliMsg.msg(self.testPhoneNumber, "Groceries")
+			self.assertIn("milk", getOutput(mock))
+
 	def test_freeform_multi_add(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 
