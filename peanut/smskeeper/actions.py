@@ -232,6 +232,7 @@ def createHandle(user, handle, targetNumber):
 
 def setTipFrequency(user, msg, keeperNumber):
 	words = msg.strip().lower().split(" ")
+	old_tip_frequency = user.tip_frequency_days
 	if words[3] == "weekly":
 		user.tip_frequency_days = 7
 		user.save()
@@ -247,12 +248,31 @@ def setTipFrequency(user, msg, keeperNumber):
 	else:
 		sms_util.sendMsg(user, "Sorry, I didn't get that. You can type 'send me tips weekly/monthly/never' to change how often I send you tips.", None, keeperNumber)
 
+	analytics.logUserEvent(
+		user,
+		"Changed Tip Frequency",
+		{
+			"Old Frequency": old_tip_frequency,
+			"New Frequency": user.tip_frequency_days,
+		}
+	)
+
 
 def help(user, msg, keeperNumber):
 	sms_util.sendMsgs(user, keeper_constants.HELP_MESSAGES, keeperNumber)
+	analytics.logUserEvent(
+		user,
+		"Requested Help",
+		None
+	)
 
 def tellMeMore(user, msg, keeperNumber):
 	sms_util.sendMsg(user, keeper_constants.TELL_ME_MORE, None, keeperNumber)
+	analytics.logUserEvent(
+		user,
+		"Tell Me More",
+		None
+	)
 
 def setName(user, msg, keeperNumber):
 	name = msg_util.nameInSetName(msg)
@@ -262,6 +282,11 @@ def setName(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "Great, I'll call you %s from now on." % name, None, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "Sorry, I didn't catch that, try saying something like 'My name is Keeper'" % name, None, keeperNumber)
+	analytics.logUserEvent(
+		user,
+		"Changed Name",
+		None
+	)
 
 def setZipcode(user, msg, keeperNumber):
 	timezone, user_error = msg_util.timezoneForMsg(msg)
@@ -272,3 +297,9 @@ def setZipcode(user, msg, keeperNumber):
 	user.timezone = timezone
 	user.save()
 	sms_util.sendMsg(user, helper_util.randomAcknowledgement(), None, keeperNumber)
+
+	analytics.logUserEvent(
+		user,
+		"Changed Zipcode",
+		None
+	)
