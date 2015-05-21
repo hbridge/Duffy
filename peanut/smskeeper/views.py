@@ -27,6 +27,7 @@ from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgFo
 from smskeeper.models import User, Entry, Message
 
 from smskeeper.states import not_activated
+from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
 
@@ -389,6 +390,11 @@ def signup_from_website(request):
 						logger.debug("Didn't find any referrerCodes for code %s" % referrerCode)
 				else:
 					not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
+
+				analytics.logUserEvent(target_user, "Website Signup", {
+					"source": source,
+					"referred": True if referrerCode else False
+				})
 		else:
 			response['result'] = False
 	else:
