@@ -41,8 +41,8 @@ def getInferredLabel(user):
 	for i in range(1, len(incoming_messages)):
 		msg_body = incoming_messages[i].getBody()
 		logger.info("message -%d: %s" % (i, msg_body))
-		if msg_util.isLabel(msg_body):
-			return msg_body
+		if msg_util.isFetchCommand(msg_body, user):
+			return msg_util.labelInFetch(msg_body)
 		elif msg_util.isDeleteCommand(msg_body):
 			continue
 		else:

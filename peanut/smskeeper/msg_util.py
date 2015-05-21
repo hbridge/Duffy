@@ -69,6 +69,15 @@ def labelInFreeformFetch(msg):
 			return "#" + match.group("label")  # the DB stores labels with the #
 	return None
 
+
+def labelInFetch(msg):
+	label = labelInFreeformFetch(msg)
+	if not label:
+		label = msg
+		if "#" not in label:
+			label = "#" + msg
+	return label
+
 def isFetchCommand(msg, user):
 	cleaned = msg.strip().lower()
 	if isLabel(cleaned):

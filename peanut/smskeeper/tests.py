@@ -160,6 +160,17 @@ class SMSKeeperMainCase(SMSKeeperBaseCase):
 			output = getOutput(mock)
 			self.assertNotIn("milk", output)
 
+	def test_freeform_delete(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+
+		cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
+		cliMsg.msg(self.testPhoneNumber, "Groceries")
+		cliMsg.msg(self.testPhoneNumber, "Delete 1")
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Groceries")
+			self.assertNotIn("milk", getOutput(mock))
+
+
 	def test_freeform_fetch_common_list(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 		with patch('smskeeper.async.recordOutput') as mock:

@@ -109,14 +109,11 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 	return createdEntries, notFoundHandles
 
 
+
+
 def fetch(user, msg, keeperNumber):
 	# This is a label fetch.  See if a note with that label exists then return
-	label = msg_util.labelInFreeformFetch(msg)
-	if not label:
-		label = msg
-		if "#" not in label:
-			label = "#" + msg
-
+	label = msg_util.labelInFetch(msg)
 	if label is None or label == "":
 		raise NameError("label is blank")
 
