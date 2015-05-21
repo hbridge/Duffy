@@ -11,6 +11,7 @@ from smskeeper.models import Entry, Message
 from smskeeper import sms_util, msg_util, helper_util
 from smskeeper import actions, keeper_constants
 from smskeeper import niceties
+from smskeeper import analytics
 
 from common import slack_logger
 
@@ -236,6 +237,11 @@ def process(user, msg, requestDict, keeperNumber):
 				response = nicety.getResponse(user, requestDict, keeperNumber)
 				if response:
 					sms_util.sendMsg(user, response, None, keeperNumber)
+					analytics.logUserEvent(
+						user,
+						"Sent Nicety",
+						None
+					)
 
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
@@ -246,11 +252,18 @@ def process(user, msg, requestDict, keeperNumber):
 					postMsg = "User %s paused after: %s" % (user.id, msg)
 					slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 					logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
-					return True
 				else:
 					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
 					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
 					user.save()
+				analytics.logUserEvent(
+					user,
+					"Sent Unknown Command",
+					{
+						"Command": msg,
+						"Paused": user.state == keeper_constants.STATE_PAUSED,
+					}
+				)
 
 		return True
 	except:
