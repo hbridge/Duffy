@@ -6,5 +6,6 @@ mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
 
 def logUserEvent(user, eventName, parametersDict=None):
-	if settings.MIXPANEL_TOKEN is not None:
+	# don't send for tests or for founders (id <= 3)
+	if settings.MIXPANEL_TOKEN is not None and user.id > 3:
 		mp.track(user.id, eventName, parametersDict)
