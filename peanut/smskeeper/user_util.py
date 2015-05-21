@@ -26,6 +26,6 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 		userToActivate,
 		"User Activated",
 		{
-			"Days Waiting": time_utils.daysAndHoursAgo(userToActivate.added)
+			"Days Waiting": time_utils.daysAndHoursAgo(userToActivate.added)[0]
 		}
 	)
