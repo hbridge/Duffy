@@ -6,7 +6,7 @@ from smskeeper import keeper_constants
 import django
 
 from smskeeper.models import Entry, Contact, User
-
+from smskeeper import analytics
 
 def shareEntries(user, entries, handles, keeperNumber):
 	sharedHandles = list()
@@ -93,6 +93,13 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 			sms_util.sendMsg(user, "Filing that under " + ", ".join(autoLabels) + shareString, None, keeperNumber)
 		else:
 			sms_util.sendMsg(user, helper_util.randomAcknowledgement() + shareString, None, keeperNumber)
+
+	analytics.logUserEvent(user, "Added Entries", {
+		"Entry Count": len(createdEntries),
+		"Share Count": len(handles),
+		"Label": label,
+		"Media Count": len(originalMedia)
+	})
 
 	return createdEntries, notFoundHandles
 

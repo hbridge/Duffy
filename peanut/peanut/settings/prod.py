@@ -58,3 +58,5 @@ KEEPER_NUMBER = "+14792026561"
 
 SLACK_LOGGING_URL = "https://hooks.slack.com/services/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"
 USER_HISTORY_PATH = "http://prod.strand.duffyapp.com/smskeeper/history?user_id="
+
+MIXPANEL_TOKEN = "165ffa12b4eac14005ec6d97872a9c63"
