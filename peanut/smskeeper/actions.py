@@ -192,6 +192,15 @@ def clear(user, msg, keeperNumber):
 			entry.save()
 		sms_util.sendMsg(user, "%s cleared" % (label.replace("#", "")), None, keeperNumber)
 
+	analytics.logUserEvent(
+		user,
+		"Cleared Label",
+		{
+			"Entry Count": len(entries),
+			"Label": label,
+		}
+	)
+
 def createHandle(user, handle, targetNumber):
 	# see if there's an existing contact for that handle
 	oldUser = None
