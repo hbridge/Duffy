@@ -77,6 +77,26 @@ SMSKEEPER_NICETIES = [
 	Nicety(
 		"whats the meaning of life",
 		["42"]
+	),
+	Nicety(
+		"where (are you from|do you live)",
+		[u"I was created is NYC \U0001f34e"]
+	),
+	Nicety(
+		"is this (a scam|for real)",
+		[u"I'm just a friendly digital assistant here to help you remember things."]
+	),
+	Nicety(
+		"(is this|are you)( kind of|kinda)? like siri",
+		[u"We're distantly related. I text and throw better parties though! \U0001f389"]
+	),
+	Nicety(
+		"what do you think of siri",
+		[u"She's a nice lady, but she needs to loosen up! \U0001f60e"]
+	),
+	Nicety(
+		"why.* my zip( )?code",
+		[u"Knowing your zip code allows me to send you reminders in the right time zone."]
 	)
 ]
 
@@ -99,7 +119,7 @@ def custom_nicety_for(regexp):
 		return f
 	return gethandler
 
-@custom_nicety_for(r'.*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|ty($| keeper)?')
+@custom_nicety_for(r'.*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|(ty|thx|thz|thks)($| keeper)?')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
 	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
