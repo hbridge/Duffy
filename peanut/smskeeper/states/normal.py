@@ -71,9 +71,8 @@ def dealWithDelete(user, msg, keeperNumber):
 	logger.debug(item_indices)
 
 	label = None
-	if msg_util.hasLabel(msg):
-		text, label, handles = msg_util.getMessagePieces(msg)
-	else:
+	text, label, handles = msg_util.getMessagePieces(msg)
+	if not label:
 		label = getInferredLabel(user)
 
 	if label:
