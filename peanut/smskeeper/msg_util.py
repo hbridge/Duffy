@@ -139,6 +139,7 @@ def isRemindCommand(msg):
 		'#remindme' in text or
 		'#reminder' in text or
 		'#reminders' in text or
+		'remind me' in text or
 		get_reminders_re.match(text) is not None
 	)
 

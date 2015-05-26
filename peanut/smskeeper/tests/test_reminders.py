@@ -119,6 +119,18 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
+	def test_reminders_middle_of_sentence(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "at 2pm tomorrow remind me to remind kate about her list")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+
+		self.assertEqual("remind kate about her list", entry.text)
+		self.assertEqual(18, entry.remind_timestamp.hour)
+
 	def test_reminders_commas(self):
 		self.setupUser(True, True)
 
