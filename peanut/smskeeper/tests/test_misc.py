@@ -1,10 +1,18 @@
 import datetime
 import pytz
+import string
 from mock import patch
 
+from django.test import TestCase
+from django.conf import settings
+
 from peanut.settings import constants
-from smskeeper.models import User, Entry, Message
+from smskeeper.models import User, Entry, Contact, Message, ZipData
 from smskeeper import msg_util, cliMsg, keeper_constants
+from smskeeper import async
+from smskeeper import tips
+
+from common import natty_util
 
 from smskeeper import sms_util
 
@@ -97,6 +105,17 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			output = self.getOutput(mock)
 			self.assertNotIn("milk", output)
 
+	def test_freeform_delete(self):
+		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
+
+		cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
+		cliMsg.msg(self.testPhoneNumber, "Groceries")
+		cliMsg.msg(self.testPhoneNumber, "Delete 1")
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Groceries")
+			self.assertNotIn("milk", self.getOutput(mock))
+
+
 	def test_freeform_fetch_common_list(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -160,8 +179,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
-			correctString = msg_util.naturalize(self.getUserNow(), self.getUserNow() + datetime.timedelta(days=1))
-			self.assertIn(correctString, self.getOutput(mock))
+			self.assertIn("tomorrow at 9am", self.getOutput(mock))
 			self.assertIn("I can also help you with other things", self.getOutput(mock))
 
 	def test_tutorial_remind_no_time_given(self):
@@ -317,6 +335,66 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+
+
+
+	def test_absolute_delete(self):
+		self.setupUser(True, True)
+		# ensure deleting from an empty list doesn't crash
+		cliMsg.msg(self.testPhoneNumber, "delete 1 #test")
+		cliMsg.msg(self.testPhoneNumber, "old fashioned #cocktail")
+
+		# First make sure that the entry is there
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#cocktail")
+			self.assertIn("old fashioned", self.getOutput(mock))
+
+		# Next make sure we delete and the list is clear
+		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#cocktail")
+			self.assertNotIn("old fashioned", self.getOutput(mock))
+
+	def test_contextual_delete(self):
+		self.setupUser(True, True)
+		for i in range(1, 2):
+			cliMsg.msg(self.testPhoneNumber, "foo%d #bar" % (i))
+
+		# ensure we don't delete when ambiguous
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 1")
+			self.assertIn("Sorry, I'm not sure", self.getOutput(mock))
+
+		# ensure deletes right item
+		cliMsg.msg(self.testPhoneNumber, "#bar")
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 2")
+			self.assertNotIn("2. foo2", self.getOutput(mock))
+
+		# ensure can chain deletes
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 1")
+			self.assertNotIn("1. foo1", self.getOutput(mock))
+
+		# ensure deleting from empty doesn't crash
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete 1")
+			self.assertNotIn("I deleted", self.getOutput(mock))
+
+	def test_multi_delete(self):
+		self.setupUser(True, True)
+		for i in range(1, 5):
+			cliMsg.msg(self.testPhoneNumber, "foo%d #bar" % (i))
+
+		# ensure we can delete with or without spaces
+		cliMsg.msg(self.testPhoneNumber, "delete 3, 5,2 #bar")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#bar")
+
+			self.assertNotIn("foo2", self.getOutput(mock))
+			self.assertNotIn("foo3", self.getOutput(mock))
+			self.assertNotIn("foo5", self.getOutput(mock))
 
 	def test_naturalize(self):
 		# Sunday, May 31 at 8 am

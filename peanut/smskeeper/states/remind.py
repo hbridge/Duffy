@@ -29,6 +29,11 @@ def validTime(startDate):
 	return not (startDate is None or abs((now - startDate).total_seconds()) < 10)
 
 
+def isNattyDefaultTime(startDate):
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	return startDate.hour == now.hour and startDate.minute == now.minute
+
+
 # Returns True if this message has a valid time and it doesn't look like another remind command
 # Otherwise False
 def isFollowup(startDate, msg):
@@ -88,7 +93,8 @@ def process(user, msg, requestDict, keeperNumber):
 
 
 #  Update or create the Entry for the reminder entry and send message to user
-def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumber, requestDict):
+#  Startdate should be utc
+def doRemindMessage(user, utcDate, msg, query, sendFollowup, entry, keeperNumber, requestDict):
 	# if the user created this reminder as "remind me to", we should remove it from the text
 	match = re.match('remind me( to)?', query, re.I)
 	if match is not None:
@@ -101,17 +107,22 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 		entries, notFoundHandles = actions.add(user, msgWithLabel, requestDict, keeperNumber, False, False)
 		entry = entries[0]
 
-	hourForUser = startDate.astimezone(user.getTimezone()).hour
+	tzAwareDate = utcDate.astimezone(user.getTimezone())
+
+	hourForUser = tzAwareDate.hour
 	if (isReminderHourSuspicious(hourForUser) and keeperNumber != constants.SMSKEEPER_TEST_NUM):
 		logger.error("Scheduling an alert for %s am local time for user %s, might want to check entry id %s" % (hourForUser, user.id, entry.id))
 
-	# Hack where we add 5 seconds to the time so we support queries like "in 2 hours"
-	# Without this, it'll return back "in 1 hour" because some time has passed and it rounds down
-	# Have to pass in cleanDate since humanize doesn't use utcnow.  To set to utc then kill the tz
-	startDate = startDate.astimezone(user.getTimezone())
-	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), startDate)
+	# If we got back a "natty default" time, which is the same time as now but a few days in the future
+	# default it to 9 am the local time
+	# Pass in startDate here since its in UTC, same as our server
+	if isNattyDefaultTime(utcDate):
+		tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
+		utcDate = tzAwareDate.astimezone(pytz.utc)
 
-	entry.remind_timestamp = startDate
+	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), tzAwareDate)
+
+	entry.remind_timestamp = utcDate
 	entry.keeper_number = keeperNumber
 	entry.orig_text = msg
 	entry.save()
@@ -140,8 +151,10 @@ def doRemindMessage(user, startDate, msg, query, sendFollowup, entry, keeperNumb
 
 	return entry
 
+
 def isReminderHourSuspicious(hourForUser):
 	return hourForUser >= 0 and hourForUser <= 6
+
 
 def getDefaultTime(user):
 	tz = user.getTimezone()
