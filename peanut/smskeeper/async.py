@@ -100,6 +100,7 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 		return
 
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
+	# Create the message now, but only save it if we know we successfully sent the message
 	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson))
 
 	if type(msgText) == unicode:
@@ -108,8 +109,10 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 	if keeperNumber == constants.SMSKEEPER_CLI_NUM:
 		# This is used for command line interface commands
 		recordOutput(msgText, True)
+		message.save()
 	elif keeperNumber == constants.SMSKEEPER_TEST_NUM:
 		recordOutput(msgText, False)
+		message.save()
 	else:
 		try:
 			logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
