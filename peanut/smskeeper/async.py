@@ -100,7 +100,7 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 		return
 
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
-	msg = Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
+	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson))
 
 	if type(msgText) == unicode:
 		msgText = msgText.encode('utf-8')
@@ -112,14 +112,14 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 		recordOutput(msgText, False)
 	else:
 		try:
+			logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)
+			message.save()
+			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
 		except TwilioRestException as e:
 			logger.info("Got TwilioRestException for user %s with message %s.  Setting to state stopped" % (userId, e))
 			user.setState(keeper_constants.STATE_STOPPED)
 			user.save()
-
-		logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
-		slack_logger.postMessage(msg, keeper_constants.SLACK_CHANNEL_FEED)
 
 
 # This is used for testing, it gets mocked out
