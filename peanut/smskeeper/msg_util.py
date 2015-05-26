@@ -345,13 +345,13 @@ def naturalize(now, futureTime):
 
 	# If the same day, then say "today at 5pm"
 	if deltaHours < 24 and futureTime.day == now.day:
-		return "today at %s" % getNaturalTime(futureTime)
+		return "later today around %s" % getNaturalTime(futureTime)
 	# Tomorrow
 	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
-		return "tomorrow at %s" % getNaturalTime(futureTime)
+		return "tomorrow around %s" % getNaturalTime(futureTime)
 	elif delta.days < 6:
-		return "%s at %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
+		return "%s around %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
 	elif delta.days < 13:
-		return "next %s at %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
+		return "next %s around %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
 
 	return "%s days from now" % delta.days
