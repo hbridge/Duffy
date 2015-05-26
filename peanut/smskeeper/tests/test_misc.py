@@ -179,7 +179,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
-			self.assertIn("tomorrow at 9am", self.getOutput(mock))
+			self.assertIn("tomorrow around 9am", self.getOutput(mock))
 			self.assertIn("I can also help you with other things", self.getOutput(mock))
 
 	def test_tutorial_remind_no_time_given(self):
@@ -197,7 +197,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 				cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 				# Since there was no time given, should have picked a time in the near future
-				self.assertIn("today at 6pm", self.getOutput(mock))
+				self.assertIn("today around 6pm", self.getOutput(mock))
 
 				# This is the key here, make sure we have the extra message
 				self.assertIn("In the future, you can", self.getOutput(mock))
@@ -404,39 +404,39 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("foo5", self.getOutput(mock))
 
 	def test_naturalize(self):
-		# Sunday, May 31 at 8 am
+		# Sunday, May 31 around 8 am
 		now = datetime.datetime(2015, 05, 31, 8, 0, 0)
 
 		# Later today
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 9, 0, 0))
-		self.assertIn("today at 9am", ret)
+		self.assertIn("today around 9am", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 0, 0))
-		self.assertIn("today at 3pm", ret)
+		self.assertIn("today around 3pm", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 5, 0))
-		self.assertIn("today at 3:05pm", ret)
+		self.assertIn("today around 3:05pm", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 45, 0))
-		self.assertIn("today at 3:45pm", ret)
+		self.assertIn("today around 3:45pm", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 23, 45, 0))
-		self.assertIn("today at 11:45pm", ret)
+		self.assertIn("today around 11:45pm", ret)
 
 		# Tomorrow
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 1, 2, 0, 0))
-		self.assertIn("tomorrow at 2am", ret)
+		self.assertIn("tomorrow around 2am", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 1, 15, 0, 0))
-		self.assertIn("tomorrow at 3pm", ret)
+		self.assertIn("tomorrow around 3pm", ret)
 
 		# Day of week (this week)
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 2, 15, 0, 0))
-		self.assertIn("Tue at 3pm", ret)
+		self.assertIn("Tue around 3pm", ret)
 
 		# date of week (next week)
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 7, 15, 0, 0))
-		self.assertIn("next Sun at 3pm", ret)
+		self.assertIn("next Sun around 3pm", ret)
 
 		# far out
 		with patch('humanize.time._now') as mocked:
