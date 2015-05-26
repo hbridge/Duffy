@@ -19,6 +19,7 @@ STATE_UNRESOLVED_HANDLES = 'unresolved-handles'
 STATE_UNKNOWN_COMMAND = 'unknown-command'
 STATE_PAUSED = 'paused'
 STATE_IMPLICIT_LABEL = 'implicit-label'
+STATE_STOPPED = 'stopped'
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
 PHOTO_LABEL = '#photo'

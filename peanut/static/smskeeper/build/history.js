@@ -5,6 +5,8 @@ It should be compiled to js by running from the outer directory
 
 from static/smskeeper:
 jsx --watch --extension jsx src/ build/
+or
+jsx --extension jsx src/ build/
 
 See: https://facebook.github.io/react/docs/tooling-integration.html for info on installing
 

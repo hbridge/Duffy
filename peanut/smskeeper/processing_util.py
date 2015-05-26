@@ -3,7 +3,7 @@ import logging
 
 from smskeeper import keeper_constants
 
-from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, paused, implicit_label
+from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, paused, implicit_label, stopped
 
 from smskeeper.models import User, Message
 from common import slack_logger
@@ -75,4 +75,5 @@ stateCallbacks = {
 	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
 	keeper_constants.STATE_PAUSED: paused,
 	keeper_constants.STATE_IMPLICIT_LABEL: implicit_label,
+	keeper_constants.STATE_STOPPED: stopped,
 }

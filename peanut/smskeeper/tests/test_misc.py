@@ -280,7 +280,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 				# Set us to middle of the day so we get paused
 				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
 				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=12)
-				cliMsg.msg(self.testPhoneNumber, "new", cli=True)
+				cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)
 				# ensure we got paused
 				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_PAUSED)
 
@@ -295,13 +295,20 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			with patch('smskeeper.states.normal.datetime') as datetimeMock:
 				# set to night time
 				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=1)
-				cliMsg.msg(self.testPhoneNumber, "new", cli=True)
+				cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)
 				# ensure we didn't get paused
 				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_UNKNOWN_COMMAND)
 
 				# And that we got a response
 				self.assertNotEqual("", self.getOutput(mock))
 
+	def test_stopped(self):
+		self.setupUser(True, True, keeper_constants.STATE_STOPPED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)
+			# Make sure we got no response
+			self.assertEqual("", self.getOutput(mock))
 
 	def test_common_niceties(self):
 		self.setupUser(True, True)

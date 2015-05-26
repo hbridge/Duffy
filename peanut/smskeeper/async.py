@@ -1,10 +1,9 @@
 from __future__ import absolute_import
-import sys
-import os
 import datetime
 import pytz
 import json
-import logging
+
+from twilio import TwilioRestException
 
 
 """
@@ -96,6 +95,10 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 		logger.error("Tried to send message to nonexistent user with id: %d", userId)
 		return
 
+	if user.state == keeper_constants.STATE_STOPPED:
+		logger.warning("Tried to send msg %s to user %s who is in state stopped" % (msgText, user.id))
+		return
+
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
 	msg = Message.objects.create(user=user, incoming=False, msg_json=json.dumps(msgJson))
 
@@ -108,10 +111,13 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 	elif keeperNumber == constants.SMSKEEPER_TEST_NUM:
 		recordOutput(msgText, False)
 	else:
-		if mediaUrl:
+		try:
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)
-		else:
-			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, None, keeperNumber)
+		except TwilioRestException as e:
+			logger.info("Got TwilioRestException for user %s with message %s.  Setting to state stopped" % (userId, e))
+			user.setState(keeper_constants.STATE_STOPPED)
+			user.save()
+
 		logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
 		slack_logger.postMessage(msg, keeper_constants.SLACK_CHANNEL_FEED)
 

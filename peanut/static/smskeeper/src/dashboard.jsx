@@ -89,6 +89,8 @@ var UserRow = React.createClass({
     tutorial_text = this.props.user.completed_tutorial ? "√ " + this.props.user.source : this.props.user.source;
     if (this.props.user.state === "paused")
       tutorial_text += " PAUSED"
+    if (this.props.user.state === "stopped")
+      tutorial_text += " STOPPED"
     activated_text = null;
     if (this.props.user.activated)
       activated_text = jQuery.timeago(new Date(this.props.user.activated));

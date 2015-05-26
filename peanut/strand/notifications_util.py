@@ -1,34 +1,30 @@
-import datetime
 import json
 import logging
-from threading import Thread
 import urllib2
 
 from django.db.models import Q
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 
 from peanut.settings import constants
-from common.models import NotificationLog, DuffyNotification, Action, User, Strand, ShareInstance
+from common.models import NotificationLog, DuffyNotification, User
 from common.api_util import DuffyJsonEncoder
-from strand import strands_util, swaps_util
+from strand import swaps_util
 
 from ios_notifications.models import APNService, Device
 from twilio.rest import TwilioRestClient
+
 import plivo
 
 logger = logging.getLogger(__name__)
 
-"""
-	Send a notification to the given user
-	msg is the string
-	msgType is from constants
-	withSound is boolean, if it vibrates
-	withVisual is if its silent (no visual)
 
-	Returns a list of logEntries (NotificationLog)
-"""
-def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
+# Send a notification to the given user
+# msg is the string
+# msgType is from constants
+# withSound is boolean, if it vibrates
+# withVisual is if its silent (no visual)
+#
+# Returns a list of logEntries (NotificationLog)
+def sendNotification(user, msg, msgTypeId, customPayload, metadata=None):
 	if metadata:
 		metadata = json.dumps(metadata, cls=DuffyJsonEncoder)
 

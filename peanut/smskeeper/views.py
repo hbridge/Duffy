@@ -71,7 +71,6 @@ def jsonp(f):
 def sendNoResponse():
 	content = '<?xml version="1.0" encoding="UTF-8"?>\n'
 	content += "<Response></Response>"
-	logger.info("Sending blank response")
 	return HttpResponse(content, content_type="text/xml")
 
 
