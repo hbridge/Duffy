@@ -29,10 +29,10 @@ def validTime(startDate):
 	return not (startDate is None or abs((now - startDate).total_seconds()) < 10)
 
 
-# Returns True if this message has a valid time and it doesn't look like another command (like another #remind)
+# Returns True if this message has a valid time and it doesn't look like another remind command
 # Otherwise False
 def isFollowup(startDate, msg):
-	return validTime(startDate) and not msg_util.hasLabel(msg)
+	return validTime(startDate) and not msg_util.isRemindCommand(msg)
 
 
 def process(user, msg, requestDict, keeperNumber):
