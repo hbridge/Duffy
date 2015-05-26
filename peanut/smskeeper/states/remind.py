@@ -79,10 +79,9 @@ def process(user, msg, requestDict, keeperNumber):
 			user.save()
 			return False
 
-		if sendFollowup:
-			user.setStateData("entryId", entry.id)
-		else:
-			user.setState(keeper_constants.STATE_NORMAL)
+		# Always save the entryId state since we always come back into this state.
+		# If they don't enter timing info then we kick out
+		user.setStateData("entryId", entry.id)
 		user.save()
 
 	return True
