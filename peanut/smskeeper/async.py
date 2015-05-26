@@ -35,23 +35,31 @@ from common import slack_logger
 logger = get_task_logger(__name__)
 
 
-@app.task
-def processReminder(entryId):
-	logger.debug("Starting reminder process for entry %s" % (entryId))
-	entry = Entry.objects.get(id=entryId)
+# Returns true if:
+# The remind timestamp ends in 0 or 30 minutes and its within 10 minutes of then
+# The current time is after the remind timestamp but we're within 5 minutes
+# Hidden is false
+def shouldRemindNow(entry):
+	if entry.hidden:
+		return False
+
 	now = datetime.datetime.now(pytz.utc)
+	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
+		# If we're within 10 minutes, so alarm goes off at 9:50 if remind is at 10
+		return (now + datetime.timedelta(minutes=10) > entry.remind_timestamp)
+	else:
+		# The current time is after the remind timestamp but we're within 5 minutes
+		return (entry.remind_timestamp < now and entry.remind_timestamp > now - datetime.timedelta(minutes=5))
 
-	# See if this entry is valid for reminder
-	# It needs to not be hidden
-	# As well as the remind_timestamp be within a few seconds of now
-	if not entry.hidden and abs((now - entry.remind_timestamp).total_seconds()) < 300:
-		msg = "Hi! Friendly reminder: %s" % entry.text
 
-		for user in entry.users.all():
-			sendMsg(user.id, msg, None, entry.keeper_number)
+def processReminder(entry):
+	msg = "Hi! Friendly reminder: %s" % entry.text
 
-		entry.hidden = True
-		entry.save()
+	for user in entry.users.all():
+		sendMsg(user.id, msg, None, entry.keeper_number)
+
+	entry.hidden = True
+	entry.save()
 
 
 @app.task
@@ -59,11 +67,11 @@ def processAllReminders():
 	entries = Entry.objects.filter(remind_timestamp__isnull=False, hidden=False)
 
 	logger.debug("Found %s entries to eval" % len(entries))
-	now = datetime.datetime.now(pytz.utc)
+
 	for entry in entries:
-		if entry.remind_timestamp < now and entry.remind_timestamp > now - datetime.timedelta(minutes=5):
+		if shouldRemindNow(entry):
 			logger.info("Processing entry: %s for users %s" % (entry.id, entry.users.all()))
-			processReminder(entry.id)
+			processReminder(entry)
 
 
 @app.task

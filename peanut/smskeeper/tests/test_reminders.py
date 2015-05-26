@@ -7,6 +7,7 @@ from testfixtures import test_datetime
 
 from smskeeper.models import Entry
 from smskeeper import cliMsg
+from smskeeper import async
 
 import test_base
 
@@ -152,3 +153,39 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 
 		self.assertIn("poop, then poop again", entry.text)
+
+	def test_func_shouldRemindNow(self):
+		self.setupUser(True, True)
+
+		dt = datetime.datetime(2020, 01, 01, 10, 0, 0, tzinfo=pytz.utc)
+		entryEven = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
+
+		dt = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
+		entryOdd = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
+
+		with Replacer() as r:
+			# This is an hour before, shouldn't remind now
+			testDt = test_datetime(2020, 01, 01, 9, 0, 0, tzinfo=pytz.utc)
+			r.replace('smskeeper.async.datetime.datetime', testDt)
+
+			ret = async.shouldRemindNow(entryEven)
+			self.assertFalse(ret)
+
+			ret = async.shouldRemindNow(entryOdd)
+			self.assertFalse(ret)
+
+			# This 10 minutes before and minutes is 0 so should remind
+			testDt = test_datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
+			r.replace('smskeeper.async.datetime.datetime', testDt)
+			ret = async.shouldRemindNow(entryEven)
+			self.assertTrue(ret)
+
+			# This has an odd minute so shouldn't fire
+			ret = async.shouldRemindNow(entryOdd)
+			self.assertFalse(ret)
+
+			# Now we're past the actual time, so should fire
+			testDt = test_datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+			r.replace('smskeeper.async.datetime.datetime', testDt)
+			ret = async.shouldRemindNow(entryOdd)
+			self.assertTrue(ret)
