@@ -246,17 +246,16 @@ def fetchHandle(user, msg, keeperNumber):
 
 
 def setTipFrequency(user, msg, keeperNumber):
-	words = msg.strip().lower().split(" ")
 	old_tip_frequency = user.tip_frequency_days
-	if words[3] == "weekly":
+	if "weekly" in msg:
 		user.tip_frequency_days = 7
 		user.save()
 		sms_util.sendMsg(user, "Ok, I'll send you tips weekly.", None, keeperNumber)
-	elif words[3] == "monthly":
+	elif "monthly" in msg:
 		user.tip_frequency_days = 30
 		user.save()
 		sms_util.sendMsg(user, "Ok, I'll send you tips monthly.", None, keeperNumber)
-	elif words[3] == "never":
+	elif "never" in msg or "stop" in msg or "don't" in msg:
 		user.tip_frequency_days = 0
 		user.save()
 		sms_util.sendMsg(user, "Ok, I'll stop sending you tips.", None, keeperNumber)

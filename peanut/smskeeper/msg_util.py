@@ -122,7 +122,7 @@ def timezoneForMsg(msg):
 	else:
 		return zipDataResults[0].timezone, None
 
-tipRE = re.compile('send me tips')
+tipRE = re.compile('.*send me tips')
 def isSetTipFrequencyCommand(msg):
 	return not hasLabel(msg) and tipRE.match(msg.strip().lower())
 

@@ -1065,6 +1065,20 @@ class SMSKeeperAsyncCase(SMSKeeperBaseCase):
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user.name), getOutput(mock))
 
+
+	def testSetTipFrequencyMalformed(self):
+		self.setupUser(True, True, "UTC")
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "send me tips/monthly")
+			# must reload the user or get a stale value for tip_frequency_days
+			self.user = User.objects.get(id=self.user.id)
+			self.assertEqual(self.user.tip_frequency_days, 30, "%s \n user.tip_frequency_days: %d" % (getOutput(mock), self.user.tip_frequency_days))
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "never send me tips")
+			# must reload the user or get a stale value for tip_frequency_days
+			self.user = User.objects.get(id=self.user.id)
+			self.assertEqual(self.user.tip_frequency_days, 0, "%s \n user.tip_frequency_days: %d" % (getOutput(mock), self.user.tip_frequency_days))
+
 	def testReminderTipRelevance(self):
 		self.setupUser(True, True, "UTC")
 		with patch('smskeeper.async.recordOutput'):
