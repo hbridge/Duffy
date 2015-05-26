@@ -66,7 +66,8 @@ def process(user, msg, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
 			return True
 		else:
-			actions.fetch(user, msg, keeperNumber)
+			label = msg
+			actions.fetch(user, label, keeperNumber)
 			sms_util.sendMsg(user, "You got it. You can also send 'huh?' anytime to get help.", None, keeperNumber)
 			time.sleep(1)
 			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)

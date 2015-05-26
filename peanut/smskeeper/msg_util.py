@@ -13,6 +13,18 @@ from models import ZipData
 logger = logging.getLogger(__name__)
 
 
+clear_re = re.compile("clear( (?P<label>.*))?", re.I)
+freeform_fetch_res = [
+	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
+	re.compile("#?(?P<label>[\S]+) list", re.I)
+]
+get_reminders_re = re.compile("#?remind( me|me|er|ers)?( to)?(: )?", re.I)
+delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
+# we allow items to be blank to support "add to myphotolist" with an attached photo
+freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
+handle_re = re.compile('@[a-zA-Z0-9]+\Z')
+set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
+
 def hasLabel(msg):
 	for word in msg.split(' '):
 		if isLabel(word):
@@ -35,13 +47,11 @@ def isLabel(msg):
 punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
 	if unicodedata.category(unichr(i)).startswith('P'))
 
-
 def cleanMsgText(msg):
 	cleaned = msg.strip().lower()
 	cleaned = cleaned.translate(punctuation_tbl)
 	return cleaned
 
-clear_re = re.compile("clear (?P<label>.*)", re.I)
 def isClearCommand(msg):
 	return clear_re.match(msg) is not None
 
@@ -55,11 +65,6 @@ def getLabelToClear(msg):
 def isPickCommand(msg):
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower() == 'pick'))
-
-freeform_fetch_res = [
-	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
-	re.compile("#?(?P<label>[\S]+) list", re.I)
-]
 
 def labelInFreeformFetch(msg):
 	cleaned = msg.strip()
@@ -127,7 +132,6 @@ def isSetTipFrequencyCommand(msg):
 	return not hasLabel(msg) and tipRE.match(msg.strip().lower())
 
 
-get_reminders_re = re.compile("#?remind( me|me|er|ers)?( to)?(: )?", re.I)
 def isRemindCommand(msg):
 	text = msg.lower()
 	return (
@@ -139,9 +143,8 @@ def isRemindCommand(msg):
 	)
 
 
-delete_re = re.compile('delete [0-9]+')
 def isDeleteCommand(msg):
-	return delete_re.match(msg.lower()) is not None
+	return delete_re.match(msg) is not None
 
 def isHelpCommand(msg):
 	cleaned = cleanMsgText(msg)
@@ -152,8 +155,7 @@ def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
 
-# we allow items to be blank to support "add to myphotolist" with an attached photo
-freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
+
 def isAddTextCommand(msg):
 	if hasLabel(msg) and not isLabel(msg):
 		return True
@@ -169,7 +171,6 @@ def isTellMeMore(msg):
 	return "tell me more" in cleaned or "what else can you do" in cleaned
 
 
-handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 def isHandle(msg):
 	return handle_re.match(msg) is not None
 
@@ -226,7 +227,6 @@ def nameInTutorialPrompt(msg):
 		return match.group('name')
 	return None
 
-set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
 
 def nameInSetName(msg):
 	match = set_name_re.match(msg.strip())
@@ -286,6 +286,27 @@ def getMessagePiecesWithMedia(msg, requestDict):
 
 	return (' '.join(nonLabels), label, handleList, mediaUrlList, mediaUrlTypes)
 
+'''
+Returns the label that should be deleted from, and the item indices (as written) of
+the items to delete
+'''
+def parseDeleteCommand(msg):
+	match = delete_re.match(msg)
+	# extract all indices
+	requested_indices = set()
+	for word in match.group('indices').split(' '):
+		subwords = word.split(",")
+		for subword in subwords:
+			try:
+				requested_indices.add(int(subword))
+			except:
+				pass
+
+	# extract label
+	label = match.group('label')
+	if label:
+		label = "#" + label
+	return label, requested_indices
 
 # Creates basic time string like:
 #  9am

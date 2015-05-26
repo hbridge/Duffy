@@ -8,7 +8,7 @@ from django.conf import settings
 
 from smskeeper.models import Entry, Message
 
-from smskeeper import sms_util, msg_util, helper_util
+from smskeeper import sms_util, msg_util
 from smskeeper import actions, keeper_constants
 from smskeeper import niceties
 from smskeeper import analytics
@@ -31,85 +31,8 @@ def getPreviousMessage(user):
 		return None
 
 
-def getInferredLabel(user):
-	# Normally would sort by added but unit tests barf since they get added at same time
-	# Here, sorting by id should accomplish the same goal
-	incoming_messages = Message.objects.filter(user=user, incoming=True).order_by("-id")
-	if len(incoming_messages) < 2:
-		return None
-
-	for i in range(1, len(incoming_messages)):
-		msg_body = incoming_messages[i].getBody()
-		logger.info("message -%d: %s" % (i, msg_body))
-		if msg_util.isFetchCommand(msg_body, user):
-			return msg_util.labelInFetch(msg_body)
-		elif msg_util.isDeleteCommand(msg_body):
-			continue
-		else:
-			return None
-
-	return None
-
-
-def dealWithDelete(user, msg, keeperNumber):
-	words = msg.strip().lower().split(" ")
-	words.remove("delete")
-	# what remains in words could be ["1"], ["1,2"], ["1,", "2"] etc.
-	requested_indices = set()
-	for word in words:
-		subwords = word.split(",")
-		logger.debug("word, subwords: %s, %s" % (word, subwords))
-		for subword in subwords:
-			try:
-				requested_indices.add(int(subword))
-			except:
-				pass
-	logger.debug("requested indices: %s" % requested_indices)
-	item_indices = map(lambda x: x - 1, requested_indices)
-
-	item_indices = sorted(item_indices, reverse=True)
-	logger.debug(item_indices)
-
-	label = None
-	text, label, handles = msg_util.getMessagePieces(msg)
-	if not label:
-		label = getInferredLabel(user)
-
-	if label:
-		entries = Entry.fetchEntries(user=user, label=label)
-		out_of_range = list()
-		deleted_texts = list()
-		if entries is None:
-			helper_util.sendNotFoundMessage(user, label, keeperNumber)
-			return
-		for item_index in item_indices:
-			if item_index < 0 or item_index >= len(entries):
-				out_of_range.append(item_index)
-				continue
-			entry = entries[item_index]
-			entry.hidden = True
-			entry.save()
-			if entry.text:
-				deleted_texts.append(entry.text)
-			else:
-				deleted_texts.append("item " + str(item_index+1))
-
-		if len(deleted_texts) > 0:
-			if len(deleted_texts) > 1:
-				retMsg = "%d items" % len(deleted_texts)
-			else:
-				retMsg = "'%s'" % (deleted_texts[0])
-			sms_util.sendMsg(user, 'Ok, I deleted %s' % (retMsg), None, keeperNumber)
-		if len(out_of_range) > 0:
-			out_of_range_string = ", ".join(map(lambda x: str(x + 1), out_of_range))
-			sms_util.sendMsg(user, 'Can\'t delete %s in %s' % (out_of_range_string, label), None, keeperNumber)
-		actions.fetch(user, label, keeperNumber)
-	else:
-		sms_util.sendMsg(user, 'Sorry, I\'m not sure which hashtag you\'re referring to. Try "delete [number] [hashtag]"', None, keeperNumber)
-
-
 def dealWithPrintHashtags(user, keeperNumber):
-	#print out all of the active hashtags for the account
+	# print out all of the active hashtags for the account
 	listText = ""
 	labels = Entry.fetchAllLabels(user)
 	if len(labels) == 0:
@@ -120,20 +43,6 @@ def dealWithPrintHashtags(user, keeperNumber):
 			listText += "%s (%d)\n" % (label, len(entries))
 
 	sms_util.sendMsg(user, listText, None, keeperNumber)
-
-
-def pickItemForUserLabel(user, label, keeperNumber):
-	entries = Entry.fetchEntries(user=user, label=label)
-	if len(entries) == 0:
-		helper_util.sendNotFoundMessage(user, label, keeperNumber)
-		return
-
-	entry = random.choice(entries)
-	if entry.img_url:
-		sms_util.sendMsg(user, "My pick for %s:" % label, None, keeperNumber)
-		sms_util.sendMsg(user, entry.text, entry.img_url, keeperNumber)
-	else:
-		sms_util.sendMsg(user, "My pick for %s: %s" % (label, entry.text), None, keeperNumber)
 
 
 def dealWithCreateHandle(user, msg, keeperNumber):
@@ -203,14 +112,20 @@ def process(user, msg, requestDict, keeperNumber):
 			dealWithPrintHashtags(user, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isFetchCommand(msg, user) and numMedia == 0:
-			actions.fetch(user, msg, keeperNumber)
+			label = msg_util.labelInFetch(msg)
+			actions.fetch(user, label, keeperNumber)
+			user.setState(
+				keeper_constants.STATE_IMPLICIT_LABEL,
+				stateData={keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY: label}
+			)
 		# STATE_NORMAL
 		elif msg_util.isClearCommand(msg) and numMedia == 0:
-			actions.clear(user, msg, keeperNumber)
+			label = msg_util.getLabelToClear(msg)
+			actions.clear(user, label, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isPickCommand(msg) and numMedia == 0:
 			label = msg_util.getLabel(msg)
-			pickItemForUserLabel(user, label, keeperNumber)
+			actions.pickItemFromLabel(user, label, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isHelpCommand(msg):
 			actions.help(user, msg, keeperNumber)
@@ -225,7 +140,12 @@ def process(user, msg, requestDict, keeperNumber):
 			dealWithCreateHandle(user, msg, keeperNumber)
 		# STATE_DELETE
 		elif msg_util.isDeleteCommand(msg):
-			dealWithDelete(user, msg, keeperNumber)
+			label, indices = msg_util.parseDeleteCommand(msg)
+			actions.deleteIndicesFromLabel(user, label, indices, keeperNumber)
+			user.setState(
+				keeper_constants.STATE_IMPLICIT_LABEL,
+				stateData={keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY: label}
+			)
 		elif msg_util.nameInSetName(msg):
 			actions.setName(user, msg, keeperNumber)
 		elif msg_util.isSetZipcodeCommand(msg):

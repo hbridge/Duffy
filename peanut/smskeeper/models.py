@@ -69,7 +69,7 @@ class User(models.Model):
 			return self.name
 		return self.phone_number
 
-	def setState(self, state, override=False):
+	def setState(self, state, override=False, stateData=None):
 		# next state means that we want to override the wishes of the current state and do something different
 		# it should all be configured already
 		if not override and self.next_state:
@@ -78,12 +78,13 @@ class User(models.Model):
 		else:
 			# Normal flow, if there's no next state already defined
 			self.state = state
-			self.state_data = None
+			self.state_data = None if stateData is None else json.dumps(stateData)
 
 		self.next_state = None
 		self.next_state_data = None
 
 		self.last_state_change = datetime.datetime.now(pytz.utc)
+		self.save()
 
 	def setNextState(self, nextState):
 		self.next_state = nextState

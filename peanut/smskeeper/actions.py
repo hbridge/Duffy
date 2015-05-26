@@ -1,5 +1,5 @@
 import humanize
-import time
+import random
 
 from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
@@ -111,9 +111,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 
 
 
-def fetch(user, msg, keeperNumber):
-	# This is a label fetch.  See if a note with that label exists then return
-	label = msg_util.labelInFetch(msg)
+def fetch(user, label, keeperNumber):
 	if label is None or label == "":
 		raise NameError("label is blank")
 
@@ -183,8 +181,7 @@ def fetch(user, msg, keeperNumber):
 		}
 	)
 
-def clear(user, msg, keeperNumber):
-	label = msg_util.getLabelToClear(msg)
+def clear(user, label, keeperNumber):
 	entries = Entry.fetchEntries(user=user, label=label)
 	if len(entries) == 0:
 		helper_util.sendNotFoundMessage(user, label, keeperNumber)
@@ -317,3 +314,56 @@ def setZipcode(user, msg, keeperNumber):
 		"Changed Zipcode",
 		None
 	)
+
+def pickItemFromLabel(user, label, keeperNumber):
+	entries = Entry.fetchEntries(user=user, label=label)
+	if len(entries) == 0:
+		helper_util.sendNotFoundMessage(user, label, keeperNumber)
+		return
+
+	entry = random.choice(entries)
+	if entry.img_url:
+		sms_util.sendMsg(user, "My pick for %s:" % label, None, keeperNumber)
+		sms_util.sendMsg(user, entry.text, entry.img_url, keeperNumber)
+	else:
+		sms_util.sendMsg(user, "My pick for %s: %s" % (label, entry.text), None, keeperNumber)
+
+def deleteIndicesFromLabel(user, label, indices, keeperNumber):
+	if label:
+		# subtract 1 from indices because userland is 1-indexed, but it's stored 0-indexed
+		indices = map(lambda x: x - 1, indices)
+		# reverse sort before we start deleting
+		indices = sorted(indices, reverse=True)
+
+		entries = Entry.fetchEntries(user=user, label=label)
+		out_of_range = list()
+		deleted_texts = list()
+		if entries is None:
+			helper_util.sendNotFoundMessage(user, label, keeperNumber)
+			return
+		for item_index in indices:
+			if item_index < 0 or item_index >= len(entries):
+				out_of_range.append(item_index)
+				continue
+			entry = entries[item_index]
+			entry.hidden = True
+			entry.save()
+			if entry.text:
+				deleted_texts.append(entry.text)
+			else:
+				deleted_texts.append("item " + str(item_index + 1))
+
+		if len(deleted_texts) > 0:
+			if len(deleted_texts) > 1:
+				retMsg = "%d items" % len(deleted_texts)
+			else:
+				retMsg = "'%s'" % (deleted_texts[0])
+			sms_util.sendMsg(user, 'Ok, I deleted %s' % (retMsg), None, keeperNumber)
+		if len(out_of_range) > 0:
+			out_of_range_string = ", ".join(map(lambda x: str(x + 1), out_of_range))
+			sms_util.sendMsg(user, 'Can\'t delete %s in %s' % (out_of_range_string, label), None, keeperNumber)
+
+		# do a fetch at the end to reprint the list
+		fetch(user, label, keeperNumber)
+	else:
+		sms_util.sendMsg(user, 'Sorry, I\'m not sure which list you\'re referring to. Try "delete NUMBER from list"', None, keeperNumber)
