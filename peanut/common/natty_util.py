@@ -78,7 +78,7 @@ def processQuery(query, timezone):
 			now = datetime.datetime.now(pytz.utc)
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
-			if startDate < now and startDate > now - datetime.timedelta(hours=24):
+			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
 				startDate = startDate + datetime.timedelta(hours=12)
 
 			column = entry["column"]
