@@ -475,6 +475,19 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		# make sure the entry got created
 		Entry.objects.get(label=keeper_constants.PHOTO_LABEL)
 
+	def testPhotoWithRandomText(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "this is my picture", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
+			# ensure we don't treat photos without a hashtag as a bad command
+			output = self.getOutput(mock)
+			self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			self.assertIn(keeper_constants.PHOTO_LABEL, output)
+
+		# make sure the entry got created
+		Entry.objects.get(label=keeper_constants.PHOTO_LABEL)
+
 	def testScreenshotWithoutTag(self):
 		self.setupUser(True, True)
 

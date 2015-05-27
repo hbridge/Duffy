@@ -52,33 +52,34 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 
 	createdEntries = list()
 
-	# Text comes back without label but still has commas. Split on those here
-	if parseCommas:
-		for entryText in text.split(','):
-			entryText = entryText.strip()
-			if len(entryText) > 0:
-				if label is None:
-					raise NameError("Cannot add text without a label")
-				entry = Entry.createEntry(user, keeperNumber, label, entryText)
-				createdEntries.append(entry)
+	if len(originalMedia) == 0:
+		# Text comes back without label but still has commas. Split on those here
+		if parseCommas:
+			for entryText in text.split(','):
+				entryText = entryText.strip()
+				if len(entryText) > 0:
+					if label is None:
+						raise NameError("Cannot add text without a label")
+					entry = Entry.createEntry(user, keeperNumber, label, entryText)
+					createdEntries.append(entry)
+		else:
+			entry = Entry.createEntry(user, keeperNumber, label, text)
+			createdEntries.append(entry)
 	else:
-		entry = Entry.createEntry(user, keeperNumber, label, text)
-		createdEntries.append(entry)
+		for i, entryMediaUrl in enumerate(originalMedia):
+			entry_label = label
+			if entry_label is None or label == "":
+				entry_label = "#attachment"
+				mediaType = mediaToTypes[originalMedia[i]]
+				if mediaType == "image/jpeg":
+					entry_label = keeper_constants.PHOTO_LABEL
+				elif mediaType == "image/png":
+					entry_label = keeper_constants.SCREENSHOT_LABEL
+				autoLabels.add(entry_label)
 
-	for i, entryMediaUrl in enumerate(originalMedia):
-		entry_label = label
-		if entry_label is None or label == "":
-			entry_label = "#attachment"
-			mediaType = mediaToTypes[originalMedia[i]]
-			if mediaType == "image/jpeg":
-				entry_label = keeper_constants.PHOTO_LABEL
-			elif mediaType == "image/png":
-				entry_label = keeper_constants.SCREENSHOT_LABEL
-			autoLabels.add(entry_label)
-
-		# create the entry with the s3 url instead of
-		entry = Entry.createEntry(user, keeperNumber, entry_label, text=None, img_url=s3mediaUrls[i])
-		createdEntries.append(entry)
+			# create the entry with the s3 url instead of
+			entry = Entry.createEntry(user, keeperNumber, entry_label, text=text, img_url=s3mediaUrls[i])
+			createdEntries.append(entry)
 
 	sharedHandles = list()
 	notFoundHandles = list()
