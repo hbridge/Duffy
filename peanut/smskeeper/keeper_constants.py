@@ -75,7 +75,7 @@ EXAMPLES_HELP_KEY = "examples"
 HELP_SUBJECTS = {
 	LISTS_HELP_SUBJECT: {
 		GENERAL_HELP_KEY: [
-			u"Lists \U0001F4DD are great for remembering things you want to find.",
+			u"Lists \U0001F4DD are great for remembering things you want to keep track of.",
 			u"Just say 'add', then the item you want to add, 'to' and the list name.  For example: 'Add spaghetti \U0001f35d to my shopping list'"
 		],
 		EXAMPLES_HELP_KEY: [
