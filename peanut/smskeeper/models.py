@@ -105,6 +105,7 @@ class User(models.Model):
 		data[key] = value
 
 		self.state_data = json.dumps(data)
+		self.save()
 
 	def setNextStateData(self, key, value):
 		if self.next_state_data:

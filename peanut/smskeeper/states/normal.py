@@ -131,8 +131,6 @@ def process(user, msg, requestDict, keeperNumber):
 			actions.help(user, msg, keeperNumber)
 		elif msg_util.isSetTipFrequencyCommand(msg):
 			actions.setTipFrequency(user, msg, keeperNumber)
-		elif msg_util.isTellMeMore(msg):
-			actions.tellMeMore(user, msg, keeperNumber)
 		# STATE_ADD
 		elif msg_util.isFetchHandleCommand(msg):
 			actions.fetchHandle(user, msg, keeperNumber)

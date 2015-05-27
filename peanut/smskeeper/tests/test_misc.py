@@ -40,13 +40,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		user = User.objects.get(phone_number=self.testPhoneNumber)
 		self.assertNotEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
 
-	def test_tellmemore(self):
-		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
-
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "tell me more")
-			self.assertIn(keeper_constants.TELL_ME_MORE, self.getOutput(mock))
-
 	def test_firstItemAdded(self):
 		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
 

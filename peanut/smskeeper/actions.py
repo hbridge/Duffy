@@ -274,16 +274,13 @@ def help(user, msg, keeperNumber):
 	analytics.logUserEvent(
 		user,
 		"Requested Help",
-		None
+		{
+			"Message": msg.lower()
+		}
 	)
 
-def tellMeMore(user, msg, keeperNumber):
-	sms_util.sendMsg(user, keeper_constants.TELL_ME_MORE, None, keeperNumber)
-	analytics.logUserEvent(
-		user,
-		"Tell Me More",
-		None
-	)
+	user.setState(keeper_constants.STATE_HELP)
+
 
 def setName(user, msg, keeperNumber):
 	name = msg_util.nameInSetName(msg)

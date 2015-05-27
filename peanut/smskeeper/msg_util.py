@@ -149,8 +149,7 @@ def isDeleteCommand(msg):
 
 def isHelpCommand(msg):
 	cleaned = cleanMsgText(msg)
-	return re.match('huh$|what$|how do you work|what (can|do) you do', cleaned) is not None or msg == "?"
-
+	return re.match('[?]$|huh$|help$|what$|how do you work|what.* (can|do) you do|tell me more', cleaned) is not None
 
 def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
@@ -166,11 +165,6 @@ def isAddTextCommand(msg):
 			return True
 
 	return False
-
-def isTellMeMore(msg):
-	cleaned = msg.strip().lower()
-	return "tell me more" in cleaned or "what else can you do" in cleaned
-
 
 def isHandle(msg):
 	return handle_re.match(msg) is not None

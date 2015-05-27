@@ -20,6 +20,7 @@ STATE_UNKNOWN_COMMAND = 'unknown-command'
 STATE_PAUSED = 'paused'
 STATE_IMPLICIT_LABEL = 'implicit-label'
 STATE_STOPPED = 'stopped'
+STATE_HELP = 'help'
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
 PHOTO_LABEL = '#photo'
@@ -60,9 +61,44 @@ TELL_ME_MORE = "I can help you remember lists of things. Send me anything like '
 
 HELP_MESSAGES = [
 	u'There are a few things I can help you with. \U0001F4AA',
-	u"\U0001F4DD You can tell me to remember lists\nFor example 'add martini to my cocktails list'",
-	u"\U0001F514 You can tell me to remind you of something at a specific time\nFor example 'Remind me to call Mom tonight'",
+	u"\U0001F4DD I can remember lists of things for you.",
+	u"\U0001F514 I can send you reminders at a specific time",
+	u"What would you like to learn more about? Lists or reminders?"
 ]
+
+LISTS_HELP_SUBJECT = "lists"
+REMINDERS_HELP_SUBJECT = "reminders"
+
+GENERAL_HELP_KEY = "general"
+EXAMPLES_HELP_KEY = "examples"
+
+HELP_SUBJECTS = {
+	LISTS_HELP_SUBJECT: {
+		GENERAL_HELP_KEY: [
+			u"Lists \U0001F4DD are great for remembering things you want to find.",
+			u"Just say 'add', then the item you want to add, 'to' and the list name.  For example: 'Add spaghetti \U0001f35d to my shopping list'"
+		],
+		EXAMPLES_HELP_KEY: [
+			u"Add Airplane \u2708\ufe0f to my movies list" + "\n" +
+			u"Add Japan \U0001f1ef\U0001f1f5, France \U0001f1eb\U0001f1f7 to travel" + "\n" +
+			u"Add Di Fara, Motorino, to Pizza Joints \U0001F355, " + "\n" +
+			u"Add invitations, party favors, seating chart to wedding \U0001F492"
+		],
+	},
+	REMINDERS_HELP_SUBJECT: {
+		GENERAL_HELP_KEY: [
+			u"Reminders \U0001F514 are great for keeping track of stuff you need to do later.",
+			u"Just say 'remind me' and then what you want to be reminded of.  If you don't include a time \U0001f554, I'll ask you for one.",
+			u"For example, you could say 'remind me to call mom \U0001f4f1 this weekend'"
+		],
+		EXAMPLES_HELP_KEY: [
+			u"Remind me to do laundry on Saturday" + "\n" +
+			u"Remind me to practice \U0001F3B8 tonight at 8pm" + "\n" +
+			u"Remind me to email the team \U0001F4E7 next week" + "\n" +
+			u"Remind me to get a gift for Dad \U0001F381"
+		]
+	},
+}
 
 SLACK_CHANNEL_FEED = "#livesmskeeperfeed"
 SLACK_CHANNEL_MANUAL_ALERTS = "#manual-alerts"
