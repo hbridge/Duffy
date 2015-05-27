@@ -91,7 +91,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 
 	if sendResponse:
 		if len(autoLabels) > 0:
-			sms_util.sendMsg(user, "Filing that under " + ", ".join(autoLabels) + shareString, None, keeperNumber)
+			sms_util.sendMsg(user, "Filing that under your %s list.%s" % (", ".join(autoLabels), shareString), None, keeperNumber)
 		else:
 			sms_util.sendMsg(user, helper_util.randomAcknowledgement() + shareString, None, keeperNumber)
 
