@@ -189,3 +189,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			r.replace('smskeeper.async.datetime.datetime', testDt)
 			ret = async.shouldRemindNow(entryOdd)
 			self.assertTrue(ret)
+
+	def test_at_preference(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me at 9am to add 1.25 hrs")
+			self.assertIn("around 9am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual("add 1.25 hrs", entry.text)
+
+		# 9 am ETC, so 13 UTC
+		self.assertEqual(13, entry.remind_timestamp.hour)
