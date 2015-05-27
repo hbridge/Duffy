@@ -526,3 +526,23 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "EST")
+
+	def testStopped(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "STOP")
+			self.assertIn(self.getOutput(mock), "unsubscribed")
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "ignore this")
+			self.assertEqual("", self.getOutput(mock))
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "start")
+			self.assertIn("welcome back", self.getOutput(mock))
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
