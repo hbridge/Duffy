@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from peanut.settings import constants
 
-SECONDS_BETWEEN_SEND = 2
+DELAY_SECONDS_PER_WORD = 0.2
 
 
 def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
@@ -22,13 +22,18 @@ def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
 		async.sendMsg(user.id, msg, mediaUrl, keeperNumber, manual)
 
 
-def sendMsgs(user, msgList, keeperNumber, delay=SECONDS_BETWEEN_SEND):
+def sendMsgs(user, msgList, keeperNumber):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 
+	seconds_delay = 0
 	for i, msgTxt in enumerate(msgList):
-		scheduledTime = datetime.now(pytz.utc) + timedelta(seconds=i * delay)
+		scheduledTime = datetime.now(pytz.utc) + timedelta(seconds=seconds_delay)
 		logger.debug("scheduling %s at time %s" % (msgTxt, scheduledTime))
+
+		# calc the time for the next message
+		wordcount = len(msgTxt.split(" "))
+		seconds_delay += wordcount * DELAY_SECONDS_PER_WORD
 
 		# Call the single method above so it does the right async logic
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime)
