@@ -87,7 +87,7 @@ HELP_SUBJECTS = {
 	REMINDERS_HELP_SUBJECT: {
 		GENERAL_HELP_KEY: [
 			u"Reminders \u23F0 are great for keeping track of stuff you need to do later.",
-			u"Just say 'remind me' and then what you want to be reminded of.  If you don't include a time \U0001f554, I'll ask you for one.",
+			u"Just say 'remind me' and then what you want to be reminded of.  If you don't include a time \U0001f554, I'll ask you for one." + "\n" +
 			u"For example, you could say 'remind me to call mom \U0001f4f1 this weekend'"
 		],
 		EXAMPLES_HELP_KEY: [
