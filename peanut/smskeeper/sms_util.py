@@ -8,6 +8,7 @@ from datetime import timedelta
 from peanut.settings import constants
 
 DELAY_SECONDS_PER_WORD = 0.2
+MIN_DELAY_SECONDS = 1
 
 
 def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
@@ -33,7 +34,7 @@ def sendMsgs(user, msgList, keeperNumber):
 
 		# calc the time for the next message
 		wordcount = len(msgTxt.split(" "))
-		seconds_delay += wordcount * DELAY_SECONDS_PER_WORD
+		seconds_delay += max(wordcount * DELAY_SECONDS_PER_WORD, MIN_DELAY_SECONDS)
 
 		# Call the single method above so it does the right async logic
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime)
