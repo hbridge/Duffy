@@ -19,6 +19,7 @@ from common.models import ContactEntry
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -133,12 +134,16 @@ def history(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		context = {	'user_id': user.id}
+		context = dict()
+
+		phoneNumToContactDict = getNameFromContactsDB([user.phone_number])
+
+		context["user_data"] = json.dumps(getUserDataDict(user, phoneNumToContactDict), cls=DjangoJSONEncoder)
 		context["development"] = settings.DEBUG
 		if form.cleaned_data['development']:
 			context["development"] = form.cleaned_data['development']
 
-		return render(request, 'thread_view.html', context)
+		return render(request, 'history.html', context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -196,11 +201,20 @@ def send_sms(request):
 		user = form.cleaned_data['user']
 		msg = form.cleaned_data['msg']
 		keeperNumber = form.cleaned_data['from_num']
+		direction = form.cleaned_data['direction']
 
 		if not keeperNumber:
 			keeperNumber = settings.KEEPER_NUMBER
 
-		sms_util.sendMsg(user, msg, None, keeperNumber)
+		if direction == "ToUser":
+			sms_util.sendMsg(user, msg, None, keeperNumber, manual=True)
+		else:
+			requestDict = dict()
+			requestDict["Body"] = msg
+			requestDict["To"] = keeperNumber
+			requestDict["From"] = user.phone_number
+			requestDict["Manual"] = True
+			processing_util.processMessage(user.phone_number, msg, requestDict, keeperNumber)
 
 		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
@@ -259,6 +273,26 @@ def resend_msg(request):
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 
+def getUserDataDict(user, phoneNumToContactDict):
+	if user.phone_number in phoneNumToContactDict:
+		full_name = phoneNumToContactDict[user.phone_number]
+	else:
+		full_name = ''
+	userData = {
+		"id": user.id,
+		"phone_number": user.phone_number,
+		"name": user.name,
+		"full_name": full_name,
+		"source": "(" + user.signup_data_json + ")" if user.signup_data_json and "default" not in user.signup_data_json else '',
+		"activated": user.activated,
+		"created": user.added,
+		"state": user.state,
+		"tutorial_step": user.tutorial_step,
+		"completed_tutorial": user.completed_tutorial
+	}
+	return userData
+
+
 @login_required(login_url='/admin/login/')
 def dashboard_feed(request):
 	users = User.objects.all().order_by("id")
@@ -270,24 +304,9 @@ def dashboard_feed(request):
 	phoneNumToContactDict = getNameFromContactsDB(phoneNumList)
 
 	for user in users:
-		if user.phone_number in phoneNumToContactDict:
-			full_name = phoneNumToContactDict[user.phone_number]
-		else:
-			full_name = ''
-		dict = {
-			"id": int(user.id),
-			"phone_number": user.phone_number,
-			"name": user.name,
-			"full_name": full_name,
-			"source": "(" + user.signup_data_json + ")" if user.signup_data_json and "default" not in user.signup_data_json else '',
-			"activated": user.activated,
-			"created": user.added,
-			"state": user.state,
-			"tutorial_step": user.tutorial_step,
-			"completed_tutorial": user.completed_tutorial
-		}
+		userData = getUserDataDict(user, phoneNumToContactDict)
 
-		dict["message_stats"] = {}
+		userData["message_stats"] = {}
 		for direction in ["incoming", "outgoing"]:
 			incoming = (direction == "incoming")
 			messages = Message.objects.filter(user=user, incoming=incoming).order_by("-added")
@@ -298,13 +317,13 @@ def dashboard_feed(request):
 			else:
 				# for new users, setting it to beginning of 2015
 				last_message_date = user.added
-			dict["message_stats"][direction] = {
+			userData["message_stats"][direction] = {
 				"count": count,
 				"last": last_message_date,
 			}
-		dict["history"] = "history?user_id=" + str(user.id)
+		userData["history"] = "history?user_id=" + str(user.id)
 
-		user_dicts.append(dict)
+		user_dicts.append(userData)
 
 	user_dicts = sorted(user_dicts, key=lambda k: k['message_stats']['incoming']['last'], reverse=True)
 

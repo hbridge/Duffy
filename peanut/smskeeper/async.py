@@ -96,7 +96,7 @@ def str_now_1():
 
 
 @app.task
-def sendMsg(userId, msgText, mediaUrl, keeperNumber):
+def sendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -109,7 +109,7 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber):
 
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
 	# Create the message now, but only save it if we know we successfully sent the message
-	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson))
+	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson), manual=manual)
 
 	if type(msgText) == unicode:
 		msgText = msgText.encode('utf-8')

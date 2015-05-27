@@ -179,10 +179,11 @@ var CommentForm = React.createClass({
   handlePostMsgSubmit: function(e) {
     e.preventDefault();
     var text = React.findDOMNode(this.refs.text).value.trim();
+    var direction = React.findDOMNode(this.refs.direction).value;
     if (!text) {
       return;
     }
-    this.props.onCommentSubmit({msg: text, user_id: USER_ID});
+    this.props.onCommentSubmit({msg: text, user_id: USER.id, direction: direction});
     React.findDOMNode(this.refs.text).value = '';
     return;
   },
@@ -198,6 +199,11 @@ var CommentForm = React.createClass({
       <form className="commentForm" onSubmit={this.handlePostMsgSubmit}>
         <input type="text" placeholder="Say something..." ref="text" className="commentBox"/>
         <input type="submit" value="Post" className="largeButton" />
+        <br/>
+        <select ref="direction">
+          <option value="ToUser">Keeper to {USER.name}</option>
+          <option value="ToKeeper">{USER.name} to Keeper</option>
+        </select>
       </form>
       <form onSubmit={this.handleTogglePause}>
         <input type="submit" value={pausedText} className="largeButton" />
@@ -220,7 +226,7 @@ var KeeperApp = React.createClass({
 
   loadDataFromServer: function() {
     $.ajax({
-      url: "/smskeeper/message_feed?user_id=" + USER_ID,
+      url: "/smskeeper/message_feed?user_id=" + USER.id,
       dataType: 'json',
       cache: false,
       success: function(data) {
