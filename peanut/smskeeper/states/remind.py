@@ -101,6 +101,7 @@ def doRemindMessage(user, utcDate, msg, query, sendFollowup, entry, keeperNumber
 		query = query[match.end():].strip()
 
 	isUpdate = entry is not None
+	isTutorial = False if user.getStateData(FROM_TUTORIAL_KEY) is None else True
 	# Need to do this so the add message correctly adds the label
 	msgWithLabel = query + " " + keeper_constants.REMIND_LABEL
 	if not entry:
@@ -130,7 +131,7 @@ def doRemindMessage(user, utcDate, msg, query, sendFollowup, entry, keeperNumber
 	toSend = "%s I'll remind you %s." % (helper_util.randomAcknowledgement(), userMsg)
 
 	if sendFollowup:
-		if user.getStateData(FROM_TUTORIAL_KEY):
+		if isTutorial:
 			toSend = toSend + "\n\n"
 			toSend = toSend + "In the future, you can also include a specific time like 'tomorrow morning' or 'Saturday at 3pm'"
 		else:
@@ -145,7 +146,8 @@ def doRemindMessage(user, utcDate, msg, query, sendFollowup, entry, keeperNumber
 		{
 			"Was Update": isUpdate,
 			"Needed Followup": sendFollowup,
-			"Was Suspicious Hour": isReminderHourSuspicious(hourForUser)
+			"Was Suspicious Hour": isReminderHourSuspicious(hourForUser),
+			"In tutorial": isTutorial
 		}
 	)
 
