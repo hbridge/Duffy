@@ -32,7 +32,7 @@ def process(user, msg, requestDict, keeperNumber):
 		"Requested Help",
 		{
 			"Subject": subject,
-			"Example Request": isExampleRequest
+			"Help Type": "Example" if isExampleRequest else "General"
 		}
 	)
 
