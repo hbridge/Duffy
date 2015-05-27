@@ -5,6 +5,8 @@ git fetch
 git rebase origin/master
 cd peanut
 DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test
+cd static/smskeeper
+jsx --extension jsx src/ build/
 sudo apachectl -k restart
 EOF
 
