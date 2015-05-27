@@ -436,14 +436,14 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		# date of week (next week)
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 7, 15, 0, 0))
-		self.assertIn("next Sun around 3pm", ret)
+		self.assertIn("Sun the 7th", ret)
 
 		# far out
 		with patch('humanize.time._now') as mocked:
 			mocked.return_value = now
 
 			ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 14, 15, 0, 0))
-			self.assertIn("14 days from now", ret)
+			self.assertIn("Sun the 14th", ret)
 
 	def test_exception_error_message(self):
 		self.setupUser(True, True)

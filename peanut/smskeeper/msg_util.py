@@ -4,6 +4,7 @@ import logging
 import unicodedata
 import sys
 import datetime
+import humanize
 
 from models import Entry
 from smskeeper import keeper_constants
@@ -343,15 +344,16 @@ def naturalize(now, futureTime):
 	delta = futureTime - now
 	deltaHours = delta.seconds / 3600
 
+	time = getNaturalTime(futureTime)
+	dayOfWeek = futureTime.strftime("%a")
+
 	# If the same day, then say "today at 5pm"
 	if deltaHours < 24 and futureTime.day == now.day:
-		return "later today around %s" % getNaturalTime(futureTime)
+		return "later today around %s" % time
 	# Tomorrow
 	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
-		return "tomorrow around %s" % getNaturalTime(futureTime)
+		return "tomorrow around %s" % time
 	elif delta.days < 6:
-		return "%s around %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
-	elif delta.days < 13:
-		return "next %s around %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
+		return "%s around %s" % (dayOfWeek, time)
 
-	return "%s days from now" % delta.days
+	return "%s the %s" % (dayOfWeek, humanize.ordinal(futureTime.day))
