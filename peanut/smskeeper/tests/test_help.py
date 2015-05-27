@@ -26,7 +26,7 @@ class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
 
 		# make sure we can ask for reminders without going back
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "reminders")
+			cliMsg.msg(self.testPhoneNumber, "Reminders")
 			self.assertIn(
 				keeper_constants.HELP_SUBJECTS[keeper_constants.REMINDERS_HELP_SUBJECT][keeper_constants.GENERAL_HELP_KEY][0],
 				self.getOutput(mock)
