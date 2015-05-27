@@ -429,14 +429,14 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		# date of week (next week)
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 7, 15, 0, 0))
-		self.assertIn("next Sun around 3pm", ret)
+		self.assertIn("Sun the 7th", ret)
 
 		# far out
 		with patch('humanize.time._now') as mocked:
 			mocked.return_value = now
 
 			ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 14, 15, 0, 0))
-			self.assertIn("14 days from now", ret)
+			self.assertIn("Sun the 14th", ret)
 
 	def test_exception_error_message(self):
 		self.setupUser(True, True)
@@ -519,3 +519,23 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "EST")
+
+	def testStopped(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "STOP")
+			self.assertIn(self.getOutput(mock), "unsubscribed")
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "ignore this")
+			self.assertEqual("", self.getOutput(mock))
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "start")
+			self.assertIn("welcome back", self.getOutput(mock))
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_NORMAL)

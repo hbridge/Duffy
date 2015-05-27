@@ -23,17 +23,17 @@ class User(models.Model):
 	activated = models.DateTimeField(null=True)
 
 	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
-	state_data = models.TextField(null=True)
+	state_data = models.TextField(null=True, blank=True)
 
 	# Used by states to say "goto this state, but come back to me afterwards"
-	next_state = models.CharField(max_length=100, null=True)
-	next_state_data = models.TextField(null=True)
+	next_state = models.CharField(max_length=100, null=True, blank=True)
+	next_state_data = models.TextField(null=True, blank=True)
 
 	last_state_change = models.DateTimeField(null=True)
 
-	signup_data_json = models.TextField(null=True)
+	signup_data_json = models.TextField(null=True, blank=True)
 
-	invite_code = models.CharField(max_length=100, null=True)
+	invite_code = models.CharField(max_length=100, null=True, blank=True)
 
 	timezone = models.CharField(max_length=100, null=True)
 	sent_tips = models.TextField(null=True, db_index=False)
@@ -43,7 +43,7 @@ class User(models.Model):
 	last_tip_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
-	last_share_upsell = models.DateTimeField(null=True)
+	last_share_upsell = models.DateTimeField(null=True, blank=True)
 
 	def history(self):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
@@ -218,19 +218,19 @@ class Entry(models.Model):
 	# creator will be in this list
 	users = models.ManyToManyField(User, db_index=True, related_name="users")
 
-	label = models.CharField(max_length=100, db_index=True)
+	label = models.CharField(max_length=100, db_index=True, blank=True)
 
-	text = models.TextField(null=True)
+	text = models.TextField(null=True, blank=True)
 
 	# Used by reminders.  Text from the user, without the timing words removed
-	orig_text = models.TextField(null=True)
+	orig_text = models.TextField(null=True, blank=True)
 	img_url = models.TextField(null=True, blank=True)
 
-	remind_timestamp = models.DateTimeField(null=True)
+	remind_timestamp = models.DateTimeField(null=True, blank=True)
 
 	hidden = models.BooleanField(default=False)
 
-	keeper_number = models.CharField(max_length=100, null=True)
+	keeper_number = models.CharField(max_length=100, null=True, blank=True)
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
@@ -269,6 +269,7 @@ class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	msg_json = models.TextField(null=True)
 	incoming = models.BooleanField(default=None)
+	manual = models.BooleanField(default=None)
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)

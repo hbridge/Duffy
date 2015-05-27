@@ -4,6 +4,7 @@ import logging
 import unicodedata
 import sys
 import datetime
+import humanize
 
 from models import Entry
 from smskeeper import keeper_constants
@@ -24,6 +25,7 @@ delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
 handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
+
 
 def hasLabel(msg):
 	for word in msg.split(' '):
@@ -47,13 +49,16 @@ def isLabel(msg):
 punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
 	if unicodedata.category(unichr(i)).startswith('P'))
 
+
 def cleanMsgText(msg):
 	cleaned = msg.strip().lower()
 	cleaned = cleaned.translate(punctuation_tbl)
 	return cleaned
 
+
 def isClearCommand(msg):
 	return clear_re.match(msg) is not None
+
 
 def getLabelToClear(msg):
 	match = clear_re.match(msg)
@@ -62,9 +67,11 @@ def getLabelToClear(msg):
 		label = "#" + label
 	return label
 
+
 def isPickCommand(msg):
 	tokens = msg.split(' ')
 	return len(tokens) == 2 and ((isLabel(tokens[0]) and tokens[1].lower() == 'pick') or (isLabel(tokens[1]) and tokens[0].lower() == 'pick'))
+
 
 def labelInFreeformFetch(msg):
 	cleaned = msg.strip()
@@ -82,6 +89,7 @@ def labelInFetch(msg):
 		if "#" not in label:
 			label = "#" + msg
 	return label
+
 
 def isFetchCommand(msg, user):
 	cleaned = msg.strip().lower()
@@ -110,6 +118,7 @@ def isCommonListName(msg):
 def isSetZipcodeCommand(msg):
 	return re.match("my zip ?code is (\d{5}(\-\d{4})?)", msg, re.I) is not None
 
+
 def timezoneForMsg(msg):
 	postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
 
@@ -126,6 +135,7 @@ def timezoneForMsg(msg):
 		return None, "Sorry, I don't know that zipcode. Please try again"
 	else:
 		return zipDataResults[0].timezone, None
+
 
 tipRE = re.compile('.*send me tips')
 def isSetTipFrequencyCommand(msg):
@@ -147,6 +157,7 @@ def isRemindCommand(msg):
 def isDeleteCommand(msg):
 	return delete_re.match(msg) is not None
 
+
 def isHelpCommand(msg):
 	cleaned = cleanMsgText(msg)
 	return re.match('[?]$|huh$|help$|what$|how do you work|what.* (can|do) you do|tell me more', cleaned) is not None
@@ -165,6 +176,7 @@ def isAddTextCommand(msg):
 			return True
 
 	return False
+
 
 def isHandle(msg):
 	return handle_re.match(msg) is not None
@@ -201,6 +213,10 @@ def extractPhoneNumbers(msg):
 	return phone_numbers, remaining_str
 
 
+def isStopCommand(msg):
+	return 'cancel' == msg.lower() or 'stop' == msg.lower()
+
+
 def isCreateHandleCommand(msg):
 	phoneNumbers, remaining_str = extractPhoneNumbers(msg)
 	return (
@@ -209,8 +225,10 @@ def isCreateHandleCommand(msg):
 		and len(phoneNumbers) > 0
 	)
 
+
 def isFetchHandleCommand(msg):
 	return isHandle(msg.strip())
+
 
 def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()
@@ -281,10 +299,9 @@ def getMessagePiecesWithMedia(msg, requestDict):
 
 	return (' '.join(nonLabels), label, handleList, mediaUrlList, mediaUrlTypes)
 
-'''
-Returns the label that should be deleted from, and the item indices (as written) of
-the items to delete
-'''
+
+# Returns the label that should be deleted from, and the item indices (as written) of
+# the items to delete
 def parseDeleteCommand(msg):
 	match = delete_re.match(msg)
 	# extract all indices
@@ -302,6 +319,7 @@ def parseDeleteCommand(msg):
 	if label:
 		label = "#" + label
 	return label, requested_indices
+
 
 # Creates basic time string like:
 #  9am
@@ -337,15 +355,16 @@ def naturalize(now, futureTime):
 	delta = futureTime - now
 	deltaHours = delta.seconds / 3600
 
+	time = getNaturalTime(futureTime)
+	dayOfWeek = futureTime.strftime("%a")
+
 	# If the same day, then say "today at 5pm"
 	if deltaHours < 24 and futureTime.day == now.day:
-		return "later today around %s" % getNaturalTime(futureTime)
+		return "later today around %s" % time
 	# Tomorrow
 	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
-		return "tomorrow around %s" % getNaturalTime(futureTime)
+		return "tomorrow around %s" % time
 	elif delta.days < 6:
-		return "%s around %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
-	elif delta.days < 13:
-		return "next %s around %s" % (futureTime.strftime("%a"), getNaturalTime(futureTime))
+		return "%s around %s" % (dayOfWeek, time)
 
-	return "%s days from now" % delta.days
+	return "%s the %s" % (dayOfWeek, humanize.ordinal(futureTime.day))

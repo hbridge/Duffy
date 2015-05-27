@@ -20,7 +20,8 @@
   <body>
     <div id="keeper_app"></div>
 		<script type='text/javascript'>
-			USER_ID = {{ user_id }};
+			USER = {% autoescape off %}{{ user_data }}{% endautoescape %};
+      console.log(USER);
 		</script>
     {% if development %}
       <script type='text/jsx' src="/static/smskeeper/src/history.jsx"></script>

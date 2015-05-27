@@ -80,7 +80,10 @@ def postMessage(message, channel):
         if message.incoming:
             userName = message.user.name + ' (' + message.user.phone_number + ')'
 
-            numMedia = int(msgContent['NumMedia'])
+            if "NumMedia" in msgContent:
+                numMedia = int(msgContent['NumMedia'])
+            else:
+                numMedia = 0
 
             if numMedia > 0:
                 for n in range(numMedia):

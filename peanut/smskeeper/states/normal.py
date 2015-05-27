@@ -106,6 +106,11 @@ def process(user, msg, requestDict, keeperNumber):
 			user.save()
 			# Reprocess
 			return False
+		elif msg_util.isStopCommand(msg):
+			user.setState(keeper_constants.STATE_STOPPED)
+			user.save()
+			# Reprocess
+			return False
 		# STATE_NORMAL
 		elif msg_util.isPrintHashtagsCommand(msg):
 			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list

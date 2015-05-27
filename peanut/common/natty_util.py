@@ -41,6 +41,9 @@ def getNattyInfo(query, timezone):
 	# Sort by the date, we want to soonest first
 	myResults = sorted(myResults, key=lambda x: x[0])
 
+	# prefer anything that has "at" in the text
+	myResults = sorted(myResults, key=lambda x: "at" in x[2], reverse=True)
+
 	return myResults
 
 
@@ -79,7 +82,12 @@ def processQuery(query, timezone):
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
-				startDate = startDate + datetime.timedelta(hours=12)
+				# If it has am or pm in the used text, then assume tomorrow
+				if "m" in usedText:
+					startDate = startDate + datetime.timedelta(days=1)
+				else:
+					# otherwise, its 8 so assume 12 hours from now
+					startDate = startDate + datetime.timedelta(hours=12)
 
 			column = entry["column"]
 			newQuery = getNewQuery(query, usedText, column)
