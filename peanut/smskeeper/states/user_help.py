@@ -1,5 +1,6 @@
 from smskeeper import keeper_constants
 from smskeeper import sms_util
+from smskeeper import analytics
 
 import logging
 logger = logging.getLogger(__name__)
@@ -11,19 +12,29 @@ def process(user, msg, requestDict, keeperNumber):
 			user.setState(keeper_constants.STATE_NORMAL)
 			return False
 
+	cleanedMsg = msg.lower()
 	subject = None
 	isExampleRequest = False
 
 	processed = False
-	if "list" in msg:
+	if "list" in cleanedMsg:
 		subject = keeper_constants.LISTS_HELP_SUBJECT
-	elif "reminder" in msg:
+	elif "reminder" in cleanedMsg:
 		subject = keeper_constants.REMINDERS_HELP_SUBJECT
 
-	if "example" in msg:
+	if "example" in cleanedMsg:
 		isExampleRequest = True
 		if subject is None:
 			subject = user.getStateData("subject")
+
+	analytics.logUserEvent(
+		user,
+		"Requested Help",
+		{
+			"Subject": subject,
+			"Example Request": isExampleRequest
+		}
+	)
 
 	if subject in keeper_constants.HELP_SUBJECTS.keys():
 		if isExampleRequest:
