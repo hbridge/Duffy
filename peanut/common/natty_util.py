@@ -82,12 +82,18 @@ def processQuery(query, timezone):
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
+
 				# If it has am or pm in the used text, then assume tomorrow
 				if "m" in usedText:
 					startDate = startDate + datetime.timedelta(days=1)
 				else:
 					# otherwise, its 8 so assume 12 hours from now
 					startDate = startDate + datetime.timedelta(hours=12)
+
+			tzAwareStartDate = startDate.astimezone(timezone)
+			# If we think tho that its super early in the morning and there's no am, we're probably wrong, so set it later
+			if tzAwareStartDate.hour >= 0 and tzAwareStartDate.hour < 6 and "am" not in usedText:
+				startDate = startDate + datetime.timedelta(hours=12)
 
 			column = entry["column"]
 			newQuery = getNewQuery(query, usedText, column)

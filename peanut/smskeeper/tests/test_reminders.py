@@ -202,3 +202,17 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		# 9 am ETC, so 13 UTC
 		self.assertEqual(13, entry.remind_timestamp.hour)
+
+	def test_single_low_number(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me tomorrow at 4 to email Itai about city year intro to lightsail via Nate.")
+			self.assertIn("around 4pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual("email Itai about city year intro to lightsail via Nate.", entry.text)
+
+		# 4 pm ETC, so 18 UTC
+		self.assertEqual(20, entry.remind_timestamp.hour)
+
