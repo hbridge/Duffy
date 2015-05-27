@@ -24,7 +24,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user,
 		"Reached Tutorial Step",
 		{
-			"Tutorial": "Reminders",
+			"Tutorial": keeper_constants.STATE_TUTORIAL_REMIND,
 			"Step": step if step is not None else 0
 		}
 	)
@@ -65,7 +65,7 @@ def process(user, msg, requestDict, keeperNumber):
 			user,
 			"Completed Tutorial",
 			{
-				"Tutorial": "Reminders"
+				"Tutorial": keeper_constants.STATE_TUTORIAL_REMIND
 			}
 		)
 
