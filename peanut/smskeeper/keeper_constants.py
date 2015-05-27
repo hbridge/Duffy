@@ -60,9 +60,9 @@ DEFAULT_TIP_FREQUENCY_DAYS = 3
 TELL_ME_MORE = "I can help you remember lists of things. Send me anything like 'add Jurassic Park to my movies list' or 'add pasta, sauce, cheese to shopping'."
 
 HELP_MESSAGES = [
-	u'There are a few things I can help you with. \U0001F4AA',
-	u"\U0001F4DD I can remember lists of things for you.",
-	u"\U0001F514 I can send you reminders at a specific time",
+	u'There are a few things I can help you with. \U0001F4AA' + "\n"
+	u"I can remember lists \U0001F4DD of things for you, and " +
+	u"I can send you reminders at a specific time \u23F0",
 	u"What would you like to learn more about? Lists or reminders?"
 ]
 
@@ -76,18 +76,18 @@ HELP_SUBJECTS = {
 	LISTS_HELP_SUBJECT: {
 		GENERAL_HELP_KEY: [
 			u"Lists \U0001F4DD are great for remembering things you want to keep track of.",
-			u"Just say 'add', then the item you want to add, 'to' and the list name.  For example: 'Add spaghetti \U0001f35d to my shopping list'"
+			u"Just say 'add' along with an item and a list. For example: 'Add spaghetti \U0001f35d to my shopping list'"
 		],
 		EXAMPLES_HELP_KEY: [
 			u"Add Airplane \u2708\ufe0f to my movies list" + "\n" +
 			u"Add Japan \U0001f1ef\U0001f1f5, France \U0001f1eb\U0001f1f7 to travel" + "\n" +
-			u"Add Di Fara, Motorino, to Pizza Joints \U0001F355, " + "\n" +
+			u"Add Di Fara, Motorino, to Pizza Joints \U0001F355" + "\n" +
 			u"Add invitations, party favors, seating chart to wedding \U0001F492"
 		],
 	},
 	REMINDERS_HELP_SUBJECT: {
 		GENERAL_HELP_KEY: [
-			u"Reminders \U0001F514 are great for keeping track of stuff you need to do later.",
+			u"Reminders \u23F0 are great for keeping track of stuff you need to do later.",
 			u"Just say 'remind me' and then what you want to be reminded of.  If you don't include a time \U0001f554, I'll ask you for one.",
 			u"For example, you could say 'remind me to call mom \U0001f4f1 this weekend'"
 		],
