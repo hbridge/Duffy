@@ -179,10 +179,11 @@ var CommentForm = React.createClass({displayName: "CommentForm",
   handlePostMsgSubmit: function(e) {
     e.preventDefault();
     var text = React.findDOMNode(this.refs.text).value.trim();
+    var direction = React.findDOMNode(this.refs.direction).value;
     if (!text) {
       return;
     }
-    this.props.onCommentSubmit({msg: text, user_id: USER_ID});
+    this.props.onCommentSubmit({msg: text, user_id: USER.id, direction: direction});
     React.findDOMNode(this.refs.text).value = '';
     return;
   },
@@ -197,7 +198,12 @@ var CommentForm = React.createClass({displayName: "CommentForm",
       React.createElement("span", null, 
       React.createElement("form", {className: "commentForm", onSubmit: this.handlePostMsgSubmit}, 
         React.createElement("input", {type: "text", placeholder: "Say something...", ref: "text", className: "commentBox"}), 
-        React.createElement("input", {type: "submit", value: "Post", className: "largeButton"})
+        React.createElement("input", {type: "submit", value: "Post", className: "largeButton"}), 
+        React.createElement("br", null), 
+        React.createElement("select", {ref: "direction"}, 
+          React.createElement("option", {value: "ToUser"}, "Keeper to ", USER.name), 
+          React.createElement("option", {value: "ToKeeper"}, USER.name, " to Keeper")
+        )
       ), 
       React.createElement("form", {onSubmit: this.handleTogglePause}, 
         React.createElement("input", {type: "submit", value: pausedText, className: "largeButton"})
@@ -220,7 +226,7 @@ var KeeperApp = React.createClass({displayName: "KeeperApp",
 
   loadDataFromServer: function() {
     $.ajax({
-      url: "/smskeeper/message_feed?user_id=" + USER_ID,
+      url: "/smskeeper/message_feed?user_id=" + USER.id,
       dataType: 'json',
       cache: false,
       success: function(data) {
