@@ -278,12 +278,13 @@ def getUserDataDict(user, phoneNumToContactDict):
 		full_name = phoneNumToContactDict[user.phone_number]
 	else:
 		full_name = ''
+
 	userData = {
 		"id": user.id,
 		"phone_number": user.phone_number,
 		"name": user.name,
 		"full_name": full_name,
-		"source": "(" + user.signup_data_json + ")" if user.signup_data_json and "default" not in user.signup_data_json else '',
+		"source": user.signup_data_json,
 		"activated": user.activated,
 		"created": user.added,
 		"state": user.state,
