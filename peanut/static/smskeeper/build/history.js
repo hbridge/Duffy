@@ -189,7 +189,7 @@ var CommentForm = React.createClass({displayName: "CommentForm",
   },
   handleTogglePause: function(e) {
     e.preventDefault();
-    this.props.onTogglePaused({user_id: USER_ID});
+    this.props.onTogglePaused({user_id: USER.id});
     return;
   },
   render: function() {
