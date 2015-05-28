@@ -284,14 +284,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 				# And that we got a response
 				self.assertNotEqual("", self.getOutput(mock))
 
-	def test_stopped(self):
-		self.setupUser(True, True, keeper_constants.STATE_STOPPED)
-
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)
-			# Make sure we got no response
-			self.assertEqual("", self.getOutput(mock))
-
 	def test_common_niceties(self):
 		self.setupUser(True, True)
 		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!", "cool", "OK", u"\U0001F44D"]
@@ -526,7 +518,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "STOP")
-			self.assertIn(self.getOutput(mock), "unsubscribed")
+			self.assertIn("unsubscribed", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
