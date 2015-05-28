@@ -123,9 +123,13 @@ var DashboardApp = React.createClass({
   getInitialState: function() {
     return {users: [], daily_stats: {}};
   },
-
-  componentWillMount: function() {
-		$.getJSON("/smskeeper/dashboard_feed", this.dataCallback);
+  loadDataFromServer: function() {
+    $.getJSON("/smskeeper/dashboard_feed", this.dataCallback);
+  },
+  componentDidMount: function() {
+		this.loadDataFromServer();
+    var loadFunc = this.loadDataFromServer;
+    setInterval(function () {loadFunc()}, 2000);
   },
 
 	dataCallback: function(data) {
