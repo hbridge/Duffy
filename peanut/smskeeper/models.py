@@ -22,7 +22,9 @@ class User(models.Model):
 	# TODO(Derek): Rename this to activated_timestamp
 	activated = models.DateTimeField(null=True, blank=True)
 
-	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
+	STATE_CHOICES = [(x, x) for x in keeper_constants.ALL_STATES]
+	state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.STATE_NOT_ACTIVATED)
+
 	state_data = models.TextField(null=True, blank=True)
 
 	# Used by states to say "goto this state, but come back to me afterwards"
