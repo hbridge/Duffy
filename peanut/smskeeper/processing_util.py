@@ -2,6 +2,7 @@ import json
 import logging
 
 from smskeeper import keeper_constants
+from smskeeper import analytics
 
 from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, paused, implicit_label, stopped, user_help
 
@@ -65,6 +66,12 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	if count == 10:
 		logger.error("Hit endless loop for msg %s" % msg)
+
+	analytics.logUserEvent(
+		user,
+		"Incoming",
+		None
+	)
 
 
 stateCallbacks = {
