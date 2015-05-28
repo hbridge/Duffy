@@ -16,7 +16,6 @@ def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
 	if isRealKeeperNumber(keeperNumber):
-		print "here"
 		async.sendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.

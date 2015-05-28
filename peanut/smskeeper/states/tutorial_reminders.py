@@ -54,7 +54,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			user.timezone = timezone
 
-		sms_util.sendMsg(user, u"\U0001F44F Thanks! Let me show you how to set a reminder \u23F0. Just say 'Remind me to call mom this weekend' or 'Remind me to pickup laundry at 7pm tonight'. Try creating one now!", None, keeperNumber)
+		sms_util.sendMsg(user, u"\U0001F44F Thanks! Let me show you how to set reminders \u23F0. Think of the last thing you wanted to be reminded of. Type it in with 'remind me'. For ex: 'Remind me to call Mom this weekend'. Try it now!", None, keeperNumber)
 
 		# Setup the next state along with data saying we're going to it from the tutorial
 		user.setState(keeper_constants.STATE_REMIND)
@@ -66,7 +66,7 @@ def process(user, msg, requestDict, keeperNumber):
 	elif step == 2:
 		# Coming back from remind state so wait a second
 		time.sleep(1)
-		sms_util.sendMsgs(user, [u"K that's all set, what else do you want to be reminded about? Calls \U0001f4f1, emails \U0001F4E7, errands \U0001F45C?  I'm here to help! \U0001F60A", "FYI, I can also help you with other things. Just txt me 'Tell me more'"], keeperNumber)
+		sms_util.sendMsgs(user, [u"K that's all set, what other reminders do you want to setup for next few days? Calls \U0001f4f1, emails \U0001F4E7, errands \U0001F45C?  I'm here to help! \U0001F60A", "FYI, I can also help you with other things. Just txt me 'Tell me more'"], keeperNumber)
 		user.setTutorialComplete()
 		analytics.logUserEvent(
 			user,

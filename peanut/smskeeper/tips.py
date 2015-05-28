@@ -46,7 +46,7 @@ SMSKEEPER_TIPS = [
 	# ),
 	KeeperTip(
 		VOICE_TIP_ID,
-		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper add speak more type less to resolutions'"
+		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper remind me to call Mom this weekend'"
 	),
 ]
 

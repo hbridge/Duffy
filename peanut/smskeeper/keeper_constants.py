@@ -96,7 +96,7 @@ HELP_SUBJECTS = {
 	LISTS_HELP_SUBJECT: {
 		GENERAL_HELP_KEY: [
 			u"Lists \U0001F4DD are great for remembering things you want to keep track of.",
-			u"Just say 'add' along with an item and a list. For example: 'Add pay rent to my todo list'"
+			u"Just say 'add' with an item and a list. For example: 'Add pay rent to my todo list'"
 		],
 		EXAMPLES_HELP_KEY: [
 			u"Add Airplane \u2708\ufe0f to my movies list" + "\n" +
