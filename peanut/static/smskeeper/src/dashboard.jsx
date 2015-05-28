@@ -47,11 +47,8 @@ var UserTable = React.createClass({
       for (index in users) {
         user = users[index];
 
-        if ((this.props.showActivated && user.activated) ||
-           (!this.props.showActivated && !user.activated)) {
-          count++;
-          result.push(<UserRow user={ user } highlighted={ count % 2 == 0 } />)
-        }
+        count++;
+        result.push(<UserRow user={ user } highlighted={ count % 2 == 0 } />)
       }
       return result;
 		}.bind(this);
@@ -151,11 +148,36 @@ var DashboardApp = React.createClass({
       return result
     }.bind(this);
 
+    var filterUsers = function(users, wantActivated, activatedBefore, activatedAfter) {
+      var results = [];
+
+      for (i=0; i<users.length; i++) {
+        if (!wantActivated && !users[i].activated) {
+          results.push(users[i]);
+        } else if (wantActivated && users[i].activated){
+          activatedDate = new Date(users[i].activated);
+          if (activatedDate > activatedAfter && activatedDate < activatedBefore) {
+            results.push(users[i]);
+          }
+        }
+      }
+      return results;
+    };
+
+    var now = new Date();
+    var yest = new Date()
+    yest.setDate(yest.getDate() - 1);
+
+    var nonActivatedUsers = filterUsers(this.state.users, false, null, null);
+    var recentlyActivatedUsers = filterUsers(this.state.users, true, now, yest);
+    var normalUsers = filterUsers(this.state.users, true, yest, new Date(0));
+
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />
-        <UserTable users={ this.state.users } showActivated={ true } title={"Activated (" + countActivated(this.state.users) + ")"}/>
-        <UserTable users={ this.state.users } showActivated={ false } title={ "Not activated (" + (this.state.users.length - countActivated(this.state.users)) + ")"}/>
+        <UserTable users={ normalUsers } showActivated={ true } title={"Active (" + normalUsers.length  + ")"}/>
+        <UserTable users={ recentlyActivatedUsers } showActivated={ true } title={"Recently Activated (" + recentlyActivatedUsers.length + ")"}/>
+        <UserTable users={ nonActivatedUsers } showActivated={ false } title={ "Not activated (" + nonActivatedUsers.length + ")"}/>
       </div>
 		);
 	},
