@@ -62,7 +62,7 @@ FIRST_INTRO_MESSAGE_NO_MAGIC = "Oh hello. I'm ready for you."
 FIRST_INTRO_MESSAGE_MAGIC = "Ah. You used the magic phrase. Smooth."
 
 INTRO_MESSAGES = [
-	"I'm Keeper and I can help you remember small things that are easy to forget.",
+	"I'm Keeper. I can help you remember small things that are easy to forget.",
 	"Instead of writing them down somewhere, just txt me. I'll show you how I work. First, what's your name?"
 ]
 
