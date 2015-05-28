@@ -157,7 +157,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		# Activation message asks for their zip
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertIn("Let me show you how to set a reminder", self.getOutput(mock))
+			self.assertIn("Let me show you how to set reminders", self.getOutput(mock))
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")

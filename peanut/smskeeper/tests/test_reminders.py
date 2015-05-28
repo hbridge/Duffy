@@ -275,4 +275,4 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure we can continue the help state by calling "lists"
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "lists")
-			self.assertIn("Just say 'add' along with an item and a list", self.getOutput(mock))
+			self.assertIn("Just say 'add' with an item and a list", self.getOutput(mock))
