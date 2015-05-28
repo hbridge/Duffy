@@ -75,12 +75,12 @@ HELP_SUBJECTS = {
 	LISTS_HELP_SUBJECT: {
 		GENERAL_HELP_KEY: [
 			u"Lists \U0001F4DD are great for remembering things you want to keep track of.",
-			u"Just say 'add' along with an item and a list. For example: 'Add spaghetti \U0001f35d to my shopping list'"
+			u"Just say 'add' along with an item and a list. For example: 'Add pay rent to my todo list'"
 		],
 		EXAMPLES_HELP_KEY: [
 			u"Add Airplane \u2708\ufe0f to my movies list" + "\n" +
-			u"Add Japan \U0001f1ef\U0001f1f5, France \U0001f1eb\U0001f1f7 to travel" + "\n" +
-			u"Add Di Fara, Motorino, to Pizza Joints \U0001F355" + "\n" +
+			u"Add Tokyo \U0001f1ef\U0001f1f5, Paris \U0001f1eb\U0001f1f7 to travel" + "\n" +
+			u"Add Di Fara, Motorino to Pizza Joints \U0001F355" + "\n" +
 			u"Add invitations, party favors, seating chart to wedding \U0001F492"
 		],
 	},
