@@ -3,6 +3,7 @@ import string
 
 from smskeeper import sms_util, msg_util, user_util
 from smskeeper import keeper_constants
+from smskeeper import analytics
 
 
 def dealWithNonActivatedUser(user, keeperNumber):
@@ -18,6 +19,21 @@ def dealWithNonActivatedUser(user, keeperNumber):
 		user.setStateData("step", 1)
 		user.invite_code = code
 		user.save()
+		analytics.logUserEvent(
+			user,
+			"User Signup",
+			{
+				"First Message": True
+			}
+		)
+	else:
+		analytics.logUserEvent(
+			user,
+			"User Signup",
+			{
+				"First Message": False
+			}
+		)
 
 
 def process(user, msg, requestDict, keeperNumber):
