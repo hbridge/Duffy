@@ -84,7 +84,7 @@ def processQuery(query, timezone):
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
 
 				# If it has am or pm in the used text, then assume tomorrow
-				if "m" in usedText:
+				if "m" in usedText.lower():
 					startDate = startDate + datetime.timedelta(days=1)
 				else:
 					# otherwise, its 8 so assume 12 hours from now
@@ -92,7 +92,7 @@ def processQuery(query, timezone):
 
 			tzAwareStartDate = startDate.astimezone(timezone)
 			# If we think tho that its super early in the morning and there's no am, we're probably wrong, so set it later
-			if tzAwareStartDate.hour >= 0 and tzAwareStartDate.hour < 6 and "am" not in usedText:
+			if tzAwareStartDate.hour >= 0 and tzAwareStartDate.hour < 6 and "am" not in usedText.lower():
 				startDate = startDate + datetime.timedelta(hours=12)
 
 			column = entry["column"]

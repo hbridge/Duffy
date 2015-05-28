@@ -194,7 +194,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me at 9am to add 1.25 hrs")
+			cliMsg.msg(self.testPhoneNumber, "Remind me at 9AM to add 1.25 hrs")
 			self.assertIn("around 9am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
