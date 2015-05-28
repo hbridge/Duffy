@@ -16,14 +16,21 @@ class KeeperTip():
 		self.message = message
 		self.mediaUrl = mediaUrl
 
+	# Render a tip for a full tip, like vcard
 	def render(self, name):
 		return self.message.replace(":NAME:", name) + "\n\n" + SMSKEEPER_TIP_FOOTER
+
+	# Mini tips are little sentences sent after first actions
+	def renderMini(self):
+		return self.message
 
 REMINDER_TIP_ID = "reminders"
 PHOTOS_TIP_ID = "photos"
 SHARING_TIP_ID = "sharing"
 VOICE_TIP_ID = "voice"
 VCARD_TIP_ID = "vcard"
+
+SNOOZE_TIP_ID = "mini-snooze"
 
 
 SMSKEEPER_TIPS = [
@@ -47,6 +54,10 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		VOICE_TIP_ID,
 		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper remind me to call Mom this weekend'"
+	),
+	KeeperTip(
+		SNOOZE_TIP_ID,
+		"btw, you can always snooze a reminder by saying 'snooze 5 mins' or 'snooze 9pm'"
 	),
 ]
 
@@ -120,13 +131,16 @@ def tipWithId(tipId):
 	return None
 
 
-def markTipSent(user, tip, customSentDate=None):
+# isMini means that its a mini message so we don't record the last time it was sent, just that it was
+def markTipSent(user, tip, customSentDate=None, isMini=False):
 	date = customSentDate if customSentDate is not None else datetime.datetime.now(pytz.utc)
 	sentTips = getSentTipIds(user)
 	if tip.id not in sentTips:
 		sentTips.append(tip.id)
 		user.sent_tips = ",".join(sentTips)
-		user.last_tip_sent = date
+
+		if not isMini:
+			user.last_tip_sent = date
 		user.save()
 
 

@@ -138,3 +138,15 @@ KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
 SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them to"
+
+SMSKEEPER_TEST_NUM = "test"
+SMSKEEPER_CLI_NUM = "cli"
+
+
+def isRealKeeperNumber(keeperNumber):
+	return keeperNumber != SMSKEEPER_CLI_NUM and keeperNumber != SMSKEEPER_TEST_NUM
+
+
+def isTestKeeperNumber(keeperNumber):
+	return keeperNumber == SMSKEEPER_TEST_NUM
+

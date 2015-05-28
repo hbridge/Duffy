@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import datetime
 import pytz
 import json
+import time
 
 from twilio import TwilioRestException
 
@@ -57,6 +58,16 @@ def processReminder(entry):
 
 	for user in entry.users.all():
 		sendMsg(user.id, msg, None, entry.keeper_number)
+
+		if tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
+			# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+			# sms_util for sending list of msgs
+			if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+				time.sleep(2)
+
+			tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
+			sendMsg(user.id, tip.renderMini(), None, entry.keeper_number)
+			tips.markTipSent(user, tip, isMini=True)
 
 		# Now set to remind, incase they send back some snooze messaging
 		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)

@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 from datetime import datetime
 from datetime import timedelta
 
-from peanut.settings import constants
+from smskeeper import keeper_constants
 
 DELAY_SECONDS_PER_WORD = 0.2
 MIN_DELAY_SECONDS = 1
@@ -15,7 +15,7 @@ def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
-	if isRealKeeperNumber(keeperNumber):
+	if keeper_constants.isRealKeeperNumber(keeperNumber):
 		async.sendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
@@ -37,11 +37,3 @@ def sendMsgs(user, msgList, keeperNumber):
 
 		# Call the single method above so it does the right async logic
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime)
-
-
-def isRealKeeperNumber(keeperNumber):
-	return keeperNumber != constants.SMSKEEPER_CLI_NUM and keeperNumber != constants.SMSKEEPER_TEST_NUM
-
-
-def isTestKeeperNumber(keeperNumber):
-	return keeperNumber == constants.SMSKEEPER_TEST_NUM

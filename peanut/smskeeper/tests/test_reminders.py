@@ -276,3 +276,34 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "lists")
 			self.assertIn("Just say 'add' with an item and a list", self.getOutput(mock))
+
+	# Make sure first reminder we send snooze tip, then second we don't
+	def test_snooze_tip(self):
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.get(label="#reminders")
+
+		# Make sure the snooze tip came through
+		with patch('smskeeper.async.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertIn("btw, you can always snooze", self.getOutput(mock))
+
+			# Make sure this isn't set... mini tips shouldn't set this
+			self.assertFalse(self.getTestUser().last_tip_sent)
+
+		# Now make sure if we do another reminder, it doesn't do the snooze tip
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop2 in 5 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+
+		# Make sure we grabbed the correct 'second' reminder
+		self.assertEqual(entry.text, "go poop2")
+		with patch('smskeeper.async.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertNotIn("btw, you can always snooze", self.getOutput(mock))
+
+

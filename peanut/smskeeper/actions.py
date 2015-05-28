@@ -45,7 +45,7 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 	# TODO use a separate process but probably this is not the right place to do it.
 	if len(originalMedia) > 0:
 		# only move media if we're not running a test or using CLI
-		if sms_util.isTestKeeperNumber(keeperNumber):
+		if keeper_constants.isTestKeeperNumber(keeperNumber):
 			s3mediaUrls = originalMedia
 		else:
 			s3mediaUrls = image_util.moveMediaToS3(originalMedia)
