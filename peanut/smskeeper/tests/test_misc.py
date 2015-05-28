@@ -518,7 +518,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "STOP")
-			self.assertIn("unsubscribed", self.getOutput(mock))
+			self.assertIn("just type 'start'", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 

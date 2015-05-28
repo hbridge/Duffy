@@ -79,7 +79,7 @@ DEFAULT_TIP_FREQUENCY_DAYS = 3
 TELL_ME_MORE = "I can help you remember lists of things. Send me anything like 'add Jurassic Park to my movies list' or 'add pasta, sauce, cheese to shopping'."
 
 HELP_MESSAGES = [
-	u'There are a few things I can help you with. \U0001F4AA' + "\n"
+	u'There are a few things I can help you with. \U0001F4AA' + "\n" +
 	u"I can remember lists \U0001F4DD of things for you, and I can send you reminders at a specific time \u23F0",
 	u"What would you like to learn more about? Lists or reminders?"
 ]

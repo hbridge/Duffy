@@ -56,7 +56,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			user.timezone = timezone
 
-		sms_util.sendMsg(user, u"\U0001F44F Thanks! Let me show you how to set reminders \u23F0. Think of the last thing you wanted to be reminded of. Type it in with 'remind me'. For ex: 'Remind me to call Mom this weekend'. Try it now!", None, keeperNumber)
+		sms_util.sendMsg(user, u"\U0001F44F Thanks! Let me show you how to set reminders \u23F0. What's a recent thing you wanted to be reminded of? Type it in with 'remind me'. For ex: 'Remind me to buy tickets to concert this weekend'. Try it now!", None, keeperNumber)
 
 		# Setup the next state along with data saying we're going to it from the tutorial
 		user.setState(keeper_constants.STATE_REMIND)
