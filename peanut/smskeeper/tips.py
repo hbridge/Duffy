@@ -11,10 +11,11 @@ class KeeperTip():
 	id = None
 	message = None
 
-	def __init__(self, id, message, mediaUrl=None):
+	def __init__(self, id, message, triggerBased, mediaUrl=None):
 		self.id = id
 		self.message = message
 		self.mediaUrl = mediaUrl
+		self.triggerBased = triggerBased
 
 	# Render a tip for a full tip, like vcard
 	def render(self, name):
@@ -37,15 +38,18 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		VCARD_TIP_ID,
 		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
-		keeper_constants.KEEPER_VCARD_URL
+		keeper_constants.KEEPER_VCARD_URL,
+		True
 	),
 	KeeperTip(
 		REMINDER_TIP_ID,
-		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')"
+		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')",
+		True
 	),
 	KeeperTip(
 		PHOTOS_TIP_ID,
-		u"I \U0001F499 pics!  Try sending me a selfie with 'add to selifes' and I'll store it for you.  It's a fast way to save documents and receipts, too!"
+		u"I \U0001F499 pics!  Try sending me a selfie with 'add to selifes' and I'll store it for you.  It's a fast way to save documents and receipts, too!",
+		True
 	),
 	# KeeperTip(
 	# 	SHARING_TIP_ID,
@@ -53,16 +57,19 @@ SMSKEEPER_TIPS = [
 	# ),
 	KeeperTip(
 		VOICE_TIP_ID,
-		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper remind me to call Mom this weekend'"
+		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper remind me to call Mom this weekend'",
+		True
 	),
 	KeeperTip(
 		SNOOZE_TIP_ID,
-		"btw, you can always snooze a reminder by saying 'snooze 5 mins' or 'snooze 9pm'"
+		"btw, you can always snooze a reminder by saying 'snooze 5 mins' or 'snooze 9pm'",
+		False
 	),
 ]
 
 SMSKEEPER_TIP_FOOTER = "Want fewer tips? Type 'send me tips weekly/monthly/never'"
 SMSKEEPER_TIP_HOUR = 18
+
 
 def isEligibleForTip(user):
 	if not user.completed_tutorial:
@@ -92,15 +99,18 @@ def isEligibleForTip(user):
 			return True
 	return False
 
-'''
-Selects a tip and returns its identifier
-'''
 
+#
+# Selects a tip and returns its identifier for trigger based tips
+#
 def selectNextTip(user):
 	if not isEligibleForTip(user):
 		return None
 
-	unsentTipIds = map(lambda tip: tip.id, SMSKEEPER_TIPS)
+	# Filter to only trigger based ones
+	triggerBasedTips = filter(lambda tip: tip.triggerBased, SMSKEEPER_TIPS)
+	unsentTipIds = map(lambda tip: tip.id, triggerBasedTips)
+
 	unsentTipIds = [x for x in unsentTipIds if x not in getSentTipIds(user)]
 	for tipId in unsentTipIds:
 		if tipId == "reminders":
