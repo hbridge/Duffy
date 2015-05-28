@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 
 class User(models.Model):
 	phone_number = models.CharField(max_length=100, unique=True)
-	name = models.CharField(max_length=100)
+	name = models.CharField(max_length=100, blank=True)
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)
 
 	# TODO(Derek): Rename this to activated_timestamp
-	activated = models.DateTimeField(null=True)
+	activated = models.DateTimeField(null=True, blank=True)
 
 	state = models.CharField(max_length=100, default=keeper_constants.STATE_NOT_ACTIVATED)
 	state_data = models.TextField(null=True, blank=True)
@@ -29,18 +29,18 @@ class User(models.Model):
 	next_state = models.CharField(max_length=100, null=True, blank=True)
 	next_state_data = models.TextField(null=True, blank=True)
 
-	last_state_change = models.DateTimeField(null=True)
+	last_state_change = models.DateTimeField(null=True, blank=True)
 
 	signup_data_json = models.TextField(null=True, blank=True)
 
 	invite_code = models.CharField(max_length=100, null=True, blank=True)
 
-	timezone = models.CharField(max_length=100, null=True)
-	sent_tips = models.TextField(null=True, db_index=False)
+	timezone = models.CharField(max_length=100, null=True, blank=True)
+	sent_tips = models.TextField(null=True, db_index=False, blank=True)
 	disable_tips = models.BooleanField(default=False)
 
 	tip_frequency_days = models.IntegerField(default=keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
-	last_tip_sent = models.DateTimeField(null=True)
+	last_tip_sent = models.DateTimeField(null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 	last_share_upsell = models.DateTimeField(null=True, blank=True)
