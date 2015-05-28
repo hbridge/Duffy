@@ -1,20 +1,10 @@
 import datetime
 import pytz
-import string
 from mock import patch
 
-from django.test import TestCase
-from django.conf import settings
-
 from peanut.settings import constants
-from smskeeper.models import User, Entry, Contact, Message, ZipData
-from smskeeper import msg_util, cliMsg, keeper_constants
-from smskeeper import async
-from smskeeper import tips
-
-from common import natty_util
-
-from smskeeper import sms_util
+from smskeeper.models import User, Entry, Message
+from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
 
 import test_base
 
@@ -133,7 +123,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "add to groceries")
 			self.assertNotIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 
-
 	def test_tutorial_list(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
@@ -142,7 +131,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "I'm UnitTests")
 			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
 			self.assertIn("Let me show you the basics", self.getOutput(mock))
-			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
+			self.assertEquals(self.getTestUser().name, "UnitTests")
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new5 #test")
@@ -163,12 +152,12 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
+			self.assertEquals(self.getTestUser().name, "UnitTests")
 
 		# Activation message asks for their zip
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
 			self.assertIn("Let me show you how to set a reminder", self.getOutput(mock))
-			self.assertEquals(User.objects.get(phone_number=self.testPhoneNumber).name, "UnitTests")
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")

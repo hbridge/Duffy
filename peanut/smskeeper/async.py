@@ -58,6 +58,12 @@ def processReminder(entry):
 	for user in entry.users.all():
 		sendMsg(user.id, msg, None, entry.keeper_number)
 
+		# Now set to remind, incase they send back some snooze messaging
+		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
+		user.setStateData("entryId", entry.id)
+		user.setStateData("reminderSent", True)
+		user.save()
+
 	entry.hidden = True
 	entry.save()
 

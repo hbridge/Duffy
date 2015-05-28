@@ -71,7 +71,10 @@ class User(models.Model):
 			return self.name
 		return self.phone_number
 
-	def setState(self, state, override=False, stateData=None):
+	def setState(self, state, override=False, stateData=None, saveCurrent=False):
+		currentState = self.state
+		currentStateData = self.state_data
+
 		# next state means that we want to override the wishes of the current state and do something different
 		# it should all be configured already
 		if not override and self.next_state:
@@ -82,8 +85,12 @@ class User(models.Model):
 			self.state = state
 			self.state_data = None if stateData is None else json.dumps(stateData)
 
-		self.next_state = None
-		self.next_state_data = None
+		if saveCurrent:
+			self.next_state = currentState
+			self.next_state_data = currentStateData
+		else:
+			self.next_state = None
+			self.next_state_data = None
 
 		self.last_state_change = datetime.datetime.now(pytz.utc)
 		self.save()

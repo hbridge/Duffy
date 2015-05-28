@@ -73,7 +73,7 @@ def processQuery(query, timezone):
 	if (nattyResult):
 		nattyJson = json.loads(nattyResult)
 		for entry in nattyJson:
-			timestamp = entry["timestamps"][0]
+			timestamp = entry["timestamps"][-1]
 			startDate = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.utc)
 
 			usedText = entry["matchingValue"]

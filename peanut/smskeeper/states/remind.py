@@ -2,6 +2,7 @@ import datetime
 import pytz
 import logging
 import re
+import json
 
 from peanut.settings import constants
 
@@ -35,9 +36,19 @@ def isNattyDefaultTime(startDate):
 
 
 # Returns True if this message has a valid time and it doesn't look like another remind command
+# If this is a followup, then we look for again or snooze which if found, we'll assume is a followup
+# Like "remind me again in 5 minutes"
 # Otherwise False
-def isFollowup(startDate, msg):
-	return validTime(startDate) and not msg_util.isRemindCommand(msg)
+def isFollowup(startDate, msg, reminderSent):
+	if validTime(startDate):
+		if reminderSent and msg_util.isRemindCommand(msg):
+			if "again" in msg or "snooze" in msg:
+				return True
+			else:
+				return False
+		elif not msg_util.isRemindCommand(msg):
+			return True
+	return False
 
 
 def process(user, msg, requestDict, keeperNumber):
@@ -54,12 +65,13 @@ def process(user, msg, requestDict, keeperNumber):
 	# See if what they entered is a valid time and if so, assign it.
 	# If not, kick out to normal mode and re-process
 	if user.getStateData("entryId"):
-		if isFollowup(startDate, msg):
+		if isFollowup(startDate, msg, user.getStateData("reminderSent")):
 			entry = Entry.objects.get(id=int(user.getStateData("entryId")))
 			doRemindMessage(user, startDate, msg, entry.text, False, entry, keeperNumber, requestDict)
 
-			user.setState(keeper_constants.STATE_NORMAL)
-			user.save()
+			if user.getStateData("reminderSent"):
+				entry.hidden = False
+				entry.save()
 			return True
 		else:
 			# Send back for reprocessing
@@ -125,7 +137,15 @@ def doRemindMessage(user, utcDate, msg, query, sendFollowup, entry, keeperNumber
 
 	entry.remind_timestamp = utcDate
 	entry.keeper_number = keeperNumber
-	entry.orig_text = msg
+	if entry.orig_text:
+		try:
+			origTextList = json.loads(entry.orig_text)
+		except ValueError:
+			origTextList = [entry.orig_text]
+	else:
+		origTextList = []
+	origTextList.append(msg)
+	entry.orig_text = json.dumps(origTextList)
 	entry.save()
 
 	toSend = "%s I'll remind you %s." % (helper_util.randomAcknowledgement(), userMsg)

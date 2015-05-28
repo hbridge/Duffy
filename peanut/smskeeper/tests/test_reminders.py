@@ -216,3 +216,63 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# 4 pm ETC, so 18 UTC
 		self.assertEqual(20, entry.remind_timestamp.hour)
 
+	# Test snooze functionality by setting a reminder, firing the reminder, then sending back a snooze message
+	def test_snooze_normal(self):
+		self.setupUser(True, True)
+
+		now = datetime.datetime.now(pytz.utc)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.get(label="#reminders")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertIn("go poop", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "snooze for 1 hour")
+
+		snoozedEntry = Entry.objects.get(label="#reminders")
+
+		# Make sure the entries are the same
+		self.assertEqual(entry.id, snoozedEntry.id)
+
+		# Make sure the snoozedEntry is now an hour later
+		self.assertEqual(snoozedEntry.remind_timestamp.hour, (now + datetime.timedelta(hours=1)).hour)
+
+	# Test snooze functionality by:
+	# Setting a reminder
+	# Change state to help
+	# firing the reminder
+	# snoozing
+	# followup to snoozing
+	# continue help state
+	def test_snooze_change_state_and_followup(self):
+		self.setupUser(True, True)
+
+		now = datetime.datetime.now(pytz.utc)
+
+		# Similar code as before but not doing asserts here to save code
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Move to help state to see if it gets saved
+		cliMsg.msg(self.testPhoneNumber, "help")
+		entry = Entry.objects.get(label="#reminders")
+		async.processReminder(entry)
+
+		# Now do our snoozes
+		cliMsg.msg(self.testPhoneNumber, "snooze for 1 hour")
+		cliMsg.msg(self.testPhoneNumber, "actually, 2 hours")
+
+		snoozedEntry = Entry.objects.get(label="#reminders")
+		# Make sure the entries are the same
+		self.assertEqual(entry.id, snoozedEntry.id)
+
+		# Make sure the snoozedEntry is now an hour later
+		self.assertEqual(snoozedEntry.remind_timestamp.hour, (now + datetime.timedelta(hours=2)).hour)
+
+		# Make sure we can continue the help state by calling "lists"
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "lists")
+			self.assertIn("Just say 'add' along with an item and a list", self.getOutput(mock))

@@ -19,17 +19,19 @@ def process(user, msg, requestDict, keeperNumber):
 
 	if step:
 		step = int(step)
+	else:
+		step = 0
 
 	analytics.logUserEvent(
 		user,
 		"Reached Tutorial Step",
 		{
 			"Tutorial": keeper_constants.STATE_TUTORIAL_REMIND,
-			"Step": step if step is not None else 0
+			"Step": step
 		}
 	)
 
-	if not step:
+	if step == 0:
 		nameFromPhrase = msg_util.nameInTutorialPrompt(msg)
 		if nameFromPhrase:
 			user.name = nameFromPhrase
