@@ -1,9 +1,10 @@
 from smskeeper import keeper_constants
-from smskeeper import sms_util
+from smskeeper import sms_util, msg_util
 from smskeeper import analytics
 
 import logging
 logger = logging.getLogger(__name__)
+
 
 def process(user, msg, requestDict, keeperNumber):
 	if "NumMedia" in requestDict:
@@ -17,10 +18,13 @@ def process(user, msg, requestDict, keeperNumber):
 	isExampleRequest = False
 
 	processed = False
-	if "list" in cleanedMsg:
+
+	if "list" in cleanedMsg and not msg_util.isAddTextCommand(msg):
 		subject = keeper_constants.LISTS_HELP_SUBJECT
 	elif "reminder" in cleanedMsg:
 		subject = keeper_constants.REMINDERS_HELP_SUBJECT
+	elif "both" in cleanedMsg:
+		subject = keeper_constants.LISTS_HELP_SUBJECT
 
 	if "example" in cleanedMsg:
 		isExampleRequest = True

@@ -71,7 +71,7 @@ class SMSKeeperAsyncCase(test_base.SMSKeeperBaseCase):
 	def testSendTipMedia(self):
 		self.setupUser(True, True, "UTC")
 
-		tip = tips.KeeperTip("testtip", "This is a tip", "http://www.getkeeper.com/favicon.png")
+		tip = tips.KeeperTip("testtip", "This is a tip", True, "http://www.getkeeper.com/favicon.png")
 		with patch('smskeeper.async.recordOutput') as mock:
 			async.sendTipToUser(tip, self.user, constants.SMSKEEPER_TEST_NUM)
 			self.assertIn("This is a tip", self.getOutput(mock))
