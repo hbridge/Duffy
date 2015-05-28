@@ -109,7 +109,7 @@ def sendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 		logger.error("Tried to send message to nonexistent user with id: %d", userId)
 		return
 
-	if user.state == keeper_constants.STATE_STOPPED:
+	if user.state == keeper_constants.STATE_STOPPED and user.getStateData("step") and user.getStateData("step") == 1:
 		logger.warning("Tried to send msg %s to user %s who is in state stopped" % (msgText, user.id))
 		return
 
