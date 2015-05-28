@@ -1,3 +1,5 @@
+import json
+
 from smskeeper import keeper_constants
 
 from smskeeper import sms_util
@@ -22,11 +24,18 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 
 	sms_util.sendMsgs(userToActivate, msgsToSend, keeperNumber)
 
+	source = None
+	if userToActivate.signup_data_json:
+		signupData = json.loads(userToActivate.signup_data_json)
+		if "source" in signupData:
+			source = signupData["source"]
+
 	analytics.logUserEvent(
 		userToActivate,
 		"User Activated",
 		{
 			"Days Waiting": time_utils.daysAndHoursAgo(userToActivate.added)[0],
-			"Tutorial": tutorialState
+			"Tutorial": tutorialState,
+			"Source": source
 		}
 	)
