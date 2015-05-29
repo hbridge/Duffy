@@ -297,6 +297,7 @@ def setName(user, msg, keeperNumber):
 		None
 	)
 
+
 def setZipcode(user, msg, keeperNumber):
 	timezone, user_error = msg_util.timezoneForMsg(msg)
 	if timezone is None:
@@ -313,6 +314,7 @@ def setZipcode(user, msg, keeperNumber):
 		None
 	)
 
+
 def pickItemFromLabel(user, label, keeperNumber):
 	entries = Entry.fetchEntries(user=user, label=label)
 	if len(entries) == 0:
@@ -325,6 +327,7 @@ def pickItemFromLabel(user, label, keeperNumber):
 		sms_util.sendMsg(user, entry.text, entry.img_url, keeperNumber)
 	else:
 		sms_util.sendMsg(user, "My pick for %s: %s" % (label, entry.text), None, keeperNumber)
+
 
 def deleteIndicesFromLabel(user, label, indices, keeperNumber):
 	if label:
@@ -365,3 +368,16 @@ def deleteIndicesFromLabel(user, label, indices, keeperNumber):
 		fetch(user, label, keeperNumber)
 	else:
 		sms_util.sendMsg(user, 'Sorry, I\'m not sure which list you\'re referring to. Try "delete NUMBER from list"', None, keeperNumber)
+
+
+# Deal with a nicety message
+# Might respond with something, might not
+def nicety(user, nicety, requestDict, keeperNumber):
+	response = nicety.getResponse(user, requestDict, keeperNumber)
+	if response:
+		sms_util.sendMsg(user, response, None, keeperNumber)
+		analytics.logUserEvent(
+			user,
+			"Sent Nicety",
+			None
+		)

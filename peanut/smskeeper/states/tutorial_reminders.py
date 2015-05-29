@@ -2,11 +2,12 @@ import time
 import re
 import logging
 import datetime
+import string
 
 from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import msg_util
-from smskeeper import analytics
+from smskeeper import analytics, niceties, actions
 
 # Might need to get ride of this at some point due to circular dependencies
 # Its only using a few constants, easily moved
@@ -32,12 +33,27 @@ def process(user, msg, requestDict, keeperNumber):
 		}
 	)
 
+	# Deal with one off things before we get to tutorial
+	nicety = niceties.getNicety(msg)
+	if nicety:
+		actions.nicety(user, nicety, requestDict, keeperNumber)
+		return True
+
+	# Tutorial stuff
 	if step == 0:
-		nameFromPhrase = msg_util.nameInTutorialPrompt(msg)
+		# First see if they did a phrase like "my name is Billy"
+		nameFromPhrase = msg_util.nameInSetName(msg, tutorial=True)
+
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
-			user.name = msg.strip()
+			# If there's more than two words, then reject
+			if len(msg.split(' ')) > 2:
+				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
+				return True
+			else:
+				user.name = msg.strip(string.punctuation)
+
 		user.save()
 		sms_util.sendMsgs(
 			user,

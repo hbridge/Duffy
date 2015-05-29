@@ -5,6 +5,7 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help
+from smskeeper import msg_util
 
 from smskeeper.models import User, Message
 from common import slack_logger
@@ -57,6 +58,11 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	# Grab just the first line, so we ignore signatures
 	msg = msg.split('\n')[0]
+
+	# Always look for a stop command first and deal with that
+	if msg_util.isStopCommand(msg):
+		user.setState(keeper_constants.STATE_STOPPED)
+		user.save()
 
 	if not user.paused:
 		processed = False

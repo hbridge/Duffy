@@ -5,6 +5,7 @@ import unicodedata
 import sys
 import datetime
 import humanize
+import string
 
 from models import Entry
 from smskeeper import keeper_constants
@@ -24,8 +25,10 @@ delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
 handle_re = re.compile('@[a-zA-Z0-9]+\Z')
-set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
 
+# We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
+tutorial_name_re = re.compile("(my name('| i)s|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
+set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
 
 def hasLabel(msg):
 	for word in msg.split(' '):
@@ -234,17 +237,17 @@ def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()
 
 
-def nameInTutorialPrompt(msg):
-	match = re.match("(my name('| i)s|i('| a)m) (?P<name>[a-zA-Z\s]+)", msg, re.I)
-	if match:
-		return match.group('name')
-	return None
+def nameInSetName(msg, tutorial=False):
+	if tutorial:
+		match = tutorial_name_re.match(msg.strip())
+	else:
+		match = set_name_re.match(msg.strip())
 
-
-def nameInSetName(msg):
-	match = set_name_re.match(msg.strip())
 	if match:
-		return match.group('name')
+		name = match.group('name')
+		name = name.strip(string.punctuation)
+
+		return name
 	return None
 
 

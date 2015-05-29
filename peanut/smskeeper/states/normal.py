@@ -158,14 +158,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:  # catch all, it's a nicety or an error
 			nicety = niceties.getNicety(msg)
 			if nicety:
-				response = nicety.getResponse(user, requestDict, keeperNumber)
-				if response:
-					sms_util.sendMsg(user, response, None, keeperNumber)
-					analytics.logUserEvent(
-						user,
-						"Sent Nicety",
-						None
-					)
+				actions.nicety(user, nicety, requestDict, keeperNumber)
 
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:

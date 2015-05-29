@@ -145,70 +145,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("You got it", self.getOutput(mock))
 
-	def test_tutorial_remind_normal(self):
-		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
-
-		# Activation message asks for their name
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
-			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
-			self.assertEquals(self.getTestUser().name, "UnitTests")
-
-		# Activation message asks for their zip
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertIn("Let me show you how to set reminders", self.getOutput(mock))
-
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
-			self.assertIn("tomorrow around 9am", self.getOutput(mock))
-			self.assertIn("I can also help you with other things", self.getOutput(mock))
-
-	def test_tutorial_remind_no_time_given(self):
-		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
-
-		# Activation message asks for their name
-		cliMsg.msg(self.testPhoneNumber, "UnitTests")
-		cliMsg.msg(self.testPhoneNumber, "10012")
-
-		with patch('smskeeper.async.recordOutput') as mock:
-			with patch('smskeeper.states.remind.datetime') as datetimeMock:
-				# We set the time to be 10 am so we can check the default time later.
-				# But need to set early otherwise default could be tomorrow
-				datetimeMock.datetime.now.return_value = self.getUserNow().replace(hour=10)
-				cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
-
-				# Since there was no time given, should have picked a time in the near future
-				self.assertIn("today around 6pm", self.getOutput(mock))
-
-				# This is the key here, make sure we have the extra message
-				self.assertIn("In the future, you can", self.getOutput(mock))
-
-	def test_tutorial_remind_time_zones(self):
-		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
-
-		# Activation message asks for their name
-		cliMsg.msg(self.testPhoneNumber, "UnitTests")
-		cliMsg.msg(self.testPhoneNumber, "94117")
-
-		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
-
-			# Since there was no time given, should have picked a time in the near future
-			self.assertIn("today", self.getOutput(mock))
-
-			# This is the key here, make sure we have the extra message
-			self.assertIn("In the future, you can", self.getOutput(mock))
-
-	def test_tutorial_zip_code(self):
-		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
-
-		# Activation message asks for their name
-		cliMsg.msg(self.testPhoneNumber, "UnitTests")
-		cliMsg.msg(self.testPhoneNumber, "94117")
-
-		user = self.getTestUser()
-		self.assertEqual(user.timezone, "PST")
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
@@ -316,7 +252,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
-
 
 
 	def test_absolute_delete(self):

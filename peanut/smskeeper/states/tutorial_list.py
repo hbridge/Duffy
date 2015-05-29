@@ -18,7 +18,7 @@ def process(user, msg, requestDict, keeperNumber):
 		stateData = int(user.state_data)
 
 	if not stateData:
-		nameFromPhrase = msg_util.nameInTutorialPrompt(msg)
+		nameFromPhrase = msg_util.nameInSetName(msg, tutorial=True)
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
