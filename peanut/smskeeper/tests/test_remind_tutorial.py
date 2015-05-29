@@ -140,3 +140,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		# Make sure no reminders were created
 		self.assertEquals(0, len(Entry.objects.filter(label="#reminders")))
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to go poop later")
+		# Make sure now messages are still though of as a reminder
+		self.assertEquals(1, len(Entry.objects.filter(label="#reminders")))
