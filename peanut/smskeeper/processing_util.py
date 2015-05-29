@@ -55,6 +55,9 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		msg = msg.decode('utf-8')
 	msg = msg.strip()
 
+	# Grab just the first line, so we ignore signatures
+	msg = msg.split('\n')[0]
+
 	processed = False
 	count = 0
 	while not processed and count < 10:

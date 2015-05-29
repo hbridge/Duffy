@@ -533,3 +533,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("welcome back", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
+
+	# Emulate a user who has a signature at the end of their messages
+	def test_signatures(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			# Activation message asks for their name
+			cliMsg.msg(self.testPhoneNumber, "UnitTests\nThis Is My Sig")
+			self.assertNotIn("Sig", self.getOutput(mock))
+		self.assertEqual("UnitTests", self.getTestUser().name)

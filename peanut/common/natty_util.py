@@ -42,7 +42,8 @@ def getNattyInfo(query, timezone):
 	myResults = sorted(myResults, key=lambda x: x[0])
 
 	# prefer anything that has "at" in the text
-	myResults = sorted(myResults, key=lambda x: "at" in x[2], reverse=True)
+	# Make sure it's "at " (with a space) since Saturday will match
+	myResults = sorted(myResults, key=lambda x: "at " in x[2], reverse=True)
 
 	return myResults
 
