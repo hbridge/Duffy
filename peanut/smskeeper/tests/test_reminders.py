@@ -80,7 +80,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		origEntry = Entry.objects.filter(label="#reminders").last()
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "remind me this evening")
+			cliMsg.msg(self.testPhoneNumber, "remind me Monday at 7pm")
 			self.assertIn("7pm", self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
@@ -95,7 +95,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "remind me poop")
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
-		cliMsg.msg(self.testPhoneNumber, "remind me pee tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "#remind pee tomorrow")
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "reminders")
 

@@ -76,7 +76,9 @@ def process(user, msg, requestDict, keeperNumber):
 	# If not, kick out to normal mode and re-process
 	if user.getStateData("entryId"):
 		# Sending in the newQuery because we want to look at the message without timing info
-		if isFollowup(startDate, newQuery, user.getStateData("reminderSent")):
+		# TODO(Derek): Get it so we don't have to attach the label
+		msgWithoutTiming = newQuery + " " + label if label else newQuery
+		if isFollowup(startDate, msgWithoutTiming, user.getStateData("reminderSent")):
 			entry = Entry.objects.get(id=int(user.getStateData("entryId")))
 			doRemindMessage(user, startDate, msg, entry.text, False, entry, keeperNumber, requestDict)
 
