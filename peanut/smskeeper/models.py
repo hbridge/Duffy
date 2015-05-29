@@ -128,7 +128,8 @@ class User(models.Model):
 
 	def getTimezone(self):
 		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
-		if self.timezone:
+		# Note: 3 letter entries are to handle the early accounts. All new accounts use the full string
+		if self.timezone and len(self.timezone) == 3:
 			if self.timezone == "PST":
 				return pytz.timezone('US/Pacific')
 			elif self.timezone == "EST":
@@ -146,6 +147,9 @@ class User(models.Model):
 			else:
 				logger.error("Didn't find %s tz for user %s, defaulting to Eastern but you should map this in models.py" % (self.timezone, self))
 				return pytz.timezone('US/Eastern')
+		# New accounts use the full string
+		elif self.timezone and len(self.timezone) > 3:
+			return pytz.timezone(self.timezone)
 		else:
 			return pytz.timezone('US/Eastern')
 

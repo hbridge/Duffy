@@ -5,7 +5,11 @@ import unicodedata
 import sys
 import datetime
 import humanize
+<<<<<<< HEAD
 import string
+=======
+import pytz
+>>>>>>> fixing issues with AZ timezone and daylight savings time
 
 from models import Entry
 from smskeeper import keeper_constants
@@ -137,7 +141,26 @@ def timezoneForMsg(msg):
 		logger.debug("Couldn't find db entry for %s" % zipCode)
 		return None, "Sorry, I don't know that zipcode. Please try again"
 	else:
-		return zipDataResults[0].timezone, None
+		return zipResultToTimeZone(zipDataResults[0]), None
+
+def zipResultToTimeZone(zipDataResult):
+	if zipDataResult.timezone == "PST":
+		return pytz.timezone('US/Pacific')
+	elif zipDataResult.timezone == "EST":
+		return pytz.timezone('US/Eastern')
+	elif zipDataResult.timezone == "CST":
+		return pytz.timezone('US/Central')
+	elif zipDataResult.timezone == "MST":
+		if zipDataResult.state == 'AZ':
+			return pytz.timezone('US/Arizona')
+		else:
+			return pytz.timezone('US/Mountain')
+	elif zipDataResult.timezone == "PST-1":
+		return pytz.timezone('US/Alaska')
+	elif zipDataResult.timezone == "PST-2":
+		return pytz.timezone('US/Hawaii')
+	elif zipDataResult.timezone == "UTC":
+		return pytz.utc
 
 
 tipRE = re.compile('.*send me tips')
