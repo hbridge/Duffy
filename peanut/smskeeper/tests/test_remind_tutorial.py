@@ -1,6 +1,7 @@
 from mock import patch
 
 from smskeeper import cliMsg, keeper_constants
+from smskeeper.models import Entry
 
 import test_base
 
@@ -126,3 +127,16 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Billy")
 
+	def test_tutorial_zip_code_again(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "94117")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I'm in 94117")
+			self.assertEquals("Got it.", self.getOutput(mock))
+
+		# Make sure no reminders were created
+		self.assertEquals(0, len(Entry.objects.filter(label="#reminders")))

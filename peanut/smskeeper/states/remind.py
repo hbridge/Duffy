@@ -63,6 +63,14 @@ def process(user, msg, requestDict, keeperNumber):
 		startDate = None
 		newQuery = text
 
+	# If we're coming from the tutorial and we find a message with a zipcode in it...just ignore the whole message
+	# Would be great not to have a hack here
+	if user.getStateData(FROM_TUTORIAL_KEY):
+		postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
+		if postalCodes:
+			sms_util.sendMsg(user, u"Got it.", None, keeperNumber)
+			return True
+
 	# If we have an entry id, then that means we just created one.
 	# See if what they entered is a valid time and if so, assign it.
 	# If not, kick out to normal mode and re-process

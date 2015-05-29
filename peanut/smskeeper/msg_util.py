@@ -28,7 +28,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 
 # We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
-set_name_re = re.compile("my name('| i)s (?P<name>[a-zA-Z\s]+)", re.I)
+set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
 def hasLabel(msg):
 	for word in msg.split(' '):
