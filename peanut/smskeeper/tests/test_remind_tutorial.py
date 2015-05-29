@@ -103,6 +103,13 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Billy")
 
+	def test_name_looks_like_nicety(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		cliMsg.msg(self.testPhoneNumber, "Tymarieo")
+		user = self.getTestUser()
+		self.assertEqual(user.name, "Tymarieo")
+
 	def test_stop(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 

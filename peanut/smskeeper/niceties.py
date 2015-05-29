@@ -119,7 +119,7 @@ def custom_nicety_for(regexp):
 		return f
 	return gethandler
 
-@custom_nicety_for(r'.*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|(ty|thx|thz|thks)($| keeper)?')
+@custom_nicety_for(r'.*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|(ty|thx|thz|thks)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
 	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
