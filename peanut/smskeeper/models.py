@@ -129,7 +129,7 @@ class User(models.Model):
 	def getTimezone(self):
 		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
 		# Note: 3 letter entries are to handle the early accounts. All new accounts use the full string
-		if self.timezone and len(self.timezone) == 3:
+		if self.timezone and len(self.timezone) <= 5:
 			if self.timezone == "PST":
 				return pytz.timezone('US/Pacific')
 			elif self.timezone == "EST":

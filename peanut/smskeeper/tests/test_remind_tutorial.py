@@ -71,7 +71,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
 		user = self.getTestUser()
-		self.assertEqual(user.timezone, "PST")
+		self.assertEqual(user.timezone, "US/Pacific")
 
 	def test_name_with_punctuation(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)

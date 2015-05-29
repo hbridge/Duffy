@@ -442,12 +442,12 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "My zipcode is 94117")
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
-			self.assertEqual(self.user.timezone, "PST")
+			self.assertEqual(self.user.timezone, "US/Pacific")
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "My zip code is 10012")
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
-			self.assertEqual(self.user.timezone, "EST")
+			self.assertEqual(self.user.timezone, "US/Eastern")
 
 	def testStopped(self):
 		self.setupUser(True, True)
