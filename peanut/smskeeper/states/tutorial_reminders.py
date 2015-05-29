@@ -1,6 +1,7 @@
 import time
 import re
 import logging
+import datetime
 
 from smskeeper import sms_util
 from smskeeper import keeper_constants
@@ -68,7 +69,9 @@ def process(user, msg, requestDict, keeperNumber):
 	elif step == 2:
 		# Coming back from remind state so wait a second
 		time.sleep(1)
-		sms_util.sendMsgs(user, [u"K that's all set, what other reminders do you want to setup for next few days? Calls \U0001f4f1, emails \U0001F4E7, errands \U0001F45C?  I'm here to help! \U0001F60A", "FYI, I can also help you with other things. Just txt me 'Tell me more'"], keeperNumber)
+		sms_util.sendMsgs(user, [u"K that's all set, what other reminders do you want to setup for next few days? Calls \U0001f4f1, emails \U0001F4E7, errands \U0001F45C?  I'm here to help! \U0001F60A"], keeperNumber)
+		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
+		sms_util.sendMsg(user, "FYI, I can also help you with other things. Just txt me 'Tell me more'", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
 		analytics.logUserEvent(
 			user,
