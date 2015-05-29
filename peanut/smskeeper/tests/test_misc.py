@@ -264,7 +264,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=12)
 				cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)
 				# ensure we got paused
-				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_PAUSED)
+				self.assertTrue(self.getTestUser().isPaused())
 
 				# And that we got no response
 				self.assertEqual("", self.getOutput(mock))

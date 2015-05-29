@@ -21,6 +21,7 @@ class User(models.Model):
 
 	# TODO(Derek): Rename this to activated_timestamp
 	activated = models.DateTimeField(null=True, blank=True)
+	paused = models.BooleanField(default=False)
 
 	STATE_CHOICES = [(x, x) for x in keeper_constants.ALL_STATES]
 	state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.STATE_NOT_ACTIVATED)
@@ -184,7 +185,7 @@ class User(models.Model):
 		self.save()
 
 	def isPaused(self):
-		return self.state == keeper_constants.STATE_PAUSED
+		return self.paused
 
 	def getInviteUrl(self):
 		url = "getkeeper.com"

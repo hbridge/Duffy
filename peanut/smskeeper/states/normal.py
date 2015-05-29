@@ -171,7 +171,7 @@ def process(user, msg, requestDict, keeperNumber):
 			else:
 				now = datetime.datetime.now(pytz.timezone("US/Eastern"))
 				if now.hour >= 9 and now.hour <= 22 and keeperNumber != constants.SMSKEEPER_TEST_NUM and not settings.DEBUG:
-					user.setState(keeper_constants.STATE_PAUSED)
+					user.paused = True
 					user.save()
 					postMsg = "User %s paused after: %s" % (user.id, msg)
 					slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
@@ -185,7 +185,7 @@ def process(user, msg, requestDict, keeperNumber):
 					"Sent Unknown Command",
 					{
 						"Command": msg,
-						"Paused": user.state == keeper_constants.STATE_PAUSED,
+						"Paused": user.isPaused(),
 					}
 				)
 

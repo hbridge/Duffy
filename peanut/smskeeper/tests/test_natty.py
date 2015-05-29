@@ -133,7 +133,10 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 		"""
 
 	def testPausedState(self):
-		self.setupUser(True, True, keeper_constants.STATE_PAUSED)
+		self.setupUser(True, True)
+		user = self.getTestUser()
+		user.paused = True
+		user.save()
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminders")

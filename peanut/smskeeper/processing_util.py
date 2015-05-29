@@ -4,7 +4,7 @@ import logging
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, paused, implicit_label, stopped, user_help
+from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help
 
 from smskeeper.models import User, Message
 from common import slack_logger
@@ -58,17 +58,18 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	# Grab just the first line, so we ignore signatures
 	msg = msg.split('\n')[0]
 
-	processed = False
-	count = 0
-	while not processed and count < 10:
-		stateModule = stateCallbacks[user.state]
-		processed = stateModule.process(user, msg, requestDict, keeperNumber)
-		if processed is None:
-			raise TypeError("modules must return True or False for processed")
-		count += 1
+	if not user.paused:
+		processed = False
+		count = 0
+		while not processed and count < 10:
+			stateModule = stateCallbacks[user.state]
+			processed = stateModule.process(user, msg, requestDict, keeperNumber)
+			if processed is None:
+				raise TypeError("modules must return True or False for processed")
+			count += 1
 
-	if count == 10:
-		logger.error("Hit endless loop for msg %s" % msg)
+		if count == 10:
+			logger.error("Hit endless loop for msg %s" % msg)
 
 	analytics.logUserEvent(
 		user,
@@ -85,7 +86,6 @@ stateCallbacks = {
 	keeper_constants.STATE_REMIND: remind,
 	keeper_constants.STATE_UNRESOLVED_HANDLES: unresolved_handles,
 	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
-	keeper_constants.STATE_PAUSED: paused,
 	keeper_constants.STATE_IMPLICIT_LABEL: implicit_label,
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_HELP: user_help,

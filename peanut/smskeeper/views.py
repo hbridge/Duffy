@@ -228,11 +228,11 @@ def toggle_paused(request):
 		user = form.cleaned_data['user']
 
 		if user.isPaused():
-			user.setState(keeper_constants.STATE_NORMAL)
+			user.paused = False
 			msg = "User %s just got unpaused" % (user.id)
 			slack_logger.postManualAlert(user, msg, constants.KEEPER_PROD_PHONE_NUMBERS[0], keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 		else:
-			user.setState(keeper_constants.STATE_PAUSED)
+			user.paused = True
 		user.save()
 
 		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
