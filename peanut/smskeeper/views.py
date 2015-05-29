@@ -286,6 +286,7 @@ def getUserDataDict(user, phoneNumToContactDict):
 		"full_name": full_name,
 		"source": user.signup_data_json,
 		"activated": user.activated,
+		"paused": user.paused,
 		"created": user.added,
 		"state": user.state,
 		"tutorial_step": user.tutorial_step,
@@ -385,11 +386,8 @@ def signup_from_website(request):
 			try:
 				target_user = User.objects.get(phone_number=phoneNum)
 
-				if target_user.activated:
-					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
-				else:
-					bodyText = "You are already on the list. Hang tight and I'll be in touch soon."
-					sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
+				bodyText = "You are already on the list. Hang tight and I'll be in touch soon."
+				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
 				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode}))
