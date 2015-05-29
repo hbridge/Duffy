@@ -126,7 +126,7 @@ var DashboardApp = React.createClass({
   componentDidMount: function() {
 		this.loadDataFromServer();
     var loadFunc = this.loadDataFromServer;
-    setInterval(function () {loadFunc()}, 2000);
+    setInterval(function () {loadFunc()}, 10000);
   },
 
 	dataCallback: function(data) {
