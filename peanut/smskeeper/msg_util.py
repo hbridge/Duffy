@@ -5,11 +5,8 @@ import unicodedata
 import sys
 import datetime
 import humanize
-<<<<<<< HEAD
 import string
-=======
 import pytz
->>>>>>> fixing issues with AZ timezone and daylight savings time
 
 from models import Entry
 from smskeeper import keeper_constants
