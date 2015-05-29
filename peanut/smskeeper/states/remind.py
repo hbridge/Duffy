@@ -46,6 +46,8 @@ def isFollowup(startDate, msg, reminderSent):
 				return True
 			else:
 				return False
+		elif "remind me" == msg:
+				return True
 		elif not msg_util.isRemindCommand(msg):
 			return True
 	return False
@@ -65,7 +67,8 @@ def process(user, msg, requestDict, keeperNumber):
 	# See if what they entered is a valid time and if so, assign it.
 	# If not, kick out to normal mode and re-process
 	if user.getStateData("entryId"):
-		if isFollowup(startDate, msg, user.getStateData("reminderSent")):
+		# Sending in the newQuery because we want to look at the message without timing info
+		if isFollowup(startDate, newQuery, user.getStateData("reminderSent")):
 			entry = Entry.objects.get(id=int(user.getStateData("entryId")))
 			doRemindMessage(user, startDate, msg, entry.text, False, entry, keeperNumber, requestDict)
 
