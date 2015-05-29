@@ -85,10 +85,10 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		# Activation message asks for their name
-		cliMsg.msg(self.testPhoneNumber, "My name is UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "My names kelly.")
 
 		user = self.getTestUser()
-		self.assertEqual(user.name, "UnitTests")
+		self.assertEqual(user.name, "kelly")
 
 	def test_nicety(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
