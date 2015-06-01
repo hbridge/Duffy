@@ -132,10 +132,7 @@ def process(user, msg, requestDict, keeperNumber):
 #  Update or create the Entry for the reminder entry and send message to user
 #  Startdate should be utc
 def doRemindMessage(user, utcDate, msg, query, sendFollowup, entry, keeperNumber, requestDict):
-	# if the user created this reminder as "remind me to", we should remove it from the text
-	match = re.match('remind me( to)?', query, re.I)
-	if match is not None:
-		query = query[match.end():].strip()
+	query = msg_util.cleanedReminder(query)
 
 	isUpdate = entry is not None
 	isTutorial = False if user.getStateData(FROM_TUTORIAL_KEY) is None else True

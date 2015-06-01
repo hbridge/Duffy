@@ -173,7 +173,18 @@ def isRemindCommand(msg):
 def getReminderHandle(msg):
 	text = msg.lower()
 	match = reminder_re.search(text)
-	return match.group("handle")
+	if match:
+		return match.group("handle")
+	return None
+
+
+def cleanedReminder(msg):
+	text = msg.lower()
+	match = reminder_re.search(text)
+	if match:
+		cleaned = msg[:match.start()] + msg[match.end():]
+		return cleaned.strip()
+	return msg
 
 
 def isDeleteCommand(msg):
