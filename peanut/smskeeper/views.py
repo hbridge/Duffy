@@ -19,7 +19,6 @@ from common.models import ContactEntry
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -409,7 +408,7 @@ def signup_from_website(request):
 					else:
 						logger.debug("Didn't find any referrerCodes for code %s" % referrerCode)
 				else:
-					if source == "fb":
+					if "fb" in source:
 						user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
 					else:
 						not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
