@@ -43,11 +43,11 @@ def isNattyDefaultTime(startDate):
 def isFollowup(startDate, msg, reminderSent):
 	if validTime(startDate):
 		if reminderSent and msg_util.isRemindCommand(msg):
-			if "again" in msg or "snooze" in msg:
+			if "again" in msg.lower() or "snooze" in msg.lower():
 				return True
 			else:
 				return False
-		elif "remind me" == msg:
+		elif "remind me" == msg.lower():
 				return True
 		elif not msg_util.isRemindCommand(msg):
 			return True
