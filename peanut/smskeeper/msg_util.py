@@ -21,7 +21,7 @@ freeform_fetch_res = [
 	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
-get_reminders_re = re.compile("#?remind( me|me|er|ers)?( to)?(: )?", re.I)
+reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to)?(: )?", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -167,14 +167,13 @@ def isSetTipFrequencyCommand(msg):
 
 def isRemindCommand(msg):
 	text = msg.lower()
-	return (
-		'#remind' in text or
-		'#remindme' in text or
-		'#reminder' in text or
-		'#reminders' in text or
-		'remind me' in text or
-		get_reminders_re.match(text) is not None
-	)
+	return (reminder_re.search(text) is not None)
+
+
+def getReminderHandle(msg):
+	text = msg.lower()
+	match = reminder_re.search(text)
+	return match.group("handle")
 
 
 def isDeleteCommand(msg):

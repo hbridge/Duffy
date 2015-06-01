@@ -6,7 +6,7 @@ from testfixtures import Replacer
 from testfixtures import test_datetime
 
 from smskeeper.models import Entry
-from smskeeper import cliMsg
+from smskeeper import cliMsg, msg_util
 from smskeeper import async
 
 import test_base
@@ -80,7 +80,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		origEntry = Entry.objects.filter(label="#reminders").last()
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "remind me Monday at 7pm")
+			cliMsg.msg(self.testPhoneNumber, "remind me tomorrow at 7pm")
 			self.assertIn("7pm", self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
@@ -327,5 +327,29 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			async.processReminder(entry)
 			self.assertNotIn("btw, you can always snooze", self.getOutput(mock))
+
+	def test_shared_reminder_regex(self):
+		handle = msg_util.getReminderHandle("remind mom to take her pill tomorrow morning")
+		self.assertEquals(handle, "mom")
+
+		handle = msg_util.getReminderHandle("remind mom: take your pill tomorrow morning")
+		self.assertEquals(handle, "mom")
+
+		handle = msg_util.getReminderHandle("remind mom about the tv show")
+		self.assertEquals(handle, "mom")
+
+		handle = msg_util.getReminderHandle("at 2pm tomorrow remind mom about the tv show")
+		self.assertEquals(handle, "mom")
+
+	"""
+	def test_shared_reminder_handle_not_setup(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+			self.assertIn("is mom's phone number?", self.getOutput(mock))
+	"""
+
+
 
 

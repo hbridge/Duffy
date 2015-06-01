@@ -36,8 +36,9 @@ def isNattyDefaultTime(startDate):
 
 
 # Returns True if this message has a valid time and it doesn't look like another remind command
-# If this is a followup, then we look for again or snooze which if found, we'll assume is a followup
+# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup
 # Like "remind me again in 5 minutes"
+# If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
 # Otherwise False
 def isFollowup(startDate, msg, reminderSent):
 	if validTime(startDate):
@@ -53,16 +54,7 @@ def isFollowup(startDate, msg, reminderSent):
 	return False
 
 
-def process(user, msg, requestDict, keeperNumber):
-	text, label, handles = msg_util.getMessagePieces(msg)
-	nattyResults = natty_util.getNattyInfo(text, user.getTimezone())
-
-	if len(nattyResults) > 0:
-		startDate, newQuery, usedText = nattyResults[0]
-	else:
-		startDate = None
-		newQuery = text
-
+def dealWithTutorialEdgecases(user, msg, keeperNumber):
 	# If we're coming from the tutorial and we find a message with a zipcode in it...just ignore the whole message
 	# Would be great not to have a hack here
 	if user.getStateData(FROM_TUTORIAL_KEY):
@@ -70,6 +62,27 @@ def process(user, msg, requestDict, keeperNumber):
 		if postalCodes:
 			sms_util.sendMsg(user, u"Got it.", None, keeperNumber)
 			return True
+	return False
+
+
+def process(user, msg, requestDict, keeperNumber):
+	if dealWithTutorialEdgecases(user, msg, keeperNumber):
+		return True
+
+	# Deal with legacy stuff
+	if '#remind' in msg:
+		msg = msg.replace("#reminder", "remind me")
+		msg = msg.replace("#remind", "remind me")
+
+	remindHandle = msg_util.getReminderHandle(msg)
+
+	nattyResults = natty_util.getNattyInfo(msg, user.getTimezone())
+
+	if len(nattyResults) > 0:
+		startDate, newQuery, usedText = nattyResults[0]
+	else:
+		startDate = None
+		newQuery = msg
 
 	# If we have an entry id, then that means we just created one.
 	# See if what they entered is a valid time and if so, assign it.
@@ -77,8 +90,7 @@ def process(user, msg, requestDict, keeperNumber):
 	if user.getStateData("entryId"):
 		# Sending in the newQuery because we want to look at the message without timing info
 		# TODO(Derek): Get it so we don't have to attach the label
-		msgWithoutTiming = newQuery + " " + label if label else newQuery
-		if isFollowup(startDate, msgWithoutTiming, user.getStateData("reminderSent")):
+		if isFollowup(startDate, newQuery, user.getStateData("reminderSent")):
 			entry = Entry.objects.get(id=int(user.getStateData("entryId")))
 			doRemindMessage(user, startDate, msg, entry.text, False, entry, keeperNumber, requestDict)
 
