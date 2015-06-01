@@ -40,7 +40,7 @@ SMSKEEPER_NICETIES = [
 	Nicety(u"cool$|ok$|great$|k$|sweet$|hah(a)?|lol$|okay$|awesome|\U0001F44D", None),
 	Nicety(
 		"how are you( today)?|how're you|hows it going",
-		["I'm good, thanks for asking!", "Can't complain!"]
+		[u"I'm good, thanks for asking! \U0001F603", u"Can't complain! \U0001F603"]
 	),
 	Nicety(
 		"i hate you|you suck|this is stupid|youre stupid",
@@ -52,7 +52,7 @@ SMSKEEPER_NICETIES = [
 	),
 	Nicety(
 		"tell me a joke",
-		["I don't think you'd appreciate my humor."]
+		[u"I don't think you'd appreciate my humor. \U0001F609"]
 	),
 	Nicety(
 		"i love you|youre (pretty )?(cool|neat|smart)",
@@ -67,8 +67,8 @@ SMSKEEPER_NICETIES = [
 		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
 	Nicety(
-		"thats all( for now)?",
-		["Ok, I'm here if you need me."]
+		"thats all( for now)?|see you later|i have to go",
+		[u"Ok, I'm here if you need me! \U0001F603"]
 	),
 	Nicety(
 		"are you( a)? real( person)?|are you human|are you an? (computer|machine)|are you an ai",
@@ -76,7 +76,7 @@ SMSKEEPER_NICETIES = [
 	),
 	Nicety(
 		"whats the meaning of life",
-		["42"]
+		[u"42 \U0001F433"]
 	),
 	Nicety(
 		"where (are you from|do you live)",
@@ -97,7 +97,15 @@ SMSKEEPER_NICETIES = [
 	Nicety(
 		"why.* my zip( )?code",
 		[u"Knowing your zip code allows me to send you reminders in the right time zone."]
-	)
+	),
+	Nicety(
+		"will do|I will|sure",
+		[u"\U0001F44F", u"\U0001F44D"]
+	),
+	Nicety(
+		"bye(bye)?",
+		[u"\U0001F44B See ya! Lmk if you need anything!"]
+	),
 ]
 
 
@@ -119,7 +127,7 @@ def custom_nicety_for(regexp):
 		return f
 	return gethandler
 
-@custom_nicety_for(r'.*thanks( keeper)?|.*thank you( (very|so) much)?( keeper)?|(ty|thx|thz|thks)( keeper)?$')
+@custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ty|thx|thz|thks)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
 	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
