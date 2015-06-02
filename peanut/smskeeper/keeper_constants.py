@@ -68,6 +68,12 @@ INTRO_MESSAGES = [
 	"Let me show you how I can help you. First, what's your name?"
 ]
 
+INTRO_MESSAGES_PAID = [
+	u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
+	"Let's start your 7-day free trial. You can send CANCEL to cancel anytime.",
+	"Let me show you how I can help you. First, what's your name?"
+]
+
 UNKNOWN_COMMAND_PHRASES = [
 	u"Sorry, I'm not sure what you mean \U0001F633\nType HELP for help. To notify my minions, say REPORT",
 	u"I'm still pretty new \U0001F423 and I don't understand that.\n\n Say HELP to see what I can do or REPORT and I'll poke one of my lackeys. \U0001F449",
