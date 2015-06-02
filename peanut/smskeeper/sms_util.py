@@ -36,7 +36,7 @@ def sendMsgs(user, msgList, keeperNumber, sendMessageDividers=True):
 		seconds_delay += max(wordcount * DELAY_SECONDS_PER_WORD, MIN_DELAY_SECONDS)
 
 		# modify the message text if we're supposed to send dividers
-		if sendMessageDividers:
+		if sendMessageDividers and len(msgList) > 1:
 			msgTxt = "%s (%d/%d)" % (msgTxt, i + 1, len(msgList))
 
 		# Call the single method above so it does the right async logic
