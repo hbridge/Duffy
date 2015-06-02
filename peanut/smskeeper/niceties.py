@@ -156,7 +156,7 @@ def renderBirthdayInquiry(user, requestDict, keeperNumber):
 	return u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423" % (deltaText)
 
 
-@custom_nicety_for(u'([\u2600-\u27BF])|([\uD83C][\uDF00-\uDFFF])|([\uD83D][\uDC00-\uDE4F])|([\uD83D][\uDE80-\uDEFF])')
+@custom_nicety_for(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
 def renderRandomEmoji(user, requestDict, keeperNumber):
 	return random.choice(emoji.EMOJI_UNICODE.values())
 
