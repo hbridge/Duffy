@@ -80,11 +80,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		origEntry = Entry.objects.filter(label="#reminders").last()
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me tomorrow at 7pm")
+			cliMsg.msg(self.testPhoneNumber, "Remind me on Sunday 7pm")
 			self.assertIn("7pm", self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()
+		# Make sure we didn't create a new entry.  Wanted to edit the first one
 		self.assertEqual(origEntry.id, entry.id)
 		self.assertEqual(entry.remind_timestamp.hour, 23)  # 7 EST, so 11 UTC
 
