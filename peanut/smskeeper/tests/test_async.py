@@ -185,3 +185,16 @@ class SMSKeeperAsyncCase(test_base.SMSKeeperBaseCase):
 				events = self.getAnalyticsEvents(analyticsMock)
 				self.assertEqual(events[0]["user"], self.user)
 				self.assertEqual(events[0]["event"], "Tip Received")
+
+	def testTipAnalyticsWithIncoming(self):
+		self.setupUser(True, True, "UTC")
+		cliMsg.msg(self.testPhoneNumber, "add foo to bar")
+
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			# ensure tip 1 gets sent out
+			setMockDatetimeToSendTip(datetime_mock)
+			with patch('smskeeper.analytics.logUserEvent') as analyticsMock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				events = self.getAnalyticsEvents(analyticsMock)
+				self.assertEqual(events[0]["user"], self.user)
+				self.assertEqual(events[0]["event"], "Tip Received")
