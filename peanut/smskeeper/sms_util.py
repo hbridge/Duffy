@@ -6,6 +6,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from smskeeper import keeper_constants
+from smskeeper import msg_util
 
 DELAY_SECONDS_PER_WORD = 0.2
 MIN_DELAY_SECONDS = 1
@@ -15,6 +16,7 @@ def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
+	msg = msg_util.renderMsg(msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
 		async.sendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual), eta=eta)
 	else:

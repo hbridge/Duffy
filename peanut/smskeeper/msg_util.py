@@ -7,6 +7,7 @@ import datetime
 import humanize
 import string
 import pytz
+import emoji
 
 from models import Entry
 from smskeeper import keeper_constants
@@ -401,3 +402,9 @@ def naturalize(now, futureTime):
 		return "%s around %s" % (dayOfWeek, time)
 
 	return "%s the %s" % (dayOfWeek, humanize.ordinal(futureTime.day))
+
+
+# right now, just emojizes, could do more in the future, i.e. replace username etc
+# returns the message text
+def renderMsg(msg):
+	return emoji.emojize(msg, use_aliases=True)

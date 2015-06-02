@@ -7,6 +7,7 @@ from smskeeper.models import User, Entry, Message
 from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
 
 import test_base
+import emoji
 
 
 class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
@@ -260,6 +261,12 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			with patch('smskeeper.async.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, "How old are you, Keeper?")
 				self.assertIn("30 days", self.getOutput(mock))
+
+	def testSendRandomEmoji(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, emoji.emojize(":green_apple:"))
+			self.assertIn(self.getOutput(mock), emoji.EMOJI_UNICODE.values())
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)

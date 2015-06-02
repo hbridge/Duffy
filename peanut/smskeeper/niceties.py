@@ -7,6 +7,7 @@ import pytz
 from smskeeper import keeper_constants
 from smskeeper import msg_util
 import humanize
+import emoji
 
 
 class Nicety():
@@ -23,11 +24,14 @@ class Nicety():
 		return re.match(self.reStr, cleanedMsg, re.I) is not None
 
 	def getResponse(self, user, requestDict, keeperNumber):
+		response = None
+
 		if self.customRenderer:
-			return self.customRenderer(user, requestDict, keeperNumber)
-		if not self.responses or len(self.responses) == 0:
-			return None
-		return random.choice(self.responses)
+			response = self.customRenderer(user, requestDict, keeperNumber)
+		elif self.responses and len(self.responses) > 0:
+			response = random.choice(self.responses)
+
+		return response
 
 	def __str__(self):
 		string = "%s %s %s" % (self.reStr, self.responses, self.customRenderer)
@@ -109,7 +113,7 @@ SMSKEEPER_NICETIES = [
 	),
 	Nicety(
 		"done$|did it",
-		[u"\U0001F44F", u"Nice!", u"Sweet!", u"\U0001F44D"]
+		[":thumbsup:", u"Nice!", u"Sweet!", ":party_popper:"]
 	),
 ]
 
@@ -125,12 +129,14 @@ Custom niceities
 These don't just return a string, but can render text conditional on the user, request and keeperNumber
 '''
 
+
 def custom_nicety_for(regexp):
 	def gethandler(f):
 		nicety = Nicety(regexp, None, f)
 		SMSKEEPER_NICETIES.append(nicety)
 		return f
 	return gethandler
+
 
 @custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ty|thx|thz|thks)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
@@ -149,6 +155,10 @@ def renderBirthdayInquiry(user, requestDict, keeperNumber):
 	deltaText = humanize.naturaldelta(delta)
 	return u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423" % (deltaText)
 
+
+@custom_nicety_for(u'([\u2600-\u27BF])|([\uD83C][\uDF00-\uDFFF])|([\uD83D][\uDC00-\uDE4F])|([\uD83D][\uDE80-\uDEFF])')
+def renderRandomEmoji(user, requestDict, keeperNumber):
+	return random.choice(emoji.EMOJI_UNICODE.values())
 
 # for nicety in SMSKEEPER_NICETIES:
 # 	print nicety
