@@ -200,6 +200,7 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 		handle = msg_util.getReminderHandle(queryWithoutTiming)  # Grab "me" or "mom"
 
 		if handle != "me":
+			# If we ever handle multiple handles... we need to create seperate entries to deal with snoozes
 			contact = Contact.fetchByHandle(user, handle)
 
 			if contact is None:
@@ -263,14 +264,14 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 
 	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), tzAwareDate)
 
-	handle = "you"
-
 	# If this is a shared reminder then look up the handle to send things out with
-	if len(entry.users.all()) > 1:
+	if user == entry.creator and len(entry.users.all()) > 1:
 		for target in entry.users.all():
 			if target.id != user.id:
 				contact = Contact.fetchByTarget(user, target)
 				handle = contact.handle
+	else:
+		handle = "you"
 
 	toSend = "%s I'll remind %s %s." % (helper_util.randomAcknowledgement(), handle, userMsg)
 

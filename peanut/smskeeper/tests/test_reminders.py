@@ -446,3 +446,22 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Bob's digital assistant", self.getOutput(mock))
 			self.assertIn("take her pill", self.getOutput(mock))
 
+	def test_shared_reminder_snooze(self):
+		phoneNumber = "+16505555555"
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill in one minute")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		# Make the user look like they've been using the product
+		otherUser = User.objects.get(phone_number=phoneNumber)
+		otherUser.completed_tutorial = True
+		otherUser.setState(keeper_constants.STATE_NORMAL)
+		otherUser.save()
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.get(label="#reminders")
+		async.processReminder(entry)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "snooze 1 hour")
+			self.assertIn("later", self.getOutput(mock))
