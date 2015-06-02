@@ -37,6 +37,8 @@ def dealWithNonActivatedUser(user, keeperNumber):
 
 
 def process(user, msg, requestDict, keeperNumber):
+	"""
+	Commented out by Derek to test removing the non_activated state
 	text, label, handles = msg_util.getMessagePieces(msg)
 
 	# If the user enters the magic phrase then they get activated
@@ -45,5 +47,7 @@ def process(user, msg, requestDict, keeperNumber):
 	# If not, then give them back some fun remarks
 	else:
 		dealWithNonActivatedUser(user, keeperNumber)
+	"""
+	user_util.activate(user, "", None, keeperNumber)
 
 	return True

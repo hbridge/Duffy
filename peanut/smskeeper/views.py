@@ -201,7 +201,7 @@ def send_sms(request):
 			requestDict["Manual"] = True
 			processing_util.processMessage(user.phone_number, msg, requestDict, keeperNumber)
 
-		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps(getMessagesResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -220,7 +220,7 @@ def toggle_paused(request):
 			user.paused = True
 		user.save()
 
-		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps(getMessagesResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
