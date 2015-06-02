@@ -15,8 +15,10 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_first_connect(self):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
-			self.assertIn("Want seamless organization now", self.getOutput(mock))
+			self.assertIn("what's your name?", self.getOutput(mock))
 
+	"""
+	Commented out by Derek while we experiement with no not-activated state
 	def test_unactivated_connect(self):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
 		cliMsg.msg(self.testPhoneNumber, "hi")
@@ -30,6 +32,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "trapper keeper")
 		user = User.objects.get(phone_number=self.testPhoneNumber)
 		self.assertNotEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
+	"""
 
 	def test_firstItemAdded(self):
 		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
