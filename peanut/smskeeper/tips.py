@@ -154,29 +154,37 @@ def markTipSent(user, tip, customSentDate=None, isMini=False):
 		if not isMini:
 			user.last_tip_sent = date
 		user.save()
-
-		# log the tip
-		messages = user.getMessages(incoming=True, ascending=False)
-		if messages and len(messages) > 0:
-			lastMessage = messages[0]
-			lastMessageHoursAgo = time_utils.totalHoursAgo(lastMessage.added)
-		else:
-			lastMessageHoursAgo = None
-
-		analytics.logUserEvent(
-			user,
-			"Tip Received",
-			{
-				"Tip ID": tip.id,
-				"Type": "Mini" if isMini else "Regular",
-				"Last Incoming Hours Ago": lastMessageHoursAgo,
-				"Total Tips Received": len(sentTips),
-				"User Tip Frequency Days": user.tip_frequency_days,
-			},
-		)
+		logTipSent(user, tip, customSentDate, isMini, sentTips)
 
 
 def getSentTipIds(user):
 	if user.sent_tips:
 		return user.sent_tips.split(",")
 	return []
+
+def logTipSent(user, tip, customSentDate, isMini, sentTips):
+	# figure out when the last incoming message came in
+	messages = user.getMessages(incoming=True, ascending=False)
+	if messages and len(messages) > 0:
+		lastMessage = messages[0]
+		lastMessageHoursAgo = time_utils.totalHoursAgo(lastMessage.added)
+	else:
+		lastMessageHoursAgo = None
+
+	# figure out local hour for the user
+	now = datetime.datetime.now(pytz.utc)
+	localdt = now.astimezone(user.getTimezone())
+	localHour = localdt.hour
+
+	analytics.logUserEvent(
+		user,
+		"Tip Received",
+		{
+			"Tip ID": tip.id,
+			"Type": "Mini" if isMini else "Regular",
+			"Last Incoming Hours Ago": lastMessageHoursAgo,
+			"Total Tips Received": len(sentTips),
+			"User Tip Frequency Days": user.tip_frequency_days,
+			"Local Hour of Day": localHour
+		},
+	)
