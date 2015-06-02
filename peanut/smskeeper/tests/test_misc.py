@@ -378,13 +378,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with self.assertRaises(TypeError):
 			sms_util.sendMsg(self.user, ["hello", "this is the wrong type"], None, constants.SMSKEEPER_TEST_NUM)
 
-	def testSendMsgDividers(self):
-		self.setupUser(True, True)
-
-		with patch('smskeeper.async.recordOutput') as mock:
-			sms_util.sendMsgs(self.user, ["hello", "again"], constants.SMSKEEPER_TEST_NUM)
-			self.assertIn("(1/2)", self.getOutput(mock))
-
 	def testPhotoWithoutTag(self):
 		self.setupUser(True, True)
 
@@ -475,6 +468,21 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("welcome back", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
+
+	def testStoppedSaveState(self):
+		self.setupUser(True, False, state=keeper_constants.STATE_NOT_ACTIVATED)
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "STOP")
+			self.assertIn("just type 'start'", self.getOutput(mock))
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "START")
+			self.assertIn("welcome back", self.getOutput(mock))
+			user = self.getTestUser()
+			self.assertEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
+
 
 	# Emulate a user who has a signature at the end of their messages
 	def test_signatures(self):
