@@ -359,6 +359,14 @@ class Contact(models.Model):
 		except Contact.DoesNotExist:
 			return None
 
+	@classmethod
+	def fetchByTarget(cls, user, target):
+		try:
+			contact = Contact.objects.get(user=user, target=target)
+			return contact
+		except Contact.DoesNotExist:
+			return None
+
 
 class ZipData(models.Model):
 	city = models.CharField(max_length=100)

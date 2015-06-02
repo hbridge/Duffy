@@ -182,6 +182,7 @@ def fetch(user, label, keeperNumber):
 		}
 	)
 
+
 def clear(user, label, keeperNumber):
 	entries = Entry.fetchEntries(user=user, label=label)
 	if len(entries) == 0:
@@ -200,6 +201,7 @@ def clear(user, label, keeperNumber):
 			"Label": label,
 		}
 	)
+
 
 def createHandle(user, handle, targetNumber):
 	# see if there's an existing contact for that handle
@@ -228,6 +230,7 @@ def createHandle(user, handle, targetNumber):
 	contact.save()
 
 	return contact, createdUser, oldUser
+
 
 def fetchHandle(user, msg, keeperNumber):
 	handle = msg.strip()

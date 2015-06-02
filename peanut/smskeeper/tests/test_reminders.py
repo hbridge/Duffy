@@ -342,15 +342,52 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		handle = msg_util.getReminderHandle("at 2pm tomorrow remind mom about the tv show")
 		self.assertEquals(handle, "mom")
 
-	"""
-	def test_shared_reminder_handle_not_setup(self):
+	def test_shared_reminder_normal(self):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
-			self.assertIn("is mom's phone number?", self.getOutput(mock))
-	"""
+			self.assertIn("What's mom's phone number?", self.getOutput(mock))
 
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "+16505555555")
+			self.assertIn("I'll remind mom tomorrow around 8am", self.getOutput(mock))
 
+		entry = Entry.objects.filter(label="#reminders").last()
+
+		# Make sure entries were created correctly
+		self.assertEquals("take her pill", entry.text)
+		self.assertEquals(2, len(entry.users.all()))
+
+	def test_shared_reminder_when_already_created(self):
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, "+16505555555")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind mom to go poop Sunday at 10 am")
+			self.assertIn("10am", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		# Make sure entries were created correctly
+		self.assertEquals(2, len(entries))
+		self.assertEquals("go poop", entries[1].text)
+
+	def test_shared_reminder_correct_for_me(self):
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind myself to take pill tomorrow morning")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "no, remind me")
+			self.assertIn("I'll remind you tomorrow around 8am", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		# Make sure entries were created correctly
+		self.assertEquals(1, len(entries))
+		self.assertEquals("take pill", entries[0].text)
 
 

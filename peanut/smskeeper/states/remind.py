@@ -103,7 +103,7 @@ def process(user, msg, requestDict, keeperNumber):
 	# Change time to 9am if he user wasn't specific
 	startDate = dealWithDefaultTime(user, startDate)
 
-	# We don't have an entryId so this is the first time we've been run in this state
+	# Create a new reminder
 	if not user.getStateData("entryId"):
 		sendFollowup = False
 		if not validTime(startDate):
@@ -111,7 +111,12 @@ def process(user, msg, requestDict, keeperNumber):
 			sendFollowup = True
 
 		entry = createReminderEntry(user, startDate, msg, queryWithoutTiming, sendFollowup, keeperNumber)
-		sendCompletionResponse(user, startDate, msg, queryWithoutTiming, sendFollowup, keeperNumber)
+
+		# See if the entry didn't create. This means there's unresolved handes
+		if not entry:
+			return False
+
+		sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
 		# If we came from the tutorial, then set state and return False so we go back for reprocessing
 		if user.getStateData(FROM_TUTORIAL_KEY):
@@ -129,14 +134,34 @@ def process(user, msg, requestDict, keeperNumber):
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.
 		# If not, kick out to normal mode and re-process
-
 		entryId = int(user.getStateData("entryId"))
+		entry = Entry.objects.get(id=entryId)
 
-		if isFollowup(startDate, queryWithoutTiming, user.getStateData("reminderSent")):
-			entry = Entry.objects.get(id=entryId)
+		if user.getStateData("fromUnresolvedHandles"):
+			logger.debug("Going to deal with unresolved handles for entry %s" % entry.id)
+
+			# Mark it that we're not coming back from unresolved handle
+			# So incase there's a followup we don't, re-enter this section
+			user.setStateData("fromUnresolvedHandles", False)
+			user.save()
+
+			unresolvedHandles = user.getStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY)
+			# See if we have all the handles resolved
+			if len(unresolvedHandles) == 0:
+				for handle in user.getStateData(keeper_constants.RESOLVED_HANDLES_DATA_KEY):
+					contact = Contact.fetchByHandle(user, handle)
+					entry.users.add(contact.target)
+
+				sendCompletionResponse(user, entry, False, keeperNumber)
+
+			else:
+				# This message could be a correction or something else.  Might need more logic here
+				sendCompletionResponse(user, entry, False, keeperNumber)
+
+		elif isFollowup(startDate, queryWithoutTiming, user.getStateData("reminderSent")):
+			logger.debug("Doing followup on entry %s with msg %s" % (entry.id, msg))
 			updateReminderEntry(user, startDate, msg, entry, keeperNumber)
-
-			sendCompletionResponse(user, startDate, msg, queryWithoutTiming, False, keeperNumber)
+			sendCompletionResponse(user, entry, False, keeperNumber)
 
 			# This means it was a snooze
 			if user.getStateData("reminderSent"):
@@ -166,21 +191,29 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 	cleanedText = msg_util.cleanedReminder(queryWithoutTiming)  # no "Remind me"
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
+	entry.remind_timestamp = utcDate
+	entry.orig_text = json.dumps([msg])
+	entry.save()
+
 	handle = msg_util.getReminderHandle(queryWithoutTiming)  # Grab "me" or "mom"
 
 	if handle != "me":
 		contact = Contact.fetchByHandle(user, handle)
+
 		if contact is None:
-			user.setStateData("")
+			logger.debug("Didn't find handle %s for user %s and msg %s on entry %s" % (handle, user.id, msg, entry.id))
+			# We couldn't find the handle so go into unresolved state
+			# Set data for ourselves for when we come back
+			user.setStateData("entryId", entry.id)
+			user.setStateData("fromUnresolvedHandles", True)
 			user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
-			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [entry.id])
 			user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])
 			user.save()
 			return False
-
-	entry.remind_timestamp = utcDate
-	entry.orig_text = json.dumps([msg])
-	entry.save()
+		else:
+			logger.debug("Didn't find handle %s for user %s and entry %s...goint to unresolved" % (handle, user.id, entry.id))
+			# We found the handle, so share the entry with the user.
+			entry.users.add(contact.target)
 
 	suspiciousHour = dealWithSuspiciousHour(user, utcDate, entry, keeperNumber)
 
@@ -222,14 +255,22 @@ def updateReminderEntry(user, utcDate, msg, entry, keeperNumber):
 	)
 
 
-#  Update or create the Entry for the reminder entry and send message to user
-#  Startdate should be utc
-def sendCompletionResponse(user, utcDate, msg, queryWithoutTiming, sendFollowup, keeperNumber):
-	tzAwareDate = utcDate.astimezone(user.getTimezone())
+#  Send off a response like "I'll remind you Sunday at 9am" or "I'll remind mom Sunday at 9am"
+def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
+	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
 
 	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), tzAwareDate)
 
-	toSend = "%s I'll remind you %s." % (helper_util.randomAcknowledgement(), userMsg)
+	handle = "you"
+
+	# If this is a shared reminder then look up the handle to send things out with
+	if len(entry.users.all()) > 1:
+		for target in entry.users.all():
+			if target.id != user.id:
+				contact = Contact.fetchByTarget(user, target)
+				handle = contact.handle
+
+	toSend = "%s I'll remind %s %s." % (helper_util.randomAcknowledgement(), handle, userMsg)
 
 	# Tutorial gets a special followup message
 	if sendFollowup:
