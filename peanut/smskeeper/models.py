@@ -153,8 +153,9 @@ class User(models.Model):
 		else:
 			return pytz.timezone('US/Eastern')
 
-	def getMessages(self, incoming):
-		return Message.objects.filter(user=self, incoming=incoming).order_by("added")
+	def getMessages(self, incoming, ascending=True):
+		orderByString = "added" if ascending else "-added"
+		return Message.objects.filter(user=self, incoming=incoming).order_by(orderByString)
 
 	def isActivated(self):
 		return self.activated is not None

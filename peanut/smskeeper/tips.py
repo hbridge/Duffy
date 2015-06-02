@@ -2,6 +2,8 @@ import datetime
 import pytz
 from smskeeper.models import Entry
 from smskeeper import keeper_constants
+from smskeeper import analytics
+from smskeeper import time_utils
 
 '''
 Tips that will be sent daily to new users.
@@ -152,6 +154,26 @@ def markTipSent(user, tip, customSentDate=None, isMini=False):
 		if not isMini:
 			user.last_tip_sent = date
 		user.save()
+
+		# log the tip
+		messages = user.getMessages(incoming=True, ascending=False)
+		if messages and len(messages) > 0:
+			lastMessage = messages[0]
+			lastMessageHoursAgo = time_utils.totalHoursAgo(lastMessage.added)
+		else:
+			lastMessageHoursAgo = None
+
+		analytics.logUserEvent(
+			user,
+			"Tip Received",
+			{
+				"Tip ID": tip.id,
+				"Type": "Mini" if isMini else "Regular",
+				"Last Incoming Hours Ago": lastMessageHoursAgo,
+				"Total Tips Received": len(sentTips),
+				"User Tip Frequency Days": user.tip_frequency_days,
+			},
+		)
 
 
 def getSentTipIds(user):

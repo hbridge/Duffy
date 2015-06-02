@@ -55,3 +55,16 @@ class SMSKeeperBaseCase(TestCase):
 			output += unicode(arg[0].decode('utf-8'))
 
 		return output
+
+	# intended to be used with a mock of smskeeper.analytics.logUserEvent
+	def getAnalyticsEvents(self, mock):
+		events = []
+		for call in mock.call_args_list:
+			arg, kargs = call
+			events.append({
+				"user": arg[0],
+				"event": arg[1],
+				"params": arg[2]
+			})
+
+		return events

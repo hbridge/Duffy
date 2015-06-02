@@ -56,7 +56,7 @@ class SMSKeeperAsyncCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True, "UTC")
 
 		with patch('smskeeper.tips.datetime') as datetime_mock:
-			# make sure we don't send at the wrong time
+			# ensure tip 1 gets sent out
 			setMockDatetimeToSendTip(datetime_mock)
 			with patch('smskeeper.async.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
@@ -173,3 +173,15 @@ class SMSKeeperAsyncCase(test_base.SMSKeeperBaseCase):
 				if tip:
 					self.assertNotEqual(tip.id, tipId)
 					tips.markTipSent(self.user, tip)
+
+	def testTipAnalytics(self):
+		self.setupUser(True, True, "UTC")
+
+		with patch('smskeeper.tips.datetime') as datetime_mock:
+			# ensure tip 1 gets sent out
+			setMockDatetimeToSendTip(datetime_mock)
+			with patch('smskeeper.analytics.logUserEvent') as analyticsMock:
+				async.sendTips(constants.SMSKEEPER_TEST_NUM)
+				events = self.getAnalyticsEvents(analyticsMock)
+				self.assertEqual(events[0]["user"], self.user)
+				self.assertEqual(events[0]["event"], "Tip Received")
