@@ -1,4 +1,6 @@
 import json
+import random
+import string
 
 from smskeeper import keeper_constants
 
@@ -14,6 +16,10 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 		tutorialState = keeper_constants.STATE_TUTORIAL_REMIND
 
 	userToActivate.setActivated(True, tutorialState=tutorialState)
+
+	if not userToActivate.invite_code:
+		userToActivate.invite_code = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		userToActivate.save()
 
 	msgsToSend = list()
 
