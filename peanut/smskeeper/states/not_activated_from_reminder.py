@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
-		actions.nicety(user, nicety, requestDict, keeperNumber)  # This sends "No problem"
-		msgFollowup = "btw, if you'd like to learn more about me just txt me 'tell me more' or visit http://getkeeper.com"
+		msgFollowup = "No problem. If there is anything I can help you with, just say 'tell me more' or visit http://getkeeper.com"
 		sms_util.sendMsg(user, msgFollowup, None, keeperNumber)
 	elif "tell me more" in msg.lower():
 		user.signup_data_json = json.dumps({"source": "reminder"})

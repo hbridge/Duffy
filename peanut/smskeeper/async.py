@@ -66,7 +66,7 @@ def processReminder(entry):
 			if isSharedReminder:
 				# If they've never used the system before
 				if user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
-					msg = "Hi, I'm Keeper, %s's digital assistant. Wanted me to remind you: %s" % (entry.creator.name, entry.text)
+					msg = "Hi, I'm Keeper. I'm a digital assistant. %s wanted me to remind you: %s" % (entry.creator.name, entry.text)
 				else:
 					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
 			else:
