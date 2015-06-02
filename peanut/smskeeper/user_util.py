@@ -27,13 +27,13 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 		msgsToSend.append(introPhrase)
 
 	#--- For Paid experiment ---
-	paid = 0
+	paid = ""
 	if userToActivate.signup_data_json:
 		signupData = json.loads(userToActivate.signup_data_json)	
 		if "paid" in signupData:
-			paid = int(signupData["paid"])
+			paid = signupData["paid"]
 
-	if paid > 0:
+	if "1" in paid:
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES_PAID)
 	else:
 	#--- end Paid experiment code --

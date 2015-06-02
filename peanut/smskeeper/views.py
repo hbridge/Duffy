@@ -371,7 +371,7 @@ def signup_from_website(request):
 	if (form.is_valid()):
 		source = form.cleaned_data['source']
 		referrerCode = form.cleaned_data['referrer']
-		paid = int(form.cleaned_data['paid'])
+		paid = form.cleaned_data['paid']
 
 		# clean phone number
 		region_code = 'US'
