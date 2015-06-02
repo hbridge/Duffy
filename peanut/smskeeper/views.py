@@ -392,6 +392,10 @@ def signup_from_website(request):
 				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode}))
 				target_user.save()
 
+				user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
+
+				"""
+				Comment out code to try always activating users
 				if referrerCode:
 					# First, activate this new user.
 					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
@@ -412,7 +416,7 @@ def signup_from_website(request):
 						user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
 					else:
 						not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
-
+				"""
 				analytics.logUserEvent(target_user, "Website Signup", {
 					"source": source,
 					"referred": True if referrerCode else False
