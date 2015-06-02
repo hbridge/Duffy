@@ -381,8 +381,10 @@ def nicety(user, nicety, requestDict, keeperNumber):
 	response = nicety.getResponse(user, requestDict, keeperNumber)
 	if response:
 		sms_util.sendMsg(user, response, None, keeperNumber)
-		analytics.logUserEvent(
-			user,
-			"Sent Nicety",
-			None
-		)
+
+	# log that the user sent a nicety regardless of whether Keeper responds
+	analytics.logUserEvent(
+		user,
+		"Sent Nicety",
+		None
+	)
