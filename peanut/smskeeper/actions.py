@@ -203,7 +203,7 @@ def clear(user, label, keeperNumber):
 	)
 
 
-def createHandle(user, handle, targetNumber):
+def createHandle(user, handle, targetNumber, initialState=None):
 	# see if there's an existing contact for that handle
 	oldUser = None
 	createdUser = False
@@ -220,6 +220,8 @@ def createHandle(user, handle, targetNumber):
 		target_user = User.objects.get(phone_number=targetNumber)
 	except User.DoesNotExist:
 		target_user = User.objects.create(phone_number=targetNumber)
+		if initialState:
+			target_user.setState(initialState)
 		target_user.save()
 		createdUser = True
 

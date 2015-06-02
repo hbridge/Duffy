@@ -386,8 +386,11 @@ def signup_from_website(request):
 			try:
 				target_user = User.objects.get(phone_number=phoneNum)
 
-				bodyText = "You are already on the list. Hang tight and I'll be in touch soon."
-				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
+				if target_user.state == keeper_constants.STATE_NOT_ACTIVATED:
+					msg = "You are already on the list. Hang tight and I'll be in touch soon."
+					sms_util.sendMsg(target_user, msg, None, settings.KEEPER_NUMBER)
+				elif target_user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
+					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
 				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid}))

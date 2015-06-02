@@ -195,25 +195,27 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 	entry.orig_text = json.dumps([msg])
 	entry.save()
 
-	handle = msg_util.getReminderHandle(queryWithoutTiming)  # Grab "me" or "mom"
+	# Don't do any of this logic in the tutorial state, shouldn't be correct
+	if not isTutorial(user):
+		handle = msg_util.getReminderHandle(queryWithoutTiming)  # Grab "me" or "mom"
 
-	if handle != "me":
-		contact = Contact.fetchByHandle(user, handle)
+		if handle != "me":
+			contact = Contact.fetchByHandle(user, handle)
 
-		if contact is None:
-			logger.debug("Didn't find handle %s for user %s and msg %s on entry %s" % (handle, user.id, msg, entry.id))
-			# We couldn't find the handle so go into unresolved state
-			# Set data for ourselves for when we come back
-			user.setStateData("entryId", entry.id)
-			user.setStateData("fromUnresolvedHandles", True)
-			user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
-			user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])
-			user.save()
-			return False
-		else:
-			logger.debug("Didn't find handle %s for user %s and entry %s...goint to unresolved" % (handle, user.id, entry.id))
-			# We found the handle, so share the entry with the user.
-			entry.users.add(contact.target)
+			if contact is None:
+				logger.debug("Didn't find handle %s for user %s and msg %s on entry %s" % (handle, user.id, msg, entry.id))
+				# We couldn't find the handle so go into unresolved state
+				# Set data for ourselves for when we come back
+				user.setStateData("entryId", entry.id)
+				user.setStateData("fromUnresolvedHandles", True)
+				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
+				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])
+				user.save()
+				return False
+			else:
+				logger.debug("Didn't find handle %s for user %s and entry %s...goint to unresolved" % (handle, user.id, entry.id))
+				# We found the handle, so share the entry with the user.
+				entry.users.add(contact.target)
 
 	suspiciousHour = dealWithSuspiciousHour(user, utcDate, entry, keeperNumber)
 

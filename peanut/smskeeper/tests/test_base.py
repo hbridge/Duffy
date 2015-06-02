@@ -39,6 +39,7 @@ class SMSKeeperBaseCase(TestCase):
 			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		self.user.state = state
 		self.user.save()
+		return self.user
 
 	def getTestUser(self):
 		return User.objects.get(id=self.user.id)

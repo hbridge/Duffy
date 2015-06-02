@@ -22,7 +22,9 @@ def process(user, msg, requestDict, keeperNumber):
 
 	if handleToResolve:
 		if msg_util.isPhoneNumber(msg):  # valid input, create the handle and share the entries
-			contact, didCreateUser, oldUser = actions.createHandle(user, handleToResolve, phoneNumbers[0])
+			# Right now, we're assuming this came from reminders.
+			# Will need to change once we have shared lists
+			contact, didCreateUser, oldUser = actions.createHandle(user, handleToResolve, phoneNumbers[0], initialState=keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER)
 
 			"""
 			Commented out by Derek. Breaking this until we re-write shared lists

@@ -14,6 +14,7 @@ COMMAND_HELP = 8
 # WHEN YOU ADD A STATE, PUT IT IN THE ALL_STATES LIST BELOW
 #
 STATE_NOT_ACTIVATED = 'not-activated'
+STATE_NOT_ACTIVATED_FROM_REMINDER = 'not-activated-from-reminder'
 STATE_TUTORIAL_LIST = 'tutorial'
 STATE_TUTORIAL_REMIND = 'tutorial-remind'
 STATE_NORMAL = 'normal'
@@ -143,6 +144,7 @@ COMMON_LIST_RES = [
 ]
 
 KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
+KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
 SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them to"
@@ -158,4 +160,3 @@ def isRealKeeperNumber(keeperNumber):
 def isTestKeeperNumber(keeperNumber):
 	return keeperNumber == SMSKEEPER_TEST_NUM
 
-KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)

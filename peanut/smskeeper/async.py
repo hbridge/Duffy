@@ -54,26 +54,42 @@ def shouldRemindNow(entry):
 
 
 def processReminder(entry):
-	msg = "Hi! Friendly reminder: %s" % entry.text
+	isSharedReminder = (len(entry.users.all()) > 1)
 
 	for user in entry.users.all():
-		sendMsg(user.id, msg, None, entry.keeper_number)
+		if user.state == keeper_constants.STATE_STOPPED:
+			pass
+		elif isSharedReminder and user.id == entry.creator.id:
+			# Only process reminders for the non-creator
+			pass
+		else:
+			if isSharedReminder:
+				# If they've never used the system before
+				if user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
+					msg = "Hi, I'm Keeper, %s's digital assistant. Wanted me to remind you: %s" % (entry.creator.name, entry.text)
+				else:
+					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
+			else:
+				msg = "Hi! Friendly reminder: %s" % entry.text
+			sendMsg(user.id, msg, None, entry.keeper_number)
 
-		if tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
-			# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
-			# sms_util for sending list of msgs
-			if keeper_constants.isRealKeeperNumber(entry.keeper_number):
-				time.sleep(2)
+			if user.completed_tutorial:
+				# Only do fancy things like snooze if they've actually gone through the tutorial
+				if tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
+					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+					# sms_util for sending list of msgs
+					if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+						time.sleep(2)
 
-			tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
-			sendMsg(user.id, tip.renderMini(), None, entry.keeper_number)
-			tips.markTipSent(user, tip, isMini=True)
+					tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
+					sendMsg(user.id, tip.renderMini(), None, entry.keeper_number)
+					tips.markTipSent(user, tip, isMini=True)
 
-		# Now set to remind, incase they send back some snooze messaging
-		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
-		user.setStateData("entryId", entry.id)
-		user.setStateData("reminderSent", True)
-		user.save()
+				# Now set to remind, incase they send back some snooze messaging
+				user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
+				user.setStateData("entryId", entry.id)
+				user.setStateData("reminderSent", True)
+				user.save()
 
 	entry.hidden = True
 	entry.save()

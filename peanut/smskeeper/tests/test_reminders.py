@@ -5,8 +5,8 @@ from mock import patch
 from testfixtures import Replacer
 from testfixtures import test_datetime
 
-from smskeeper.models import Entry
-from smskeeper import cliMsg, msg_util
+from smskeeper.models import Entry, User
+from smskeeper import cliMsg, msg_util, keeper_constants
 from smskeeper import async
 
 import test_base
@@ -343,6 +343,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(handle, "mom")
 
 	def test_shared_reminder_normal(self):
+		phoneNumber = "+16505555555"
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
@@ -350,11 +351,14 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("What's mom's phone number?", self.getOutput(mock))
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "+16505555555")
+			cliMsg.msg(self.testPhoneNumber, phoneNumber)
 			self.assertIn("I'll remind mom tomorrow around 8am", self.getOutput(mock))
 
-		entry = Entry.objects.filter(label="#reminders").last()
+		# Make sure other user was created successfully
+		otherUser = User.objects.get(phone_number=phoneNumber)
+		self.assertEqual(otherUser.state, keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER)
 
+		entry = Entry.objects.filter(label="#reminders").last()
 		# Make sure entries were created correctly
 		self.assertEquals("take her pill", entry.text)
 		self.assertEquals(2, len(entry.users.all()))
@@ -390,4 +394,55 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(1, len(entries))
 		self.assertEquals("take pill", entries[0].text)
 
+	def test_shared_reminder_nicety(self):
+		phoneNumber = "+16505555555"
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "thanks")
+			# See if it goes into tutorial
+			self.assertIn("btw", self.getOutput(mock))
+
+	def test_shared_reminder_other_person_tell_me_more(self):
+		phoneNumber = "+16505555555"
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "tell me more")
+			# See if it goes into tutorial
+			self.assertIn("what's your name?", self.getOutput(mock))
+
+	def test_shared_reminder_other_person_paused(self):
+		phoneNumber = "+16505555555"
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		cliMsg.msg(phoneNumber, "wtf")
+		otherUser = User.objects.get(phone_number=phoneNumber)
+		self.assertTrue(otherUser.paused)
+
+	def test_shared_reminder_processed(self):
+		phoneNumber = "+16505555555"
+		user = self.setupUser(True, True)
+		user.name = "Bob"
+		user.save()
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill in one minute")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.get(label="#reminders")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertIn("Bob's digital assistant", self.getOutput(mock))
+			self.assertIn("take her pill", self.getOutput(mock))
 

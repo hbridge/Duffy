@@ -4,35 +4,13 @@ import logging
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help
+from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help
 from smskeeper import msg_util
 
 from smskeeper.models import User, Message
 from common import slack_logger
 
 logger = logging.getLogger(__name__)
-
-# This is not used yet
-# COMMAND_FUNCS = {
-# 	keeper_constants.COMMAND_PICK: msg_util.isPickCommand,
-# 	keeper_constants.COMMAND_CLEAR: msg_util.isClearCommand,
-# 	keeper_constants.COMMAND_FETCH: msg_util.isFetchCommand,
-# 	keeper_constants.COMMAND_ADD: msg_util.isAddCommand,
-# 	keeper_constants.COMMAND_REMIND: msg_util.isRemindCommand,
-# 	keeper_constants.COMMAND_DELETE: msg_util.isDeleteCommand,
-# 	keeper_constants.COMMAND_ACTIVATE: msg_util.isActivateCommand,
-# 	keeper_constants.COMMAND_LIST: msg_util.isPrintHashtagsCommand,
-# 	keeper_constants.COMMAND_HELP: msg_util.isHelpCommand,
-# 	keeper_constants.COMMAND_ADD_SHARE: msg_util.isAddShareCommand,
-# }
-
-
-# def getPossibleCommands(msg):
-# 	commandList = list()
-# 	for key, func in COMMAND_FUNCS.iteritems():
-# 		if func(msg):
-# 			commandList.append(key)
-# 	return commandList
 
 
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
@@ -95,4 +73,5 @@ stateCallbacks = {
 	keeper_constants.STATE_IMPLICIT_LABEL: implicit_label,
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_HELP: user_help,
+	keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER: not_activated_from_reminder,
 }
