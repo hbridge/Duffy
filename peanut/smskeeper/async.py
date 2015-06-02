@@ -99,8 +99,6 @@ def processReminder(entry):
 def processAllReminders():
 	entries = Entry.objects.filter(remind_timestamp__isnull=False, hidden=False)
 
-	logger.debug("Found %s entries to eval" % len(entries))
-
 	for entry in entries:
 		if shouldRemindNow(entry):
 			logger.info("Processing entry: %s for users %s" % (entry.id, entry.users.all()))
