@@ -36,6 +36,7 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	if paid > 0:
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES_PAID)
 	else:
+	#--- end Paid experiment code --
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES)
 
 
