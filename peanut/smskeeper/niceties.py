@@ -6,6 +6,7 @@ import re
 import pytz
 from smskeeper import keeper_constants
 from smskeeper import msg_util
+import humanize
 
 
 class Nicety():
@@ -103,8 +104,12 @@ SMSKEEPER_NICETIES = [
 		[u"\U0001F44F", u"\U0001F44D"]
 	),
 	Nicety(
-		"bye(bye)?",
+		"bye(bye)?|keep in touch",
 		[u"\U0001F44B See ya! Lmk if you need anything!"]
+	),
+	Nicety(
+		"done$|did it",
+		[u"\U0001F44F", u"Nice!", u"Sweet!", u"\U0001F44D"]
 	),
 ]
 
@@ -136,6 +141,13 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		return "%s %s %s!" % (base, keeper_constants.SHARE_UPSELL_PHRASE, user.getInviteUrl())
 	else:
 		return base
+
+
+@custom_nicety_for(r'how old are you|whats your birthday|when were you born')
+def renderBirthdayInquiry(user, requestDict, keeperNumber):
+	delta = datetime.date.today() - keeper_constants.KEEPER_BIRTHDAY
+	deltaText = humanize.naturaldelta(delta)
+	return u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423" % (deltaText)
 
 
 # for nicety in SMSKEEPER_NICETIES:

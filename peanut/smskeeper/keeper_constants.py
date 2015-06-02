@@ -1,3 +1,5 @@
+import datetime
+
 COMMAND_PICK = 0
 COMMAND_CLEAR = 1
 COMMAND_FETCH = 2
@@ -148,3 +150,4 @@ def isRealKeeperNumber(keeperNumber):
 def isTestKeeperNumber(keeperNumber):
 	return keeperNumber == SMSKEEPER_TEST_NUM
 
+KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)

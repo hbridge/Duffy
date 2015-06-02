@@ -253,6 +253,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
 
+	def testBirthdayNicety(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.niceties.datetime') as dateMock:
+			dateMock.date.today.return_value = datetime.date(2015, 5, 29)  # a 30 days after keeper birthday
+			with patch('smskeeper.async.recordOutput') as mock:
+				cliMsg.msg(self.testPhoneNumber, "How old are you, Keeper?")
+				self.assertIn("30 days", self.getOutput(mock))
 
 	def test_absolute_delete(self):
 		self.setupUser(True, True)
