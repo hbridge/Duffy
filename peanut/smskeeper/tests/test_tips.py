@@ -26,7 +26,7 @@ def setMockDatetimeToSendTip(mock):
 	setMockDatetimeDaysAhead(mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS, tips.SMSKEEPER_TIP_HOUR)
 
 
-class SMSKeeperAsyncCase(test_base.SMSKeeperBaseCase):
+class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 	def setupUser(self, activated, tutorialComplete, timezoneString):
 		test_base.SMSKeeperBaseCase.setupUser(self, activated, tutorialComplete)
 
