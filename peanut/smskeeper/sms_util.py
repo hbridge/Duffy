@@ -22,7 +22,7 @@ def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
 		async.sendMsg(user.id, msg, mediaUrl, keeperNumber, manual)
 
 
-def sendMsgs(user, msgList, keeperNumber):
+def sendMsgs(user, msgList, keeperNumber, sendMessageDividers=True):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 
@@ -34,6 +34,10 @@ def sendMsgs(user, msgList, keeperNumber):
 		# calc the time for the next message
 		wordcount = len(msgTxt.split(" "))
 		seconds_delay += max(wordcount * DELAY_SECONDS_PER_WORD, MIN_DELAY_SECONDS)
+
+		# modify the message text if we're supposed to send dividers
+		if sendMessageDividers:
+			msgTxt = "%s (%d/%d)" % (msgTxt, i + 1, len(msgList))
 
 		# Call the single method above so it does the right async logic
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime)

@@ -378,6 +378,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with self.assertRaises(TypeError):
 			sms_util.sendMsg(self.user, ["hello", "this is the wrong type"], None, constants.SMSKEEPER_TEST_NUM)
 
+	def testSendMsgDividers(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			sms_util.sendMsgs(self.user, ["hello", "again"], constants.SMSKEEPER_TEST_NUM)
+			self.assertIn("(1/2)", self.getOutput(mock))
+
 	def testPhotoWithoutTag(self):
 		self.setupUser(True, True)
 
