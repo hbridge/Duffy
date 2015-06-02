@@ -24,9 +24,9 @@
       console.log(USER);
 		</script>
     {% if development %}
-      <script type='text/jsx' src="/static/smskeeper/src/history.jsx"></script>
+      <script type='text/jsx' src="/static/smskeeper/src/{{ script_name }}.jsx"></script>
     {% else %}
-      <script type='text/javascript' src="/static/smskeeper/build/history.js"></script>
+      <script type='text/javascript' src="/static/smskeeper/build/{{ script_name }}.js"></script>
     {% endif %}
   </body>
 </html>

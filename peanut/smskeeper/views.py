@@ -19,6 +19,7 @@ from common.models import ContactEntry
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -74,26 +75,6 @@ def sendNoResponse():
 	return HttpResponse(content, content_type="text/xml")
 
 
-def htmlForUserLabel(user, label):
-	html = "%s:\n" % (label)
-	entries = Entry.fetchEntries(user, label)
-	if len(entries) == 0:
-		html += "(empty)<br><br>"
-		return html
-
-	count = 1
-	html += "<ol>\n"
-	for entry in entries:
-		if not entry.img_url:
-			html += "<li>%s</li>" % (entry.text)
-			count += 1
-		else:
-			html += "<img src=\"%s\" />" % (entry.img_url)
-	html += "</ol>"
-
-	return html
-
-
 @csrf_exempt
 def incoming_sms(request):
 	form = SmsContentForm(api_util.getRequestData(request))
@@ -112,24 +93,16 @@ def incoming_sms(request):
 
 
 @login_required(login_url='/admin/login/')
-def all_notes(request):
-	form = UserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		try:
-			html = ""
-			for label in Entry.fetchAllLabels(user):
-				html += htmlForUserLabel(user, label)
-			return HttpResponse(html, content_type="text/html", status=200)
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'phone_number': "Not Found"}), content_type="text/json", status=400)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+def keeper_app(request):
+	return renderReact(request, 'keeper_app')
 
 
 @login_required(login_url='/admin/login/')
 def history(request):
+	return renderReact(request, 'history')
+
+
+def renderReact(request, templateName):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
@@ -141,8 +114,9 @@ def history(request):
 		context["development"] = settings.DEBUG
 		if form.cleaned_data['development']:
 			context["development"] = form.cleaned_data['development']
+		context["script_name"] = templateName
 
-		return render(request, 'history.html', context)
+		return render(request, "react_app.html", context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
@@ -165,7 +139,7 @@ def getMessagesForUser(user):
 	return messages_dicts
 
 
-def getResponseForUser(user):
+def getMessagesResponseForUser(user):
 	response = dict()
 	messages_dicts = getMessagesForUser(user)
 	response['messages'] = messages_dicts
@@ -181,10 +155,22 @@ def message_feed(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		return HttpResponse(json.dumps(getResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps(getMessagesResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+
+@login_required(login_url='/admin/login/')
+def entry_feed(request):
+	form = UserIdForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+
+		entries = Entry.fetchEntries(user, hidden=None, orderByString="-updated")
+		data = serializers.serialize("json", entries)
+		return HttpResponse(data, content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 #
 # Send a sms message to a user from a certain number

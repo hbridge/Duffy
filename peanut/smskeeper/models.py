@@ -252,7 +252,11 @@ class Entry(models.Model):
 
 	@classmethod
 	def fetchAllLabels(cls, user, hidden=False):
-		entries = Entry.objects.filter(users__in=[user], hidden=hidden)
+		if hidden is None:
+			entries = Entry.objects.filter(users__in=[user])
+		else:
+			entries = Entry.objects.filter(users__in=[user], hidden=hidden)
+
 		labels = entries.values_list("label", flat=True).distinct()
 		return labels
 
@@ -265,8 +269,8 @@ class Entry(models.Model):
 			return None
 
 	@classmethod
-	def fetchEntries(cls, user, label=None, hidden=False):
-		entries = Entry.objects.filter(users__in=[user]).order_by("added")
+	def fetchEntries(cls, user, label=None, hidden=False, orderByString="added"):
+		entries = Entry.objects.filter(users__in=[user]).order_by(orderByString)
 		if hidden is not None:
 			entries = entries.filter(hidden=hidden)
 		if label:
