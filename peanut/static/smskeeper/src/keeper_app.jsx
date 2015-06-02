@@ -38,7 +38,23 @@ var KeeperApp = React.createClass({
   processDataFromServer: function(data) {
     console.log("Got data from the server:");
     console.log(data);
-    this.setState({entries : data});
+    var entriesByList = {};
+    for (entry of data) {
+      var labelArr = []
+      if ("fields" in entry) {
+        if (entry.fields.label in entriesByList) {
+          labelArr = entriesByList[entry.fields.label];
+        }
+        labelArr.push(entry);
+      } else {
+        console.error("fields not in obj");
+        console.error(entry);
+      }
+      entriesByList[entry.fields.label] = labelArr;
+    }
+    console.log(entriesByList)
+
+    this.setState({entries : data, entriesByList: entriesByList});
   },
 
   loadDataFromServer: function() {
