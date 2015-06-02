@@ -371,6 +371,7 @@ def signup_from_website(request):
 	if (form.is_valid()):
 		source = form.cleaned_data['source']
 		referrerCode = form.cleaned_data['referrer']
+		paid = int(form.cleaned_data['paid'])
 
 		# clean phone number
 		region_code = 'US'
@@ -389,7 +390,7 @@ def signup_from_website(request):
 				sms_util.sendMsg(target_user, bodyText, None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode}))
+				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid}))
 				target_user.save()
 
 				user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)

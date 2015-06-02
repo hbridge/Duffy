@@ -47,3 +47,4 @@ class WebsiteRegistrationForm(forms.Form):
 	phone_number = forms.CharField(min_length=1, max_length=100)
 	source = forms.CharField(min_length=1, max_length=100, required=False)
 	referrer = forms.CharField(min_length=1, max_length=100, required=False)
+	paid = forms.CharField(min_length=1, max_length=100, required=False)
