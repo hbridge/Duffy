@@ -404,7 +404,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "thanks")
 			# See if it goes into tutorial
-			self.assertIn("btw", self.getOutput(mock))
+			self.assertIn("No problem", self.getOutput(mock))
 
 	def test_shared_reminder_other_person_tell_me_more(self):
 		phoneNumber = "+16505555555"
@@ -443,7 +443,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Bob's digital assistant", self.getOutput(mock))
+			self.assertIn("Bob wanted me", self.getOutput(mock))
 			self.assertIn("take her pill", self.getOutput(mock))
 
 	def test_shared_reminder_snooze(self):
