@@ -472,7 +472,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "start")
-			self.assertIn("welcome back", self.getOutput(mock))
+			self.assertIn("welcome back", self.getOutput(mock).lower())
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
 
@@ -486,7 +486,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "START")
-			self.assertIn("welcome back", self.getOutput(mock))
+			self.assertIn("welcome back", self.getOutput(mock).lower())
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
 

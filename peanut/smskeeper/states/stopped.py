@@ -2,6 +2,8 @@ import time
 
 from smskeeper import keeper_constants
 from smskeeper import sms_util
+from smskeeper import analytics
+from smskeeper import time_utils
 
 
 def process(user, msg, requestDict, keeperNumber):
@@ -11,6 +13,11 @@ def process(user, msg, requestDict, keeperNumber):
 		time.sleep(1)
 		user.setStateData('step', 1)
 		user.save()
+		analytics.logUserEvent(
+			user,
+			"Stop/Start",
+			{"Action": "Stop"}
+		)
 		return True
 	else:
 		# We were already in this state
@@ -18,7 +25,15 @@ def process(user, msg, requestDict, keeperNumber):
 		if msg.lower() == "start":
 			user.setState(keeper_constants.STATE_NORMAL)
 			user.save()
-			sms_util.sendMsg(user, "Got it, welcome back", None, keeperNumber)
+			sms_util.sendMsg(user, u"\U0001F44B Welcome back!", None, keeperNumber)
+			analytics.logUserEvent(
+				user,
+				"Stop/Start",
+				{
+					"Action": "Start",
+					"Hours Paused": time_utils.totalHoursAgo(user.last_state_change),
+				}
+			)
 
 		# Ignore other messages
 		return True
