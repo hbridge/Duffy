@@ -62,6 +62,16 @@ def isNattyDefaultTime(utcTime):
 	return utcTime.hour == now.hour and utcTime.minute == now.minute
 
 
+def updatedTimeBasedOnUsedText(utcTime, usedText, timezone):
+	if usedText.lower() == "next week":
+		tzAwareDate = datetime.datetime.now(pytz.utc).astimezone(timezone)
+		# This finds us the next Monday
+		tzAwareDate = tzAwareDate + datetime.timedelta(days=-tzAwareDate.weekday(), weeks=1)
+		tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
+		return tzAwareDate.astimezone(pytz.utc)
+	return utcTime
+
+
 def processQuery(query, timezone):
 	# get startDate from Natty
 	nattyPort = "7990"
@@ -88,10 +98,13 @@ def processQuery(query, timezone):
 	if (nattyResult):
 		nattyJson = json.loads(nattyResult)
 		for entry in nattyJson:
+			usedText = entry["matchingValue"]
+
 			timestamp = entry["timestamps"][-1]
 			startDate = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.utc)
 
-			usedText = entry["matchingValue"]
+			# Correct for a few edgecases
+			startDate = updatedTimeBasedOnUsedText(startDate, usedText, timezone)
 
 			now = datetime.datetime.now(pytz.utc)
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.

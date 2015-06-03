@@ -390,6 +390,8 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "remind me to call North East Medical Services (415) 391-9686 monday at 11 am")
 			self.assertNotIn("tomorrow", self.getOutput(mock))
 
+	"""
+
 	def test_next_week_becomes_sunday(self):
 		self.setupUser(True, True)
 
@@ -399,10 +401,8 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 
-		# Make sure next week translates to Sunday
-		self.assertEqual("Sun", humanize.ordinal(entry.remind_timestamp))
-
-	"""
+		# Make sure next week translates to Monday 9 am
+		self.assertEqual(0, entry.remind_timestamp.weekday())
 
 	# Deal with 3 digit numbers that should be timing info
 	def test_three_digit_time(self):
