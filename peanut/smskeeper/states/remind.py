@@ -325,8 +325,7 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 	# Tutorial gets a special followup message
 	if sendFollowup:
 		if isTutorial(user):
-			toSend = toSend + "\n\n"
-			toSend = toSend + "In the future, you can also include a specific time like 'tomorrow morning' or 'Saturday at 3pm'"
+			toSend = toSend + " (If that time doesn't work, just tell me what time is better)"
 		else:
 			toSend = toSend + "\n\n"
 			toSend = toSend + "If that time doesn't work, tell me what time is better"
