@@ -226,7 +226,8 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 		{
 			"Needed Followup": sendFollowup,
 			"Was Suspicious Hour": suspiciousHour,
-			"In tutorial": isTutorial(user)
+			"In tutorial": isTutorial(user),
+			"Is shared": len(entry.users.all()) > 1
 		}
 	)
 
@@ -253,7 +254,8 @@ def updateReminderEntry(user, utcDate, msg, entry, keeperNumber):
 		"Updated Reminder",
 		{
 			"Was Suspicious Hour": suspiciousHour,
-			"In tutorial": isTutorial(user)
+			"In tutorial": isTutorial(user),
+			"Is shared": len(entry.users.all()) > 1
 		}
 	)
 
