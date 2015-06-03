@@ -1,11 +1,12 @@
 body {
 	font-family: 'Montserrat', sans-serif;
 	font-weight: normal;
+	font-size: 10pt;
 }
 
 h2 {
   border-bottom: none;
-  font-size: 16pt;
+  font-size: 12pt;
   color: white;
   margin-bottom: 0;
 }
@@ -26,7 +27,7 @@ h2 {
 }
 
 .list .container {
-	padding-left: 10px;
+	padding: 8px 12px;
 }
 
 .grid-item { width: 200px; }
@@ -34,10 +35,13 @@ h2 {
 
 .entriesList {
 	background-color: white;
-	padding-left: 10px;
-	padding-right: 10px;
 }
 
 .createEntryFooter a {
 	color: white;
+}
+
+.entry {
+	border-bottom: 1px solid;
+	border-color: #E5E5E5;
 }
