@@ -94,7 +94,7 @@ def incoming_sms(request):
 
 @login_required(login_url='/admin/login/')
 def keeper_app(request):
-	return renderReact(request, 'keeper_app')
+	return renderReact(request, 'keeper_app', 'keeper_app.html')
 
 
 @login_required(login_url='/admin/login/')
@@ -102,7 +102,7 @@ def history(request):
 	return renderReact(request, 'history')
 
 
-def renderReact(request, templateName):
+def renderReact(request, appName, templateFile="react_app.html"):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
@@ -114,9 +114,9 @@ def renderReact(request, templateName):
 		context["development"] = settings.DEBUG
 		if form.cleaned_data['development']:
 			context["development"] = form.cleaned_data['development']
-		context["script_name"] = templateName
+		context["script_name"] = appName
 
-		return render(request, "react_app.html", context)
+		return render(request, templateFile, context)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 

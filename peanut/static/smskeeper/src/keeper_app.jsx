@@ -22,7 +22,7 @@ var EntryRow = React.createClass({
   render: function() {
     return (
       <div className="entry">
-        <b>{this.props.fields.label}</b> {this.props.fields.text}
+        {this.props.fields.text}
       </div>
     );
   }
@@ -37,7 +37,7 @@ var List = React.createClass({
     }.bind(this);
 
     return (
-      <div>
+      <div className="list grid-item">
         <h2> {this.props.label} </h2>
         <div id="entries">
            { this.props.entries.map(createEntry) }
@@ -127,7 +127,7 @@ var KeeperApp = React.createClass({
 
     return (
       <div>
-        <div id="lists">
+        <div id="lists" className="grid">
            { listNodes }
         </div>
       </div>
@@ -135,7 +135,18 @@ var KeeperApp = React.createClass({
   },
 
   componentDidUpdate: function() {
+    var elem = document.querySelector('.grid');
+    var msnry = new Masonry( elem, {
+      // options
+      itemSelector: '.grid-item',
+      columnWidth: 200
+    });
 
+    // element argument can be a selector string
+    //   for an individual element
+    var msnry = new Masonry( '.grid', {
+      // options
+    });
   },
 });
 
