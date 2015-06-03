@@ -110,8 +110,6 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Tymarieo")
 
-	"""
-	TODO(Derek): Get this to work
 	def test_stop(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
@@ -129,7 +127,6 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("I won't txt you anymore", self.getOutput(mock))
 		user = self.getTestUser()
 		self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
-	"""
 
 	def test_long_sentence(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
