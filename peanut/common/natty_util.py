@@ -52,14 +52,14 @@ def getNattyInfo(query, timezone):
 
 			myResults.append(subResult)
 
-	# Sort by the date, we want to soonest first
-	myResults = sorted(myResults, key=lambda x: x.utcTime)
-
-	# prefer anything that has "at" in the text
-	# Make sure it's "at " (with a space) since Saturday will match
-	myResults = sorted(myResults, key=lambda x: "at " in x.textUsed, reverse=True)
-
 	return myResults
+
+
+# Looks to see if the given time is the same hour and minute as now. Natty returns this if it doesn't
+# know what else to do
+def isNattyDefaultTime(utcTime):
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	return utcTime.hour == now.hour and utcTime.minute == now.minute
 
 
 def processQuery(query, timezone):
@@ -113,7 +113,9 @@ def processQuery(query, timezone):
 			column = entry["column"]
 			newQuery = getNewQuery(query, usedText, column)
 
-			result.append(NattyResult(startDate, newQuery, usedText, None, None))
+			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"]
+			hasTime = "EXPLICIT_TIME" in entry["syntaxTree"] or not isNattyDefaultTime(startDate)
+			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime))
 	return result
 
 
@@ -126,7 +128,7 @@ def representsInt(s):
 
 
 # This method takes the query and usedText and returns back the query without the usedText in it
-# The column is where the phase starts if its defined
+# The column is where the phrase starts if its defined
 def getNewQuery(query, usedText, column=None):
 	if column:
 		newQuery = query[:column - 1] + query[column - 1 + len(usedText):]

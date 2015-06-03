@@ -24,14 +24,9 @@ FROM_TUTORIAL_KEY = "fromtutorial"
 
 # Returns True if the time exists and isn't within 10 seconds of now.
 # We check for the 10 seconds to deal with natty phrases that don't really tell us a time (like "today")
-def validTime(startDate):
+def validTime(utcTime):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	return not (startDate is None or abs((now - startDate).total_seconds()) < 10)
-
-
-def isNattyDefaultTime(startDate):
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	return startDate.hour == now.hour and startDate.minute == now.minute
+	return not (utcTime is None or abs((now - utcTime).total_seconds()) < 10)
 
 
 # Returns True if this message has a valid time and it doesn't look like another remind command
@@ -39,18 +34,19 @@ def isNattyDefaultTime(startDate):
 # Like "remind me again in 5 minutes"
 # If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
 # Otherwise False
-def isFollowup(startDate, queryWithoutTiming, reminderSent):
-	if validTime(startDate):
-		cleanedText = msg_util.cleanedReminder(queryWithoutTiming)  # no "Remind me"
-		if reminderSent and msg_util.isRemindCommand(queryWithoutTiming):
-			if "again" in queryWithoutTiming.lower() or "snooze" in queryWithoutTiming.lower():
+def isFollowup(nattyResult, reminderSent):
+	if validTime(nattyResult.utcTime):
+		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
+		if reminderSent and msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
+			query = nattyResult.queryWithoutTiming.lower()
+			if "again" in query or "snooze" in query:
 				return True
 			else:
 				return False
 		# Covers cases where there is a followup like "remind me in 5 minutes"
 		elif len(cleanedText) <= 2 or cleanedText == "around":
 			return True
-		elif not msg_util.isRemindCommand(queryWithoutTiming):
+		elif not msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
 			return True
 	return False
 
@@ -72,15 +68,14 @@ def dealWithTutorialEdgecases(user, msg, keeperNumber):
 
 # If we got back a "natty default" time, which is the same time as now but a few days in the future
 # default it to 9 am the local time
-# Pass in startDate here since its in UTC, same as our server
-def dealWithDefaultTime(user, startDate):
-	if startDate:
-		tzAwareDate = startDate.astimezone(user.getTimezone())
-		if isNattyDefaultTime(startDate):
-			tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
-			startDate = tzAwareDate.astimezone(pytz.utc)
+# Pass in utcTime here since its in UTC, same as our server
+def dealWithDefaultTime(user, nattyResult):
+	if nattyResult.utcTime and not nattyResult.hadTime:
+		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
+		tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
+		nattyResult.utcTime = tzAwareDate.astimezone(pytz.utc)
 
-	return startDate
+	return nattyResult
 
 
 # Remove and replace troublesome strings for Natty
@@ -106,6 +101,19 @@ def fixMsgForNatty(msg):
 	return newMsg
 
 
+def getBestNattyResult(nattyResults):
+	if len(nattyResults) == 0:
+		return None
+
+	# Sort by the date, we want to soonest first
+	nattyResults = sorted(nattyResults, key=lambda x: x.utcTime)
+
+	# prefer anything that has "at" in the text
+	# Make sure it's "at " (with a space) since Saturday will match
+	nattyResults = sorted(nattyResults, key=lambda x: "at " in x.textUsed, reverse=True)
+	return nattyResults[0]
+
+
 def process(user, msg, requestDict, keeperNumber):
 	if dealWithTutorialEdgecases(user, msg, keeperNumber):
 		return True
@@ -116,26 +124,26 @@ def process(user, msg, requestDict, keeperNumber):
 		msg = msg.replace("#remind", "remind me")
 
 	nattyMsg = fixMsgForNatty(msg)
-	nattyResults = natty_util.getNattyInfo(nattyMsg, user.getTimezone())
+	nattyResult = getBestNattyResult(natty_util.getNattyInfo(nattyMsg, user.getTimezone()))
 
-	if len(nattyResults) > 0:
-		startDate = nattyResults[0].utcTime
-		queryWithoutTiming = nattyResults[0].queryWithoutTiming
-	else:
-		startDate = None
-		queryWithoutTiming = msg
+	if not nattyResult:
+		nattyResult = natty_util.NattyResult(None, msg, None, False, False)
 
 	# Change time to 9am if he user wasn't specific
-	startDate = dealWithDefaultTime(user, startDate)
+	nattyResult = dealWithDefaultTime(user, nattyResult)
 
 	# Create a new reminder
 	if not user.getStateData("entryId"):
 		sendFollowup = False
-		if not validTime(startDate):
-			startDate = getDefaultTime(user)
+		if not nattyResult:
+			nattyResult = natty_util.NattyResult(getDefaultTime(user), msg, None, False, False)
+			sendFollowup = False
+
+		if not validTime(nattyResult.utcTime):
+			nattyResult.utcTime = getDefaultTime(user)
 			sendFollowup = True
 
-		entry = createReminderEntry(user, startDate, msg, queryWithoutTiming, sendFollowup, keeperNumber)
+		entry = createReminderEntry(user, nattyResult.utcTime, msg, nattyResult.queryWithoutTiming, sendFollowup, keeperNumber)
 
 		# See if the entry didn't create. This means there's unresolved handes
 		if not entry:
@@ -183,9 +191,9 @@ def process(user, msg, requestDict, keeperNumber):
 				# This message could be a correction or something else.  Might need more logic here
 				sendCompletionResponse(user, entry, False, keeperNumber)
 
-		elif isFollowup(startDate, queryWithoutTiming, user.getStateData("reminderSent")):
+		elif isFollowup(nattyResult, user.getStateData("reminderSent")):
 			logger.debug("Doing followup on entry %s with msg %s" % (entry.id, msg))
-			updateReminderEntry(user, startDate, msg, entry, keeperNumber)
+			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber)
 			sendCompletionResponse(user, entry, False, keeperNumber)
 
 			# This means it was a snooze
@@ -202,9 +210,9 @@ def process(user, msg, requestDict, keeperNumber):
 	return True
 
 
-def dealWithSuspiciousHour(user, utcDate, entry, keeperNumber):
+def dealWithSuspiciousHour(user, entry, keeperNumber):
 	# If we're setting for early morning, send out a warning
-	tzAwareDate = utcDate.astimezone(user.getTimezone())
+	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
 	hourForUser = tzAwareDate.hour
 	if (isReminderHourSuspicious(hourForUser) and keeperNumber != constants.SMSKEEPER_TEST_NUM):
 		logger.error("Scheduling an alert for %s am local time for user %s, might want to check entry id %s" % (hourForUser, user.id, entry.id))
@@ -243,7 +251,7 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 				# We found the handle, so share the entry with the user.
 				entry.users.add(contact.target)
 
-	suspiciousHour = dealWithSuspiciousHour(user, utcDate, entry, keeperNumber)
+	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
 
 	analytics.logUserEvent(
 		user,
@@ -259,8 +267,20 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 	return entry
 
 
-def updateReminderEntry(user, utcDate, msg, entry, keeperNumber):
-	entry.remind_timestamp = utcDate
+def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber):
+	newDate = entry.remind_timestamp
+	# Only update with a date or time if Natty found one
+	if nattyResult.hadDate:
+		newDate = newDate.replace(year=nattyResult.utcTime.year)
+		newDate = newDate.replace(month=nattyResult.utcTime.month)
+		newDate = newDate.replace(day=nattyResult.utcTime.day)
+
+	if nattyResult.hadTime:
+		newDate = newDate.replace(hour=nattyResult.utcTime.hour)
+		newDate.replace(minute=nattyResult.utcTime.minute)
+		newDate.replace(second=nattyResult.utcTime.second)
+
+	entry.remind_timestamp = newDate
 	if entry.orig_text:
 		try:
 			origTextList = json.loads(entry.orig_text)
@@ -272,7 +292,7 @@ def updateReminderEntry(user, utcDate, msg, entry, keeperNumber):
 	entry.orig_text = json.dumps(origTextList)
 	entry.save()
 
-	suspiciousHour = dealWithSuspiciousHour(user, utcDate, entry, keeperNumber)
+	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
 
 	analytics.logUserEvent(
 		user,
