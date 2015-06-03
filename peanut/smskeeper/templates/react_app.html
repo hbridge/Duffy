@@ -21,6 +21,9 @@
     <div id="keeper_app"></div>
 		<script type='text/javascript'>
 			USER = {% autoescape off %}{{ user_data }}{% endautoescape %};
+      {% if development %}
+      DEVELOPMENT = true;
+      {% endif %}
       console.log(USER);
 		</script>
     {% if development %}

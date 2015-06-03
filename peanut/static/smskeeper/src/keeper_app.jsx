@@ -28,33 +28,56 @@ var EntryRow = React.createClass({
   }
 });
 
+var List = React.createClass({
+  render: function() {
+    var createEntry = function(entry, index) {
+      return <EntryRow fields={ entry.fields }
+        key= { entry.pk }
+        />
+    }.bind(this);
 
+    return (
+      <div>
+        <h2> {this.props.label} </h2>
+        <div id="entries">
+           { this.props.entries.map(createEntry) }
+        </div>
+      </div>
+    );
+  }
+});
 
 var KeeperApp = React.createClass({
   getInitialState: function() {
-    return {entries: [], selectedMessage: null };
+    return {entries: [], lists: [], reminders: [] };
   },
 
   processDataFromServer: function(data) {
     console.log("Got data from the server:");
     console.log(data);
-    var entriesByList = {};
+    var entriesByList = [];
     for (entry of data) {
-      var labelArr = []
+      var entriesForLabel = []
       if ("fields" in entry) {
         if (entry.fields.label in entriesByList) {
-          labelArr = entriesByList[entry.fields.label];
+          entriesForLabel = entriesByList[entry.fields.label];
         }
-        labelArr.push(entry);
+        entriesForLabel.push(entry);
       } else {
         console.error("fields not in obj");
         console.error(entry);
       }
-      entriesByList[entry.fields.label] = labelArr;
+      entriesByList[entry.fields.label] = entriesForLabel;
     }
     console.log(entriesByList)
 
-    this.setState({entries : data, entriesByList: entriesByList});
+    // pull out reminders
+    var reminderEntries = [];
+    if (entriesByList["#reminders"]) {
+      reminderEntries = entriesByList["#reminders"]
+      delete entriesByList["#reminders"]
+    }
+    this.setState({entries : data, lists: entriesByList, reminders: reminderEntries});
   },
 
   loadDataFromServer: function() {
@@ -74,24 +97,42 @@ var KeeperApp = React.createClass({
   componentDidMount: function() {
     this.loadDataFromServer();
     var loadFunc = this.loadDataFromServer;
-    setInterval(function () {loadFunc()}, 2000);
+    if (window['DEVELOPMENT'] == undefined) {
+      setInterval(function () {loadFunc()}, 2000);
+    } else {
+      console.log("in development, not autorefreshing");
+    }
   },
 
 	render: function() {
-		var createEntry = function(entry, index) {
-			return <EntryRow fields={ entry.fields }
-        key= { entry.pk }
-        />
-		}.bind(this);
+    var listNodes = []
 
-		return (
+    // put reminders on top
+    listNodes.push(
+      <List label="#reminders"
+        entries={ this.state.reminders }
+        key= { "#reminders" }
+      />
+    );
+
+    // then add the rest of the lists
+    for (key in this.state.lists) {
+      listNodes.push(
+        <List label={ key }
+          entries={ this.state.lists[key] }
+          key= { key }
+        />
+      );
+    }
+
+    return (
       <div>
-  			<div id="entries">
-  			   { this.state.entries.map(createEntry) }
+        <div id="lists">
+           { listNodes }
         </div>
       </div>
-		);
-	},
+    );
+  },
 
   componentDidUpdate: function() {
 
