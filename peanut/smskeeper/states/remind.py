@@ -137,10 +137,13 @@ def process(user, msg, requestDict, keeperNumber):
 		sendFollowup = False
 		if not nattyResult:
 			nattyResult = natty_util.NattyResult(getDefaultTime(user), msg, None, False, False)
-			sendFollowup = False
+			sendFollowup = True
 
 		if not validTime(nattyResult.utcTime):
 			nattyResult.utcTime = getDefaultTime(user)
+			sendFollowup = True
+
+		if not nattyResult.hadDate or not nattyResult.hadTime:
 			sendFollowup = True
 
 		entry = createReminderEntry(user, nattyResult.utcTime, msg, nattyResult.queryWithoutTiming, sendFollowup, keeperNumber)

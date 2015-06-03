@@ -45,7 +45,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 				self.assertIn("today around 6pm", self.getOutput(mock))
 
 				# This is the key here, make sure we have the extra message
-				self.assertIn("In the future, you can", self.getOutput(mock))
+				self.assertIn("If that time doesn't work", self.getOutput(mock))
 
 	def test_tutorial_remind_time_zones(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
@@ -61,7 +61,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("today", self.getOutput(mock))
 
 			# This is the key here, make sure we have the extra message
-			self.assertIn("In the future, you can", self.getOutput(mock))
+			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
 	def test_tutorial_zip_code(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
