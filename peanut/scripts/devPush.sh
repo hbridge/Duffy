@@ -6,7 +6,7 @@ git rebase origin/master
 cd peanut
 DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test
 cd static/smskeeper
-jsx --extension jsx src/ build/
+jsx --extension jsx src/ build/ history keeper_app dashboard
 sudo apachectl -k restart
 EOF
 
