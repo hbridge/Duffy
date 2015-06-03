@@ -67,7 +67,7 @@ def postManualAlert(user, msg, keeperNumber, channel):
         params['username'] = name
         params['text'] = "%s | %s" % (msg, historyLink)
         params['channel'] = channel
-        params['parse'] = "full"
+        params['link_names'] = 1
 
         requests.post(SLACK_URL, data=json.dumps(params))
 
