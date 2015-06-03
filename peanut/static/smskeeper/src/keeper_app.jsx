@@ -57,25 +57,28 @@ var KeeperApp = React.createClass({
     console.log(data);
     var entriesByList = [];
     for (entry of data) {
+      var labelName = entry.fields.label.replace("#", "")
+
       var entriesForLabel = []
       if ("fields" in entry) {
-        if (entry.fields.label in entriesByList) {
-          entriesForLabel = entriesByList[entry.fields.label];
+        if (labelName in entriesByList) {
+          entriesForLabel = entriesByList[labelName];
         }
         entriesForLabel.push(entry);
       } else {
         console.error("fields not in obj");
         console.error(entry);
       }
-      entriesByList[entry.fields.label] = entriesForLabel;
+
+      entriesByList[labelName] = entriesForLabel;
     }
     console.log(entriesByList)
 
     // pull out reminders
     var reminderEntries = [];
-    if (entriesByList["#reminders"]) {
-      reminderEntries = entriesByList["#reminders"]
-      delete entriesByList["#reminders"]
+    if (entriesByList["reminders"]) {
+      reminderEntries = entriesByList["reminders"]
+      delete entriesByList["reminders"]
     }
     this.setState({entries : data, lists: entriesByList, reminders: reminderEntries});
   },
@@ -109,9 +112,9 @@ var KeeperApp = React.createClass({
 
     // put reminders on top
     listNodes.push(
-      <List label="#reminders"
+      <List label="reminders"
         entries={ this.state.reminders }
-        key= { "#reminders" }
+        key= { "reminders" }
       />
     );
 
