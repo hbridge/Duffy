@@ -34,10 +34,15 @@ var EntryRow = React.createClass({
 var CreateEntryFooter = React.createClass({
   render: function() {
     return (
-      <div className="container">
-        <a href="#">+ Add Item</a>
+      <div className="container createEntryFooter">
+        <a href="#" onClick={this.handleClick}>+ Add Item</a>
       </div>
     );
+  },
+
+  handleClick: function(e) {
+    e.preventDefault();
+    this.setState({expanded : !this.state.expanded});
   }
 });
 

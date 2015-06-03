@@ -1,6 +1,11 @@
+body {
+	font-family: 'Montserrat', sans-serif;
+	font-weight: normal;
+}
+
 h2 {
   border-bottom: none;
-  font-size: 18pt;
+  font-size: 16pt;
   color: white;
   margin-bottom: 0;
 }
@@ -31,4 +36,8 @@ h2 {
 	background-color: white;
 	padding-left: 10px;
 	padding-right: 10px;
+}
+
+.createEntryFooter a {
+	color: white;
 }
