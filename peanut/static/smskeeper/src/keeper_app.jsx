@@ -28,6 +28,16 @@ var EntryRow = React.createClass({
   }
 });
 
+var CreateEntryFooter = React.createClass({
+  render: function() {
+    return (
+      <div className="container">
+        <a href="#">+ Add Item</a>
+      </div>
+    );
+  }
+});
+
 var List = React.createClass({
   render: function() {
     var createEntry = function(entry, index) {
@@ -36,12 +46,21 @@ var List = React.createClass({
         />
     }.bind(this);
 
+    var listClasses = classNames({
+      'list': true,
+      'grid-item': true,
+      'reminderList': this.props.isReminders,
+    });
+
     return (
-      <div className="list grid-item">
-        <h2> {this.props.label} </h2>
-        <div id="entries">
+      <div className={listClasses}>
+        <div className="container">
+          <h2> {this.props.label} </h2>
+        </div>
+        <div className="entriesList">
            { this.props.entries.map(createEntry) }
         </div>
+        <CreateEntryFooter />
       </div>
     );
   }
@@ -112,9 +131,10 @@ var KeeperApp = React.createClass({
 
     // put reminders on top
     listNodes.push(
-      <List label="reminders"
+      <List label="Reminders"
         entries={ this.state.reminders }
         key= { "reminders" }
+        isReminders= { true }
       />
     );
 
