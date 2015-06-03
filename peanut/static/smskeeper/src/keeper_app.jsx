@@ -32,18 +32,44 @@ var EntryRow = React.createClass({
 });
 
 var CreateEntryFooter = React.createClass({
+  getInitialState: function() {
+    return {expanded: false};
+  },
+
   render: function() {
+    var mainElement;
+    if (this.state.expanded) {
+      mainElement =
+      <form className="itemForm" onSubmit={this.handleSave}>
+        <input type="text" placeholder="New item" ref="text" className="textInput"/>
+        <input type="submit" value="Save" className="button" />
+      </form>
+    } else {
+      if (this.props.isReminders) {
+        mainElement = <a href="#" onClick={this.handleAddClicked}>+ Add Reminder</a>;
+      } else {
+        mainElement = <a href="#" onClick={this.handleAddClicked}>+ Add Item</a>;
+      }
+    }
+
     return (
       <div className="container createEntryFooter">
-        <a href="#" onClick={this.handleClick}>+ Add Item</a>
+        { mainElement }
       </div>
     );
   },
 
-  handleClick: function(e) {
+  handleAddClicked: function(e) {
     e.preventDefault();
     this.setState({expanded : !this.state.expanded});
-  }
+  },
+
+  handleSave: function(e) {
+    e.preventDefault();
+    var text = React.findDOMNode(this.refs.text).value.trim();
+    window.alert("mock save: " + text);
+  },
+
 });
 
 var List = React.createClass({
@@ -68,7 +94,7 @@ var List = React.createClass({
         <div className="entriesList">
            { this.props.entries.map(createEntry) }
         </div>
-        <CreateEntryFooter />
+        <CreateEntryFooter isReminders={ this.props.isReminders }/>
       </div>
     );
   }
