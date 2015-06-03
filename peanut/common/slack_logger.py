@@ -41,7 +41,8 @@ class SlackLogHandler(Handler):
                 "username": "Error Bot",
                 "icon_emoji": ":bomb:",
                 "text": message,
-                "attachments": attachments
+                "attachments": attachments,
+                "link_names": 1
             })
         # print "posting to %s: %s" % (settings.SLACK_LOGGING_URL, payload)
         requests.post(
