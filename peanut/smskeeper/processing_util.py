@@ -39,7 +39,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	# Always look for a stop command first and deal with that
 	if msg_util.isStopCommand(msg):
-		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True)
+		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 		user.save()
 		logger.debug("I think '%s' is a stop command, setting state to %s for user %s" % (msg, user.state, user.id))
 
