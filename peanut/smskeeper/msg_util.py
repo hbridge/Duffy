@@ -179,6 +179,7 @@ def getReminderHandle(msg):
 	return None
 
 
+# Returns a string which doesn't have the "remind me" phrase in it
 def cleanedReminder(msg):
 	text = msg.lower()
 	match = reminder_re.search(text)

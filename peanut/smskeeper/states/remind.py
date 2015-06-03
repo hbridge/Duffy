@@ -83,6 +83,29 @@ def dealWithDefaultTime(user, startDate):
 	return startDate
 
 
+# Remove and replace troublesome strings for Natty
+# This is meant to just be used to change up the string for processing, not used later for
+def fixMsgForNatty(msg):
+	newMsg = msg
+	# Fix 3 digit numbers with timing info like "520p"
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a)', msg)
+	if threeDigitsWithAP:
+		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
+		newtime = oldtime[0] + ":" + oldtime[1:]
+
+		newMsg = newMsg.replace(oldtime, newtime)
+
+	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
+	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', msg)
+	if threeDigitsWithAT:
+		oldtime = threeDigitsWithAT.group("time")
+		newtime = oldtime[0] + ":" + oldtime[1:]
+
+		newMsg = newMsg.replace(oldtime, newtime)
+
+	return newMsg
+
+
 def process(user, msg, requestDict, keeperNumber):
 	if dealWithTutorialEdgecases(user, msg, keeperNumber):
 		return True
@@ -92,7 +115,8 @@ def process(user, msg, requestDict, keeperNumber):
 		msg = msg.replace("#reminder", "remind me")
 		msg = msg.replace("#remind", "remind me")
 
-	nattyResults = natty_util.getNattyInfo(msg, user.getTimezone())
+	nattyMsg = fixMsgForNatty(msg)
+	nattyResults = natty_util.getNattyInfo(nattyMsg, user.getTimezone())
 
 	if len(nattyResults) > 0:
 		startDate, queryWithoutTiming, usedText = nattyResults[0]
