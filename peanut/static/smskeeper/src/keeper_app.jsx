@@ -12,6 +12,9 @@ See: https://facebook.github.io/react/docs/tooling-integration.html for info on 
 
 */
 
+var masonryOptions = {
+    transitionDuration: 0
+};
 
 var formatDate = function(d){
   return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();
@@ -67,6 +70,7 @@ var List = React.createClass({
 });
 
 var KeeperApp = React.createClass({
+  mixins: [MasonryMixin('masonryContainer', masonryOptions)],
   getInitialState: function() {
     return {entries: [], lists: [], reminders: [] };
   },
@@ -150,7 +154,7 @@ var KeeperApp = React.createClass({
 
     return (
       <div>
-        <div id="lists" className="grid">
+        <div id="lists" className="grid" ref="masonryContainer">
            { listNodes }
         </div>
       </div>
@@ -158,18 +162,7 @@ var KeeperApp = React.createClass({
   },
 
   componentDidUpdate: function() {
-    var elem = document.querySelector('.grid');
-    var msnry = new Masonry( elem, {
-      // options
-      itemSelector: '.grid-item',
-      columnWidth: 200
-    });
 
-    // element argument can be a selector string
-    //   for an individual element
-    var msnry = new Masonry( '.grid', {
-      // options
-    });
   },
 });
 

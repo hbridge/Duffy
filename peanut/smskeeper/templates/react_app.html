@@ -4,18 +4,15 @@
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="/static/smskeeper/style/common.css" />
     <link rel="stylesheet" href="/static/smskeeper/style/{{ script_name }}.css" />
-    <!-- React JS -->
-
     {% if development %}
     <script src="https://fb.me/react-0.13.0.js"></script>
     <script src="https://fb.me/JSXTransformer-0.13.0.js"></script>
     {% else %}
       <script src="https://fb.me/react-0.13.0.min.js"></script>
     {% endif %}
-    <!-- JQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
     <!-- Class Names -->
+    <script type='text/javascript' src="/static/smskeeper/build/{{ script_name }}_bundle.js"></script>
     <script src="/static/smskeeper/src/node_modules/classnames/index.js"></script>
     {% block extra_includes %}{% endblock %}
     <meta name=viewport content="width=device-width, initial-scale=1">
