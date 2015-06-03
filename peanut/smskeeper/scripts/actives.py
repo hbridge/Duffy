@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from smskeeper.models import Message, User
+from smskeeper import keeper_constants
 
 dateFilter = date.today() - timedelta(days=7)
 
@@ -10,9 +11,9 @@ usersAll = Message.objects.values('user__name').filter(incoming=True, added__gt=
 
 usersFB = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__completed_tutorial=True, user__in=activatedUsersFB, user__signup_data_json__icontains='fb').distinct()
 
-for i,k in enumerate(usersAll):
-    print k
+usersStopped = User.objects.filter(activated__lt=dateFilter, state=keeper_constants.STATE_STOPPED)
 
 print "Total users activated: %s (FB: %s)" %(len(activatedUsersAll), len(activatedUsersFB))
 print "Active users: %s (FB: %s)"%(len(usersAll), len(usersFB))
-print "percent actives: %s%% (FB: %s%%)"%(float(len(usersAll))/float(len(activatedUsersAll))*100.0, float(len(usersFB))/float(len(activatedUsersFB))*100.0)
+print "%% actives: %s%% (FB: %s%%)"%(float(len(usersAll))/float(len(activatedUsersAll))*100.0, float(len(usersFB))/float(len(activatedUsersFB))*100.0)
+print "Stopped users: %s"%(len(usersStopped))
