@@ -24,10 +24,20 @@ var formatDate = function(d){
 var EntryRow = React.createClass({
   render: function() {
     return (
-      <div className="entry">
-        {this.props.fields.text}
+      <div className="entry container" onClick={ this.handleClick }>
+        <span ref="textspan">{this.props.fields.text}</span>
       </div>
     );
+  },
+
+  handleClick: function(e) {
+    e.preventDefault();
+    console.log(this);
+    this.getDOMNode().contentEditable = true;
+  },
+
+  componentDidUpdate: function() {
+    console.log('updated')
   }
 });
 
