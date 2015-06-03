@@ -23,17 +23,39 @@ var formatDate = function(d){
 
 var EntryRow = React.createClass({
   render: function() {
+    var reminderTimeElement = null;
+    if (this.props.fields.remind_timestamp) {
+      reminderTimeElement = (
+        <div>
+          {this.props.fields.remind_timestamp}
+        </div>
+      );
+    }
+
     return (
-      <div className="entry container" onClick={ this.handleClick }>
-        <span ref="textspan">{this.props.fields.text}</span>
+      <div className="entry container">
+        <div
+        onClick = { this.handleClick }
+        onBlur = { this.handleTextFinishedEditing }
+        onInput= { this.handleTextChanged}
+        contentEditable={true}>
+          <span ref="textspan">{this.props.fields.text}</span>
+        </div>
+        {reminderTimeElement}
       </div>
     );
   },
 
   handleClick: function(e) {
     e.preventDefault();
-    console.log(this);
-    this.getDOMNode().contentEditable = true;
+  },
+
+  handleTextChanged: function(e) {
+
+  },
+
+  handleTextFinishedEditing: function(e) {
+    console.log("finished with text: " + this.refs.textspan.props.children);
   },
 
   componentDidUpdate: function() {
