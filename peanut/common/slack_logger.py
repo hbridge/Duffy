@@ -42,7 +42,6 @@ class SlackLogHandler(Handler):
                 "icon_emoji": ":bomb:",
                 "text": message,
                 "attachments": attachments,
-                "link_names": 1
             })
         # print "posting to %s: %s" % (settings.SLACK_LOGGING_URL, payload)
         requests.post(
@@ -68,6 +67,7 @@ def postManualAlert(user, msg, keeperNumber, channel):
         params['username'] = name
         params['text'] = "%s | %s" % (msg, historyLink)
         params['channel'] = channel
+        params['link_names'] = 1
 
         requests.post(SLACK_URL, data=json.dumps(params))
 
