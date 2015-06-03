@@ -10,6 +10,21 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+class NattyResult():
+	utcTime = None
+	queryWithoutTiming = None
+	textUsed = None
+	hadDate = None
+	hadTime = None
+
+	def __init__(self, utcTime, queryWithoutTiming, textUsed, hadDate, hadTime):
+		self.utcTime = utcTime
+		self.queryWithoutTiming = queryWithoutTiming
+		self.textUsed = textUsed
+		self.hadDate = hadDate
+		self.hadTime = hadTime
+
+
 # Helper method to get a startDate and a new filtered query from Natty.
 # This makes a url call to the Natty server that gets back the timestamp around a
 # time phrase like "last week" then also gives us the words used, which are then
@@ -29,21 +44,20 @@ def getNattyInfo(query, timezone):
 	# newQuery: book meeting with Andrew for in two hours
 	# Return: book meeting with Andrew for tues morning  (two hours from now)
 	for result in results:
-		startDate, newQuery, usedText = result
-
-		subResults = getNattyInfo(newQuery, timezone)
+		subResults = getNattyInfo(result.queryWithoutTiming, timezone)
 
 		for subResult in subResults:
-			subDate, subNewQuery, subUsedText = subResult
+			subResultUsedText = subResult.textUsed
+			subResult.queryWithoutTiming = getNewQuery(query, subResultUsedText)
 
-			myResults.append((subDate, getNewQuery(query, subUsedText), subUsedText))
+			myResults.append(subResult)
 
 	# Sort by the date, we want to soonest first
-	myResults = sorted(myResults, key=lambda x: x[0])
+	myResults = sorted(myResults, key=lambda x: x.utcTime)
 
 	# prefer anything that has "at" in the text
 	# Make sure it's "at " (with a space) since Saturday will match
-	myResults = sorted(myResults, key=lambda x: "at " in x[2], reverse=True)
+	myResults = sorted(myResults, key=lambda x: "at " in x.textUsed, reverse=True)
 
 	return myResults
 
@@ -99,7 +113,7 @@ def processQuery(query, timezone):
 			column = entry["column"]
 			newQuery = getNewQuery(query, usedText, column)
 
-			result.append((startDate, newQuery, usedText))
+			result.append(NattyResult(startDate, newQuery, usedText, None, None))
 	return result
 
 

@@ -119,7 +119,8 @@ def process(user, msg, requestDict, keeperNumber):
 	nattyResults = natty_util.getNattyInfo(nattyMsg, user.getTimezone())
 
 	if len(nattyResults) > 0:
-		startDate, queryWithoutTiming, usedText = nattyResults[0]
+		startDate = nattyResults[0].utcTime
+		queryWithoutTiming = nattyResults[0].queryWithoutTiming
 	else:
 		startDate = None
 		queryWithoutTiming = msg

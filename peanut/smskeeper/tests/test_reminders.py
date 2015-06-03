@@ -1,5 +1,6 @@
 import datetime
 import pytz
+import humanize
 from mock import patch
 
 from testfixtures import Replacer
@@ -301,8 +302,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Just say 'add' with an item and a list", self.getOutput(mock))
 
 	"""
-	TO MAKE PASS:
-
 	def test_followup_only_time(self):
 		self.setupUser(True, True)
 
@@ -312,13 +311,18 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Actually, do noon")
-			self.assertIn("around 10am", self.getOutput(mock))
+			self.assertIn("around 12pm", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEqual("poop", entry.text)
 
-		# 12 pm EST, so 16 UTC
+		# Look for Jan 1 12 pm
+		self.assertEqual(1, entry.remind_timestamp.day)
+		self.assertEqual(1, entry.remind_timestamp.month)
 		self.assertEqual(16, entry.remind_timestamp.hour)
+	"""
+	"""
+	TO MAKE PASS:
 
 	# Test cases which have two times, but the closer one (we normally default to) is incorrect
 	# Assume that the correct time always starts at the begining of the msg
@@ -346,6 +350,53 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(1, len(entries))
 		self.assertEqual(entries[0].remind_timestamp.hour, 22)  # 6 EST, so 10 UTC
+
+
+	def test_day_of_month_without_specific_month(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I also need you to remind me to say happy birthday to a friend on the 11th at 12 am")
+			self.assertIn("around 12am", self.getOutput(mock))
+
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertEqual(entry.remind_timestamp.day, 11)  # 6 EST, so 10 UTC
+
+	def test_single_number(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me my 3 algebra assignments are due Dec 7")
+			self.assertIn("around 9am", self.getOutput(mock))
+
+	def test_phone_numbers(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me to call North East Medical Services (415) 391-9686 monday at 11 am")
+			self.assertNotIn("tomorrow", self.getOutput(mock))
+
+
+	def test_followup_only_day(self):
+		self.setupUser(True, True)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to poop Sunday at 11am")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Actually, do tomorrow")
+			self.assertIn("tomorrow around 11am", self.getOutput(mock))
+
+	def test_next_week_becomes_sunday(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to poop next week")
+			self.assertIn("around 9am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+
+		# Make sure next week translates to Sunday
+		self.assertEqual("Sun", humanize.ordinal(entry.remind_timestamp))
 
 	"""
 
