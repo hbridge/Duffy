@@ -41,6 +41,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	if msg_util.isStopCommand(msg):
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True)
 		user.save()
+		logger.debug("I think '%s' is a stop command, setting state to %s for user %s" % (msg, user.state, user.id))
 
 	if not user.paused:
 		processed = False

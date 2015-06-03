@@ -300,6 +300,24 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "lists")
 			self.assertIn("Just say 'add' with an item and a list", self.getOutput(mock))
 
+	def test_followup_only_time(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to poop Jan 1 at 10am")
+			self.assertIn("around 10am", self.getOutput(mock))
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Actually, do noon")
+			self.assertIn("around 10am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual("poop", entry.text)
+
+		# 12 pm EST, so 16 UTC
+		self.assertEqual(16, entry.remind_timestamp.hour)
+
+
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_snooze_tip(self):
 		self.setupUser(True, True)
