@@ -16,7 +16,8 @@ def process(user, msg, requestDict, keeperNumber):
 	implicitLabel = user.getStateData(keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY)
 	if not implicitLabel:
 		user.setState(keeper_constants.STATE_NORMAL)
-		logger.error("Processing implicit label state without an implicit label")
+		if not keeper_constants.isTestKeeperNumber(keeperNumber):
+			logger.error("Processing implicit label state without an implicit label")
 		return False
 
 	processed = False
