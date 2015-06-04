@@ -275,20 +275,21 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 
 
 def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber):
-	newDate = entry.remind_timestamp
+	newDate = entry.remind_timestamp.astimezone(user.getTimezone())
+	nattyTzTime = nattyResult.utcTime.astimezone(user.getTimezone())
 	# Only update with a date or time if Natty found one
 	if nattyResult.hadDate:
-		newDate = newDate.replace(year=nattyResult.utcTime.year)
-		newDate = newDate.replace(month=nattyResult.utcTime.month)
-		newDate = newDate.replace(day=nattyResult.utcTime.day)
+		newDate = newDate.replace(year=nattyTzTime.year)
+		newDate = newDate.replace(month=nattyTzTime.month)
+		newDate = newDate.replace(day=nattyTzTime.day)
 
 	if nattyResult.hadTime:
-		newDate = newDate.replace(hour=nattyResult.utcTime.hour)
-		newDate.replace(minute=nattyResult.utcTime.minute)
-		newDate.replace(second=nattyResult.utcTime.second)
+		newDate = newDate.replace(hour=nattyTzTime.hour)
+		newDate = newDate.replace(minute=nattyTzTime.minute)
+		newDate = newDate.replace(second=nattyTzTime.second)
 
 	logger.debug("Updating entry %s for user %s and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (entry.id, user.id, msg, newDate, nattyResult, entry.remind_timestamp))
-	entry.remind_timestamp = newDate
+	entry.remind_timestamp = newDate.astimezone(pytz.utc)
 	if entry.orig_text:
 		try:
 			origTextList = json.loads(entry.orig_text)

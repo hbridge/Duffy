@@ -295,9 +295,10 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.async.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me to poop Jan 1 at 10am")
+			cliMsg.msg(self.testPhoneNumber, "Remind me to poop Friday at 10am")
 			self.assertIn("around 10am", self.getOutput(mock))
 
+		origEntry = Entry.objects.get(label="#reminders")
 		cliMsg.msg(self.testPhoneNumber, "Actually, do 2pm")
 
 		entries = Entry.objects.filter(label="#reminders")
@@ -307,9 +308,9 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		entry = entries[0]
 		self.assertEqual("poop", entry.text)
 
-		# Look for Jan 1 2 pm
-		self.assertEqual(1, entry.remind_timestamp.day)
-		self.assertEqual(1, entry.remind_timestamp.month)
+		# Look for Friday 2 pm
+		self.assertEqual(origEntry.remind_timestamp.day, entry.remind_timestamp.day)
+		self.assertEqual(origEntry.remind_timestamp.month, entry.remind_timestamp.month)
 		self.assertEqual(18, entry.remind_timestamp.hour)
 
 	# These next 2 tests are pretty similar but still nice to have

@@ -105,6 +105,39 @@ def processAllReminders():
 			processReminder(entry)
 
 
+def shouldSendDigestForUser(user):
+	now = datetime.datetime.now(pytz.utc)
+	localTime = now.astimezone(user.getTimezone())
+
+	# By default only send if its 9 am
+	# Later on might make this per-user specific
+	#if localTime.hour == 9 and localTime.minute == 0:
+	#	return True
+	return True
+
+
+@app.task
+def processDailyDigest():
+	entries = Entry.objects.filter(creator__product_id=1, label="#reminders", hidden=False)
+
+	entriesByCreator = dict()
+
+	for entry in entries:
+		if entry.creator.id not in entriesByCreator:
+			entriesByCreator[entry.creator.id] = list()
+		entriesByCreator[entry.creator.id].append(entry)
+
+	for user, entries in entriesByCreator.iteritems():
+		if not shouldSendDigestForUser(user):
+			pass
+
+		msg = ""
+		for entry in entries:
+			msg += msg + entry.txt + "\n"
+
+		sendMsg(user.id, msg, None, entry.keeper_number)
+
+
 @app.task
 def sendTips(keeperNumber=None):
 	if not keeperNumber:

@@ -290,6 +290,7 @@ class BASE_CELERY_CONFIG:
         'smskeeper.async.sendTips': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.sendMsg': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.testCelery': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.processDailyDigest': {'queue': 'keeper', 'routing_key': 'keeper'},
     }
 
     CELERYBEAT_SCHEDULE = {

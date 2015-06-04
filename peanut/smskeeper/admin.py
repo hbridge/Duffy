@@ -63,3 +63,16 @@ class ReminderAdmin(admin.ModelAdmin):
 
 	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'hidden')
 	readonly_fields = ['added_tz_aware']
+
+
+class Todo(Reminder):
+	class Meta:
+		proxy = True
+
+
+@admin.register(Todo)
+class TodoAdmin(ReminderAdmin):
+
+	def queryset(self, request):
+		qs = super(TodoAdmin, self).queryset(request)
+		return qs.filter(creator__product_id=1, label="#reminders")
