@@ -23,14 +23,14 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 	def test_natty_timezone(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 19)  # 3 pm Eastern in UTC
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "clear #reminders")
 			self.assertIn("cleared", self.getOutput(mock))
 
@@ -47,7 +47,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 
 		inTwoHours = self.getUserNow() + datetime.timedelta(hours=2)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tuesday morning in two hours")
 			correctString = msg_util.naturalize(self.getUserNow(), inTwoHours)
 			self.assertIn(correctString, self.getOutput(mock))
@@ -60,7 +60,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 	def test_natty_two_times_by_number(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			inFourHours = self.getUserNow() + datetime.timedelta(hours=4)
 
 			cliMsg.msg(self.testPhoneNumber, "#remind change archie grade to 2 in 4 hours")
@@ -70,7 +70,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 			entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 			self.assertIn("change archie grade to 2", entry.text)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			inFiveHours = self.getUserNow() + datetime.timedelta(hours=5)
 
 			cliMsg.msg(self.testPhoneNumber, "#remind change bobby grade to 10 in 5 hours")
@@ -138,7 +138,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 		user.paused = True
 		user.save()
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminders")
 			output = self.getOutput(mock)
 			self.assertIs(u'', output)

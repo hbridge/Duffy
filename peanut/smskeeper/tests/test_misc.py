@@ -13,7 +13,7 @@ import emoji
 class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def test_first_connect(self):
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
 			self.assertIn("what's your name?", self.getOutput(mock))
 
@@ -23,7 +23,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(False, False, keeper_constants.STATE_NOT_ACTIVATED)
 		cliMsg.msg(self.testPhoneNumber, "hi")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hi")
 			self.assertIn("", self.getOutput(mock))
 
@@ -37,14 +37,14 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_firstItemAdded(self):
 		self.setupUser(False, False, keeper_constants.STATE_NORMAL)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#groceries milk")
 			self.assertIn("Just type 'groceries'", self.getOutput(mock))
 
 	def test_freeform_add_fetch(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Add milk to groceries")
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertIn("milk", self.getOutput(mock))
@@ -57,7 +57,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def test_freeform_add_punctuation(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Add milk to groceries.")
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertIn("milk", self.getOutput(mock))
@@ -65,7 +65,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_freeform_multi_add(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			output = self.getOutput(mock)
@@ -76,7 +76,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_add_multi_word_label(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Add foo to my bar baz list")
 			cliMsg.msg(self.testPhoneNumber, "bar baz")
 			output = self.getOutput(mock)
@@ -85,7 +85,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_freeform_clear(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
 			cliMsg.msg(self.testPhoneNumber, "Clear groceries")
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
@@ -98,21 +98,21 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
 		cliMsg.msg(self.testPhoneNumber, "Groceries")
 		cliMsg.msg(self.testPhoneNumber, "Delete 1")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertNotIn("milk", self.getOutput(mock))
 
 
 	def test_freeform_fetch_common_list(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "groceries")
 			self.assertNotIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
 	def test_freeform_add_photo(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "add to foo", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
 			# ensure we don't treat photos without a hashtag as a bad command
 			output = self.getOutput(mock)
@@ -123,7 +123,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def test_freeform_malformed_add(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "add to groceries")
 			self.assertNotIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 
@@ -131,28 +131,28 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
 		# Activation message asks for their name
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I'm UnitTests")
 			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
 			self.assertIn("Let me show you the basics", self.getOutput(mock))
 			self.assertEquals(self.getTestUser().name, "UnitTests")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new5 #test")
 			self.assertIn("Now let's add other items to your list", self.getOutput(mock))
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new2 #test")
 			self.assertIn("You can send items to this", self.getOutput(mock))
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("You got it", self.getOutput(mock))
 
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("don't have anything", self.getOutput(mock))
 
@@ -161,7 +161,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "new #test")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("new", self.getOutput(mock))
 
@@ -169,7 +169,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		cliMsg.msg(self.testPhoneNumber, "new #test")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "pick #test")
 			self.assertTrue("new", self.getOutput(mock))
 
@@ -177,19 +177,19 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		cliMsg.msg(self.testPhoneNumber, "new #test")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#hashtag")
 			self.assertIn("(1)", self.getOutput(mock))
 
 	def test_unknown_command(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "new")
 			# ensure we tell the user we don't understand
 			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, keeper_constants.REPORT_ISSUE_KEYWORD)
 			self.assertIn(keeper_constants.REPORT_ISSUE_CONFIRMATION, self.getOutput(mock))
 
@@ -197,7 +197,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_sets_paused_when_daytime(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			with patch('smskeeper.states.normal.datetime') as datetimeMock:
 				# Set us to middle of the day so we get paused
 				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
@@ -213,7 +213,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_sets_paused_when_night(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			with patch('smskeeper.states.normal.datetime') as datetimeMock:
 				# set to night time
 				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=1)
@@ -229,20 +229,20 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!", "cool", "OK", u"\U0001F44D"]
 
 		for phrase in dumb_phrases:
-			with patch('smskeeper.async.recordOutput') as mock:
+			with patch('smskeeper.sms_util.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, phrase)
 				output = self.getOutput(mock)
 				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
 
 	def test_thanks_upsell(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
 
 		# make sure we don't send it immediately after
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			self.assertNotIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
@@ -252,7 +252,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			days=keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS
 		)
 		self.user.save()
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
@@ -261,13 +261,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.niceties.datetime') as dateMock:
 			dateMock.date.today.return_value = datetime.date(2015, 5, 29)  # a 30 days after keeper birthday
-			with patch('smskeeper.async.recordOutput') as mock:
+			with patch('smskeeper.sms_util.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, "How old are you, Keeper?")
 				self.assertIn("30 days", self.getOutput(mock))
 
 	def testSendRandomEmoji(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, emoji.emojize(":green_apple:"))
 			self.assertIn(self.getOutput(mock), emoji.EMOJI_UNICODE.values())
 
@@ -278,13 +278,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "old fashioned #cocktail")
 
 		# First make sure that the entry is there
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertIn("old fashioned", self.getOutput(mock))
 
 		# Next make sure we delete and the list is clear
 		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertNotIn("old fashioned", self.getOutput(mock))
 
@@ -294,23 +294,23 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "foo%d #bar" % (i))
 
 		# ensure we don't delete when ambiguous
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertIn("Sorry, I'm not sure", self.getOutput(mock))
 
 		# ensure deletes right item
 		cliMsg.msg(self.testPhoneNumber, "#bar")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 2")
 			self.assertNotIn("2. foo2", self.getOutput(mock))
 
 		# ensure can chain deletes
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertNotIn("1. foo1", self.getOutput(mock))
 
 		# ensure deleting from empty doesn't crash
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertNotIn("I deleted", self.getOutput(mock))
 
@@ -322,7 +322,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		# ensure we can delete with or without spaces
 		cliMsg.msg(self.testPhoneNumber, "delete 3, 5,2 #bar")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#bar")
 
 			self.assertNotIn("foo2", self.getOutput(mock))
@@ -383,7 +383,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_unicode_msg(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, u'poop\u2019s tmr #unitest')
 			cliMsg.msg(self.testPhoneNumber, u'#unitest')
 			self.assertIn(u'poop\u2019s tmr', self.getOutput(mock))
@@ -398,7 +398,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def testPhotoWithoutTag(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
 			# ensure we don't treat photos without a hashtag as a bad command
 			output = self.getOutput(mock)
@@ -411,7 +411,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def testPhotoWithRandomText(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "this is my picture", mediaURL="http://getkeeper.com/favicon.jpeg", mediaType="image/jpeg")
 			# ensure we don't treat photos without a hashtag as a bad command
 			output = self.getOutput(mock)
@@ -424,7 +424,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def testScreenshotWithoutTag(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "", mediaURL="http://getkeeper.com/favicon.png", mediaType="image/png")
 			# ensure we don't treat photos without a hashtag as a bad command
 			output = self.getOutput(mock)
@@ -455,12 +455,12 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def testSetZipcodeLater(self):
 		self.setupUser(True, True)
 		self.assertNotEqual(self.user.timezone, "PST")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "My zipcode is 94117")
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "US/Pacific")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "My zip code is 10012")
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
@@ -468,19 +468,19 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def testStopped(self):
 		self.setupUser(True, True)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "STOP")
 			self.assertIn("just type 'start'", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "ignore this")
 			self.assertEqual("", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "start")
 			self.assertIn("welcome back", self.getOutput(mock).lower())
 			user = self.getTestUser()
@@ -488,13 +488,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def testStoppedSaveState(self):
 		self.setupUser(True, False, state=keeper_constants.STATE_NOT_ACTIVATED)
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "STOP")
 			self.assertIn("just type 'start'", self.getOutput(mock))
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "START")
 			self.assertIn("welcome back", self.getOutput(mock).lower())
 			user = self.getTestUser()
@@ -505,7 +505,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_signatures(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name
 			cliMsg.msg(self.testPhoneNumber, "UnitTests\nThis Is My Sig")
 			self.assertNotIn("Sig", self.getOutput(mock))

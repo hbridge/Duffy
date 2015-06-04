@@ -24,7 +24,7 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
 		cliMsg.msg(self.testPhoneNumber, "Delete 1 from groceries")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertNotIn("milk", self.getOutput(mock))
 
@@ -34,7 +34,7 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "Add milk, spinach, bread to groceries")
 		cliMsg.msg(self.testPhoneNumber, "Groceries")
 		cliMsg.msg(self.testPhoneNumber, "Delete 1")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertNotIn("milk", self.getOutput(mock))
 
@@ -45,13 +45,13 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "old fashioned #cocktail")
 
 		# First make sure that the entry is there
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertIn("old fashioned", self.getOutput(mock))
 
 		# Next make sure we delete and the list is clear
 		cliMsg.msg(self.testPhoneNumber, "delete 1 #cocktail")   # test absolute delete
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#cocktail")
 			self.assertNotIn("old fashioned", self.getOutput(mock))
 
@@ -61,23 +61,23 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "add foo%d to #bar" % (i))
 
 		# ensure we don't delete when ambiguous
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertIn("Sorry, I'm not sure", self.getOutput(mock))
 
 		# ensure deletes right item
 		cliMsg.msg(self.testPhoneNumber, "#bar")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 2")
 			self.assertNotIn("2. foo2", self.getOutput(mock))
 
 		# ensure can chain deletes
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertNotIn("1. foo1", self.getOutput(mock))
 
 		# ensure deleting from empty doesn't crash
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "delete 1")
 			self.assertNotIn("I deleted", self.getOutput(mock))
 
@@ -89,13 +89,13 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 		# ensure we don't clear this list when we use an absolute of another list
 		cliMsg.msg(self.testPhoneNumber, "bar")
 		cliMsg.msg(self.testPhoneNumber, "clear baz")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "bar")
 			self.assertIn("foo", self.getOutput(mock))
 
 		# clear now after we just listed bar
 		cliMsg.msg(self.testPhoneNumber, "clear")
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "bar")
 			self.assertNotIn("foo", self.getOutput(mock))
 
@@ -107,7 +107,7 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 		# ensure we can delete with or without spaces
 		cliMsg.msg(self.testPhoneNumber, "delete 3, 5,2 #bar")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#bar")
 
 			self.assertNotIn("foo2", self.getOutput(mock))

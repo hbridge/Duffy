@@ -12,17 +12,17 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		# Activation message asks for their name
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
 			self.assertEquals(self.getTestUser().name, "UnitTests")
 
 		# Activation message asks for their zip
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
 			self.assertIn("Let's set your first reminder", self.getOutput(mock))
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
 			self.assertIn("tomorrow around 9am", self.getOutput(mock))
 			self.assertIn("I can also help you with other things", self.getOutput(mock))
@@ -34,7 +34,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			with patch('smskeeper.states.remind.datetime') as datetimeMock:
 				# We set the time to be 10 am so we can check the default time later.
 				# But need to set early otherwise default could be tomorrow
@@ -56,7 +56,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show on Sunday")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me at 4pm")
 
 			self.assertIn("Sun around 4pm", self.getOutput(mock))
@@ -71,7 +71,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future
@@ -111,7 +111,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 	def test_nicety(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with nicety
 			cliMsg.msg(self.testPhoneNumber, "Hey")
 			self.assertIn("Hi there", self.getOutput(mock))
@@ -130,7 +130,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 	def test_stop(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with nicety
 			cliMsg.msg(self.testPhoneNumber, "Hey")
 			self.assertIn("Hi there", self.getOutput(mock))
@@ -139,7 +139,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Stop")
 			self.assertIn("I won't txt you anymore", self.getOutput(mock))
 		user = self.getTestUser()
@@ -148,7 +148,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 	def test_long_sentence(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with sentence
 			cliMsg.msg(self.testPhoneNumber, "What are you?")
 			self.assertIn("but first what's your name?", self.getOutput(mock))
@@ -164,7 +164,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
-		with patch('smskeeper.async.recordOutput') as mock:
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I'm in 94117")
 			self.assertEquals("Got it.", self.getOutput(mock))
 
