@@ -19,6 +19,10 @@ var formatDate = function(d){
 MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
 var EntryRow = React.createClass({
+  getInitialState: function() {
+    return {expanded: false};
+  },
+
   render: function() {
     var reminderTimeElement = null;
     if (this.props.fields.remind_timestamp) {
@@ -34,8 +38,16 @@ var EntryRow = React.createClass({
       );
     }
 
+    var deleteElement = null;
+    if (this.state.expanded) {
+      deleteElement = <div className="clearButton">
+        <a onClick={this.handleClear} href="#" > X </a>
+      </div>;
+    }
+
     return (
       <div className="entry container">
+        {deleteElement}
         <div
         onClick = { this.handleClick }
         onBlur = { this.handleTextFinishedEditing }
@@ -44,13 +56,14 @@ var EntryRow = React.createClass({
           <span ref="textspan">{this.props.fields.text}</span>
         </div>
         {reminderTimeElement}
+
       </div>
     );
   },
 
   handleClick: function(e) {
     e.preventDefault();
-
+    this.setState({expanded: true});
   },
 
   handleTextChanged: function(e) {
@@ -59,6 +72,12 @@ var EntryRow = React.createClass({
 
   handleTextFinishedEditing: function(e) {
     console.log("finished with text: " + this.refs.textspan.props.children);
+    this.setState({expanded: false});
+  },
+
+  handleClear: function(e) {
+    e.preventDefault();
+    alert('mock clear');
   },
 
   componentDidUpdate: function() {

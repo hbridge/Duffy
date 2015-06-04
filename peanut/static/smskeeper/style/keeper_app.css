@@ -56,3 +56,18 @@ h2 {
 .upcoming {
 	color: #4CD964;
 }
+
+.clearButton {
+	float: right;
+	position: relative;
+	left: 30px;
+	background-color: white;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+}
+
+.clearButton a {
+	color: red;
+	margin: auto;
+}
