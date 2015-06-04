@@ -19,6 +19,8 @@ class User(models.Model):
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)
 
+	product_id = models.IntegerField(default=0)
+
 	# TODO(Derek): Rename this to activated_timestamp
 	activated = models.DateTimeField(null=True, blank=True)
 	paused = models.BooleanField(default=False)
