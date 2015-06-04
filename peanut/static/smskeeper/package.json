@@ -1,0 +1,25 @@
+
+
+{
+  "name": "keeper_frontend",
+  "version": "1.0.0",
+  "description": "Keeper frontend website",
+  "main": "index.js",
+  "dependencies": {
+    "jquery-ui": "^1.10.5",
+    "jquery": "^2.1.4",
+    "react": "^0.13.3",
+    "classnames": "^1.2.2",
+    "react-masonry-mixin": "^0.5.7",
+    "reactify": "^1.1.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Duffy, Inc",
+  "license": "ISC",
+  "repository": "https://github.com/hbridge/Duffy"
+}
