@@ -46,12 +46,12 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		REMINDER_TIP_ID,
 		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')",
-		True
+		False
 	),
 	KeeperTip(
 		PHOTOS_TIP_ID,
 		u"I \U0001F499 pics!  Try sending me a selfie with 'add to selifes' and I'll store it for you.  It's a fast way to save documents and receipts, too!",
-		True
+		False
 	),
 	# KeeperTip(
 	# 	SHARING_TIP_ID,
