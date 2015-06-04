@@ -45,7 +45,8 @@
     "pretty-hrtime": "~1.0.0",
     "require-dir": "^0.1.0",
     "vinyl-source-stream": "~1.0.0",
-    "watchify": "^2.4.0"
+    "watchify": "^2.4.0",
+    "reactify": "^1.1.1"
   },
   "browserify": {
     "transform": ["reactify"],
