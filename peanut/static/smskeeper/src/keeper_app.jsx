@@ -18,61 +18,37 @@ var formatDate = function(d){
 
 MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
+SelectedEntryRow = null;
+
 var EntryRow = React.createClass({
   getInitialState: function() {
-    return {expanded: false};
+    return {isSelected: false};
   },
 
   render: function() {
-    var reminderTimeElement = null;
-    if (this.props.fields.remind_timestamp) {
-      var reminderDate = new Date(this.props.fields.remind_timestamp);
-      var reminderClasses = classNames({
-        "overdue": moment(reminderDate).isBefore(moment()),
-        "upcoming": moment(reminderDate).isBetween(moment(), moment().add(1, 'days'))
-      });
-      reminderTimeElement = (
-        <div>
-          <Timestamp value={reminderDate} format="MMM Do [at] LT" titleFormat="YYYY/MM/DD HH:mm" className={reminderClasses}/>
-        </div>
-      );
+    // create the clear X button if we're selected
+    var deleteElement = null;
+    if (this.state.isSelected) {
+      deleteElement = <div className="clearButton">
+        <a ref="clearButton" onClick={this.handleClear} href="#" > X </a>
+      </div>;
     }
 
-    var deleteElement = null;
-    if (this.state.expanded) {
-      deleteElement = <div className="clearButton">
-        <a onClick={this.handleClear} href="#" > X </a>
-      </div>;
+    // create the reminder element if this is a reminder
+    var entryTimeField = null;
+    if (this.props.fields.remind_timestamp) {
+      entryTimeField = <EntryTimeField date={new Date(this.props.fields.remind_timestamp)}
+      handleClicked={this.handleChildClicked}
+      ref="entryTimeField"/>
     }
 
     return (
       <div className="entry container">
         {deleteElement}
-        <div
-        onClick = { this.handleClick }
-        onBlur = { this.handleTextFinishedEditing }
-        onInput= { this.handleTextChanged}
-        contentEditable={true}>
-          <span ref="textspan">{this.props.fields.text}</span>
-        </div>
-        {reminderTimeElement}
-
+        <EntryTextField text={this.props.fields.text} handleClicked={this.handleChildClicked} ref="entryTextField" />
+        {entryTimeField}
       </div>
     );
-  },
-
-  handleClick: function(e) {
-    e.preventDefault();
-    this.setState({expanded: true});
-  },
-
-  handleTextChanged: function(e) {
-
-  },
-
-  handleTextFinishedEditing: function(e) {
-    console.log("finished with text: " + this.refs.textspan.props.children);
-    this.setState({expanded: false});
   },
 
   handleClear: function(e) {
@@ -80,8 +56,121 @@ var EntryRow = React.createClass({
     alert('mock clear');
   },
 
+  handleChildClicked: function(child) {
+    // deselect the previously selected entry row
+    if (SelectedEntryRow && SelectedEntryRow != this) {
+      SelectedEntryRow.setState({isSelected: false});
+    }
+    SelectedEntryRow = this;
+    this.setState({isSelected: true});
+  },
+
+  componentWillUpdate: function(nextProps, nextState) {
+    if (!nextState.isSelected) {
+      console.log("deselecting children");
+      this.refs.entryTextField.setState({expanded: false});
+      if (this.refs.entryTimeField) {
+        this.refs.entryTimeField.setState({expanded: false});
+      }
+    }
+  }
+});
+
+var EntryTextField = React.createClass({
+  render: function() {
+    return (<div
+        onClick = { this.handleClicked }
+        onBlur = { this.handleTextFinishedEditing }
+        onInput= { this.handleTextChanged}
+        contentEditable={true}>
+          <span ref="textspan">{this.props.text}</span>
+        </div>
+    );
+  },
+
+  handleClicked: function(e) {
+    this.props.handleClicked(this);
+  },
+
+  handleTextChanged: function(e) {
+
+  },
+
+  handleTextFinishedEditing: function(e) {
+    var destination = e.nativeEvent.relatedTarget;
+    if (destination && destination == React.findDOMNode(this.refs.clearButton)) {
+      // this isn't a cancel if the user is tapping another element in the form
+      return;
+    }
+
+    console.log("finished with text: " + this.refs.textspan.props.children);
+    this.setState({expanded: false});
+  },
+});
+
+
+var EntryTimeField = React.createClass({
+  getInitialState: function() {
+    return {expanded: false};
+  },
+
+  render: function() {
+    if (this.state.expanded) {
+        return (
+          <div >
+            <form className="itemForm" ref="timeForm" onSubmit={this.handleSaveTime} onBlur={this.handleTimeEditCancelled}>
+            <input type="text" placeholder="New time" ref="timeInput" className="textInput" />
+            <input type="submit" value="Save" ref="timeSave" className="button" />
+          </form>
+          </div>
+        );
+      } else {
+        var reminderDate = new Date(this.props.date);
+        var reminderClasses = classNames({
+          "reminderTime" : true,
+          "overdue": moment(reminderDate).isBefore(moment()),
+          "upcoming": moment(reminderDate).isBetween(moment(), moment().add(1, 'days'))
+        });
+        return (
+          <div>
+            <a onClick={this.handleClicked} href="#">
+              <Timestamp value={reminderDate} format="MMM Do [at] LT" titleFormat="YYYY/MM/DD HH:mm" className={reminderClasses}/>
+            </a>
+          </div>
+        );
+      }
+  },
+
+  // deal with time events
+  handleClicked: function(e) {
+    e.preventDefault();
+    console.log("time clicked");
+    this.setState({expanded: true});
+    this.props.handleClicked(this);
+  },
+
+  handleTimeEditCancelled: function(e) {
+    console.log("time edit cancelled");
+
+    var destination = e.nativeEvent.relatedTarget;
+    if (destination && destination.form == React.findDOMNode(this.refs.timeForm)) {
+      // this isn't a cancel if the user is tapping another element in the form
+      return;
+    }
+
+    this.setState({expanded: false});
+  },
+
+  handleSaveTime: function(e) {
+    e.preventDefault();
+    console.log('save time');
+    this.setState({expanded: false});
+  },
+
   componentDidUpdate: function() {
-    console.log('updated')
+    if (this.state.expanded) {
+      React.findDOMNode(this.refs.timeInput).focus();
+    }
   }
 });
 
