@@ -8,7 +8,7 @@ def resolveNextHandle(user, unresolvedHandles, keeperNumber):
 		return
 
 	to_resolve = unresolvedHandles[0]
-	sms_util.sendMsg(user, "What's %s's phone number?" % (to_resolve), None, keeperNumber)
+	sms_util.sendMsg(user, "I can remind %s.  What's %s's phone number?" % (to_resolve, to_resolve), None, keeperNumber)
 	user.setStateData("handleToResolve", to_resolve)
 	user.save()
 

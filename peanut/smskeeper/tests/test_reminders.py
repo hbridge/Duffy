@@ -393,6 +393,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "remind me to call North East Medical Services (415) 391-9686 monday at 11 am")
 			self.assertNotIn("tomorrow", self.getOutput(mock))
 
+
+	def test_two_dates_far_away(self):
+		self.setupUser(True, True)
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me on September 5 that I have appointment with Becca on September 6 at 12:30 PM")
+			self.assertIn("Sat the 5th", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(13, entry.remind_timestamp.hour)  # Make sure its 9am EST
 	"""
 
 	def test_next_week_becomes_sunday(self):
@@ -593,3 +603,4 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "snooze 1 hour")
 			self.assertIn("later", self.getOutput(mock))
+

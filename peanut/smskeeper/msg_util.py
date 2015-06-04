@@ -22,7 +22,7 @@ freeform_fetch_res = [
 	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
-reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to)?(: )?", re.I)
+reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at )?", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -175,7 +175,9 @@ def getReminderHandle(msg):
 	text = msg.lower()
 	match = reminder_re.search(text)
 	if match:
-		return match.group("handle")
+		handle = match.group("handle")
+		if handle != "to" and handle != "on" and handle != "at":
+			return handle
 	return None
 
 

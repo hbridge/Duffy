@@ -239,7 +239,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	if not isTutorial(user):
 		handle = msg_util.getReminderHandle(nattyResult.queryWithoutTiming)  # Grab "me" or "mom"
 
-		if handle != "me":
+		if handle and handle != "me":
 			# If we ever handle multiple handles... we need to create seperate entries to deal with snoozes
 			contact = Contact.fetchByHandle(user, handle)
 
