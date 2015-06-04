@@ -239,6 +239,7 @@ class Entry(models.Model):
 	img_url = models.TextField(null=True, blank=True)
 
 	remind_timestamp = models.DateTimeField(null=True, blank=True)
+	remind_last_notified = models.DateTimeField(null=True, blank=True)
 
 	hidden = models.BooleanField(default=False)
 

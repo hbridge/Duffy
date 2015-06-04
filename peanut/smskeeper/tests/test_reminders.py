@@ -204,6 +204,13 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			ret = async.shouldRemindNow(entryOdd)
 			self.assertTrue(ret)
 
+			# Now we're past the actual time, but we say we were just notified, so shouldn't fire
+			entryOdd.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
+			testDt = test_datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+			r.replace('smskeeper.async.datetime.datetime', testDt)
+			ret = async.shouldRemindNow(entryOdd)
+			self.assertFalse(ret)
+
 	def test_at_preference(self):
 		self.setupUser(True, True)
 

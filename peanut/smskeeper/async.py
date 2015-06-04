@@ -2,25 +2,21 @@ from __future__ import absolute_import
 import datetime
 import pytz
 import time
-
-"""
-TEMP REMOVE
-see if we really need this.  If something breaks with async, talk to Derek
-Removed due to circular dependencies with admin.py
+import os
+import sys
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 import django
 django.setup()
-"""
 
 from django.conf import settings
 
 from celery.utils.log import get_task_logger
 from peanut.celery import app
 
-from smskeeper import tips, sms_util
+from smskeeper import tips, sms_util, user_util, msg_util
 from smskeeper.models import Entry
 from smskeeper.models import User
 from smskeeper import keeper_constants
@@ -37,12 +33,20 @@ def shouldRemindNow(entry):
 		return False
 
 	now = datetime.datetime.now(pytz.utc)
+
+	# Don't remind if we sent one in the last few minutes
+	if entry.remind_last_notified and entry.remind_last_notified > now - datetime.timedelta(minutes=2):
+		return False
+
+	# Don't remind if its too far in the past
+	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
+		return False
+
 	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
 		# If we're within 10 minutes, so alarm goes off at 9:50 if remind is at 10
 		return (now + datetime.timedelta(minutes=10) > entry.remind_timestamp)
 	else:
-		# The current time is after the remind timestamp but we're within 5 minutes
-		return (entry.remind_timestamp < now and entry.remind_timestamp > now - datetime.timedelta(minutes=5))
+		return (now > entry.remind_timestamp)
 
 
 def processReminder(entry):
@@ -63,7 +67,9 @@ def processReminder(entry):
 					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
 			else:
 				msg = "Hi! Friendly reminder: %s" % entry.text
+
 			sms_util.sendMsg(user, msg, None, entry.keeper_number)
+			entry.remind_last_notified = datetime.datetime.now(pytz.utc)
 
 			if user.completed_tutorial:
 				# Only do fancy things like snooze if they've actually gone through the tutorial
@@ -83,7 +89,10 @@ def processReminder(entry):
 				user.setStateData("reminderSent", True)
 				user.save()
 
-	entry.hidden = True
+	# For product id 0, hide after a reminder has occured
+	if entry.creator.product_id == 0:
+		entry.hidden = True
+
 	entry.save()
 
 
@@ -98,14 +107,52 @@ def processAllReminders():
 
 
 def shouldSendDigestForUser(user):
-	now = datetime.datetime.now(pytz.utc)
-	localTime = now.astimezone(user.getTimezone())
+	localNow = datetime.datetime.now(user.getTimezone())
 
 	# By default only send if its 9 am
 	# Later on might make this per-user specific
-	#if localTime.hour == 9 and localTime.minute == 0:
-	#	return True
+	if localNow.hour == 9 and localNow.minute == 0:
+		return True
 	return True
+
+
+def shouldIncludeEntry(entry):
+	# Cutoff time is 23 hours ahead, could be changed later to be more tz aware
+	localNow = datetime.datetime.now(entry.creator.getTimezone())
+	# Cutoff time is midnight local time
+	cutoffTime = (localNow + datetime.timedelta(days=1)).replace(hour=0, minute=0)
+
+	if not entry.hidden and entry.remind_timestamp < cutoffTime:
+		return True
+	return False
+
+
+def getDigestMessageForUser(user, entries):
+	now = datetime.datetime.now(pytz.utc)
+	msg = "Your things for today:\n"
+	pendingEntries = user_util.pendingTodoEntries(user, entries)
+	for entry in pendingEntries:
+		entry.remind_last_notified = datetime.datetime.now(pytz.utc)
+		entry.save()
+		msg += entry.text
+
+		if entry.remind_timestamp > now:
+			msg += " at %s" % msg_util.getNaturalTime(entry.remind_timestamp.astimezone(user.getTimezone()))
+		msg += "\n"
+
+	msg += "\nlet me know if you finish something!"
+
+	return msg
+
+
+@app.task
+def sendDigestForUserId(userId):
+	user = User.objects.get(id=userId)
+
+	msg = getDigestMessageForUser(user, None)
+
+	if msg:
+		sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
 
 
 @app.task
@@ -115,19 +162,18 @@ def processDailyDigest():
 	entriesByCreator = dict()
 
 	for entry in entries:
-		if entry.creator.id not in entriesByCreator:
-			entriesByCreator[entry.creator.id] = list()
-		entriesByCreator[entry.creator.id].append(entry)
+		if entry.creator not in entriesByCreator:
+			entriesByCreator[entry.creator] = list()
+		entriesByCreator[entry.creator].append(entry)
 
 	for user, entries in entriesByCreator.iteritems():
 		if not shouldSendDigestForUser(user):
 			pass
 
-		msg = ""
-		for entry in entries:
-			msg += msg + entry.txt + "\n"
+		msg = getDigestMessageForUser(user, entries)
 
-		sms_util.sendMsg(user, msg, None, entry.keeper_number)
+		if msg:
+			sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
 
 
 @app.task
