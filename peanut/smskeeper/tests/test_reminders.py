@@ -1,6 +1,5 @@
 import datetime
 import pytz
-import humanize
 from mock import patch
 
 from testfixtures import Replacer

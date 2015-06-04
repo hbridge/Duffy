@@ -1,5 +1,8 @@
 import humanize
 import random
+import datetime
+import pytz
+import logging
 
 from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
@@ -7,6 +10,11 @@ import django
 
 from smskeeper.models import Entry, Contact, User
 from smskeeper import analytics
+
+from common import slack_logger
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def shareEntries(user, entries, handles, keeperNumber):
 	sharedHandles = list()
@@ -258,6 +266,10 @@ def setTipFrequency(user, msg, keeperNumber):
 		user.tip_frequency_days = 30
 		user.save()
 		sms_util.sendMsg(user, "Ok, I'll send you tips monthly.", None, keeperNumber)
+	elif "daily" in msg:
+		user.tip_frequency_days = 1
+		user.save()
+		sms_util.sendMsg(user, "Ok, I'll send you tips daily.", None, keeperNumber)
 	elif "never" in msg or "stop" in msg or "don't" in msg:
 		user.tip_frequency_days = 0
 		user.save()
@@ -388,3 +400,32 @@ def nicety(user, nicety, requestDict, keeperNumber):
 		"Sent Nicety",
 		None
 	)
+
+
+def done(user, msg, possibleEntry, requestDict, keeperNumber):
+	# figure out entry
+	pass
+
+
+def unknown(user, msg, keeperNumber):
+	now = datetime.datetime.now(pytz.timezone("US/Eastern"))
+	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_TEST_NUM and not settings.DEBUG:
+		user.paused = True
+		user.save()
+		postMsg = "User %s paused after: '%s'   @derek @aseem @henry" % (user.id, msg)
+		slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
+		logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
+	else:
+		sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
+		user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
+		user.save()
+		logger.info("For user %s I couldn't figure out '%s'" % (user.id, msg))
+	analytics.logUserEvent(
+		user,
+		"Sent Unknown Command",
+		{
+			"Command": msg,
+			"Paused": user.isPaused(),
+		}
+	)
+

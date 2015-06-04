@@ -32,11 +32,13 @@ class SMSKeeperBaseCase(TestCase):
 		ZipData.objects.create(city="New York", state="NY", zip_code="10012", timezone="EST", area_code="212")
 
 	# TODO(Derek): Eventually activated and tutorialComplete should go away
-	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL):
+	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL, productId=None):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		self.user.completed_tutorial = tutorialComplete
-		if (activated):
+		if activated:
 			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		if productId:
+			self.user.product_id = productId
 		self.user.state = state
 		self.user.save()
 		return self.user

@@ -198,7 +198,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			with patch('smskeeper.states.normal.datetime') as datetimeMock:
+			with patch('smskeeper.actions.datetime') as datetimeMock:
 				# Set us to middle of the day so we get paused
 				self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
 				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=12)
@@ -214,7 +214,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			with patch('smskeeper.states.normal.datetime') as datetimeMock:
+			with patch('smskeeper.actions.datetime') as datetimeMock:
 				# set to night time
 				datetimeMock.datetime.now.return_value = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(hour=1)
 				cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)

@@ -23,6 +23,7 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at )?", re.I)
+done_re = re.compile("\b(done|finished|called|bought|did|picked|went|got)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -31,6 +32,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 # We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
+
 
 def hasLabel(msg):
 	for word in msg.split(' '):
@@ -167,8 +169,15 @@ def isSetTipFrequencyCommand(msg):
 
 
 def isRemindCommand(msg):
-	text = msg.lower()
-	return (reminder_re.search(text) is not None)
+	return (reminder_re.search(msg.lower()) is not None)
+
+
+def isDoneCommand(msg):
+	return (done_re.search(msg.lower()) is not None)
+
+
+def isQuestion(msg):
+	return ("?" in msg)
 
 
 def getReminderHandle(msg):

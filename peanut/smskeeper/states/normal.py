@@ -1,21 +1,12 @@
 import random
 import re
 import logging
-import datetime
-import pytz
-
-from django.conf import settings
 
 from smskeeper.models import Entry, Message
 
 from smskeeper import sms_util, msg_util
 from smskeeper import actions, keeper_constants
 from smskeeper import niceties
-from smskeeper import analytics
-
-from common import slack_logger
-
-from peanut.settings import constants
 
 logger = logging.getLogger(__name__)
 
@@ -163,36 +154,29 @@ def process(user, msg, requestDict, keeperNumber):
 		elif msg_util.isAddTextCommand(msg) or numMedia > 0:
 			logger.debug("For user %s I think '%s' is a add text command" % (user.id, msg))
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
-		else:  # catch all, it's a nicety or an error
+		elif niceties.getNicety(msg):
 			nicety = niceties.getNicety(msg)
-			if nicety:
-				logger.debug("For user %s I think '%s' is a nicety" % (user.id, msg))
-				actions.nicety(user, nicety, requestDict, keeperNumber)
-
+			logger.debug("For user %s I think '%s' is a nicety" % (user.id, msg))
+			actions.nicety(user, nicety, requestDict, keeperNumber)
+		else:  # catch all, we're not sure
+			if user.product_id == 1:
+				if msg_util.isDoneCommand(msg):
+					logger.debug("For user %s (product id 1) I think '%s' is a done command" % (user.id, msg))
+				elif msg_util.isQuestion(msg):
+					logger.debug("For user %s (product id 1) I think '%s' is a question" % (user.id, msg))
+					actions.unknown(user, msg, keeperNumber)
+				else:
+					logger.debug("For user %s (product id 1) I think '%s' is something else so doing remind state" % (user.id, msg))
+					user.setState(keeper_constants.STATE_REMIND)
+					user.save()
+					# Reprocess
+					return False
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
-				now = datetime.datetime.now(pytz.timezone("US/Eastern"))
-				if now.hour >= 9 and now.hour <= 22 and keeperNumber != constants.SMSKEEPER_TEST_NUM and not settings.DEBUG:
-					user.paused = True
-					user.save()
-					postMsg = "User %s paused after: '%s'   @derek @aseem @henry" % (user.id, msg)
-					slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
-					logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
-				else:
-					sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
-					user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
-					user.save()
-					logger.info("For user %s I couldn't figure out '%s'" % (user.id, msg))
-				analytics.logUserEvent(
-					user,
-					"Sent Unknown Command",
-					{
-						"Command": msg,
-						"Paused": user.isPaused(),
-					}
-				)
+				actions.unknown(user, msg, keeperNumber)
 
 		return True
 	except:
+		logger.warning("For user %s and msg '%s' got exception" % (user.id, msg))
 		sms_util.sendMsg(user, random.choice(keeper_constants.GENERIC_ERROR_MESSAGES), None, keeperNumber)
 		raise
