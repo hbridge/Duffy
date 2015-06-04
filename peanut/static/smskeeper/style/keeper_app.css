@@ -48,3 +48,11 @@ h2 {
 	border-bottom: 1px solid;
 	border-color: #E5E5E5;
 }
+
+.overdue {
+	color: red;
+}
+
+.upcoming {
+	color: #4CD964;
+}

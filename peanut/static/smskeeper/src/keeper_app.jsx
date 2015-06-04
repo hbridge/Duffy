@@ -5,6 +5,8 @@ var React = require('react')
 var $ = require('jquery');
 var MasonryMixin = require('react-masonry-mixin');
 var classNames = require('classnames');
+var Timestamp = require('react-time');
+var moment = require('moment');
 
 var masonryOptions = {
     transitionDuration: 0
@@ -14,13 +16,20 @@ var formatDate = function(d){
   return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();
 }
 
+MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
+
 var EntryRow = React.createClass({
   render: function() {
     var reminderTimeElement = null;
     if (this.props.fields.remind_timestamp) {
+      var reminderDate = new Date(this.props.fields.remind_timestamp);
+      var reminderClasses = classNames({
+        "overdue": moment(reminderDate).isBefore(moment()),
+        "upcoming": moment(reminderDate).isBetween(moment(), moment().add(1, 'days'))
+      });
       reminderTimeElement = (
         <div>
-          {this.props.fields.remind_timestamp}
+          <Timestamp value={reminderDate} format="MMM Do [at] LT" titleFormat="YYYY/MM/DD HH:mm" className={reminderClasses}/>
         </div>
       );
     }
@@ -41,6 +50,7 @@ var EntryRow = React.createClass({
 
   handleClick: function(e) {
     e.preventDefault();
+
   },
 
   handleTextChanged: function(e) {
