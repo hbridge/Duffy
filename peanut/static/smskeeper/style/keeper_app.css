@@ -75,3 +75,16 @@ h2 {
 	color: red;
 	margin: auto;
 }
+
+.headerBar {
+	color: #3131AC;
+	background-color: white;
+	padding: 20px;
+}
+
+.headerBar .greeting {
+	font-size: 20pt;
+}
+
+.headerBar .userStats {
+}

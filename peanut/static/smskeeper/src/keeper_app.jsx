@@ -1,6 +1,4 @@
 
-console.log("top")
-
 var React = require('react')
 var $ = require('jquery');
 var MasonryMixin = require('react-masonry-mixin');
@@ -67,7 +65,6 @@ var EntryRow = React.createClass({
 
   componentWillUpdate: function(nextProps, nextState) {
     if (!nextState.isSelected) {
-      console.log("deselecting children");
       this.refs.entryTextField.setState({expanded: false});
       if (this.refs.entryTimeField) {
         this.refs.entryTimeField.setState({expanded: false});
@@ -144,14 +141,11 @@ var EntryTimeField = React.createClass({
   // deal with time events
   handleClicked: function(e) {
     e.preventDefault();
-    console.log("time clicked");
     this.setState({expanded: true});
     this.props.handleClicked(this);
   },
 
   handleTimeEditCancelled: function(e) {
-    console.log("time edit cancelled");
-
     var destination = e.nativeEvent.relatedTarget;
     if (destination && destination.form == React.findDOMNode(this.refs.timeForm)) {
       // this isn't a cancel if the user is tapping another element in the form
@@ -243,6 +237,19 @@ var List = React.createClass({
   }
 });
 
+var HeaderBar = React.createClass({
+  render: function() {
+    return (
+      <div className="headerBar">
+        <span className="greeting">Hi {USER.name}.</span>
+        <div className="userStats">
+          Last week you rocked it.
+        </div>
+      </div>
+    );
+  }
+});
+
 var KeeperApp = React.createClass({
   mixins: [MasonryMixin('masonryContainer', masonryOptions)],
   getInitialState: function() {
@@ -305,7 +312,7 @@ var KeeperApp = React.createClass({
   },
 
 	render: function() {
-    var listNodes = []
+    var listNodes = [];
 
     // put reminders on top
     listNodes.push(
@@ -328,6 +335,7 @@ var KeeperApp = React.createClass({
 
     return (
       <div>
+        <HeaderBar />
         <div id="lists" className="grid" ref="masonryContainer">
            { listNodes }
         </div>
