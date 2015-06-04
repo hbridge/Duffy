@@ -32,7 +32,7 @@ h2 {
 
 .grid-item {
 	width: 300px;
-	max-width: calc(100vw - 92px);
+	max-width: calc(100vw - 40px);
 }
 .grid-item--width2 { width: 400px; }
 
