@@ -1,16 +1,9 @@
 
-/*
-Note this file is only used in its raw form if ?development=True is passed in
-It should be compiled to js by running from the outer directory
+console.log("top")
 
-from static/smskeeper:
-jsx --watch --extension jsx src/ build/
-or
-jsx --extension jsx src/ build/
-
-See: https://facebook.github.io/react/docs/tooling-integration.html for info on installing
-
-*/
+var React = require('react')
+var $ = require('jquery');
+var MasonryMixin = require('react-masonry-mixin');
 
 var masonryOptions = {
     transitionDuration: 0
@@ -19,7 +12,6 @@ var masonryOptions = {
 var formatDate = function(d){
   return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();
 }
-
 
 var EntryRow = React.createClass({
   render: function() {

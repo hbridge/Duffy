@@ -5,15 +5,8 @@
     <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/static/smskeeper/style/common.css" />
     <link rel="stylesheet" href="/static/smskeeper/style/{{ script_name }}.css" />
-    {% if development %}
-    <script src="https://fb.me/react-0.13.0.js"></script>
-    <script src="https://fb.me/JSXTransformer-0.13.0.js"></script>
-    {% else %}
-      <script src="https://fb.me/react-0.13.0.min.js"></script>
-    {% endif %}
 
     <!-- Class Names -->
-    <script type='text/javascript' src="/static/smskeeper/src/deps/{{ script_name }}_bundle.js"></script>
     <script src="/static/smskeeper/node_modules/classnames/index.js"></script>
     {% block extra_includes %}{% endblock %}
     <meta name=viewport content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
@@ -27,10 +20,6 @@
       {% endif %}
       console.log(USER);
 		</script>
-    {% if development %}
-      <script type='text/jsx' src="/static/smskeeper/src/{{ script_name }}.jsx"></script>
-    {% else %}
-      <script type='text/javascript' src="/static/smskeeper/build/{{ script_name }}.js"></script>
-    {% endif %}
+    <script type='text/javascript' src="/static/smskeeper/build/{{ script_name }}_bundle.js"></script>
   </body>
 </html>
