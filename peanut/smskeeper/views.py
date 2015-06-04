@@ -264,12 +264,23 @@ def getUserDataDict(user, phoneNumToContactDict):
 	else:
 		full_name = ''
 
+	newSignupData = dict()
+	if user.signup_data_json:
+		signupData = json.loads(user.signup_data_json)
+		
+		if 'source' in signupData and signupData['source'] != 'default':
+			newSignupData['source'] = signupData['source']
+		if 'referrer' in signupData and len(signupData['referrer']) > 0:
+			newSignupData['ref'] = signupData['referrer']
+		if 'paid' in signupData and len(signupData['paid']) > 0 and signupData['paid'] != '0':
+			newSignupData['paid'] = signupData['paid']
+
 	userData = {
 		"id": user.id,
 		"phone_number": user.phone_number,
 		"name": user.name,
 		"full_name": full_name,
-		"source": user.signup_data_json,
+		"source": json.dumps(newSignupData),
 		"activated": user.activated,
 		"paused": user.paused,
 		"created": user.added,
