@@ -30,7 +30,10 @@ h2 {
 	padding: 8px 12px;
 }
 
-.grid-item { width: 200px; }
+.grid-item {
+	width: 300px;
+	max-width: calc(100vw - 92px);
+}
 .grid-item--width2 { width: 400px; }
 
 .entriesList {
