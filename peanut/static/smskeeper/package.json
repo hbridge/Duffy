@@ -1,16 +1,15 @@
-
-
 {
   "name": "keeper_frontend",
   "version": "1.0.0",
   "description": "Keeper frontend website",
   "main": "index.js",
   "dependencies": {
-    "jquery-ui": "^1.10.5",
-    "jquery": "^2.1.4",
-    "react": "^0.13.3",
     "classnames": "^1.2.2",
-    "react-masonry-mixin": "^0.5.7"
+    "jquery": "^2.1.4",
+    "jquery-ui": "^1.10.5",
+    "react": "^0.13.3",
+    "react-masonry-mixin": "^0.5.7",
+    "timeago": "^0.2.0"
   },
   "devDependencies": {
     "browser-sync": "~2.2.2",
@@ -49,7 +48,9 @@
     "reactify": "^1.1.1"
   },
   "browserify": {
-    "transform": ["reactify"],
+    "transform": [
+      "reactify"
+    ],
     "reactify": "^1.1.1"
   },
   "scripts": {

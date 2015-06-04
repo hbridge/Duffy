@@ -1,6 +1,7 @@
 var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
+var timeago = require('timeago');
 
 var DailyTable = React.createClass({
   render: function() {
@@ -86,7 +87,7 @@ var HeaderRow = React.createClass({
 
 var UserRow = React.createClass({
   render: function() {
-    accountAge = jQuery.timeago(new Date(this.props.user.created));
+    accountAge = timeago(new Date(this.props.user.created));
     tutorial_text = this.props.user.completed_tutorial ? "√ " + this.props.user.source : this.props.user.source;
     if (this.props.user.paused)
       tutorial_text += " PAUSED"
@@ -94,12 +95,12 @@ var UserRow = React.createClass({
       tutorial_text += " STOPPED"
     activated_text = null;
     if (this.props.user.activated)
-      activated_text = jQuery.timeago(new Date(this.props.user.activated));
+      activated_text = timeago(new Date(this.props.user.activated));
     in_date = new Date(this.props.user.message_stats.incoming.last);
     out_date = new Date(this.props.user.message_stats.outgoing.last);
     //last = in_date > out_date ? in_date : out_date;
     last = in_date
-    timeago_text = jQuery.timeago(last);
+    timeago_text = timeago(last);
 
     var rowClasses = classNames({
       'oddrow' : this.props.highlighted == true,
