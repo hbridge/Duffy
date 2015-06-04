@@ -24,6 +24,9 @@ class NattyResult():
 		self.hadDate = hadDate
 		self.hadTime = hadTime
 
+	def __unicode__(self):
+		return "=%s '%s' '%s' %s %s=" % (self.utcTime, self.queryWithoutTiming, self.textUsed, self.hadDate, self.hadTime)
+
 
 # Helper method to get a startDate and a new filtered query from Natty.
 # This makes a url call to the Natty server that gets back the timestamp around a

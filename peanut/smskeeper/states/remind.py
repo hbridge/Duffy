@@ -146,7 +146,7 @@ def process(user, msg, requestDict, keeperNumber):
 		if not nattyResult.hadDate or not nattyResult.hadTime:
 			sendFollowup = True
 
-		entry = createReminderEntry(user, nattyResult.utcTime, msg, nattyResult.queryWithoutTiming, sendFollowup, keeperNumber)
+		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
 
 		# See if the entry didn't create. This means there's unresolved handes
 		if not entry:
@@ -176,7 +176,7 @@ def process(user, msg, requestDict, keeperNumber):
 		entry = Entry.objects.get(id=entryId)
 
 		if user.getStateData("fromUnresolvedHandles"):
-			logger.debug("Going to deal with unresolved handles for entry %s" % entry.id)
+			logger.debug("Going to deal with unresolved handles for entry %s and user %s" % (entry.id, user.id))
 
 			# Mark it that we're not coming back from unresolved handle
 			# So incase there's a followup we don't, re-enter this section
@@ -225,17 +225,19 @@ def dealWithSuspiciousHour(user, entry, keeperNumber):
 	return False
 
 
-def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, keeperNumber):
-	cleanedText = msg_util.cleanedReminder(queryWithoutTiming)  # no "Remind me"
+def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
+	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
-	entry.remind_timestamp = utcDate
+	entry.remind_timestamp = nattyResult.utcTime
 	entry.orig_text = json.dumps([msg])
 	entry.save()
 
+	logger.debug("Created entry %s for user %s and msg '%s' with timestamp %s from using nattyResult %s" % (entry.id, user.id, msg, nattyResult.utcTime, nattyResult))
+
 	# Don't do any of this logic in the tutorial state, shouldn't be correct
 	if not isTutorial(user):
-		handle = msg_util.getReminderHandle(queryWithoutTiming)  # Grab "me" or "mom"
+		handle = msg_util.getReminderHandle(nattyResult.queryWithoutTiming)  # Grab "me" or "mom"
 
 		if handle != "me":
 			# If we ever handle multiple handles... we need to create seperate entries to deal with snoozes
@@ -285,6 +287,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber):
 		newDate.replace(minute=nattyResult.utcTime.minute)
 		newDate.replace(second=nattyResult.utcTime.second)
 
+	logger.debug("Updating entry %s for user %s and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (entry.id, user.id, msg, newDate, nattyResult, entry.remind_timestamp))
 	entry.remind_timestamp = newDate
 	if entry.orig_text:
 		try:
