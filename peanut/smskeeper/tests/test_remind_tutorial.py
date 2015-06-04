@@ -47,6 +47,23 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 				# This is the key here, make sure we have the extra message
 				self.assertIn("If that time doesn't work", self.getOutput(mock))
 
+	def test_tutorial_remind_followup(self):
+		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show on Sunday")
+
+		with patch('smskeeper.async.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me at 4pm")
+
+			self.assertIn("Sun around 4pm", self.getOutput(mock))
+
+		# Make sure there's only 1 created
+		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
+
 	def test_tutorial_remind_time_zones(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 

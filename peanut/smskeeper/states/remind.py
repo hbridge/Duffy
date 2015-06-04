@@ -133,7 +133,7 @@ def process(user, msg, requestDict, keeperNumber):
 	nattyResult = dealWithDefaultTime(user, nattyResult)
 
 	# Create a new reminder
-	if not user.getStateData("entryId"):
+	if not user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
 		sendFollowup = False
 		if not nattyResult:
 			nattyResult = natty_util.NattyResult(getDefaultTime(user), msg, None, False, False)
@@ -159,18 +159,20 @@ def process(user, msg, requestDict, keeperNumber):
 			# Note, some behind the scene magic sets the state and state_data for us.  So this call
 			# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
 			user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
+			# We set this so it knows what entry was created
+			user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 			user.save()
 			return False
 
 		# Always save the entryId state since we always come back into this state.
 		# If they don't enter timing info then we kick out
-		user.setStateData("entryId", entry.id)
+		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 		user.save()
 	else:
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.
 		# If not, kick out to normal mode and re-process
-		entryId = int(user.getStateData("entryId"))
+		entryId = int(user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY))
 		entry = Entry.objects.get(id=entryId)
 
 		if user.getStateData("fromUnresolvedHandles"):
@@ -243,7 +245,7 @@ def createReminderEntry(user, utcDate, msg, queryWithoutTiming, sendFollowup, ke
 				logger.debug("Didn't find handle %s for user %s and msg %s on entry %s" % (handle, user.id, msg, entry.id))
 				# We couldn't find the handle so go into unresolved state
 				# Set data for ourselves for when we come back
-				user.setStateData("entryId", entry.id)
+				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 				user.setStateData("fromUnresolvedHandles", True)
 				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
 				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])

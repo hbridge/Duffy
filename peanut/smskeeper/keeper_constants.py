@@ -59,6 +59,8 @@ FROM_UNRESOLVED_HANDLES_DATA_KEY = "fromUnresolvedHandles"
 ENTRY_IDS_DATA_KEY = "entryIDs"
 IMPLICIT_LABEL_STATE_DATA_KEY = "implicitLabel"
 
+ENTRY_ID_DATA_KEY = "entryId"
+
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
 

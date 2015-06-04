@@ -328,12 +328,15 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "#remind poop")
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
+		origEntry = Entry.objects.get(label="#reminders")
 		with patch('smskeeper.async.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "sunday")
-			self.assertIn("Sun around 9am", self.getOutput(mock))
+			self.assertIn("Sun around", self.getOutput(mock))
 
-		# Make sure we didn't create a new entry
-		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
+		newEntry = Entry.objects.get(label="#reminders")  # Should crash if more than 1 created
+
+		# Make sure the times are the same
+		self.assertEqual(origEntry.remind_timestamp.hour, newEntry.remind_timestamp.hour)
 
 	"""
 	TO MAKE PASS:

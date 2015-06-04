@@ -89,6 +89,12 @@ def process(user, msg, requestDict, keeperNumber):
 		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
 		sms_util.sendMsg(user, "FYI, I can also help you with other things. Just txt me 'Tell me more'", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
+
+		entryId = user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)
+		user.setState(keeper_constants.STATE_REMIND)
+		# The remind state will pass this to us...so pass it back
+		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entryId)
+
 		analytics.logUserEvent(
 			user,
 			"Completed Tutorial",

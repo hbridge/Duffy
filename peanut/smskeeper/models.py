@@ -177,16 +177,11 @@ class User(models.Model):
 	def isTutorialComplete(self):
 		return self.completed_tutorial
 
-	def setTutorialComplete(self, completeDate=datetime.datetime.now(pytz.utc)):
+	def setTutorialComplete(self):
 		if self.state == keeper_constants.STATE_NOT_ACTIVATED or not self.activated:
 			raise NameError("Trying to set unactivated user to tutorial passed")
 
-		if completeDate is not None:
-			self.completed_tutorial = True
-			self.setState(keeper_constants.STATE_NORMAL)
-		else:
-			self.completed_tutorial = False
-			self.setState(keeper_constants.STATE_TUTORIAL_REMIND)
+		self.completed_tutorial = True
 		self.save()
 
 	def isPaused(self):
