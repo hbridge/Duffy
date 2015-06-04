@@ -1,3 +1,7 @@
+var React = require('react')
+var $ = require('jquery');
+var classNames = require('classnames');
+
 var DailyTable = React.createClass({
   render: function() {
     headerValues = ["days", "users (in/out)", "msgs (in/out)"];

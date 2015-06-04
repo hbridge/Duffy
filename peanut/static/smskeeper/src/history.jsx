@@ -1,7 +1,8 @@
 
 var React = require('react')
-$ = require('jquery');
-JQueryUI = require('jquery-ui')
+var $ = require('jquery');
+var JQueryUI = require('jquery-ui')
+var classNames = require('classnames');
 
 var formatDate = function(d){
   return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();

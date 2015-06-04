@@ -4,6 +4,7 @@ console.log("top")
 var React = require('react')
 var $ = require('jquery');
 var MasonryMixin = require('react-masonry-mixin');
+var classNames = require('classnames');
 
 var masonryOptions = {
     transitionDuration: 0
