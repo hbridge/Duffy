@@ -274,6 +274,8 @@ def getUserDataDict(user, phoneNumToContactDict):
 			newSignupData['ref'] = signupData['referrer']
 		if 'paid' in signupData and len(signupData['paid']) > 0 and signupData['paid'] != '0':
 			newSignupData['paid'] = signupData['paid']
+		if 'exp' in signupData and len(signupData['exp']) > 0:
+			newSignupData['exp'] = signupData['exp']
 
 	userData = {
 		"id": user.id,
@@ -369,6 +371,7 @@ def signup_from_website(request):
 		source = form.cleaned_data['source']
 		referrerCode = form.cleaned_data['referrer']
 		paid = form.cleaned_data['paid']
+		exp = form.cleaned_data['exp']
 
 		# clean phone number
 		region_code = 'US'
@@ -390,7 +393,7 @@ def signup_from_website(request):
 					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid}))
+				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}))
 				target_user.save()
 
 				user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
