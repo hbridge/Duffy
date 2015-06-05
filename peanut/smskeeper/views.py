@@ -406,7 +406,7 @@ def signup_from_website(request):
 					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				if 'todo' in exp:
+				if 'todo1' in exp:
 					productId=1
 				else:
 					productId=0

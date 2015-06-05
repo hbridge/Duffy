@@ -25,7 +25,7 @@ class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 
 
 	def test_signup_product_id_1(self):
-		request = self.createRequest('+16505759014', exp='todo')
+		request = self.createRequest('+16505759014', exp='todo1')
 		response = views.signup_from_website(request) #httpresponse
 		self.assertIn('{"result": true}', response.content)
 
