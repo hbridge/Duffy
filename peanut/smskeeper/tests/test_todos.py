@@ -6,7 +6,7 @@ from mock import patch
 from testfixtures import Replacer
 from testfixtures import test_datetime
 
-from smskeeper import cliMsg, keeper_constants
+from smskeeper import cliMsg, keeper_constants, async
 from smskeeper.models import Entry
 
 from common import natty_util
@@ -133,3 +133,49 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Are you my daddy?")
 			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+
+	# Make sure first reminder we send snooze tip, then second we don't
+	def test_done_hides(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.get(label="#reminders")
+
+		# Make sure the snooze tip came through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertIn("let me know when you're done", self.getOutput(mock))
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done!")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertTrue(entry.hidden)
+
+	# Make sure first reminder we send snooze tip, then second we don't
+	def test_create_new_after_reminder(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		firstEntry = Entry.objects.filter(label="#reminders").last()
+
+		# Make sure the snooze tip came through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processReminder(firstEntry)
+			self.assertIn("let me know when you're done", self.getOutput(mock))
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I need to go biking this weekend")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		secondEntry = Entry.objects.filter(label="#reminders").last()
+		self.assertNotEqual(firstEntry.id, secondEntry.id)

@@ -412,7 +412,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(13, entry.remind_timestamp.hour)  # Make sure its 9am EST
 	"""
 
-	def test_next_week_becomes_sunday(self):
+	def test_next_week_becomes_monday(self):
 		self.setupUser(True, True)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:

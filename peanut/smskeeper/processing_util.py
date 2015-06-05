@@ -4,7 +4,7 @@ import logging
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo
+from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo
 from smskeeper import msg_util
 
 from smskeeper.models import User, Message
@@ -70,6 +70,7 @@ stateCallbacks = {
 	keeper_constants.STATE_TUTORIAL_REMIND: tutorial_reminders,
 	keeper_constants.STATE_NORMAL: normal,
 	keeper_constants.STATE_REMIND: remind,
+	keeper_constants.STATE_REMINDER_SENT: reminder_sent,
 	keeper_constants.STATE_UNRESOLVED_HANDLES: unresolved_handles,
 	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
 	keeper_constants.STATE_IMPLICIT_LABEL: implicit_label,

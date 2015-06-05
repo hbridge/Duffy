@@ -35,7 +35,7 @@ def shouldRemindNow(entry):
 	now = datetime.datetime.now(pytz.utc)
 
 	# Don't remind if we sent one in the last few minutes
-	if entry.remind_last_notified and entry.remind_last_notified > now - datetime.timedelta(minutes=2):
+	if entry.remind_last_notified and entry.remind_last_notified > now - datetime.timedelta(minutes=5):
 		return False
 
 	# Don't remind if its too far in the past
@@ -71,23 +71,58 @@ def processReminder(entry):
 			sms_util.sendMsg(user, msg, None, entry.keeper_number)
 			entry.remind_last_notified = datetime.datetime.now(pytz.utc)
 
+			# Only do fancy things like snooze if they've actually gone through the tutorial
 			if user.completed_tutorial:
-				# Only do fancy things like snooze if they've actually gone through the tutorial
-				if tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
-					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
-					# sms_util for sending list of msgs
-					if keeper_constants.isRealKeeperNumber(entry.keeper_number):
-						time.sleep(2)
+				if user.product_id == 1:
+					# Hack for now until we figure out better tips for
+					if tips.DONE_TIP1_ID not in tips.getSentTipIds(user):
+						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+						# sms_util for sending list of msgs
+						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+							time.sleep(2)
 
-					tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
-					sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
-					tips.markTipSent(user, tip, isMini=True)
+						tip = tips.tipWithId(tips.DONE_TIP1_ID)
+						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+						tips.markTipSent(user, tip, isMini=True)
+					elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user):
+						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+						# sms_util for sending list of msgs
+						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+							time.sleep(2)
 
-				# Now set to remind, incase they send back some snooze messaging
-				user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
-				user.setStateData("entryId", entry.id)
-				user.setStateData("reminderSent", True)
-				user.save()
+						tip = tips.tipWithId(tips.DONE_TIP2_ID)
+						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+						tips.markTipSent(user, tip, isMini=True)
+					elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user):
+						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+						# sms_util for sending list of msgs
+						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+							time.sleep(2)
+
+						tip = tips.tipWithId(tips.DONE_TIP3_ID)
+						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+						tips.markTipSent(user, tip, isMini=True)
+
+					# Now set to reminder sent, incase they send back done message
+					user.setState(keeper_constants.STATE_REMINDER_SENT, saveCurrent=True)
+					user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+					user.save()
+				else:
+					if tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
+						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+						# sms_util for sending list of msgs
+						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+							time.sleep(2)
+
+						tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
+						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+						tips.markTipSent(user, tip, isMini=True)
+
+					# Now set to reminder sent, incase they send back snooze
+					user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
+					user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+					user.setStateData("reminderSent", True)
+					user.save()
 
 	# For product id 0, hide after a reminder has occured
 	if entry.creator.product_id == 0:

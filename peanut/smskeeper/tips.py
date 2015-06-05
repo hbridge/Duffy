@@ -35,6 +35,11 @@ VCARD_TIP_ID = "vcard"
 
 SNOOZE_TIP_ID = "mini-snooze"
 
+# Hack(Derek), doesn't really need 3 different ones, just easier than counting in user settings
+DONE_TIP1_ID = "mini-done1"
+DONE_TIP2_ID = "mini-done2"
+DONE_TIP3_ID = "mini-done3"
+
 
 SMSKEEPER_TIPS = [
 	KeeperTip(
@@ -65,6 +70,21 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		SNOOZE_TIP_ID,
 		"btw, you can always snooze a reminder by saying 'snooze 5 mins' or 'snooze 9pm'",
+		False
+	),
+	KeeperTip(
+		DONE_TIP1_ID,
+		"btw, let me know when you're done",
+		False
+	),
+	KeeperTip(
+		DONE_TIP2_ID,
+		"btw, let me know when you're done",
+		False
+	),
+	KeeperTip(
+		DONE_TIP3_ID,
+		"btw, let me know when you're done",
 		False
 	),
 ]
