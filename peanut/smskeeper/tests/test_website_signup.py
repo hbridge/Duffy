@@ -22,6 +22,7 @@ class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(1, len(users))
 
 		self.assertEquals(users[0].product_id, keeper_constants.REMINDER_PRODUCT_ID)
+		self.assertEquals(users[0].state, keeper_constants.STATE_TUTORIAL_REMIND)
 
 
 	def test_signup_product_id_1(self):
@@ -33,6 +34,7 @@ class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 		users = User.objects.all()
 		self.assertEquals(1, len(users))
 		self.assertEquals(users[0].product_id, keeper_constants.TODO_PRODUCT_ID)
+		self.assertEquals(users[0].state, keeper_constants.STATE_TUTORIAL_TODO)
 
 
 	def createRequest(self, phoneNumber, source='default', exp='',paid='0'):

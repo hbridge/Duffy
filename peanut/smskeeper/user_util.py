@@ -18,6 +18,9 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	if not tutorialState:
 		tutorialState = keeper_constants.STATE_TUTORIAL_REMIND
 
+	if userToActivate.product_id == keeper_constants.TODO_PRODUCT_ID
+		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
+
 	userToActivate.setActivated(True, tutorialState=tutorialState)
 
 	if not userToActivate.invite_code:
