@@ -3,7 +3,6 @@
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "cd Duffy/peanut; git fetch; git rebase origin/master"
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo apachectl -k restart"
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "cd /home/ubuntu/Duffy/peanut && DJANGO_SETTINGS_MODULE=peanut.settings.prod /home/ubuntu/env/bin/python manage.py syncdb"
-ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "cd /home/ubuntu/Duffy/peanut && DJANGO_SETTINGS_MODULE=peanut.settings.prod /home/ubuntu/env/bin/python manage.py test"
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "cd /home/ubuntu/Duffy/peanut/static/smskeeper && npm install && node_modules/.bin/gulp"
 
 
