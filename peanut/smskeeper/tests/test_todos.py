@@ -192,7 +192,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "done with email")
 			self.assertIn("Nice!", self.getOutput(mock))
-			self.assertIn("done with email", self.getOutput(mock))
+			self.assertIn("send email to alex", self.getOutput(mock))
 
 		entry = Entry.objects.get(text="send email to alex")
 		self.assertTrue(entry.hidden)
