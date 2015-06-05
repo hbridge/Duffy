@@ -61,7 +61,7 @@ h2 {
 	color: #4CD964;
 }
 
-.clearButton {
+.deleteButton {
 	float: right;
 	position: relative;
 	left: 30px;
@@ -71,7 +71,7 @@ h2 {
 	text-align: center;
 }
 
-.clearButton a {
+.deleteButton a {
 	color: red;
 	margin: auto;
 }

@@ -17,6 +17,7 @@ var formatDate = function(d){
 MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
 SelectedEntryRow = null;
+SubmitCommandToServer = null;
 
 var EntryRow = React.createClass({
   getInitialState: function() {
@@ -24,11 +25,11 @@ var EntryRow = React.createClass({
   },
 
   render: function() {
-    // create the clear X button if we're selected
+    // create the delete X button if we're selected
     var deleteElement = null;
     if (this.state.isSelected) {
-      deleteElement = <div className="clearButton">
-        <a ref="clearButton" onClick={this.handleClear} href="#" > X </a>
+      deleteElement = <div className="deleteButton">
+        <a ref="deleteButton" onClick={this.handleDelete} href="#" > X </a>
       </div>;
     }
 
@@ -49,9 +50,9 @@ var EntryRow = React.createClass({
     );
   },
 
-  handleClear: function(e) {
+  handleDelete: function(e) {
     e.preventDefault();
-    alert('mock clear');
+    alert('mock delete');
   },
 
   handleChildClicked: function(child) {
@@ -95,7 +96,7 @@ var EntryTextField = React.createClass({
 
   handleTextFinishedEditing: function(e) {
     var destination = e.nativeEvent.relatedTarget;
-    if (destination && destination == React.findDOMNode(this.refs.clearButton)) {
+    if (destination && destination == React.findDOMNode(this.refs.deleteButton)) {
       // this isn't a cancel if the user is tapping another element in the form
       return;
     }
@@ -301,7 +302,23 @@ var KeeperApp = React.createClass({
     });
   },
 
+  submitCommandToServer: function(msg) {
+    $.ajax({
+      url: "/smskeeper/send_sms",
+      dataType: 'json',
+      type: 'POST',
+      data: {msg: msg, user_id: USER.id, direction: "ToKeeper", silent: true, response_data: "entries"},
+      success: function(entryData) {
+        this.processDataFromServer(entryData);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("send_sms", status, err.toString());
+      }.bind(this)
+    });
+  },
+
   componentDidMount: function() {
+    SubmitCommandToServer = this.submitCommandToServer;
     this.loadDataFromServer();
     var loadFunc = this.loadDataFromServer;
     if (window['DEVELOPMENT'] == undefined) {
