@@ -402,9 +402,47 @@ def nicety(user, nicety, requestDict, keeperNumber):
 	)
 
 
-def done(user, msg, possibleEntry, requestDict, keeperNumber):
-	# figure out entry
-	pass
+def getBestMatch(user, msg):
+	entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
+
+	entries = sorted(entries, key=lambda x: x.added)
+
+	bestMatch = None
+	bestNumWords = 0
+	bestNumChar = 0
+
+	for entry in entries:
+		numWords = 0
+		numChar = 0
+		for entryWord in entry.text.split(" "):
+			for msgWord in msg.split(" "):
+				if msgWord.lower() == entryWord.lower():
+					numWords += 1
+					numChar += len(msgWord)
+		if numWords > bestNumWords:
+			bestMatch = entry
+			bestNumWords = numWords
+			bestNumChar = numChar
+		elif numWords == bestNumWords and numChar > bestNumChar:
+			bestMatch = entry
+			bestNumWords = numWords
+			bestNumChar = numChar
+
+	return bestMatch
+
+
+def done(user, msg, keeperNumber):
+	bestMatch = getBestMatch(user, msg)
+
+	if bestMatch:
+		bestMatch.hidden = True
+		bestMatch.save()
+
+		msgBack = "Nice!"
+		sms_util.sendMsg(user, msgBack, None, keeperNumber)
+	else:
+		msgBack = "Sorry, I'm not sure which entry you mean"
+		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 
 
 def unknown(user, msg, keeperNumber):

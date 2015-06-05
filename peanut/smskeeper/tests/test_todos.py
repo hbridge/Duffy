@@ -179,3 +179,20 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make it process the record, like the reminder fired
 		secondEntry = Entry.objects.filter(label="#reminders").last()
 		self.assertNotEqual(firstEntry.id, secondEntry.id)
+
+	# Make sure first reminder we send snooze tip, then second we don't
+	def test_done_fuzzy_one_word_match(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "buy that thing I need")
+		cliMsg.msg(self.testPhoneNumber, "send email to alex")
+		cliMsg.msg(self.testPhoneNumber, "poop in the woods")
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "done with email")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		entry = Entry.objects.get(text="send email to alex")
+		self.assertTrue(entry.hidden)
+

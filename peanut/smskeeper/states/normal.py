@@ -152,6 +152,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if user.product_id == 1:
 				if msg_util.isDoneCommand(msg):
 					logger.debug("For user %s (product id 1) I think '%s' is a done command" % (user.id, msg))
+					actions.done(user, msg, keeperNumber)
 				elif msg_util.isQuestion(msg):
 					logger.debug("For user %s (product id 1) I think '%s' is a question" % (user.id, msg))
 					actions.unknown(user, msg, keeperNumber)
