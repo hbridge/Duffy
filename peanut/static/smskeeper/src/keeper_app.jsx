@@ -21,6 +21,14 @@ SelectedEntryRow = null;
 SubmitCommandToServer = null;
 
 
+var oldSync = Backbone.sync;
+Backbone.sync = function(method, model, options){
+    options.beforeSend = function(xhr){
+        xhr.setRequestHeader('X-CSRFToken', $('meta[name="csrf-token"]').attr('content'));
+    };
+    return oldSync(method, model, options);
+};
+
 var Entry = Backbone.Model.extend({
   defaults: function() {
       return {
@@ -42,6 +50,8 @@ var EntryList = Backbone.Collection.extend({
   lists: function() {
     var entriesByList = [];
     for (entry of this.models) {
+      var hidden = entry.get('hidden');
+      if (hidden) continue;
       var labelName = entry.get('label').replace("#", "")
 
       var entriesForLabel = []
@@ -103,7 +113,9 @@ var EntryRow = React.createClass({
 
   handleDelete: function(e) {
     e.preventDefault();
-    alert('mock delete');
+    var result = this.getModel().save({hidden: true});
+    console.log("delete result:");
+    console.log(result);
   },
 
   handleChildClicked: function(child) {

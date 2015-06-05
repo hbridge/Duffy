@@ -32,6 +32,8 @@ from smskeeper import analytics
 
 from smskeeper.serializers import EntrySerializer
 from rest_framework import generics
+from rest_framework import permissions
+from rest_framework import authentication
 
 logger = logging.getLogger(__name__)
 
@@ -182,6 +184,8 @@ class EntryList(generics.ListCreateAPIView):
 
 
 class EntryDetail(generics.RetrieveUpdateAPIView):
+	authentication_classes = (authentication.BasicAuthentication,)
+	permission_classes = (permissions.AllowAny,)
 	queryset = Entry.objects.all()
 	serializer_class = EntrySerializer
 
