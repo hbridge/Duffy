@@ -406,7 +406,11 @@ def signup_from_website(request):
 					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
 
 			except User.DoesNotExist:
-				target_user = User.objects.create(phone_number=phoneNum, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}))
+				if 'todo' in exp:
+					productId=1
+				else:
+					productId=0
+				target_user = User.objects.create(phone_number=phoneNum, product_id=productId, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}))
 				target_user.save()
 
 				user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)

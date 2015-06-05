@@ -159,6 +159,8 @@ SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them 
 SMSKEEPER_TEST_NUM = "test"
 SMSKEEPER_CLI_NUM = "cli"
 
+REMINDER_PRODUCT_ID = 0
+TODO_PRODUCT_ID = 1
 
 def isRealKeeperNumber(keeperNumber):
 	return keeperNumber != SMSKEEPER_CLI_NUM and keeperNumber != SMSKEEPER_TEST_NUM
