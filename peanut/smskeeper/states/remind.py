@@ -22,11 +22,9 @@ logger = logging.getLogger(__name__)
 FROM_TUTORIAL_KEY = "fromtutorial"
 
 
-# Returns True if the time exists and isn't within 10 seconds of now.
-# We check for the 10 seconds to deal with natty phrases that don't really tell us a time (like "today")
-def validTime(utcTime):
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	return not (utcTime is None or abs((now - utcTime).total_seconds()) < 10)
+# Returns True if the the user entered any type of timing information
+def validTime(nattyResult):
+	return nattyResult.hadDate or nattyResult.hadTime
 
 
 # Returns True if this message has a valid time and it doesn't look like another remind command
@@ -35,7 +33,7 @@ def validTime(utcTime):
 # If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
 # Otherwise False
 def isFollowup(nattyResult, reminderSent):
-	if validTime(nattyResult.utcTime):
+	if validTime(nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 		if reminderSent and msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
 			query = nattyResult.queryWithoutTiming.lower()
@@ -66,14 +64,27 @@ def dealWithTutorialEdgecases(user, msg, keeperNumber):
 	return False
 
 
-# If we got back a "natty default" time, which is the same time as now but a few days in the future
-# default it to 9 am the local time
-# Pass in utcTime here since its in UTC, same as our server
+# If we got a natty result with no time, then we need to pick one.
+# If there was no date, pick the default time (could be 9am tmr or later today)
+# If there a date, then see if its today.  If so, pick best default time for today.
+# If not today, then pick that day and set to the default time (9am)
 def dealWithDefaultTime(user, nattyResult):
-	if nattyResult.utcTime and not nattyResult.hadTime:
+	if nattyResult.hadTime:
+		return nattyResult
+
+	# If there was no time whatsoever, plug in the default time
+	if not nattyResult.hadDate:
+		nattyResult.utcTime = getDefaultTime(user)
+	else:
+		tzAwareNow = datetime.datetime.now(user.getTimezone())
 		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
-		tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
-		nattyResult.utcTime = tzAwareDate.astimezone(pytz.utc)
+
+		# If the user says 'today', then this should match up.
+		if tzAwareDate.day == tzAwareNow.day:
+			nattyResult.utcTime = getDefaultTime(user, isToday=True)
+		else:
+			tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
+			nattyResult.utcTime = tzAwareDate.astimezone(pytz.utc)
 
 	return nattyResult
 
@@ -129,28 +140,22 @@ def process(user, msg, requestDict, keeperNumber):
 	if not nattyResult:
 		nattyResult = natty_util.NattyResult(None, msg, None, False, False)
 
-	# Change time to 9am if he user wasn't specific
-	nattyResult = dealWithDefaultTime(user, nattyResult)
+	# Deal with situation where a time wasn't specified
+	if not nattyResult.hadTime:
+		nattyResult = dealWithDefaultTime(user, nattyResult)
 
 	# Create a new reminder
-	if not user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
+	if not user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY) or user.product_id == 1:
 		sendFollowup = False
-		if not nattyResult:
-			nattyResult = natty_util.NattyResult(getDefaultTime(user), msg, None, False, False)
-			sendFollowup = True
 
-		if not validTime(nattyResult.utcTime):
-			nattyResult.utcTime = getDefaultTime(user)
-			sendFollowup = True
-
-		if not nattyResult.hadDate or not nattyResult.hadTime:
+		if not validTime(nattyResult):
 			sendFollowup = True
 
 		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
 
 		# See if the entry didn't create. This means there's unresolved handes
 		if not entry:
-			return False
+			return False  # Send back for reprocessing by unknown handles state
 
 		sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
@@ -168,6 +173,10 @@ def process(user, msg, requestDict, keeperNumber):
 		# If they don't enter timing info then we kick out
 		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 		user.save()
+
+		if user.product_id == 1:
+			user.setState(keeper_constants.STATE_NORMAL)
+			user.save()
 	else:
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.
@@ -318,7 +327,11 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber):
 def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
 
-	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), tzAwareDate)
+	# Include time if old product or if its not a default time
+	includeTime = (user.product_id == 0 or (user.product_id == 1 and not (tzAwareDate.hour == 9 and tzAwareDate.minute == 0)))
+
+	# Get the text liked "tomorrow" or "Sat at 5pm"
+	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), tzAwareDate, includeTime=includeTime)
 
 	# If this is a shared reminder then look up the handle to send things out with
 	if user == entry.creator and len(entry.users.all()) > 1:
@@ -346,19 +359,22 @@ def isReminderHourSuspicious(hourForUser):
 	return hourForUser >= 0 and hourForUser <= 6
 
 
-def getDefaultTime(user):
-	tz = user.getTimezone()
-	userNow = datetime.datetime.now(tz)
+def getDefaultTime(user, isToday=False):
+	userNow = datetime.datetime.now(user.getTimezone())
 
-	# If before 2 pm, remind at 6 pm
-	if userNow.hour < 14:
-		replaceTime = userNow.replace(hour=18, minute=0, second=0)
-	# If between 2 pm and 5 pm, remind at 9 pm
-	elif userNow.hour >= 14 and userNow.hour < 17:
-		replaceTime = userNow.replace(hour=21, minute=0, second=0)
+	if user.product_id == 0 or (user.product_id == 1 and isToday):
+		# If before 2 pm, remind at 6 pm
+		if userNow.hour < 14:
+			replaceTime = userNow.replace(hour=18, minute=0, second=0)
+		# If between 2 pm and 5 pm, remind at 9 pm
+		elif userNow.hour >= 14 and userNow.hour < 17:
+			replaceTime = userNow.replace(hour=21, minute=0, second=0)
+		else:
+			# If after 5 pm, remind 9 am next day
+			replaceTime = userNow + datetime.timedelta(days=1)
+			replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
 	else:
-		# If after 5 pm, remind 9 am next day
+		# Remind 9 am next day
 		replaceTime = userNow + datetime.timedelta(days=1)
 		replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
-
 	return replaceTime

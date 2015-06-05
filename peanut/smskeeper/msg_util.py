@@ -397,7 +397,7 @@ def getNaturalTime(time):
 # tomorrow at 4:15pm
 # next Wed at 3pm
 # This would be great to find a library to do
-def naturalize(now, futureTime):
+def naturalize(now, futureTime, includeTime=True):
 	delta = futureTime - now
 	deltaHours = delta.seconds / 3600
 
@@ -406,14 +406,21 @@ def naturalize(now, futureTime):
 
 	# If the same day, then say "today at 5pm"
 	if deltaHours < 24 and futureTime.day == now.day:
-		return "later today around %s" % time
+		result = "later today"
+		if includeTime:
+			result += " around %s" % time
 	# Tomorrow
 	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
-		return "tomorrow around %s" % time
+		result = "tomorrow"
+		if includeTime:
+			result += " around %s" % time
 	elif delta.days < 6:
-		return "%s around %s" % (dayOfWeek, time)
-
-	return "%s the %s" % (dayOfWeek, humanize.ordinal(futureTime.day))
+		result = "%s" % (dayOfWeek)
+		if includeTime:
+			result += " around %s" % time
+	else:
+		result = "%s the %s" % (dayOfWeek, humanize.ordinal(futureTime.day))
+	return result
 
 
 # right now, just emojizes, could do more in the future, i.e. replace username etc

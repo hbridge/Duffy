@@ -16,6 +16,7 @@ class NattyResult():
 	textUsed = None
 	hadDate = None
 	hadTime = None
+	isToday = None
 
 	def __init__(self, utcTime, queryWithoutTiming, textUsed, hadDate, hadTime):
 		self.utcTime = utcTime
@@ -59,7 +60,7 @@ def getNattyInfo(query, timezone):
 
 
 # Looks to see if the given time is the same hour and minute as now. Natty returns this if it doesn't
-# know what else to do
+# know what else to do, like for queries of "today"
 def isNattyDefaultTime(utcTime):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	return utcTime.hour == now.hour and utcTime.minute == now.minute

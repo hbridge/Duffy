@@ -169,8 +169,7 @@ def process(user, msg, requestDict, keeperNumber):
 					logger.debug("For user %s (product id 1) I think '%s' is something else so doing remind state" % (user.id, msg))
 					user.setState(keeper_constants.STATE_REMIND)
 					user.save()
-					# Reprocess
-					return False
+					return False  # Reprocess
 			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
 			else:
 				actions.unknown(user, msg, keeperNumber)
