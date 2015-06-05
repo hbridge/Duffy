@@ -314,6 +314,11 @@ class BASE_CELERY_CONFIG:
             'task': 'smskeeper.async.processAllReminders',
             "schedule": datetime.timedelta(seconds=30),
             'args': None,
+        },
+        'smskeeper-todo-digest': {
+            'task': 'smskeeper.async.processDailyDigest',
+            "schedule": datetime.timedelta(hours=1),
+            'args': None,
         }
     }
 

@@ -438,7 +438,7 @@ def done(user, msg, keeperNumber):
 		bestMatch.hidden = True
 		bestMatch.save()
 
-		msgBack = "Nice!"
+		msgBack = "Nice!  I checked this off your list: %s" % bestMatch.text
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 	else:
 		msgBack = "Sorry, I'm not sure which entry you mean"
