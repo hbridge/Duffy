@@ -1,10 +1,11 @@
-
-var React = require('react')
+var React = require('react');
 var $ = require('jquery');
 var MasonryMixin = require('react-masonry-mixin');
 var classNames = require('classnames');
 var Timestamp = require('react-time');
 var moment = require('moment');
+var Backbone = require('backbone');
+var BackboneReactComponent = require('backbone-react-component');
 
 var masonryOptions = {
     transitionDuration: 0
@@ -19,13 +20,63 @@ MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 SelectedEntryRow = null;
 SubmitCommandToServer = null;
 
+
+var Entry = Backbone.Model.extend({
+  defaults: function() {
+      return {
+        hidden: false,
+        creator: USER.id,
+        users: [USER.id]
+      };
+    },
+
+    urlRoot: function() {
+      return "/smskeeper/entry";
+    },
+});
+
+
+var EntryList = Backbone.Collection.extend({
+  model: Entry,
+  url: "/smskeeper/entry_feed?user_id=" + USER.id,
+  lists: function() {
+    var entriesByList = [];
+    for (entry of this.models) {
+      var labelName = entry.get('label').replace("#", "")
+
+      var entriesForLabel = []
+      if (labelName in entriesByList) {
+        entriesForLabel = entriesByList[labelName];
+      }
+      entriesForLabel.push(entry);
+
+      entriesByList[labelName] = entriesForLabel;
+    }
+
+    // pull out reminders
+    if (entriesByList["reminders"]) {
+      delete entriesByList["reminders"]
+    }
+    return entriesByList;
+  },
+  reminders: function() {
+    return(this.where({label: "#reminders"}));
+  }
+});
+
 var EntryRow = React.createClass({
+  mixins: [BackboneReactComponent],
+
   getInitialState: function() {
     return {isSelected: false};
   },
 
   render: function() {
     // create the delete X button if we're selected
+    var text = this.state.model.text;
+    if (!text) text = "";
+    var remindDateText = this.state.model.remind_timestamp;
+
     var deleteElement = null;
     if (this.state.isSelected) {
       deleteElement = <div className="deleteButton">
@@ -35,8 +86,8 @@ var EntryRow = React.createClass({
 
     // create the reminder element if this is a reminder
     var entryTimeField = null;
-    if (this.props.fields.remind_timestamp) {
-      entryTimeField = <EntryTimeField date={new Date(this.props.fields.remind_timestamp)}
+    if (remindDateText) {
+      entryTimeField = <EntryTimeField date={new Date(remindDateText)}
       handleClicked={this.handleChildClicked}
       ref="entryTimeField"/>
     }
@@ -44,7 +95,7 @@ var EntryRow = React.createClass({
     return (
       <div className="entry container">
         {deleteElement}
-        <EntryTextField text={this.props.fields.text} handleClicked={this.handleChildClicked} ref="entryTextField" />
+        <EntryTextField text={text} handleClicked={this.handleChildClicked} ref="entryTextField" />
         {entryTimeField}
       </div>
     );
@@ -213,9 +264,9 @@ var CreateEntryFooter = React.createClass({
 var List = React.createClass({
   render: function() {
     var createEntry = function(entry, index) {
-      return <EntryRow fields={ entry.fields }
-        key= { entry.pk }
-        />
+      return (
+        <EntryRow model={ entry } key={ entry.get('id') } />
+      );
     }.bind(this);
 
     var listClasses = classNames({
@@ -252,54 +303,12 @@ var HeaderBar = React.createClass({
 });
 
 var KeeperApp = React.createClass({
-  mixins: [MasonryMixin('masonryContainer', masonryOptions)],
+  mixins: [
+    MasonryMixin('masonryContainer', masonryOptions),
+    BackboneReactComponent,
+  ],
   getInitialState: function() {
-    return {entries: [], lists: [], reminders: [] };
-  },
-
-  processDataFromServer: function(data) {
-    console.log("Got data from the server:");
-    console.log(data);
-    var entriesByList = [];
-    for (entry of data) {
-      var labelName = entry.fields.label.replace("#", "")
-
-      var entriesForLabel = []
-      if ("fields" in entry) {
-        if (labelName in entriesByList) {
-          entriesForLabel = entriesByList[labelName];
-        }
-        entriesForLabel.push(entry);
-      } else {
-        console.error("fields not in obj");
-        console.error(entry);
-      }
-
-      entriesByList[labelName] = entriesForLabel;
-    }
-    console.log(entriesByList)
-
-    // pull out reminders
-    var reminderEntries = [];
-    if (entriesByList["reminders"]) {
-      reminderEntries = entriesByList["reminders"]
-      delete entriesByList["reminders"]
-    }
-    this.setState({entries : data, lists: entriesByList, reminders: reminderEntries});
-  },
-
-  loadDataFromServer: function() {
-    $.ajax({
-      url: "/smskeeper/entry_feed?user_id=" + USER.id,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.processDataFromServer(data);
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error("lists_feed", status, err.toString());
-      }.bind(this)
-    });
+    return { lists: [], reminders: [] };
   },
 
   submitCommandToServer: function(msg) {
@@ -319,7 +328,6 @@ var KeeperApp = React.createClass({
 
   componentDidMount: function() {
     SubmitCommandToServer = this.submitCommandToServer;
-    this.loadDataFromServer();
     var loadFunc = this.loadDataFromServer;
     if (window['DEVELOPMENT'] == undefined) {
       setInterval(function () {loadFunc()}, 2000);
@@ -332,21 +340,21 @@ var KeeperApp = React.createClass({
     var listNodes = [];
 
     // put reminders on top
-    listNodes.push(
-      <List label="Reminders"
-        entries={ this.state.reminders }
-        key= { "reminders" }
-        isReminders= { true }
-      />
-    );
+    if (this.props.reminders) {
+      listNodes.push(
+        <List label="Reminders"
+          entries={ this.props.reminders }
+          key= { "reminders" }
+          isReminders= { true }/>
+      );
+    }
 
     // then add the rest of the lists
-    for (key in this.state.lists) {
+    for (key in this.props.lists) {
       listNodes.push(
         <List label={ key }
-          entries={ this.state.lists[key] }
-          key= { key }
-        />
+          entries={ this.props.lists[key] }
+          key= { key }/>
       );
     }
 
@@ -360,9 +368,16 @@ var KeeperApp = React.createClass({
     );
   },
 
+  componentWillUpdate: function(nextProps, nextState) {
+    this.props.reminders = nextProps.collection.reminders();
+    this.props.lists = nextProps.collection.lists();
+  },
+
   componentDidUpdate: function() {
 
   },
 });
 
-React.render(<KeeperApp />, document.getElementById("keeper_app"));
+var entryCollection = new EntryList();
+entryCollection.fetch();
+React.render(<KeeperApp collection={entryCollection} />, document.getElementById("keeper_app"));

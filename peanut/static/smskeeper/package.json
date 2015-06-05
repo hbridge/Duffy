@@ -4,6 +4,8 @@
   "description": "Keeper frontend website",
   "main": "index.js",
   "dependencies": {
+    "backbone": "^1.2.1",
+    "backbone-react-component": "^0.8.1",
     "classnames": "^1.2.2",
     "jquery": "^2.1.4",
     "jquery-ui": "^1.10.5",

@@ -30,6 +30,9 @@ from smskeeper.models import User, Entry, Message
 from smskeeper.states import not_activated
 from smskeeper import analytics
 
+from smskeeper.serializers import EntrySerializer
+from rest_framework import generics
+
 logger = logging.getLogger(__name__)
 
 
@@ -167,10 +170,20 @@ def entry_feed(request):
 		user = form.cleaned_data['user']
 
 		entries = Entry.fetchEntries(user, hidden=None, orderByString="-updated")
-		data = serializers.serialize("json", entries)
-		return HttpResponse(data, content_type="text/json", status=200)
+		serializer = EntrySerializer(entries, many=True)
+		return HttpResponse(json.dumps(serializer.data), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+class EntryList(generics.ListCreateAPIView):
+	queryset = Entry.objects.all()
+	serializer_class = EntrySerializer
+
+
+class EntryDetail(generics.RetrieveUpdateAPIView):
+	queryset = Entry.objects.all()
+	serializer_class = EntrySerializer
 
 #
 # Send a sms message to a user from a certain number
@@ -267,7 +280,7 @@ def getUserDataDict(user, phoneNumToContactDict):
 	newSignupData = dict()
 	if user.signup_data_json:
 		signupData = json.loads(user.signup_data_json)
-		
+
 		if 'source' in signupData and signupData['source'] != 'default':
 			newSignupData['source'] = signupData['source']
 		if 'referrer' in signupData and len(signupData['referrer']) > 0:

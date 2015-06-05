@@ -1,5 +1,6 @@
 """Main project URL definitions."""
 from django.conf.urls import patterns, url
+from smskeeper import views
 
 urlpatterns = patterns(
 	'',
@@ -14,5 +15,7 @@ urlpatterns = patterns(
 	url(r'^dashboard_feed', 'smskeeper.views.dashboard_feed'),
 	url(r'^dashboard', 'smskeeper.views.dashboard'),
 	url(r'^resend_msg', 'smskeeper.views.resend_msg'),
-	url(r'^signup_from_website', 'smskeeper.views.signup_from_website')
+	url(r'^signup_from_website', 'smskeeper.views.signup_from_website'),
+	url(r'^entry/$', views.EntryList.as_view()),
+	url(r'^entry/(?P<pk>[0-9]+)/$', views.EntryDetail.as_view()),
 )
