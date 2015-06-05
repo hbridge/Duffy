@@ -74,7 +74,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			user.timezone = timezone
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Schedule doctor's apptmt next week'."], keeperNumber )
+		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Schedule doctor's apptmt for next week'."], keeperNumber )
 
 		user.setStateData("step", 2)
 		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
@@ -88,7 +88,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
 
 	elif step == 3:
-		sms_util.sendMsgs(user, [u"Great. I'll send you what you need to do at the best time. You can send me more things at any time."], keeperNumber)
+		sms_util.sendMsgs(user, [u"Great. I'm tracking these things for you. I'll remind you on the right day."], keeperNumber)
 
 		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
 		sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
