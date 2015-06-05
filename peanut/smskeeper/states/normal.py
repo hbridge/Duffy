@@ -145,19 +145,9 @@ def process(user, msg, requestDict, keeperNumber):
 				keeper_constants.STATE_IMPLICIT_LABEL,
 				stateData={keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY: label}
 			)
-		elif msg_util.nameInSetName(msg):
-			logger.debug("For user %s I think '%s' is a set name command" % (user.id, msg))
-			actions.setName(user, msg, keeperNumber)
-		elif msg_util.isSetZipcodeCommand(msg):
-			logger.debug("For user %s I think '%s' is a set zip command" % (user.id, msg))
-			actions.setZipcode(user, msg, keeperNumber)
 		elif msg_util.isAddTextCommand(msg) or numMedia > 0:
 			logger.debug("For user %s I think '%s' is a add text command" % (user.id, msg))
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
-		elif niceties.getNicety(msg):
-			nicety = niceties.getNicety(msg)
-			logger.debug("For user %s I think '%s' is a nicety" % (user.id, msg))
-			actions.nicety(user, nicety, requestDict, keeperNumber)
 		else:  # catch all, we're not sure
 			if user.product_id == 1:
 				if msg_util.isDoneCommand(msg):

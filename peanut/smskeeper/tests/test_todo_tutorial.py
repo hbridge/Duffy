@@ -11,7 +11,6 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 	def setupUser(self):
 		super(SMSKeeperTodoTutorialCase, self).setupUser(True, False, keeper_constants.STATE_TUTORIAL_TODO, productId=1)
 
-
 	def test_tutorial_remind_normal(self):
 		self.setupUser()
 
@@ -33,7 +32,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Wish Dad happy birthday next week")
-			self.assertIn("next week", self.getOutput(mock))
+			self.assertIn("Mon", self.getOutput(mock))
 			self.assertIn("I'll send you what you need to do at the best time", self.getOutput(mock))
 
 	def test_tutorial_remind_nicety(self):
@@ -63,7 +62,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I'm in 94117")
-			self.assertEquals("Thanks", self.getOutput(mock))
+			self.assertEquals("", self.getOutput(mock))
 
 		# Make sure no reminders were created
 		self.assertEquals(0, len(Entry.objects.filter(label="#reminders")))

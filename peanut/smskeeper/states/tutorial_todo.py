@@ -77,33 +77,24 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Schedule doctor's apptmt next week'."], keeperNumber )
 
 		user.setStateData("step", 2)
-		user.setState(keeper_constants.STATE_NORMAL, saveCurrent=True)
+		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
+		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
 
 	elif step == 2:
-		entry = Entry.objects.filter(creator=user, label='#reminders')
-		if len(entry) > 0:
-			# succeeded
-			sms_util.sendMsgs(user, [u"What's something you need to get done next week? Like 'Wish Dad happy birthday on Wednesday'"], keeperNumber)
-			user.setStateData("step", 3)
-			user.setState(keeper_constants.STATE_NORMAL, saveCurrent=True)
-
-		else:
-			user.setState(keeper_constants.STATE_NORMAL, saveCurrent=True)
-			return False
+		# succeeded
+		sms_util.sendMsgs(user, [u"What's something you need to get done next week? Like 'Wish Dad happy birthday on Wednesday'"], keeperNumber)
+		user.setStateData("step", 3)
+		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
+		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
 
 	elif step == 3:
-		entryCount = Entry.objects.filter(creator=user, label='#reminders').count()
-		if entryCount > 1:
-			sms_util.sendMsgs(user, [u"Great. I'll send you what you need to do at the best time. You can send me more things at any time."], keeperNumber)
+		sms_util.sendMsgs(user, [u"Great. I'll send you what you need to do at the best time. You can send me more things at any time."], keeperNumber)
 
-			delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
-			sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
-			user.setTutorialComplete()
-			user.setState(keeper_constants.STATE_NORMAL)
-		else:
-			user.setState(keeper_constants.STATE_NORMAL, saveCurrent=True)
-			return False
-		
+		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
+		sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
+		user.setTutorialComplete()
+		user.setState(keeper_constants.STATE_NORMAL)
+
 		analytics.logUserEvent(
 			user,
 			"Completed Tutorial",

@@ -166,7 +166,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I'm in 94117")
-			self.assertEquals("Got it.", self.getOutput(mock))
+			self.assertEquals("", self.getOutput(mock))
 
 		# Make sure no reminders were created
 		self.assertEquals(0, len(Entry.objects.filter(label="#reminders")))

@@ -1,11 +1,13 @@
 import json
 import logging
+import datetime
+import pytz
 
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo
-from smskeeper import msg_util
+from smskeeper import msg_util, actions, niceties
 
 from smskeeper.models import User, Message
 from common import slack_logger
@@ -13,12 +15,43 @@ from common import slack_logger
 logger = logging.getLogger(__name__)
 
 
+# Process basic and important things like STOP, "hey there", "thanks", etc
+# Need hacks for if those commands might be used later on though
+def processBasicMessages(user, msg, requestDict, keeperNumber):
+	# Always look for a stop command first and deal with that
+	if msg_util.isStopCommand(msg):
+		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
+		user.save()
+		logger.debug("I think '%s' is a stop command, setting state to %s for user %s" % (msg, user.state, user.id))
+		return False  # Return false here since we do a bit of processing
+	elif msg_util.nameInSetName(msg):
+		logger.debug("For user %s I think '%s' is a set name command" % (user.id, msg))
+		actions.setName(user, msg, keeperNumber)
+		return True
+	elif msg_util.isSetZipcodeCommand(msg):
+		logger.debug("For user %s I think '%s' is a set zip command" % (user.id, msg))
+		actions.setZipcode(user, msg, keeperNumber)
+		return True
+	elif niceties.getNicety(msg):
+		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
+		if msg_util.isDoneCommand(msg) and user.product_id == 1:
+			logger.debug("For user %s I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
+			return False
+		nicety = niceties.getNicety(msg)
+		logger.debug("For user %s I think '%s' is a nicety" % (user.id, msg))
+		actions.nicety(user, nicety, requestDict, keeperNumber)
+		return True
+	return False
+
+
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	try:
 		user = User.objects.get(phone_number=phoneNumber)
+		newUser = False
 	except User.DoesNotExist:
 		try:
 			user = User.objects.create(phone_number=phoneNumber)
+			newUser = True
 		except Exception as e:
 			logger.error("Got Exception in user creation: %s" % e)
 	except Exception as e:
@@ -29,22 +62,19 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
 		slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
 
+	processed = False
 	# convert message to unicode
 	if type(msg) == str:
 		msg = msg.decode('utf-8')
 	msg = msg.strip()
-
 	# Grab just the first line, so we ignore signatures
 	msg = msg.split('\n')[0]
 
-	# Always look for a stop command first and deal with that
-	if msg_util.isStopCommand(msg):
-		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
-		user.save()
-		logger.debug("I think '%s' is a stop command, setting state to %s for user %s" % (msg, user.state, user.id))
+	# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
+	if not newUser:
+		processed = processBasicMessages(user, msg, requestDict, keeperNumber)
 
-	if not user.paused:
-		processed = False
+	if not user.paused and not processed:
 		count = 0
 		while not processed and count < 10:
 			stateModule = stateCallbacks[user.state]

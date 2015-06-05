@@ -18,10 +18,6 @@ from smskeeper.models import Entry, Contact
 logger = logging.getLogger(__name__)
 
 
-# Might need to move these to common constants file at some point.
-FROM_TUTORIAL_KEY = "fromtutorial"
-
-
 # Returns True if the the user entered any type of timing information
 def validTime(nattyResult):
 	return nattyResult.hadDate or nattyResult.hadTime
@@ -50,16 +46,16 @@ def isFollowup(nattyResult, reminderSent):
 
 
 def isTutorial(user):
-	return False if user.getStateData(FROM_TUTORIAL_KEY) is None else True
+	return False if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY) is None else True
 
 
 def dealWithTutorialEdgecases(user, msg, keeperNumber):
 	# If we're coming from the tutorial and we find a message with a zipcode in it...just ignore the whole message
 	# Would be great not to have a hack here
-	if user.getStateData(FROM_TUTORIAL_KEY):
+	if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
 		postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
 		if postalCodes:
-			sms_util.sendMsg(user, u"Got it.", None, keeperNumber)
+			# ignore the message
 			return True
 	return False
 
@@ -160,7 +156,7 @@ def process(user, msg, requestDict, keeperNumber):
 		sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
 		# If we came from the tutorial, then set state and return False so we go back for reprocessing
-		if user.getStateData(FROM_TUTORIAL_KEY):
+		if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
 			# Note, some behind the scene magic sets the state and state_data for us.  So this call
 			# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
 			user.setState(keeper_constants.STATE_TUTORIAL_REMIND)

@@ -64,7 +64,7 @@ ENTRY_IDS_DATA_KEY = "entryIDs"
 IMPLICIT_LABEL_STATE_DATA_KEY = "implicitLabel"
 
 ENTRY_ID_DATA_KEY = "entryId"
-
+FROM_TUTORIAL_KEY = "fromtutorial"
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
 

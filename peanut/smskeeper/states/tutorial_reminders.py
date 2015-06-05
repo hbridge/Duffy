@@ -9,10 +9,6 @@ from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper import analytics, niceties, actions
 
-# Might need to get ride of this at some point due to circular dependencies
-# Its only using a few constants, easily moved
-from smskeeper.states import remind
-
 logger = logging.getLogger(__name__)
 
 
@@ -77,7 +73,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		# Setup the next state along with data saying we're going to it from the tutorial
 		user.setState(keeper_constants.STATE_REMIND)
-		user.setStateData(remind.FROM_TUTORIAL_KEY, True)
+		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
 
 		# Make sure that we come back to the tutorial and don't goto NORMAL
 		user.setNextState(keeper_constants.STATE_TUTORIAL_REMIND)
