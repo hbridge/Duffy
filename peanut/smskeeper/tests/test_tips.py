@@ -66,7 +66,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2, tips.SMSKEEPER_TIP_HOUR)
 			with patch('smskeeper.sms_util.recordOutput') as mock:
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
-				self.assertIn(tips.SMSKEEPER_TIPS[1].render(self.user.name), self.getOutput(mock))
+				self.assertIn(tips.SMSKEEPER_TIPS[3].render(self.user.name), self.getOutput(mock))
 
 	def testSendTipMedia(self):
 		self.setupUser(True, True, "UTC")
