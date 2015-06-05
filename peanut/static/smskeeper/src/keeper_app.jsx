@@ -21,14 +21,6 @@ SelectedEntryRow = null;
 SubmitCommandToServer = null;
 
 
-var oldSync = Backbone.sync;
-Backbone.sync = function(method, model, options){
-    options.beforeSend = function(xhr){
-        xhr.setRequestHeader('X-CSRFToken', $('meta[name="csrf-token"]').attr('content'));
-    };
-    return oldSync(method, model, options);
-};
-
 var Entry = Backbone.Model.extend({
   defaults: function() {
       return {
@@ -39,7 +31,7 @@ var Entry = Backbone.Model.extend({
     },
 
     urlRoot: function() {
-      return "/smskeeper/entry";
+      return "/smskeeper/entry/";
     },
 });
 
@@ -233,6 +225,7 @@ var EntryTimeField = React.createClass({
 });
 
 var CreateEntryFooter = React.createClass({
+  mixins: [BackboneReactComponent],
   getInitialState: function() {
     return {expanded: false};
   },
@@ -268,12 +261,19 @@ var CreateEntryFooter = React.createClass({
   handleSave: function(e) {
     e.preventDefault();
     var text = React.findDOMNode(this.refs.text).value.trim();
-    window.alert("mock save: " + text);
+    if (text == "") return;
+    var entry = new Entry();
+    entry.set('label', "#" + this.props.listName);
+    entry.set('text', text);
+    this.getCollection().add([entry]);
+    entry.save();
+    React.findDOMNode(this.refs.text).value = "";
   },
 
 });
 
 var List = React.createClass({
+  mixins: [BackboneReactComponent],
   render: function() {
     var createEntry = function(entry, index) {
       return (
@@ -295,7 +295,8 @@ var List = React.createClass({
         <div className="entriesList">
            { this.props.entries.map(createEntry) }
         </div>
-        <CreateEntryFooter isReminders={ this.props.isReminders }/>
+        <CreateEntryFooter isReminders={ this.props.isReminders }
+          listName={this.props.label}/>
       </div>
     );
   }
@@ -366,7 +367,7 @@ var KeeperApp = React.createClass({
       listNodes.push(
         <List label={ key }
           entries={ this.props.lists[key] }
-          key= { key }/>
+          key= { key } />
       );
     }
 

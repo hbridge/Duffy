@@ -179,11 +179,15 @@ def entry_feed(request):
 
 
 class EntryList(generics.ListCreateAPIView):
+	# set authentication to basic and allow any to disable CSRF protection
+	authentication_classes = (authentication.BasicAuthentication,)
+	permission_classes = (permissions.AllowAny,)
 	queryset = Entry.objects.all()
 	serializer_class = EntrySerializer
 
 
 class EntryDetail(generics.RetrieveUpdateAPIView):
+	# set authentication to basic and allow any to disable CSRF protection
 	authentication_classes = (authentication.BasicAuthentication,)
 	permission_classes = (permissions.AllowAny,)
 	queryset = Entry.objects.all()
