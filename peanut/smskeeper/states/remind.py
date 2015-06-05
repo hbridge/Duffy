@@ -144,7 +144,7 @@ def process(user, msg, requestDict, keeperNumber):
 	if not user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY) or user.product_id == 1:
 		sendFollowup = False
 
-		if not validTime(nattyResult):
+		if not validTime(nattyResult) and user.product_id != keeper_constants.TODO_PRODUCT_ID:
 			sendFollowup = True
 
 		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
