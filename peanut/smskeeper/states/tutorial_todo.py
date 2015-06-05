@@ -89,9 +89,11 @@ def process(user, msg, requestDict, keeperNumber):
 
 	elif step == 3:
 		sms_util.sendMsgs(user, [u"Great. I'm tracking these things for you. I'll remind you on the right day."], keeperNumber)
+		sms_util.sendMsgs(user, [u"Whenever you think of something you need to get done, just txt me and I'll track it for you."], keeperNumber)
 
-		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
-		sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
+		# TODO: enable tell me more 
+		#delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
+		#sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
 		user.setState(keeper_constants.STATE_NORMAL)
 
