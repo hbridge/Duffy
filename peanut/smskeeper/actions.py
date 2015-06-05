@@ -160,8 +160,11 @@ def fetch(user, label, keeperNumber):
 			newStr = str(count) + ". " + entry.text + " " + otherUsersString
 
 			if entry.remind_timestamp:
-				dt = entry.remind_timestamp.replace(tzinfo=None)
-				newStr = "%s %s" % (newStr, humanize.naturaltime(dt))
+				if entry.remind_timestamp > datetime.datetime.now(pytz.utc):
+					localNow = datetime.datetime.now(user.getTimezone())
+					futureTime = entry.remind_timestamp.astimezone(user.getTimezone())
+					newStr = "%s %s" % (newStr, msg_util.naturalize(localNow, futureTime))
+
 			currentMsg = currentMsg + "\n " + newStr
 			count += 1
 
