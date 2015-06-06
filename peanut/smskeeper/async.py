@@ -148,7 +148,7 @@ def shouldSendDigestForUser(user):
 	# Later on might make this per-user specific
 	if localNow.hour == 9 and localNow.minute == 0:
 		return True
-	return True
+	return False
 
 
 def shouldIncludeEntry(entry):
