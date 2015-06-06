@@ -173,7 +173,7 @@ def entry_feed(request):
 
 		entries = Entry.fetchEntries(user, hidden=None, orderByString="-updated")
 		serializer = EntrySerializer(entries, many=True)
-		return HttpResponse(json.dumps(serializer.data), content_type="text/json", status=200)
+		return HttpResponse(json.dumps(serializer.data, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
