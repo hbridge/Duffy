@@ -315,11 +315,11 @@ class BASE_CELERY_CONFIG:
             "schedule": datetime.timedelta(seconds=30),
             'args': None,
         },
-        'smskeeper-todo-digest': {
-            'task': 'smskeeper.async.processDailyDigest',
-            "schedule": crontab(minute=0, hour='*'),
-            'args': None,
-        }
+        #'smskeeper-todo-digest': {
+        #    'task': 'smskeeper.async.processDailyDigest',
+        #    "schedule": crontab(minute=0, hour='*'),
+        #    'args': None,
+        #}
 
     }
 
