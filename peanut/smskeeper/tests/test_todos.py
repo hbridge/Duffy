@@ -15,12 +15,6 @@ import test_base
 
 class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
-	def setUp(self):
-		super(SMSKeeperTodoCase, self).setUp()
-
-	def tearDown(self):
-		super(SMSKeeperTodoCase, self).tearDown()
-
 	def setupUser(self):
 		super(SMSKeeperTodoCase, self).setupUser(True, True, productId=1)
 
