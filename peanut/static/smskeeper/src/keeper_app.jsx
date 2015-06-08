@@ -8,6 +8,7 @@ var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
 var PlainEditable = require("react-plain-editable");
 var Mixpanel = require("mixpanel")
+var NodeEmoji = require("node-emoji")
 
 var mixpanelToken = "d309a366da36d3f897ad2772390d1679";
 if (window['DEVELOPMENT'] == undefined) {
@@ -385,12 +386,21 @@ var List = React.createClass({
 });
 
 var HeaderBar = React.createClass({
+  getDefaultProps: function() {
+    return {
+      header: NodeEmoji.get(":raising_hand:") +" Hi " + USER.name + ".",
+      subheader: "Hope you're having a great day! " + NodeEmoji.get("smile"),
+    };
+  },
+
   render: function() {
     return (
       <div className="headerBar">
-        <span className="greeting">Hi {USER.name}.</span>
+        <span className="greeting">
+          {this.props.header}
+        </span>
         <div className="userStats">
-          Last week you rocked it.
+          {this.props.subheader}
         </div>
       </div>
     );
