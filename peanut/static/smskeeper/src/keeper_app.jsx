@@ -63,7 +63,13 @@ var EntryList = Backbone.Collection.extend({
     return entriesByList;
   },
   reminders: function() {
-    return(this.where({label: "#reminders"}));
+    var notHidden = this.where({label: "#reminders", hidden: false})
+    var sorted = notHidden.sort(function(a, b){
+      var dateA = new Date(a.get("remind_timestamp"));
+      var dateB = new Date(b.get("remind_timestamp"));
+      return dateA > dateB;
+    });
+    return(sorted);
   }
 });
 
