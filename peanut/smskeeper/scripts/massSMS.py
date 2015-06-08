@@ -32,7 +32,9 @@ def sendMassSMS(userIdList):
 
 def main(argv):
 	print "Starting..."
-	userList = [104, 106]
+
+	# UPDATE this list to whoever you want to send this to
+	userList = [1, 2]
 
 	sendMassSMS(userList)
 	print "Donezo!"
