@@ -140,7 +140,7 @@ var EntryTextField = React.createClass({
    mixins: [BackboneReactComponent],
   render: function() {
     return (
-      <PlainEditable onBlur={this.handleTextFinishedEditing} value={this.props.text} ref="editable"/>
+      <PlainEditable onBlur={this.handleTextFinishedEditing} onClick={this.handleClicked} value={this.props.text} ref="editable"/>
     );
   },
 
