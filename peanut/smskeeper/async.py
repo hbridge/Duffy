@@ -146,7 +146,7 @@ def shouldSendDigestForUser(user):
 
 	# By default only send if its 9 am
 	# Later on might make this per-user specific
-	if localNow.hour == 17 and localNow.minute == 32:
+	if localNow.hour == 17 and localNow.minute == 50:
 		return True
 	return False
 
