@@ -60,9 +60,13 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 	# Deal with a follow up of "remind me this evening" which looks like a new reminder
 	# but it isn't
-	def test_remind_me_followup(self):
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_remind_me_followup(self, nattyMock, dateMock):
 		self.setupUser(True, True)
+		self.setNow(dateMock, self.MON_8AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.TUE, "remind me poop", "tomorrow")
 			cliMsg.msg(self.testPhoneNumber, "remind me poop tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
@@ -70,6 +74,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		origEntry = Entry.objects.filter(label="#reminders").last()
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.SUNDAY_7PM, "remind me on", "Sunday 7pm")
 			cliMsg.msg(self.testPhoneNumber, "Remind me on Sunday 7pm")
 			self.assertIn("7pm", self.getOutput(mock))
 
@@ -205,6 +210,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 			# Now we're past the actual time, but we say we were just notified, so shouldn't fire
 			entryOdd.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
+			entryOdd.save()
 			testDt = test_datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
 			r.replace('smskeeper.async.datetime.datetime', testDt)
 			ret = async.shouldRemindNow(entryOdd)
@@ -412,12 +418,17 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(13, entry.remind_timestamp.hour)  # Make sure its 9am EST
 	"""
 
-	def test_next_week_becomes_monday(self):
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_next_week_becomes_monday(self, nattyMock, dateMock):
 		self.setupUser(True, True)
+		self.setNow(dateMock, self.TUE_8AM)
+		self.setupNatty(nattyMock, self.NEXT_WEEK, "Remind me to poop", "next week")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
+
 			cliMsg.msg(self.testPhoneNumber, "Remind me to poop next week")
-			self.assertIn("around 9am", self.getOutput(mock))
+			self.assertIn("Mon", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
 

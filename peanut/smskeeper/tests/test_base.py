@@ -6,6 +6,7 @@ from django.conf import settings
 
 from smskeeper.models import User, ZipData
 from smskeeper import keeper_constants
+from common import natty_util
 
 # turn off mixpanel for tests
 settings.MIXPANEL_TOKEN = None
@@ -71,3 +72,22 @@ class SMSKeeperBaseCase(TestCase):
 			})
 
 		return events
+
+	# Day, hasDate, hasTime
+	# Assuming these are all in ETC
+	MON_8AM = ([2015, 6, 1, 8, 0, 0], True, True)
+	TUE_8AM = ([2015, 6, 2, 8, 0, 0], True, True)
+	TUE = ([2015, 6, 2, 8, 0, 0], True, False)
+	WEEKEND = ([2015, 6, 6, 8, 0, 0], True, False)
+	ONLY_4PM = ([2015, 6, 1, 16, 0, 0], False, True)
+	NEXT_WEEK = ([2015, 6, 8, 9, 0, 0], True, False)
+	SUNDAY_7PM = ([2015, 6, 7, 19, 0, 0], True, True)
+
+	def setNow(self, dateMock, date):
+		d, hasDate, hasTime = date
+		dateMock.return_value = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=self.getTestUser().getTimezone()).astimezone(pytz.utc)
+
+	def setupNatty(self, nattyMock, date, queryWithoutTiming, usedText):
+		d, hasDate, hasTime = date
+		dt = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=self.getTestUser().getTimezone())
+		nattyMock.return_value = [natty_util.NattyResult(dt, queryWithoutTiming, usedText, hasDate, hasTime)]

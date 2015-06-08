@@ -2,7 +2,6 @@ import datetime
 import pytz
 
 from mock import patch
-
 from testfixtures import Replacer
 from testfixtures import test_datetime
 
@@ -15,6 +14,12 @@ import test_base
 
 
 class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
+
+	def setUp(self):
+		super(SMSKeeperTodoCase, self).setUp()
+
+	def tearDown(self):
+		super(SMSKeeperTodoCase, self).tearDown()
 
 	def setupUser(self):
 		super(SMSKeeperTodoCase, self).setupUser(True, True, productId=1)
@@ -157,9 +162,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
-	# Make sure first reminder we send snooze tip, then second we don't
-	def test_create_new_after_reminder(self):
+	# Make sure we create a new entry instead of a followup
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_create_new_after_reminder(self, nattyMock, dateMock):
 		self.setupUser()
+
+		self.setNow(dateMock, self.MON_8AM)
+		self.setupNatty(nattyMock, self.MON_8AM, "Remind me go poop", "in 1 minute")
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
 
@@ -171,10 +181,11 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processReminder(firstEntry)
 			self.assertIn("let me know when you're done", self.getOutput(mock))
 
-		# Now make sure if we type done, we get a nice response and it gets hidden
+		# Make sure we create a new entry and don't treat as a followup
+		self.setupNatty(nattyMock, self.WEEKEND, "I need to go biking", "this weekend")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to go biking this weekend")
-			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("Sat", self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		secondEntry = Entry.objects.filter(label="#reminders").last()

@@ -1,5 +1,4 @@
 import time
-import re
 import logging
 import datetime
 import string
@@ -8,6 +7,7 @@ from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper import analytics, niceties, actions
+from smskeeper.models import Entry
 
 logger = logging.getLogger(__name__)
 

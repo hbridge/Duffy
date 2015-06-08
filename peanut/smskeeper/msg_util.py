@@ -414,7 +414,7 @@ def naturalize(now, futureTime, includeTime=True):
 		result = "tomorrow"
 		if includeTime:
 			result += " around %s" % time
-	elif delta.days < 6:
+	elif delta.days < 7:
 		result = "%s" % (dayOfWeek)
 		if includeTime:
 			result += " around %s" % time

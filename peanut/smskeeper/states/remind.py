@@ -1,12 +1,12 @@
-import datetime
 import pytz
 import logging
 import re
 import json
+import datetime
 
 from peanut.settings import constants
 
-from common import natty_util
+from common import natty_util, date_util
 
 from smskeeper import sms_util, msg_util
 from smskeeper import keeper_constants
@@ -72,7 +72,7 @@ def dealWithDefaultTime(user, nattyResult):
 	if not nattyResult.hadDate:
 		nattyResult.utcTime = getDefaultTime(user)
 	else:
-		tzAwareNow = datetime.datetime.now(user.getTimezone())
+		tzAwareNow = date_util.now(user.getTimezone())
 		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
 
 		# If the user says 'today', then this should match up.
@@ -235,6 +235,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
 	entry.remind_timestamp = nattyResult.utcTime
+
 	entry.orig_text = json.dumps([msg])
 	entry.save()
 
@@ -327,7 +328,7 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 	includeTime = (user.product_id == 0 or (user.product_id == 1 and not (tzAwareDate.hour == 9 and tzAwareDate.minute == 0)))
 
 	# Get the text liked "tomorrow" or "Sat at 5pm"
-	userMsg = msg_util.naturalize(datetime.datetime.now(user.getTimezone()), tzAwareDate, includeTime=includeTime)
+	userMsg = msg_util.naturalize(date_util.now(user.getTimezone()), tzAwareDate, includeTime=includeTime)
 
 	# If this is a shared reminder then look up the handle to send things out with
 	if user == entry.creator and len(entry.users.all()) > 1:
@@ -356,7 +357,7 @@ def isReminderHourSuspicious(hourForUser):
 
 
 def getDefaultTime(user, isToday=False):
-	userNow = datetime.datetime.now(user.getTimezone())
+	userNow = date_util.now(user.getTimezone())
 
 	if user.product_id == 0 or (user.product_id == 1 and isToday):
 		# If before 2 pm, remind at 6 pm

@@ -1,3 +1,5 @@
+import datetime
+
 from mock import patch
 
 from smskeeper import cliMsg, keeper_constants
@@ -27,7 +29,9 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("tomorrow around 9am", self.getOutput(mock))
 			self.assertIn("I can also help you with other things", self.getOutput(mock))
 
-	def test_tutorial_remind_no_time_given(self):
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_tutorial_remind_no_time_given(self, nattyMock, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		# Activation message asks for their name
@@ -35,31 +39,33 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			with patch('smskeeper.states.remind.datetime') as datetimeMock:
-				# We set the time to be 10 am so we can check the default time later.
-				# But need to set early otherwise default could be tomorrow
-				datetimeMock.datetime.now.return_value = self.getUserNow().replace(hour=10)
-				cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
+			self.setNow(dateMock, self.MON_8AM)
+			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
-				# Since there was no time given, should have picked a time in the near future
-				self.assertIn("today around 6pm", self.getOutput(mock))
+			# Since there was no time given, should have picked a time in the near future
+			self.assertIn("today around 6pm", self.getOutput(mock))
 
-				# This is the key here, make sure we have the extra message
-				self.assertIn("If that time doesn't work", self.getOutput(mock))
+			# This is the key here, make sure we have the extra message
+			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
-	def test_tutorial_remind_followup(self):
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_tutorial_remind_followup(self, nattyMock, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
-		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show on Sunday")
+		self.setNow(dateMock, self.MON_8AM)
+		self.setupNatty(nattyMock, self.WEEKEND, "Remind me about the Improv show", "this weekend")
+		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show this weekend")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.ONLY_4PM, "Remind me", "at 4pm")
 			cliMsg.msg(self.testPhoneNumber, "Remind me at 4pm")
 
-			self.assertIn("Sun around 4pm", self.getOutput(mock))
+			self.assertIn("Sat around 4pm", self.getOutput(mock))
 
 		# Make sure there's only 1 created
 		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
