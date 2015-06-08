@@ -268,12 +268,34 @@ var CreateEntryFooter = React.createClass({
     e.preventDefault();
     var text = React.findDOMNode(this.refs.text).value.trim();
     if (text == "") return;
-    var entry = new Entry();
-    entry.set('label', "#" + this.props.listName);
-    entry.set('text', text);
-    this.getCollection().add([entry]);
-    entry.save();
+
+    if (this.props.isReminders) {
+      if (text.indexOf("#reminder") == -1) {
+        text = "#reminder " + text;
+        console.log("reminder command: " + text);
+      }
+
+      $.ajax({
+        url: "/smskeeper/send_sms",
+        dataType: 'json',
+        type: 'POST',
+        data: {msg: text, user_id: USER.id, direction: "ToKeeper"},
+        success: function(data) {
+          this.getCollection().fetch();
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error("send_sms", status, err.toString());
+        }.bind(this)
+      });
+    } else {
+      var entry = new Entry();
+      entry.set('label', "#" + this.props.listName);
+      entry.set('text', text);
+      this.getCollection().add([entry]);
+      entry.save();
+    }
     React.findDOMNode(this.refs.text).value = "";
+
   },
 
 });
