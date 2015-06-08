@@ -29,6 +29,7 @@ logger = get_task_logger(__name__)
 # The current time is after the remind timestamp but we're within 5 minutes
 # Hidden is false
 def shouldRemindNow(entry):
+	# TODO: Remove this line. Leaving it in for now as a last defense against sending hidden reminders
 	if entry.hidden:
 		return False
 
@@ -125,8 +126,8 @@ def processReminder(entry):
 					user.save()
 
 	# For product id 0, hide after a reminder has occured
-	if entry.creator.product_id == 0:
-		entry.hidden = True
+	#if entry.creator.product_id == 0:
+	#	entry.hidden = True
 
 	entry.save()
 
