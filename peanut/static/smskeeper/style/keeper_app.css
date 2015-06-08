@@ -7,7 +7,6 @@ body {
 h2 {
   border-bottom: none;
   font-size: 12pt;
-  color: white;
   margin-bottom: 0;
 }
 
@@ -20,6 +19,7 @@ h2 {
 	margin-left: 20px;
 	margin-top: 20px;
 	border-radius: 10px;
+	color: white;
 }
 
 .reminderList {
@@ -28,6 +28,14 @@ h2 {
 
 .list .container {
 	padding: 8px 12px;
+}
+
+.clearButton {
+	float: right;
+}
+
+.clearButton a {
+	color: white;
 }
 
 .grid-item {
@@ -45,6 +53,7 @@ h2 {
 }
 
 .entry {
+	color: black;
 	border-bottom: 1px solid;
 	border-color: #E5E5E5;
 }
@@ -88,3 +97,4 @@ h2 {
 
 .headerBar .userStats {
 }
+

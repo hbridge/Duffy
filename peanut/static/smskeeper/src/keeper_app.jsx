@@ -290,6 +290,7 @@ var List = React.createClass({
     return (
       <div className={listClasses}>
         <div className="container">
+          <span className="clearButton"><a href="#" onClick={this.handleClear}>X</a></span>
           <h2> {this.props.label} </h2>
         </div>
         <div className="entriesList">
@@ -299,7 +300,19 @@ var List = React.createClass({
           listName={this.props.label}/>
       </div>
     );
-  }
+  },
+
+  handleClear: function(e) {
+    e.preventDefault();
+    var deleteWord = this.props.isReminders ? "Clear" : "Delete";
+    result = confirm(deleteWord + " " + this.props.label + "?");
+    if (result) {
+      this.props.entries.map(function(entry){
+        entry.set("hidden", true);
+        entry.save();
+      });
+    }
+  },
 });
 
 var HeaderBar = React.createClass({
