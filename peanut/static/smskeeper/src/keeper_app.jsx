@@ -7,6 +7,13 @@ var moment = require('moment');
 var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
 var PlainEditable = require("react-plain-editable");
+var Mixpanel = require("mixpanel")
+
+var mixpanelToken = "d309a366da36d3f897ad2772390d1679";
+if (window['DEVELOPMENT'] == undefined) {
+  mixpanelToken = "165ffa12b4eac14005ec6d97872a9c63";
+}
+var mixpanel = Mixpanel.init(mixpanelToken);
 
 var masonryOptions = {
     transitionDuration: 0
@@ -104,7 +111,9 @@ var EntryRow = React.createClass({
     return (
       <div className="entry container">
         {deleteElement}
-        <EntryTextField text={text} handleClicked={this.handleChildClicked} ref="entryTextField" />
+        <EntryTextField text={text}
+          handleClicked={this.handleChildClicked}
+          ref="entryTextField" />
         {entryTimeField}
       </div>
     );
@@ -115,6 +124,12 @@ var EntryRow = React.createClass({
     var result = this.getModel().save({hidden: true});
     console.log("delete result:");
     console.log(result);
+    mixpanel.track("Deleted Entry", {
+        distinct_id: USER.id,
+        interface: "web",
+        entryType: this.getModel().get("remind_timestamp") ? "reminder" : "text",
+        result: result,
+      });
   },
 
   handleChildClicked: function(child) {
@@ -168,6 +183,12 @@ var EntryTextField = React.createClass({
       console.log("saving updated text: " + newValue);
       model.set("text", newValue);
       model.save();
+
+      mixpanel.track("Changed Entry Text", {
+        distinct_id: USER.id,
+        interface: "web",
+        entryType: this.getModel().get("remind_timestamp") ? "reminder" : "text"
+      });
     }
     this.setState({expanded: false});
   },
@@ -209,8 +230,17 @@ var EntryTimeField = React.createClass({
   // deal with time events
   handleClicked: function(e) {
     e.preventDefault();
-    this.setState({expanded: true});
+    mixpanel.track("Changed Reminder Time", {
+      distinct_id: USER.id,
+      interface: "web",
+      result: "not implemented",
+    });
     this.props.handleClicked(this);
+
+    return;
+    // TODO actually make saving time work
+    this.setState({expanded: true});
+
   },
 
   handleTimeEditCancelled: function(e) {
@@ -280,28 +310,25 @@ var CreateEntryFooter = React.createClass({
         text = "#reminder " + text;
         console.log("reminder command: " + text);
       }
+      SubmitCommandToServer(text);
 
-      $.ajax({
-        url: "/smskeeper/send_sms",
-        dataType: 'json',
-        type: 'POST',
-        data: {msg: text, user_id: USER.id, direction: "ToKeeper"},
-        success: function(data) {
-          this.getCollection().fetch();
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error("send_sms", status, err.toString());
-        }.bind(this)
-      });
     } else {
       var entry = new Entry();
       entry.set('label', "#" + this.props.listName);
       entry.set('text', text);
       this.getCollection().add([entry]);
       entry.save();
+
+      mixpanel.track("Added Entries", {
+        distinct_id: USER.id,
+        interface: "web",
+        "Entry Count": 1,
+        Label: entry.get('label'),
+        "Share Count": 0,
+        "Media Count": 0,
+      });
     }
     React.findDOMNode(this.refs.text).value = "";
-
   },
 
 });
@@ -339,13 +366,21 @@ var List = React.createClass({
   handleClear: function(e) {
     e.preventDefault();
     var deleteWord = this.props.isReminders ? "Clear" : "Delete";
-    result = confirm(deleteWord + " " + this.props.label + "?");
+    var result = confirm(deleteWord + " " + this.props.label + "?");
+    var entryCount = this.props.entries.length;
     if (result) {
       this.props.entries.map(function(entry){
         entry.set("hidden", true);
         entry.save();
       });
     }
+    mixpanel.track("Cleared Label", {
+      distinct_id: USER.id,
+      interface: "web",
+      label: this.props.label,
+      "Entry Count": entryCount,
+      result: result
+    });
   },
 });
 
@@ -376,9 +411,9 @@ var KeeperApp = React.createClass({
       url: "/smskeeper/send_sms",
       dataType: 'json',
       type: 'POST',
-      data: {msg: msg, user_id: USER.id, direction: "ToKeeper", silent: true, response_data: "entries"},
+      data: {msg: msg, user_id: USER.id, direction: "ToKeeper", response_data: "entries", from_num: "web"},
       success: function(entryData) {
-        this.processDataFromServer(entryData);
+        this.getCollection().fetch();
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("send_sms", status, err.toString());

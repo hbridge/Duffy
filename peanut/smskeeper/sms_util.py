@@ -51,12 +51,8 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 	if type(msgText) == unicode:
 		msgText = msgText.encode('utf-8')
 
-	if keeperNumber == constants.SMSKEEPER_CLI_NUM:
-		# This is used for command line interface commands
-		recordOutput(msgText, True)
-		message.save()
-	elif keeperNumber == constants.SMSKEEPER_TEST_NUM:
-		recordOutput(msgText, False)
+	if keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_TEST_NUM, keeper_constants.SMSKEEPER_WEB_NUM]:
+		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
 	else:
 		try:

@@ -9,6 +9,7 @@
     "classnames": "^1.2.2",
     "jquery": "^2.1.4",
     "jquery-ui": "^1.10.5",
+    "mixpanel": "^0.2.1",
     "moment": "^2.10.3",
     "react": "^0.13.3",
     "react-masonry-mixin": "^0.5.7",
