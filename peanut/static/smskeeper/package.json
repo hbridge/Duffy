@@ -12,6 +12,7 @@
     "moment": "^2.10.3",
     "react": "^0.13.3",
     "react-masonry-mixin": "^0.5.7",
+    "react-plain-editable": "^2.0.0",
     "react-time": "^2.5.0",
     "timeago": "^0.2.0"
   },

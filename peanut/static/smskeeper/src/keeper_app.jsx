@@ -6,6 +6,7 @@ var Timestamp = require('react-time');
 var moment = require('moment');
 var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
+var PlainEditable = require("react-plain-editable");
 
 var masonryOptions = {
     transitionDuration: 0
@@ -130,14 +131,10 @@ var EntryRow = React.createClass({
 });
 
 var EntryTextField = React.createClass({
+   mixins: [BackboneReactComponent],
   render: function() {
-    return (<div
-        onClick = { this.handleClicked }
-        onBlur = { this.handleTextFinishedEditing }
-        onInput= { this.handleTextChanged}
-        contentEditable={true}>
-          <span ref="textspan">{this.props.text}</span>
-        </div>
+    return (
+      <PlainEditable onBlur={this.handleTextFinishedEditing} value={this.props.text} ref="editable"/>
     );
   },
 
@@ -146,17 +143,26 @@ var EntryTextField = React.createClass({
   },
 
   handleTextChanged: function(e) {
-
+    console.log("text changed");
+    this.setState({textChanged : true});
   },
 
-  handleTextFinishedEditing: function(e) {
+  handleTextFinishedEditing: function(e, newValue) {
     var destination = e.nativeEvent.relatedTarget;
     if (destination && destination == React.findDOMNode(this.refs.deleteButton)) {
       // this isn't a cancel if the user is tapping another element in the form
       return;
     }
 
-    console.log("finished with text: " + this.refs.textspan.props.children);
+    var model = this.getModel();
+    var oldValue = model.get("text");
+    console.log("text finished editing old text: " + oldValue + " new text: "+ newValue);
+
+    if (oldValue != newValue) {
+      console.log("saving updated text: " + newValue);
+      model.set("text", newValue);
+      model.save();
+    }
     this.setState({expanded: false});
   },
 });
