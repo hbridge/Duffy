@@ -179,7 +179,7 @@ def getDigestMessageForUser(user, entries):
 			msg += " (%s)" % msg_util.getNaturalTime(entry.remind_timestamp.astimezone(user.getTimezone()))
 		msg += "\n"
 
-	msg += "\njust say 'done with...' aftewards"
+	msg += "\njust say 'done with...' afterwards"
 
 	return msg
 
