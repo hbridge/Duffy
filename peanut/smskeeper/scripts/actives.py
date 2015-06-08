@@ -21,7 +21,10 @@ print "Stopped users: %s"%(len(usersStopped))
 
 # query to get sorted list of incoming count by users
 
-users = Message.objects.values_list('user__id', 'user__name').filter(incoming=True, user__completed_tutorial=True).annotate(total_incoming=Count('user__id')).order_by('-total_incoming')
+from smskeeper.models import Message
+from django.db.models import Count
+
+users = Message.objects.values_list('user__id', 'user__name').filter(incoming=True, user__completed_tutorial=True).annotate(total_incoming=Count('user__id')).order_by('total_incoming')
 
 for entry in users:
     print "%s %s: %s"%(entry[0], entry[1], entry[2])
