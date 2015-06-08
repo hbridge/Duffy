@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from smskeeper import time_utils
 import random
 import re
@@ -20,8 +20,13 @@ class Nicety():
 		self.customRenderer = customRenderer
 
 	def matchesMsg(self, msg):
+		if not msg or msg == "":
+			return False
 		cleanedMsg = msg_util.cleanMsgText(msg)
-		return re.match(self.reStr, cleanedMsg, re.I) is not None
+		try:
+			return re.match(self.reStr, cleanedMsg, re.I) is not None
+		except:
+			print "RE raised exception: %s", self.reStr
 
 	def getResponse(self, user, requestDict, keeperNumber):
 		response = None
@@ -156,7 +161,14 @@ def renderBirthdayInquiry(user, requestDict, keeperNumber):
 	return u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423" % (deltaText)
 
 
-@custom_nicety_for(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
+EMOJI_NICETY_RE = u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])'
+try:
+	re.compile(EMOJI_NICETY_RE)
+except:
+	EMOJI_NICETY_RE = (u'([\u2600-\u27BF])|([\uD83C][\uDF00-\uDFFF])|([\uD83D][\uDC00-\uDE4F])|([\uD83D][\uDE80-\uDEFF])')
+
+
+@custom_nicety_for(EMOJI_NICETY_RE)
 def renderRandomEmoji(user, requestDict, keeperNumber):
 	return random.choice(emoji.EMOJI_UNICODE.values())
 
