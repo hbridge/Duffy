@@ -146,7 +146,7 @@ def shouldSendDigestForUser(user):
 
 	# By default only send if its 9 am
 	# Later on might make this per-user specific
-	if localNow.hour == 9 and localNow.minute == 0:
+	if localNow.hour == 17 and localNow.minute == 32:
 		return True
 	return False
 
@@ -166,16 +166,20 @@ def getDigestMessageForUser(user, entries):
 	now = datetime.datetime.now(pytz.utc)
 	msg = "Your things for today:\n"
 	pendingEntries = user_util.pendingTodoEntries(user, entries)
+
+	if len(pendingEntries) == 0:
+		return ""
+
 	for entry in pendingEntries:
 		entry.remind_last_notified = datetime.datetime.now(pytz.utc)
 		entry.save()
 		msg += entry.text
 
 		if entry.remind_timestamp > now:
-			msg += " at %s" % msg_util.getNaturalTime(entry.remind_timestamp.astimezone(user.getTimezone()))
+			msg += " (%s)" % msg_util.getNaturalTime(entry.remind_timestamp.astimezone(user.getTimezone()))
 		msg += "\n"
 
-	msg += "\nJust say 'done with...' aftewards!"
+	msg += "\njust say 'done with...' aftewards"
 
 	return msg
 
@@ -203,12 +207,14 @@ def processDailyDigest():
 
 	for user, entries in entriesByCreator.iteritems():
 		if not shouldSendDigestForUser(user):
-			pass
+			continue
 
 		msg = getDigestMessageForUser(user, entries)
 
 		if msg:
 			sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
+		else:
+			sms_util.sendMsg(user, "fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, settings.KEEPER_NUMBER)
 
 
 @app.task
