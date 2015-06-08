@@ -49,7 +49,8 @@ class User(models.Model):
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 	last_share_upsell = models.DateTimeField(null=True, blank=True)
-
+	last_feedback_prompt = models.DateTimeField(null=True, blank=True)
+	
 	def history(self):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
 

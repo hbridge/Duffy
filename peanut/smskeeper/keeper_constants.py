@@ -156,6 +156,10 @@ KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 SHARE_UPSELL_FREQUENCY_DAYS = 3
 SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them to"
 
+FEEDBACK_FREQUENCY_DAYS = 15
+FEEDBACK_PHRASE = u"Any tips for me on how I can help you more? \U0001F423 getkeeper.com/feedback.php"
+FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS = 3
+
 SMSKEEPER_TEST_NUM = "test"
 SMSKEEPER_CLI_NUM = "cli"
 
