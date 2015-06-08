@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from smskeeper import time_utils
 import random
 import re
@@ -146,11 +146,11 @@ def custom_nicety_for(regexp):
 @custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ty|thx|thz|thks)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
-	if time_utils.isDateOlderThan(user.last_feedback_prompt, keeper_constants.FEEDBACK_FREQUENCY_DAYS) and user.activated < datetime.now(pytz.utc) - timedelta(days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS):
-		user.last_feedback_prompt = datetime.now(pytz.utc)
+	if time_utils.isDateOlderThan(user.last_feedback_prompt, keeper_constants.FEEDBACK_FREQUENCY_DAYS) and user.activated < datetime.datetime.now(pytz.utc) - datetime.timedelta(days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS):
+		user.last_feedback_prompt = datetime.datetime.now(pytz.utc)
 		user.save()
 	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
-		user.last_share_upsell = datetime.now(pytz.utc)
+		user.last_share_upsell = datetime.datetime.now(pytz.utc)
 		user.save()
 		return "%s %s %s!" % (base, keeper_constants.SHARE_UPSELL_PHRASE, user.getInviteUrl())
 	else:
