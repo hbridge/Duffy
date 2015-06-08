@@ -75,6 +75,8 @@ class User(models.Model):
 		return self.phone_number
 
 	def setState(self, state, override=False, stateData=None, saveCurrent=False):
+
+		logger.debug("Setting state for user %s  starting state:  %s %s   and next state: %s %s" % (self.id, self.state, self.state_data, self.next_state, self.next_state_data))
 		currentState = self.state
 		currentStateData = self.state_data
 
@@ -96,6 +98,9 @@ class User(models.Model):
 			self.next_state_data = None
 
 		self.last_state_change = datetime.datetime.now(pytz.utc)
+
+		logger.debug("Set state for user %s  new state:  %s %s  and next state: %s %s" % (self.id, self.state, self.state_data, self.next_state, self.next_state_data))
+
 		self.save()
 
 	def setNextState(self, nextState):
