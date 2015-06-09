@@ -520,10 +520,10 @@ var KeeperApp = React.createClass({
     var listNodes = [];
 
     // put reminders on top
-    if (this.props.reminders) {
+    if (this.state.reminders) {
       listNodes.push(
         <List label="Reminders"
-          entries={ this.props.reminders }
+          entries={ this.state.reminders }
           key= { "reminders" }
           isReminders= { true }/>
       );
@@ -535,10 +535,10 @@ var KeeperApp = React.createClass({
     );
 
     // then add the rest of the lists
-    for (key in this.props.lists) {
+    for (key in this.state.lists) {
       listNodes.push(
         <List label={ key }
-          entries={ this.props.lists[key] }
+          entries={ this.state.lists[key] }
           key= { key } />
       );
     }
@@ -554,8 +554,8 @@ var KeeperApp = React.createClass({
   },
 
   componentWillUpdate: function(nextProps, nextState) {
-    this.props.reminders = nextProps.collection.reminders();
-    this.props.lists = nextProps.collection.lists();
+    nextState.reminders = nextProps.collection.reminders();
+    nextState.lists = nextProps.collection.lists();
   },
 
   componentDidUpdate: function() {
