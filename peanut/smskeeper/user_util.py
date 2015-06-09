@@ -30,7 +30,7 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 		userToActivate.save()
 
 	if not userToActivate.key:
-		userToActivate.key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		userToActivate.key = "K" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
 		userToActivate.save()
 
 	msgsToSend = list()

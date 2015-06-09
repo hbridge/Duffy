@@ -104,7 +104,7 @@ def keeper_app(request):
 
 def mykeeper(request, key):
 	try:
-		user = User.objects.get(key=key)
+		user = User.objects.get(key="K" + key)
 		return renderReact(request, 'keeper_app', 'keeper_app.html', user)
 	except User.DoesNotExist:
 		return HttpResponse(json.dumps({"Errors": "User not found"}), content_type="text/json", status=400)
