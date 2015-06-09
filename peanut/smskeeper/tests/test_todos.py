@@ -228,7 +228,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertEquals("", self.getOutput(mock))
 
 		# Now set to tomorrow at 9am, when the reminder is set for
-		self.setNow(dateMock, self.TUE_850AM)
+		self.setNow(dateMock, self.TUE_858AM)
 
 		# Shouldn't send in the normal processReminders
 		with patch('smskeeper.sms_util.recordOutput') as mock:

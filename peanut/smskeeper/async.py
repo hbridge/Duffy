@@ -48,7 +48,7 @@ def shouldRemindNow(entry):
 	# If this is a todo, don't send a reminder if this is during the digest time, since it'll be
 	# included in that
 	if entry.creator.product_id == keeper_constants.TODO_PRODUCT_ID:
-		if shouldSendDigestForUser(entry.creator, now):
+		if shouldSendDigestForUser(entry.creator, entry.remind_timestamp):
 			return False
 
 	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
