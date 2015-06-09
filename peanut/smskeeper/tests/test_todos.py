@@ -196,7 +196,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "done with email")
-			self.assertIn("Nice!", self.getOutput(mock))
 			self.assertIn("send email to alex", self.getOutput(mock))
 
 		entry = Entry.objects.get(text="send email to alex")
