@@ -30,6 +30,27 @@ SelectedEntryRow = null;
 SubmitCommandToServer = null;
 
 
+var PostToSlack = function(text, channel){
+  var params = {
+    username: USER.name,
+    icon_emoji: ':globe_with_meridians:',
+    text: text + " (via web) | <http://prod.strand.duffyapp.com/smskeeper/history?user_id=" + USER.id + "|history>",
+    channel: channel,
+  };
+
+  $.ajax({
+    url: "https://hooks.slack.com/services/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",
+    type: 'POST',
+    data: JSON.stringify(params),
+    success: function(response) {
+      console.log("Posted to slack.")
+    }.bind(this),
+    error: function(xhr, status, err) {
+      console.error("Error posting to slack:", status, err.toString());
+    }.bind(this)
+  });
+}
+
 var Entry = Backbone.Model.extend({
   defaults: function() {
       var dateString = (new Date()).toISOString();
@@ -137,9 +158,11 @@ var EntryRow = React.createClass({
 
   handleDelete: function(e) {
     e.preventDefault();
-    var result = this.getModel().save({hidden: true});
+    var entry = this.getModel();
+    var result = entry.save({hidden: true});
     console.log("delete result:");
     console.log(result);
+    PostToSlack("Deleted " + entry.get("text") + " from " + entry.get('label'), "#livesmskeeperfeed");
     mixpanel.track("Deleted Entry", {
         distinct_id: USER.id,
         interface: "web",
@@ -359,6 +382,7 @@ var CreateEntryFooter = React.createClass({
         text = "#reminder " + text;
         console.log("reminder command: " + text);
       }
+      PostToSlack(text, "#livesmskeeperfeed");
       SubmitCommandToServer(text);
 
     } else {
@@ -368,6 +392,7 @@ var CreateEntryFooter = React.createClass({
       this.getCollection().add([entry]);
       entry.save();
 
+      PostToSlack("Added " + text + " to " + entry.get('label'), "#livesmskeeperfeed");
       mixpanel.track("Added Entries", {
         distinct_id: USER.id,
         interface: "web",
@@ -430,7 +455,9 @@ var List = React.createClass({
         entry.set("hidden", true);
         entry.save();
       });
+      PostToSlack("Cleared " + this.props.label, "#livesmskeeperfeed");
     }
+
     mixpanel.track("Cleared Label", {
       distinct_id: USER.id,
       interface: "web",
