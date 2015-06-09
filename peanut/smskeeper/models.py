@@ -10,6 +10,8 @@ from django.utils.html import format_html
 from common import api_util
 from smskeeper import keeper_constants
 
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +52,7 @@ class User(models.Model):
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 	last_share_upsell = models.DateTimeField(null=True, blank=True)
 	last_feedback_prompt = models.DateTimeField(null=True, blank=True)
-	
+
 	def history(self):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
 
@@ -200,6 +202,14 @@ class User(models.Model):
 		if self.invite_code:
 			url += "/%s" % (self.invite_code)
 		return url
+
+	def getKeeperNumber(self):
+		if not settings.KEEPER_NUMBER_DICT:
+			raise NameError("Keeper number dict not set")
+		elif self.product_id not in settings.KEEPER_NUMBER_DICT:
+			raise NameError("Keeper number not set for product id %s" % self.product_id)
+		else:
+			return settings.KEEPER_NUMBER_DICT[self.product_id]
 
 	def __unicode__(self):
 		if self.name:

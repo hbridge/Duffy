@@ -11,8 +11,6 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from django.conf import settings
-
 from celery.utils.log import get_task_logger
 from peanut.celery import app
 
@@ -201,11 +199,12 @@ def sendDigestForUserId(userId):
 	msg = getDigestMessageForUser(user, None)
 
 	if msg:
-		sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
+		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
 
 @app.task
-def processDailyDigest(keeperNumber=settings.KEEPER_NUMBER):
+def processDailyDigest(keeperNumber=None):
+
 	entries = Entry.objects.filter(creator__product_id=1, label="#reminders", hidden=False)
 
 	entriesByCreator = dict()
@@ -221,21 +220,23 @@ def processDailyDigest(keeperNumber=settings.KEEPER_NUMBER):
 
 		msg = getDigestMessageForUser(user, entries)
 
+		if not keeperNumber:
+			keeperNumber = user.getKeeperNumber()
+
 		if msg:
 			sms_util.sendMsg(user, msg, None, keeperNumber)
 		else:
-			sms_util.sendMsg(user, "fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, settings.KEEPER_NUMBER)
+			sms_util.sendMsg(user, "fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, user.getKeeperNumber())
 
 
 @app.task
 def sendTips(keeperNumber=None):
-	if not keeperNumber:
-		keeperNumber = settings.KEEPER_NUMBER
-
 	users = User.objects.all()
 	for user in users:
 		tip = tips.selectNextTip(user)
 		if tip:
+			if not keeperNumber:
+				keeperNumber = user.getKeeperNumber()
 			sendTipToUser(tip, user, keeperNumber)
 
 

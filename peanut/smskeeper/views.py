@@ -210,7 +210,7 @@ def send_sms(request):
 		direction = form.cleaned_data['direction']
 
 		if not keeperNumber:
-			keeperNumber = settings.KEEPER_NUMBER
+			keeperNumber = user.getKeeperNumber()
 
 		if direction == "ToUser":
 			sms_util.sendMsg(user, msg, None, keeperNumber, manual=True)
@@ -262,7 +262,7 @@ def resend_msg(request):
 		keeperNumber = form.cleaned_data['from_num']
 
 		if not keeperNumber:
-			keeperNumber = settings.KEEPER_NUMBER
+			keeperNumber = user.getKeeperNumber()
 
 		message = Message.objects.get(id=msgId)
 		data = json.loads(message.msg_json)
@@ -409,9 +409,9 @@ def signup_from_website(request):
 
 				if target_user.state == keeper_constants.STATE_NOT_ACTIVATED:
 					msg = "You are already on the list. Hang tight and I'll be in touch soon."
-					sms_util.sendMsg(target_user, msg, None, settings.KEEPER_NUMBER)
+					sms_util.sendMsg(target_user, msg, None, target_user.getKeeperNumber())
 				elif target_user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
-					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
+					user_util.activate(target_user, "", None, target_user.getKeeperNumber())
 
 			except User.DoesNotExist:
 				if 'todo1' in exp:
@@ -421,7 +421,7 @@ def signup_from_website(request):
 				target_user = User.objects.create(phone_number=phoneNum, product_id=productId, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}))
 				target_user.save()
 
-				user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
+				user_util.activate(target_user, "", None, target_user.getKeeperNumber())
 
 				"""
 				Comment out code to try always activating users
