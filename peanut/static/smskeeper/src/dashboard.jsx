@@ -108,7 +108,7 @@ var UserRow = React.createClass({
 		return (
       <tr className= {rowClasses}>
         <td className="cell"> { this.props.user.id } ({ this.props.user.phone_number })</td>
-        <td className="cell"> <a href="/{this.props.user.key}">{ this.props.user.name }</a></td>
+        <td className="cell"> <a href={"/"+this.props.user.key}>{ this.props.user.name }</a></td>
         <td className="cell" title={ this.props.user.full_name }> { this.props.user.full_name[0] }</td>
         <td className="cell"> { accountAge }</td>
         <td className="cell"> { activated_text }</td>
