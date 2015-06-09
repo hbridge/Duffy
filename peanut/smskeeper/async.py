@@ -21,6 +21,8 @@ from smskeeper.models import Entry
 from smskeeper.models import User
 from smskeeper import keeper_constants
 
+from common import date_util
+
 logger = get_task_logger(__name__)
 
 
@@ -33,21 +35,27 @@ def shouldRemindNow(entry):
 	if entry.hidden:
 		return False
 
-	now = datetime.datetime.now(pytz.utc)
+	now = date_util.now(pytz.utc)
 
-	# Don't remind if we sent one since the last time it was updated/created
-	if entry.remind_last_notified and entry.updated:
+	# Don't remind if we sent one after the remind time
+	if entry.remind_last_notified and entry.remind_last_notified >= entry.remind_timestamp:
 		return False
 
 	# Don't remind if its too far in the past
 	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
 		return False
 
+	# If this is a todo, don't send a reminder if this is during the digest time, since it'll be
+	# included in that
+	if entry.creator.product_id == keeper_constants.TODO_PRODUCT_ID:
+		if shouldSendDigestForUser(entry.creator, now):
+			return False
+
 	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
 		# If we're within 10 minutes, so alarm goes off at 9:50 if remind is at 10
 		return (now + datetime.timedelta(minutes=10) > entry.remind_timestamp)
 	else:
-		return (now > entry.remind_timestamp)
+		return (now >= entry.remind_timestamp)
 
 
 def processReminder(entry):
@@ -70,7 +78,7 @@ def processReminder(entry):
 				msg = "Hi! Friendly reminder: %s" % entry.text
 
 			sms_util.sendMsg(user, msg, None, entry.keeper_number)
-			entry.remind_last_notified = datetime.datetime.now(pytz.utc)
+			entry.remind_last_notified = date_util.now(pytz.utc)
 
 			# Only do fancy things like snooze if they've actually gone through the tutorial
 			if user.completed_tutorial:
@@ -142,19 +150,20 @@ def processAllReminders():
 			processReminder(entry)
 
 
-def shouldSendDigestForUser(user):
-	localNow = datetime.datetime.now(user.getTimezone())
+# Returns true if the user should be sent the digest at the given utc time
+def shouldSendDigestForUser(user, utcTime):
+	localTime = utcTime.astimezone(user.getTimezone())
 
 	# By default only send if its 9 am
 	# Later on might make this per-user specific
-	if localNow.hour == 17 and localNow.minute == 50:
+	if localTime.hour == keeper_constants.TODO_DIGEST_HOUR and localTime.minute == keeper_constants.TODO_DIGEST_MINUTE:
 		return True
 	return False
 
 
 def shouldIncludeEntry(entry):
 	# Cutoff time is 23 hours ahead, could be changed later to be more tz aware
-	localNow = datetime.datetime.now(entry.creator.getTimezone())
+	localNow = date_util.now(entry.creator.getTimezone())
 	# Cutoff time is midnight local time
 	cutoffTime = (localNow + datetime.timedelta(days=1)).replace(hour=0, minute=0)
 
@@ -164,7 +173,7 @@ def shouldIncludeEntry(entry):
 
 
 def getDigestMessageForUser(user, entries):
-	now = datetime.datetime.now(pytz.utc)
+	now = date_util.now(pytz.utc)
 	msg = "Your things for today:\n"
 	pendingEntries = user_util.pendingTodoEntries(user, entries)
 
@@ -172,7 +181,7 @@ def getDigestMessageForUser(user, entries):
 		return ""
 
 	for entry in pendingEntries:
-		entry.remind_last_notified = datetime.datetime.now(pytz.utc)
+		entry.remind_last_notified = date_util.now(pytz.utc)
 		entry.save()
 		msg += entry.text
 
@@ -196,7 +205,7 @@ def sendDigestForUserId(userId):
 
 
 @app.task
-def processDailyDigest():
+def processDailyDigest(keeperNumber=settings.KEEPER_NUMBER):
 	entries = Entry.objects.filter(creator__product_id=1, label="#reminders", hidden=False)
 
 	entriesByCreator = dict()
@@ -207,13 +216,13 @@ def processDailyDigest():
 		entriesByCreator[entry.creator].append(entry)
 
 	for user, entries in entriesByCreator.iteritems():
-		if not shouldSendDigestForUser(user):
+		if not shouldSendDigestForUser(user, date_util.now(pytz.utc)):
 			continue
 
 		msg = getDigestMessageForUser(user, entries)
 
 		if msg:
-			sms_util.sendMsg(user, msg, None, settings.KEEPER_NUMBER)
+			sms_util.sendMsg(user, msg, None, keeperNumber)
 		else:
 			sms_util.sendMsg(user, "fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, settings.KEEPER_NUMBER)
 

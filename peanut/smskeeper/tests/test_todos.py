@@ -202,3 +202,44 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(text="send email to alex")
 		self.assertTrue(entry.hidden)
 
+		# Make sure we create a new entry instead of a followup
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_process_daily_digest(self, nattyMock, dateMock):
+		self.setupUser()
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.NO_TIME, "I need to run", "")
+			cliMsg.msg(self.testPhoneNumber, "I need to run")
+			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertNotIn("around 9am", self.getOutput(mock))
+
+		# Make sure it was made for Tue 9am
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertEquals(2, entry.remind_timestamp.day)
+		self.assertEquals(13, entry.remind_timestamp.hour)
+
+		# Nothing for digest yet
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest("test")
+			self.assertEquals("", self.getOutput(mock))
+
+		# Now set to tomorrow at 9am, when the reminder is set for
+		self.setNow(dateMock, self.TUE_850AM)
+
+		# Shouldn't send in the normal processReminders
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertEquals("", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		# Digest should kicks off
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest("test")
+			self.assertIn("I need to run", self.getOutput(mock))
+
+
+

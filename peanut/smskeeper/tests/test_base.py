@@ -74,20 +74,25 @@ class SMSKeeperBaseCase(TestCase):
 		return events
 
 	# Day, hasDate, hasTime
-	# Assuming these are all in ETC
-	MON_8AM = ([2015, 6, 1, 8, 0, 0], True, True)
-	TUE_8AM = ([2015, 6, 2, 8, 0, 0], True, True)
-	TUE = ([2015, 6, 2, 8, 0, 0], True, False)
-	WEEKEND = ([2015, 6, 6, 8, 0, 0], True, False)
-	ONLY_4PM = ([2015, 6, 1, 16, 0, 0], False, True)
-	NEXT_WEEK = ([2015, 6, 8, 9, 0, 0], True, False)
-	SUNDAY_7PM = ([2015, 6, 7, 19, 0, 0], True, True)
+	# These should all in UTC
+	MON_8AM = ([2015, 6, 1, 12, 0, 0], True, True)
+	MON_9AM = ([2015, 6, 1, 13, 0, 0], True, True)
+	TUE_8AM = ([2015, 6, 2, 12, 0, 0], True, True)
+	TUE_9AM = ([2015, 6, 2, 13, 0, 0], True, True)
+	TUE_850AM = ([2015, 6, 2, 12, 50, 0], True, True)
+	TUE = ([2015, 6, 2, 12, 0, 0], True, False)
+	WEEKEND = ([2015, 6, 6, 12, 0, 0], True, False)
+	ONLY_4PM = ([2015, 6, 1, 20, 0, 0], False, True)
+	NEXT_WEEK = ([2015, 6, 8, 12, 0, 0], True, False)
+	SUNDAY_7PM = ([2015, 6, 7, 23, 0, 0], True, True)
+
+	NO_TIME = ([2010, 6, 1, 8, 0, 0], False, False)
 
 	def setNow(self, dateMock, date):
 		d, hasDate, hasTime = date
-		dateMock.return_value = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=self.getTestUser().getTimezone()).astimezone(pytz.utc)
+		dateMock.return_value = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=pytz.utc)
 
 	def setupNatty(self, nattyMock, date, queryWithoutTiming, usedText):
 		d, hasDate, hasTime = date
-		dt = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=self.getTestUser().getTimezone())
+		dt = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=pytz.utc)
 		nattyMock.return_value = [natty_util.NattyResult(dt, queryWithoutTiming, usedText, hasDate, hasTime)]

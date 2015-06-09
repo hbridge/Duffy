@@ -167,6 +167,11 @@ SMSKEEPER_WEB_NUM = "web"
 REMINDER_PRODUCT_ID = 0
 TODO_PRODUCT_ID = 1
 
+# This is local time, so 9am
+TODO_DIGEST_HOUR = 9
+TODO_DIGEST_MINUTE = 0
+
+
 def isRealKeeperNumber(keeperNumber):
 	return keeperNumber != SMSKEEPER_CLI_NUM and keeperNumber != SMSKEEPER_TEST_NUM
 

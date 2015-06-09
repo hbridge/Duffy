@@ -2,9 +2,6 @@ import datetime
 import pytz
 from mock import patch
 
-from testfixtures import Replacer
-from testfixtures import test_datetime
-
 from smskeeper.models import Entry, User
 from smskeeper import cliMsg, msg_util, keeper_constants
 from smskeeper import async
@@ -98,45 +95,37 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			# Make sure pee shows up as a seperate entry
 			self.assertIn("pee", self.getOutput(mock))
 
-	def test_reminders_defaults(self):
+	@patch('common.date_util.utcnow')
+	def test_reminders_defaults(self, dateMock):
 		self.setupUser(True, True)
 
 		# Emulate the user sending in a reminder without a time for 9am, 3 pm and 10 pm
 		# Need to use replacer since we save these objects so need to be real datetimes
-		with Replacer() as r:
-			with patch('humanize.time._now') as mocked:
-				tz = pytz.timezone('US/Eastern')
-				# Try with 9 am EST
-				testDt = test_datetime(2020, 01, 01, 9, 0, 0, tzinfo=tz)
-				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
+		tz = pytz.timezone('US/Eastern')
+		# Try with 9 am EST
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 0, 0, tzinfo=tz)
 
-				# humanize.time._now should always return utcnow because that's what the
-				# server's time is set in
-				mocked.return_value = testDt.utcnow()
-				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, "#remind poop")
-					# Should be 6 pm, so 9 hours
-					self.assertIn("today around 6pm", self.getOutput(mock))
+		# humanize.time._now should always return utcnow because that's what the
+		# server's time is set in
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop")
+			# Should be 6 pm, so 9 hours
+			self.assertIn("today around 6pm", self.getOutput(mock))
 
-				# Try with 3 pm EST
-				testDt = test_datetime(2020, 01, 01, 15, 0, 0, tzinfo=tz)
-				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
-				mocked.return_value = testDt.utcnow()
-				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, "#remind poop")
-					# Should be 9 pm, so 6 hours
-					self.assertIn("today around 9pm", self.getOutput(mock))
+		# Try with 3 pm EST
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 15, 0, 0, tzinfo=tz)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop")
+			# Should be 9 pm, so 6 hours
+			self.assertIn("today around 9pm", self.getOutput(mock))
 
-				# Try with 10 pm EST
-				testDt = test_datetime(2020, 01, 01, 22, 0, 0, tzinfo=tz)
-				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
-				mocked.return_value = testDt.utcnow()
-				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, "#remind poop")
-					# Should be 9 am next day, so in 11 hours
-					self.assertIn("tomorrow around 9am", self.getOutput(mock))
+		# Try with 10 pm EST
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 22, 0, 0, tzinfo=tz)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "#remind poop")
+			# Should be 9 am next day, so in 11 hours
+			self.assertIn("tomorrow around 9am", self.getOutput(mock))
 
-			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
 	def test_reminders_middle_of_sentence(self):
 		self.setupUser(True, True)
@@ -172,7 +161,8 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertIn("poop, then poop again", entry.text)
 
-	def test_func_shouldRemindNow(self):
+	@patch('common.date_util.utcnow')
+	def test_func_shouldRemindNow(self, dateMock):
 		self.setupUser(True, True)
 
 		dt = datetime.datetime(2020, 01, 01, 10, 0, 0, tzinfo=pytz.utc)
@@ -180,41 +170,44 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		dt = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
 		entryOdd = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
+		entryOdd.save()
 
-		with Replacer() as r:
-			# This is an hour before, shouldn't remind now
-			testDt = test_datetime(2020, 01, 01, 9, 0, 0, tzinfo=pytz.utc)
-			r.replace('smskeeper.async.datetime.datetime', testDt)
+		# This is an hour before, shouldn't remind now
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 0, 0, tzinfo=pytz.utc)
 
-			ret = async.shouldRemindNow(entryEven)
-			self.assertFalse(ret)
+		ret = async.shouldRemindNow(entryEven)
+		self.assertFalse(ret)
 
-			ret = async.shouldRemindNow(entryOdd)
-			self.assertFalse(ret)
+		ret = async.shouldRemindNow(entryOdd)
+		self.assertFalse(ret)
 
-			# This 10 minutes before and minutes is 0 so should remind
-			testDt = test_datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
-			r.replace('smskeeper.async.datetime.datetime', testDt)
-			ret = async.shouldRemindNow(entryEven)
-			self.assertTrue(ret)
+		# This 10 minutes before and minutes is 0 so should remind
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entryEven)
+		self.assertTrue(ret)
 
-			# This has an odd minute so shouldn't fire
-			ret = async.shouldRemindNow(entryOdd)
-			self.assertFalse(ret)
+		# This has an odd minute so shouldn't fire
+		ret = async.shouldRemindNow(entryOdd)
+		self.assertFalse(ret)
 
-			# Now we're past the actual time, so should fire
-			testDt = test_datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
-			r.replace('smskeeper.async.datetime.datetime', testDt)
-			ret = async.shouldRemindNow(entryOdd)
-			self.assertTrue(ret)
+		# Now we're past the actual time, so should fire
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entryOdd)
+		self.assertTrue(ret)
 
-			# Now we're past the actual time, but we say we were just notified, so shouldn't fire
-			entryOdd.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
-			entryOdd.save()
-			testDt = test_datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
-			r.replace('smskeeper.async.datetime.datetime', testDt)
-			ret = async.shouldRemindNow(entryOdd)
-			self.assertFalse(ret)
+		# Now we're past the actual time, but we say we were just notified, so shouldn't fire
+		# Pretend we just fired the reminder... Now it shouldn't fire again afterwards
+		entryOdd.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entryOdd)
+		self.assertFalse(ret)
+
+		# Now set the remind timestamp  like it was snoozed for an hour one minute later
+		# Should fire
+		entryOdd.remind_timestamp = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 11, 16, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entryOdd)
+		self.assertTrue(ret)
 
 	def test_at_preference(self):
 		self.setupUser(True, True)

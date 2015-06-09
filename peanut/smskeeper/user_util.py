@@ -11,6 +11,8 @@ from smskeeper import time_utils
 
 from smskeeper.models import Entry
 
+from common import date_util
+
 
 # Options for tutorial state are:
 # keeper_constants.STATE_TUTORIAL_REMIND and keeper_constants.STATE_TUTORIAL_LIST
@@ -66,7 +68,7 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 
 def shouldIncludeEntry(entry):
 	# Cutoff time is 23 hours ahead, could be changed later to be more tz aware
-	localNow = datetime.datetime.now(entry.creator.getTimezone())
+	localNow = date_util.now(entry.creator.getTimezone())
 	# Cutoff time is midnight local time
 	cutoffTime = (localNow + datetime.timedelta(days=1)).replace(hour=0, minute=0)
 
