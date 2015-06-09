@@ -379,16 +379,18 @@ var List = React.createClass({
     }.bind(this);
 
     var listClasses = classNames({
-      'list': true,
       'grid-item': true,
+      'list': true,
+      'textList': !this.props.isReminders,
       'reminderList': this.props.isReminders,
+      'stamp': this.props.isReminders,
     });
 
     return (
       <div className={listClasses}>
         <div className="container">
           <span className="clearButton"><a href="#" onClick={this.handleClear}>X</a></span>
-          <h2> {this.props.label} </h2>
+          <span classnName="listTitle"> {this.props.label} </span>
         </div>
         <div className="entriesList">
            { this.props.entries.map(createEntry) }
@@ -418,6 +420,44 @@ var List = React.createClass({
       result: result
     });
   },
+});
+
+var CreateListField = React.createClass({
+  mixins: [BackboneReactComponent],
+  render: function() {
+     return (
+      <div className="grid-item createListControl stamp">
+        <form className="createListForm" onSubmit={this.handleSave}>
+          <input type="text" placeholder="New List..." ref="text" className="createListField listTitle"/>
+          <input type="submit" value="Save" style={{display: "none"}} />
+        </form>
+      </div>
+    );
+  },
+
+  handleSave: function(e) {
+    e.preventDefault();
+    console.log("create list");
+
+    var text = React.findDOMNode(this.refs.text).value.trim();
+    if (text == "") return;
+
+    var entry = new Entry();
+    entry.set('label', "#" + text);
+    entry.set('text', "New item");
+    this.getCollection().add([entry]);
+    entry.save();
+
+    mixpanel.track("Created List", {
+      distinct_id: USER.id,
+      interface: "web",
+      Label: entry.get('label'),
+      "Share Count": 0,
+      "Media Count": 0,
+    });
+
+    React.findDOMNode(this.refs.text).value = "";
+  }
 });
 
 var HeaderBar = React.createClass({
@@ -488,6 +528,11 @@ var KeeperApp = React.createClass({
           isReminders= { true }/>
       );
     }
+
+    // then the create list field
+    listNodes.push(
+      <CreateListField key="createList" />
+    );
 
     // then add the rest of the lists
     for (key in this.props.lists) {
