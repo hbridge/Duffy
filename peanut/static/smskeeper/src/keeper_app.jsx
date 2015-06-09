@@ -124,7 +124,7 @@ var EntryRow = React.createClass({
     }
 
     return (
-      <div className="entry container" onMouseOver={this.handleChildClicked}>
+      <div className="entry container" onMouseOver={this.selectRow}>
         {deleteElement}
         <EntryTextField text={text}
           handleClicked={this.handleChildClicked}
@@ -148,13 +148,24 @@ var EntryRow = React.createClass({
       });
   },
 
-  handleChildClicked: function(child) {
-    // deselect the previously selected entry row
+  selectRow: function() {
     if (SelectedEntryRow && SelectedEntryRow != this) {
       SelectedEntryRow.setState({isSelected: false});
     }
     SelectedEntryRow = this;
     this.setState({isSelected: true});
+  },
+
+  deselectRow: function() {
+    if (SelectedEntryRow == this) {
+      this.setState({isSelected: false});
+      SelectedEntryRow = null;
+    }
+  },
+
+  handleChildClicked: function(child) {
+    // deselect the previously selected entry row
+    this.selectRow();
   },
 
   componentWillUpdate: function(nextProps, nextState) {
