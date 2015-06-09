@@ -270,6 +270,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'smskeeper.sms_util': {
+            'handlers': ['celery', 'duffyfile', 'djangoerror'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
     }
 }
 
