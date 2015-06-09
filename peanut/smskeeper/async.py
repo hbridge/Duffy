@@ -241,7 +241,7 @@ def sendTips(keeperNumber=None):
 
 
 def sendTipToUser(tip, user, keeperNumber):
-	sms_util.sendMsg(user, tip.render(user.name), tip.mediaUrl, keeperNumber)
+	sms_util.sendMsg(user, tip.render(user), tip.mediaUrl, keeperNumber)
 	tips.markTipSent(user, tip)
 
 

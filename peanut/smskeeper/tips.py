@@ -20,8 +20,10 @@ class KeeperTip():
 		self.triggerBased = triggerBased
 
 	# Render a tip for a full tip, like vcard
-	def render(self, name):
-		return self.message.replace(":NAME:", name) + "\n\n" + SMSKEEPER_TIP_FOOTER
+	def render(self, user):
+		if self.id == VCARD_TIP_ID:
+			self.mediaUrl = getKeeperVCard(user)
+		return self.message.replace(":NAME:", user.name) + "\n\n" + SMSKEEPER_TIP_FOOTER
 
 	# Mini tips are little sentences sent after first actions
 	def renderMini(self):
@@ -42,10 +44,9 @@ DONE_TIP3_ID = "mini-done3"
 
 
 SMSKEEPER_TIPS = [
-	KeeperTip(
+	KeeperTip( #mediaurl will be put in at render time
 		VCARD_TIP_ID,
 		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
-		keeper_constants.KEEPER_VCARD_URL,
 		True
 	),
 	KeeperTip(
@@ -111,8 +112,7 @@ def isEligibleForTip(user):
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
 	if not user.last_tip_sent:
 		dt_activated = datetime.datetime.now(pytz.utc) - user.activated  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
-		# print "user.activated %s dt_activated: %s" % (user.activated, dt_activated)
-		if dt_activated.total_seconds() >= tip_frequency_seconds:
+		if dt_activated.total_seconds() >= 3*60*60: # if it's been at least 3 hours since they signed up, send them the first tip
 			return True
 	else:
 		dt_tip_sent = datetime.datetime.now(pytz.utc) - user.last_tip_sent  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
@@ -208,3 +208,9 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 			"Local Hour of Day": localHour
 		},
 	)
+
+def getKeeperVCard(user):
+	if user.product_id == 1:
+		return keeper_constants.KEEPER_TODO_VCARD_URL
+	else:
+		return keeper_constants.KEEPER_VCARD_URL

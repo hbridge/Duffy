@@ -151,6 +151,7 @@ COMMON_LIST_RES = [
 ]
 
 KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
+KEEPER_TODO_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper_todo.vcf"
 KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
@@ -170,7 +171,6 @@ TODO_PRODUCT_ID = 1
 # This is local time, so 9am
 TODO_DIGEST_HOUR = 9
 TODO_DIGEST_MINUTE = 0
-
 
 def isRealKeeperNumber(keeperNumber):
 	return keeperNumber != SMSKEEPER_CLI_NUM and keeperNumber != SMSKEEPER_TEST_NUM
