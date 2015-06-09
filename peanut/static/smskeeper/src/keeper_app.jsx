@@ -390,7 +390,7 @@ var List = React.createClass({
       <div className={listClasses}>
         <div className="container">
           <span className="clearButton"><a href="#" onClick={this.handleClear}>X</a></span>
-          <span classnName="listTitle"> {this.props.label} </span>
+          <span className="listTitle"> {this.props.label} </span>
         </div>
         <div className="entriesList">
            { this.props.entries.map(createEntry) }
