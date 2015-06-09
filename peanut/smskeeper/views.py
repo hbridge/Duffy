@@ -308,6 +308,7 @@ def getUserDataDict(user, phoneNumToContactDict):
 
 	userData = {
 		"id": user.id,
+		"key": user.key,
 		"phone_number": user.phone_number,
 		"name": user.name,
 		"full_name": full_name,
