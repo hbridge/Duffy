@@ -62,7 +62,6 @@ var EntryList = Backbone.Collection.extend({
       var hidden = entry.get('hidden');
       if (hidden) return;
       var labelName = entry.get('label').replace("#", "")
-      console.log(labelName);
 
       var entriesForLabel = []
       if (labelName in entriesByList) {
@@ -125,7 +124,7 @@ var EntryRow = React.createClass({
     }
 
     return (
-      <div className="entry container">
+      <div className="entry container" onMouseOver={this.handleChildClicked}>
         {deleteElement}
         <EntryTextField text={text}
           handleClicked={this.handleChildClicked}
@@ -402,7 +401,7 @@ var List = React.createClass({
           <span className="listTitle"> {this.props.label} </span>
         </div>
         <div className="entriesList">
-           { this.props.entries.map(createEntry) }
+           { this.props.entries.reverse().map(createEntry) }
         </div>
         <CreateEntryFooter isReminders={ this.props.isReminders }
           listName={this.props.label}/>
