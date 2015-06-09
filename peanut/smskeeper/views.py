@@ -270,11 +270,11 @@ def resend_msg(request):
 		msgId = form.cleaned_data['msg_id']
 		keeperNumber = form.cleaned_data['from_num']
 
-		if not keeperNumber:
-			keeperNumber = user.getKeeperNumber()
-
 		message = Message.objects.get(id=msgId)
 		data = json.loads(message.msg_json)
+
+		if not keeperNumber:
+			keeperNumber = message.user.getKeeperNumber()
 
 		if (message.incoming):
 			requestDict = json.loads(message.msg_json)
