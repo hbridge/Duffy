@@ -120,6 +120,10 @@ SMSKEEPER_NICETIES = [
 		"done$|did it",
 		[":thumbsup:", u"Nice!", u"Sweet!", ":party_popper:"]
 	),
+	Nicety(
+		"have a(n)? [\w]+ day",
+		["Thanks, you too! :smile:"]
+	),
 ]
 
 
