@@ -17,7 +17,7 @@ def process(user, msg, requestDict, keeperNumber):
 		entry.hidden = True
 		entry.save()
 
-		msgBack = "Nice!"
+		msgBack = u"Nice! \u2705"
 
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 
