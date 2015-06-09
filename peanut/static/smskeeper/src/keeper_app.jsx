@@ -75,7 +75,7 @@ var EntryList = Backbone.Collection.extend({
     var sorted = notHidden.sort(function(a, b){
       var dateA = new Date(a.get("remind_timestamp"));
       var dateB = new Date(b.get("remind_timestamp"));
-      return dateA > dateB;
+      return dateA - dateB;
     });
     return(sorted);
   }
