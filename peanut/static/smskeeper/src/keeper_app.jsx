@@ -510,7 +510,7 @@ var KeeperApp = React.createClass({
     SubmitCommandToServer = this.submitCommandToServer;
     var loadFunc = this.loadDataFromServer;
     if (window['DEVELOPMENT'] == undefined) {
-      setInterval(function () {loadFunc()}, 2000);
+      setInterval(function () {this.getCollection().fetch()}.bind(this), 10000);
     } else {
       console.log("in development, not autorefreshing");
     }
