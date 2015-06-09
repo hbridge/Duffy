@@ -256,7 +256,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("around 4pm", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEqual("email Itai about city year intro to lightsail via Nate.", entry.text)
+		self.assertEqual("email Itai about city year intro to lightsail via Nate", entry.text)
 
 		# 4 pm ETC, so 18 UTC
 		self.assertEqual(20, entry.remind_timestamp.hour)

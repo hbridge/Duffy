@@ -102,7 +102,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertNotIn("milk", self.getOutput(mock))
 
-
 	def test_freeform_fetch_common_list(self):
 		self.setupUser(True, True, keeper_constants.STATE_NORMAL)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -148,7 +147,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#test")
 			self.assertIn("You got it", self.getOutput(mock))
-
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
@@ -500,7 +498,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			user = self.getTestUser()
 			self.assertEqual(user.state, keeper_constants.STATE_NOT_ACTIVATED)
 
-
 	# Emulate a user who has a signature at the end of their messages
 	def test_signatures(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
@@ -521,3 +518,9 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, 'tell me more')
 			self.assertEqual('', self.getOutput(mock))
 
+	def test_reminder_clean(self):
+		s = msg_util.cleanedReminder("remind me on blah.")
+		self.assertEquals(s, "blah")
+
+		s = msg_util.cleanedReminder("remind me on blah at.")
+		self.assertEquals(s, "blah")

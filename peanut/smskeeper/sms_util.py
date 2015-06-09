@@ -37,11 +37,11 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
-		logger.error("Tried to send message to nonexistent user with id: %d", userId)
+		logger.error("User %s: Tried to send message to nonexistent user", userId)
 		return
 
 	if user.state == keeper_constants.STATE_STOPPED and user.getStateData("step") and user.getStateData("step") == 1:
-		logger.warning("Tried to send msg %s to user %s who is in state stopped" % (msgText, user.id))
+		logger.warning("User %s: Tried to send msg '%s' but they are in state stopped" % (user.id, msgText))
 		return
 
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
@@ -56,7 +56,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 		message.save()
 	else:
 		try:
-			logger.info("Sending %s to %s" % (msgText, str(user.phone_number)))
+			logger.info("User %s: Sending '%s'" % (user.id, msgText))
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)
 			message.save()
 			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)

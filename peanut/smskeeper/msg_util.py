@@ -33,6 +33,8 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
+REMINDER_FRINGE_TERMS = ["to", "on", "at"]
+
 
 def hasLabel(msg):
 	for word in msg.split(' '):
@@ -185,7 +187,7 @@ def getReminderHandle(msg):
 	match = reminder_re.search(text)
 	if match:
 		handle = match.group("handle")
-		if handle != "to" and handle != "on" and handle != "at":
+		if handle not in REMINDER_FRINGE_TERMS:
 			return handle
 	return None
 
@@ -196,8 +198,18 @@ def cleanedReminder(msg):
 	match = reminder_re.search(text)
 	if match:
 		cleaned = msg[:match.start()] + msg[match.end():]
-		return cleaned.strip()
-	return msg
+
+		cleaned = cleaned.strip(string.punctuation).strip()
+		words = cleaned.split(' ')
+		if len(words) >= 2:
+			if words[0] in REMINDER_FRINGE_TERMS:
+				cleaned = cleaned.split(' ', 1)[1]
+			if words[-1] in REMINDER_FRINGE_TERMS:
+				cleaned = cleaned.rsplit(' ', 1)[0]
+
+		return cleaned
+	else:
+		return msg
 
 
 def isDeleteCommand(msg):
