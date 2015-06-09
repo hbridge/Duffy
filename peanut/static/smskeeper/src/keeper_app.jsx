@@ -32,10 +32,13 @@ SubmitCommandToServer = null;
 
 var Entry = Backbone.Model.extend({
   defaults: function() {
+      var dateString = (new Date()).toISOString();
       return {
         hidden: false,
         creator: USER.id,
-        users: [USER.id]
+        users: [USER.id],
+        added: dateString,
+        updated: dateString,
       };
     },
 
@@ -48,12 +51,18 @@ var Entry = Backbone.Model.extend({
 var EntryList = Backbone.Collection.extend({
   model: Entry,
   url: "/smskeeper/entry_feed?user_id=" + USER.id,
+  comparator: function(entry) {
+    var date = new Date(entry.get("added"));
+    var dval = (date - 0) * -1;
+    return dval;
+  },
   lists: function() {
     var entriesByList = [];
-    for (entry of this.models) {
+    this.forEach(function(entry){
       var hidden = entry.get('hidden');
-      if (hidden) continue;
+      if (hidden) return;
       var labelName = entry.get('label').replace("#", "")
+      console.log(labelName);
 
       var entriesForLabel = []
       if (labelName in entriesByList) {
@@ -62,7 +71,7 @@ var EntryList = Backbone.Collection.extend({
       entriesForLabel.push(entry);
 
       entriesByList[labelName] = entriesForLabel;
-    }
+    });
 
     // pull out reminders
     if (entriesByList["reminders"]) {
