@@ -214,6 +214,9 @@ class User(models.Model):
 		else:
 			return settings.KEEPER_NUMBER_DICT[self.product_id]
 
+	def getWebsiteURLPath(self):
+		return "/k/%s" % self.key
+
 	def __unicode__(self):
 		if self.name:
 			return str(self.id) + " - " + self.name
