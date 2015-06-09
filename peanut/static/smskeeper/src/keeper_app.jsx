@@ -30,7 +30,14 @@ SelectedEntryRow = null;
 SubmitCommandToServer = null;
 
 
+var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
+
 var PostToSlack = function(text, channel){
+  if (DevelopmentMode) {
+    console.log("In development, not posting to slack");
+    return;
+  }
+
   var params = {
     username: USER.name,
     icon_emoji: ':globe_with_meridians:',
@@ -494,6 +501,7 @@ var CreateListField = React.createClass({
     this.getCollection().add([entry]);
     entry.save();
 
+    PostToSlack("Created a list: " + entry.get('label'), "#livesmskeeperfeed");
     mixpanel.track("Created List", {
       distinct_id: USER.id,
       interface: "web",
