@@ -12,6 +12,7 @@ body {
 
 #keeper_app {
 	background-color: #3131AC;
+	padding-bottom: 50px;
 }
 
 .reminderList {
