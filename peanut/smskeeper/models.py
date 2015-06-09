@@ -42,6 +42,9 @@ class User(models.Model):
 
 	invite_code = models.CharField(max_length=100, null=True, blank=True)
 
+	# Used as an identifier for a user instead of an id
+	key = models.CharField(max_length=100, null=True, blank=True)
+
 	timezone = models.CharField(max_length=100, null=True, blank=True)
 	sent_tips = models.TextField(null=True, db_index=False, blank=True)
 	disable_tips = models.BooleanField(default=False)

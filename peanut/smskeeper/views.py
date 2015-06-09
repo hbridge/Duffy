@@ -102,15 +102,24 @@ def keeper_app(request):
 	return renderReact(request, 'keeper_app', 'keeper_app.html')
 
 
+def mykeeper(request, key):
+	try:
+		user = User.objects.get(key=key)
+		return renderReact(request, 'keeper_app', 'keeper_app.html', user)
+	except User.DoesNotExist:
+		return HttpResponse(json.dumps({"Errors": "User not found"}), content_type="text/json", status=400)
+
+
 @login_required(login_url='/admin/login/')
 def history(request):
 	return renderReact(request, 'history')
 
 
-def renderReact(request, appName, templateFile="react_app.html"):
+def renderReact(request, appName, templateFile="react_app.html", user=None):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
-		user = form.cleaned_data['user']
+		if not user:
+			user = form.cleaned_data['user']
 		context = dict()
 
 		phoneNumToContactDict = getNameFromContactsDB([user.phone_number])

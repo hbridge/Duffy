@@ -5,18 +5,19 @@ from smskeeper.models import User
 class UserIdMixin(forms.Form):
 	def clean_user_id(self):
 		userId = self.cleaned_data['user_id']
-		try:
-			user = User.objects.get(id=userId)
-			self.cleaned_data['user'] = user
+		if userId:
+			try:
+				user = User.objects.get(id=userId)
+				self.cleaned_data['user'] = user
 
-		except User.DoesNotExist:
-			raise forms.ValidationError("User not found")
+			except User.DoesNotExist:
+				raise forms.ValidationError("User not found")
 
 		return self.cleaned_data['user_id']
 
 
 class UserIdForm(UserIdMixin):
-	user_id = forms.IntegerField(required=True)
+	user_id = forms.IntegerField(required=False)
 	development = forms.BooleanField(required=False)
 
 
