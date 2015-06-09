@@ -162,51 +162,77 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertIn("poop, then poop again", entry.text)
 
 	@patch('common.date_util.utcnow')
-	def test_func_shouldRemindNow(self, dateMock):
+	def test_func_should_remind_now_even(self, dateMock):
 		self.setupUser(True, True)
 
 		dt = datetime.datetime(2020, 01, 01, 10, 0, 0, tzinfo=pytz.utc)
-		entryEven = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
-
-		dt = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
-		entryOdd = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
-		entryOdd.save()
+		entry = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
 
 		# This is an hour before, shouldn't remind now
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 0, 0, tzinfo=pytz.utc)
 
-		ret = async.shouldRemindNow(entryEven)
-		self.assertFalse(ret)
-
-		ret = async.shouldRemindNow(entryOdd)
+		ret = async.shouldRemindNow(entry)
 		self.assertFalse(ret)
 
 		# This 10 minutes before and minutes is 0 so should remind
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
-		ret = async.shouldRemindNow(entryEven)
+		ret = async.shouldRemindNow(entry)
 		self.assertTrue(ret)
 
-		# This has an odd minute so shouldn't fire
-		ret = async.shouldRemindNow(entryOdd)
-		self.assertFalse(ret)
+		# Make it look like we just sent out a reminder by setting last_notified and updated
+		entry.remind_last_notified = datetime.datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
+		entry.updated = datetime.datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
 
-		# Now we're past the actual time, so should fire
-		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
-		ret = async.shouldRemindNow(entryOdd)
-		self.assertTrue(ret)
-
-		# Now we're past the actual time, but we say we were just notified, so shouldn't fire
-		# Pretend we just fired the reminder... Now it shouldn't fire again afterwards
-		entryOdd.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
-		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
-		ret = async.shouldRemindNow(entryOdd)
+		# Now set for a minute later and make sure we don't fire again
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 51, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entry)
 		self.assertFalse(ret)
 
 		# Now set the remind timestamp  like it was snoozed for an hour one minute later
 		# Should fire
-		entryOdd.remind_timestamp = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
+		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 10, 51, 0, tzinfo=pytz.utc)
+		entry.updated = datetime.datetime(2020, 01, 01, 10, 51, 0, tzinfo=pytz.utc)
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 51, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entry)
+		self.assertTrue(ret)
+
+	@patch('common.date_util.utcnow')
+	def test_func_should_remind_now_odd(self, dateMock):
+		self.setupUser(True, True)
+
+		dt = datetime.datetime(2020, 01, 01, 10, 15, 0, tzinfo=pytz.utc)
+		entry = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
+
+		# This is an hour before, shouldn't remind now
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 0, 0, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entry)
+		self.assertFalse(ret)
+
+		# This has an odd minute so shouldn't fire
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 50, 0, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entry)
+		self.assertFalse(ret)
+
+		# Now we're past the actual time, so should fire
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entry)
+		self.assertTrue(ret)
+
+		# Make it look like we just sent out a reminder by setting last_notified and updated
+		entry.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+		entry.updated = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+
+		# Now we're past the actual time, but we were just notified, so shouldn't fire
+		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 15, 2, tzinfo=pytz.utc)
+		ret = async.shouldRemindNow(entry)
+		self.assertFalse(ret)
+
+		# Now set the remind timestamp  like it was snoozed for an hour one minute later
+		# Should fire
+		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
+		entry.updated = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 11, 16, 1, tzinfo=pytz.utc)
-		ret = async.shouldRemindNow(entryOdd)
+		ret = async.shouldRemindNow(entry)
 		self.assertTrue(ret)
 
 	def test_at_preference(self):

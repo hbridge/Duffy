@@ -37,8 +37,8 @@ def shouldRemindNow(entry):
 
 	now = date_util.now(pytz.utc)
 
-	# Don't remind if we sent one after the remind time
-	if entry.remind_last_notified and entry.remind_last_notified >= entry.remind_timestamp:
+	# Don't remind if we just sent one out (hence the updated is the same as last reminded)
+	if entry.remind_last_notified and entry.remind_last_notified >= entry.updated:
 		return False
 
 	# Don't remind if its too far in the past

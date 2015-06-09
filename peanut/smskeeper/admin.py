@@ -50,7 +50,10 @@ class ReminderAdmin(admin.ModelAdmin):
 		return obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
 
 	def remind_last_notified_tz_aware(self, obj):
-		return obj.remind_last_notified.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+		if obj.remind_last_notified:
+			return obj.remind_last_notified.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+		else:
+			return ""
 
 	def get_object(self, request, object_id):
 		obj = super(ReminderAdmin, self).get_object(request, object_id)
