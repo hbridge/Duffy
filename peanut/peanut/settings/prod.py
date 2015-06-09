@@ -39,7 +39,7 @@ ADMINS = (
 	('Trello', 'servererrors+xl4dq5gxaohxoqfhln4q@boards.trello.com')
 )
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "my.getkeeper.com"]
 
 # S3 Prod server settings
 AWS_STORAGE_BUCKET_NAME = 'strand-prod'
