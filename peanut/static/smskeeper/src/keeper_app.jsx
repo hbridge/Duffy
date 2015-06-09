@@ -541,7 +541,7 @@ var KeeperApp = React.createClass({
     // put reminders on top
     if (this.state.reminders) {
       listNodes.push(
-        <List label="Reminders"
+        <List label={NodeEmoji.get("bell") + "Reminders"}
           entries={ this.state.reminders }
           key= { "reminders" }
           isReminders= { true }/>
