@@ -34,12 +34,15 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 	def test_tutorial_remind_no_time_given(self, nattyMock, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
+		#TODO Derek to see if we can get away without doing this statement up front
+		self.setNow(dateMock, self.MON_8AM)
+		
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setNow(dateMock, self.MON_8AM)
+
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future
@@ -53,11 +56,14 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 	def test_tutorial_remind_followup(self, nattyMock, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
+		#TODO Derek to see if we can get away without doing this statement up front
+		self.setNow(dateMock, self.MON_8AM)
+
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
-		self.setNow(dateMock, self.MON_8AM)
+
 		self.setupNatty(nattyMock, self.WEEKEND, "Remind me about the Improv show", "this weekend")
 		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show this weekend")
 

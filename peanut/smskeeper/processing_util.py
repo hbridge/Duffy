@@ -1,5 +1,7 @@
 import json
 import logging
+import pytz
+from datetime import timedelta
 
 from smskeeper import keeper_constants
 from smskeeper import analytics
@@ -8,7 +10,7 @@ from smskeeper.states import not_activated, not_activated_from_reminder, tutoria
 from smskeeper import msg_util, actions, niceties, sms_util
 
 from smskeeper.models import User, Message
-from common import slack_logger
+from common import slack_logger, date_util
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +65,15 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	finally:
 		# This is true if this is from a manual entry off the history page
 		manual = "Manual" in requestDict
+		if isDuplicateMsg(user, msg):
+			logger.debug("Ignore duplicate message from user %s: %s"%(user.id, msg))
+			# TODO figure out better logic so we aren't repeating this statement
+			messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
+			return False
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
 		slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
+
+
 
 	processed = False
 	# convert message to unicode
@@ -120,3 +129,14 @@ stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER: not_activated_from_reminder,
 	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,
 }
+
+# Checks for duplicate message
+def isDuplicateMsg(user, msg):
+	incomingMsg = Message.objects.filter(user=user, incoming=True, added__gt=date_util.now(pytz.utc)-timedelta(minutes=2)).order_by('-added')
+	if len(incomingMsg) > 0:
+		if incomingMsg[0].msg_json:
+			content = json.loads(incomingMsg[0].msg_json)
+			if 'Body' in content and content['Body'] == msg:
+				return True
+
+	return False

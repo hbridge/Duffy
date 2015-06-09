@@ -253,7 +253,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		)
 		self.user.save()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "thanks")
+			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
 
@@ -510,3 +510,14 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "UnitTests\nThis Is My Sig")
 			self.assertNotIn("Sig", self.getOutput(mock))
 		self.assertEqual("UnitTests", self.getTestUser().name)
+
+	# check for identical messages
+	def test_identical_messages(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, 'tell me more')
+			self.assertIn(keeper_constants.HELP_MESSAGES[0], self.getOutput(mock))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, 'tell me more')
+			self.assertEqual('', self.getOutput(mock))
+
