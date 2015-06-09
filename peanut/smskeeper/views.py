@@ -174,7 +174,6 @@ def message_feed(request):
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 
-@login_required(login_url='/admin/login/')
 def entry_feed(request):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
