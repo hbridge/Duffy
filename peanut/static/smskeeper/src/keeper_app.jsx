@@ -361,6 +361,12 @@ var CreateEntryFooter = React.createClass({
     React.findDOMNode(this.refs.text).value = "";
   },
 
+  componentDidUpdate: function(){
+    if (this.state.expanded) {
+      this.refs.text.getDOMNode().focus();
+    }
+  },
+
 });
 
 var List = React.createClass({
