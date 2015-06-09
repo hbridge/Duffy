@@ -109,6 +109,12 @@ var EntryRow = React.createClass({
       ref="entryTimeField"/>
     }
 
+    // create an attachment element if there's an attachment
+    var entryAttachment = null;
+    if (this.state.model.img_url) {
+      entryAttachment = <EntryAttachment attachmentUrl={this.state.model.img_url} />
+    }
+
     return (
       <div className="entry container">
         {deleteElement}
@@ -116,6 +122,7 @@ var EntryRow = React.createClass({
           handleClicked={this.handleChildClicked}
           ref="entryTextField" />
         {entryTimeField}
+        {entryAttachment}
       </div>
     );
   },
@@ -156,7 +163,10 @@ var EntryTextField = React.createClass({
    mixins: [BackboneReactComponent],
   render: function() {
     return (
-      <PlainEditable onBlur={this.handleTextFinishedEditing} onClick={this.handleClicked} value={this.props.text} ref="editable"/>
+      <PlainEditable onBlur={this.handleTextFinishedEditing}
+        onClick={this.handleClicked}
+        value={this.props.text}
+        ref="editable"/>
     );
   },
 
@@ -264,6 +274,25 @@ var EntryTimeField = React.createClass({
     if (this.state.expanded) {
       React.findDOMNode(this.refs.timeInput).focus();
     }
+  }
+});
+
+var EntryAttachment = React.createClass({
+  getStyle: function() {
+    return {
+      background: "url(%SRC%)".replace("%SRC%", this.props.attachmentUrl),
+      width: "100%",
+      height: "200px",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "contain",
+    };
+  },
+
+  render: function(){
+    return (
+      <div style={this.getStyle()}>
+      </div>
+    );
   }
 });
 
