@@ -85,7 +85,7 @@ INTRO_MESSAGES_PAID = [
 UNKNOWN_COMMAND_PHRASES = [
 	u"Sorry, I'm not sure what you mean \U0001F633\nType HELP for help. To notify my minions, say REPORT",
 	u"I'm still pretty new \U0001F423 and I don't understand that.\n\n Say HELP to see what I can do or REPORT and I'll poke one of my lackeys. \U0001F449",
-	u"Do you have a map?  'Cause I'm lost. \U0001F615 Say HELP for instructions or REPORT to notify the stooges."
+	u"I hope you have a map, 'cause I'm lost. \U0001F615 Say HELP for instructions or REPORT to notify the stooges."
 ]
 REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."

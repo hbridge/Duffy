@@ -51,7 +51,13 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			sms_util.sendMsgs(
 				user,
-				keeper_constants.HELP_SUBJECTS[subject][keeper_constants.GENERAL_HELP_KEY] + ["Say 'examples' if you want more examples."],
+				(
+					keeper_constants.HELP_SUBJECTS[subject][keeper_constants.GENERAL_HELP_KEY] +
+					[
+						"You can see and manage your stuff anytime at %s" % (user.getWebAppURL()),
+						"Say 'examples' if you want more examples."
+					]
+				),
 				keeperNumber,
 			)
 			user.setStateData("subject", subject)

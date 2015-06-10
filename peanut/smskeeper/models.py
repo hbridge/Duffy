@@ -217,6 +217,9 @@ class User(models.Model):
 	def getWebsiteURLPath(self):
 		return "%s" % self.key
 
+	def getWebAppURL(self):
+		return "my.getkeeper.com/%s" % self.getWebsiteURLPath()
+
 	def __unicode__(self):
 		if self.name:
 			return str(self.id) + " - " + self.name
