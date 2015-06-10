@@ -59,15 +59,20 @@ var UserTable = React.createClass({
 		}.bind(this);
     headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial (src)", "msgs (in/out)", "last in", "history"];
 
-		return (
-      <div>
-        <h1>{ this.props.title }</h1>
-        <table>
-          <HeaderRow headerValues={ headerValues } />
-          { createRows(this.props.users) }
-        </table>
-      </div>
-    );
+    if (this.props.users.length > 0) {
+      return (
+        <div>
+          <h1>{ this.props.title }</h1>
+          <table>
+            <HeaderRow headerValues={ headerValues } />
+            { createRows(this.props.users) }
+          </table>
+        </div>
+      );
+    } else {
+      return (<div></div>);
+    }
+
   },
 });
 
@@ -169,17 +174,31 @@ var DashboardApp = React.createClass({
       return results;
     };
 
-    var now = new Date();
-    var yest = new Date()
-    yest.setDate(yest.getDate() - 1);
+    var getPausedUsers = function(users) {
+      var results = [];
+      for (i=0; i<users.length; i++) {
+        if (users[i].paused) {
+          results.push(users[i]);
+        }
+      }
+      return results;
+    }
 
+    var now = new Date();
+    var yest = new Date();
+    var twoweeks = new Date();
+    yest.setDate(yest.getDate() - 1);
+    twoweeks.setDate(twoweeks.getDate() - 14);
+
+    var pausedUsers = getPausedUsers(this.state.users);
     var nonActivatedUsers = filterUsers(this.state.users, false, null, null);
     var recentlyActivatedUsers = filterUsers(this.state.users, true, now, yest);
-    var normalUsers = filterUsers(this.state.users, true, yest, new Date(0));
+    var normalUsers = filterUsers(this.state.users, true, yest, twoweeks);
 
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />
+        <UserTable users={ pausedUsers } showActivated={ true } title={"Paused (" + pausedUsers.length  + ")"}/>
         <UserTable users={ normalUsers } showActivated={ true } title={"Active (" + normalUsers.length  + ")"}/>
         <UserTable users={ recentlyActivatedUsers } showActivated={ true } title={"Recently Activated (" + recentlyActivatedUsers.length + ")"}/>
         <UserTable users={ nonActivatedUsers } showActivated={ false } title={ "Not activated (" + nonActivatedUsers.length + ")"}/>
