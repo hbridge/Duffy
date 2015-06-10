@@ -280,7 +280,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 			"Was Suspicious Hour": suspiciousHour,
 			"In tutorial": isTutorial(user),
 			"Is shared": len(entry.users.all()) > 1,
-			"Interface": keeperNumber,
+			"interface": keeperNumber,
 		}
 	)
 
