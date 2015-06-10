@@ -101,12 +101,6 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
 
-		self.setupUser(True, True, "UTC")
-		# user just activated don't send tip
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertNotIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
-
 	def testSetTipFrequency(self):
 		self.setupUser(True, True, "UTC")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
