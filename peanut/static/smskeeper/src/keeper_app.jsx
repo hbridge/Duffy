@@ -10,8 +10,13 @@ var PlainEditable = require("react-plain-editable");
 var Mixpanel = require("mixpanel")
 var NodeEmoji = require("node-emoji")
 
-var mixpanelToken = "d309a366da36d3f897ad2772390d1679";
-if (window['DEVELOPMENT'] == undefined) {
+var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
+
+var mixpanelToken;
+if (DevelopmentMode || USER.id <= 3) {
+  mixpanelToken = "d309a366da36d3f897ad2772390d1679";
+  console.log("In development, logging to dev stats");
+} else {
   mixpanelToken = "165ffa12b4eac14005ec6d97872a9c63";
 }
 var mixpanel = Mixpanel.init(mixpanelToken);
@@ -28,9 +33,6 @@ MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
 SelectedEntryRow = null;
 SubmitCommandToServer = null;
-
-
-var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 
 var PostToSlack = function(text, channel){
   if (DevelopmentMode) {
