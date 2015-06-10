@@ -194,12 +194,13 @@ var DashboardApp = React.createClass({
     var nonActivatedUsers = filterUsers(this.state.users, false, null, null);
     var recentlyActivatedUsers = filterUsers(this.state.users, true, now, yest);
     var normalUsers = filterUsers(this.state.users, true, yest, twoweeks);
-
+    var oldUsers = filterUsers(this.state.users, true, twoweeks, new Date(0));
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />
         <UserTable users={ pausedUsers } showActivated={ true } title={"Paused (" + pausedUsers.length  + ")"}/>
         <UserTable users={ normalUsers } showActivated={ true } title={"Active (" + normalUsers.length  + ")"}/>
+        <div>{ oldUsers.length } users inactive for more than 2 weeks </div>
         <UserTable users={ recentlyActivatedUsers } showActivated={ true } title={"Recently Activated (" + recentlyActivatedUsers.length + ")"}/>
         <UserTable users={ nonActivatedUsers } showActivated={ false } title={ "Not activated (" + nonActivatedUsers.length + ")"}/>
       </div>
