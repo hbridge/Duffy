@@ -135,12 +135,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
 
-	def test_question(self):
-		self.setupUser()
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Are you my daddy?")
-			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
-
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_hides(self):
 		self.setupUser()

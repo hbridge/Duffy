@@ -36,7 +36,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		#TODO Derek to see if we can get away without doing this statement up front
 		self.setNow(dateMock, self.MON_8AM)
-		
+
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
@@ -162,7 +162,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with sentence
-			cliMsg.msg(self.testPhoneNumber, "What are you?")
+			cliMsg.msg(self.testPhoneNumber, "What are you")
 			self.assertIn("but first what's your name?", self.getOutput(mock))
 
 		cliMsg.msg(self.testPhoneNumber, "I'm Billy")

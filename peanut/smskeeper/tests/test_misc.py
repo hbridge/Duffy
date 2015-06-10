@@ -49,7 +49,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertIn("milk", self.getOutput(mock))
 			cliMsg.msg(self.testPhoneNumber, "Add spinach to my groceries list")
-			cliMsg.msg(self.testPhoneNumber, "what's on my groceries list?")
+			cliMsg.msg(self.testPhoneNumber, "what's on my groceries list")
 			self.assertIn("spinach", self.getOutput(mock))
 			cliMsg.msg(self.testPhoneNumber, "add tofu to groceries")
 			cliMsg.msg(self.testPhoneNumber, "groceries list")
@@ -524,3 +524,10 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		s = msg_util.cleanedReminder("remind me on blah at.")
 		self.assertEquals(s, "blah")
+
+	def test_question(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Are you my daddy, please remind me?")
+			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+

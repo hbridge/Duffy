@@ -122,13 +122,6 @@ def process(user, msg, requestDict, keeperNumber):
 			logger.debug("For user %s I think '%s' is a pick command" % (user.id, msg))
 			label = msg_util.getLabel(msg)
 			actions.pickItemFromLabel(user, label, keeperNumber)
-		# STATE_NORMAL
-		elif msg_util.isHelpCommand(msg):
-			logger.debug("For user %s I think '%s' is a help command" % (user.id, msg))
-			actions.help(user, msg, keeperNumber)
-		elif msg_util.isSetTipFrequencyCommand(msg):
-			logger.debug("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
-			actions.setTipFrequency(user, msg, keeperNumber)
 		# STATE_ADD
 		elif msg_util.isFetchHandleCommand(msg):
 			logger.debug("For user %s I think '%s' is a fetch handle command" % (user.id, msg))
@@ -153,9 +146,6 @@ def process(user, msg, requestDict, keeperNumber):
 				if msg_util.isDoneCommand(msg):
 					logger.debug("User %s: (product id 1) I think '%s' is a done command" % (user.id, msg))
 					actions.done(user, msg, keeperNumber)
-				elif msg_util.isQuestion(msg):
-					logger.debug("User %s: (product id 1) I think '%s' is a question" % (user.id, msg))
-					actions.unknown(user, msg, keeperNumber)
 				elif len(msg.split(' ')) <= 1:
 					logger.debug("User %s: (product id 1) I think '%s' is a single word, skipping" % (user.id, msg))
 				else:

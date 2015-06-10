@@ -30,14 +30,6 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 		user.save()
 		return True
-	elif msg_util.nameInSetName(msg):
-		logger.debug("User %s: I think '%s' is a set name command" % (user.id, msg))
-		actions.setName(user, msg, keeperNumber)
-		return True
-	elif msg_util.isSetZipcodeCommand(msg):
-		logger.debug("User %s: I think '%s' is a set zip command" % (user.id, msg))
-		actions.setZipcode(user, msg, keeperNumber)
-		return True
 	elif niceties.getNicety(msg):
 		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
 		if msg_util.isDoneCommand(msg) and user.product_id == 1:
@@ -46,6 +38,26 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		nicety = niceties.getNicety(msg)
 		logger.debug("User %s: I think '%s' is a nicety" % (user.id, msg))
 		actions.nicety(user, nicety, requestDict, keeperNumber)
+		return True
+	elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
+		logger.debug("For user %s I think '%s' is a help command" % (user.id, msg))
+		actions.help(user, msg, keeperNumber)
+		return True
+	elif msg_util.isQuestion(msg):
+		logger.debug("User %s: I think '%s' is a question" % (user.id, msg))
+		actions.unknown(user, msg, keeperNumber)
+		return True
+	elif msg_util.isSetTipFrequencyCommand(msg):
+		logger.debug("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
+		actions.setTipFrequency(user, msg, keeperNumber)
+		return True
+	elif msg_util.nameInSetName(msg):
+		logger.debug("User %s: I think '%s' is a set name command" % (user.id, msg))
+		actions.setName(user, msg, keeperNumber)
+		return True
+	elif msg_util.isSetZipcodeCommand(msg):
+		logger.debug("User %s: I think '%s' is a set zip command" % (user.id, msg))
+		actions.setZipcode(user, msg, keeperNumber)
 		return True
 	return False
 

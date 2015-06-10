@@ -141,7 +141,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with sentence
-			cliMsg.msg(self.testPhoneNumber, "What are you?")
+			cliMsg.msg(self.testPhoneNumber, "What are you")
 			self.assertIn("but first what's your name?", self.getOutput(mock))
 
 		cliMsg.msg(self.testPhoneNumber, "I'm Billy")
