@@ -7,13 +7,13 @@ var moment = require('moment');
 var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
 var PlainEditable = require("react-plain-editable");
-var Mixpanel = require("mixpanel")
-var NodeEmoji = require("node-emoji")
+var Mixpanel = require("mixpanel");
+var NodeEmoji = require("node-emoji");
+var Utils = require("./utils");
 
 var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 
-var mixpanelToken;
-if (DevelopmentMode || USER.id <= 3) {
+if (DevelopmentMode || USER.id <= 3 || Utils.getUrlParameter("internal")) {
   mixpanelToken = "d309a366da36d3f897ad2772390d1679";
   console.log("In development, logging to dev stats");
 } else {
@@ -541,7 +541,7 @@ var HeaderBar = React.createClass({
 var Footer = React.createClass({
   render: function(){
     return(
-      <footer class="wrapper">
+      <footer>
 
       <div id="footer_links">
         <a href='mailto:support@duffytech.co'>Contact</a> &middot; <a href="http://getkeeper.com/privacy.php">Privacy</a><br />
