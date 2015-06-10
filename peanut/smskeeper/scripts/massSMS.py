@@ -23,7 +23,7 @@ def sendMassSMS(userIdList):
 	for user in userList:
 
 		#msg = u"Hi %s! I'm trying to go from \U0001F423 to \U0001F413. Do you have any tips for me on how I can help you more? getkeeper.com/feedback.php" % (user.name)
-		msg = u"Hi %s! Did you know that you can now access your lists and reminders on the web? my.getkeeper.com/%s" % (user.name, user.getWebsiteURLPath())
+		msg = u"Hi %s! Did you know that you can now access your lists and reminders on the web? %s" % (user.name, user.getWebAppURL())
 		logger.debug("Sent msg to %s: %s" % (user.id, msg))
 
 		sendMsg(user, msg, None, user.getKeeperNumber())
