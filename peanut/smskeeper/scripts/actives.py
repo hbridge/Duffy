@@ -28,3 +28,14 @@ users = Message.objects.values_list('user__id', 'user__name').filter(incoming=Tr
 
 for entry in users:
     print "%s %s: %s"%(entry[0], entry[1], entry[2])
+
+
+# query to find users who have many entries not in reminders
+
+from smskeeper.models import Message, User, Entry
+from django.db.models import Count
+
+entries = Entry.objects.values_list('creator__id', 'creator__name').exclude(label='#reminders').annotate(totalCount=Count('creator__id')).order_by('-totalCount')
+
+for entry in entries:
+    print "%s %s: %s"%(entry[0], entry[1],entry[2])
