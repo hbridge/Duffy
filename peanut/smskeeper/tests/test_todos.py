@@ -203,6 +203,48 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(text="send email to alex")
 		self.assertTrue(entry.hidden)
 
+	# Make that after we send a reminder, we look for a fuzzy match first
+	def test_reminder_sent_fuzzy_match_default(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		async.processReminder(entry)
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done with call mom")
+			self.assertIn("call mom", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").first()
+		self.assertTrue(entry.hidden)
+
+	# Make sure that when there's two reminders, if we just sent a reminder and there's no
+	# fuzzy match, we use that one
+	def test_reminder_sent_fuzzy_match_not_default(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		async.processReminder(entry)
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done!")
+			# When we respond to a reminder just sent, we don't include the text
+			self.assertNotIn("go poop", self.getOutput(mock))
+
+		# Make sure the last entry was hidden
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertTrue(entry.hidden)
+
 		# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
 	@patch('common.natty_util.getNattyInfo')

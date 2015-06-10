@@ -1,4 +1,3 @@
-import humanize
 import random
 import datetime
 import pytz
@@ -15,6 +14,7 @@ from common import slack_logger
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
 
 def shareEntries(user, entries, handles, keeperNumber):
 	sharedHandles = list()
@@ -116,8 +116,6 @@ def add(user, msg, requestDict, keeperNumber, sendResponse, parseCommas):
 		)
 
 	return createdEntries, notFoundHandles
-
-
 
 
 def fetch(user, label, keeperNumber):
@@ -405,7 +403,7 @@ def nicety(user, nicety, requestDict, keeperNumber):
 	)
 
 
-def getBestMatch(user, msg):
+def getBestEntryMatch(user, msg):
 	entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
 
 	entries = sorted(entries, key=lambda x: x.added)
@@ -435,13 +433,13 @@ def getBestMatch(user, msg):
 
 
 def done(user, msg, keeperNumber):
-	bestMatch = getBestMatch(user, msg)
+	bestMatch = getBestEntryMatch(user, msg)
 
 	if bestMatch:
 		bestMatch.hidden = True
 		bestMatch.save()
 
-		msgBack = u"\u2705 %s" % bestMatch.text
+		msgBack = u"Nice. %s  \u2705" % bestMatch.text
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 	else:
 		msgBack = "Sorry, I'm not sure which entry you mean"

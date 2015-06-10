@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import sms_util, msg_util
+from smskeeper import sms_util, msg_util, actions
 from smskeeper import keeper_constants
 from smskeeper.models import Entry
 
@@ -20,10 +20,17 @@ def process(user, msg, requestDict, keeperNumber):
 		return False  # Reprocess
 
 	if msg_util.isDoneCommand(msg):
-		entry.hidden = True
-		entry.save()
+		bestMatch = actions.getBestEntryMatch(user, msg)
 
-		msgBack = u"Nice! \u2705"
+		# If we didn't fuzzy match on anything, assume its the last one we sent a reminder about
+		if not bestMatch:
+			msgBack = u"Nice! \u2705"
+			bestMatch = entry
+		else:
+			msgBack = u"Nice. %s  \u2705" % bestMatch.text
+
+		bestMatch.hidden = True
+		bestMatch.save()
 
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 
