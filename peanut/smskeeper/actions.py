@@ -4,7 +4,7 @@ import pytz
 import logging
 from fuzzywuzzy import fuzz
 
-from smskeeper import sms_util, msg_util, helper_util, image_util, user_util, tips
+from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
 import django
 
@@ -181,11 +181,6 @@ def fetch(user, label, keeperNumber):
 		sms_util.sendMsg(user, '', gridImageUrl, keeperNumber)
 	else:
 		sms_util.sendMsg(user, currentMsg + clearMsg, None, keeperNumber)
-
-	if tips.MINI_WEB_LISTS_ID not in tips.getSentTipIds(user):
-		tip = tips.tipWithId(tips.MINI_WEB_LISTS_ID)
-		sms_util.sendMsg(user, tip.render(user), None, keeperNumber)
-		tips.markTipSent(user, tip, isMini=True)
 
 	analytics.logUserEvent(
 		user,
