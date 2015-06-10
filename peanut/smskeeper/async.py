@@ -38,7 +38,7 @@ def shouldRemindNow(entry):
 	# Don't remind if we just sent one out (hence the updated is the same as last reminded)
 	if entry.remind_last_notified:
 		diff = abs((entry.remind_last_notified - entry.updated).total_seconds())
-		if diff < 30 or entry.remind_last_notified >= entry.remind_timestamp:
+		if diff < 5 or entry.remind_last_notified >= entry.remind_timestamp:
 			return False
 
 	# Don't remind if its too far in the past

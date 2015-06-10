@@ -11,7 +11,13 @@ logger = logging.getLogger(__name__)
 # See if its a done command. If not, send back for normal processing
 def process(user, msg, requestDict, keeperNumber):
 	entryId = int(user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY))
-	entry = Entry.objects.get(id=entryId)
+	try:
+		entry = Entry.objects.get(id=entryId)
+	except Entry.DoesNotExist:
+		# Couldn't find entry so try sending back through normal flow
+		user.setState(keeper_constants.STATE_NORMAL)
+		user.save()
+		return False  # Reprocess
 
 	if msg_util.isDoneCommand(msg):
 		entry.hidden = True

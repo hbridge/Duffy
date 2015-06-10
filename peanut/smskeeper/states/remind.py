@@ -140,8 +140,16 @@ def process(user, msg, requestDict, keeperNumber):
 	if not nattyResult.hadTime:
 		nattyResult = dealWithDefaultTime(user, nattyResult)
 
+	entry = None
+	if user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
+		entryId = int(user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY))
+		try:
+			entry = Entry.objects.get(id=entryId)
+		except Entry.DoesNotExist:
+			pass
+
 	# Create a new reminder
-	if not user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY) or user.product_id == 1:
+	if not entry or user.product_id == 1:
 		sendFollowup = False
 
 		if not validTime(nattyResult) and user.product_id != keeper_constants.TODO_PRODUCT_ID:
@@ -177,8 +185,6 @@ def process(user, msg, requestDict, keeperNumber):
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.
 		# If not, kick out to normal mode and re-process
-		entryId = int(user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY))
-		entry = Entry.objects.get(id=entryId)
 
 		if user.getStateData("fromUnresolvedHandles"):
 			logger.debug("Going to deal with unresolved handles for entry %s and user %s" % (entry.id, user.id))
