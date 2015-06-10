@@ -70,7 +70,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	finally:
 		# This is true if this is from a manual entry off the history page
 		manual = "Manual" in requestDict
-		if isDuplicateMsg(user, msg):
+		if not manual and isDuplicateMsg(user, msg):
 			logger.debug("Ignore duplicate message from user %s: %s"%(user.id, msg))
 			# TODO figure out better logic so we aren't repeating this statement
 			messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
