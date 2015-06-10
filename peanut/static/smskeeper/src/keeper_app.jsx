@@ -538,6 +538,21 @@ var HeaderBar = React.createClass({
   }
 });
 
+var Footer = React.createClass({
+  render: function(){
+    return(
+      <footer class="wrapper">
+
+      <div id="footer_links">
+        <a href='mailto:support@duffytech.co'>Contact</a> &middot; <a href="http://getkeeper.com/privacy.php">Privacy</a><br />
+        &copy;2015 Duffy, Inc.<br />
+        Made in NYC {NodeEmoji.get(":apple:")}
+      </div>
+      </footer>
+    );
+  }
+});
+
 var KeeperApp = React.createClass({
   mixins: [
     MasonryMixin('masonryContainer', masonryOptions),
@@ -609,6 +624,7 @@ var KeeperApp = React.createClass({
         <div id="lists" className="grid" ref="masonryContainer">
            { listNodes }
         </div>
+        <Footer />
       </div>
     );
   },
