@@ -20,10 +20,10 @@ def process(user, msg, requestDict, keeperNumber):
 		return False  # Reprocess
 
 	if msg_util.isDoneCommand(msg):
-		bestMatch = actions.getBestEntryMatch(user, msg)
+		bestMatch, score = actions.getBestEntryMatch(user, msg)
 
 		# If we didn't fuzzy match on anything, assume its the last one we sent a reminder about
-		if not bestMatch:
+		if score < 50:
 			msgBack = u"Nice! \u2705"
 			bestMatch = entry
 		else:

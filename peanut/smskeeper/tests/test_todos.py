@@ -49,11 +49,11 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_two_entries(self):
 		self.setupUser()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "I need to pick up my sox tomorrow")
+			cliMsg.msg(self.testPhoneNumber, "I want to pick up my sox tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		firstEntry = Entry.objects.filter(label="#reminders").last()
-		self.assertEquals("I need to pick up my sox", firstEntry.text)
+		self.assertEquals("I want to pick up my sox", firstEntry.text)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to buy tickets next week")
@@ -245,7 +245,27 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
-		# Make sure we create a new entry instead of a followup
+	# Make sure that when there's two reminders, if we just sent a reminder and there's no
+	# fuzzy match, we use that one
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_followup_fuzzy_match(self, nattyMock, dateMock):
+		self.setupUser()
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
+
+		# Send in a message that could be new, but really is a followup
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.SUNDAY, "actually, I want to call mom", "on sunday")
+			cliMsg.msg(self.testPhoneNumber, "actually, I want to call mom on sunday")
+
+			self.assertIn("Sun", self.getOutput(mock))
+
+		# Make sure there's only one entry
+		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
+
+	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
 	@patch('common.natty_util.getNattyInfo')
 	def test_process_daily_digest(self, nattyMock, dateMock):

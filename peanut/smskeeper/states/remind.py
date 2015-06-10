@@ -8,7 +8,7 @@ from peanut.settings import constants
 
 from common import natty_util, date_util
 
-from smskeeper import sms_util, msg_util
+from smskeeper import sms_util, msg_util, actions
 from smskeeper import keeper_constants
 from smskeeper import helper_util
 from smskeeper import analytics
@@ -28,7 +28,7 @@ def validTime(nattyResult):
 # Like "remind me again in 5 minutes"
 # If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
 # Otherwise False
-def isFollowup(nattyResult, reminderSent):
+def isFollowup(user, entry, nattyResult, reminderSent):
 	if validTime(nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 		if reminderSent and msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
@@ -37,14 +37,24 @@ def isFollowup(nattyResult, reminderSent):
 				return True
 			else:
 				return False
-		# Covers cases where there is a followup like "remind me in 5 minutes"
+		# Covers cases where there the cleanedText is "in" or "around"
 		elif len(cleanedText) <= 2 or cleanedText == "around":
-			return True
-		elif not msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
 			return True
 		# If they write "no, remind me sunday instead" then want to process as followup
 		elif msg_util.startsWithNo(nattyResult.queryWithoutTiming):
 			return True
+		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
+			# This could be a new entry due to todos
+			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
+			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
+			if bestEntry.id == entry.id and score > 50:
+				logger.debug("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
+				return True
+			return False
+		# Regular reminders will just assume that if it doesn't have "remind me" in it then its followup
+		elif not msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
+			return True
+
 	return False
 
 
@@ -156,7 +166,7 @@ def process(user, msg, requestDict, keeperNumber):
 			pass
 
 	# Create a new reminder
-	if not entry or user.product_id == 1:
+	if not entry:
 		sendFollowup = False
 
 		if not validTime(nattyResult) and user.product_id != keeper_constants.TODO_PRODUCT_ID:
@@ -184,10 +194,6 @@ def process(user, msg, requestDict, keeperNumber):
 		# If they don't enter timing info then we kick out
 		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 		user.save()
-
-		if user.product_id == 1:
-			user.setState(keeper_constants.STATE_NORMAL)
-			user.save()
 	else:
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.
@@ -213,8 +219,7 @@ def process(user, msg, requestDict, keeperNumber):
 			else:
 				# This message could be a correction or something else.  Might need more logic here
 				sendCompletionResponse(user, entry, False, keeperNumber)
-
-		elif isFollowup(nattyResult, user.getStateData("reminderSent")):
+		elif isFollowup(user, entry, nattyResult, user.getStateData("reminderSent")):
 			logger.debug("Doing followup on entry %s with msg %s" % (entry.id, msg))
 			isSnooze = user.getStateData("reminderSent")
 			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)

@@ -2,6 +2,7 @@ import random
 import datetime
 import pytz
 import logging
+from fuzzywuzzy import fuzz
 
 from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
@@ -409,33 +410,21 @@ def getBestEntryMatch(user, msg):
 	entries = sorted(entries, key=lambda x: x.added)
 
 	bestMatch = None
-	bestNumWords = 0
-	bestNumChar = 0
+	bestScore = 0
 
 	for entry in entries:
-		numWords = 0
-		numChar = 0
-		for entryWord in entry.text.split(" "):
-			for msgWord in msg.split(" "):
-				if msgWord.lower() == entryWord.lower():
-					numWords += 1
-					numChar += len(msgWord)
-		if numWords > bestNumWords:
+		score = fuzz.token_set_ratio(entry.text, msg)
+		if score > bestScore:
 			bestMatch = entry
-			bestNumWords = numWords
-			bestNumChar = numChar
-		elif numWords == bestNumWords and numChar > bestNumChar:
-			bestMatch = entry
-			bestNumWords = numWords
-			bestNumChar = numChar
+			bestScore = score
 
-	return bestMatch
+	return (bestMatch, bestScore)
 
 
 def done(user, msg, keeperNumber):
-	bestMatch = getBestEntryMatch(user, msg)
+	bestMatch, score = getBestEntryMatch(user, msg)
 
-	if bestMatch:
+	if score > 10:
 		bestMatch.hidden = True
 		bestMatch.save()
 
