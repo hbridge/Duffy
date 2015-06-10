@@ -7,7 +7,7 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo
-from smskeeper import msg_util, actions, niceties, sms_util
+from smskeeper import msg_util, actions, niceties
 
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
@@ -21,14 +21,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 	# Always look for a stop command first and deal with that
 	if msg_util.isStopCommand(msg):
 		logger.debug("User %s: I think '%s' is a stop command, setting state to %s" % (user.id, msg, user.state))
-		sms_util.sendMsg(user, u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'", None, keeperNumber)
-		analytics.logUserEvent(
-			user,
-			"Stop/Start",
-			{"Action": "Stop"}
-		)
-		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
-		user.save()
+		stopped.dealWithStop(user, msg, keeperNumber)
 		return True
 	elif niceties.getNicety(msg):
 		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
@@ -84,8 +77,6 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 			return False
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
 		slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
-
-
 
 	processed = False
 	# convert message to unicode

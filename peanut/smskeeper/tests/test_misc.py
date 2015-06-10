@@ -469,8 +469,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "STOP")
 			self.assertIn("just type 'start'", self.getOutput(mock))
-			user = self.getTestUser()
-			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
+			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_STOPPED)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "CANCEL")
@@ -479,14 +478,11 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "ignore this")
 			self.assertEqual("", self.getOutput(mock))
-			user = self.getTestUser()
-			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "start")
-			self.assertIn("welcome back", self.getOutput(mock).lower())
-			user = self.getTestUser()
-			self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
+			self.assertIn("Welcome back", self.getOutput(mock))
+			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
 
 	def testStoppedSaveState(self):
 		self.setupUser(True, False, state=keeper_constants.STATE_NOT_ACTIVATED)

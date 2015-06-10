@@ -22,3 +22,16 @@ def process(user, msg, requestDict, keeperNumber):
 
 	# Ignore other messages
 	return True
+
+
+# Hack, this kinda stands out where the processing_util calls this
+def dealWithStop(user, msg, keeperNumber):
+	sms_util.sendMsg(user, u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'", None, keeperNumber)
+	analytics.logUserEvent(
+		user,
+		"Stop/Start",
+		{"Action": "Stop"}
+	)
+	if user.state != keeper_constants.STATE_STOPPED:
+		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
+		user.save()
