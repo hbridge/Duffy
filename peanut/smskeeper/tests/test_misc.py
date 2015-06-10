@@ -473,6 +473,10 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "CANCEL")
+			self.assertEqual("", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "ignore this")
 			self.assertEqual("", self.getOutput(mock))
 			user = self.getTestUser()
