@@ -209,11 +209,11 @@ def process(user, msg, requestDict, keeperNumber):
 
 		elif isFollowup(nattyResult, user.getStateData("reminderSent")):
 			logger.debug("Doing followup on entry %s with msg %s" % (entry.id, msg))
-			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber)
+			isSnooze = user.getStateData("reminderSent")
+			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)
 			sendCompletionResponse(user, entry, False, keeperNumber)
 
-			# This means it was a snooze
-			if user.getStateData("reminderSent"):
+			if isSnooze:
 				entry.hidden = False
 				entry.save()
 			return True
@@ -287,7 +287,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	return entry
 
 
-def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber):
+def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=False):
 	newDate = entry.remind_timestamp.astimezone(user.getTimezone())
 	nattyTzTime = nattyResult.utcTime.astimezone(user.getTimezone())
 	# Only update with a date or time if Natty found one
@@ -322,7 +322,8 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber):
 		{
 			"Was Suspicious Hour": suspiciousHour,
 			"In tutorial": isTutorial(user),
-			"Is shared": len(entry.users.all()) > 1
+			"Is shared": len(entry.users.all()) > 1,
+			"Type": "Snooze" if isSnooze else "Time Correction"
 		}
 	)
 
