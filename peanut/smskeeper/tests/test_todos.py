@@ -5,7 +5,7 @@ from mock import patch
 from testfixtures import Replacer
 from testfixtures import test_datetime
 
-from smskeeper import cliMsg, keeper_constants, async
+from smskeeper import cliMsg, async
 from smskeeper.models import Entry
 
 from common import natty_util

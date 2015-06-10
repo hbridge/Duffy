@@ -182,6 +182,15 @@ def isQuestion(msg):
 	return ("?" in msg)
 
 
+# See if the first word is a 'no' or 'not'
+def startsWithNo(msg):
+	words = msg.split(' ')
+	if len(words) > 0:
+		firstWord = words[0].strip(string.punctuation).strip().lower()
+		return firstWord in ["no", "not"]
+	return False
+
+
 def getReminderHandle(msg):
 	text = msg.lower()
 	match = reminder_re.search(text)

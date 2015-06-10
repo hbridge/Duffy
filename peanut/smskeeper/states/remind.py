@@ -42,6 +42,9 @@ def isFollowup(nattyResult, reminderSent):
 			return True
 		elif not msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
 			return True
+		# If they write "no, remind me sunday instead" then want to process as followup
+		elif msg_util.startsWithNo(nattyResult.queryWithoutTiming):
+			return True
 	return False
 
 
