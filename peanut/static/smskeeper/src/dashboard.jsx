@@ -174,6 +174,18 @@ var DashboardApp = React.createClass({
       return results;
     };
 
+    var filterUsersByActivity = function(users, activeBefore, activeAfter) {
+      var results = [];
+
+      for (i=0; i<users.length; i++) {
+        lastActiveDate =  new Date(users[i].message_stats.incoming.last);
+        if (lastActiveDate > activeAfter && lastActiveDate < activeBefore) {
+          results.push(users[i]);
+        }
+      }
+      return results;
+    };
+
     var getPausedUsers = function(users) {
       var results = [];
       for (i=0; i<users.length; i++) {
@@ -182,19 +194,21 @@ var DashboardApp = React.createClass({
         }
       }
       return results;
-    }
+    };
 
     var now = new Date();
     var yest = new Date();
     var twoweeks = new Date();
     yest.setDate(yest.getDate() - 1);
-    twoweeks.setDate(twoweeks.getDate() - 14);
+    twoweeks.setDate(twoweeks.getDate() - 6);
 
     var pausedUsers = getPausedUsers(this.state.users);
     var nonActivatedUsers = filterUsers(this.state.users, false, null, null);
     var recentlyActivatedUsers = filterUsers(this.state.users, true, now, yest);
-    var normalUsers = filterUsers(this.state.users, true, yest, twoweeks);
-    var oldUsers = filterUsers(this.state.users, true, twoweeks, new Date(0));
+    var allActivated = filterUsers(this.state.users, true, yest, new Date(0));
+    var normalUsers = filterUsersByActivity(allActivated, now, twoweeks);
+    var oldUsers = filterUsersByActivity(allActivated, twoweeks, new Date(0));
+
 		return (
       <div>
         <DailyTable stats={ this.state.daily_stats} />
