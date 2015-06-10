@@ -127,7 +127,7 @@ def fetch(user, label, keeperNumber):
 	if msg_util.isRemindCommand(label):
 		label = keeper_constants.REMIND_LABEL
 	entries = Entry.fetchEntries(user=user, label=label)
-	clearMsg = "\n\nSend 'clear %s' to clear or 'delete [number]' to delete an item." % (label.replace("#", ""))
+	clearMsg = "\n\nYou can say 'clear' to clear or 'delete NUMBER' to delete an item.\nManage lists at %s" % (user.getWebAppURL())
 	mediaUrls = list()
 
 	if len(entries) == 0:
