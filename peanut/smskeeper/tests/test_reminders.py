@@ -302,7 +302,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 	# firing the reminder
 	# snoozing
 	# followup to snoozing
-	# continue help state
 	def test_snooze_change_state_and_followup(self):
 		self.setupUser()
 
@@ -327,10 +326,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the snoozedEntry is now an hour later
 		self.assertEqual(snoozedEntry.remind_timestamp.hour, (now + datetime.timedelta(hours=2)).hour)
 
-		# Make sure we can continue the help state by calling "lists"
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "lists")
-			self.assertIn("Just say 'add' with an item and a list", self.getOutput(mock))
 
 	def test_followup_only_time(self):
 		self.setupUser()

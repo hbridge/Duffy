@@ -113,7 +113,7 @@ def processReminder(entry):
 						tips.markTipSent(user, tip, isMini=True)
 
 					# Now set to reminder sent, incase they send back done message
-					user.setState(keeper_constants.STATE_REMINDER_SENT, saveCurrent=True)
+					user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 					user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 					user.save()
 				else:
@@ -128,7 +128,7 @@ def processReminder(entry):
 						tips.markTipSent(user, tip, isMini=True)
 
 					# Now set to reminder sent, incase they send back snooze
-					user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
+					user.setState(keeper_constants.STATE_REMIND, override=True)
 					user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 					user.setStateData("reminderSent", True)
 					user.save()

@@ -158,6 +158,29 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
+	# Make sure first reminder we send snooze tip, then second we don't
+	def test_done_works_after_two_reminders(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "Thanks!")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 5 minute")
+		cliMsg.msg(self.testPhoneNumber, "I need to buy sox in 1 minute")
+
+		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		async.processReminder(entry)
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done!")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertTrue(entry.hidden)
+
 	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
 	@patch('common.natty_util.getNattyInfo')
