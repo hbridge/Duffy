@@ -122,7 +122,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	analytics.logUserEvent(
 		user,
 		"Incoming",
-		None
+		{"Is Stop": msg_util.isStopCommand(msg)}
 	)
 
 
