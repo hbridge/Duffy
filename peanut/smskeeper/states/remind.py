@@ -89,8 +89,12 @@ def dealWithDefaultTime(user, nattyResult):
 # This is meant to just be used to change up the string for processing, not used later for
 def fixMsgForNatty(msg):
 	newMsg = msg
+
+	# Replace 'around' with 'at' since natty recognizes that better
+	newMsg = newMsg.replace("around", "at")
+
 	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a)', msg)
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a)', newMsg)
 	if threeDigitsWithAP:
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
@@ -98,7 +102,7 @@ def fixMsgForNatty(msg):
 		newMsg = newMsg.replace(oldtime, newtime)
 
 	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
-	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', msg)
+	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg)
 	if threeDigitsWithAT:
 		oldtime = threeDigitsWithAT.group("time")
 		newtime = oldtime[0] + ":" + oldtime[1:]
