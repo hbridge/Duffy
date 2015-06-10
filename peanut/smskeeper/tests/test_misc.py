@@ -241,7 +241,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		# make sure we don't send it immediately after
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "thanks")
+			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
 			self.assertNotIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
 
@@ -251,9 +251,40 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		)
 		self.user.save()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "thank you")
+			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+
+	def test_feedback_upsell(self):
+		self.setupUser(True, True)
+
+		# set activated to 3 days back and make sure feedback prompt goes out
+		self.user.activated = datetime.datetime.now(pytz.utc) - datetime.timedelta(
+			days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS)
+		self.user.save()
+		
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thanks")
+			output = self.getOutput(mock)
+			self.assertIn(keeper_constants.FEEDBACK_PHRASE, output)
+
+		# make sure feedback prompt doesn't go out again
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thanks!")
+			output = self.getOutput(mock)
+			self.assertNotIn(keeper_constants.FEEDBACK_PHRASE, output)
+
+		# make sure that after 15 days, it goes out again
+		user = self.getTestUser()
+		user.last_feedback_prompt = datetime.datetime.now(pytz.utc) - datetime.timedelta(
+			days=keeper_constants.FEEDBACK_FREQUENCY_DAYS)
+		user.save()
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thank you")
+			output = self.getOutput(mock)
+			self.assertIn(keeper_constants.FEEDBACK_PHRASE, output)
+
 
 	def testBirthdayNicety(self):
 		self.setupUser(True, True)

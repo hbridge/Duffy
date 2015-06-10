@@ -153,6 +153,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 	if time_utils.isDateOlderThan(user.last_feedback_prompt, keeper_constants.FEEDBACK_FREQUENCY_DAYS) and user.activated < datetime.datetime.now(pytz.utc) - datetime.timedelta(days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS):
 		user.last_feedback_prompt = datetime.datetime.now(pytz.utc)
 		user.save()
+		return "%s %s" % (base, keeper_constants.FEEDBACK_PHRASE)
 	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
 		user.last_share_upsell = datetime.datetime.now(pytz.utc)
 		user.save()
