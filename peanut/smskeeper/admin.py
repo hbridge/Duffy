@@ -40,7 +40,7 @@ class ReminderAdmin(admin.ModelAdmin):
 
 	def queryset(self, request):
 		qs = super(ReminderAdmin, self).queryset(request)
-		return qs.filter(remind_timestamp__isnull=False)
+		return qs.filter(remind_timestamp__isnull=False).order_by("hidden", "remind_timestamp")
 
 	def added_tz_aware(self, obj):
 		return obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
@@ -80,4 +80,4 @@ class TodoAdmin(ReminderAdmin):
 
 	def queryset(self, request):
 		qs = super(TodoAdmin, self).queryset(request)
-		return qs.filter(creator__product_id=1, label="#reminders")
+		return qs.filter(creator__product_id=1).order_by("hidden", "remind_timestamp")
