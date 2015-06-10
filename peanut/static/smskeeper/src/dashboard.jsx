@@ -200,7 +200,7 @@ var DashboardApp = React.createClass({
     var yest = new Date();
     var twoweeks = new Date();
     yest.setDate(yest.getDate() - 1);
-    twoweeks.setDate(twoweeks.getDate() - 6);
+    twoweeks.setDate(twoweeks.getDate() - 14);
 
     var pausedUsers = getPausedUsers(this.state.users);
     var nonActivatedUsers = filterUsers(this.state.users, false, null, null);
