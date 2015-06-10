@@ -23,7 +23,10 @@ class KeeperTip():
 	def render(self, user):
 		if self.id == VCARD_TIP_ID:
 			self.mediaUrl = getKeeperVCard(user)
-		return self.message.replace(":NAME:", user.name) + "\n\n" + SMSKEEPER_TIP_FOOTER
+		result = self.message.replace(":NAME:", user.name) + "\n\n" + SMSKEEPER_TIP_FOOTER
+		result = self.message.replace(":APP_URL:", user.getWebAppURL())
+
+		return result
 
 	# Mini tips are little sentences sent after first actions
 	def renderMini(self):
@@ -36,6 +39,7 @@ VOICE_TIP_ID = "voice"
 VCARD_TIP_ID = "vcard"
 
 SNOOZE_TIP_ID = "mini-snooze"
+MINI_WEB_LISTS_ID = "mini-weblists"
 
 # Hack(Derek), doesn't really need 3 different ones, just easier than counting in user settings
 DONE_TIP1_ID = "mini-done1"
@@ -86,6 +90,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		DONE_TIP3_ID,
 		"btw, let me know when you're done",
+		False
+	),
+	KeeperTip(
+		MINI_WEB_LISTS_ID,
+		"btw, you can see and manage your lists at :APP_URL: any time!",
 		False
 	),
 ]

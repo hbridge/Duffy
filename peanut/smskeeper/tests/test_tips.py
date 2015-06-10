@@ -201,3 +201,18 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 				events = self.getAnalyticsEvents(analyticsMock)
 				self.assertEqual(events[0]["user"], self.user)
 				self.assertEqual(events[0]["event"], "Tip Received")
+
+	def testFetchWebMiniTip(self):
+		self.setupUser(True, True, "UTC")
+
+		webtip = tips.tipWithId(tips.MINI_WEB_LISTS_ID)
+		rendered = webtip.render(self.user)
+		cliMsg.msg(self.testPhoneNumber, "add foo to bar")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bar")
+			self.assertIn(rendered, self.getOutput(mock))
+
+		# make sure it's not sent every time
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bar")
+			self.assertNotIn(rendered, self.getOutput(mock))
