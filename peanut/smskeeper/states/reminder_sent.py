@@ -32,12 +32,16 @@ def process(user, msg, requestDict, keeperNumber):
 		bestMatch.hidden = True
 		bestMatch.save()
 
+		logging.debug("User %s: I think this is a done command for entry %s with text '%s' and score %s" % (user.id, bestMatch.id, bestMatch.text, score))
+
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()
 		return True
 	else:
+		logging.debug("User %s: I don't think this is a done command, so kicking out" % (user.id))
+
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()
 		return False  # Reprocess

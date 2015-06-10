@@ -92,7 +92,7 @@ def process(user, msg, requestDict, keeperNumber):
 			raise NameError("intentional exception")
 		# STATE_REMIND
 		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg, user):
-			logger.debug("For user %s I think '%s' is a remind command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a remind command" % (user.id, msg))
 			# TODO  Fix this state so the logic isn't so complex
 			user.setState(keeper_constants.STATE_REMIND)
 			user.save()
@@ -100,12 +100,12 @@ def process(user, msg, requestDict, keeperNumber):
 			return False
 		# STATE_NORMAL
 		elif msg_util.isPrintHashtagsCommand(msg):
-			logger.debug("For user %s I think '%s' is a print hashtags command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a print hashtags command" % (user.id, msg))
 			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list
 			dealWithPrintHashtags(user, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isFetchCommand(msg, user) and numMedia == 0:
-			logger.debug("For user %s I think '%s' is a fetch command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a fetch command" % (user.id, msg))
 			label = msg_util.labelInFetch(msg)
 			actions.fetch(user, label, keeperNumber)
 			user.setState(
@@ -114,24 +114,24 @@ def process(user, msg, requestDict, keeperNumber):
 			)
 		# STATE_NORMAL
 		elif msg_util.isClearCommand(msg) and numMedia == 0:
-			logger.debug("For user %s I think '%s' is a clear command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a clear command" % (user.id, msg))
 			label = msg_util.getLabelToClear(msg)
 			actions.clear(user, label, keeperNumber)
 		# STATE_NORMAL
 		elif msg_util.isPickCommand(msg) and numMedia == 0:
-			logger.debug("For user %s I think '%s' is a pick command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a pick command" % (user.id, msg))
 			label = msg_util.getLabel(msg)
 			actions.pickItemFromLabel(user, label, keeperNumber)
 		# STATE_ADD
 		elif msg_util.isFetchHandleCommand(msg):
-			logger.debug("For user %s I think '%s' is a fetch handle command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a fetch handle command" % (user.id, msg))
 			actions.fetchHandle(user, msg, keeperNumber)
 		elif msg_util.isCreateHandleCommand(msg):
-			logger.debug("For user %s I think '%s' is a create handle command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a create handle command" % (user.id, msg))
 			dealWithCreateHandle(user, msg, keeperNumber)
 		# STATE_DELETE
 		elif msg_util.isDeleteCommand(msg):
-			logger.debug("For user %s I think '%s' is a delete command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a delete command" % (user.id, msg))
 			label, indices = msg_util.parseDeleteCommand(msg)
 			actions.deleteIndicesFromLabel(user, label, indices, keeperNumber)
 			user.setState(
@@ -139,7 +139,7 @@ def process(user, msg, requestDict, keeperNumber):
 				stateData={keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY: label}
 			)
 		elif msg_util.isAddTextCommand(msg) or numMedia > 0:
-			logger.debug("For user %s I think '%s' is a add text command" % (user.id, msg))
+			logger.debug("User %s: I think '%s' is a add text command" % (user.id, msg))
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
 		else:  # catch all, we're not sure
 			if user.product_id == 1:
@@ -149,7 +149,7 @@ def process(user, msg, requestDict, keeperNumber):
 				elif len(msg.split(' ')) <= 1:
 					logger.debug("User %s: (product id 1) I think '%s' is a single word, skipping" % (user.id, msg))
 				else:
-					logger.debug("For user %s (product id 1) I think '%s' is something else so doing remind state" % (user.id, msg))
+					logger.debug("User %s: (product id 1) I think '%s' is something else so doing remind state" % (user.id, msg))
 					user.setState(keeper_constants.STATE_REMIND)
 					user.save()
 					return False  # Reprocess
@@ -159,6 +159,6 @@ def process(user, msg, requestDict, keeperNumber):
 
 		return True
 	except:
-		logger.warning("For user %s and msg '%s' got exception" % (user.id, msg))
+		logger.warning("User %s: and msg '%s' got exception" % (user.id, msg))
 		sms_util.sendMsg(user, random.choice(keeper_constants.GENERIC_ERROR_MESSAGES), None, keeperNumber)
 		raise

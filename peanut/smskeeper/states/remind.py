@@ -200,7 +200,7 @@ def process(user, msg, requestDict, keeperNumber):
 		# If not, kick out to normal mode and re-process
 
 		if user.getStateData("fromUnresolvedHandles"):
-			logger.debug("Going to deal with unresolved handles for entry %s and user %s" % (entry.id, user.id))
+			logger.debug("User %s: Going to deal with unresolved handles for entry %s and user %s" % (user.id, entry.id, user.id))
 
 			# Mark it that we're not coming back from unresolved handle
 			# So incase there's a followup we don't, re-enter this section
@@ -220,7 +220,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# This message could be a correction or something else.  Might need more logic here
 				sendCompletionResponse(user, entry, False, keeperNumber)
 		elif isFollowup(user, entry, nattyResult, user.getStateData("reminderSent")):
-			logger.debug("Doing followup on entry %s with msg %s" % (entry.id, msg))
+			logger.debug("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
 			isSnooze = user.getStateData("reminderSent")
 			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)
 			sendCompletionResponse(user, entry, False, keeperNumber)
@@ -243,7 +243,7 @@ def dealWithSuspiciousHour(user, entry, keeperNumber):
 	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
 	hourForUser = tzAwareDate.hour
 	if (isReminderHourSuspicious(hourForUser) and keeperNumber != constants.SMSKEEPER_TEST_NUM):
-		logger.error("Scheduling an alert for %s am local time for user %s, might want to check entry id %s" % (hourForUser, user.id, entry.id))
+		logger.info("User %s: Scheduling an alert for %s am local time, might want to check entry id %s" % (user.id, hourForUser, entry.id))
 		return True
 	return False
 
@@ -257,7 +257,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	entry.orig_text = json.dumps([msg])
 	entry.save()
 
-	logger.debug("Created entry %s for user %s and msg '%s' with timestamp %s from using nattyResult %s" % (entry.id, user.id, msg, nattyResult.utcTime, nattyResult))
+	logger.debug("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))
 
 	# Don't do any of this logic in the tutorial state, shouldn't be correct
 	if not isTutorial(user):
@@ -268,7 +268,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 			contact = Contact.fetchByHandle(user, handle)
 
 			if contact is None:
-				logger.debug("Didn't find handle %s for user %s and msg %s on entry %s" % (handle, user.id, msg, entry.id))
+				logger.debug("User %s: Didn't find handle %s and msg %s on entry %s" % (user.id, handle, msg, entry.id))
 				# We couldn't find the handle so go into unresolved state
 				# Set data for ourselves for when we come back
 				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
@@ -278,7 +278,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 				user.save()
 				return False
 			else:
-				logger.debug("Didn't find handle %s for user %s and entry %s...goint to unresolved" % (handle, user.id, entry.id))
+				logger.debug("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
 				# We found the handle, so share the entry with the user.
 				entry.users.add(contact.target)
 
@@ -313,7 +313,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 		newDate = newDate.replace(minute=nattyTzTime.minute)
 		newDate = newDate.replace(second=nattyTzTime.second)
 
-	logger.debug("Updating entry %s for user %s and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (entry.id, user.id, msg, newDate, nattyResult, entry.remind_timestamp))
+	logger.debug("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
 	entry.remind_timestamp = newDate.astimezone(pytz.utc)
 	if entry.orig_text:
 		try:
