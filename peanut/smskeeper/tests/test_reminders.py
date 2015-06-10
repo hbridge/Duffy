@@ -669,4 +669,25 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
 
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_only_day_of_month(self, nattyMock, dateMock):
+		self.setupUser()
+		self.setNow(dateMock, self.TUE_8AM)  # This is on June 2nd
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 4th")
+
+		arg, kargs = nattyMock.call_args
+		self.assertEquals("Remind me about pooping at 9pm on June 4th", arg[0])
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 1st")
+
+		# Should be first of next month
+		arg, kargs = nattyMock.call_args
+		self.assertEquals("Remind me about pooping at 9pm on July 1st", arg[0])
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 20th")
+
+		arg, kargs = nattyMock.call_args
+		self.assertEquals("Remind me about pooping at 9pm on June 20th", arg[0])
 

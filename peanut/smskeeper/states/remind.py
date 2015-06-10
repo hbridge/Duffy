@@ -3,6 +3,7 @@ import logging
 import re
 import json
 import datetime
+from dateutil import relativedelta
 
 from peanut.settings import constants
 
@@ -100,7 +101,7 @@ def dealWithDefaultTime(user, nattyResult):
 
 # Remove and replace troublesome strings for Natty
 # This is meant to just be used to change up the string for processing, not used later for
-def fixMsgForNatty(msg):
+def fixMsgForNatty(msg, user):
 	newMsg = msg
 
 	# Replace 'around' with 'at' since natty recognizes that better
@@ -122,6 +123,21 @@ def fixMsgForNatty(msg):
 
 		newMsg = newMsg.replace(oldtime, newtime)
 
+	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg)
+	if dayOfMonth:
+		localtime = date_util.now(user.getTimezone())
+
+		dayStr = dayOfMonth.group("time")
+		number = int(filter(str.isdigit, str(dayStr)))
+
+		if number <= localtime.day:
+			# They said 1st while it was June 2nd, so return July 1st
+			monthName = (localtime + relativedelta.relativedelta(months=1)).strftime("%B")
+		else:
+			monthName = localtime.strftime("%B")
+
+		# Turn 'the 9th' into 'June 9th'
+		newMsg = newMsg.replace("the %s" % dayStr, "%s %s" % (monthName, dayStr))
 	return newMsg
 
 
@@ -147,7 +163,7 @@ def process(user, msg, requestDict, keeperNumber):
 		msg = msg.replace("#reminder", "remind me")
 		msg = msg.replace("#remind", "remind me")
 
-	nattyMsg = fixMsgForNatty(msg)
+	nattyMsg = fixMsgForNatty(msg, user)
 	nattyResult = getBestNattyResult(natty_util.getNattyInfo(nattyMsg, user.getTimezone()))
 
 	if not nattyResult:
