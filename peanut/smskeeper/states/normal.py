@@ -151,11 +151,13 @@ def process(user, msg, requestDict, keeperNumber):
 		else:  # catch all, we're not sure
 			if user.product_id == 1:
 				if msg_util.isDoneCommand(msg):
-					logger.debug("For user %s (product id 1) I think '%s' is a done command" % (user.id, msg))
+					logger.debug("User %s: (product id 1) I think '%s' is a done command" % (user.id, msg))
 					actions.done(user, msg, keeperNumber)
 				elif msg_util.isQuestion(msg):
-					logger.debug("For user %s (product id 1) I think '%s' is a question" % (user.id, msg))
+					logger.debug("User %s: (product id 1) I think '%s' is a question" % (user.id, msg))
 					actions.unknown(user, msg, keeperNumber)
+				elif len(msg.split(' ')) <= 1:
+					logger.debug("User %s: (product id 1) I think '%s' is a single word, skipping" % (user.id, msg))
 				else:
 					logger.debug("For user %s (product id 1) I think '%s' is something else so doing remind state" % (user.id, msg))
 					user.setState(keeper_constants.STATE_REMIND)

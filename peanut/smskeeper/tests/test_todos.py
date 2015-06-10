@@ -28,6 +28,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEquals(13, entry.remind_timestamp.hour)  # 9 am EST
 
+	def test_single_word(self):
+		self.setupUser()
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "kk")
+			self.assertEquals("", self.getOutput(mock))
+
+		self.assertEquals(0, len(Entry.objects.filter(label="#reminders")))
+
 	def test_tomorrow_no_time(self):
 		self.setupUser()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
