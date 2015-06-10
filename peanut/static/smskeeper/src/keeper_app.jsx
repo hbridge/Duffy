@@ -568,6 +568,10 @@ var KeeperApp = React.createClass({
     } else {
       console.log("in development, not autorefreshing");
     }
+    mixpanel.track("Webapp Load", {
+      distinct_id: USER.id,
+      interface: "web",
+    });
   },
 
 	render: function() {
