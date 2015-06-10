@@ -47,7 +47,7 @@ SMSKEEPER_NICETIES = [
 	Nicety("hi$|hello|hey", ["Hi there."]),
 	Nicety("no thanks|not now|maybe later|great to meet you too|nice to meet you too", None),
 	Nicety("yes$|no$|y$|n$|nope$", None),
-	Nicety(u"cool$|ok$|great$|k$|sweet$|hah(a)?|lol$|okay$|awesome|\U0001F44D", None),
+	Nicety(u"cool$|ok$|great$|k+$|sweet$|hah(a)?|lol$|okay$|(thats )?awesome|\U0001F44D", None),
 	Nicety(
 		"how are you( today)?|how're you|hows it going",
 		[u"I'm good, thanks for asking! \U0001F603", u"Can't complain! \U0001F603"]
@@ -65,7 +65,7 @@ SMSKEEPER_NICETIES = [
 		[u"I don't think you'd appreciate my humor. \U0001F609"]
 	),
 	Nicety(
-		"i love you|youre (pretty )?(cool|neat|smart)",
+		"i love you|youre (pretty )?(cool|neat|smart)|youre the (best|greatest)",
 		[u"You're pretty cool too! \U0001F60E"]
 	),
 	Nicety(
