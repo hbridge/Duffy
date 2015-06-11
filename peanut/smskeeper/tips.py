@@ -24,7 +24,7 @@ class KeeperTip():
 		if self.id == VCARD_TIP_ID:
 			self.mediaUrl = getKeeperVCard(user)
 		result = self.message
-		result = result.replace(":NAME:", user.name) + "\n\n"
+		result = result.replace(":NAME:", user.name)
 		result = result.replace(":APP_URL:", user.getWebAppURL())
 		result += "\n\n" + SMSKEEPER_TIP_FOOTER
 		return result
