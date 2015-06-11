@@ -174,7 +174,6 @@ def getDigestMessageForUser(user, entries):
 	now = date_util.now(pytz.utc)
 	msg = "Your things for today:\n"
 	pendingEntries = user_util.pendingTodoEntries(user, entries)
-
 	if len(pendingEntries) == 0:
 		return "", []
 
@@ -206,7 +205,6 @@ def sendDigestForUserId(userId):
 @app.task
 def processDailyDigest(keeperNumber=None):
 	entries = Entry.objects.filter(creator__product_id=1, label="#reminders", hidden=False)
-
 	entriesByCreator = dict()
 
 	for entry in entries:

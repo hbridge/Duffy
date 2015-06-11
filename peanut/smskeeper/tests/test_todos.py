@@ -337,6 +337,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupNatty(nattyMock, self.NO_TIME, "I need to run with my dad", "")
 		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
 
+		self.setupNatty(nattyMock, self.WEEKEND, "I want to go buy some stuff", "this weekend")
+		cliMsg.msg(self.testPhoneNumber, "I need to go buy some stuff this weekend")
+
 		self.setupNatty(nattyMock, self.NO_TIME, "I need to go poop in the yard", "")
 		cliMsg.msg(self.testPhoneNumber, "I need to go poop in the yard")
 
@@ -345,6 +348,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertIn("run with my dad", self.getOutput(mock))
 			self.assertIn("go poop in the yard", self.getOutput(mock))
+			self.assertNotIn("buy some stuff", self.getOutput(mock))
 
 		# Digest should kicks off
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -355,9 +359,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			# We don't send back individals
 			self.assertNotIn("poop", self.getOutput(mock))
 
-		# Make sure they all got done
+		# Make sure first and third were cleared
 		entries = Entry.objects.all()
-		for entry in entries:
-			self.assertTrue(entry.hidden)
+		self.assertTrue(entries[0].hidden)
+		self.assertFalse(entries[1].hidden)
+		self.assertTrue(entries[2].hidden)
 
 
