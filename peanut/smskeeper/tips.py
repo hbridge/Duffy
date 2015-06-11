@@ -5,19 +5,16 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 from smskeeper import time_utils
 
-'''
-Tips that will be sent daily to new users.
-Tips will be evaluated for sending based on order so new tips should be added to the end.
-'''
+
 class KeeperTip():
 	id = None
 	message = None
 
-	def __init__(self, id, message, triggerBased, mediaUrl=None):
+	def __init__(self, id, message, type, mediaUrl=None):
 		self.id = id
 		self.message = message
 		self.mediaUrl = mediaUrl
-		self.triggerBased = triggerBased
+		self.type = type
 
 	# Render a tip for a full tip, like vcard
 	def render(self, user):
@@ -32,6 +29,9 @@ class KeeperTip():
 	# Mini tips are little sentences sent after first actions
 	def renderMini(self):
 		return self.message
+
+FULL_TIP_TYPE = "full"
+MINI_TIP_TYPE = "mini"
 
 REMINDER_TIP_ID = "reminders"
 WEB_APP_TIP_ID = "webapp"
@@ -48,26 +48,27 @@ DONE_TIP2_ID = "mini-done2"
 DONE_TIP3_ID = "mini-done3"
 
 
+# Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
-	KeeperTip(  #mediaurl will be put in at render time
+	KeeperTip(  # mediaurl will be put in at render time
 		VCARD_TIP_ID,
 		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
-		True
+		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		REMINDER_TIP_ID,
 		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')",
-		False
+		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		WEB_APP_TIP_ID,
 		"Ahoy :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL: It works on your :computer: too!",
-		False
+		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		PHOTOS_TIP_ID,
 		u"I \U0001F499 pics!",
-		False,
+		type=FULL_TIP_TYPE,
 		mediaUrl=keeper_constants.PHOTOS_TIP_URL
 	),
 	# KeeperTip(
@@ -77,27 +78,27 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		VOICE_TIP_ID,
 		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper remind me to call Mom this weekend'",
-		True
+		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		SNOOZE_TIP_ID,
 		"btw, you can always snooze a reminder by saying 'snooze 5 mins' or 'snooze 9pm'",
-		False
+		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP1_ID,
 		"btw, let me know when you're done",
-		False
+		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP2_ID,
 		"btw, let me know when you're done",
-		False
+		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP3_ID,
 		"btw, let me know when you're done",
-		False
+		type=MINI_TIP_TYPE
 	),
 ]
 
@@ -123,7 +124,7 @@ def isEligibleForTip(user):
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
 	if not user.last_tip_sent:
 		dt_activated = datetime.datetime.now(pytz.utc) - user.activated  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
-		if dt_activated.total_seconds() >= 3*60*60: # if it's been at least 3 hours since they signed up, send them the first tip
+		if dt_activated.total_seconds() >= 3 * 60 * 60:  # if it's been at least 3 hours since they signed up, send them the first tip
 			return True
 	else:
 		dt_tip_sent = datetime.datetime.now(pytz.utc) - user.last_tip_sent  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
@@ -134,15 +135,15 @@ def isEligibleForTip(user):
 
 
 #
-# Selects a tip and returns its identifier for trigger based tips
+# Selects a full tip and returns its identifier
 #
-def selectNextTip(user):
+def selectNextFullTip(user):
 	if not isEligibleForTip(user):
 		return None
 
-	# Filter to only trigger based ones
-	triggerBasedTips = filter(lambda tip: tip.triggerBased, SMSKEEPER_TIPS)
-	unsentTipIds = map(lambda tip: tip.id, triggerBasedTips)
+	# Filter to only full tips
+	fullTips = filter(lambda tip: tip.type == FULL_TIP_TYPE, SMSKEEPER_TIPS)
+	unsentTipIds = map(lambda tip: tip.id, fullTips)
 
 	unsentTipIds = [x for x in unsentTipIds if x not in getSentTipIds(user)]
 	for tipId in unsentTipIds:
@@ -193,6 +194,7 @@ def getSentTipIds(user):
 		return user.sent_tips.split(",")
 	return []
 
+
 def logTipSent(user, tip, customSentDate, isMini, sentTips):
 	# figure out when the last incoming message came in
 	messages = user.getMessages(incoming=True, ascending=False)
@@ -219,6 +221,7 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 			"Local Hour of Day": localHour
 		},
 	)
+
 
 def getKeeperVCard(user):
 	if user.product_id == 1:

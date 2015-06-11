@@ -236,7 +236,7 @@ def processDailyDigest(keeperNumber=None):
 def sendTips(keeperNumber=None):
 	users = User.objects.all()
 	for user in users:
-		tip = tips.selectNextTip(user)
+		tip = tips.selectNextFullTip(user)
 		if tip:
 			if not keeperNumber:
 				keeperNumber = user.getKeeperNumber()

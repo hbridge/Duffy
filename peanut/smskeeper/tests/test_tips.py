@@ -68,7 +68,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 
 	def assertTipSends(self, user):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-				self.assertNotEqual(tips.selectNextTip(self.user), None)
+				self.assertNotEqual(tips.selectNextFullTip(self.user), None)
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
 				self.assertNotEqual(self.getOutput(mock), None)
 				self.assertNotEqual(self.getOutput(mock), "")
@@ -176,7 +176,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		for i, tip in enumerate(tips.SMSKEEPER_TIPS):
 			with patch('smskeeper.tips.datetime') as datetime_mock:
 				setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * (i + 1), tips.SMSKEEPER_TIP_HOUR)
-				tip = tips.selectNextTip(self.user)
+				tip = tips.selectNextFullTip(self.user)
 				if tip:
 					self.assertNotEqual(tip.id, tipId)
 					tips.markTipSent(self.user, tip)
