@@ -13,7 +13,6 @@ from smskeeper.models import Entry
 def process(user, msg, requestDict, keeperNumber):
 	step = user.getStateData("step")
 
-	print "reached at beginning of tutorial-list"
 	if step:
 		step = int(step)
 	else:

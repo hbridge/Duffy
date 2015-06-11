@@ -126,27 +126,31 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "add to groceries")
 			self.assertNotIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 
-	def test_tutorial_list(self):
+	def test_tutorial_list_normal(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_LIST)
 
 		# Activation message asks for their name
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "I'm UnitTests")
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
-			self.assertIn("Let me show you the basics", self.getOutput(mock))
 			self.assertEquals(self.getTestUser().name, "UnitTests")
 
+		# Activation message asks for their zip
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "new5 #test")
-			self.assertIn("Now let's add other items to your list", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "10012")
+			self.assertIn("Let's add some things you want to remember", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "new2 #test")
-			self.assertIn("You can send items to this", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "add pasta to shopping list")
+			self.assertIn("let's add other items to your list", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "#test")
-			self.assertIn("You got it", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "add cheese, meatballs to shopping list")
+			self.assertIn("You can add items to this list anytime", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "shopping list")
+			self.assertIn("pasta", self.getOutput(mock))
 
 	def test_get_label_doesnt_exist(self):
 		self.setupUser(True, True)
