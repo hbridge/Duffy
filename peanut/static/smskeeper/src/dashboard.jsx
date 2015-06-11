@@ -2,10 +2,15 @@ var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
 var timeago = require('timeago');
+var FixedDataTable = require('fixed-data-table');
+var Table = FixedDataTable.Table;
+var Column = FixedDataTable.Column;
+var format = require('string-format')
 
 var DailyTable = React.createClass({
   render: function() {
     headerValues = ["days", "users (in/out)", "msgs (in/out)"];
+    var dayKeys = null;
     var createRow = function(days, index) {
 			return <DailyStatsRow days={days} stats={ this.props.stats[days] } index= { index } />
 		}.bind(this);
@@ -17,114 +22,121 @@ var DailyTable = React.createClass({
     }
     console.log(day_keys);
 
+    var rowGetter = function rowGetter(rowIndex) {
+      day_key = day_keys[rowIndex];
+      stats = this.props.stats[day_key];
+      return [
+        day_key,
+        stats.incoming.user_count + "/" + stats.outgoing.user_count,
+        stats.incoming.messages + "/" + stats.outgoing.messages,
+      ];
+    }.bind(this);
+
+    var rowCount = 0;
+    if (this.props.stats) rowCount = day_keys.length;
+    console.log("rowCount " + rowCount);
+
     return (
       <div>
         <h1>Daily Stats</h1>
-        <table>
-          <HeaderRow headerValues={ headerValues } />
-          { day_keys.map(createRow) }
-        </table>
+        <Table
+          rowHeight={40}
+          rowGetter={rowGetter}
+          rowsCount={rowCount}
+          width={600}
+          maxHeight={768}
+          headerHeight={40}>
+          <Column
+            label="days"
+            width={200}
+            dataKey={0}
+            />
+          <Column
+            label="users (in/out)"
+            width={200}
+            dataKey={1}
+          />
+          <Column
+            label="msgs (in/out)"
+            width={200}
+            dataKey={2}
+          />
+        </Table>
       </div>
     );
-  }
-});
 
-var DailyStatsRow = React.createClass({
-  render: function() {
-    var rowClasses = classNames({
-      'oddrow' : this.props.index % 2 == 1,
-		});
-    return (
-      <tr className={ rowClasses }>
-        <th className="cell"> {this.props.days} </th>
-        <td> { this.props.stats.incoming.user_count }/{ this.props.stats.outgoing.user_count }</td>
-        <td> { this.props.stats.incoming.messages }/{ this.props.stats.outgoing.messages }</td>
-      </tr>
-    );
   }
 });
 
 var UserTable = React.createClass({
-  render: function() {
-    var createRows = function(users) {
-      count = 0;
-      result = [];
-      for (index in users) {
-        user = users[index];
-
-        count++;
-        result.push(<UserRow user={ user } highlighted={ count % 2 == 0 } />)
-      }
-      return result;
-		}.bind(this);
-    headerValues = ["user", "name", "fullname", "joined", "activated", "tutorial (src)", "msgs (in/out)", "last in", "history"];
-
-    if (this.props.users.length > 0) {
-      return (
-        <div>
-          <h1>{ this.props.title }</h1>
-          <table>
-            <HeaderRow headerValues={ headerValues } />
-            { createRows(this.props.users) }
-          </table>
-        </div>
-      );
-    } else {
-      return (<div></div>);
-    }
-
-  },
-});
-
-var HeaderRow = React.createClass({
-  render: function() {
-    var createHeaderCell = function(item, index){
-      return (<th className="cell"> { item } </th>);
+  render: function(){
+    var rowGetter = function rowGetter(rowIndex) {
+      return this.rowForUser(this.props.users[rowIndex]);
     }.bind(this);
 
-    return (
-      <tr>
-        { this.props.headerValues.map(createHeaderCell)}
-      </tr>
-    );
-  }
-});
+    var reactObjRenderer = function(data) {
+      return data;
+    }
 
-var UserRow = React.createClass({
-  render: function() {
-    accountAge = timeago(new Date(this.props.user.created));
-    tutorial_text = this.props.user.completed_tutorial ? "√ " + this.props.user.source : this.props.user.source;
-    if (this.props.user.paused)
+    return (
+      <div>
+        <h1>{ this.props.title }</h1>
+        <Table
+          rowHeight={40}
+          rowGetter={rowGetter}
+          rowsCount={this.props.users.length}
+          width={2000}
+          maxHeight={768}
+          headerHeight={40}>
+          <Column label="user" width={180} dataKey={0} />
+          <Column label="name" width={180} dataKey={1} cellRenderer={reactObjRenderer} />
+          <Column label="fullname" width={180} dataKey={2} cellRenderer={reactObjRenderer}/>
+          <Column label="joined" width={120} dataKey={3} flexgrow={1} />
+          <Column label="activated" width={120} dataKey={4}  flexgrow={1}/>
+          <Column label="tutorial (src)" width={100} dataKey={5} />
+          <Column label="msgs (in/out)" width={80} dataKey={6} />
+          <Column label="last in" width={120} dataKey={7} />
+          <Column label="history" width={80} dataKey={8} cellRenderer={reactObjRenderer}/>
+        </Table>
+      </div>
+      );
+  },
+
+
+  rowForUser: function(user){
+    accountAge = timeago(new Date(user.created));
+    tutorial_text = user.completed_tutorial ? "√ " + user.source : user.source;
+    if (user.paused)
       tutorial_text += " PAUSED"
-    if (this.props.user.state === "stopped")
+    if (user.state === "stopped")
       tutorial_text += " STOPPED"
     activated_text = null;
-    if (this.props.user.activated)
-      activated_text = timeago(new Date(this.props.user.activated));
-    in_date = new Date(this.props.user.message_stats.incoming.last);
-    out_date = new Date(this.props.user.message_stats.outgoing.last);
+    if (user.activated)
+      activated_text = timeago(new Date(user.activated));
+    in_date = new Date(user.message_stats.incoming.last);
+    out_date = new Date(user.message_stats.outgoing.last);
     //last = in_date > out_date ? in_date : out_date;
     last = in_date
     timeago_text = timeago(last);
 
     var rowClasses = classNames({
       'oddrow' : this.props.highlighted == true,
-		});
-		return (
-      <tr className= {rowClasses}>
-        <td className="cell"> { this.props.user.id } ({ this.props.user.phone_number })</td>
-        <td className="cell"> <a href={"/"+this.props.user.key+"?internal=1"}>{ this.props.user.name }</a></td>
-        <td className="cell" title={ this.props.user.full_name }> { this.props.user.full_name[0] }</td>
-        <td className="cell"> { accountAge }</td>
-        <td className="cell"> { activated_text }</td>
-        <td className="cell"> { tutorial_text }</td>
-        <td className="cell"> { this.props.user.message_stats.incoming.count }/{ this.props.user.message_stats.outgoing.count }</td>
-        <td className="cell"> { timeago_text } </td>
-        <td className="cell"> <a target="_blank" href={ this.props.user.history }>history</a></td>
-      </tr>
-    );
-  },
+    });
+    return ([
+      format("{id} ({phone_number})", user),
+      //format("<a href=/{key}?internal=1>{name}</a>", user),
+      <a href={"/"+user.key+"?internal=1"}>{ user.name }</a>,
+      <span title={ user.full_name }> { user.full_name[0] }</span>,
+      accountAge,
+      activated_text,
+      tutorial_text,
+      format("{message_stats.incoming.count}/{message_stats.outgoing.count}", user),
+      timeago_text,
+      <a target="_blank" href={ user.history }>history</a>,
+    ]);
+  }
 });
+
 
 var DashboardApp = React.createClass({
   getInitialState: function() {

@@ -7,6 +7,7 @@
     "backbone": "^1.2.1",
     "backbone-react-component": "^0.8.1",
     "classnames": "^1.2.2",
+    "fixed-data-table": "^0.3.0",
     "jquery": "^2.1.4",
     "jquery-ui": "^1.10.5",
     "mixpanel": "^0.2.1",
@@ -16,6 +17,7 @@
     "react-masonry-mixin": "^0.5.7",
     "react-plain-editable": "^2.0.0",
     "react-time": "^2.5.0",
+    "string-format": "^0.5.0",
     "timeago": "^0.2.0"
   },
   "devDependencies": {
