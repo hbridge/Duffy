@@ -23,9 +23,10 @@ class KeeperTip():
 	def render(self, user):
 		if self.id == VCARD_TIP_ID:
 			self.mediaUrl = getKeeperVCard(user)
-		result = self.message.replace(":NAME:", user.name) + "\n\n"
+		result = self.message
+		result = result.replace(":NAME:", user.name) + "\n\n"
 		result = result.replace(":APP_URL:", user.getWebAppURL())
-		result += "\n\n" +SMSKEEPER_TIP_FOOTER
+		result += "\n\n" + SMSKEEPER_TIP_FOOTER
 		return result
 
 	# Mini tips are little sentences sent after first actions
