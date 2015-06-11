@@ -44,7 +44,7 @@ DONE_TIP3_ID = "mini-done3"
 
 
 SMSKEEPER_TIPS = [
-	KeeperTip( #mediaurl will be put in at render time
+	KeeperTip(  #mediaurl will be put in at render time
 		VCARD_TIP_ID,
 		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
 		True
@@ -56,8 +56,9 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		PHOTOS_TIP_ID,
-		u"I \U0001F499 pics!  Try sending me a selfie with 'add to selifes' and I'll store it for you.  It's a fast way to save documents and receipts, too!",
-		False
+		u"I \U0001F499 pics!",
+		False,
+		mediaUrl=keeper_constants.PHOTOS_TIP_URL
 	),
 	# KeeperTip(
 	# 	SHARING_TIP_ID,
