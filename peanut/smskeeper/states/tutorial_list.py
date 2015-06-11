@@ -1,78 +1,165 @@
 import time
+import re
+import logging
+import datetime
+import string
 
-from smskeeper import sms_util, msg_util
-from smskeeper import actions
-
-from smskeeper.models import Entry
+from smskeeper import sms_util
 from smskeeper import keeper_constants
-
-
-def sendContactCard(user, keeperNumber):
-		cardURL = keeper_constants.KEEPER_VCARD_URL
-		sms_util.sendMsg(user, '', cardURL, keeperNumber)
-
+from smskeeper import msg_util
+from smskeeper import analytics, niceties, actions
+from smskeeper.models import Entry
 
 def process(user, msg, requestDict, keeperNumber):
-	stateData = None
-	if user.state_data:
-		stateData = int(user.state_data)
+	step = user.getStateData("step")
 
-	if not stateData:
+	print "reached at beginning of tutorial-list"
+	if step:
+		step = int(step)
+	else:
+		step = 0
+
+	analytics.logUserEvent(
+		user,
+		"Reached Tutorial Step",
+		{
+			"Tutorial": keeper_constants.STATE_TUTORIAL_LIST,
+			"Step": step
+		}
+	)
+
+	# Deal with one off things before we get to tutorial
+	nicety = niceties.getNicety(msg)
+	if nicety:
+		actions.nicety(user, nicety, requestDict, keeperNumber)
+		return True
+
+	# Tutorial stuff
+	if step == 0:
+		# First see if they did a phrase like "my name is Billy"
 		nameFromPhrase = msg_util.nameInSetName(msg, tutorial=True)
+
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
-			user.name = msg.strip()
-		user.save()
-		sms_util.sendMsg(user, "Great, nice to meet you %s!" % user.name, None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "Let me show you the basics. I remember anything you send me with a hashtag.", None, keeperNumber)
-		time.sleep(1)
-		sms_util.sendMsg(user, "Let's make your shopping list. Just type 'pasta #shopping'. Try it now.", None, keeperNumber)
-		user.state_data = 1
-	elif stateData == 1:
-		if not msg_util.hasLabel(msg):
-			# They didn't send in something with a label.
-			sms_util.sendMsg(user, "Actually, let's create a list first. Try 'pasta #shopping'.", None, keeperNumber)
-		else:
-			# They sent in something with a label, have them add to it
-			actions.add(user, msg, requestDict, keeperNumber, False, True)
-			sms_util.sendMsg(user, "Now let's add other items to your list. Don't forget to add your hashtag again. '%s'" % msg_util.getLabel(msg), None, keeperNumber)
-			user.state_data = stateData + 1
-	elif stateData == 2:
-		# They should be sending in a second add command to an existing label
-		if not msg_util.hasLabel(msg) or msg_util.isLabel(msg):
-			existingLabel = Entry.fetchFirstLabel(user)
-			if not existingLabel:
-				sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
+			# If there's more than two words, then reject
+			if len(msg.split(' ')) > 2:
+				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
 				return True
-			sms_util.sendMsg(user, "Actually, let's add to the first list. Try 'visit atm %s'." % existingLabel, None, keeperNumber)
-		else:
-			actions.add(user, msg, requestDict, keeperNumber, False, True)
-			sms_util.sendMsg(user, "Got it. You can send items to this hashtag anytime (including photos). To see your items, send just the hashtag '%s' to me. Give it a shot." % msg_util.getLabel(msg), None, keeperNumber)
-			user.state_data = stateData + 1
-	elif stateData == 3:
-		# The should be sending in just a label
-		existingLabel = Entry.fetchFirstLabel(user)
-		if not existingLabel:
-			sms_util.sendMsg(user, "I'm borked, well done", None, keeperNumber)
-			return
+			else:
+				user.name = msg.strip(string.punctuation)
 
-		if not msg_util.isLabel(msg):
-			sms_util.sendMsg(user, "Actually, let's view your list. Try '%s'." % existingLabel, None, keeperNumber)
+		user.save()
+		sms_util.sendMsgs(
+			user,
+			[
+				u"Great, nice to meet you %s! \U0001F44B" % user.name,
+				u"What's your zipcode? It'll help me remind you of things at the right time \U0001F553"
+			],
+			keeperNumber
+		)
+		user.setStateData("step", 1)
+	elif step == 1:
+		timezone, user_error = msg_util.timezoneForMsg(msg)
+
+		if timezone is None:
+			sms_util.sendMsg(user, user_error, None, keeperNumber)
+			return True
+		else:
+			user.timezone = timezone
+
+		sms_util.sendMsgs(user, 
+			[
+				u"\U0001F44F Thanks! Let's add some things you want to remember. ", 
+				u"What's a recent thing you wanted to buy? You can say 'Add pasta to my shopping list'. Give it a try - just start with 'Add...'!"
+			], 
+			keeperNumber)
+
+		user.setStateData("step", 2)
+	elif step == 2:
+
+		if msg_util.isAddTextCommand(msg):
+			actions.add(user, msg, requestDict, keeperNumber, True, True)
+		else:
+			sms_util.sendMsgs(
+				user,
+				[
+					u"I didn't understand that \U0001F61E. Try saying it as 'Add ITEM to LIST'"
+				], 
+				keeperNumber)
 			return True
 
-		if msg not in Entry.fetchAllLabels(user):
-			sms_util.sendMsg(user, "Actually, let's view the list you already created. Try '%s'." % existingLabel, None, keeperNumber)
-			return True
-		else:
-			label = msg
-			actions.fetch(user, label, keeperNumber)
-			sms_util.sendMsg(user, "You got it. You can also send HELP anytime to get help.", None, keeperNumber)
-			time.sleep(1)
-			sms_util.sendMsg(user, "And here are some ideas to start you off: movies to watch, restaurants to try, books to read, or even a food journal. Try creating your own list.", None, keeperNumber)
+		# time.sleep so the response to add Action goes out first
+		time.sleep(1)
+		sms_util.sendMsgs(
+			user, 
+			[
+				u"Now let's add other items to your list. Like 'Add meatballs, cheese to shopping list'"
+			], 
+			keeperNumber
+			)
 
-			user.setTutorialComplete()
+		user.setStateData("step", 3)
+
+	elif step == 3:
+
+		if msg_util.isAddTextCommand(msg):
+			actions.add(user, msg, requestDict, keeperNumber, True, True)
+		else:
+			sms_util.sendMsgs(
+				user,
+				[
+					u"I didn't understand that \U0001F61E. Try saying it as 'Add ITEM to LIST'"
+				], 
+				keeperNumber
+				)
+			return True
+
+		sms_util.sendMsgs(
+			user,
+			[
+				u"Great! You can add items to this list anytime (including photos). To see items on a list, just ask for it 'my shopping list'. Give it a shot."
+			],
+			keeperNumber
+			)
+
+		user.setStateData("step", 4)
+
+	elif step == 4:
+
+		if msg_util.isFetchCommand(msg, user):
+			actions.fetch(user, msg_util.labelInFetch(msg), keeperNumber)
+		else:
+			sms_util.sendMsgs(
+				user,
+				[
+					u"I didn't understand that \U0001F61E. Try saying it as 'shopping list'"
+				], 
+				keeperNumber
+				)
+			return True
+
+		sms_util.sendMsgs(
+			user, 
+			[
+				u"You got it. What's something else you want to remember?",
+				u"Like movies to watch, restaurants to try, books to read, or even a food journal. Give it a shot \U0001F44D",
+			], 
+			keeperNumber
+			)
+
+		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
+		sms_util.sendMsg(user, "FYI, I can also help you with other things. Just txt me 'Tell me more'", None, keeperNumber, eta=delayedTime)
+		user.setTutorialComplete()
+		user.setState(keeper_constants.STATE_NORMAL)
+
+		analytics.logUserEvent(
+			user,
+			"Completed Tutorial",
+			{
+				"Tutorial": keeper_constants.STATE_TUTORIAL_LIST
+			}
+		)
 
 	user.save()
 	return True

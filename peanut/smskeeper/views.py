@@ -428,10 +428,15 @@ def signup_from_website(request):
 					productId=1
 				else:
 					productId=0
+
 				target_user = User.objects.create(phone_number=phoneNum, product_id=productId, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}))
 				target_user.save()
 
-				user_util.activate(target_user, "", None, target_user.getKeeperNumber())
+				if 'list-webapp1' in exp:
+					tutorial = keeper_constants.STATE_TUTORIAL_LIST
+				else:
+					tutorial = None
+				user_util.activate(target_user, "", tutorial, target_user.getKeeperNumber())
 
 				"""
 				Comment out code to try always activating users

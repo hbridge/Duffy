@@ -15,7 +15,7 @@ COMMAND_HELP = 8
 #
 STATE_NOT_ACTIVATED = 'not-activated'
 STATE_NOT_ACTIVATED_FROM_REMINDER = 'not-activated-from-reminder'
-STATE_TUTORIAL_LIST = 'tutorial'
+STATE_TUTORIAL_LIST = 'tutorial-list'
 STATE_TUTORIAL_REMIND = 'tutorial-remind'
 STATE_TUTORIAL_TODO = 'tutorial-todo'
 STATE_NORMAL = 'normal'
