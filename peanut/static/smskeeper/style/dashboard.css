@@ -6,3 +6,15 @@ body {
 h1 {
   font-size: 18pt;
 }
+
+.filterControl
+{
+	float: right;
+	background-color: #CCF;
+	padding: 10px;
+}
+
+.filterControl * {
+	font-size: 12pt;
+}
+

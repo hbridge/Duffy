@@ -143,13 +143,35 @@ var UserTable = React.createClass({
       timeago_text,
       user,
     ]);
+  },
+});
+
+var FilterForm = React.createClass({
+  render: function() {
+    var options = this.props.filterFields.map(function(field){
+      return (<option value={field}>{field}</option>);
+    });
+
+    return (
+      <div className="filterControl">
+      <select onChange={this._onFilterChange} ref="select">
+        {options}
+      </select>
+      <input onChange={this._onFilterChange} placeholder='Value' ref="text"/>
+      </div>
+    );
+  },
+
+  _onFilterChange: function(e) {
+    this.props.onChange(this.refs.select.getDOMNode().value,
+      this.refs.text.getDOMNode().value);
   }
 });
 
 
 var DashboardApp = React.createClass({
   getInitialState: function() {
-    return {users: [], daily_stats: {}};
+    return {users: [], daily_stats: {}, filter:{}};
   },
   loadDataFromServer: function() {
     $.getJSON("/smskeeper/dashboard_feed", this.dataCallback);
@@ -237,15 +259,36 @@ var DashboardApp = React.createClass({
     yest.setDate(yest.getDate() - 1);
     twoweeks.setDate(twoweeks.getDate() - 14);
 
-    var pausedUsers = getPausedUsers(this.state.users);
-    var nonActivatedUsers = filterUsers(this.state.users, false, null, null);
-    var recentlyActivatedUsers = filterUsers(this.state.users, true, now, yest);
-    var allActivated = filterUsers(this.state.users, true, yest, new Date(0));
+    var users = this.state.users;
+    var filter = this.state.filter;
+    if (Object.keys(filter).length > 0) {
+      var filterKey = Object.keys(this.state.filter)[0];
+      var filterVal = filter[filterKey];
+      if (filterVal && filterVal != "") {
+        console.log("Applying filter: " + filterKey + ":" + filter[filterKey]);
+        console.log(filter);
+        users = users.filter(function(user){
+          if (filterKey == "id") {
+            if (user[filterKey] == filter[filterKey]) return true;
+          } else {
+            if (user[filterKey].match(filter[filterKey])) return true;
+          }
+          return false;
+        });
+      }
+    }
+    console.log(users);
+
+    var pausedUsers = getPausedUsers(users);
+    var nonActivatedUsers = filterUsers(users, false, null, null);
+    var recentlyActivatedUsers = filterUsers(users, true, now, yest);
+    var allActivated = filterUsers(users, true, yest, new Date(0));
     var normalUsers = filterUsersByActivity(allActivated, now, twoweeks);
     var oldUsers = filterUsersByActivity(allActivated, twoweeks, new Date(0));
 
 		return (
       <div>
+        <FilterForm filterFields={["name", "id", "source"]} onChange={this._onFilterChange} />
         <DailyTable stats={ this.state.daily_stats} />
         <UserTable users={ pausedUsers } showActivated={ true } title={"Paused (" + pausedUsers.length  + ")"}/>
         <UserTable users={ normalUsers } showActivated={ true } title={"Active (" + normalUsers.length  + ")"}/>
@@ -255,6 +298,13 @@ var DashboardApp = React.createClass({
       </div>
 		);
 	},
+
+  _onFilterChange: function(key, value) {
+    console.log(format("{} {}", key, value));
+    var filter = {}
+    filter[key] = value
+    this.setState({filter: filter});
+  }
 });
 
 React.render(<DashboardApp />, document.getElementById("app"));
