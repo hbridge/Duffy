@@ -44,7 +44,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.debug("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
 		actions.setTipFrequency(user, msg, keeperNumber)
 		return True
-	elif msg_util.nameInSetName(msg):
+	elif msg_util.nameInSetName(msg) and user.completed_tutorial:
 		logger.debug("User %s: I think '%s' is a set name command" % (user.id, msg))
 		actions.setName(user, msg, keeperNumber)
 		return True
