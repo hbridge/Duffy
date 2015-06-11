@@ -74,7 +74,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			user.timezone = timezone
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Schedule doctor's apptmt for next week'."], keeperNumber )
+		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Pick up Susie at 2:30 Friday'."], keeperNumber )
 
 		user.setStateData("step", 2)
 		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
@@ -82,7 +82,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	elif step == 2:
 		# succeeded
-		sms_util.sendMsgs(user, [u"What's something you need to get done next week? Like 'Wish Dad happy birthday on Wednesday'"], keeperNumber)
+		sms_util.sendMsgs(user, [u"What's something else you need to do?  just txt me what and when"], keeperNumber)
 		user.setStateData("step", 3)
 		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
 		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
@@ -91,7 +91,7 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(user, [u"I'll also send you a daily morning digest of things you need to get done that day."], keeperNumber)
 		sms_util.sendMsgs(user, [u"Just txt me when things pop in your head and I'll track them for you. It's that easy. \U0001F60E"], keeperNumber)
 
-		# TODO: enable tell me more 
+		# TODO: enable tell me more
 		#delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
 		#sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
