@@ -61,7 +61,7 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		WEB_APP_TIP_ID,
-		"Ahoy :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL:\nIt works on your :computer: too!",
+		"Ahoy :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL: It works on your :computer: too!",
 		False
 	),
 	KeeperTip(
