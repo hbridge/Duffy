@@ -64,9 +64,15 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 
 			# ensure tip 2 gets sent out
 			setMockDatetimeDaysAhead(datetime_mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2, tips.SMSKEEPER_TIP_HOUR)
-			with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.assertTipSends(self.user)
+
+	def assertTipSends(self, user):
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+				self.assertNotEqual(tips.selectNextTip(self.user), None)
 				async.sendTips(constants.SMSKEEPER_TEST_NUM)
-				self.assertIn(tips.SMSKEEPER_TIPS[3].render(self.user), self.getOutput(mock))
+				self.assertNotEqual(self.getOutput(mock), None)
+				self.assertNotEqual(self.getOutput(mock), "")
+
 
 	def testSendTipMedia(self):
 		self.setupUser(True, True, "UTC")
@@ -127,9 +133,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 
 			# make sure we do send them in 31 days
 			setMockDatetimeDaysAhead(datetime_mock, 31, tips.SMSKEEPER_TIP_HOUR)
-			with patch('smskeeper.sms_util.recordOutput') as mock:
-				async.sendTips(constants.SMSKEEPER_TEST_NUM)
-				self.assertIn(tips.SMSKEEPER_TIPS[3].render(self.user), self.getOutput(mock))
+			self.assertTipSends(self.user)
 
 	def testSetTipFrequencyMalformed(self):
 		self.setupUser(True, True, "UTC")

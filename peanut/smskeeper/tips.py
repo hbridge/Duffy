@@ -23,13 +23,17 @@ class KeeperTip():
 	def render(self, user):
 		if self.id == VCARD_TIP_ID:
 			self.mediaUrl = getKeeperVCard(user)
-		return self.message.replace(":NAME:", user.name) + "\n\n" + SMSKEEPER_TIP_FOOTER
+		result = self.message.replace(":NAME:", user.name) + "\n\n"
+		result = self.message.replace(":APP_URL:", user.getWebAppURL())
+		result += SMSKEEPER_TIP_FOOTER
+		return result
 
 	# Mini tips are little sentences sent after first actions
 	def renderMini(self):
 		return self.message
 
 REMINDER_TIP_ID = "reminders"
+WEB_APP_TIP_ID = "webapp"
 PHOTOS_TIP_ID = "photos"
 SHARING_TIP_ID = "sharing"
 VOICE_TIP_ID = "voice"
@@ -52,6 +56,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		REMINDER_TIP_ID,
 		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')",
+		False
+	),
+	KeeperTip(
+		WEB_APP_TIP_ID,
+		"Ahoy :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL:\nIt works on your :computer: too!",
 		False
 	),
 	KeeperTip(
