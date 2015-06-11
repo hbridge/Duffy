@@ -28,7 +28,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call jesus tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("What's something you need to get done", self.getOutput(mock))
+			self.assertIn("What's something else you need to do?", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Wish Dad happy birthday next week")
