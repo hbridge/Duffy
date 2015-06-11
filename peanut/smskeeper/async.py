@@ -233,11 +233,13 @@ def processDailyDigest(keeperNumber=None):
 
 
 @app.task
-def sendTips(keeperNumber=None):
+def sendTips(overrideKeeperNumber=None):
+	# TODO add test to make sure we send tips to the right number for each user
 	users = User.objects.all()
 	for user in users:
 		tip = tips.selectNextFullTip(user)
 		if tip:
+			keeperNumber = overrideKeeperNumber
 			if not keeperNumber:
 				keeperNumber = user.getKeeperNumber()
 			sendTipToUser(tip, user, keeperNumber)
