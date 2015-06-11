@@ -84,6 +84,7 @@ class SMSKeeperBaseCase(TestCase):
 	TUE_850AM = ([2015, 6, 2, 12, 50, 0], True, True)
 	TUE_858AM = ([2015, 6, 2, 12, 58, 0], True, True)
 	TUE = ([2015, 6, 2], True, False)
+	WED = ([2015, 6, 3], True, False)
 	WEEKEND = ([2015, 6, 6], True, False)
 	ONLY_4PM = ([2015, 6, 1, 20, 0, 0], False, True)
 	NEXT_WEEK = ([2015, 6, 8], True, False)

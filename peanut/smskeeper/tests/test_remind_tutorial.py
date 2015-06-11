@@ -63,7 +63,6 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
-
 		self.setupNatty(nattyMock, self.WEEKEND, "Remind me about the Improv show", "this weekend")
 		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show this weekend")
 
@@ -76,14 +75,19 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		# Make sure there's only 1 created
 		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
 
-	def test_tutorial_remind_time_zones(self):
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_tutorial_remind_time_zones(self, nattyMock, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
+
+		self.setNow(dateMock, self.MON_8AM)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.NO_TIME, "Remind me to call mom", "")
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future
