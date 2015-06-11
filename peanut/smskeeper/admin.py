@@ -68,6 +68,7 @@ class ReminderAdmin(admin.ModelAdmin):
 
 	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'remind_last_notified_tz_aware', 'added_tz_aware', 'hidden')
 	readonly_fields = ['added_tz_aware']
+	search_fields = ['creator__id']
 
 
 class Todo(Reminder):
