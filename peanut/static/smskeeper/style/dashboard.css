@@ -9,12 +9,16 @@ h1 {
 
 .filterControl
 {
-	float: right;
 	background-color: #CCF;
 	padding: 10px;
 }
 
 .filterControl * {
 	font-size: 12pt;
+	margin-left: 10px;
+}
+
+.filterControl input {
+	width: 50%;
 }
 

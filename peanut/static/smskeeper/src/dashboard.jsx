@@ -271,7 +271,7 @@ var DashboardApp = React.createClass({
           if (filterKey == "id") {
             if (user[filterKey] == filter[filterKey]) return true;
           } else {
-            if (user[filterKey].match(filter[filterKey])) return true;
+            if (user[filterKey].match(new RegExp(filter[filterKey], "ig"))) return true;
           }
           return false;
         });
