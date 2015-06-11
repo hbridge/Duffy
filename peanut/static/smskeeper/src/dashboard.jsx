@@ -74,8 +74,14 @@ var UserTable = React.createClass({
       return this.rowForUser(this.props.users[rowIndex]);
     }.bind(this);
 
-    var reactObjRenderer = function(data) {
-      return data;
+    var renderUsername = function(user) {
+      return (<a href={"/"+user.key+"?internal=1"}>{ user.name }</a>);
+    }
+    var renderFullName = function(user) {
+      return (<span title={ user.full_name }> { user.full_name[0] }</span>);
+    }
+    var renderHistory = function(user) {
+      return (<a target="_blank" href={ user.history }>history</a>);
     }
 
     return (
@@ -85,18 +91,18 @@ var UserTable = React.createClass({
           rowHeight={40}
           rowGetter={rowGetter}
           rowsCount={this.props.users.length}
-          width={2000}
+          width={1200}
           maxHeight={768}
           headerHeight={40}>
           <Column label="user" width={180} dataKey={0} />
-          <Column label="name" width={180} dataKey={1} cellRenderer={reactObjRenderer} />
-          <Column label="fullname" width={180} dataKey={2} cellRenderer={reactObjRenderer}/>
+          <Column label="name" width={180} dataKey={1} cellRenderer={renderUsername} />
+          <Column label="fullname" width={180} dataKey={2} cellRenderer={renderFullName}/>
           <Column label="joined" width={120} dataKey={3} flexgrow={1} />
           <Column label="activated" width={120} dataKey={4}  flexgrow={1}/>
           <Column label="tutorial (src)" width={100} dataKey={5} />
           <Column label="msgs (in/out)" width={80} dataKey={6} />
           <Column label="last in" width={120} dataKey={7} />
-          <Column label="history" width={80} dataKey={8} cellRenderer={reactObjRenderer}/>
+          <Column label="history" width={80} dataKey={8} cellRenderer={renderHistory}/>
         </Table>
       </div>
       );
@@ -125,14 +131,14 @@ var UserTable = React.createClass({
     return ([
       format("{id} ({phone_number})", user),
       //format("<a href=/{key}?internal=1>{name}</a>", user),
-      <a href={"/"+user.key+"?internal=1"}>{ user.name }</a>,
-      <span title={ user.full_name }> { user.full_name[0] }</span>,
+      user, // for user name
+      user, // for full name
       accountAge,
       activated_text,
       tutorial_text,
       format("{message_stats.incoming.count}/{message_stats.outgoing.count}", user),
       timeago_text,
-      <a target="_blank" href={ user.history }>history</a>,
+      user,
     ]);
   }
 });
