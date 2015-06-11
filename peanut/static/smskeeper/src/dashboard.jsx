@@ -159,6 +159,11 @@ var DashboardApp = React.createClass({
 
 	dataCallback: function(data) {
 	  console.log(data);
+    if (JSON.stringify(this.state.users) == JSON.stringify(data.users)
+      && JSON.stringify(this.state.daily_stats) == JSON.stringify(data.daily_stats)) {
+      console.log("no data change");
+      return;
+    }
     this.setState( {
       users : data.users,
       daily_stats : data.daily_stats
