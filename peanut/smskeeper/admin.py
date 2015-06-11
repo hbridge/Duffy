@@ -58,6 +58,7 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj = super(ReminderAdmin, self).get_object(request, object_id)
 		if obj is not None:
 			obj.remind_timestamp = obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+			obj.remind_last_notified = obj.remind_last_notified.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
 		return obj
 
 	def save_model(self, request, obj, form, chage):
