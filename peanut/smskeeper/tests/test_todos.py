@@ -231,7 +231,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser()
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
-		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 10 minutes")
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -327,5 +327,37 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest("test")
 			self.assertIn("I need to run", self.getOutput(mock))
 
+		# Make sure we create a new entry instead of a followup
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_done_all_after_daily_digest(self, nattyMock, dateMock):
+		self.setupUser()
+
+		self.setNow(dateMock, self.MON_8AM)
+		self.setupNatty(nattyMock, self.NO_TIME, "I need to run with my dad", "")
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
+
+		self.setupNatty(nattyMock, self.NO_TIME, "I need to go poop in the yard", "")
+		cliMsg.msg(self.testPhoneNumber, "I need to go poop in the yard")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("run with my dad", self.getOutput(mock))
+			self.assertIn("go poop in the yard", self.getOutput(mock))
+
+		# Digest should kicks off
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done with all")
+
+			self.assertIn("Nice!", self.getOutput(mock))
+
+			# We don't send back individals
+			self.assertNotIn("poop", self.getOutput(mock))
+
+		# Make sure they all got done
+		entries = Entry.objects.all()
+		for entry in entries:
+			self.assertTrue(entry.hidden)
 
 

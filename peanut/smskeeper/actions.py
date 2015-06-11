@@ -430,7 +430,7 @@ def getBestEntryMatch(user, msg, entries=None):
 def done(user, msg, keeperNumber):
 	bestMatch, score = getBestEntryMatch(user, msg)
 
-	if score > 10:
+	if score > 50:
 		bestMatch.hidden = True
 		bestMatch.save()
 

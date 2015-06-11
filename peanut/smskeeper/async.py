@@ -176,7 +176,7 @@ def getDigestMessageForUser(user, entries):
 	pendingEntries = user_util.pendingTodoEntries(user, entries)
 
 	if len(pendingEntries) == 0:
-		return ""
+		return "", []
 
 	for entry in pendingEntries:
 		if isDigestTimeForUser(user, entry.remind_timestamp):
@@ -190,7 +190,7 @@ def getDigestMessageForUser(user, entries):
 
 	msg += "\njust say 'done with...' afterwards"
 
-	return msg
+	return msg, pendingEntries
 
 
 @app.task
@@ -218,13 +218,18 @@ def processDailyDigest(keeperNumber=None):
 		if not isDigestTimeForUser(user, date_util.now(pytz.utc)):
 			continue
 
-		msg = getDigestMessageForUser(user, entries)
+		msg, pendingEntries = getDigestMessageForUser(user, entries)
 
 		if not keeperNumber:
 			keeperNumber = user.getKeeperNumber()
 
 		if msg:
 			sms_util.sendMsg(user, msg, None, keeperNumber)
+
+			# Now set to reminder sent, incase they send back done message
+			user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
+			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
+			user.save()
 		else:
 			sms_util.sendMsg(user, "fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, user.getKeeperNumber())
 
