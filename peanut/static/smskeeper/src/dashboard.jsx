@@ -74,14 +74,19 @@ var UserTable = React.createClass({
       return this.rowForUser(this.props.users[rowIndex]);
     }.bind(this);
 
-    var renderUsername = function(user) {
-      return (<a href={"/"+user.key+"?internal=1"}>{ user.name }</a>);
-    }
     var renderFullName = function(user) {
-      return (<span title={ user.full_name }> { user.full_name[0] }</span>);
+      var fullName = "";
+      if (user.full_name[0]) {
+        fullName = format("({})", user.fullName[0]);
+      }
+      return (<span title={ user.full_name }> {user.name} { fullName }</span>);
     }
-    var renderHistory = function(user) {
-      return (<a target="_blank" href={ user.history }>history</a>);
+    var renderLinks = function(user) {
+      return (
+        <span>
+        <a target="_blank" href={ user.history }>history</a> | <a href={"/"+user.key+"?internal=1"}>app</a>
+        </span>
+      );
     }
 
     var rowHeight = 40;
@@ -93,19 +98,18 @@ var UserTable = React.createClass({
           rowHeight={rowHeight}
           rowGetter={rowGetter}
           rowsCount={this.props.users.length}
-          width={1300}
+          width={1200}
           maxHeight={rowHeight * 10}
           headerHeight={60}
           >
           <Column label="user" width={180} dataKey={0}/>
-          <Column label="name" width={180} dataKey={1} cellRenderer={renderUsername} />
-          <Column label="fullname" width={180} dataKey={2} cellRenderer={renderFullName}/>
-          <Column label="joined" width={150} dataKey={3} />
-          <Column label="activated" width={150} dataKey={4} />
+          <Column label="name" width={240} dataKey={1} cellRenderer={renderFullName} />
+          <Column label="links" width={110} dataKey={2} cellRenderer={renderLinks}/>
+          <Column label="joined" width={130} dataKey={3} />
+          <Column label="activated" width={130} dataKey={4} />
           <Column label="tutorial (src)" width={100} dataKey={5} />
           <Column label="msgs (in/out)" width={80} dataKey={6} />
-          <Column label="last in" width={200} dataKey={7} />
-          <Column label="history" width={80} dataKey={8} cellRenderer={renderHistory}/>
+          <Column label="last in" width={130} dataKey={7} />
         </Table>
       </div>
       );
@@ -113,20 +117,21 @@ var UserTable = React.createClass({
 
 
   rowForUser: function(user){
-    accountAge = timeago(new Date(user.created));
-    tutorial_text = user.completed_tutorial ? "√ " + user.source : user.source;
+    accountAge = timeago(new Date(user.created)).replace("about ", "");;
+    var sourceObj = JSON.parse(user.source);
+    tutorial_text = user.completed_tutorial ? "√ " + sourceObj.source : sourceObj.source;
     if (user.paused)
       tutorial_text += " PAUSED"
     if (user.state === "stopped")
       tutorial_text += " STOPPED"
     activated_text = null;
     if (user.activated)
-      activated_text = timeago(new Date(user.activated));
+      activated_text = timeago(new Date(user.activated)).replace("about ", "");
     in_date = new Date(user.message_stats.incoming.last);
     out_date = new Date(user.message_stats.outgoing.last);
     //last = in_date > out_date ? in_date : out_date;
     last = in_date
-    timeago_text = timeago(last);
+    timeago_text = timeago(last).replace("about ", "");
 
     var rowClasses = classNames({
       'oddrow' : this.props.highlighted == true,
