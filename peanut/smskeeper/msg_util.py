@@ -178,8 +178,18 @@ def isDoneCommand(msg):
 	return (done_re.search(msg.lower()) is not None)
 
 
+def getFirstWord(msg):
+	words = msg.split(' ')
+	if len(words) > 0:
+		firstWord = words[0].strip(string.punctuation).strip().lower()
+		return firstWord
+	else:
+		return ""
+
+
 def isQuestion(msg):
-	return ("?" in msg)
+	firstWord = getFirstWord(msg)
+	return ("?" in msg) or firstWord in ["who", "what", "where", "when", "why", "how"]
 
 
 # See if the first word is a 'no' or 'not'

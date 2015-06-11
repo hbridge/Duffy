@@ -36,7 +36,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.debug("For user %s I think '%s' is a help command" % (user.id, msg))
 		actions.help(user, msg, keeperNumber)
 		return True
-	elif msg_util.isQuestion(msg):
+	elif msg_util.isQuestion(msg) and user.completed_tutorial:
 		logger.debug("User %s: I think '%s' is a question" % (user.id, msg))
 		actions.unknown(user, msg, keeperNumber)
 		return True

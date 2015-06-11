@@ -266,7 +266,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.user.activated = datetime.datetime.now(pytz.utc) - datetime.timedelta(
 			days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS)
 		self.user.save()
-		
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
@@ -564,5 +564,9 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Are you my daddy, please remind me?")
+			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Who is the bestests")
 			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
