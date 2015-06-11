@@ -55,6 +55,8 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
 	else:
+		if user.getKeeperNumber() != keeperNumber:
+			raise NameError("This user's keeperNumber doesn't match the keeperNumber passed into asyncSendMsg: %s"%(user.id))
 		try:
 			logger.info("User %s: Sending '%s'" % (user.id, msgText))
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)
