@@ -84,24 +84,27 @@ var UserTable = React.createClass({
       return (<a target="_blank" href={ user.history }>history</a>);
     }
 
+    var rowHeight = 40;
+
     return (
       <div>
         <h1>{ this.props.title }</h1>
         <Table
-          rowHeight={40}
+          rowHeight={rowHeight}
           rowGetter={rowGetter}
           rowsCount={this.props.users.length}
-          width={1200}
-          maxHeight={768}
-          headerHeight={40}>
-          <Column label="user" width={180} dataKey={0} />
+          width={1300}
+          maxHeight={rowHeight * 10}
+          headerHeight={60}
+          >
+          <Column label="user" width={180} dataKey={0}/>
           <Column label="name" width={180} dataKey={1} cellRenderer={renderUsername} />
           <Column label="fullname" width={180} dataKey={2} cellRenderer={renderFullName}/>
-          <Column label="joined" width={120} dataKey={3} flexgrow={1} />
-          <Column label="activated" width={120} dataKey={4}  flexgrow={1}/>
+          <Column label="joined" width={150} dataKey={3} />
+          <Column label="activated" width={150} dataKey={4} />
           <Column label="tutorial (src)" width={100} dataKey={5} />
           <Column label="msgs (in/out)" width={80} dataKey={6} />
-          <Column label="last in" width={120} dataKey={7} />
+          <Column label="last in" width={200} dataKey={7} />
           <Column label="history" width={80} dataKey={8} cellRenderer={renderHistory}/>
         </Table>
       </div>
@@ -164,6 +167,15 @@ var DashboardApp = React.createClass({
       console.log("no data change");
       return;
     }
+
+    // var manyUsers = [];
+    // while (manyUsers.length < 1000) {
+    //   manyUsers.push(data.users[0]);
+    // }
+    // console.log(data.users);
+    // console.log(manyUsers);
+
+
     this.setState( {
       users : data.users,
       daily_stats : data.daily_stats
