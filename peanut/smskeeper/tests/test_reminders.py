@@ -194,7 +194,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Now set the remind timestamp  like it was snoozed for an hour one minute later
 		# Should fire
 		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 10, 51, 0, tzinfo=pytz.utc)
-		entry.updated = datetime.datetime(2020, 01, 01, 10, 51, 0, tzinfo=pytz.utc)
+		entry.remind_last_notified = None
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 51, 1, tzinfo=pytz.utc)
 		ret = async.shouldRemindNow(entry)
 		self.assertTrue(ret)
@@ -233,7 +233,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Now set the remind timestamp  like it was snoozed for an hour one minute later
 		# Should fire
 		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
-		entry.updated = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
+		entry.remind_last_notified = None
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 11, 16, 1, tzinfo=pytz.utc)
 		ret = async.shouldRemindNow(entry)
 		self.assertTrue(ret)
