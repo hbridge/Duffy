@@ -14,6 +14,7 @@ def process(user, msg, requestDict, keeperNumber):
 	try:
 		entry = Entry.objects.get(id=entryId)
 	except Entry.DoesNotExist:
+		logging.debug("User %s: Couldn't find entry with id %s, kicking to normal" % (user.id, entryId))
 		# Couldn't find entry so try sending back through normal flow
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()

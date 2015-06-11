@@ -406,7 +406,7 @@ def nicety(user, nicety, requestDict, keeperNumber):
 
 def getBestEntryMatch(user, msg):
 	entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
-
+	logger.debug("User %s: Going to try to find the best match to '%s'" % (user.id, msg))
 	entries = sorted(entries, key=lambda x: x.added)
 
 	bestMatch = None
@@ -415,9 +415,13 @@ def getBestEntryMatch(user, msg):
 	for entry in entries:
 		score = fuzz.token_set_ratio(entry.text, msg)
 		if score > bestScore:
+			logger.debug("User %s: Message %s got score %s, higher than best of %s. New Best" % (user.id, entry.text, score, bestScore))
 			bestMatch = entry
 			bestScore = score
+		else:
+			logger.debug("User %s: Message %s got score %s, lower than best of %s" % (user.id, entry.text, score, bestScore))
 
+	logger.debug("User %s: Decided on best match of %s to '%s' with score %s" % (user.id, bestMatch.text, msg, bestScore))
 	return (bestMatch, bestScore)
 
 
@@ -428,9 +432,14 @@ def done(user, msg, keeperNumber):
 		bestMatch.hidden = True
 		bestMatch.save()
 
+		logger.info("User %s: Done got msg '%s' and decided to hide entry '%s' (%s) due to score of %s" % (user.id, msg, bestMatch.text, bestMatch.id, score))
+
 		msgBack = u"Nice. %s  \u2705" % bestMatch.text
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 	else:
+
+		logger.info("User %s: Done got msg '%s' and only got best score of %s with match '%s' (%s)" % (user.id, msg, score, bestMatch.text, bestMatch.id))
+
 		msgBack = "Sorry, I'm not sure which entry you mean"
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 
