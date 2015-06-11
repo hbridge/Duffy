@@ -35,11 +35,9 @@ def shouldRemindNow(entry):
 
 	now = date_util.now(pytz.utc)
 
-	# Don't remind if we just sent one out (hence the updated is the same as last reminded)
+	# Don't remind if we have already send one out
 	if entry.remind_last_notified:
-		diff = abs((entry.remind_last_notified - entry.updated).total_seconds())
-		if diff < 5 or entry.remind_last_notified >= entry.remind_timestamp:
-			return False
+		return False
 
 	# Don't remind if its too far in the past
 	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
@@ -48,7 +46,7 @@ def shouldRemindNow(entry):
 	# If this is a todo, don't send a reminder if this is during the digest time, since it'll be
 	# included in that
 	if entry.creator.product_id == keeper_constants.TODO_PRODUCT_ID:
-		if shouldSendDigestForUser(entry.creator, entry.remind_timestamp):
+		if isDigestTimeForUser(entry.creator, entry.remind_timestamp):
 			return False
 
 	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
@@ -151,7 +149,7 @@ def processAllReminders():
 
 
 # Returns true if the user should be sent the digest at the given utc time
-def shouldSendDigestForUser(user, utcTime):
+def isDigestTimeForUser(user, utcTime):
 	localTime = utcTime.astimezone(user.getTimezone())
 
 	# By default only send if its 9 am
@@ -181,8 +179,9 @@ def getDigestMessageForUser(user, entries):
 		return ""
 
 	for entry in pendingEntries:
-		entry.remind_last_notified = date_util.now(pytz.utc)
-		entry.save()
+		if isDigestTimeForUser(user, entry.remind_timestamp):
+			entry.remind_last_notified = date_util.now(pytz.utc)
+			entry.save()
 		msg += entry.text
 
 		if entry.remind_timestamp > now:
@@ -206,7 +205,6 @@ def sendDigestForUserId(userId):
 
 @app.task
 def processDailyDigest(keeperNumber=None):
-
 	entries = Entry.objects.filter(creator__product_id=1, label="#reminders", hidden=False)
 
 	entriesByCreator = dict()
@@ -217,7 +215,7 @@ def processDailyDigest(keeperNumber=None):
 		entriesByCreator[entry.creator].append(entry)
 
 	for user, entries in entriesByCreator.iteritems():
-		if not shouldSendDigestForUser(user, date_util.now(pytz.utc)):
+		if not isDigestTimeForUser(user, date_util.now(pytz.utc)):
 			continue
 
 		msg = getDigestMessageForUser(user, entries)

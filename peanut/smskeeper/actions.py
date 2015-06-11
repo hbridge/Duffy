@@ -404,8 +404,10 @@ def nicety(user, nicety, requestDict, keeperNumber):
 	)
 
 
-def getBestEntryMatch(user, msg):
-	entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
+def getBestEntryMatch(user, msg, entries=None):
+	if not entries:
+		entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
+
 	logger.debug("User %s: Going to try to find the best match to '%s'" % (user.id, msg))
 	entries = sorted(entries, key=lambda x: x.added)
 
