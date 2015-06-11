@@ -88,27 +88,28 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	logger.debug("User %s: Starting processing of '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
 
-	# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
-	if not newUser:
-		processed = processBasicMessages(user, msg, requestDict, keeperNumber)
+	if not user.paused:
+		# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
+		if not newUser:
+			processed = processBasicMessages(user, msg, requestDict, keeperNumber)
 
-	if not user.paused and not processed:
-		count = 0
-		while not processed and count < 10:
-			stateModule = stateCallbacks[user.state]
-			logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
-			processed = stateModule.process(user, msg, requestDict, keeperNumber)
-			if processed is None:
-				raise TypeError("modules must return True or False for processed")
-			count += 1
+		if not processed:
+			count = 0
+			while not processed and count < 10:
+				stateModule = stateCallbacks[user.state]
+				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
+				processed = stateModule.process(user, msg, requestDict, keeperNumber)
+				if processed is None:
+					raise TypeError("modules must return True or False for processed")
+				count += 1
 
-			if processed:
-				logger.debug("User %s: Done processing '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
+				if processed:
+					logger.debug("User %s: Done processing '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
-		if count == 10:
-			logger.error("User %s: Hit endless loop for msg %s" % (user.id, msg))
+			if count == 10:
+				logger.error("User %s: Hit endless loop for msg %s" % (user.id, msg))
 	else:
-		logger.debug("User %s: not processing '%s' because paused: %s  processed: %s" % (user.id, msg, user.paused, processed))
+		logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))
 
 	analytics.logUserEvent(
 		user,
