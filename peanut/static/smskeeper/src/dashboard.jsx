@@ -77,7 +77,7 @@ var UserTable = React.createClass({
     var renderFullName = function(user) {
       var fullName = "";
       if (user.full_name && user.full_name.length > 0) {
-        fullName = format("({})", user.fullName[0]);
+        fullName = format("({})", user.full_name[0]);
       }
       return (<span title={ user.full_name }> {user.name} { fullName }</span>);
     }
