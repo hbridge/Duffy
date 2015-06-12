@@ -1,5 +1,6 @@
-var dest = "./build";
+var dest = "../../static/smskeeper/build";
 var src = './src';
+var srcjs = src + "/js";
 
 module.exports = {
   browserSync: {
@@ -12,7 +13,7 @@ module.exports = {
     src: src + "/sass/**/*.{sass,scss}",
     dest: dest,
     settings: {
-      indentedSyntax: true, // Enable .sass syntax!
+      indentedSyntax: false, // Enable .sass syntax!
       imagePath: 'images' // Used by the image-url helper
     }
   },
@@ -43,20 +44,20 @@ module.exports = {
     // A separate bundle will be generated for each
     // bundle config in the list below
     bundleConfigs: [{
-      entries: src + '/dashboard.jsx',
+      entries: srcjs + '/dashboard.jsx',
       dest: dest,
       outputName: 'dashboard_bundle.js',
       // require: ['jquery', 'backbone/node_modules/underscore']
       // See https://github.com/greypants/gulp-starter/issues/87 for note about
       // why this is 'backbone/node_modules/underscore' and not 'underscore'
     }, {
-      entries: src + '/history.jsx',
+      entries: srcjs + '/history.jsx',
       dest: dest,
       outputName: 'history_bundle.js',
       // list of externally available modules to exclude from the bundle
       // external: ['jquery', 'underscore']
     }, {
-      entries: src + '/keeper_app.jsx',
+      entries: srcjs + '/keeper_app.jsx',
       dest: dest,
       outputName: 'keeper_app_bundle.js',
       // list of externally available modules to exclude from the bundle

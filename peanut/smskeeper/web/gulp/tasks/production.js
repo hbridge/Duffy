@@ -4,7 +4,7 @@ var gulp = require('gulp');
 // set NODE_ENV so we use prod REACT
 process.env.NODE_ENV = 'production';
 gulp.task('production', function(){
-	gulp.start(['uglifyJs']);
+	gulp.start(['minifyCss', 'uglifyJs']);
 });
 
 // Run this to compress all the things!
