@@ -2,6 +2,7 @@ import json
 import random
 import string
 import datetime
+import logging
 
 from smskeeper import keeper_constants
 
@@ -12,6 +13,8 @@ from smskeeper import time_utils
 from smskeeper.models import Entry
 
 from common import date_util
+
+logger = logging.getLogger(__name__)
 
 
 # Options for tutorial state are:
@@ -50,6 +53,8 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	else:
 		# --- end Paid experiment code --
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES)
+
+	logger.debug("User %s: Just activated user to tutorial %s and keeperNumber %s" % (userToActivate.id, tutorialState, keeperNumber))
 
 	sms_util.sendMsgs(userToActivate, msgsToSend, keeperNumber)
 
