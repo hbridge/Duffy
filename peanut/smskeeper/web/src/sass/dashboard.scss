@@ -6,21 +6,24 @@ body {
 }
 
 h1 {
-  font-size: 18pt;
+  font-size: 14pt;
+  border: none;
+  margin-top: 20px;
+  margin-bottom: 4px;
 }
 
 .filterControl
 {
 	background-color: #CCF;
 	padding: 10px;
-}
 
-.filterControl * {
-	font-size: 12pt;
-	margin-left: 10px;
-}
+	select, input {
+		font-size: 12pt;
+		margin-left: 10px;
+	}
 
-.filterControl input {
-	width: 50%;
+	input {
+		width: 50%;
+	}
 }
 

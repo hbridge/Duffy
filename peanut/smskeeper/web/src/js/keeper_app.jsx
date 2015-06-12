@@ -443,9 +443,9 @@ var List = React.createClass({
       <div className={listClasses}>
         <div className="container">
           <span className="clearButton"><a href="#" onClick={this.handleClear}>X</a></span>
-          <span className="listTitle"> {this.props.label} </span>
+          <span className="title"> {this.props.label} </span>
         </div>
-        <div className="entriesList">
+        <div className="entriesContainer">
            { this.props.entries.reverse().map(createEntry) }
         </div>
         <CreateEntryFooter isReminders={ this.props.isReminders }
@@ -483,7 +483,7 @@ var CreateListField = React.createClass({
      return (
       <div className="grid-item createListControl stamp">
         <form className="createListForm" onSubmit={this.handleSave}>
-          <input type="text" placeholder="New List..." ref="text" className="createListField listTitle"/>
+          <input type="text" placeholder="New List..." ref="text" className="bigfield title"/>
           <input type="submit" value="Save" style={{display: "none"}} />
         </form>
       </div>

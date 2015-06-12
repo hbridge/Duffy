@@ -1,35 +1,11 @@
-@import "_common";
-
 body {
 	font: 100% 'Montserrat', sans-serif;
 	font-weight: normal;
 	font-size: 10pt;
 }
 
-.listTitle {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12pt;
-  margin-bottom: 0;
-}
-
-.reminderList {
-	background-color: #49C86B;
-}
-
-.textList {
-	background-color: #C7C7E7;
-}
-
-.list .container {
-	padding: 8px 12px;
-}
-
-.clearButton {
-	float: right;
-}
-
-.clearButton a {
-	color: white;
+a {
+  text-decoration: none;
 }
 
 .grid {
@@ -47,18 +23,44 @@ body {
 }
 .grid-item--width2 { width: 400px; }
 
-.entriesList {
-	background-color: white;
+.title {
+	font-size: 12pt;
+	margin-bottom: 0;
 }
 
-.createEntryFooter a {
-	color: white;
+.list {
+	.container {
+		padding: 8px 12px;
+	}
+
+	.clearButton {
+		float: right;
+		a {
+			color: white;
+		}
+	}
+
+	.entriesContainer {
+		background-color: white;
+
+		.entry {
+			color: black;
+			border-bottom: 1px solid;
+			border-color: #E5E5E5;
+		}
+	}
+
+	.createEntryFooter a {
+		color: white;
+	}
 }
 
-.entry {
-	color: black;
-	border-bottom: 1px solid;
-	border-color: #E5E5E5;
+.reminderList {
+	background-color: #49C86B;
+}
+
+.textList {
+	background-color: #C7C7E7;
 }
 
 .reminderTime {
@@ -81,34 +83,31 @@ body {
 	width: 20px;
 	height: 20px;
 	text-align: center;
-}
-
-.deleteButton a {
-	color: red;
-	margin: auto;
+	a {
+		color: red;
+		margin: auto;
+	}
 }
 
 .headerBar {
 	color: #3131AC;
 	background-color: white;
 	padding: 20px;
-}
-
-.headerBar .greeting {
-	font-size: 20pt;
-}
-
-.headerBar .userStats {
+	.greeting {
+		font-size: 20pt;
+	}
 }
 
 .createListControl {
 	background-color: #C7C7E7;
+	.bigfield {
+		background-color: #C7C7E7;
+    	background-color: rgba(0,0,0,0);
+	}
 }
 
-.createListField {
+.bigfield {
 	border: none;
-	background-color: #C7C7E7;
-    background-color: rgba(0,0,0,0);
     padding: 8px 12px;
     width: calc(100% - 24px);
 }
