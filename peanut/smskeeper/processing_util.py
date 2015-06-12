@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 def processBasicMessages(user, msg, requestDict, keeperNumber):
 	# Always look for a stop command first and deal with that
 	if msg_util.isStopCommand(msg):
-		logger.debug("User %s: I think '%s' is a stop command, setting state to %s" % (user.id, msg, user.state))
 		stopped.dealWithStop(user, msg, keeperNumber)
+		logger.debug("User %s: I think '%s' is a stop command, state is now %s" % (user.id, msg, user.state))
 		return True
 	elif niceties.getNicety(msg):
 		# Hack(Derek): Make if its a nicety that also could be considered done...let that through

@@ -83,6 +83,7 @@ class SMSKeeperBaseCase(TestCase):
 	TUE_9AM = ([2015, 6, 2, 13, 0, 0], True, True)
 	TUE_850AM = ([2015, 6, 2, 12, 50, 0], True, True)
 	TUE_858AM = ([2015, 6, 2, 12, 58, 0], True, True)
+	WED_9AM = ([2015, 6, 3, 13, 0, 0], True, True)
 	TUE = ([2015, 6, 2], True, False)
 	WED = ([2015, 6, 3], True, False)
 	WEEKEND = ([2015, 6, 6], True, False)

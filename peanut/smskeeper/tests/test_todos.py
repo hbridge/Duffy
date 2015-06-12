@@ -327,7 +327,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest("test")
 			self.assertIn("I need to run", self.getOutput(mock))
 
-		# Make sure we create a new entry instead of a followup
+	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
 	@patch('common.natty_util.getNattyInfo')
 	def test_done_all_after_daily_digest(self, nattyMock, dateMock):
@@ -364,5 +364,29 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[0].hidden)
 		self.assertFalse(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
+
+	# Make sure we create a new entry instead of a followup
+	@patch('common.date_util.utcnow')
+	@patch('common.natty_util.getNattyInfo')
+	def test_stop_then_daily_digest(self, nattyMock, dateMock):
+		self.setupUser()
+
+		self.setNow(dateMock, self.MON_8AM)
+		self.setupNatty(nattyMock, self.NO_TIME, "I need to run with my dad", "")
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Stop")
+			self.assertIn("I won't", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertEqual("", self.getOutput(mock))
+
+		self.setNow(dateMock, self.WED_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertEqual("", self.getOutput(mock))
 
 

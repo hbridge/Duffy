@@ -81,6 +81,10 @@ class User(models.Model):
 		return self.phone_number
 
 	def setState(self, state, override=False, stateData=None, saveCurrent=False):
+		if self.state == keeper_constants.STATE_STOPPED:
+			logger.error("User %s: Tried to set state but was stopped" % (self.id))
+			return
+
 		logger.debug("User %s: Start of setState   %s %s %s %s" % (self.id, state, override, stateData, saveCurrent))
 		logger.debug("User %s: Starting state:  %s %s   and next state: %s %s" % (self.id, self.state, self.state_data, self.next_state, self.next_state_data))
 		currentState = self.state
