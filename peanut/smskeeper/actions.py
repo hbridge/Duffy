@@ -423,7 +423,10 @@ def getBestEntryMatch(user, msg, entries=None):
 		else:
 			logger.debug("User %s: Message %s got score %s, lower than best of %s" % (user.id, entry.text, score, bestScore))
 
-	logger.debug("User %s: Decided on best match of %s to '%s' with score %s" % (user.id, bestMatch.text, msg, bestScore))
+	if bestMatch:
+		logger.debug("User %s: Decided on best match of %s to '%s' with score %s" % (user.id, bestMatch.text, msg, bestScore))
+	else:
+		logger.debug("User %s: Decided on no best to '%s'" % (user.id, msg))
 	return (bestMatch, bestScore)
 
 
