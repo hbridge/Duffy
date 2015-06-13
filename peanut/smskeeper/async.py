@@ -213,6 +213,9 @@ def processDailyDigest(keeperNumber=None):
 		entriesByCreator[entry.creator].append(entry)
 
 	for user, entries in entriesByCreator.iteritems():
+		if user.state == keeper_constants.STATE_STOPPED:
+			continue
+
 		if not isDigestTimeForUser(user, date_util.now(pytz.utc)):
 			continue
 
