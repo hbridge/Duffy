@@ -196,7 +196,7 @@ def getDigestMessageForUser(user, entries):
 def sendDigestForUserId(userId):
 	user = User.objects.get(id=userId)
 
-	msg = getDigestMessageForUser(user, None)
+	msg, pendingEntries = getDigestMessageForUser(user, None)
 
 	if msg:
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
