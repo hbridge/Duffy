@@ -239,9 +239,10 @@ def isHelpCommand(msg):
 	cleaned = cleanMsgText(msg)
 	return re.match('[?]$|huh$|help$|what$|how do you work|what.* (can|do) you do|tell me more', cleaned) is not None
 
+
 def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
-	return cleaned == '#' or cleaned == '#hashtag' or cleaned == '#hashtags'
+	return cleaned in ['#', '#hashtag', 'lists', 'my lists']
 
 
 def isAddTextCommand(msg):
