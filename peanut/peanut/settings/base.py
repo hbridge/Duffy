@@ -310,11 +310,11 @@ class BASE_CELERY_CONFIG:
             'schedule': crontab(minute=15),
             'args': None,
         },
-        # 'smskeeper-tips': {
-        #     'task': 'smskeeper.async.sendTips',
-        #     'schedule': crontab(minute=5),
-        #     'args': None,
-        # },
+        'smskeeper-tips': {
+            'task': 'smskeeper.async.sendTips',
+            'schedule': crontab(minute=5),
+            'args': None,
+        },
         'smskeeper-reminders': {
             'task': 'smskeeper.async.processAllReminders',
             "schedule": datetime.timedelta(seconds=30),
@@ -327,9 +327,6 @@ class BASE_CELERY_CONFIG:
         }
 
     }
-
-
-
 
 # the HTTP request parser to use - we set a default as the tests need a valid parser.
 INBOUND_EMAIL_PARSER = 'django_inbound_email.backends.mailgun.MailgunRequestParser'
