@@ -75,7 +75,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
 
 	if user.getKeeperNumber() != keeperNumber and keeper_constants.isRealKeeperNumber(keeperNumber):
-		raise NameError("User %s: Recieved message from number %s but user should be sending to %s" % (user.id, keeperNumber, user.getKeeperNumber()))
+		logger.error("User %s: Recieved message from number %s but user should be sending to %s" % (user.id, keeperNumber, user.getKeeperNumber()))
+		keeperNumber = user.getKeeperNumber()
 
 	processed = False
 	# convert message to unicode
