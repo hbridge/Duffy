@@ -27,7 +27,7 @@ class SMSKeeperBaseCase(TestCase):
 		# then the database will be empty and default to Eastern
 		self.setupZipCodeData()
 
-		settings.KEEPER_NUMBER_DICT = {0: "test", 1: "test"}
+		settings.KEEPER_NUMBER_DICT = {0: "test0", 1: "test1"}
 
 	def setupZipCodeData(self):
 		ZipData.objects.create(city="San Francisco", state="CA", zip_code="94117", timezone="PST", area_code="415")

@@ -22,7 +22,7 @@ from smskeeper import processing_util
 
 	NOTE:  Make sure all values here are strings instead of ints so it accuratly reflects what comes in on the web
 """
-def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False):
+def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False, keeperNumber=None):
 	numMedia = 0
 	jsonDict = {
 		"Body": msg,
@@ -37,7 +37,9 @@ def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False):
 	else:
 		jsonDict["NumMedia"] = "0"
 
-	keeperNumber = constants.SMSKEEPER_TEST_NUM
+	if not keeperNumber:
+		keeperNumber = constants.SMSKEEPER_TEST_NUM
+
 	if cli:
 		keeperNumber = constants.SMSKEEPER_CLI_NUM
 

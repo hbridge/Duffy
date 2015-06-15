@@ -51,12 +51,13 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 	if type(msgText) == unicode:
 		msgText = msgText.encode('utf-8')
 
-	if keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_TEST_NUM, keeper_constants.SMSKEEPER_WEB_NUM]:
+	if keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_WEB_NUM] or "test" in keeperNumber:
 		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
 	else:
 		if user.getKeeperNumber() != keeperNumber:
-			raise NameError("User %s: This user's keeperNumber %s doesn't match the keeperNumber passed into asyncSendMsg: %s" % (user.id, user.getKeeperNumber(), keeperNumber))
+			logger.error("User %s: This user's keeperNumber %s doesn't match the keeperNumber passed into asyncSendMsg: %s... fixing" % (user.id, user.getKeeperNumber(), keeperNumber))
+			keeperNumber = user.getKeeperNumber()
 		try:
 			logger.info("User %s: Sending '%s'" % (user.id, msgText))
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)

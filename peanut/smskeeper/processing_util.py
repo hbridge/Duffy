@@ -7,7 +7,7 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo
-from smskeeper import msg_util, actions, niceties
+from smskeeper import msg_util, actions, niceties, user_util
 
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
@@ -60,23 +60,22 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		user = User.objects.get(phone_number=phoneNumber)
 		newUser = False
 	except User.DoesNotExist:
-		try:
-			user = User.objects.create(phone_number=phoneNumber)
-			newUser = True
-		except Exception as e:
-			logger.error("Got Exception in user creation: %s" % e)
-	except Exception as e:
-		logger.error("Got Exception in user creation: %s" % e)
-	finally:
-		# This is true if this is from a manual entry off the history page
-		manual = "Manual" in requestDict
-		if not manual and isDuplicateMsg(user, msg):
-			logger.debug("User %s: Ignoring duplicate message: %s" % (user.id, msg))
-			# TODO figure out better logic so we aren't repeating this statement
-			messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
-			return False
+		user = user_util.createUser(phoneNumber, {}, keeperNumber, None)
+		newUser = True
+
+	# This is true if this is from a manual entry off the history page
+	manual = "Manual" in requestDict
+	if not manual and isDuplicateMsg(user, msg):
+		logger.debug("User %s: Ignoring duplicate message: %s" % (user.id, msg))
+		# TODO figure out better logic so we aren't repeating this statement
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
-		slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
+		return False
+
+	messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
+	slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
+
+	if user.getKeeperNumber() != keeperNumber and keeper_constants.isRealKeeperNumber(keeperNumber):
+		raise NameError("User %s: Recieved message from number %s but user should be sending to %s" % (user.id, keeperNumber, user.getKeeperNumber()))
 
 	processed = False
 	# convert message to unicode

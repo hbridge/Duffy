@@ -173,10 +173,11 @@ TODO_PRODUCT_ID = 1
 TODO_DIGEST_HOUR = 9
 TODO_DIGEST_MINUTE = 0
 
+
 def isRealKeeperNumber(keeperNumber):
-	return keeperNumber != SMSKEEPER_CLI_NUM and keeperNumber != SMSKEEPER_TEST_NUM
+	return keeperNumber != SMSKEEPER_CLI_NUM and "test" not in keeperNumber
 
 
 def isTestKeeperNumber(keeperNumber):
-	return keeperNumber == SMSKEEPER_TEST_NUM
+	return "test" in SMSKEEPER_TEST_NUM
 

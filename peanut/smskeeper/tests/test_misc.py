@@ -5,6 +5,7 @@ from mock import patch
 from peanut.settings import constants
 from smskeeper.models import User, Entry, Message
 from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
+from django.conf import settings
 
 import test_base
 import emoji
@@ -12,10 +13,21 @@ import emoji
 
 class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
-	def test_first_connect(self):
+	def test_first_connect_product0(self):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "hi")
+			cliMsg.msg(self.testPhoneNumber, "hi", keeperNumber=settings.KEEPER_NUMBER_DICT[0])
 			self.assertIn("what's your name?", self.getOutput(mock))
+
+		user = User.objects.get(phone_number=self.testPhoneNumber)
+		self.assertEqual(keeper_constants.REMINDER_PRODUCT_ID, user.product_id)
+
+	def test_first_connect_product1(self):
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "hi", keeperNumber=settings.KEEPER_NUMBER_DICT[1])
+			self.assertIn("what's your name?", self.getOutput(mock))
+
+		user = User.objects.get(phone_number=self.testPhoneNumber)
+		self.assertEqual(keeper_constants.TODO_PRODUCT_ID, user.product_id)
 
 	"""
 	Commented out by Derek while we experiement with no not-activated state

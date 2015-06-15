@@ -429,8 +429,7 @@ def signup_from_website(request):
 				else:
 					productId = 0
 
-				target_user = User.objects.create(phone_number=phoneNum, product_id=productId, signup_data_json=json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}))
-				target_user.save()
+				target_user = user_util.createUser(phoneNum, json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}), None, productId)
 
 				logger.debug("User %s: Just created user with productId %s and keeperNumber %s" % (target_user.id, target_user.product_id, target_user.getKeeperNumber()))
 

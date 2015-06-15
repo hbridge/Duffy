@@ -4,17 +4,35 @@ import string
 import datetime
 import logging
 
+from django.conf import settings
+
 from smskeeper import keeper_constants
 
 from smskeeper import sms_util
 from smskeeper import analytics
 from smskeeper import time_utils
 
-from smskeeper.models import Entry
+from smskeeper.models import Entry, User
 
 from common import date_util
 
 logger = logging.getLogger(__name__)
+
+
+def createUser(phoneNumber, signupDataJson, keeperNumber, productId=None):
+	if keeperNumber and productId is None:
+		for pid, num in settings.KEEPER_NUMBER_DICT.iteritems():
+			if num == keeperNumber:
+				productId = pid
+		if productId is None:
+			logger.error("Tried looking for a productId for number %s but couldn't find for incoming phone num %s" % (keeperNumber, phoneNumber))
+			if keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM:
+				productId = keeper_constants.TODO_PRODUCT_ID
+			else:
+				return None
+
+	user = User.objects.create(phone_number=phoneNumber, product_id=productId, signup_data_json=signupDataJson)
+	return user
 
 
 # Options for tutorial state are:
