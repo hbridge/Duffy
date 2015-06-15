@@ -110,6 +110,7 @@ var UserTable = React.createClass({
           <Column label="tutorial (src)" width={100} dataKey={5} />
           <Column label="msgs (in/out)" width={80} dataKey={6} />
           <Column label="last in" width={130} dataKey={7} />
+          <Column label="product id" width={80} dataKey={8} />
         </Table>
       </div>
       );
@@ -136,6 +137,7 @@ var UserTable = React.createClass({
     var rowClasses = classNames({
       'oddrow' : this.props.highlighted == true,
     });
+    console.log("HERE");
     return ([
       format("{id} ({phone_number})", user),
       //format("<a href=/{key}?internal=1>{name}</a>", user),
@@ -146,6 +148,7 @@ var UserTable = React.createClass({
       tutorial_text,
       format("{message_stats.incoming.count}/{message_stats.outgoing.count}", user),
       timeago_text,
+      user.product_id,
       user,
     ]);
   },
