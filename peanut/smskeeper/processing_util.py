@@ -48,7 +48,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.debug("User %s: I think '%s' is a set name command" % (user.id, msg))
 		actions.setName(user, msg, keeperNumber)
 		return True
-	elif msg_util.isSetZipcodeCommand(msg):
+	elif msg_util.isSetZipcodeCommand(msg) and user.completed_tutorial:
 		logger.debug("User %s: I think '%s' is a set zip command" % (user.id, msg))
 		actions.setZipcode(user, msg, keeperNumber)
 		return True
