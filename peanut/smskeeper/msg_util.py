@@ -22,7 +22,7 @@ freeform_fetch_res = [
 	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
-reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at )?", re.I)
+reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in )?", re.I)
 done_re = re.compile(r"\b(done|finished|called|bought|did|picked|went|got)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
