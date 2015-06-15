@@ -49,19 +49,21 @@ def process(user, msg, requestDict, keeperNumber):
 			)
 			processed = True
 		else:
-			sms_util.sendMsgs(
-				user,
-				(
-					keeper_constants.HELP_SUBJECTS[subject][keeper_constants.GENERAL_HELP_KEY] +
-					[
-						"You can see and manage your stuff anytime at %s" % (user.getWebAppURL()),
-						"Say 'examples' if you want more examples."
-					]
-				),
-				keeperNumber,
-			)
-			user.setStateData("subject", subject)
-			processed = True
+			if not user.getStateData("hasReceived%sHelp" % (subject)):
+				user.setStateData("hasReceived%sHelp" % (subject), True)
+				sms_util.sendMsgs(
+					user,
+					(
+						keeper_constants.HELP_SUBJECTS[subject][keeper_constants.GENERAL_HELP_KEY] +
+						[
+							"You can see and manage your stuff anytime at %s" % (user.getWebAppURL()),
+							"Say 'examples' if you want more examples."
+						]
+					),
+					keeperNumber,
+				)
+				user.setStateData("subject", subject)
+				processed = True
 
 	if not processed:
 		user.setState(keeper_constants.STATE_NORMAL)

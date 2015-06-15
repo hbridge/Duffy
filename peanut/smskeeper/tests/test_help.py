@@ -53,3 +53,13 @@ class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
 			with patch('smskeeper.sms_util.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, alias)
 				self.assertIn(keeper_constants.HELP_MESSAGES[0], self.getOutput(mock))
+
+	def test_get_lists_after_help(self):
+		self.setupUser(True, True)
+		cliMsg.msg(self.testPhoneNumber, "add foo to barbaz")
+		cliMsg.msg(self.testPhoneNumber, "huh?")
+		cliMsg.msg(self.testPhoneNumber, "lists")
+		cliMsg.msg(self.testPhoneNumber, "reminders")  # we do reminders so we don't hit the repeat message detection for lists
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "lists")
+			self.assertIn("barbaz", self.getOutput(mock))
