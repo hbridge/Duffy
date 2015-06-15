@@ -23,8 +23,10 @@ print "Stopped users: %s"%(len(usersStopped))
 
 from smskeeper.models import Message
 from django.db.models import Count
+from datetime import date, timedelta
 
-users = Message.objects.values_list('user__id', 'user__name').filter(incoming=True, user__completed_tutorial=True).annotate(total_incoming=Count('user__id')).order_by('total_incoming')
+dateFilter = date.today() - timedelta(days=7)
+users = Message.objects.values_list('user__id', 'user__name').filter(incoming=True, user__completed_tutorial=True, added__gt=dateFilter).annotate(total_incoming=Count('user__id')).order_by('total_incoming')
 
 for entry in users:
     print "%s %s: %s"%(entry[0], entry[1], entry[2])
