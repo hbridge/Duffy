@@ -224,6 +224,13 @@ class User(models.Model):
 	def getWebAppURL(self):
 		return "my.getkeeper.com/%s" % self.getWebsiteURLPath()
 
+	def getSignupData(self, field):
+		signupJson = self.signup_data_json
+		if not signupJson or signupJson == "":
+			return None
+		signupObj = json.loads(signupJson)
+		return signupObj.get(field, None)
+
 	def __unicode__(self):
 		if self.name:
 			return str(self.id) + " - " + self.name

@@ -67,11 +67,11 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			user.timezone = timezone
 
-		sms_util.sendMsgs(user, 
+		sms_util.sendMsgs(user,
 			[
-				u"\U0001F44F Thanks! Let's add some things you want to remember. ", 
+				u"\U0001F44F Thanks! Let's add some things you want to remember. ",
 				u"What's a recent thing you wanted to buy? You can say 'Add pasta to my shopping list'. Give it a try - just start with 'Add...'!"
-			], 
+			],
 			keeperNumber)
 
 		user.setStateData("step", 2)
@@ -84,17 +84,17 @@ def process(user, msg, requestDict, keeperNumber):
 				user,
 				[
 					u"I didn't understand that \U0001F61E. Try saying it as 'Add ITEM to LIST'"
-				], 
+				],
 				keeperNumber)
 			return True
 
 		# time.sleep so the response to add Action goes out first
 		time.sleep(1)
 		sms_util.sendMsgs(
-			user, 
+			user,
 			[
 				u"Now let's add other items to your list. Like 'Add meatballs, cheese to shopping list'"
-			], 
+			],
 			keeperNumber
 			)
 
@@ -109,7 +109,7 @@ def process(user, msg, requestDict, keeperNumber):
 				user,
 				[
 					u"I didn't understand that \U0001F61E. Try saying it as 'Add ITEM to LIST'"
-				], 
+				],
 				keeperNumber
 				)
 			return True
@@ -133,17 +133,17 @@ def process(user, msg, requestDict, keeperNumber):
 				user,
 				[
 					u"I didn't understand that \U0001F61E. Try saying it as 'shopping list'"
-				], 
+				],
 				keeperNumber
 				)
 			return True
 
 		sms_util.sendMsgs(
-			user, 
+			user,
 			[
 				u"You got it. What's something else you want to remember?",
 				u"Like movies to watch, restaurants to try, books to read, or even a food journal. Give it a shot \U0001F44D",
-			], 
+			],
 			keeperNumber
 			)
 
@@ -159,6 +159,7 @@ def process(user, msg, requestDict, keeperNumber):
 				"Tutorial": keeper_constants.STATE_TUTORIAL_LIST
 			}
 		)
+		analytics.setUserInfo(user)
 
 	user.save()
 	return True

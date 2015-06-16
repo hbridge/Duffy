@@ -104,6 +104,7 @@ def process(user, msg, requestDict, keeperNumber):
 				"Tutorial": keeper_constants.STATE_TUTORIAL_TODO
 			}
 		)
+		analytics.setUserInfo(user)
 
 	user.save()
 	return True
