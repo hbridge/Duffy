@@ -437,6 +437,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEqual(13, entry.remind_timestamp.hour)  # Make sure its 9am EST
+
+
+	@patch('common.date_util.utcnow')
+	def test_time_with_dash(self, dateMock):
+		self.setupUser()
+		self.setNow(dateMock, self.TUE_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me Cheer practice from 5:30-7:30")
+			self.assertIn("by 5:30pm", self.getOutput(mock))
 	"""
 
 	@patch('common.date_util.utcnow')
@@ -686,4 +696,5 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		arg, kargs = nattyMock.call_args
 		self.assertEquals("Remind me about pooping at 9pm on June 20th", arg[0])
+
 

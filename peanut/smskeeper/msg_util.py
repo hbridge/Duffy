@@ -213,22 +213,20 @@ def getReminderHandle(msg):
 
 # Returns a string which doesn't have the "remind me" phrase in it
 def cleanedReminder(msg):
-	text = msg.lower()
-	match = reminder_re.search(text)
+	cleaned = msg.lower()
+	match = reminder_re.search(cleaned)
 	if match:
 		cleaned = msg[:match.start()] + msg[match.end():]
 
-		cleaned = cleaned.strip(string.punctuation).strip()
-		words = cleaned.split(' ')
-		if len(words) >= 2:
-			if words[0] in REMINDER_FRINGE_TERMS:
-				cleaned = cleaned.split(' ', 1)[1]
-			if words[-1] in REMINDER_FRINGE_TERMS:
-				cleaned = cleaned.rsplit(' ', 1)[0]
+	cleaned = cleaned.strip(string.punctuation).strip()
+	words = cleaned.split(' ')
+	if len(words) >= 2:
+		if words[0] in REMINDER_FRINGE_TERMS:
+			cleaned = cleaned.split(' ', 1)[1]
+		if words[-1] in REMINDER_FRINGE_TERMS:
+			cleaned = cleaned.rsplit(' ', 1)[0]
 
-		return cleaned
-	else:
-		return msg
+	return cleaned
 
 
 def isDeleteCommand(msg):

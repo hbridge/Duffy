@@ -375,4 +375,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertEqual("", self.getOutput(mock))
 
+	@patch('common.date_util.utcnow')
+	def test_clean_up_text(self, dateMock):
+		self.setupUser()
+		self.setNow(dateMock, self.TUE_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "take brick to the vet on Friday at 3:45.")
+			self.assertIn("Fri", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.text, "take brick to the vet")
 
