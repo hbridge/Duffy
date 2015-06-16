@@ -47,7 +47,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 				logger.info("User %s: I think this is a done command decided to hide entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
 
-				msgBack = u"Nice. %s  \u2705" % bestMatch.text
+				msgBack = u"Nice. \u2705  %s" % bestMatch.text
 			else:
 				# If the score is low, it probably means we didn't match a specific one, so clear them all
 				logging.debug("User %s: I think this is a done command for all entries %s since the score was low: %s" % (user.id, [x.id for x in entries], score))

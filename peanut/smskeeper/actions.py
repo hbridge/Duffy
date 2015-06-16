@@ -439,7 +439,7 @@ def done(user, msg, keeperNumber):
 
 		logger.info("User %s: Done got msg '%s' and decided to hide entry '%s' (%s) due to score of %s" % (user.id, msg, bestMatch.text, bestMatch.id, score))
 
-		msgBack = u"Nice. %s  \u2705" % bestMatch.text
+		msgBack = u"Nice. \u2705  %s" % bestMatch.text
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 	else:
 
