@@ -229,6 +229,8 @@ class User(models.Model):
 		if not signupJson or signupJson == "":
 			return None
 		signupObj = json.loads(signupJson)
+		if type(signupObj) == unicode or type(signupObj) == str:
+			return None
 		return signupObj.get(field, None)
 
 	def __unicode__(self):
