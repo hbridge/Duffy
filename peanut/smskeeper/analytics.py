@@ -1,6 +1,6 @@
 from mixpanel import Mixpanel
 from django.conf import settings
-
+from smskeeper import time_utils
 
 mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
@@ -14,6 +14,10 @@ def logUserEvent(user, eventName, parametersDict=None):
 		parametersDict['User Source'] = user.getSignupData('source'),
 		parametersDict['User Experiment'] = user.getSignupData('exp'),
 		parametersDict['User Paid'] = user.getSignupData('paid')
+
+		if user.activated:
+			accountActivatedDays, hours = time_utils.daysAndHoursAgo(user.activated)
+			parametersDict['User Activated Days'] = accountActivatedDays
 
 		mp.track(user.id, eventName, parametersDict)
 
