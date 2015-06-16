@@ -6,7 +6,6 @@ from django.conf import settings
 
 from smskeeper.models import User, ZipData
 from smskeeper import keeper_constants
-from common import natty_util
 
 # turn off mixpanel for tests
 settings.MIXPANEL_TOKEN = None
@@ -77,35 +76,14 @@ class SMSKeeperBaseCase(TestCase):
 
 	# Day, hasDate, hasTime
 	# These should all in UTC
-	MON_8AM = ([2015, 6, 1, 12, 0, 0], True, True)
-	MON_9AM = ([2015, 6, 1, 13, 0, 0], True, True)
-	TUE_8AM = ([2015, 6, 2, 12, 0, 0], True, True)
-	TUE_9AM = ([2015, 6, 2, 13, 0, 0], True, True)
-	TUE_850AM = ([2015, 6, 2, 12, 50, 0], True, True)
-	TUE_858AM = ([2015, 6, 2, 12, 58, 0], True, True)
-	WED_9AM = ([2015, 6, 3, 13, 0, 0], True, True)
-	TUE = ([2015, 6, 2], True, False)
-	WED = ([2015, 6, 3], True, False)
-	WEEKEND = ([2015, 6, 6], True, False)
-	ONLY_4PM = ([2015, 6, 1, 20, 0, 0], False, True)
-	NEXT_WEEK = ([2015, 6, 8], True, False)
-	SUNDAY_7PM = ([2015, 6, 7, 23, 0, 0], True, True)
-	SUNDAY = ([2015, 6, 7], True, False)
-
-	NO_TIME = ([2010, 6, 1, 8, 0, 0], False, False)
+	MON_8AM = datetime.datetime(2015, 6, 1, 12, 0, 0, tzinfo=pytz.utc)
+	MON_9AM = datetime.datetime(2015, 6, 1, 13, 0, 0, tzinfo=pytz.utc)
+	TUE_8AM = datetime.datetime(2015, 6, 2, 12, 0, 0, tzinfo=pytz.utc)
+	TUE_9AM = datetime.datetime(2015, 6, 2, 13, 0, 0, tzinfo=pytz.utc)
+	TUE_850AM = datetime.datetime(2015, 6, 2, 12, 50, 0, tzinfo=pytz.utc)
+	TUE_858AM = datetime.datetime(2015, 6, 2, 12, 58, 0, tzinfo=pytz.utc)
+	WED_9AM = datetime.datetime(2015, 6, 3, 13, 0, 0, tzinfo=pytz.utc)
+	SUNDAY_7PM = datetime.datetime(2015, 6, 7, 23, 0, 0, tzinfo=pytz.utc)
 
 	def setNow(self, dateMock, date):
-		d, hasDate, hasTime = date
-		if not hasTime:
-			d.replace(hour=12)
-		dateMock.return_value = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=pytz.utc)
-
-	def setupNatty(self, nattyMock, date, queryWithoutTiming, usedText):
-		d, hasDate, hasTime = date
-		if not hasTime:
-			d.append(12)
-			d.append(0)
-			d.append(0)
-
-		dt = datetime.datetime(d[0], d[1], d[2], d[3], d[4], d[5], tzinfo=pytz.utc)
-		nattyMock.return_value = [natty_util.NattyResult(dt, queryWithoutTiming, usedText, hasDate, hasTime)]
+		dateMock.return_value = date

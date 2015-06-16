@@ -28,8 +28,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("I can also help you with other things", self.getOutput(mock))
 
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_tutorial_remind_no_time_given(self, nattyMock, dateMock):
+	def test_tutorial_remind_no_time_given(self, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		#  TODO Derek to see if we can get away without doing this statement up front
@@ -50,8 +49,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_tutorial_remind_followup(self, nattyMock, dateMock):
+	def test_tutorial_remind_followup(self, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		#  TODO Derek to see if we can get away without doing this statement up front
@@ -61,11 +59,9 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
-		self.setupNatty(nattyMock, self.WEEKEND, "Remind me about the Improv show", "this weekend")
 		cliMsg.msg(self.testPhoneNumber, "Remind me about the Improv show this weekend")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.ONLY_4PM, "Remind me", "at 4pm")
 			cliMsg.msg(self.testPhoneNumber, "Remind me at 4pm")
 
 			self.assertIn("Sat by 4pm", self.getOutput(mock))
@@ -74,8 +70,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
 
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_tutorial_remind_time_zones(self, nattyMock, dateMock):
+	def test_tutorial_remind_time_zones(self, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
 
 		self.setNow(dateMock, self.MON_8AM)
@@ -85,7 +80,6 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.NO_TIME, "Remind me to call mom", "")
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future

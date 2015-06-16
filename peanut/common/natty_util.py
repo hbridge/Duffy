@@ -64,13 +64,13 @@ def getNattyInfo(query, timezone):
 # Looks to see if the given time is the same hour and minute as now. Natty returns this if it doesn't
 # know what else to do, like for queries of "today"
 def isNattyDefaultTime(utcTime):
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	now = date_util.now(pytz.utc)
 	return utcTime.hour == now.hour and utcTime.minute == now.minute
 
 
 def updatedTimeBasedOnUsedText(utcTime, usedText, timezone):
 	if usedText.lower() == "next week":
-		tzAwareDate = datetime.datetime.now(pytz.utc).astimezone(timezone)
+		tzAwareDate = date_util.now(pytz.utc).astimezone(timezone)
 		# This finds us the next Monday
 		tzAwareDate = tzAwareDate + datetime.timedelta(days=-tzAwareDate.weekday(), weeks=1)
 		tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
@@ -120,7 +120,7 @@ def processQuery(query, timezone):
 			# Correct for a few edgecases
 			startDate = updatedTimeBasedOnUsedText(startDate, usedText, timezone)
 
-			now = datetime.datetime.now(pytz.utc)
+			now = date_util.now(pytz.utc)
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
@@ -143,6 +143,7 @@ def processQuery(query, timezone):
 			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"]
 			hasTime = "EXPLICIT_TIME" in entry["syntaxTree"] or not isNattyDefaultTime(startDate)
 			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime))
+
 	return result
 
 

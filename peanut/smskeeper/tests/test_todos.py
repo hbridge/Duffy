@@ -120,6 +120,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	def test_today_from_10pm(self):
 		self.setupUser()
+
 		with Replacer() as r:
 			with patch('common.natty_util.getNattyInfo') as mocked:
 				tz = self.getTestUser().getTimezone()
@@ -183,12 +184,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_create_new_after_reminder(self, nattyMock, dateMock):
+	def test_create_new_after_reminder(self, dateMock):
 		self.setupUser()
 
 		self.setNow(dateMock, self.MON_8AM)
-		self.setupNatty(nattyMock, self.MON_8AM, "Remind me go poop", "in 1 minute")
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
 
@@ -201,7 +200,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("let me know when you're done", self.getOutput(mock))
 
 		# Make sure we create a new entry and don't treat as a followup
-		self.setupNatty(nattyMock, self.WEEKEND, "I need to go biking", "this weekend")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to go biking this weekend")
 			self.assertIn("Sat", self.getOutput(mock))
@@ -271,8 +269,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	# Make sure that when there's two reminders, if we just sent a reminder and there's no
 	# fuzzy match, we use that one
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_followup_fuzzy_match(self, nattyMock, dateMock):
+	def test_followup_fuzzy_match(self, dateMock):
 		self.setupUser()
 
 		self.setNow(dateMock, self.MON_8AM)
@@ -280,7 +277,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Send in a message that could be new, but really is a followup
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.SUNDAY, "actually, I want to call mom", "on sunday")
 			cliMsg.msg(self.testPhoneNumber, "actually, I want to call mom on sunday")
 
 			self.assertIn("Sun", self.getOutput(mock))
@@ -290,14 +286,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_process_daily_digest(self, nattyMock, dateMock):
+	def test_process_daily_digest(self, dateMock):
 		self.setupUser()
 
 		self.setNow(dateMock, self.MON_8AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.NO_TIME, "I need to run", "")
 			cliMsg.msg(self.testPhoneNumber, "I need to run")
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertNotIn("by 9am", self.getOutput(mock))
@@ -329,18 +323,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_done_all_after_daily_digest(self, nattyMock, dateMock):
+	def test_done_all_after_daily_digest(self, dateMock):
 		self.setupUser()
 
 		self.setNow(dateMock, self.MON_8AM)
-		self.setupNatty(nattyMock, self.NO_TIME, "I need to run with my dad", "")
 		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
-
-		self.setupNatty(nattyMock, self.WEEKEND, "I want to go buy some stuff", "this weekend")
 		cliMsg.msg(self.testPhoneNumber, "I need to go buy some stuff this weekend")
-
-		self.setupNatty(nattyMock, self.NO_TIME, "I need to go poop in the yard", "")
 		cliMsg.msg(self.testPhoneNumber, "I need to go poop in the yard")
 
 		self.setNow(dateMock, self.TUE_9AM)
@@ -367,12 +355,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_stop_then_daily_digest(self, nattyMock, dateMock):
+	def test_stop_then_daily_digest(self, dateMock):
 		self.setupUser()
 
 		self.setNow(dateMock, self.MON_8AM)
-		self.setupNatty(nattyMock, self.NO_TIME, "I need to run with my dad", "")
 		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:

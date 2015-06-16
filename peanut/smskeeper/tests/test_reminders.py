@@ -45,29 +45,25 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("reminders", self.getOutput(mock))
 
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_reminders_with_time_followup(self, nattyMock, dateMock):
+	def test_reminders_with_time_followup(self, dateMock):
 		self.setupUser()
 		self.setNow(dateMock, self.MON_8AM)
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.TUE, "remind me poop", "tomorrow")
 			cliMsg.msg(self.testPhoneNumber, "#remind poop tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.WED, "actually,", "2 days from now")
 			cliMsg.msg(self.testPhoneNumber, "actually, 2 days from now")
 			self.assertIn("Wed", self.getOutput(mock))
 
 	# Deal with a follow up of "remind me this evening" which looks like a new reminder
 	# but it isn't
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_remind_me_followup(self, nattyMock, dateMock):
+	def test_remind_me_followup(self, dateMock):
 		self.setupUser()
 		self.setNow(dateMock, self.MON_8AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.TUE, "remind me poop", "tomorrow")
 			cliMsg.msg(self.testPhoneNumber, "remind me poop tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
@@ -75,7 +71,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		origEntry = Entry.objects.filter(label="#reminders").last()
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.SUNDAY_7PM, "remind me on", "Sunday 7pm")
 			cliMsg.msg(self.testPhoneNumber, "Remind me on Sunday 7pm")
 			self.assertIn("7pm", self.getOutput(mock))
 
@@ -445,11 +440,9 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 	"""
 
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_next_week_becomes_monday(self, nattyMock, dateMock):
+	def test_next_week_becomes_monday(self, dateMock):
 		self.setupUser()
 		self.setNow(dateMock, self.TUE_8AM)
-		self.setupNatty(nattyMock, self.NEXT_WEEK, "Remind me to poop", "next week")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 
@@ -654,23 +647,19 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("later", self.getOutput(mock))
 
 	@patch('common.date_util.utcnow')
-	@patch('common.natty_util.getNattyInfo')
-	def test_followup_if_starts_with_no(self, nattyMock, dateMock):
+	def test_followup_if_starts_with_no(self, dateMock):
 		self.setupUser()
 		self.setNow(dateMock, self.TUE_8AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.NEXT_WEEK, "Remind me to get gas in my car before", "next week")
 			cliMsg.msg(self.testPhoneNumber, "Remind me to get gas in my car before next week")
 			self.assertIn("Mon", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.SUNDAY, "no, remind me", "this Sunday")
 			cliMsg.msg(self.testPhoneNumber, "no, remind me this Sunday")
 			self.assertIn("Sun", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.setupNatty(nattyMock, self.WED, "don't do that remind me", "this Wednesday")
 			cliMsg.msg(self.testPhoneNumber, "don't do that remind me this Wednesday")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
