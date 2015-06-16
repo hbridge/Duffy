@@ -6,13 +6,16 @@ from smskeeper.models import Entry
 import test_base
 
 
+@patch('common.date_util.utcnow')
 class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
-	def setupUser(self):
+	def setupUser(self, dateMock):
+		# All tests start at Tuesday 8am
+		self.setNow(dateMock, self.TUE_8AM)
 		super(SMSKeeperTodoTutorialCase, self).setupUser(True, False, keeper_constants.STATE_TUTORIAL_TODO, productId=1)
 
-	def test_tutorial_remind_normal(self):
-		self.setupUser()
+	def test_tutorial_remind_normal(self, dateMock):
+		self.setupUser(dateMock)
 
 		# Activation message asks for their name
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -35,8 +38,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Mon", self.getOutput(mock))
 			self.assertIn("daily morning digest", self.getOutput(mock))
 
-	def test_tutorial_remind_nicety(self):
-		self.setupUser()
+	def test_tutorial_remind_nicety(self, dateMock):
+		self.setupUser(dateMock)
 
 		# Activation message asks for their name
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -53,8 +56,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "hello")
 			self.assertNotIn("I'll send you what you need to do at the best time", self.getOutput(mock))
 
-	def test_tutorial_zip_code_again(self):
-		self.setupUser()
+	def test_tutorial_zip_code_again(self, dateMock):
+		self.setupUser(dateMock)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
@@ -71,8 +74,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		# Make sure now messages are still though of as a reminder
 		self.assertEquals(1, len(Entry.objects.filter(label="#reminders")))
 
-	def test_tutorial_zip_code(self):
-		self.setupUser()
+	def test_tutorial_zip_code(self, dateMock):
+		self.setupUser(dateMock)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests")
@@ -81,8 +84,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "US/Pacific")
 
-	def test_name_with_punctuation(self):
-		self.setupUser()
+	def test_name_with_punctuation(self, dateMock):
+		self.setupUser(dateMock)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "UnitTests.")
@@ -90,8 +93,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "UnitTests")
 
-	def test_name_with_phrase(self):
-		self.setupUser()
+	def test_name_with_phrase(self, dateMock):
+		self.setupUser(dateMock)
 
 		# Activation message asks for their name
 		cliMsg.msg(self.testPhoneNumber, "My names kelly.")
@@ -99,8 +102,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "kelly")
 
-	def test_nicety(self):
-		self.setupUser()
+	def test_nicety(self, dateMock):
+		self.setupUser(dateMock)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with nicety
@@ -111,15 +114,15 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Billy")
 
-	def test_name_looks_like_nicety(self):
-		self.setupUser()
+	def test_name_looks_like_nicety(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "Tymarieo")
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Tymarieo")
 
-	def test_stop(self):
-		self.setupUser()
+	def test_stop(self, dateMock):
+		self.setupUser(dateMock)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with nicety
@@ -136,8 +139,8 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.state, keeper_constants.STATE_STOPPED)
 
-	def test_long_sentence(self):
-		self.setupUser()
+	def test_long_sentence(self, dateMock):
+		self.setupUser(dateMock)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with sentence

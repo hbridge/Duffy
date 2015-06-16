@@ -13,13 +13,16 @@ from common import natty_util
 import test_base
 
 
+@patch('common.date_util.utcnow')
 class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
-	def setupUser(self):
+	def setupUser(self, dateMock):
+		# All tests start at Tuesday 8am
+		self.setNow(dateMock, self.TUE_8AM)
 		super(SMSKeeperTodoCase, self).setupUser(True, True, productId=1)
 
-	def test_no_time(self):
-		self.setupUser()
+	def test_no_time(self, dateMock):
+		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to run")
 			self.assertIn("tomorrow", self.getOutput(mock))
@@ -28,16 +31,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEquals(13, entry.remind_timestamp.hour)  # 9 am EST
 
-	def test_single_word(self):
-		self.setupUser()
+	def test_single_word(self, dateMock):
+		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "kk")
 			self.assertEquals("", self.getOutput(mock))
 
 		self.assertEquals(0, len(Entry.objects.filter(label="#reminders")))
 
-	def test_tomorrow_no_time(self):
-		self.setupUser()
+	def test_tomorrow_no_time(self, dateMock):
+		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to pick up my sox tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
@@ -46,8 +49,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEquals("I need to pick up my sox", entry.text)
 
-	def test_two_entries(self):
-		self.setupUser()
+	def test_two_entries(self, dateMock):
+		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I want to pick up my sox tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
@@ -64,8 +67,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.assertNotEqual(firstEntry.id, secondEntry.id)
 
-	def test_weekend_no_time(self):
-		self.setupUser()
+	def test_weekend_no_time(self, dateMock):
+		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to buy detergent this weekend")
 			if (datetime.datetime.now(self.getTestUser().getTimezone()).weekday() == 4):  # Its Friday, so check for tmr
@@ -77,8 +80,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEquals("I need to buy detergent", entry.text)
 
-	def test_weekend_with_time(self):
-		self.setupUser()
+	def test_weekend_with_time(self, dateMock):
+		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to prep dinner sat at 5 pm")
 			if (datetime.datetime.now(self.getTestUser().getTimezone()).weekday() == 4):  # Its Friday, so check for tmr
@@ -87,58 +90,33 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 				self.assertIn("Sat", self.getOutput(mock))
 			self.assertIn("by 5pm", self.getOutput(mock))
 
-	# Make sure that "today" still returns stuff later in the day for todos
-	def test_today_from_9am(self):
-		self.setupUser()
-		with Replacer() as r:
-			with patch('common.natty_util.getNattyInfo') as mocked:
-				tz = self.getTestUser().getTimezone()
-				now = datetime.datetime.now(self.getTestUser().getTimezone())
-				# Try with 9 am EST
-				testDt = test_datetime(now.year, now.month, now.day, 9, 0, 0, tzinfo=tz)
-				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
-				mocked.return_value = [natty_util.NattyResult(testDt.now(pytz.utc), "I buy stuff later", "today", True, False)]
-				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, "I buy stuff later today")
-					# Should be 6 pm, so 9 hours
-					self.assertIn("today by 6pm", self.getOutput(mock))
+	def test_today(self, dateMock):
+		self.setupUser(dateMock)
 
-	def test_today_from_3pm(self):
-		self.setupUser()
-		with Replacer() as r:
-			with patch('common.natty_util.getNattyInfo') as mocked:
-				tz = self.getTestUser().getTimezone()
-				now = datetime.datetime.now(tz)
-				# Try with 3 pm EST
-				testDt = test_datetime(now.year, now.month, now.day, 15, 0, 0, tzinfo=tz)
-				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
-				mocked.return_value = [natty_util.NattyResult(testDt.now(pytz.utc), "I buy stuff later", "today", True, False)]
-				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, "I buy stuff later today")
-					# Should be 9 pm, so 6 hours
-					self.assertIn("today by 9pm", self.getOutput(mock))
+		# Try with 8 am EST
+		self.setNow(dateMock, self.TUE_8AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "go shopping later today")
+			# Should be 6 pm, so 9 hours
+			self.assertIn("today by 6pm", self.getOutput(mock))
 
-	def test_today_from_10pm(self):
-		self.setupUser()
+		# Try with 3 pm EST
+		self.setNow(dateMock, self.TUE_3PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "watch tv later today")
+			# Should be 9 pm, so 6 hours
+			self.assertIn("today by 9pm", self.getOutput(mock))
 
-		with Replacer() as r:
-			with patch('common.natty_util.getNattyInfo') as mocked:
-				tz = self.getTestUser().getTimezone()
-				now = datetime.datetime.now(self.getTestUser().getTimezone())
-				# Try with 10 pm EST
-				testDt = test_datetime(now.year, now.month, now.day, 22, 0, 0, tzinfo=tz)
-				r.replace('smskeeper.states.remind.datetime.datetime', testDt)
-				mocked.return_value = [natty_util.NattyResult(testDt.now(pytz.utc), "I buy stuff later", "today", True, False)]
-				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, "I buy stuff later today")
-					# Should be 9 am next day, so in 11 hours
-					self.assertIn("tomorrow", self.getOutput(mock))
-
-			r.replace('smskeeper.states.remind.datetime.datetime', datetime.datetime)
+		# Try with 10 pm EST
+		self.setNow(dateMock, self.TUE_10PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bowling later today")
+			# Should be 9 am next day, so in 11 hours
+			self.assertIn("tomorrow", self.getOutput(mock))
 
 	# Make sure first reminder we send snooze tip, then second we don't
-	def test_done_hides(self):
-		self.setupUser()
+	def test_done_hides(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
 
@@ -160,8 +138,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entry.hidden)
 
 	# Make sure first reminder we send snooze tip, then second we don't
-	def test_done_works_after_two_reminders(self):
-		self.setupUser()
+	def test_done_works_after_two_reminders(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "Thanks!")
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 5 minute")
@@ -183,8 +161,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entry.hidden)
 
 	# This checks against a bug where we fuzzy matched to "done" to something that wasn't just fired
-	def test_done_only_evals_recent_reminder(self):
-		self.setupUser()
+	def test_done_only_evals_recent_reminder(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "text dan")
 		cliMsg.msg(self.testPhoneNumber, "call court")
@@ -205,9 +183,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entry.hidden)
 
 	# Make sure we create a new entry instead of a followup
-	@patch('common.date_util.utcnow')
 	def test_create_new_after_reminder(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
 
@@ -231,8 +208,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertNotEqual(firstEntry.id, secondEntry.id)
 
 	# Make sure first reminder we send snooze tip, then second we don't
-	def test_done_fuzzy_one_word_match(self):
-		self.setupUser()
+	def test_done_fuzzy_one_word_match(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "buy that thing I need")
 		cliMsg.msg(self.testPhoneNumber, "send email to alex")
@@ -247,8 +224,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entry.hidden)
 
 	# Make that after we send a reminder, we eventually look for a fuzzy match
-	def test_reminder_sent_fuzzy_match_default(self):
-		self.setupUser()
+	def test_reminder_sent_fuzzy_match_default(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 10 minutes")
@@ -268,8 +245,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# Make sure that when there's two reminders, if we just sent a reminder and there's no
 	# fuzzy match, we use that one
-	def test_reminder_sent_fuzzy_match_not_default(self):
-		self.setupUser()
+	def test_reminder_sent_fuzzy_match_not_default(self, dateMock):
+		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
@@ -290,9 +267,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# Make sure that when there's two reminders, if we just sent a reminder and there's no
 	# fuzzy match, we use that one
-	@patch('common.date_util.utcnow')
 	def test_followup_fuzzy_match(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
@@ -307,9 +283,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
 
 	# Make sure we create a new entry instead of a followup
-	@patch('common.date_util.utcnow')
 	def test_process_daily_digest(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
 
@@ -344,9 +319,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("I need to run", self.getOutput(mock))
 
 	# Make sure we create a new entry instead of a followup
-	@patch('common.date_util.utcnow')
 	def test_done_all_after_daily_digest(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
 		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
@@ -376,9 +350,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[2].hidden)
 
 	# Make sure we create a new entry instead of a followup
-	@patch('common.date_util.utcnow')
 	def test_stop_then_daily_digest(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
 		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
@@ -397,9 +370,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertEqual("", self.getOutput(mock))
 
-	@patch('common.date_util.utcnow')
 	def test_clean_up_text(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 		self.setNow(dateMock, self.TUE_8AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -409,9 +381,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEqual(entry.text, "take brick to the vet")
 
-	@patch('common.date_util.utcnow')
 	def test_can_you(self, dateMock):
-		self.setupUser()
+		self.setupUser(dateMock)
 		self.setNow(dateMock, self.TUE_8AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
