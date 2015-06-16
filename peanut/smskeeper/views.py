@@ -425,10 +425,10 @@ def signup_from_website(request):
 					user_util.activate(target_user, "", None, target_user.getKeeperNumber())
 
 			except User.DoesNotExist:
-				if 'todo1' in exp:
-					productId = 1
-				else:
+				if 'reminders1' in exp:
 					productId = 0
+				else:
+					productId = 1
 
 				target_user = user_util.createUser(phoneNum, json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}), None, productId)
 
