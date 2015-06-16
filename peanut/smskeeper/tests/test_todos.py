@@ -387,3 +387,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEqual(entry.text, "take brick to the vet")
 
+	@patch('common.date_util.utcnow')
+	def test_can_you(self, dateMock):
+		self.setupUser()
+		self.setNow(dateMock, self.TUE_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "can you remind me on monday to get a resume?")
+			self.assertIn("Mon", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.text, "get a resume")
+

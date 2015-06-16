@@ -22,7 +22,7 @@ freeform_fetch_res = [
 	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
-reminder_re = re.compile("#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in )?", re.I)
+reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in )?", re.I)
 done_re = re.compile(r"\b(done|finished|called|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
@@ -33,7 +33,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
-REMINDER_FRINGE_TERMS = ["to", "on", "at"]
+REMINDER_FRINGE_TERMS = ["to", "on", "at", "in"]
 
 
 def hasLabel(msg):
@@ -189,6 +189,8 @@ def getFirstWord(msg):
 
 def isQuestion(msg):
 	firstWord = getFirstWord(msg)
+	if isRemindCommand(msg):
+		return False
 	return ("?" in msg) or firstWord in ["who", "what", "where", "when", "why", "how"]
 
 
@@ -213,17 +215,18 @@ def getReminderHandle(msg):
 
 # Returns a string which doesn't have the "remind me" phrase in it
 def cleanedReminder(msg):
-	cleaned = msg.lower()
-	match = reminder_re.search(cleaned)
+	match = reminder_re.search(msg.lower())
 	if match:
 		cleaned = msg[:match.start()] + msg[match.end():]
+	else:
+		cleaned = msg
 
 	cleaned = cleaned.strip(string.punctuation).strip()
 	words = cleaned.split(' ')
 	if len(words) >= 2:
-		if words[0] in REMINDER_FRINGE_TERMS:
+		if words[0].lower() in REMINDER_FRINGE_TERMS:
 			cleaned = cleaned.split(' ', 1)[1]
-		if words[-1] in REMINDER_FRINGE_TERMS:
+		if words[-1].lower() in REMINDER_FRINGE_TERMS:
 			cleaned = cleaned.rsplit(' ', 1)[0]
 
 	return cleaned

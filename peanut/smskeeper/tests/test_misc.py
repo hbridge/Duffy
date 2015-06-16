@@ -572,7 +572,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	def test_question(self):
 		self.setupUser(True, True)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Are you my daddy, please remind me?")
+			cliMsg.msg(self.testPhoneNumber, "Are you my daddy?")
 			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
