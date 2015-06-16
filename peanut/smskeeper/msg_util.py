@@ -192,12 +192,12 @@ def isQuestion(msg):
 	return ("?" in msg) or firstWord in ["who", "what", "where", "when", "why", "how"]
 
 
-# See if the first word is a 'no' or 'not'
+# See if the first word is a 'no' or 'not' and is multiple words
 def startsWithNo(msg):
 	words = msg.split(' ')
-	if len(words) > 0:
+	if len(words) > 1:
 		firstWord = words[0].strip(string.punctuation).strip().lower()
-		return firstWord in ["no", "not"]
+		return firstWord in ["no", "not", "cancel", "don't", "stop"]
 	return False
 
 

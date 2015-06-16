@@ -669,6 +669,11 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "no, remind me this Sunday")
 			self.assertIn("Sun", self.getOutput(mock))
 
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.setupNatty(nattyMock, self.WED, "don't do that remind me", "this Wednesday")
+			cliMsg.msg(self.testPhoneNumber, "don't do that remind me this Wednesday")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
 		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
 
 	@patch('common.date_util.utcnow')
