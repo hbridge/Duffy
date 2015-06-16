@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
- 
+
 import java.util.*;
 import com.joestelmach.natty.*;
 
@@ -19,9 +19,9 @@ public class NattyDateParserServer extends AbstractHandler
         private List<Date> dates;
         private List<Long> timestamps;
         private String matchingValue;
-	private String syntaxTree;
+	    private String syntaxTree;
         private int column;
-        
+
         public NattyResult( DateGroup dateGroup) {
             this.dates = dateGroup.getDates();
 
@@ -32,7 +32,7 @@ public class NattyDateParserServer extends AbstractHandler
 
             this.matchingValue = dateGroup.getText();
             this.column = dateGroup.getPosition();
-	    this.syntaxTree = dateGroup.getSyntaxTree().toStringTree();
+	        this.syntaxTree = dateGroup.getSyntaxTree().toStringTree();
         }
         /*
             List<Date> dates = group.getDates();
@@ -50,17 +50,26 @@ public class NattyDateParserServer extends AbstractHandler
     public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
-                       HttpServletResponse response) 
+                       HttpServletResponse response)
         throws IOException, ServletException
     {
+        Date baseDate;
+    	String query = request.getParameter("q");
+    	String tz = request.getParameter("tz");
+        String baseDateStr = request.getParameter("baseDate");
 
-	String query = request.getParameter("q");
-	String tz = request.getParameter("tz");
+    	if (tz == null) {
+    	    tz = "US/Eastern";
+    	}
 
-	if (tz == null) {
-	    tz = "US/Eastern";
-	}
+        System.out.println(baseDateStr);
+        if (baseDateStr == null) {
+            baseDate = new Date();
+        } else {
+            baseDate = new Date(Long.parseLong(baseDateStr) * 1000);
+        }
 
+        CalendarSource.setBaseDate(baseDate);
         Parser parser = new Parser(TimeZone.getTimeZone(tz));
         Gson gson = new Gson();
 
@@ -85,16 +94,16 @@ public class NattyDateParserServer extends AbstractHandler
             response.getWriter().println(json);
         }
 
-        
+
     }
- 
+
     public static void main(String[] args) throws Exception
     {
         Server server = new Server(7990);
         server.setHandler(new NattyDateParserServer());
 
         System.out.println("Hello World!");
- 
+
         server.start();
         server.join();
     }
