@@ -13,7 +13,7 @@ import json
 class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 
 	def test_signup_product_id_0(self):
-		request = self.createRequest('+16505759014')
+		request = self.createRequest('+16505759014', exp='reminders1')
 		response = views.signup_from_website(request) #httpresponse
 		self.assertIn('{"result": true}', response.content)
 
@@ -26,7 +26,7 @@ class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 
 
 	def test_signup_product_id_1(self):
-		request = self.createRequest('+16505759014', exp='todo1')
+		request = self.createRequest('+16505759014')
 		response = views.signup_from_website(request) #httpresponse
 		self.assertIn('{"result": true}', response.content)
 
