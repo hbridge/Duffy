@@ -182,6 +182,28 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
+	# This checks against a bug where we fuzzy matched to "done" to something that wasn't just fired
+	def test_done_only_evals_recent_reminder(self):
+		self.setupUser()
+
+		cliMsg.msg(self.testPhoneNumber, "text dan")
+		cliMsg.msg(self.testPhoneNumber, "call court")
+
+		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		async.processReminder(entry)
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertTrue(entry.hidden)
+
 	# Make sure we create a new entry instead of a followup
 	@patch('common.date_util.utcnow')
 	def test_create_new_after_reminder(self, dateMock):
@@ -224,7 +246,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(text="send email to alex")
 		self.assertTrue(entry.hidden)
 
-	# Make that after we send a reminder, we look for a fuzzy match first
+	# Make that after we send a reminder, we eventually look for a fuzzy match
 	def test_reminder_sent_fuzzy_match_default(self):
 		self.setupUser()
 

@@ -133,6 +133,7 @@ class User(models.Model):
 
 		self.state_data = json.dumps(data)
 		self.save()
+		logger.debug("User %s: Setting state data %s %s" % (self.id, key, value))
 
 	def setNextStateData(self, key, value):
 		if self.next_state_data:

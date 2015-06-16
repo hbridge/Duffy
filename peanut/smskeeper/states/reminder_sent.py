@@ -7,6 +7,16 @@ from smskeeper.models import Entry
 logger = logging.getLogger(__name__)
 
 
+def clearAll(entries):
+	# Assume this is done, or done with and clear all
+	msgBack = u"Nice! "
+	for entry in entries:
+		msgBack += u"\u2705"
+		entry.hidden = True
+		entry.save()
+	return msgBack
+
+
 # Enter this state after a message was just sent to the user
 # See if its a done command. If not, send back for normal processing
 def process(user, msg, requestDict, keeperNumber):
@@ -24,28 +34,30 @@ def process(user, msg, requestDict, keeperNumber):
 		return False  # Reprocess
 
 	if msg_util.isDoneCommand(msg):
-		bestMatch, score = actions.getBestEntryMatch(user, msg)
-
-		# If we didn't fuzzy match on anything, assume its all of them
-		if score < 50:
-			msgBack = u"Nice! "
-			for entry in entries:
-				msgBack += u"\u2705"
-				entry.hidden = True
-				entry.save()
-			logging.debug("User %s: I think this is a done command for all entries %s and score %s" % (user.id, [x.id for x in entries], score))
+		if len(msg.split(' ')) <= 2:
+			logging.debug("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
+			msgBack = clearAll(entries)
 		else:
-			msgBack = u"Nice. %s  \u2705" % bestMatch.text
-			logging.debug("User %s: I think this is a done command for entry %s with text '%s' and score %s" % (user.id, bestMatch.id, bestMatch.text, score))
+			bestMatch, score = actions.getBestEntryMatch(user, msg)
 
-			bestMatch.hidden = True
-			bestMatch.save()
+			if score > 80:
+				# We got a great hit to something so it was probably specific, just hide that one
+				bestMatch.hidden = True
+				bestMatch.save()
+
+				logger.info("User %s: I think this is a done command decided to hide entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
+
+				msgBack = u"Nice. %s  \u2705" % bestMatch.text
+			else:
+				# If the score is low, it probably means we didn't match a specific one, so clear them all
+				logging.debug("User %s: I think this is a done command for all entries %s since the score was low: %s" % (user.id, [x.id for x in entries], score))
+				msgBack = clearAll(entries)
 
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
-
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()
 		return True
+
 	else:
 		logging.debug("User %s: I don't think this is a done command, so kicking out" % (user.id))
 
