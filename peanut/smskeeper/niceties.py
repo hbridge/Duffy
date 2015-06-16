@@ -147,7 +147,7 @@ def custom_nicety_for(regexp):
 	return gethandler
 
 
-@custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ty|thx|thz|thks|thnx|thanx)( keeper)?$')
+@custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ok )?(ty|thx|thz|thks|thnx|thanx)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
 	if time_utils.isDateOlderThan(user.last_feedback_prompt, keeper_constants.FEEDBACK_FREQUENCY_DAYS) and user.activated < datetime.datetime.now(pytz.utc) - datetime.timedelta(days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS):
