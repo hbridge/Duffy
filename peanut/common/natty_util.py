@@ -7,6 +7,8 @@ from urllib2 import URLError
 import pytz
 from django.conf import settings
 
+from common import date_util
+
 logger = logging.getLogger(__name__)
 
 
@@ -76,6 +78,12 @@ def updatedTimeBasedOnUsedText(utcTime, usedText, timezone):
 	return utcTime
 
 
+def unixTime(dt):
+	epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=pytz.utc)
+	delta = dt - epoch
+	return int(delta.total_seconds())
+
+
 def processQuery(query, timezone):
 	# get startDate from Natty
 	nattyPort = "7990"
@@ -84,6 +92,8 @@ def processQuery(query, timezone):
 
 	if timezone:
 		nattyParams["tz"] = str(timezone)
+
+	nattyParams["baseDate"] = unixTime(date_util.now(pytz.utc))
 
 	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
 
