@@ -375,46 +375,43 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("foo5", self.getOutput(mock))
 
 	def test_naturalize(self):
-		# Sunday, May 31 around 8 am
+		# Sunday, May 31 by 8 am
 		now = datetime.datetime(2015, 05, 31, 8, 0, 0)
 
 		# Later today
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 9, 0, 0))
-		self.assertIn("today around 9am", ret)
+		self.assertIn("today by 9am", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 0, 0))
-		self.assertIn("today around 3pm", ret)
+		self.assertIn("today by 3pm", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 5, 0))
-		self.assertIn("today around 3:05pm", ret)
+		self.assertIn("today at 3:05pm", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 15, 45, 0))
-		self.assertIn("today around 3:45pm", ret)
+		self.assertIn("today at 3:45pm", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 05, 31, 23, 45, 0))
-		self.assertIn("today around 11:45pm", ret)
+		self.assertIn("today at 11:45pm", ret)
 
 		# Tomorrow
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 1, 2, 0, 0))
-		self.assertIn("tomorrow around 2am", ret)
+		self.assertIn("tomorrow by 2am", ret)
 
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 1, 15, 0, 0))
-		self.assertIn("tomorrow around 3pm", ret)
+		self.assertIn("tomorrow by 3pm", ret)
 
 		# Day of week (this week)
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 2, 15, 0, 0))
-		self.assertIn("Tue around 3pm", ret)
+		self.assertIn("Tue by 3pm", ret)
 
 		# date of week (next week)
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 7, 15, 0, 0))
 		self.assertIn("Sun the 7th", ret)
 
-		# far out
-		with patch('humanize.time._now') as mocked:
-			mocked.return_value = now
-
-			ret = msg_util.naturalize(now, datetime.datetime(2015, 06, 14, 15, 0, 0))
-			self.assertIn("Sun the 14th", ret)
+		# a month from now
+		ret = msg_util.naturalize(now, datetime.datetime(2015, 07, 7, 15, 0, 0))
+		self.assertIn("July 7th", ret)
 
 	def test_exception_error_message(self):
 		self.setupUser(True, True)

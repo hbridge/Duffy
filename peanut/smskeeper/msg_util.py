@@ -435,23 +435,29 @@ def naturalize(now, futureTime, includeTime=True):
 
 	time = getNaturalTime(futureTime)
 	dayOfWeek = futureTime.strftime("%a")
+	monthName = futureTime.strftime("%B")
+
+	evenTime = (futureTime.minute == 0 or futureTime.minute == 30)
+	bindingWord = "by" if evenTime else "at"
 
 	# If the same day, then say "today at 5pm"
 	if deltaHours < 24 and futureTime.day == now.day:
 		result = "later today"
 		if includeTime:
-			result += " around %s" % time
+			result += " %s %s" % (bindingWord, time)
 	# Tomorrow
 	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
 		result = "tomorrow"
 		if includeTime:
-			result += " around %s" % time
+			result += " %s %s" % (bindingWord, time)
 	elif delta.days < 7:
 		result = "%s" % (dayOfWeek)
 		if includeTime:
-			result += " around %s" % time
-	else:
+			result += " %s %s" % (bindingWord, time)
+	elif delta.days < 14:
 		result = "%s the %s" % (dayOfWeek, humanize.ordinal(futureTime.day))
+	else:
+		result = "%s %s" % (monthName, humanize.ordinal(futureTime.day))
 	return result
 
 

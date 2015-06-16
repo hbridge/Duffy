@@ -23,7 +23,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to run")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertNotIn("around 9am", self.getOutput(mock))
+			self.assertNotIn("by 9am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEquals(13, entry.remind_timestamp.hour)  # 9 am EST
@@ -85,7 +85,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 				self.assertIn("tomorrow", self.getOutput(mock))
 			else:
 				self.assertIn("Sat", self.getOutput(mock))
-			self.assertIn("around 5pm", self.getOutput(mock))
+			self.assertIn("by 5pm", self.getOutput(mock))
 
 	# Make sure that "today" still returns stuff later in the day for todos
 	def test_today_from_9am(self):
@@ -101,7 +101,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 				with patch('smskeeper.sms_util.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "I buy stuff later today")
 					# Should be 6 pm, so 9 hours
-					self.assertIn("today around 6pm", self.getOutput(mock))
+					self.assertIn("today by 6pm", self.getOutput(mock))
 
 	def test_today_from_3pm(self):
 		self.setupUser()
@@ -116,7 +116,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 				with patch('smskeeper.sms_util.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, "I buy stuff later today")
 					# Should be 9 pm, so 6 hours
-					self.assertIn("today around 9pm", self.getOutput(mock))
+					self.assertIn("today by 9pm", self.getOutput(mock))
 
 	def test_today_from_10pm(self):
 		self.setupUser()
@@ -300,7 +300,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.setupNatty(nattyMock, self.NO_TIME, "I need to run", "")
 			cliMsg.msg(self.testPhoneNumber, "I need to run")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertNotIn("around 9am", self.getOutput(mock))
+			self.assertNotIn("by 9am", self.getOutput(mock))
 
 		# Make sure it was made for Tue 9am
 		entry = Entry.objects.filter(label="#reminders").last()
