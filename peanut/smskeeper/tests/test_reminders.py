@@ -682,4 +682,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		arg, kargs = nattyMock.call_args
 		self.assertEquals("Remind me about pooping at 9pm on June 20th", arg[0])
 
+	def test_ish(self, dateMock):
+		self.setupUser(dateMock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to poop 7ish")
+			self.assertIn("later today by 7pm", self.getOutput(mock))
+
+		self.assertEqual("poop", Entry.objects.get(label="#reminders").text)
 

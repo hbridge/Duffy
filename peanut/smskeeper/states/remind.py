@@ -123,6 +123,7 @@ def fixMsgForNatty(msg, user):
 
 		newMsg = newMsg.replace(oldtime, newtime)
 
+	# Change '4th' to 'June 4th'
 	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg)
 	if dayOfMonth:
 		localtime = date_util.now(user.getTimezone())
@@ -138,6 +139,13 @@ def fixMsgForNatty(msg, user):
 
 		# Turn 'the 9th' into 'June 9th'
 		newMsg = newMsg.replace("the %s" % dayStr, "%s %s" % (monthName, dayStr))
+
+	# Take anything like 7ish and just make 7
+	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg)
+	if ish:
+		time = ish.group("time")
+		newMsg = newMsg.replace(time + "ish", time)
+
 	return newMsg
 
 
