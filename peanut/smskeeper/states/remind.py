@@ -193,7 +193,7 @@ def process(user, msg, requestDict, keeperNumber):
 	if not entry:
 		sendFollowup = False
 
-		if not validTime(nattyResult) and user.product_id != keeper_constants.TODO_PRODUCT_ID:
+		if not validTime(nattyResult) or isTutorial(user):
 			sendFollowup = True
 
 		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
