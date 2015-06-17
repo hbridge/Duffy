@@ -81,21 +81,24 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
 
 	elif step == 2:
-		# succeeded
-		sms_util.sendMsgs(user, [u"What's something else you need to do?  just txt me what and when"], keeperNumber)
-		user.setStateData("step", 3)
-		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
-		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
+		time.sleep(1)
+		sms_util.sendMsgs(
+			user, 
+			[
+				u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E",
+			], 
+			keeperNumber)
 
-	elif step == 3:
-		sms_util.sendMsgs(user, [u"I'll also send you a daily morning digest of things you need to get done that day."], keeperNumber)
-		sms_util.sendMsgs(user, [u"Just txt me when things pop in your head and I'll track them for you. It's that easy. \U0001F60E"], keeperNumber)
 
-		# TODO: enable tell me more
-		#delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
-		#sms_util.sendMsg(user, "FYI, you can always say 'Tell me more' to learn more.", None, keeperNumber, eta=delayedTime)
+		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
+		sms_util.sendMsg(user, u"Btw, I'll send you a morning digest of things you need to get done that day.", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
-		user.setState(keeper_constants.STATE_NORMAL)
+
+		entryId = user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)
+		user.setState(keeper_constants.STATE_REMIND)
+		# The remind state will pass this to us...so pass it back
+		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entryId)
+
 
 		analytics.logUserEvent(
 			user,
