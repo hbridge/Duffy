@@ -433,7 +433,7 @@ def getBestEntryMatch(user, msg, entries=None):
 def done(user, msg, keeperNumber):
 	bestMatch, score = getBestEntryMatch(user, msg)
 
-	if score > 50:
+	if score >= 50:
 		bestMatch.hidden = True
 		bestMatch.save()
 
@@ -441,12 +441,13 @@ def done(user, msg, keeperNumber):
 
 		msgBack = u"Nice. \u2705  %s" % bestMatch.text
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
-	else:
-
+	elif bestMatch:
 		logger.info("User %s: Done got msg '%s' and only got best score of %s with match '%s' (%s)" % (user.id, msg, score, bestMatch.text, bestMatch.id))
 
 		msgBack = "Sorry, I'm not sure which entry you mean"
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
+	else:
+		logger.info("User %s: Done got msg '%s' but didn't find any best entries (prob zero)" % (user.id, msg))
 
 
 def unknown(user, msg, keeperNumber):
