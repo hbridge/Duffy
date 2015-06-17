@@ -691,3 +691,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEqual("poop", Entry.objects.get(label="#reminders").text)
 
+	def test_message_warp(self, dateMock):
+		self.setupUser(dateMock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me to pay my bills tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		self.assertEqual("pay your bills", Entry.objects.get(label="#reminders").text)
+

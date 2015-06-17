@@ -22,7 +22,7 @@ freeform_fetch_res = [
 	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
-reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in )?", re.I)
+reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?", re.I)
 done_re = re.compile(r"\b(done|finished|called|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
@@ -33,7 +33,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
-REMINDER_FRINGE_TERMS = ["to", "on", "at", "in"]
+REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
 
 def hasLabel(msg):
@@ -230,6 +230,17 @@ def cleanedReminder(msg):
 			cleaned = cleaned.rsplit(' ', 1)[0]
 
 	return cleaned
+
+
+# Returns a string which converts "my" to "your" and "i" to "you"
+def warpReminderText(msg):
+	i_words = re.compile(r'\bi\b', re.IGNORECASE)
+	warpedText = i_words.sub(r'you', msg)
+
+	my_words = re.compile(r'\bmy\b', re.IGNORECASE)
+	warpedText = my_words.sub('your', warpedText)
+
+	return warpedText.strip()
 
 
 def isDeleteCommand(msg):

@@ -274,6 +274,7 @@ def dealWithSuspiciousHour(user, entry, keeperNumber):
 
 def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
+	cleanedText = msg_util.warpReminderText(cleanedText)  # I to your
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
 	entry.remind_timestamp = nattyResult.utcTime
