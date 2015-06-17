@@ -4,7 +4,7 @@ import pytz
 from django.test import TestCase
 from django.conf import settings
 
-from smskeeper.models import User, ZipData
+from smskeeper.models import User, ZipData, VerbData
 from smskeeper import keeper_constants
 
 # turn off mixpanel for tests
@@ -26,12 +26,18 @@ class SMSKeeperBaseCase(TestCase):
 		# then the database will be empty and default to Eastern
 		self.setupZipCodeData()
 
+		self.setupVerbData()
+
 		settings.KEEPER_NUMBER_DICT = {0: "test0", 1: "test1"}
 
 	def setupZipCodeData(self):
 		ZipData.objects.create(city="San Francisco", state="CA", zip_code="94117", timezone="PST", area_code="415")
 		ZipData.objects.create(city="Manhattan", state="NY", zip_code="10012", timezone="EST", area_code="212")
 		ZipData.objects.create(city="New York", state="NY", zip_code="10012", timezone="EST", area_code="212")
+
+	def setupVerbData(self):
+		VerbData.objects.create(past="done")
+		VerbData.objects.create(past="got")
 
 	# TODO(Derek): Eventually activated and tutorialComplete should go away
 	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL, productId=None):

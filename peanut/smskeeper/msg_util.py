@@ -182,7 +182,8 @@ def isDoneCommand(msg):
 		return True
 
 	# Then look in db
-	for word in msg.split(' '):
+	for word in msg.lower().split(' '):
+		word = word.strip(string.punctuation).strip()
 		dbWords = VerbData.objects.filter(Q(past=word) | Q(past_participle=word))
 		if len(dbWords) > 0:
 			return True
