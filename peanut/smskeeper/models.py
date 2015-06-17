@@ -415,3 +415,12 @@ class ZipData(models.Model):
 	zip_code = models.CharField(max_length=10, db_index=True)
 	area_code = models.CharField(max_length=10, db_index=True)
 	timezone = models.CharField(max_length=10)
+
+
+class VerbData(models.Model):
+	base = models.CharField(max_length=40)
+	past = models.CharField(max_length=40, db_index=True)
+	past_participle = models.CharField(max_length=40, db_index=True)
+	s_es_ies = models.CharField(max_length=40)
+	ing = models.CharField(max_length=40)
+
