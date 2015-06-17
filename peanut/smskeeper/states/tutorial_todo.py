@@ -85,7 +85,7 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(
 			user, 
 			[
-				u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E",
+				u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do?",
 			], 
 			keeperNumber)
 
