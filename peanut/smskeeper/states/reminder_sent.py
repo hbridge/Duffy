@@ -40,7 +40,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			bestMatch, score = actions.getBestEntryMatch(user, msg)
 
-			if score > 80:
+			if score >= 70:
 				# We got a great hit to something so it was probably specific, just hide that one
 				bestMatch.hidden = True
 				bestMatch.save()
