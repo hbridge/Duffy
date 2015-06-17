@@ -9,9 +9,11 @@ import string
 import pytz
 import emoji
 
+from django.db.models import Q
+
 from models import Entry
 from smskeeper import keeper_constants
-from models import ZipData
+from models import ZipData, VerbData
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +25,7 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?", re.I)
-done_re = re.compile(r"\b(done|finished|called|bought|did|picked|went|got|had|completed)\b", re.I)
+done_re = re.compile(r"\b(picked)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -175,7 +177,15 @@ def isRemindCommand(msg):
 
 
 def isDoneCommand(msg):
-	return (done_re.search(msg.lower()) is not None)
+	# First look with local regex
+	if (done_re.search(msg.lower()) is not None):
+		return True
+
+	# Then look in db
+	for word in msg.split(' '):
+		dbWords = VerbData.objects.filter(Q(past=word) | Q(past_participle=word))
+		if len(dbWords) > 0:
+			return True
 
 
 def getFirstWord(msg):
