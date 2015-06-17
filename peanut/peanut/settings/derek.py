@@ -6,3 +6,5 @@ STATICFILES_DIRS = (
 	# Don't forget to use absolute paths, not relative paths.
 	'/home/derek/Duffy/peanut/static',
 )
+
+KEEPER_NUMBER_DICT = {0: "+12488178301", 1: "+12488178301"}
