@@ -48,7 +48,7 @@ def isFollowup(user, entry, nattyResult, reminderSent):
 			# This could be a new entry due to todos
 			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
 			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
-			if bestEntry.id == entry.id and score > 60:
+			if bestEntry and bestEntry.id == entry.id and score > 60:
 				logger.debug("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
 				return True
 			return False
