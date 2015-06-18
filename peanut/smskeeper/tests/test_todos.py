@@ -210,10 +210,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "send email to alex")
 		cliMsg.msg(self.testPhoneNumber, "poop in the woods")
 
-		# Now make sure if we type done, we get a nice response and it gets hidden
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "done with email")
-			self.assertIn("send email to alex", self.getOutput(mock))
+		cliMsg.msg(self.testPhoneNumber, "done with email")
 
 		entry = Entry.objects.get(text="send email to alex")
 		self.assertTrue(entry.hidden)
@@ -230,9 +227,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		async.processReminder(entry)
 
 		# Now make sure if we type done, we get a nice response and it gets hidden
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Done with call mom")
-			self.assertIn("call mom", self.getOutput(mock))
+		cliMsg.msg(self.testPhoneNumber, "Done with call mom")
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").first()
@@ -344,6 +339,26 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
 
+	# Make sure we clear pending even not after daily digest
+	def test_done_all_not_after_daily_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu next week")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me dancy dance tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Done with everything")
+
+		# Make sure right one is removed and not all
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertFalse(entries[0].hidden)
+		self.assertTrue(entries[1].hidden)
+		self.assertTrue(entries[2].hidden)
+
 	# Make sure we create a new entry instead of a followup
 	def test_stop_then_daily_digest(self, dateMock):
 		self.setupUser(dateMock)
@@ -386,4 +401,80 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEqual(entry.text, "get a resume")
+
+	# Make sure we fuzzy match after taking out the done with.
+	# If we didn't, then this test would fail
+	def test_reminder_removes_done_with_after(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("call charu", self.getOutput(mock))
+			self.assertIn("go poop", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done with charu")
+			self.assertIn("Nice", self.getOutput(mock))
+
+		# Make sure right one is removed and not all
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertTrue(entries[0].hidden)
+		self.assertFalse(entries[1].hidden)
+
+	# Make sure we fuzzy match after taking out the done with.
+	# If we didn't, then this test would fail
+	def test_done_with_and(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me dancy dance tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done with charu and poop")
+			self.assertIn("Nice", self.getOutput(mock))
+
+		# Make sure right ones are removed and not all
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertTrue(entries[0].hidden)
+		self.assertTrue(entries[1].hidden)
+		self.assertFalse(entries[2].hidden)
+
+	# Make sure we pause after an unknown phrase
+	def test_done_unknown_pauses(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu next week")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me dancy dance tomorrow")
+
+		self.setNow(dateMock, self.TUE_3PM)
+
+		# Some unkown phrasem, we shouldn't get anything back
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done with the other thing")
+			self.assertEquals("", self.getOutput(mock))
+
+		# Make sure nothing was hidden
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertFalse(entries[0].hidden)
+		self.assertFalse(entries[1].hidden)
+		self.assertFalse(entries[2].hidden)
+
+		# Makae sure we're now paused
+		self.assertTrue(self.getTestUser().paused)
+
 

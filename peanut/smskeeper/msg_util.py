@@ -244,6 +244,19 @@ def cleanedReminder(msg):
 	return cleaned
 
 
+# Returns a string which doesn't have the "done with" phrase in it
+def cleanedDoneCommand(msg):
+	match = done_re.search(msg.lower())
+	if match:
+		cleaned = msg[:match.start()] + msg[match.end():]
+	else:
+		cleaned = msg
+
+	cleaned = cleaned.replace("with", "").strip(string.punctuation).strip()
+
+	return cleaned
+
+
 # Returns a string which converts "my" to "your" and "i" to "you"
 def warpReminderText(msg):
 	i_words = re.compile(r'\bi\b', re.IGNORECASE)

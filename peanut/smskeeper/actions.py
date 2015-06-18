@@ -11,7 +11,7 @@ import django
 from smskeeper.models import Entry, Contact, User
 from smskeeper import analytics
 
-from common import slack_logger
+from common import slack_logger, date_util
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -159,8 +159,8 @@ def fetch(user, label, keeperNumber):
 			newStr = str(count) + ". " + entry.text + " " + otherUsersString
 
 			if entry.remind_timestamp:
-				if entry.remind_timestamp > datetime.datetime.now(pytz.utc):
-					localNow = datetime.datetime.now(user.getTimezone())
+				if entry.remind_timestamp > date_util.now(pytz.utc):
+					localNow = date_util.now(user.getTimezone())
 					futureTime = entry.remind_timestamp.astimezone(user.getTimezone())
 					newStr = "%s %s" % (newStr, msg_util.naturalize(localNow, futureTime))
 
@@ -430,39 +430,78 @@ def getBestEntryMatch(user, msg, entries=None):
 	return (bestMatch, bestScore)
 
 
-def done(user, msg, keeperNumber):
-	bestMatch, score = getBestEntryMatch(user, msg)
-
-	if score >= 50:
-		bestMatch.hidden = True
-		bestMatch.save()
-
-		logger.info("User %s: Done got msg '%s' and decided to hide entry '%s' (%s) due to score of %s" % (user.id, msg, bestMatch.text, bestMatch.id, score))
-
-		msgBack = u"Nice. \u2705  %s" % bestMatch.text
-		sms_util.sendMsg(user, msgBack, None, keeperNumber)
-	elif bestMatch:
-		logger.info("User %s: Done got msg '%s' and only got best score of %s with match '%s' (%s)" % (user.id, msg, score, bestMatch.text, bestMatch.id))
-
-		msgBack = "Sorry, I'm not sure which entry you mean"
-		sms_util.sendMsg(user, msgBack, None, keeperNumber)
+def clearAll(entries):
+	# Assume this is done, or done with and clear all
+	if len(entries) > 1:
+		msgBack = u"Nice! Checked those off "
 	else:
-		logger.info("User %s: Done got msg '%s' but didn't find any best entries (prob zero)" % (user.id, msg))
+		msgBack = u"Nice! Checked that off "
+
+	for entry in entries:
+		msgBack += u"\u2705"
+		entry.hidden = True
+		entry.save()
+	return msgBack
 
 
-def unknown(user, msg, keeperNumber):
-	now = datetime.datetime.now(pytz.timezone("US/Eastern"))
-	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_TEST_NUM and not settings.DEBUG:
+def done(user, msg, keeperNumber, justSentEntries=None):
+	msgBack = ""
+	cleanedDoneCommand = msg_util.cleanedDoneCommand(msg)
+
+	donePhrases = cleanedDoneCommand.split("and")
+
+	for phrase in donePhrases:
+		# This could be put into a regex
+		if phrase == "" or phrase == "all" or phrase == "everything" or phrase == "every thing" or phrase == "both":
+			if justSentEntries:
+				entries = justSentEntries
+			else:
+				entries = user_util.pendingTodoEntries(user)
+			msgBack = clearAll(entries)
+			logging.debug("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
+		else:
+			bestMatch, score = getBestEntryMatch(user, phrase)
+
+			if score >= 60:
+				# We got a great hit to something so it was probably specific, just hide that one
+				bestMatch.hidden = True
+				bestMatch.save()
+
+				logger.info("User %s: I think this is a done command decided to hide entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
+
+				msgBack = u"Nice! Checked that off \u2705"
+			elif bestMatch:
+				logger.info("User %s: I think this is a done command but couldn't find a good enough entry. pausing" % (user.id))
+				# If the score is low, it probably means we didn't match a specific one, so pause
+				paused = unknown(user, msg, keeperNumber, sendMsg=False)
+				if not paused:
+					msgBack = "Sorry, I'm not sure which entry you mean"
+			else:
+				# We didn't find anything at all, so just skip
+				pass
+
+	if msgBack:
+		sms_util.sendMsg(user, msgBack, None, keeperNumber)
+		return True
+	return False
+
+
+def unknown(user, msg, keeperNumber, sendMsg=True):
+	now = date_util.now(pytz.timezone("US/Eastern"))
+	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM and not settings.DEBUG:
 		user.paused = True
 		user.save()
 		postMsg = "User %s paused after: '%s'   @derek @aseem @henry" % (user.id, msg)
 		slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 		logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
+		ret = True
 	else:
-		sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
-		user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
-		user.save()
-		logger.info("For user %s I couldn't figure out '%s'" % (user.id, msg))
+		if sendMsg:
+			sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
+			user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
+			user.save()
+			logger.info("For user %s I couldn't figure out '%s'" % (user.id, msg))
+		ret = False
 	analytics.logUserEvent(
 		user,
 		"Sent Unknown Command",
@@ -471,4 +510,5 @@ def unknown(user, msg, keeperNumber):
 			"Paused": user.isPaused(),
 		}
 	)
+	return ret
 
