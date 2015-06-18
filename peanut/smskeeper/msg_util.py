@@ -25,7 +25,7 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?", re.I)
-done_re = re.compile(r"\b(picked|done|got)\b", re.I)
+done_re = re.compile(r"\b(done|finished|called|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -181,13 +181,14 @@ def isDoneCommand(msg):
 	if (done_re.search(msg.lower()) is not None):
 		return True
 
+	"""
 	# Then look in db
 	for word in msg.lower().split(' '):
 		word = word.strip(string.punctuation).strip()
 		dbWords = VerbData.objects.filter(Q(past=word) | Q(past_participle=word))
 		if len(dbWords) > 0:
 			return True
-
+	"""
 
 def getFirstWord(msg):
 	words = msg.split(' ')
