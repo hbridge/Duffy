@@ -48,6 +48,9 @@ class ReminderAdmin(admin.ModelAdmin):
 	def remind_timestamp_tz_aware(self, obj):
 		return obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
 
+	def product_id(self, obj):
+		return obj.creator.product_id
+
 	def remind_last_notified_tz_aware(self, obj):
 		if obj.remind_last_notified:
 			return obj.remind_last_notified.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
@@ -68,7 +71,7 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj.remind_timestamp = tz.localize(obj.remind_timestamp.replace(tzinfo=None))
 		obj.save()
 
-	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'remind_last_notified_tz_aware', 'added_tz_aware', 'hidden')
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'remind_last_notified_tz_aware', 'added_tz_aware', 'hidden', 'product_id', 'updated')
 	readonly_fields = ['added_tz_aware']
 	search_fields = ['creator__id']
 
