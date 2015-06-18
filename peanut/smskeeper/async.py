@@ -201,6 +201,11 @@ def sendDigestForUserId(userId):
 	if msg:
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
+		# Now set to reminder sent, incase they send back done message
+		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
+		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
+		user.save()
+
 
 @app.task
 def processDailyDigest(keeperNumber=None):
