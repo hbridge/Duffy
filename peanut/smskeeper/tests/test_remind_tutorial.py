@@ -24,7 +24,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
-			self.assertIn("tomorrow by 9am", self.getOutput(mock))
+			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertIn("I can also help you with other things", self.getOutput(mock))
 
 	@patch('common.date_util.utcnow')
@@ -43,7 +43,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future
-			self.assertIn("today by 6pm", self.getOutput(mock))
+			self.assertIn("tomorrow", self.getOutput(mock))
 
 			# This is the key here, make sure we have the extra message
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
@@ -83,7 +83,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have picked a time in the near future
-			self.assertIn("today", self.getOutput(mock))
+			self.assertIn("tomorrow", self.getOutput(mock))
 
 			# This is the key here, make sure we have the extra message
 			self.assertIn("If that time doesn't work", self.getOutput(mock))

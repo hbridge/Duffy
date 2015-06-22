@@ -63,6 +63,9 @@ FROM_UNRESOLVED_HANDLES_DATA_KEY = "fromUnresolvedHandles"
 ENTRY_IDS_DATA_KEY = "entryIDs"
 IMPLICIT_LABEL_STATE_DATA_KEY = "implicitLabel"
 
+IS_SNOOZE_KEY = "isFollowup"
+LAST_ACTION_KEY = "lastAction"
+
 ENTRY_ID_DATA_KEY = "entryId"
 FROM_TUTORIAL_KEY = "fromtutorial"
 

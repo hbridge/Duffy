@@ -344,13 +344,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu next week")
+
+		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+
+		self.setNow(dateMock, self.MON_10AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me dancy dance tomorrow")
 
 		self.setNow(dateMock, self.TUE_9AM)
-
 		cliMsg.msg(self.testPhoneNumber, "Done with everything")
 
 		# Make sure right one is removed and not all
@@ -408,8 +410,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
+
+		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
 
 		self.setNow(dateMock, self.TUE_9AM)
@@ -433,9 +436,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
+
+		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+
+		self.setNow(dateMock, self.MON_10AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me dancy dance tomorrow")
 
 		self.setNow(dateMock, self.TUE_9AM)
@@ -456,9 +462,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu next week")
+		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop tomorrow")
+		self.setNow(dateMock, self.MON_10AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me dancy dance tomorrow")
 
 		self.setNow(dateMock, self.TUE_3PM)

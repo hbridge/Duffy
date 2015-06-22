@@ -25,7 +25,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		return True
 	elif niceties.getNicety(msg):
 		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
-		if msg_util.isDoneCommand(msg) and user.product_id == 1:
+		if msg_util.isDoneCommand(msg):
 			logger.debug("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
 			return False
 		nicety = niceties.getNicety(msg)

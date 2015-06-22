@@ -43,11 +43,10 @@ def shouldRemindNow(entry):
 	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
 		return False
 
-	# If this is a todo, don't send a reminder if this is during the digest time, since it'll be
+	# Ddon't send a reminder if this is during the digest time, since it'll be
 	# included in that
-	if entry.creator.product_id == keeper_constants.TODO_PRODUCT_ID:
-		if isDigestTimeForUser(entry.creator, entry.remind_timestamp):
-			return False
+	if entry.creator.isDigestTime(entry.remind_timestamp):
+		return False
 
 	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
 		# If we're within 10 minutes, so alarm goes off at 9:50 if remind is at 10
@@ -80,60 +79,48 @@ def processReminder(entry):
 
 			# Only do fancy things like snooze if they've actually gone through the tutorial
 			if user.completed_tutorial:
-				if user.product_id == 1:
-					# Hack for now until we figure out better tips for
-					if tips.DONE_TIP1_ID not in tips.getSentTipIds(user):
-						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
-						# sms_util for sending list of msgs
-						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
-							time.sleep(2)
+				# Hack for now until we figure out better tips for
+				if tips.DONE_TIP1_ID not in tips.getSentTipIds(user):
+					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+					# sms_util for sending list of msgs
+					if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+						time.sleep(2)
 
-						tip = tips.tipWithId(tips.DONE_TIP1_ID)
-						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
-						tips.markTipSent(user, tip, isMini=True)
-					elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user):
-						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
-						# sms_util for sending list of msgs
-						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
-							time.sleep(2)
+					tip = tips.tipWithId(tips.DONE_TIP1_ID)
+					sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+					tips.markTipSent(user, tip, isMini=True)
+				elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user):
+					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+					# sms_util for sending list of msgs
+					if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+						time.sleep(2)
 
-						tip = tips.tipWithId(tips.DONE_TIP2_ID)
-						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
-						tips.markTipSent(user, tip, isMini=True)
-					elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user):
-						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
-						# sms_util for sending list of msgs
-						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
-							time.sleep(2)
+					tip = tips.tipWithId(tips.DONE_TIP2_ID)
+					sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+					tips.markTipSent(user, tip, isMini=True)
+				elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user):
+					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+					# sms_util for sending list of msgs
+					if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+						time.sleep(2)
 
-						tip = tips.tipWithId(tips.DONE_TIP3_ID)
-						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
-						tips.markTipSent(user, tip, isMini=True)
+					tip = tips.tipWithId(tips.DONE_TIP3_ID)
+					sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+					tips.markTipSent(user, tip, isMini=True)
+				elif tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
+					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
+					# sms_util for sending list of msgs
+					if keeper_constants.isRealKeeperNumber(entry.keeper_number):
+						time.sleep(2)
 
-					# Now set to reminder sent, incase they send back done message
-					user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
-					user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-					user.save()
-				else:
-					if tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
-						# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
-						# sms_util for sending list of msgs
-						if keeper_constants.isRealKeeperNumber(entry.keeper_number):
-							time.sleep(2)
+					tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
+					sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
+					tips.markTipSent(user, tip, isMini=True)
 
-						tip = tips.tipWithId(tips.SNOOZE_TIP_ID)
-						sms_util.sendMsg(user, tip.renderMini(), None, entry.keeper_number)
-						tips.markTipSent(user, tip, isMini=True)
-
-					# Now set to reminder sent, incase they send back snooze
-					user.setState(keeper_constants.STATE_REMIND, override=True)
-					user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-					user.setStateData("reminderSent", True)
-					user.save()
-
-	# For product id 0, hide after a reminder has occured
-	#if entry.creator.product_id == 0:
-	#	entry.hidden = True
+				# Now set to reminder sent, incase they send back done message
+				user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
+				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+				user.save()
 
 	entry.save()
 
@@ -146,17 +133,6 @@ def processAllReminders():
 		if shouldRemindNow(entry):
 			logger.info("Processing entry: %s for users %s" % (entry.id, entry.users.all()))
 			processReminder(entry)
-
-
-# Returns true if the user should be sent the digest at the given utc time
-def isDigestTimeForUser(user, utcTime):
-	localTime = utcTime.astimezone(user.getTimezone())
-
-	# By default only send if its 9 am
-	# Later on might make this per-user specific
-	if localTime.hour == keeper_constants.TODO_DIGEST_HOUR and localTime.minute == keeper_constants.TODO_DIGEST_MINUTE:
-		return True
-	return False
 
 
 def shouldIncludeEntry(entry):
@@ -183,7 +159,7 @@ def getDigestMessageForUser(user, entries, includeAll):
 		return "", []
 
 	for entry in pendingEntries:
-		if isDigestTimeForUser(user, entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
+		if user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 			entry.remind_last_notified = date_util.now(pytz.utc)
 			entry.save()
 		msg += u"\U0001F538 " + entry.text
@@ -229,7 +205,7 @@ def sendAllRemindersForUserId(userId):
 
 @app.task
 def processDailyDigest(keeperNumber=None):
-	entries = Entry.objects.filter(creator__product_id=1, label="#reminders", hidden=False)
+	entries = Entry.objects.filter(label="#reminders", hidden=False)
 	entriesByCreator = dict()
 
 	for entry in entries:
@@ -241,7 +217,7 @@ def processDailyDigest(keeperNumber=None):
 		if user.state == keeper_constants.STATE_STOPPED:
 			continue
 
-		if not isDigestTimeForUser(user, date_util.now(pytz.utc)):
+		if not user.isDigestTime(date_util.now(pytz.utc)):
 			continue
 
 		msg, pendingEntries = getDigestMessageForUser(user, entries, False)
@@ -256,7 +232,7 @@ def processDailyDigest(keeperNumber=None):
 			user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
 			user.save()
-		else:
+		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
 			sms_util.sendMsg(user, "Looks like I'm not tracking anything for you today. What do you want to get done today?", None, user.getKeeperNumber())
 
 

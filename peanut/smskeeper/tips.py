@@ -220,7 +220,7 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 
 
 def getKeeperVCard(user):
-	if user.product_id == 1:
+	if user.product_id == keeper_constants.TODO_PRODUCT_ID:
 		return keeper_constants.KEEPER_TODO_VCARD_URL
 	else:
 		return keeper_constants.KEEPER_VCARD_URL

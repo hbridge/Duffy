@@ -39,7 +39,7 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId=None):
 # keeper_constants.STATE_TUTORIAL_REMIND and keeper_constants.STATE_TUTORIAL_LIST
 def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	if not tutorialState:
-		tutorialState = keeper_constants.STATE_TUTORIAL_REMIND
+		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
 
 	if userToActivate.product_id == keeper_constants.TODO_PRODUCT_ID:
 		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
@@ -99,9 +99,6 @@ def shouldIncludeEntry(entry, includeAll):
 
 
 def pendingTodoEntries(user, entries=None, includeAll=False):
-	if user.product_id < 1:
-		return []
-
 	if entries is None:
 		entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
 

@@ -79,6 +79,20 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 	return True
 
 
+def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
+	if msg_util.isDoneCommand(msg):
+		logger.debug("User %s: I think '%s' is a done command" % (user.id, msg))
+		actions.done(user, msg, keeperNumber)
+	elif len(msg.split(' ')) <= 1:
+		logger.debug("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
+	else:
+		logger.debug("User %s: I think '%s' is something else so doing remind state" % (user.id, msg))
+		user.setState(keeper_constants.STATE_REMIND)
+		user.save()
+		return False  # Reprocess
+	return True
+
+
 #   Main logic for processing a message
 #   Pulled out so it can be called either from sms code or command line
 def process(user, msg, requestDict, keeperNumber):
@@ -90,6 +104,10 @@ def process(user, msg, requestDict, keeperNumber):
 	try:
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")
+		if user.product_id == keeper_constants.TODO_PRODUCT_ID:
+			return dealWithNormalMsg(user, msg, requestDict, keeperNumber)
+
+		# Below here is legacy stuff, lists, pictures
 		# STATE_REMIND
 		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg, user):
 			logger.debug("User %s: I think '%s' is a remind command" % (user.id, msg))
@@ -142,20 +160,7 @@ def process(user, msg, requestDict, keeperNumber):
 			logger.debug("User %s: I think '%s' is a add text command" % (user.id, msg))
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
 		else:  # catch all, we're not sure
-			if user.product_id == 1:
-				if msg_util.isDoneCommand(msg):
-					logger.debug("User %s: (product id 1) I think '%s' is a done command" % (user.id, msg))
-					actions.done(user, msg, keeperNumber)
-				elif len(msg.split(' ')) <= 1:
-					logger.debug("User %s: (product id 1) I think '%s' is a single word, skipping" % (user.id, msg))
-				else:
-					logger.debug("User %s: (product id 1) I think '%s' is something else so doing remind state" % (user.id, msg))
-					user.setState(keeper_constants.STATE_REMIND)
-					user.save()
-					return False  # Reprocess
-			# there's no label or media, and we don't know what to do with this, send generic info and put user in unknown state
-			else:
-				actions.unknown(user, msg, keeperNumber)
+			return dealWithNormalMsg(user, msg, requestDict, keeperNumber)
 
 		return True
 	except:

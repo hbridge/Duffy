@@ -195,18 +195,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "#hashtag")
 			self.assertIn("(1)", self.getOutput(mock))
 
-	def test_unknown_command(self):
-		self.setupUser(True, True)
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "new", cli=True)
-			# ensure we tell the user we don't understand
-			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, keeper_constants.REPORT_ISSUE_KEYWORD)
-			self.assertIn(keeper_constants.REPORT_ISSUE_CONFIRMATION, self.getOutput(mock))
-
 	# See if we get into the paused state when we enter an invalid command during daytime hours
 	@patch('common.date_util.utcnow')
 	def test_sets_paused_when_daytime(self, dateMock):
@@ -217,7 +205,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
-			cliMsg.msg(self.testPhoneNumber, "from-test")
+			cliMsg.msg(self.testPhoneNumber, "what is blah blah")
 			# ensure we got paused
 			self.assertTrue(self.getTestUser().isPaused())
 
@@ -233,7 +221,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_1AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "from-test", cli=True)
+			cliMsg.msg(self.testPhoneNumber, "what is blah blah", cli=True)
 
 			# And that we got a response
 			self.assertNotEqual("", self.getOutput(mock))

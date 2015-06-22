@@ -24,37 +24,52 @@ def validTime(nattyResult):
 	return nattyResult.hadDate or nattyResult.hadTime
 
 
+def getLastActionTime(user):
+	if user.getStateData(keeper_constants.LAST_ACTION_KEY):
+		return datetime.datetime.utcfromtimestamp(user.getStateData(keeper_constants.LAST_ACTION_KEY)).replace(tzinfo=pytz.utc)
+	else:
+		return None
+
+
+def unixTime(dt):
+	epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=pytz.utc)
+	delta = dt - epoch
+	return int(delta.total_seconds())
+
+
 # Returns True if this message has a valid time and it doesn't look like another remind command
 # If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup
 # Like "remind me again in 5 minutes"
 # If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
 # Otherwise False
-def isFollowup(user, entry, nattyResult, reminderSent):
+def isFollowup(user, entry, nattyResult):
+	now = date_util.now(pytz.utc)
 	if validTime(nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
-		if reminderSent and msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
-			query = nattyResult.queryWithoutTiming.lower()
-			if "again" in query or "snooze" in query:
-				return True
-			else:
-				return False
+		lastActionTime = getLastActionTime(user)
+
 		# Covers cases where there the cleanedText is "in" or "around"
-		elif len(cleanedText) <= 2 or cleanedText == "around":
+		if len(cleanedText) <= 2:
+			logger.debug("User %s: I think this is a followup to %s bc its less than 2 letters" % (user.id, entry.id))
 			return True
 		# If they write "no, remind me sunday instead" then want to process as followup
 		elif msg_util.startsWithNo(nattyResult.queryWithoutTiming):
+			logger.debug("User %s: I think this is a followup to %s bc it starts with a No" % (user.id, entry.id))
 			return True
-		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
+		elif user.getStateData(keeper_constants.IS_SNOOZE_KEY):
+			logger.debug("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
+			return True
+		# If we were just editing this entry and the query has only a couple words
+		elif lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=10) and len(cleanedText.split(' ')) < 4:
+			logger.debug("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
+			return True
+		else:
+			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
 			# This could be a new entry due to todos
 			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
-			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
 			if bestEntry and bestEntry.id == entry.id and score > 60:
 				logger.debug("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
 				return True
-			return False
-		# Regular reminders will just assume that if it doesn't have "remind me" in it then its followup
-		elif not msg_util.isRemindCommand(nattyResult.queryWithoutTiming):
-			return True
 
 	return False
 
@@ -162,10 +177,7 @@ def getBestNattyResult(nattyResults):
 	return nattyResults[0]
 
 
-def process(user, msg, requestDict, keeperNumber):
-	if dealWithTutorialEdgecases(user, msg, keeperNumber):
-		return True
-
+def getNattyResult(user, msg):
 	# Deal with legacy stuff
 	if '#remind' in msg:
 		msg = msg.replace("#reminder", "remind me")
@@ -181,6 +193,10 @@ def process(user, msg, requestDict, keeperNumber):
 	if not nattyResult.hadTime:
 		nattyResult = dealWithDefaultTime(user, nattyResult)
 
+	return nattyResult
+
+
+def getPreviousEntry(user):
 	entry = None
 	if user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
 		entryId = int(user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY))
@@ -188,6 +204,16 @@ def process(user, msg, requestDict, keeperNumber):
 			entry = Entry.objects.get(id=entryId)
 		except Entry.DoesNotExist:
 			pass
+
+	return entry
+
+
+def process(user, msg, requestDict, keeperNumber):
+	if dealWithTutorialEdgecases(user, msg, keeperNumber):
+		return True
+
+	nattyResult = getNattyResult(user, msg)
+	entry = getPreviousEntry(user)
 
 	# Create a new reminder
 	if not entry:
@@ -198,9 +224,12 @@ def process(user, msg, requestDict, keeperNumber):
 
 		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
 
+		"""
+		Temp comment out by Derek due to taking out shared reminders
 		# See if the entry didn't create. This means there's unresolved handes
 		if not entry:
 			return False  # Send back for reprocessing by unknown handles state
+		"""
 
 		sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
@@ -223,6 +252,8 @@ def process(user, msg, requestDict, keeperNumber):
 		# See if what they entered is a valid time and if so, assign it.
 		# If not, kick out to normal mode and re-process
 
+		"""
+		Temp comment out by Derek due to taking out shared reminders
 		if user.getStateData("fromUnresolvedHandles"):
 			logger.debug("User %s: Going to deal with unresolved handles for entry %s and user %s" % (user.id, entry.id, user.id))
 
@@ -243,15 +274,13 @@ def process(user, msg, requestDict, keeperNumber):
 			else:
 				# This message could be a correction or something else.  Might need more logic here
 				sendCompletionResponse(user, entry, False, keeperNumber)
-		elif isFollowup(user, entry, nattyResult, user.getStateData("reminderSent")):
+		"""
+		if isFollowup(user, entry, nattyResult):
+			isSnooze = user.getStateData(keeper_constants.IS_SNOOZE_KEY)
 			logger.debug("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
-			isSnooze = user.getStateData("reminderSent")
 			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)
 			sendCompletionResponse(user, entry, False, keeperNumber)
 
-			if isSnooze:
-				entry.hidden = False
-				entry.save()
 			return True
 		else:
 			# Send back for reprocessing
@@ -259,6 +288,8 @@ def process(user, msg, requestDict, keeperNumber):
 			user.save()
 			return False
 
+	user.setStateData(keeper_constants.LAST_ACTION_KEY, unixTime(date_util.now(pytz.utc)))
+	user.save()
 	return True
 
 
@@ -285,6 +316,8 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 
 	logger.debug("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))
 
+	"""
+	Temp remove due to pausing shared reminders
 	# Don't do any of this logic in the tutorial state, shouldn't be correct
 	if not isTutorial(user):
 		handle = msg_util.getReminderHandle(nattyResult.queryWithoutTiming)  # Grab "me" or "mom"
@@ -307,7 +340,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 				logger.debug("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
 				# We found the handle, so share the entry with the user.
 				entry.users.add(contact.target)
-
+	"""
 	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
 
 	analytics.logUserEvent(
@@ -342,6 +375,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 	logger.debug("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
 	entry.remind_timestamp = newDate.astimezone(pytz.utc)
 	entry.remind_last_notified = None
+	entry.hidden = False
 
 	if entry.orig_text:
 		try:
@@ -373,7 +407,7 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
 
 	# Include time if old product or if its not a default time
-	includeTime = (user.product_id == 0 or (user.product_id == 1 and not (tzAwareDate.hour == 9 and tzAwareDate.minute == 0)))
+	includeTime = not user.isDigestTime(entry.remind_timestamp)
 
 	# Get the text liked "tomorrow" or "Sat at 5pm"
 	userMsg = msg_util.naturalize(date_util.now(user.getTimezone()), tzAwareDate, includeTime=includeTime)
@@ -407,7 +441,7 @@ def isReminderHourSuspicious(hourForUser):
 def getDefaultTime(user, isToday=False):
 	userNow = date_util.now(user.getTimezone())
 
-	if user.product_id == 0 or (user.product_id == 1 and isToday):
+	if isToday:
 		# If before 2 pm, remind at 6 pm
 		if userNow.hour < 14:
 			replaceTime = userNow.replace(hour=18, minute=0, second=0)
