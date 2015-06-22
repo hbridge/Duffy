@@ -5,6 +5,7 @@ import datetime
 import pytz
 
 from django.db import models
+from django.db.models import Q
 from django.utils.html import format_html
 
 from common import api_util
@@ -292,24 +293,22 @@ class Entry(models.Model):
 
 	hidden = models.BooleanField(default=False)
 
-	keeper_number = models.CharField(max_length=100, null=True, blank=True)
-
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 
 	@classmethod
 	def fetchAllLabels(cls, user, hidden=False):
 		if hidden is None:
-			entries = Entry.objects.filter(users__in=[user])
+			entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user))
 		else:
-			entries = Entry.objects.filter(users__in=[user], hidden=hidden)
+			entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user)).filter(hidden=hidden)
 
 		labels = entries.values_list("label", flat=True).distinct()
 		return labels
 
 	@classmethod
 	def fetchFirstLabel(cls, user):
-		entries = Entry.objects.filter(users__in=[user], hidden=False).order_by("added")[:1]
+		entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user)).filter(hidden=False).order_by("added")[:1]
 		if len(entries) > 0:
 			return entries[0].label
 		else:
@@ -317,7 +316,7 @@ class Entry(models.Model):
 
 	@classmethod
 	def fetchEntries(cls, user, label=None, hidden=False, orderByString="added"):
-		entries = Entry.objects.filter(users__in=[user]).order_by(orderByString)
+		entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user)).order_by(orderByString)
 		if hidden is not None:
 			entries = entries.filter(hidden=hidden)
 		if label:
@@ -326,7 +325,7 @@ class Entry(models.Model):
 
 	@classmethod
 	def createEntry(cls, user, keeper_number, label, text, img_url=None, remind_timestamp=None):
-		entry = Entry.objects.create(creator=user, label=label, keeper_number=keeper_number, text=text, img_url=img_url, remind_timestamp=remind_timestamp)
+		entry = Entry.objects.create(creator=user, label=label, text=text, img_url=img_url, remind_timestamp=remind_timestamp)
 		entry.users.add(user)
 		return entry
 
