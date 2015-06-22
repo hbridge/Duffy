@@ -490,7 +490,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Btw, you can always snooze", self.getOutput(mock))
+			self.assertIn("Just let me know when you're done", self.getOutput(mock))
 
 		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
@@ -498,7 +498,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("btw, let me know when you're done", self.getOutput(mock))
+			self.assertIn("Let me know when you're done", self.getOutput(mock))
 
 		self.setNow(dateMock, self.MON_10AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
@@ -506,13 +506,22 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("btw, let me know when you're done", self.getOutput(mock))
+			self.assertIn("Btw, let me know when you're done", self.getOutput(mock))
 
-		self.setNow(dateMock, self.TUE_9AM)
+		self.setNow(dateMock, self.TUE_8AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop2 in 1 minute")
 		entry = Entry.objects.filter(label="#reminders").last()
 		# Make sure we grabbed the correct reminder
 		self.assertEqual(entry.text, "go poop2")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertIn("Btw, you can always snooze", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop3 in 1 minute")
+		entry = Entry.objects.filter(label="#reminders").last()
+		# Make sure we grabbed the correct reminder
+		self.assertEqual(entry.text, "go poop3")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
 			self.assertNotIn("Btw, you can always snooze", self.getOutput(mock))

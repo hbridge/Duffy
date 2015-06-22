@@ -41,8 +41,8 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	if not tutorialState:
 		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
 
-	if userToActivate.product_id == keeper_constants.TODO_PRODUCT_ID:
-		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
+	if userToActivate.product_id == keeper_constants.REMINDER_PRODUCT_ID:
+		tutorialState = keeper_constants.STATE_TUTORIAL_REMIND
 
 	userToActivate.setActivated(True, tutorialState=tutorialState)
 
