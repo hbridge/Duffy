@@ -159,8 +159,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_done_only_evals_recent_reminder(self, dateMock):
 		self.setupUser(dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "text dan")
-		cliMsg.msg(self.testPhoneNumber, "call court")
+		cliMsg.msg(self.testPhoneNumber, "a text dan")
+		cliMsg.msg(self.testPhoneNumber, "a call court")
 
 		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
 
@@ -483,5 +483,17 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Makae sure we're now paused
 		self.assertTrue(self.getTestUser().paused)
+
+	# Make sure we fuzzy match after taking out the done with.
+	# If we didn't, then this test would fail
+	def test_not_real_followup(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "great job")
+			self.assertEqual("", self.getOutput(mock))
 
 

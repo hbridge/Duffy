@@ -360,7 +360,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "#remind poop")
+			cliMsg.msg(self.testPhoneNumber, "remind me poop")
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
 		origEntry = Entry.objects.get(label="#reminders")
