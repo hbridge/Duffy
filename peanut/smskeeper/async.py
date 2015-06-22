@@ -146,15 +146,14 @@ def shouldIncludeEntry(entry):
 	return False
 
 
-def getDigestMessageForUser(user, entries, includeAll):
+def getDigestMessageForUser(user, pendingEntries, isAll):
 	now = date_util.now(pytz.utc)
 
-	if not includeAll:
+	if not isAll:
 		msg = u"Your tasks for today: \U0001F4DD\n"
 	else:
 		msg = u"Your current tasks: \U0001F4DD\n"
 
-	pendingEntries = user_util.pendingTodoEntries(user, entries, includeAll)
 	if len(pendingEntries) == 0:
 		return "", []
 
@@ -170,14 +169,15 @@ def getDigestMessageForUser(user, entries, includeAll):
 
 	msg += "\nWant me to check tasks off this list? Just tell me like 'Done with calling Mom'"
 
-	return msg, pendingEntries
+	return msg
 
 
 @app.task
 def sendDigestForUserId(userId):
 	user = User.objects.get(id=userId)
 
-	msg, pendingEntries = getDigestMessageForUser(user, None, False)
+	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
+	msg = getDigestMessageForUser(user, pendingEntries, False)
 
 	if msg:
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
@@ -192,7 +192,8 @@ def sendDigestForUserId(userId):
 def sendAllRemindersForUserId(userId):
 	user = User.objects.get(id=userId)
 
-	msg, pendingEntries = getDigestMessageForUser(user, None, True)
+	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
+	msg = getDigestMessageForUser(user, pendingEntries, True)
 
 	if msg:
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
@@ -204,36 +205,35 @@ def sendAllRemindersForUserId(userId):
 
 
 @app.task
-def processDailyDigest(keeperNumber=None):
-	entries = Entry.objects.filter(label="#reminders", hidden=False)
-	entriesByCreator = dict()
-
-	for entry in entries:
-		if entry.creator not in entriesByCreator:
-			entriesByCreator[entry.creator] = list()
-		entriesByCreator[entry.creator].append(entry)
-
-	for user, entries in entriesByCreator.iteritems():
+def processDailyDigest():
+	for user in User.objects.all():
 		if user.state == keeper_constants.STATE_STOPPED:
 			continue
 
 		if not user.isDigestTime(date_util.now(pytz.utc)):
 			continue
 
-		msg, pendingEntries = getDigestMessageForUser(user, entries, False)
+		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
-		if not keeperNumber:
-			keeperNumber = user.getKeeperNumber()
-
-		if msg:
-			sms_util.sendMsg(user, msg, None, keeperNumber)
+		if len(pendingEntries) > 0:
+			msg = getDigestMessageForUser(user, pendingEntries, False)
+			sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
 			# Now set to reminder sent, incase they send back done message
 			user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
 			user.save()
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
-			sms_util.sendMsg(user, "Looks like I'm not tracking anything for you today. What do you want to get done today?", None, user.getKeeperNumber())
+			userNow = date_util.now(user.getTimezone())
+			# TODO(Derek): Move this back to Monday.  Don't forget to change the days 4-5 as well
+			if userNow.weekday() == 1:  # Tuesday
+				pendingThisWeek = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
+				if len(pendingThisWeek) == 0:
+					sms_util.sendMsg(user, "Looks like I'm not tracking anything for you this week. What do you want to get done this week?", None, user.getKeeperNumber())
+			elif userNow.weekday() == 4:  # Friday
+				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
+				if len(pendingThisWeekend) == 0:
+					sms_util.sendMsg(user, "Looks like I'm not tracking anything for you. What do you want to get done this weekend?", None, user.getKeeperNumber())
 
 
 @app.task
