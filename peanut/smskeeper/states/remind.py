@@ -208,10 +208,10 @@ def getPreviousEntry(user):
 	return entry
 
 
-# If we don't have a valid time and its less than 3 words, don't count as a valid entry
+# If we don't have a valid time and its less than 4 words, don't count as a valid entry
 def looksLikeValidEntry(msg, nattyResult):
 	words = msg.split(' ')
-	if not validTime(nattyResult) and len(words) < 3 and msg_util.isOkPhrase(msg):
+	if not validTime(nattyResult) and len(words) < 4 and msg_util.isOkPhrase(msg):
 		return False
 	return True
 
@@ -225,6 +225,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	# If this doesn't look valid then ignore
 	if not looksLikeValidEntry(msg, nattyResult):
+		logger.debug("User %s: Skipping msg '%s' because it doesn't look valid to me" % (user.id, msg))
 		return True
 
 	# Create a new reminder

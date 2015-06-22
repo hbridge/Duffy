@@ -496,4 +496,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "nothing blah")
 			self.assertEqual("", self.getOutput(mock))
 
+	# Make sure we fuzzy match after taking out the done with.
+	# If we didn't, then this test would fail
+	def test_short_valid_msg(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "clean room")
+			self.assertIn("tomorrow", self.getOutput(mock))
 
