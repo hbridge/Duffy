@@ -84,7 +84,7 @@ var UserTable = React.createClass({
     var renderLinks = function(user) {
       return (
         <span>
-        <a target="_blank" href={ user.history }>history</a> | <a href={"/"+user.key+"?internal=1"}>app</a>
+        <a target="_blank" href={ user.history }>history</a> | <a target="_blank" href={"/"+user.key+"?internal=1"}>app</a>
         </span>
       );
     }
