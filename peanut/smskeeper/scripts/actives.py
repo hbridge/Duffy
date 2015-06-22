@@ -7,9 +7,9 @@ dateFilter = date.today() - timedelta(days=7)
 activatedUsersAll= User.objects.filter(activated__lt=dateFilter)
 activatedUsersFB = User.objects.filter(activated__lt=dateFilter, signup_data_json__icontains='fb')
 
-usersAll = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__activated__lt=dateFilter, user__completed_tutorial=True).distinct()
+usersAll = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__activated__lt=dateFilter, user__completed_tutorial=True).exclude(user__state=keeper_constants.STATE_STOPPED).distinct()
 
-usersFB = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__completed_tutorial=True, user__in=activatedUsersFB, user__signup_data_json__icontains='fb').distinct()
+usersFB = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__completed_tutorial=True, user__in=activatedUsersFB, user__signup_data_json__icontains='fb').exclude(user__state=keeper_constants.STATE_STOPPED).distinct()
 
 usersStopped = User.objects.filter(activated__lt=dateFilter, state=keeper_constants.STATE_STOPPED)
 
