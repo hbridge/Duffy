@@ -299,7 +299,7 @@ def help(user, msg, keeperNumber):
 		}
 	)
 
-	user.setState(keeper_constants.STATE_HELP)
+	#user.setState(keeper_constants.STATE_HELP)
 
 
 def setName(user, msg, keeperNumber):

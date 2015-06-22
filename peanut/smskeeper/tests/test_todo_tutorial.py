@@ -31,7 +31,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call jesus tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("morning digest", self.getOutput(mock))
+			self.assertIn("digest of things", self.getOutput(mock))
 
 	def test_tutorial_remind_nicety(self, dateMock):
 		self.setupUser(dateMock)

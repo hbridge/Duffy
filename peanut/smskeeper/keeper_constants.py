@@ -91,9 +91,14 @@ REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
 
-TELL_ME_MORE = "I can help you remember lists of things. Send me anything like 'add Jurassic Park to my movies list' or 'add pasta, sauce, cheese to shopping'."
-
 HELP_MESSAGES = [
+	u"I'm an automated digital assistant. I can remind you when you need to get things done.",
+	u"Send me what you need to get done (and when) and I'll txt you back at the right time.",
+	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
+]
+
+
+HELP_MESSAGES_OLD = [
 	u'There are a few things I can help you with. \U0001F4AA' + "\n" +
 	u"I can remember lists \U0001F4DD of things for you, and I can send you reminders at a specific time \u23F0",
 	u"What would you like to learn more about? Lists or reminders?"

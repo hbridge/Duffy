@@ -91,7 +91,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 
 		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
-		sms_util.sendMsg(user, u"Btw, I'll send you a morning digest of things you need to get done that day.", None, keeperNumber, eta=delayedTime)
+		sms_util.sendMsg(user, u"Oh and I'll also send you a morning \U0001F304 digest of things you need to get done that day.", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
 
 		entryId = user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)

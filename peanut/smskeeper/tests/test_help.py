@@ -7,6 +7,16 @@ import test_base
 
 
 class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
+
+
+	def test_help(self):
+		self.setupUser(True, True)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "huh?")
+			self.assertIn(keeper_constants.HELP_MESSAGES[0], self.getOutput(mock))
+
+	# commenting all the original test cases out, since Help is now stateless and simpler
+	'''
 	def test_help(self):
 		self.setupUser(True, True)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -37,7 +47,7 @@ class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "add X to Y")
 			Entry.objects.get(creator=self.user)
-
+	
 	def test_help_add_list_from_help(self):
 		self.setupUser(True, True)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -64,3 +74,4 @@ class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "lists")
 			self.assertIn("barbaz", self.getOutput(mock))
+	'''
