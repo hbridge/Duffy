@@ -170,21 +170,26 @@ def shouldIncludeEntry(entry):
 	return False
 
 
-def getDigestMessageForUser(user, entries):
+def getDigestMessageForUser(user, entries, includeAll):
 	now = date_util.now(pytz.utc)
-	msg = "Your things for today:\n"
-	pendingEntries = user_util.pendingTodoEntries(user, entries)
+
+	if not includeAll:
+		msg = "Your things for today:\n"
+	else:
+		msg = "Your current tasks:\n"
+
+	pendingEntries = user_util.pendingTodoEntries(user, entries, includeAll)
 	if len(pendingEntries) == 0:
 		return "", []
 
 	for entry in pendingEntries:
-		if isDigestTimeForUser(user, entry.remind_timestamp):
+		if isDigestTimeForUser(user, entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 			entry.remind_last_notified = date_util.now(pytz.utc)
 			entry.save()
 		msg += entry.text
 
 		if entry.remind_timestamp > now:
-			msg += " (%s)" % msg_util.getNaturalTime(entry.remind_timestamp.astimezone(user.getTimezone()))
+			msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
 		msg += "\n"
 
 	msg += "\nLet me know, when you are done with a task. Like 'Done with calling Mom'"
@@ -196,7 +201,22 @@ def getDigestMessageForUser(user, entries):
 def sendDigestForUserId(userId):
 	user = User.objects.get(id=userId)
 
-	msg, pendingEntries = getDigestMessageForUser(user, None)
+	msg, pendingEntries = getDigestMessageForUser(user, None, False)
+
+	if msg:
+		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
+
+		# Now set to reminder sent, incase they send back done message
+		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
+		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
+		user.save()
+
+
+@app.task
+def sendAllRemindersForUserId(userId):
+	user = User.objects.get(id=userId)
+
+	msg, pendingEntries = getDigestMessageForUser(user, None, True)
 
 	if msg:
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
@@ -224,7 +244,7 @@ def processDailyDigest(keeperNumber=None):
 		if not isDigestTimeForUser(user, date_util.now(pytz.utc)):
 			continue
 
-		msg, pendingEntries = getDigestMessageForUser(user, entries)
+		msg, pendingEntries = getDigestMessageForUser(user, entries, False)
 
 		if not keeperNumber:
 			keeperNumber = user.getKeeperNumber()

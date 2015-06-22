@@ -456,7 +456,8 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 			if justSentEntries:
 				entries = justSentEntries
 			else:
-				entries = user_util.pendingTodoEntries(user)
+				# Do we want to include all here?
+				entries = user_util.pendingTodoEntries(user, includeAll=False)
 			msgBack = clearAll(entries)
 			logging.debug("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
 		else:

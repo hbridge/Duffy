@@ -87,18 +87,18 @@ def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
 	)
 
 
-def shouldIncludeEntry(entry):
+def shouldIncludeEntry(entry, includeAll):
 	# Cutoff time is 23 hours ahead, could be changed later to be more tz aware
 	localNow = date_util.now(entry.creator.getTimezone())
 	# Cutoff time is midnight local time
 	cutoffTime = (localNow + datetime.timedelta(days=1)).replace(hour=0, minute=0)
 
-	if not entry.hidden and entry.remind_timestamp < cutoffTime:
+	if not entry.hidden and (includeAll or entry.remind_timestamp < cutoffTime):
 		return True
 	return False
 
 
-def pendingTodoEntries(user, entries=None):
+def pendingTodoEntries(user, entries=None, includeAll=False):
 	if user.product_id < 1:
 		return []
 
@@ -107,7 +107,9 @@ def pendingTodoEntries(user, entries=None):
 
 	results = list()
 	for entry in entries:
-		if shouldIncludeEntry(entry):
+		if shouldIncludeEntry(entry, includeAll):
 			results.append(entry)
+
+	results = sorted(results, key=lambda x: x.remind_timestamp)
 
 	return results
