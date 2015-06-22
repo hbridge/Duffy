@@ -159,8 +159,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_done_only_evals_recent_reminder(self, dateMock):
 		self.setupUser(dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "a text dan")
-		cliMsg.msg(self.testPhoneNumber, "a call court")
+		cliMsg.msg(self.testPhoneNumber, "text dan")
+		cliMsg.msg(self.testPhoneNumber, "call court")
 
 		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
 
@@ -493,7 +493,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "great job")
+			cliMsg.msg(self.testPhoneNumber, "nothing blah")
 			self.assertEqual("", self.getOutput(mock))
 
 

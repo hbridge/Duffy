@@ -35,6 +35,8 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
+ok_words = ["nothing", "ok", "okay"]
+
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
 
@@ -167,6 +169,9 @@ def zipResultToTimeZone(zipDataResult):
 		return pytz.utc
 
 
+def cleanedMsg(msg):
+	return msg.strip(string.punctuation).strip().lower()
+
 tipRE = re.compile('.*send me tips')
 def isSetTipFrequencyCommand(msg):
 	return not hasLabel(msg) and tipRE.match(msg.strip().lower())
@@ -174,6 +179,15 @@ def isSetTipFrequencyCommand(msg):
 
 def isRemindCommand(msg):
 	return (reminder_re.search(msg.lower()) is not None)
+
+
+def isOkPhrase(msg):
+	words = cleanedMsg(msg).split(' ')
+	for word in words:
+		if word in ok_words:
+			return True
+
+	return False
 
 
 def isDoneCommand(msg):

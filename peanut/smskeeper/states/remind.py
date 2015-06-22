@@ -209,9 +209,9 @@ def getPreviousEntry(user):
 
 
 # If we don't have a valid time and its less than 3 words, don't count as a valid entry
-def looksLikeNewEntry(msg, nattyResult):
+def looksLikeValidEntry(msg, nattyResult):
 	words = msg.split(' ')
-	if not validTime(nattyResult) and len(words) < 3:
+	if not validTime(nattyResult) and len(words) < 3 and msg_util.isOkPhrase(msg):
 		return False
 	return True
 
@@ -223,6 +223,10 @@ def process(user, msg, requestDict, keeperNumber):
 	nattyResult = getNattyResult(user, msg)
 	entry = getPreviousEntry(user)
 
+	# If this doesn't look valid then ignore
+	if not looksLikeValidEntry(msg, nattyResult):
+		return True
+
 	# Create a new reminder
 	if not entry:
 		sendFollowup = False
@@ -230,32 +234,31 @@ def process(user, msg, requestDict, keeperNumber):
 		if not validTime(nattyResult) or isTutorial(user):
 			sendFollowup = True
 
-		if looksLikeNewEntry(msg, nattyResult):
-			entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
+		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
 
-			"""
-			Temp comment out by Derek due to taking out shared reminders
-			# See if the entry didn't create. This means there's unresolved handes
-			if not entry:
-				return False  # Send back for reprocessing by unknown handles state
-			"""
+		"""
+		Temp comment out by Derek due to taking out shared reminders
+		# See if the entry didn't create. This means there's unresolved handes
+		if not entry:
+			return False  # Send back for reprocessing by unknown handles state
+		"""
 
-			sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+		sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
-			# If we came from the tutorial, then set state and return False so we go back for reprocessing
-			if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
-				# Note, some behind the scene magic sets the state and state_data for us.  So this call
-				# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
-				user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
-				# We set this so it knows what entry was created
-				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-				user.save()
-				return False
-
-			# Always save the entryId state since we always come back into this state.
-			# If they don't enter timing info then we kick out
+		# If we came from the tutorial, then set state and return False so we go back for reprocessing
+		if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
+			# Note, some behind the scene magic sets the state and state_data for us.  So this call
+			# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
+			user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
+			# We set this so it knows what entry was created
 			user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 			user.save()
+			return False
+
+		# Always save the entryId state since we always come back into this state.
+		# If they don't enter timing info then we kick out
+		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+		user.save()
 	else:
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.
