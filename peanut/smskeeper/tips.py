@@ -62,7 +62,7 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		WEB_APP_TIP_ID,
-		"Ahoy :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL: It works on your :computer: too!",
+		"Hi :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL: It works on your :computer: too!",
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
@@ -76,28 +76,23 @@ SMSKEEPER_TIPS = [
 	# 	"Hey :NAME:! I can help you keep track of stuff with friends. For example, type: 'Avengers #movie @Bob' to start a list of movies to watch with Bob."
 	# ),
 	KeeperTip(
-		VOICE_TIP_ID,
-		"If you hate typing, :NAME:, you can text me without typing a word! On an iPhone, try holding down your home button and saying 'text Keeper remind me to call Mom this weekend'",
-		type=FULL_TIP_TYPE
-	),
-	KeeperTip(
 		SNOOZE_TIP_ID,
-		"btw, you can always snooze a reminder by saying 'snooze 5 mins' or 'snooze 9pm'",
+		"Btw, you can always snooze a reminder by saying 'snooze for 5 mins' or 'snooze till 9pm'",
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP1_ID,
-		"btw, let me know when you're done",
+		"Btw, let me know when you're done",
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP2_ID,
-		"btw, let me know when you're done",
+		"Btw, let me know when you're done",
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP3_ID,
-		"btw, let me know when you're done",
+		"Btw, let me know when you're done",
 		type=MINI_TIP_TYPE
 	),
 ]

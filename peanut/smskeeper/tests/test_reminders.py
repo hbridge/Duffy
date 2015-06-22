@@ -486,7 +486,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the snooze tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("btw, you can always snooze", self.getOutput(mock))
+			self.assertIn("Btw, you can always snooze", self.getOutput(mock))
 
 			# Make sure this isn't set... mini tips shouldn't set this
 			self.assertFalse(self.getTestUser().last_tip_sent)
@@ -501,7 +501,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(entry.text, "go poop2")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertNotIn("btw, you can always snooze", self.getOutput(mock))
+			self.assertNotIn("Btw, you can always snooze", self.getOutput(mock))
 
 	def test_shared_reminder_regex(self, dateMock):
 		handle = msg_util.getReminderHandle("remind mom to take her pill tomorrow morning")
