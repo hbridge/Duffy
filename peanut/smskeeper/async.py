@@ -233,7 +233,7 @@ def processDailyDigest():
 			elif userNow.weekday() == 4:  # Friday
 				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
 				if len(pendingThisWeekend) == 0:
-					sms_util.sendMsg(user, "Looks like I'm not tracking anything for you. What do you want to get done this weekend?", None, user.getKeeperNumber())
+					sms_util.sendMsg(user, "Looks like I'm not tracking anything for you this weekend. What do you want to get done this weekend?", None, user.getKeeperNumber())
 
 
 @app.task
