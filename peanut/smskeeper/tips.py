@@ -39,6 +39,7 @@ PHOTOS_TIP_ID = "photos"
 SHARING_TIP_ID = "sharing"
 VOICE_TIP_ID = "voice"
 VCARD_TIP_ID = "vcard"
+DONE_ALL_TIP_ID = "done-all"
 
 SNOOZE_TIP_ID = "mini-snooze"
 
@@ -56,21 +57,21 @@ SMSKEEPER_TIPS = [
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
-		REMINDER_TIP_ID,
-		"Hi :NAME:. Just an FYI that I can set reminders for you. For example: 'remind me to call mom tomorrow at 5pm')",
-		type=FULL_TIP_TYPE
-	),
-	KeeperTip(
 		WEB_APP_TIP_ID,
 		"Hi :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL: It works on your :computer: too!",
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
-		PHOTOS_TIP_ID,
-		u"I \U0001F499 pics!",
-		type=FULL_TIP_TYPE,
-		mediaUrl=keeper_constants.PHOTOS_TIP_URL
+		DONE_ALL_TIP_ID,
+		"Pro tip: You can also say 'Done with everything' to mark all items as done.",
+		type=MINI_TIP_TYPE
 	),
+	#KeeperTip(
+	#	PHOTOS_TIP_ID,
+	#	u"I \U0001F499 pics!",
+	#	type=FULL_TIP_TYPE,
+	#	mediaUrl=keeper_constants.PHOTOS_TIP_URL
+	#),
 	# KeeperTip(
 	# 	SHARING_TIP_ID,
 	# 	"Hey :NAME:! I can help you keep track of stuff with friends. For example, type: 'Avengers #movie @Bob' to start a list of movies to watch with Bob."
@@ -82,12 +83,12 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		DONE_TIP1_ID,
-		"Btw, let me know when you're done",
+		"Just let me know when you're done and I'll check it off your list",
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP2_ID,
-		"Btw, let me know when you're done",
+		"Let me know when you're done and I'll check it off for you",
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(

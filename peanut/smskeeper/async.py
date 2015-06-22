@@ -174,9 +174,9 @@ def getDigestMessageForUser(user, entries, includeAll):
 	now = date_util.now(pytz.utc)
 
 	if not includeAll:
-		msg = "Your things for today:\n"
+		msg = u"Your tasks for today: \U0001F4DD\n"
 	else:
-		msg = "Your current tasks:\n"
+		msg = u"Your current tasks: \U0001F4DD\n"
 
 	pendingEntries = user_util.pendingTodoEntries(user, entries, includeAll)
 	if len(pendingEntries) == 0:
@@ -186,13 +186,13 @@ def getDigestMessageForUser(user, entries, includeAll):
 		if isDigestTimeForUser(user, entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 			entry.remind_last_notified = date_util.now(pytz.utc)
 			entry.save()
-		msg += entry.text
+		msg += u"\U0001F538 " + entry.text
 
 		if entry.remind_timestamp > now:
 			msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
 		msg += "\n"
 
-	msg += "\nLet me know, when you are done with a task. Like 'Done with calling Mom'"
+	msg += "\nWant me to check tasks off this list? Just tell me like 'Done with calling Mom'"
 
 	return msg, pendingEntries
 
@@ -257,7 +257,7 @@ def processDailyDigest(keeperNumber=None):
 			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
 			user.save()
 		else:
-			sms_util.sendMsg(user, "fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, user.getKeeperNumber())
+			sms_util.sendMsg(user, "Fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, user.getKeeperNumber())
 
 
 @app.task
