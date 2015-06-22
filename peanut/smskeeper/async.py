@@ -257,7 +257,7 @@ def processDailyDigest(keeperNumber=None):
 			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
 			user.save()
 		else:
-			sms_util.sendMsg(user, "Fyi, there's nothing I'm tracking for you today. If something comes up, txt me", None, user.getKeeperNumber())
+			sms_util.sendMsg(user, "Looks like I'm not tracking anything for you today. What do you want to get done today?", None, user.getKeeperNumber())
 
 
 @app.task
