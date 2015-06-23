@@ -97,7 +97,7 @@ def dealWithDefaultTime(user, nattyResult):
 	if nattyResult.hadTime:
 		return nattyResult
 
-	# If there was no time whatsoever, plug in the default time
+	# If there was no date whatsoever, plug in the default time
 	if not nattyResult.hadDate:
 		nattyResult.utcTime = getDefaultTime(user)
 	else:
@@ -107,6 +107,9 @@ def dealWithDefaultTime(user, nattyResult):
 		# If the user says 'today', then this should match up.
 		if tzAwareDate.day == tzAwareNow.day:
 			nattyResult.utcTime = getDefaultTime(user, isToday=True)
+
+			# We set this to say we had a date so we swap in the time correctly if its a followup
+			nattyResult.hadTime = True
 		else:
 			tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
 			nattyResult.utcTime = tzAwareDate.astimezone(pytz.utc)
@@ -379,6 +382,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=False):
 	newDate = entry.remind_timestamp.astimezone(user.getTimezone())
 	nattyTzTime = nattyResult.utcTime.astimezone(user.getTimezone())
+
 	# Only update with a date or time if Natty found one
 	if nattyResult.hadDate:
 		newDate = newDate.replace(year=nattyTzTime.year)

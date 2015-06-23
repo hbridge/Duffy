@@ -574,3 +574,59 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "clean room")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
+	# Make sure if we type "in an hour" after it thinks its another day, it picks same day
+	def test_in_an_hour(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "clean room")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "in an hour")
+			self.assertIn("later today by 11am", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(1, len(entries))
+		self.assertEquals(self.MON_11AM.day, entries[0].remind_timestamp.day)
+		self.assertEquals(self.MON_11AM.hour, entries[0].remind_timestamp.hour)
+
+	# Make sure if we type "tonight" after it thinks its another day, it picks same day
+	def test_tonight(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "clean room")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "no, tonight")
+			self.assertIn("later today by 8pm", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(1, len(entries))
+		self.assertEquals(self.MON_8PM.day, entries[0].remind_timestamp.day)
+		self.assertEquals(self.MON_8PM.hour, entries[0].remind_timestamp.hour)
+
+	# Make sure if we type "today" when its in the morning, it doesn't pick a time in the past
+	def test_later_today(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "clean room")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "later today")
+			self.assertIn("later today by 6pm", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(1, len(entries))
+		self.assertEquals(22, entries[0].remind_timestamp.hour)
+
