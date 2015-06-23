@@ -155,7 +155,7 @@ def getDigestMessageForUser(user, pendingEntries, isAll):
 		msg = u"Your current tasks: \U0001F4DD\n"
 
 	if len(pendingEntries) == 0:
-		return "", []
+		return None, []
 
 	for entry in pendingEntries:
 		if user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
@@ -177,9 +177,10 @@ def sendDigestForUserId(userId):
 	user = User.objects.get(id=userId)
 
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
-	msg = getDigestMessageForUser(user, pendingEntries, False)
 
-	if msg:
+	if len(pendingEntries) > 0:
+		msg = getDigestMessageForUser(user, pendingEntries, False)
+
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
 		# Now set to reminder sent, incase they send back done message
@@ -192,16 +193,18 @@ def sendDigestForUserId(userId):
 def sendAllRemindersForUserId(userId):
 	user = User.objects.get(id=userId)
 
-	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
-	msg = getDigestMessageForUser(user, pendingEntries, True)
+	pendingEntries = user_util.pendingTodoEntries(user, includeAll=True)
 
-	if msg:
+	if len(pendingEntries) > 0:
+		msg = getDigestMessageForUser(user, pendingEntries, True)
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
 		user.save()
+	else:
+		sms_util.sendMsg(user, "You have no pending tasks", None, user.getKeeperNumber())
 
 
 @app.task

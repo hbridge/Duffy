@@ -40,6 +40,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setState(keeper_constants.STATE_REMIND)
 		user.setStateData(keeper_constants.IS_SNOOZE_KEY, True)
 		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entries[0].id)
+		user.save()
 
 		return False  # Reprocess by state remind
 	else:
