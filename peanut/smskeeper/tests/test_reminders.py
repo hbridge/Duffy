@@ -473,6 +473,21 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("by 5:30pm", self.getOutput(mock))
 	"""
 
+	# Covers the case of "100 and" which with a bad regex got turned into "1:00 and" due to the a
+	def test_numbers_which_have_and_after(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+
+			cliMsg.msg(self.testPhoneNumber, "Remind me to pay my sister 100 and keep 45 in my bank and give 50 to my mom for my bill on Thursday")
+			self.assertIn("Thu", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+
+		# Make sure it picked out Thursday
+		self.assertEqual(3, entry.remind_timestamp.weekday())
+
 	def test_next_week_becomes_monday(self, dateMock):
 		self.setupUser(dateMock)
 

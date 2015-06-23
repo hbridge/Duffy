@@ -131,7 +131,7 @@ def fixMsgForNatty(msg, user):
 		newMsg = newMsg.replace("again at", "at")
 
 	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a)', newMsg)
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg)
 	if threeDigitsWithAP:
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
@@ -182,6 +182,7 @@ def getBestNattyResult(nattyResults):
 	# prefer anything that has "at" in the text
 	# Make sure it's "at " (with a space) since Saturday will match
 	nattyResults = sorted(nattyResults, key=lambda x: "at " in x.textUsed, reverse=True)
+
 	return nattyResults[0]
 
 
