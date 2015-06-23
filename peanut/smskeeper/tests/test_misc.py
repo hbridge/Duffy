@@ -61,7 +61,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Groceries")
 			self.assertIn("milk", self.getOutput(mock))
 			cliMsg.msg(self.testPhoneNumber, "Add spinach to my groceries list")
-			cliMsg.msg(self.testPhoneNumber, "what's on my groceries list")
+			cliMsg.msg(self.testPhoneNumber, "groceries list")
 			self.assertIn("spinach", self.getOutput(mock))
 			cliMsg.msg(self.testPhoneNumber, "add tofu to groceries")
 			cliMsg.msg(self.testPhoneNumber, "groceries list")

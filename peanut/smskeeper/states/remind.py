@@ -122,6 +122,11 @@ def fixMsgForNatty(msg, user):
 	# Replace 'around' with 'at' since natty recognizes that better
 	newMsg = newMsg.replace("around", "at")
 
+	# Fix "again at 3" situation where natty doesn't like that...wtf
+	againAt = re.search(r'.*again at ([0-9])', newMsg)
+	if againAt:
+		newMsg = newMsg.replace("again at", "at")
+
 	# Fix 3 digit numbers with timing info like "520p"
 	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a)', newMsg)
 	if threeDigitsWithAP:
