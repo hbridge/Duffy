@@ -217,7 +217,7 @@ def isQuestion(msg):
 	firstWord = getFirstWord(msg)
 	if isRemindCommand(msg):
 		return False
-	return ("?" in msg) or firstWord in ["who", "what", "where", "when", "why", "how"]
+	return ("?" in msg) or firstWord in ["who", "what", "where", "when", "why", "how", "what's", "whats", "is", "are"]
 
 
 # See if the first word is a 'no' or 'not' and is multiple words

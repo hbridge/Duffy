@@ -213,6 +213,9 @@ def processDailyDigest():
 		if not user.isDigestTime(date_util.now(pytz.utc)):
 			continue
 
+		if not user.completed_tutorial:
+			continue
+
 		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 		if len(pendingEntries) > 0:
@@ -229,11 +232,11 @@ def processDailyDigest():
 			if userNow.weekday() == 1:  # Tuesday
 				pendingThisWeek = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
 				if len(pendingThisWeek) == 0:
-					sms_util.sendMsg(user, "Looks like I'm not tracking anything for you this week. What do you want to get done this week?", None, user.getKeeperNumber())
+					sms_util.sendMsg(user, "Morning! Looks like I'm not tracking anything for you this week. What do you want to get done this week?", None, user.getKeeperNumber())
 			elif userNow.weekday() == 4:  # Friday
 				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
 				if len(pendingThisWeekend) == 0:
-					sms_util.sendMsg(user, "Looks like I'm not tracking anything for you this weekend. What do you want to get done this weekend?", None, user.getKeeperNumber())
+					sms_util.sendMsg(user, "Morning! Looks like I'm not tracking anything for you this weekend. What do you want to get done this weekend?", None, user.getKeeperNumber())
 
 
 @app.task
