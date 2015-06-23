@@ -93,6 +93,10 @@ def shouldIncludeEntry(entry, includeAll):
 	# Cutoff time is midnight local time
 	cutoffTime = (localNow + datetime.timedelta(days=1)).replace(hour=0, minute=0)
 
+	if not entry.remind_timestamp:
+		logger.warning("User %s: Found reminder without timestamp %s" % (entry.creator.id, entry.id))
+		return False
+
 	if not entry.hidden and (includeAll or entry.remind_timestamp < cutoffTime):
 		return True
 	return False
