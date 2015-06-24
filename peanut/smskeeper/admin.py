@@ -70,6 +70,8 @@ class ReminderAdmin(admin.ModelAdmin):
 		# Time comes in as utc, so we need to convert back to user's timezone
 		tz = obj.creator.getTimezone()
 		obj.remind_timestamp = tz.localize(obj.remind_timestamp.replace(tzinfo=None))
+		if obj.remind_last_notified:
+			obj.remind_last_notified = tz.localize(obj.remind_last_notified.replace(tzinfo=None))
 		obj.save()
 
 	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'remind_last_notified_tz_aware', 'added_tz_aware', 'hidden', 'product_id', 'updated')
