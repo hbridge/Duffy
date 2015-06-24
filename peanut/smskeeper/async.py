@@ -58,7 +58,7 @@ def processReminder(entry):
 	isSharedReminder = (len(entry.users.all()) > 1)
 
 	for user in entry.users.all():
-		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
+		if user.state == keeper_constants.STATE_STOPPED:
 			pass
 		elif isSharedReminder and user.id == entry.creator.id:
 			# Only process reminders for the non-creator
@@ -281,7 +281,7 @@ def suspendInactiveUsers(doit=False):
 
 		futureReminders = user_util.pendingTodoEntries(user, includeAll=True, after=now)
 		if lastMessageIn and lastMessageIn.added < cutoff and len(futureReminders) == 0:
-			logger.info("Putting user %s into suspended state because last message was %s" % (lastMessageIn.added, user.id))
+			logger.info("Putting user %s into suspended state because last message was %s" % (user.id, lastMessageIn.added))
 			if doit:
 				user.setState(keeper_constants.STATE_SUSPENDED, override=True)
 				user.save()
