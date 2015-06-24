@@ -1,6 +1,7 @@
 import pytz
 
 from django.contrib import admin
+from django.db.models import Q
 
 from smskeeper.models import User, Entry
 from smskeeper import keeper_constants
@@ -40,7 +41,7 @@ class ReminderAdmin(admin.ModelAdmin):
 
 	def queryset(self, request):
 		qs = super(ReminderAdmin, self).queryset(request)
-		return qs.filter(remind_timestamp__isnull=False).order_by("hidden", "remind_timestamp")
+		return qs.filter(remind_timestamp__isnull=False).exclude(Q(creator__state=keeper_constants.STATE_STOPPED) | Q(creator__state=keeper_constants.STATE_SUSPENDED)).order_by("hidden", "remind_timestamp")
 
 	def added_tz_aware(self, obj):
 		return obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
