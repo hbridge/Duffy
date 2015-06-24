@@ -271,17 +271,18 @@ def testCelery():
 
 
 @app.task
-def suspendInactiveUsers():
+def suspendInactiveUsers(doit=False):
 	now = date_util.now(pytz.utc)
 	cutoff = now - datetime.timedelta(days=7)
 
 	users = User.objects.exclude(state=keeper_constants.STATE_SUSPENDED).exclude(state=keeper_constants.STATE_STOPPED)
 	for user in users:
-		lastMessageIn = Message.objects.filter(user=user, incoming=True).order_by("-added").last()
+		lastMessageIn = Message.objects.filter(user=user, incoming=True).order_by("added").last()
 
 		futureReminders = user_util.pendingTodoEntries(user, includeAll=True, after=now)
 		if lastMessageIn and lastMessageIn.added < cutoff and len(futureReminders) == 0:
-			logger.info("Putting user %s into suspended state" % user.id)
-			user.setState(keeper_constants.STATE_SUSPENDED, override=True)
-			user.save()
+			logger.info("Putting user %s into suspended state because last message was %s" % (lastMessageIn.added, user.id))
+			if doit:
+				user.setState(keeper_constants.STATE_SUSPENDED, override=True)
+				user.save()
 
