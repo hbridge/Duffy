@@ -524,6 +524,29 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[1].hidden)
 		self.assertFalse(entries[2].hidden)
 
+	# Make sure we can handle messages that have and in it and its not meant to be split
+	def test_done_with_and_not_split(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "Find house")
+		cliMsg.msg(self.testPhoneNumber, "message Amina and dazie")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Done with message Amina and dazie")
+			self.assertIn("Nice", self.getOutput(mock))
+			self.assertNotIn("I'm not sure which entry you mean", self.getOutput(mock))
+
+		# Make sure we hid the entry
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertFalse(entries[0].hidden)
+		self.assertTrue(entries[1].hidden)
+
+		self.assertFalse(self.getTestUser().paused)
+
 	# Make sure we pause after an unknown phrase
 	def test_done_unknown_pauses(self, dateMock):
 		self.setupUser(dateMock)

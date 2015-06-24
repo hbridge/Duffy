@@ -446,9 +446,11 @@ def clearAll(entries):
 
 def done(user, msg, keeperNumber, justSentEntries=None):
 	msgBack = ""
+	foundEntry = False
 	cleanedDoneCommand = msg_util.cleanedDoneCommand(msg)
 
 	donePhrases = cleanedDoneCommand.split("and")
+	donePhrases.append(cleanedDoneCommand)
 
 	for phrase in donePhrases:
 		# This could be put into a regex
@@ -460,6 +462,7 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 				entries = user_util.pendingTodoEntries(user, includeAll=False)
 			msgBack = clearAll(entries)
 			logging.debug("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
+			foundEntry = True
 		else:
 			bestMatch, score = getBestEntryMatch(user, phrase)
 
@@ -471,15 +474,14 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 				logger.info("User %s: I think this is a done command decided to hide entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
 
 				msgBack = u"Nice! Checked that off \u2705"
-			elif bestMatch:
-				logger.info("User %s: I think this is a done command but couldn't find a good enough entry. pausing" % (user.id))
-				# If the score is low, it probably means we didn't match a specific one, so pause
-				paused = unknown(user, msg, keeperNumber, sendMsg=False)
-				if not paused:
-					msgBack = "Sorry, I'm not sure which entry you mean"
-			else:
-				# We didn't find anything at all, so just skip
-				pass
+				foundEntry = True
+
+	if not foundEntry:
+		logger.info("User %s: I think this is a done command but couldn't find a good enough entry. pausing" % (user.id))
+		# If the score is low, it probably means we didn't match a specific one, so pause
+		paused = unknown(user, msg, keeperNumber, sendMsg=False)
+		if not paused:
+			msgBack = "Sorry, I'm not sure which entry you mean"
 
 	if msgBack:
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
