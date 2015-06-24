@@ -60,7 +60,7 @@ def isFollowup(user, entry, nattyResult):
 			logger.debug("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
 			return True
 		# If we were just editing this entry and the query has only a couple words
-		elif lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=10) and len(cleanedText.split(' ')) < 4:
+		elif lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=2) and len(cleanedText.split(' ')) < 3:
 			logger.debug("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
 			return True
 		else:
