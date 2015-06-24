@@ -11,6 +11,8 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
+from django.db.models import Q
+
 from smskeeper.models import User, Entry
 from smskeeper import keeper_constants
 
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 def main(argv):
 	print "Starting..."
 
-	userList = User.objects.filter(state=keeper_constants.STATE_STOPPED)
+	userList = User.objects.filter(Q(state=keeper_constants.STATE_STOPPED) | Q(state=keeper_constants.STATE_SUSPENDED))
 
 	for user in userList:
 		reminders = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
