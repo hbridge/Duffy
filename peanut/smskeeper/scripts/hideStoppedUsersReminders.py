@@ -23,12 +23,12 @@ def main(argv):
 	userList = User.objects.filter(state=keeper_constants.STATE_STOPPED)
 
 	for user in userList:
-		reminders = Entry.objects.filter(creator=user, label="#reminders")
+		reminders = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
 
 		for reminder in reminders:
 			print "Processing: %s" % reminder.id
-			#reminder.hidden = True
-			#reminder.save()
+			reminder.hidden = True
+			reminder.save()
 
 	print "Donezo!"
 
