@@ -35,7 +35,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
-ok_words = ["nothing", "ok", "okay", "awesome", "great"]
+ok_words = ["nothing", "ok", "okay", "awesome", "great", "that's"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 

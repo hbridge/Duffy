@@ -102,7 +102,7 @@ def shouldIncludeEntry(entry, includeAll):
 	return False
 
 
-def pendingTodoEntries(user, includeAll=False, before=None):
+def pendingTodoEntries(user, includeAll=False, before=None, after=None):
 	entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
 
 	results = list()
@@ -114,5 +114,8 @@ def pendingTodoEntries(user, includeAll=False, before=None):
 
 	if before:
 		results = filter(lambda x: x.remind_timestamp < before, results)
+
+	if after:
+		results = filter(lambda x: x.remind_timestamp > after, results)
 
 	return results

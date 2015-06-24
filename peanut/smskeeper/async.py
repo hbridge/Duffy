@@ -15,8 +15,7 @@ from celery.utils.log import get_task_logger
 from peanut.celery import app
 
 from smskeeper import tips, sms_util, user_util, msg_util
-from smskeeper.models import Entry
-from smskeeper.models import User
+from smskeeper.models import Entry, Message, User
 from smskeeper import keeper_constants
 
 from common import date_util
@@ -269,3 +268,20 @@ def str_now_1():
 @app.task
 def testCelery():
 	logger.debug("Celery task ran.")
+
+
+@app.task
+def suspendInactiveUsers():
+	now = date_util.now(pytz.utc)
+	cutoff = now - datetime.timedelta(days=7)
+
+	users = User.objects.exclude(state=keeper_constants.STATE_SUSPENDED).exclude(state=keeper_constants.STATE_STOPPED)
+	for user in users:
+		lastMessageIn = Message.objects.filter(user=user, incoming=True).order_by("-added").last()
+
+		futureReminders = user_util.pendingTodoEntries(user, includeAll=True, after=now)
+		if lastMessageIn and lastMessageIn.added < cutoff and len(futureReminders) == 0:
+			logger.info("Putting user %s into suspended state" % user.id)
+			user.setState(keeper_constants.STATE_SUSPENDED, override=True)
+			user.save()
+

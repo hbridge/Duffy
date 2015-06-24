@@ -298,6 +298,7 @@ class BASE_CELERY_CONFIG:
         'smskeeper.async.processDailyDigest': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.sendDigestForUserId': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.sendAllRemindersForUserId': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.async.suspendInactiveUsers': {'queue': 'keeper', 'routing_key': 'keeper'},
     }
 
     CELERYBEAT_SCHEDULE = {
