@@ -8,8 +8,6 @@ from twilio import TwilioRestException
 
 from celery.utils.log import get_task_logger
 
-from peanut.settings import constants
-
 from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper.models import Message, User

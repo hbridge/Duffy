@@ -366,7 +366,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_daily_digest_pings_if_nothing_set_week(self, dateMock):
 		self.setupUser(dateMock)
 
-		self.setNow(dateMock, self.TUE_9AM)
+		self.setNow(dateMock, self.MON_9AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
@@ -389,7 +389,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.product_id = keeper_constants.REMINDER_PRODUCT_ID
 		user.save()
 
-		self.setNow(dateMock, self.TUE_9AM)
+		self.setNow(dateMock, self.MON_9AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
@@ -399,7 +399,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_daily_digest_pings_if_weekend_set(self, dateMock):
 		self.setupUser(dateMock)
 
-		self.setNow(dateMock, self.TUE_9AM)
+		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop this weekend")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -410,7 +410,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_daily_digest_doesnt_ping_if_something_set(self, dateMock):
 		self.setupUser(dateMock)
 
-		self.setNow(dateMock, self.TUE_9AM)
+		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop wednesday")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -652,4 +652,28 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(1, len(entries))
 		self.assertEquals(22, entries[0].remind_timestamp.hour)
+
+	# Make sure that digest pings doesn't go out for suspended users
+	def testSuspended(self, dateMock):
+		self.setupUser(dateMock)
+
+		# Nothing for digest if we're suspended
+		# Also make sure an incoming message brings us back
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			# We shouldn't send a digest since we have an entry for tomorrow
+			self.assertIn("this week?", self.getOutput(mock))
+
+		self.getTestUser().setState(keeper_constants.STATE_SUSPENDED)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			# We shouldn't send a digest since we have an entry for tomorrow
+			self.assertEqual("", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me to go poop")
+			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_REMIND)
 

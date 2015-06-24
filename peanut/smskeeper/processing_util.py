@@ -6,7 +6,7 @@ from datetime import timedelta
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo
+from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo, suspended
 from smskeeper import msg_util, actions, niceties, user_util
 
 from smskeeper.models import User, Message
@@ -129,6 +129,7 @@ stateCallbacks = {
 	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
 	keeper_constants.STATE_IMPLICIT_LABEL: implicit_label,
 	keeper_constants.STATE_STOPPED: stopped,
+	keeper_constants.STATE_SUSPENDED: suspended,
 	keeper_constants.STATE_HELP: user_help,
 	keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER: not_activated_from_reminder,
 	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,

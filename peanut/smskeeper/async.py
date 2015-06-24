@@ -59,7 +59,7 @@ def processReminder(entry):
 	isSharedReminder = (len(entry.users.all()) > 1)
 
 	for user in entry.users.all():
-		if user.state == keeper_constants.STATE_STOPPED:
+		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
 			pass
 		elif isSharedReminder and user.id == entry.creator.id:
 			# Only process reminders for the non-creator
@@ -210,7 +210,7 @@ def sendAllRemindersForUserId(userId):
 @app.task
 def processDailyDigest():
 	for user in User.objects.all():
-		if user.state == keeper_constants.STATE_STOPPED:
+		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
 			continue
 
 		if not user.isDigestTime(date_util.now(pytz.utc)):
@@ -231,9 +231,8 @@ def processDailyDigest():
 			user.save()
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
 			userNow = date_util.now(user.getTimezone())
-			# TODO(Derek): Move this back to Monday.  Don't forget to change the days 4-5 as well
-			if userNow.weekday() == 1:  # Tuesday
-				pendingThisWeek = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
+			if userNow.weekday() == 0:  # Monday
+				pendingThisWeek = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=5))
 				if len(pendingThisWeek) == 0:
 					sms_util.sendMsg(user, "Morning! Looks like I'm not tracking anything for you this week. What do you want to get done this week?", None, user.getKeeperNumber())
 			elif userNow.weekday() == 4:  # Friday
@@ -247,6 +246,9 @@ def sendTips(overrideKeeperNumber=None):
 	# TODO add test to make sure we send tips to the right number for each user
 	users = User.objects.all()
 	for user in users:
+		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
+			continue
+
 		tip = tips.selectNextFullTip(user)
 		if tip:
 			keeperNumber = overrideKeeperNumber
