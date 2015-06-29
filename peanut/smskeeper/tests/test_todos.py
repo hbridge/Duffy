@@ -7,6 +7,8 @@ from smskeeper.models import Entry
 
 import test_base
 
+import emoji
+
 
 @patch('common.date_util.utcnow')
 class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
@@ -373,7 +375,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("What do you want to get done this week?", self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY_MONDAY), self.getOutput(mock))
 
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_weekend(self, dateMock):
@@ -383,7 +385,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("What do you want to get done this weekend?", self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY_FRIDAY), self.getOutput(mock))
 
 	# Make sure we don't ping for product id 0
 	def test_daily_digest_doesnt_ping_product_0(self, dateMock):
@@ -407,7 +409,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("What do you want to get done this week?", self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY_MONDAY), self.getOutput(mock))
 
 	# Make sure we don't ping if we have something for the week
 	def test_daily_digest_doesnt_ping_if_something_set(self, dateMock):
@@ -705,7 +707,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			# We shouldn't send a digest since we have an entry for tomorrow
-			self.assertIn("this week?", self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY_MONDAY), self.getOutput(mock))
 
 		self.getTestUser().setState(keeper_constants.STATE_SUSPENDED)
 

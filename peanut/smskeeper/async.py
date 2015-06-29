@@ -149,7 +149,8 @@ def getDigestMessageForUser(user, pendingEntries, isAll):
 	now = date_util.now(pytz.utc)
 
 	if not isAll:
-		msg = u"Your tasks for today: \U0001F4DD\n"
+		header_phrase = keeper_constants.REMINDER_DIGEST_HEADERS[now.weekday()]
+		msg = u"%s\nYour tasks for today: \U0001F4DD\n" % (header_phrase)
 	else:
 		msg = u"Your current tasks: \U0001F4DD\n"
 
@@ -166,7 +167,7 @@ def getDigestMessageForUser(user, pendingEntries, isAll):
 			msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
 		msg += "\n"
 
-	msg += "\nWant me to check tasks off this list? Just tell me like 'Done with calling Mom'"
+	msg += "\nTo check a task off this list, tell me what you're done with, like 'Done with calling Mom'"
 
 	return msg
 
@@ -233,11 +234,11 @@ def processDailyDigest():
 			if userNow.weekday() == 0:  # Monday
 				pendingThisWeek = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=5))
 				if len(pendingThisWeek) == 0:
-					sms_util.sendMsg(user, "Morning! Looks like I'm not tracking anything for you this week. What do you want to get done this week?", None, user.getKeeperNumber())
+					sms_util.sendMsg(user, keeper_constants.REMINDER_DIGEST_EMPTY_MONDAY, None, user.getKeeperNumber())
 			elif userNow.weekday() == 4:  # Friday
 				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
 				if len(pendingThisWeekend) == 0:
-					sms_util.sendMsg(user, "Morning! Looks like I'm not tracking anything for you this weekend. What do you want to get done this weekend?", None, user.getKeeperNumber())
+					sms_util.sendMsg(user, keeper_constants.REMINDER_DIGEST_EMPTY_FRIDAY, None, user.getKeeperNumber())
 
 
 @app.task

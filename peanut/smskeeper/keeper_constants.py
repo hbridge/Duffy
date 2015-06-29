@@ -191,3 +191,15 @@ def isRealKeeperNumber(keeperNumber):
 def isTestKeeperNumber(keeperNumber):
 	return "test" in SMSKEEPER_TEST_NUM
 
+REMINDER_DIGEST_HEADERS = [
+	":sunrise: Happy Monday!",
+	"Good Tuesday to you!",
+	"Welcome to Wednesday.",
+	"Ohai Thursday! :cat:"
+	"TGIF! :party_popper:"
+	"Hope you're having a great weekend!",
+	"Hope you're having a great weekend!"
+]
+
+REMINDER_DIGEST_EMPTY_MONDAY = ":sunrise: Happy Monday! Looks like I'm not tracking anything for you this week. Let me know what you need to get done."
+REMINDER_DIGEST_EMPTY_FRIDAY = ":party_popper: TGIF! Looks like I'm not tracking anything for you this weekend. Let me know if you have any errands etc to get done. :runner:"
