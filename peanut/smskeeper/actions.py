@@ -452,6 +452,7 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 	donePhrases = cleanedDoneCommand.split("and")
 
 	if len(donePhrases) > 1:
+		# only append on the original if we see that it got split up
 		donePhrases.append(cleanedDoneCommand)
 
 	for phrase in donePhrases:
