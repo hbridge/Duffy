@@ -16,6 +16,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_8AM)
 		super(SMSKeeperTodoCase, self).setupUser(True, True, productId=1)
 
+	"""
+	Commenting out for now since this is no longer valid
 	def test_no_time(self, dateMock):
 		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -25,6 +27,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 		self.assertEquals(13, entry.remind_timestamp.hour)  # 9 am EST
+	"""
 
 	def test_single_word(self, dateMock):
 		self.setupUser(dateMock)
@@ -159,8 +162,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_done_only_evals_recent_reminder(self, dateMock):
 		self.setupUser(dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "text dan")
-		cliMsg.msg(self.testPhoneNumber, "call court")
+		cliMsg.msg(self.testPhoneNumber, "text dan tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "call court on the phone tomorrow")
 
 		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
 
@@ -202,13 +205,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		secondEntry = Entry.objects.filter(label="#reminders").last()
 		self.assertNotEqual(firstEntry.id, secondEntry.id)
 
-	# Make sure first reminder we send snooze tip, then second we don't
+	# Test fuzzy matching to a single world
 	def test_done_fuzzy_one_word_match(self, dateMock):
 		self.setupUser(dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "buy that thing I need")
-		cliMsg.msg(self.testPhoneNumber, "send email to alex")
-		cliMsg.msg(self.testPhoneNumber, "poop in the woods")
+		cliMsg.msg(self.testPhoneNumber, "buy that thing I need tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "send email to alex tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "poop in the woods tomorrow")
 
 		cliMsg.msg(self.testPhoneNumber, "done with email")
 
@@ -279,7 +282,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_8AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "I need to run")
+			cliMsg.msg(self.testPhoneNumber, "I need to run tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertNotIn("by 9am", self.getOutput(mock))
 
@@ -314,9 +317,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad")
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
 		cliMsg.msg(self.testPhoneNumber, "I need to go buy some stuff this weekend")
-		cliMsg.msg(self.testPhoneNumber, "I need to go poop in the yard")
+		cliMsg.msg(self.testPhoneNumber, "I need to go poop in the yard tomorrow")
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -529,8 +532,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-		cliMsg.msg(self.testPhoneNumber, "Find house")
-		cliMsg.msg(self.testPhoneNumber, "message Amina and dazie")
+		cliMsg.msg(self.testPhoneNumber, "Find house tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "message Amina and dazie tomorrow")
 
 		self.setNow(dateMock, self.TUE_9AM)
 		async.processDailyDigest()
@@ -560,7 +563,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.TUE_3PM)
 
-		# Some unkown phrasem, we shouldn't get anything back
+		# Some unkown phrase, we shouldn't get anything back
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done with the other thing")
 			self.assertEquals("", self.getOutput(mock))
@@ -574,6 +577,40 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Makae sure we're now paused
 		self.assertTrue(self.getTestUser().paused)
 
+	# Make sure we pause after an unknown phrase during daytime hours
+	def test_create_unknown_pauses(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		# Some unkown phrase, we shouldn't get anything back
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "this is a random phrase")
+			self.assertEquals("", self.getOutput(mock))
+
+		# Make sure nothing was hidden
+		self.assertEqual(0, len(Entry.objects.filter(label="#reminders")))
+
+		# Makae sure we're now paused
+		self.assertTrue(self.getTestUser().paused)
+
+	# Make sure we do a create for an unkonwn phrase if its early (8 am)
+	def test_create_unknown_night_creates(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		# Some unkown phrase, we shouldn't get anything back
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "this is a random phrase")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		# Make sure nothing was hidden
+		self.assertEqual(1, len(Entry.objects.filter(label="#reminders")))
+
+		# Makae sure we're now paused
+		self.assertFalse(self.getTestUser().paused)
+
 	# Make sure we fuzzy match after taking out the done with.
 	# If we didn't, then this test would fail
 	def test_not_real_followup(self, dateMock):
@@ -586,17 +623,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "nothing blah")
 			self.assertEqual("", self.getOutput(mock))
 
-	# Make sure we fuzzy match after taking out the done with.
-	# If we didn't, then this test would fail
-	def test_short_valid_msg(self, dateMock):
-		self.setupUser(dateMock)
-
-		self.setNow(dateMock, self.MON_8AM)
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "clean room")
-			self.assertIn("tomorrow", self.getOutput(mock))
-
 	# Make sure if we type "in an hour" after it thinks its another day, it picks same day
 	def test_in_an_hour(self, dateMock):
 		self.setupUser(dateMock)
@@ -604,7 +630,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "clean room")
+			cliMsg.msg(self.testPhoneNumber, "clean room tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -623,7 +649,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "clean room")
+			cliMsg.msg(self.testPhoneNumber, "clean room tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -642,7 +668,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "clean room")
+			cliMsg.msg(self.testPhoneNumber, "clean room tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:

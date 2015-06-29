@@ -218,10 +218,24 @@ def getPreviousEntry(user):
 
 
 # If we don't have a valid time and its less than 4 words, don't count as a valid entry
+# Things like "ok great"
 def looksLikeValidEntry(msg, nattyResult):
 	words = msg.split(' ')
 	if not validTime(nattyResult) and len(words) < 4 and msg_util.isOkPhrase(msg):
 		return False
+	return True
+
+
+# Method to determine if we create a new reminder.
+# If its tutorial, def do it.  But if there's no timing info, then don't
+def shouldCreateReminder(user, nattyResult, msg):
+	if isTutorial(user):
+		return True
+	if msg_util.isRemindCommand(msg):
+		return True
+	if not validTime(nattyResult):
+		return False
+
 	return True
 
 
@@ -244,31 +258,42 @@ def process(user, msg, requestDict, keeperNumber):
 		if not validTime(nattyResult) or isTutorial(user):
 			sendFollowup = True
 
-		entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
+		doCreate = False
 
-		"""
-		Temp comment out by Derek due to taking out shared reminders
-		# See if the entry didn't create. This means there's unresolved handes
-		if not entry:
-			return False  # Send back for reprocessing by unknown handles state
-		"""
+		if shouldCreateReminder(user, nattyResult, msg):
+			doCreate = True
+		else:
+			paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
 
-		sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+			if not paused:
+				doCreate = True
 
-		# If we came from the tutorial, then set state and return False so we go back for reprocessing
-		if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
-			# Note, some behind the scene magic sets the state and state_data for us.  So this call
-			# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
-			user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
-			# We set this so it knows what entry was created
+		if doCreate:
+			entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
+
+			"""
+			Temp comment out by Derek due to taking out shared reminders
+			# See if the entry didn't create. This means there's unresolved handes
+			if not entry:
+				return False  # Send back for reprocessing by unknown handles state
+			"""
+
+			sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+
+			# If we came from the tutorial, then set state and return False so we go back for reprocessing
+			if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
+				# Note, some behind the scene magic sets the state and state_data for us.  So this call
+				# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
+				user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
+				# We set this so it knows what entry was created
+				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+				user.save()
+				return False
+
+			# Always save the entryId state since we always come back into this state.
+			# If they don't enter timing info then we kick out
 			user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
 			user.save()
-			return False
-
-		# Always save the entryId state since we always come back into this state.
-		# If they don't enter timing info then we kick out
-		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-		user.save()
 	else:
 		# If we have an entry id, then that means we are doing a follow up
 		# See if what they entered is a valid time and if so, assign it.

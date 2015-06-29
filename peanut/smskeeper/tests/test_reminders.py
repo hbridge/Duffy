@@ -2,8 +2,8 @@ import datetime
 import pytz
 from mock import patch
 
-from smskeeper.models import Entry, User
-from smskeeper import cliMsg, msg_util, keeper_constants
+from smskeeper.models import Entry
+from smskeeper import cliMsg
 from smskeeper import async
 
 import test_base
@@ -148,7 +148,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 	def test_reminders_commas(self, dateMock):
 		self.setupUser(dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "remind me to poop, then poop again")
+		cliMsg.msg(self.testPhoneNumber, "remind me to poop, then poop again tomorrow")
 
 		entry = Entry.objects.get(label="#reminders")
 
