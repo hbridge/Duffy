@@ -659,7 +659,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(self.MON_11AM.hour, entries[0].remind_timestamp.hour)
 
 	# Make sure if we type "tonight" after it thinks its another day, it picks same day
-	def test_tonight_negative_correction(self, dateMock):
+	def test_tonight(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
