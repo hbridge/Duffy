@@ -17,7 +17,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	entries = Entry.objects.filter(id__in=entryIds)
 	if len(entries) == 0:
-		logging.debug("User %s: Couldn't find any entries with ids %s, kicking to normal" % (user.id, entryIds))
+		logging.info("User %s: Couldn't find any entries with ids %s, kicking to normal" % (user.id, entryIds))
 		# Couldn't find entry so try sending back through normal flow
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()
@@ -44,7 +44,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		return False  # Reprocess by state remind
 	else:
-		logging.debug("User %s: I don't think this is a done or followup command, so kicking out" % (user.id))
+		logging.info("User %s: I don't think this is a done or followup command, so kicking out" % (user.id))
 
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()

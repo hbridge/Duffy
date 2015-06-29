@@ -21,35 +21,35 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 	# Always look for a stop command first and deal with that
 	if msg_util.isStopCommand(msg):
 		stopped.dealWithStop(user, msg, keeperNumber)
-		logger.debug("User %s: I think '%s' is a stop command, state is now %s" % (user.id, msg, user.state))
+		logger.info("User %s: I think '%s' is a stop command, state is now %s" % (user.id, msg, user.state))
 		return True
 	elif niceties.getNicety(msg):
 		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
 		if msg_util.isDoneCommand(msg):
-			logger.debug("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
+			logger.info("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
 			return False
 		nicety = niceties.getNicety(msg)
-		logger.debug("User %s: I think '%s' is a nicety" % (user.id, msg))
+		logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
 		actions.nicety(user, nicety, requestDict, keeperNumber)
 		return True
 	elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
-		logger.debug("For user %s I think '%s' is a help command" % (user.id, msg))
+		logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
 		actions.help(user, msg, keeperNumber)
 		return True
 	elif msg_util.isQuestion(msg) and user.completed_tutorial:
-		logger.debug("User %s: I think '%s' is a question" % (user.id, msg))
+		logger.info("User %s: I think '%s' is a question" % (user.id, msg))
 		actions.unknown(user, msg, keeperNumber)
 		return True
 	elif msg_util.isSetTipFrequencyCommand(msg):
-		logger.debug("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
+		logger.info("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
 		actions.setTipFrequency(user, msg, keeperNumber)
 		return True
 	elif msg_util.nameInSetName(msg) and user.completed_tutorial:
-		logger.debug("User %s: I think '%s' is a set name command" % (user.id, msg))
+		logger.info("User %s: I think '%s' is a set name command" % (user.id, msg))
 		actions.setName(user, msg, keeperNumber)
 		return True
 	elif msg_util.isSetZipcodeCommand(msg) and user.completed_tutorial:
-		logger.debug("User %s: I think '%s' is a set zip command" % (user.id, msg))
+		logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
 		actions.setZipcode(user, msg, keeperNumber)
 		return True
 	# If this starts to get too agressive, then move into reminder code where we see if there's
@@ -57,7 +57,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 	elif msg_util.startsWithNo(msg):
 		# If the user does "don't" or "cancel that reminder" then pause if its daytime.
 		# otherwise, let it go through for now
-		logger.debug("User %s: I think '%s' starts with a frustration word, pausing" % (user.id, msg))
+		logger.info("User %s: I think '%s' starts with a frustration word, pausing" % (user.id, msg))
 		paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
 		if paused:
 			return True
@@ -76,7 +76,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	# This is true if this is from a manual entry off the history page
 	manual = "Manual" in requestDict
 	if not manual and isDuplicateMsg(user, msg):
-		logger.debug("User %s: Ignoring duplicate message: %s" % (user.id, msg))
+		logger.info("User %s: Ignoring duplicate message: %s" % (user.id, msg))
 		# TODO figure out better logic so we aren't repeating this statement
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
 		return False
@@ -96,7 +96,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	# Grab just the first line, so we ignore signatures
 	msg = msg.split('\n')[0]
 
-	logger.debug("User %s: Starting processing of '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
+	logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
 
 	if not user.paused:
 		# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
@@ -114,10 +114,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				count += 1
 
 				if processed:
-					logger.debug("User %s: Done processing '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
+					logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
 			if count == 10:
-				logger.error("User %s: Hit endless loop for msg %s" % (user.id, msg))
+				logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
 	else:
 		logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))
 

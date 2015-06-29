@@ -51,25 +51,25 @@ def isFollowup(user, entry, nattyResult):
 
 		# Covers cases where there the cleanedText is "in" or "around"
 		if len(cleanedText) <= 2:
-			logger.debug("User %s: I think this is a followup to %s bc its less than 2 letters" % (user.id, entry.id))
+			logger.info("User %s: I think this is a followup to %s bc its less than 2 letters" % (user.id, entry.id))
 			return True
 		# If they write "no, remind me sunday instead" then want to process as followup
 		elif msg_util.startsWithNo(nattyResult.queryWithoutTiming):
-			logger.debug("User %s: I think this is a followup to %s bc it starts with a No" % (user.id, entry.id))
+			logger.info("User %s: I think this is a followup to %s bc it starts with a No" % (user.id, entry.id))
 			return True
 		elif user.getStateData(keeper_constants.IS_SNOOZE_KEY):
-			logger.debug("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
+			logger.info("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
 			return True
 		# If we were just editing this entry and the query has only a couple words
 		elif isRecentAction and len(cleanedText.split(' ')) < 3:
-			logger.debug("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
+			logger.info("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
 			return True
 		else:
 			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
 			# This could be a new entry due to todos
 			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
 			if bestEntry and bestEntry.id == entry.id and score > 60 and isRecentAction:
-				logger.debug("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
+				logger.info("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
 				return True
 
 	return False
@@ -249,7 +249,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	# If this doesn't look valid then ignore
 	if not looksLikeValidEntry(msg, nattyResult):
-		logger.debug("User %s: Skipping msg '%s' because it doesn't look valid to me" % (user.id, msg))
+		logger.info("User %s: Skipping msg '%s' because it doesn't look valid to me" % (user.id, msg))
 		return True
 
 	# Create a new reminder
@@ -264,10 +264,20 @@ def process(user, msg, requestDict, keeperNumber):
 		if shouldCreateReminder(user, nattyResult, msg):
 			doCreate = True
 		else:
-			paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
-
-			if not paused:
-				doCreate = True
+			# HACKY
+			# So right here we're confused on what to do.
+			# lastAction only is set by us, so if we are here again and are confused... try normal
+			# route first
+			# If that doesn't work, it'll clear this field
+			lastAction = user.getStateData("lastAction")
+			if lastAction:
+				user.setState(keeper_constants.STATE_NORMAL)
+				user.save()
+				return False
+			else:
+				paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
+				if not paused:
+					doCreate = True
 
 		if doCreate:
 			entry = createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
@@ -303,7 +313,7 @@ def process(user, msg, requestDict, keeperNumber):
 		"""
 		Temp comment out by Derek due to taking out shared reminders
 		if user.getStateData("fromUnresolvedHandles"):
-			logger.debug("User %s: Going to deal with unresolved handles for entry %s and user %s" % (user.id, entry.id, user.id))
+			logger.info("User %s: Going to deal with unresolved handles for entry %s and user %s" % (user.id, entry.id, user.id))
 
 			# Mark it that we're not coming back from unresolved handle
 			# So incase there's a followup we don't, re-enter this section
@@ -325,7 +335,7 @@ def process(user, msg, requestDict, keeperNumber):
 		"""
 		if isFollowup(user, entry, nattyResult):
 			isSnooze = user.getStateData(keeper_constants.IS_SNOOZE_KEY)
-			logger.debug("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
+			logger.info("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
 			updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)
 			sendCompletionResponse(user, entry, False, keeperNumber)
 
@@ -362,7 +372,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	entry.orig_text = json.dumps([msg])
 	entry.save()
 
-	logger.debug("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))
+	logger.info("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))
 
 	"""
 	Temp remove due to pausing shared reminders
@@ -375,7 +385,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 			contact = Contact.fetchByHandle(user, handle)
 
 			if contact is None:
-				logger.debug("User %s: Didn't find handle %s and msg %s on entry %s" % (user.id, handle, msg, entry.id))
+				logger.info("User %s: Didn't find handle %s and msg %s on entry %s" % (user.id, handle, msg, entry.id))
 				# We couldn't find the handle so go into unresolved state
 				# Set data for ourselves for when we come back
 				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
@@ -385,7 +395,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 				user.save()
 				return False
 			else:
-				logger.debug("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
+				logger.info("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
 				# We found the handle, so share the entry with the user.
 				entry.users.add(contact.target)
 	"""
@@ -421,7 +431,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 		newDate = newDate.replace(minute=nattyTzTime.minute)
 		newDate = newDate.replace(second=nattyTzTime.second)
 
-	logger.debug("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
+	logger.info("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
 	entry.remind_timestamp = newDate.astimezone(pytz.utc)
 	entry.remind_last_notified = None
 	entry.hidden = False
