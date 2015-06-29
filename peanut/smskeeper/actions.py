@@ -450,7 +450,9 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 	cleanedDoneCommand = msg_util.cleanedDoneCommand(msg)
 
 	donePhrases = cleanedDoneCommand.split("and")
-	donePhrases.append(cleanedDoneCommand)
+
+	if len(donePhrases) > 1:
+		donePhrases.append(cleanedDoneCommand)
 
 	for phrase in donePhrases:
 		# This could be put into a regex
@@ -461,7 +463,7 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 				# Do we want to include all here?
 				entries = user_util.pendingTodoEntries(user, includeAll=False)
 			msgBack = clearAll(entries)
-			logging.debug("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
+			logging.info("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
 			foundEntry = True
 		else:
 			bestMatch, score = getBestEntryMatch(user, phrase)

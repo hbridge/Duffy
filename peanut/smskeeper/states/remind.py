@@ -47,6 +47,7 @@ def isFollowup(user, entry, nattyResult):
 	if validTime(nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 		lastActionTime = getLastActionTime(user)
+		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=2)) else False
 
 		# Covers cases where there the cleanedText is "in" or "around"
 		if len(cleanedText) <= 2:
@@ -60,14 +61,14 @@ def isFollowup(user, entry, nattyResult):
 			logger.debug("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
 			return True
 		# If we were just editing this entry and the query has only a couple words
-		elif lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=2) and len(cleanedText.split(' ')) < 3:
+		elif isRecentAction and len(cleanedText.split(' ')) < 3:
 			logger.debug("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
 			return True
 		else:
 			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
 			# This could be a new entry due to todos
 			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
-			if bestEntry and bestEntry.id == entry.id and score > 60:
+			if bestEntry and bestEntry.id == entry.id and score > 60 and isRecentAction:
 				logger.debug("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
 				return True
 

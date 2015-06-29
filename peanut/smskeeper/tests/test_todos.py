@@ -680,7 +680,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(22, entries[0].remind_timestamp.hour)
 
 	# Make sure that digest pings doesn't go out for suspended users
-	def testSuspended(self, dateMock):
+	def test_suspended(self, dateMock):
 		self.setupUser(dateMock)
 
 		# Nothing for digest if we're suspended
@@ -702,4 +702,25 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "remind me to go poop")
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_REMIND)
+
+	# Hit a bug where we were running the actions.done code twice, so extra entries
+	# could be cleared by accident
+	def test_two_similar_entries_only_one_cleared(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "write imaging doc tomorrow")
+
+		self.setNow(dateMock, self.MON_10AM)
+		cliMsg.msg(self.testPhoneNumber, "send imaging doc to Thomas Hensley tomorrow")
+		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "done writing imaging doc")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertTrue(entries[0].hidden)
+		self.assertFalse(entries[1].hidden)
 
