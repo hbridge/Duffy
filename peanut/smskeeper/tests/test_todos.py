@@ -594,6 +594,22 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Makae sure we're now paused
 		self.assertTrue(self.getTestUser().paused)
 
+	# Make sure we pause after an unknown phrase during daytime hours
+	def test_pauses_when_user_frustrated(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "buy stuff tomorrow")
+
+		# Some unkown phrase, we shouldn't get anything back
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "don't do that, do later today")
+			self.assertEquals("", self.getOutput(mock))
+
+		# Makae sure we're now paused
+		self.assertTrue(self.getTestUser().paused)
+
 	# Make sure we do a create for an unkonwn phrase if its early (8 am)
 	def test_create_unknown_night_creates(self, dateMock):
 		self.setupUser(dateMock)
@@ -643,7 +659,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(self.MON_11AM.hour, entries[0].remind_timestamp.hour)
 
 	# Make sure if we type "tonight" after it thinks its another day, it picks same day
-	def test_tonight(self, dateMock):
+	def test_tonight_negative_correction(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
@@ -653,7 +669,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "no, tonight")
+			cliMsg.msg(self.testPhoneNumber, "do tonight")
 			self.assertIn("later today by 8pm", self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")

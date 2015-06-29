@@ -52,6 +52,16 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.debug("User %s: I think '%s' is a set zip command" % (user.id, msg))
 		actions.setZipcode(user, msg, keeperNumber)
 		return True
+	# If this starts to get too agressive, then move into reminder code where we see if there's
+	# timing information
+	elif msg_util.startsWithNo(msg):
+		# If the user does "don't" or "cancel that reminder" then pause if its daytime.
+		# otherwise, let it go through for now
+		logger.debug("User %s: I think '%s' starts with a frustration word, pausing" % (user.id, msg))
+		paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
+		if paused:
+			return True
+
 	return False
 
 
