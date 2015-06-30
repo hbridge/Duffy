@@ -120,7 +120,17 @@ var UserTable = React.createClass({
   rowForUser: function(user){
     accountAge = timeago(new Date(user.created)).replace("about ", "");;
     var sourceObj = JSON.parse(user.source);
-    tutorial_text = user.completed_tutorial ? "√ " + sourceObj.source + ", " + sourceObj.ref : sourceObj.source + ", " + sourceObj.ref;
+    var sourceString = "";
+    if (sourceObj.source && sourceObj.ref) {
+      sourceString = sourceObj.source + ", " + sourceObj.ref;
+    }
+    else if (sourceObj.source) {
+      sourceString = sourceObj.source;
+    }
+    else if (sourceObj.ref) {
+      sourceString = sourceObj.ref;
+    }
+    tutorial_text = user.completed_tutorial ? "√ " + sourceString : sourceString;
     if (user.paused)
       tutorial_text += " PAUSED"
     if (user.state === "stopped")
