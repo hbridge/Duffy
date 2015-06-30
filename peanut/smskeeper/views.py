@@ -468,7 +468,7 @@ def signup_from_website(request):
 					"referred": True if referrerCode else False
 				})
 				if 'no-js' in source:
-					return HttpResponseRedirect('http://aseem.dev.getkeeper.com/')
+					return HttpResponseRedirect('http://getkeeper.com/')
 		else:
 			response['result'] = False
 	else:
