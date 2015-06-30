@@ -214,6 +214,9 @@ def isDoneCommand(msg):
 	"""
 
 
+def isSnoozeCommand(msg):
+	return re.match("snooze", msg, re.I) is not None
+
 def getFirstWord(msg):
 	words = msg.split(' ')
 	if len(words) > 0:

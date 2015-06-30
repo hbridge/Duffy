@@ -82,6 +82,9 @@ def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
 	if msg_util.isDoneCommand(msg):
 		logger.info("User %s: I think '%s' is a done command" % (user.id, msg))
 		actions.done(user, msg, keeperNumber)
+	elif msg_util.isSnoozeCommand(msg):
+		logger.info("User %s: I think '%s' is a snooze command" % (user.id, msg))
+		actions.snooze(user, msg, keeperNumber)
 	elif len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
 	else:

@@ -199,6 +199,9 @@ class User(models.Model):
 			self.setState(keeper_constants.STATE_NOT_ACTIVATED)
 		self.save()
 
+	def isInTutorial(self):
+		return False if self.getStateData(keeper_constants.FROM_TUTORIAL_KEY) is None else True
+
 	def isTutorialComplete(self):
 		return self.completed_tutorial
 

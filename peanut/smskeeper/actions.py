@@ -13,6 +13,7 @@ from smskeeper import analytics
 
 from common import slack_logger, date_util
 from django.conf import settings
+from smskeeper import reminder_util
 
 logger = logging.getLogger(__name__)
 
@@ -471,6 +472,32 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 		return True
 	return False
 
+def snooze(user, msg, keeperNumber, justSentEntries=None):
+	nattyResult = reminder_util.getNattyResult(user, msg)
+	msgWithoutTiming = nattyResult.queryWithoutTiming
+	entries = fuzzyMatchEntries(user, msgWithoutTiming, keeperNumber, justSentEntries)
+	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
+
+	print "snooze called entries found: %d" % len(entries)
+
+	for entry in entries:
+		reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=True)
+
+	msgBack = None
+	if len(entries) == 0:
+		logger.info("User %s: I think this is a snooze command but couldn't find a good enough entry." % (user.id))
+		paused = unknown(user, msg, keeperNumber, sendMsg=False)
+		if not paused:
+			msgBack = "Sorry, I'm not sure what entry you mean."
+			if len(todayEntries) == 0:
+				msgBack += " You don't have any tasks today."
+			sms_util.sendMsg(user, msgBack, None, keeperNumber)
+		else:
+			return False
+	else:
+		reminder_util.sendCompletionResponse(user, entries[0], False, keeperNumber)
+
+	return True
 
 def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 	cleanedCommand = msg_util.cleanCommand(msg)
@@ -482,8 +509,10 @@ def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 		# e.g. "call bob and sue"
 		phrases.append(cleanedCommand)
 
+	print "cleanedCommand %s phrases %s" % (cleanedCommand, phrases)
 	for phrase in phrases:
 		# This could be put into a regex
+		phrase = phrase.strip()
 		if phrase == "" or re.match("all$|everything$|every thing$|both$", phrase, re.I):
 			if justSentEntries:
 				entries = justSentEntries
@@ -500,7 +529,7 @@ def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 
 	if len(entries) == 0:
 		logger.info("User %s: Couldn't find a good fuzzy match." % (user.id))
-	return entries
+	return list(entries)
 
 
 def unknown(user, msg, keeperNumber, sendMsg=True):
@@ -528,4 +557,3 @@ def unknown(user, msg, keeperNumber, sendMsg=True):
 		}
 	)
 	return ret
-

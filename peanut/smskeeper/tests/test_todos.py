@@ -8,6 +8,8 @@ from smskeeper.models import Entry
 import test_base
 
 import emoji
+from smskeeper import time_utils
+from common import date_util
 
 
 @patch('common.date_util.utcnow')
@@ -218,7 +220,22 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "done with email")
 
 		entry = Entry.objects.get(text="send email to alex")
+		days, hours = time_utils.daysAndHoursAgo(entry.remind_timestamp)
 		self.assertTrue(entry.hidden)
+
+	# Test fuzzy matching to a single world
+	def test_snooze_fuzzy_one_word_match(self, dateMock):
+		self.setupUser(dateMock)
+
+		cliMsg.msg(self.testPhoneNumber, "buy that thing I need tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "send email to alex tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "poop in the woods tomorrow")
+
+		cliMsg.msg(self.testPhoneNumber, "snooze email for 1 week")
+
+		entry = Entry.objects.get(text="send email to alex")
+		dt = entry.remind_timestamp - date_util.now()
+		self.assertTrue(dt.days == 7, "Days != 7.  Days == %d, Today: %s Remind TS %s" % (dt.days, date_util.now(), entry.remind_timestamp))
 
 	# Make that after we send a reminder, we eventually look for a fuzzy match
 	def test_reminder_sent_fuzzy_match_default(self, dateMock):
@@ -315,6 +332,32 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("you need to run", self.getOutput(mock))
 
 	# Make sure we create a new entry instead of a followup
+	def test_snooze_all_after_daily_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "I need to go buy some stuff this weekend")
+		cliMsg.msg(self.testPhoneNumber, "I need to go poop in the yard tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("run with your dad", self.getOutput(mock))
+			self.assertIn("go poop in the yard", self.getOutput(mock))
+			self.assertNotIn("buy some stuff", self.getOutput(mock))
+
+		# Digest should kicks off
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Snooze all 3 days")
+			self.assertIn("I'll remind", self.getOutput(mock))
+
+		# Make sure first and third have dates three days from now
+		entries = Entry.objects.all()
+		for entry in [entries[0], entries[2]]:
+			dt = entry.remind_timestamp - date_util.now()
+			self.assertTrue(dt.days == 3, "Days != 3.  Days == %d, Today: %s Remind TS %s" % (dt.days, date_util.now(), entry.remind_timestamp))
+
 	def test_done_all_after_daily_digest(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -344,6 +387,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[0].hidden)
 		self.assertFalse(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
+
 
 	# Make sure we clear pending even not after daily digest
 	def test_done_all_not_after_daily_digest(self, dateMock):

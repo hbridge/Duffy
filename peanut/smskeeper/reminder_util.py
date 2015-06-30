@@ -1,0 +1,301 @@
+import datetime
+import json
+import re
+
+from dateutil import relativedelta
+from peanut.settings import constants
+import pytz
+from smskeeper import analytics
+from common import date_util
+from smskeeper import keeper_constants
+from smskeeper import msg_util
+from common import natty_util
+from smskeeper.models import Entry, Contact
+from smskeeper import helper_util
+from smskeeper import sms_util
+
+import logging
+logger = logging.getLogger(__name__)
+
+
+def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
+	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
+	cleanedText = msg_util.warpReminderText(cleanedText)  # I to your
+	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
+
+	entry.remind_timestamp = nattyResult.utcTime
+	entry.remind_last_notified = None
+
+	entry.orig_text = json.dumps([msg])
+	entry.save()
+
+	logger.info("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))
+
+	"""
+	Temp remove due to pausing shared reminders
+	# Don't do any of this logic in the tutorial state, shouldn't be correct
+	if not isTutorial(user):
+		handle = msg_util.getReminderHandle(nattyResult.queryWithoutTiming)  # Grab "me" or "mom"
+
+		if handle and handle != "me":
+			# If we ever handle multiple handles... we need to create seperate entries to deal with snoozes
+			contact = Contact.fetchByHandle(user, handle)
+
+			if contact is None:
+				logger.info("User %s: Didn't find handle %s and msg %s on entry %s" % (user.id, handle, msg, entry.id))
+				# We couldn't find the handle so go into unresolved state
+				# Set data for ourselves for when we come back
+				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+				user.setStateData("fromUnresolvedHandles", True)
+				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
+				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])
+				user.save()
+				return False
+			else:
+				logger.info("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
+				# We found the handle, so share the entry with the user.
+				entry.users.add(contact.target)
+	"""
+	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
+
+	analytics.logUserEvent(
+		user,
+		"Created Reminder",
+		{
+			"Needed Followup": sendFollowup,
+			"Was Suspicious Hour": suspiciousHour,
+			"In tutorial": user.isInTutorial(),
+			"Is shared": len(entry.users.all()) > 1,
+			"interface": keeperNumber,
+		}
+	)
+
+	return entry
+
+
+def dealWithSuspiciousHour(user, entry, keeperNumber):
+	# If we're setting for early morning, send out a warning
+	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
+	hourForUser = tzAwareDate.hour
+	if (isReminderHourSuspicious(hourForUser) and keeperNumber != constants.SMSKEEPER_TEST_NUM):
+		logger.info("User %s: Scheduling an alert for %s am local time, might want to check entry id %s" % (user.id, hourForUser, entry.id))
+		return True
+	return False
+
+
+def isReminderHourSuspicious(hourForUser):
+	return hourForUser >= 0 and hourForUser <= 6
+
+
+def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=False):
+	newDate = entry.remind_timestamp.astimezone(user.getTimezone())
+	nattyTzTime = nattyResult.utcTime.astimezone(user.getTimezone())
+
+	# Only update with a date or time if Natty found one
+	if nattyResult.hadDate:
+		newDate = newDate.replace(year=nattyTzTime.year)
+		newDate = newDate.replace(month=nattyTzTime.month)
+		newDate = newDate.replace(day=nattyTzTime.day)
+
+	if nattyResult.hadTime:
+		newDate = newDate.replace(hour=nattyTzTime.hour)
+		newDate = newDate.replace(minute=nattyTzTime.minute)
+		newDate = newDate.replace(second=nattyTzTime.second)
+
+	logger.info("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
+	entry.remind_timestamp = newDate.astimezone(pytz.utc)
+	entry.remind_last_notified = None
+	entry.hidden = False
+
+	if entry.orig_text:
+		try:
+			origTextList = json.loads(entry.orig_text)
+		except ValueError:
+			origTextList = [entry.orig_text]
+	else:
+		origTextList = []
+	origTextList.append(msg)
+	entry.orig_text = json.dumps(origTextList)
+	entry.save()
+
+	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
+
+	analytics.logUserEvent(
+		user,
+		"Updated Reminder",
+		{
+			"Was Suspicious Hour": suspiciousHour,
+			"In tutorial": user.isInTutorial(),
+			"Is shared": len(entry.users.all()) > 1,
+			"Type": "Snooze" if isSnooze else "Time Correction"
+		}
+	)
+
+
+def getDefaultTime(user, isToday=False):
+	userNow = date_util.now(user.getTimezone())
+
+	if isToday:
+		# If before 2 pm, remind at 6 pm
+		if userNow.hour < 14:
+			replaceTime = userNow.replace(hour=18, minute=0, second=0)
+		# If between 2 pm and 5 pm, remind at 9 pm
+		elif userNow.hour >= 14 and userNow.hour < 17:
+			replaceTime = userNow.replace(hour=21, minute=0, second=0)
+		else:
+			# If after 5 pm, remind 9 am next day
+			replaceTime = userNow + datetime.timedelta(days=1)
+			replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
+	else:
+		# Remind 9 am next day
+		replaceTime = userNow + datetime.timedelta(days=1)
+		replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
+	return replaceTime
+
+
+#  Send off a response like "I'll remind you Sunday at 9am" or "I'll remind mom Sunday at 9am"
+def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
+	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
+
+	# Include time if old product or if its not a default time
+	includeTime = not user.isDigestTime(entry.remind_timestamp)
+
+	# Get the text liked "tomorrow" or "Sat at 5pm"
+	userMsg = msg_util.naturalize(date_util.now(user.getTimezone()), tzAwareDate, includeTime=includeTime)
+
+	# If this is a shared reminder then look up the handle to send things out with
+	if user == entry.creator and len(entry.users.all()) > 1:
+		for target in entry.users.all():
+			if target.id != user.id:
+				contact = Contact.fetchByTarget(user, target)
+				handle = contact.handle
+	else:
+		handle = "you"
+
+	toSend = "%s I'll remind %s %s." % (helper_util.randomAcknowledgement(), handle, userMsg)
+
+	# Tutorial gets a special followup message
+	if sendFollowup:
+		if user.isInTutorial():
+			toSend = toSend + " (If that time doesn't work, just tell me what time is better)"
+		else:
+			toSend = toSend + "\n\n"
+			toSend = toSend + "If that time doesn't work, tell me what time is better"
+
+	sms_util.sendMsg(user, toSend, None, keeperNumber)
+
+
+# If we got a natty result with no time, then we need to pick one.
+# If there was no date, pick the default time (could be 9am tmr or later today)
+# If there a date, then see if its today.  If so, pick best default time for today.
+# If not today, then pick that day and set to the default time (9am)
+def dealWithDefaultTime(user, nattyResult):
+	if nattyResult.hadTime:
+		return nattyResult
+
+	# If there was no date whatsoever, plug in the default time
+	if not nattyResult.hadDate:
+		nattyResult.utcTime = getDefaultTime(user)
+	else:
+		tzAwareNow = date_util.now(user.getTimezone())
+		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
+
+		# If the user says 'today', then this should match up.
+		if tzAwareDate.day == tzAwareNow.day:
+			nattyResult.utcTime = getDefaultTime(user, isToday=True)
+
+			# We set this to say we had a date so we swap in the time correctly if its a followup
+			nattyResult.hadTime = True
+		else:
+			tzAwareDate = tzAwareDate.replace(hour=9, minute=0)
+			nattyResult.utcTime = tzAwareDate.astimezone(pytz.utc)
+
+	return nattyResult
+
+
+# Remove and replace troublesome strings for Natty
+# This is meant to just be used to change up the string for processing, not used later for
+def fixMsgForNatty(msg, user):
+	newMsg = msg
+
+	# Replace 'around' with 'at' since natty recognizes that better
+	newMsg = newMsg.replace("around", "at")
+
+	# Fix "again at 3" situation where natty doesn't like that...wtf
+	againAt = re.search(r'.*again at ([0-9])', newMsg)
+	if againAt:
+		newMsg = newMsg.replace("again at", "at")
+
+	# Fix 3 digit numbers with timing info like "520p"
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg)
+	if threeDigitsWithAP:
+		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
+		newtime = oldtime[0] + ":" + oldtime[1:]
+
+		newMsg = newMsg.replace(oldtime, newtime)
+
+	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
+	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg)
+	if threeDigitsWithAT:
+		oldtime = threeDigitsWithAT.group("time")
+		newtime = oldtime[0] + ":" + oldtime[1:]
+
+		newMsg = newMsg.replace(oldtime, newtime)
+
+	# Change '4th' to 'June 4th'
+	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg)
+	if dayOfMonth:
+		localtime = date_util.now(user.getTimezone())
+
+		dayStr = dayOfMonth.group("time")
+		number = int(filter(str.isdigit, str(dayStr)))
+
+		if number <= localtime.day:
+			# They said 1st while it was June 2nd, so return July 1st
+			monthName = (localtime + relativedelta.relativedelta(months=1)).strftime("%B")
+		else:
+			monthName = localtime.strftime("%B")
+
+		# Turn 'the 9th' into 'June 9th'
+		newMsg = newMsg.replace("the %s" % dayStr, "%s %s" % (monthName, dayStr))
+
+	# Take anything like 7ish and just make 7
+	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg)
+	if ish:
+		time = ish.group("time")
+		newMsg = newMsg.replace(time + "ish", time)
+
+	return newMsg
+
+
+def getBestNattyResult(nattyResults):
+	if len(nattyResults) == 0:
+		return None
+
+	# Sort by the date, we want to soonest first
+	nattyResults = sorted(nattyResults, key=lambda x: x.utcTime)
+
+	# prefer anything that has "at" in the text
+	# Make sure it's "at " (with a space) since Saturday will match
+	nattyResults = sorted(nattyResults, key=lambda x: "at " in x.textUsed, reverse=True)
+
+	return nattyResults[0]
+
+
+def getNattyResult(user, msg):
+	# Deal with legacy stuff
+	if '#remind' in msg:
+		msg = msg.replace("#reminder", "remind me")
+		msg = msg.replace("#remind", "remind me")
+
+	nattyMsg = fixMsgForNatty(msg, user)
+	nattyResult = getBestNattyResult(natty_util.getNattyInfo(nattyMsg, user.getTimezone()))
+
+	if not nattyResult:
+		nattyResult = natty_util.NattyResult(None, msg, None, False, False)
+
+	# Deal with situation where a time wasn't specified
+	if not nattyResult.hadTime:
+		nattyResult = dealWithDefaultTime(user, nattyResult)
+
+	return nattyResult
