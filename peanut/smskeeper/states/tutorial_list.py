@@ -1,5 +1,4 @@
 import time
-import re
 import logging
 import datetime
 import string
@@ -8,7 +7,9 @@ from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper import analytics, niceties, actions
-from smskeeper.models import Entry
+
+logger = logging.getLogger(__name__)
+
 
 def process(user, msg, requestDict, keeperNumber):
 	step = user.getStateData("step")
@@ -59,13 +60,20 @@ def process(user, msg, requestDict, keeperNumber):
 		)
 		user.setStateData("step", 1)
 	elif step == 1:
-		timezone, user_error = msg_util.timezoneForMsg(msg)
+		hasZipCode = msg_util.hasZipCode(msg)
 
-		if timezone is None:
-			sms_util.sendMsg(user, user_error, None, keeperNumber)
-			return True
+		if hasZipCode:
+			timezone = msg_util.timezoneForMsg(msg)
+			if timezone is None:
+				response = "Sorry, I don't know that zipcode. Could you check that?"
+				sms_util.sendMsg(user, response, None, keeperNumber)
+				return True
+			else:
+				user.timezone = timezone
 		else:
-			user.timezone = timezone
+			logger.debug("postalCodes were none for: %s" % msg)
+			response = "Sorry, I didn't understand that, what's your zipcode?"
+			sms_util.sendMsg(user, response, None, keeperNumber)
 
 		sms_util.sendMsgs(user,
 			[

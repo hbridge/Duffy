@@ -318,9 +318,9 @@ def setName(user, msg, keeperNumber):
 
 
 def setZipcode(user, msg, keeperNumber):
-	timezone, user_error = msg_util.timezoneForMsg(msg)
+	timezone = msg_util.timezoneForMsg(msg)
 	if timezone is None:
-		sms_util.sendMsg(user, user_error, None, keeperNumber)
+		sms_util.sendMsg(user, "I'm sorry, I don't know that zipcode", None, keeperNumber)
 		return True
 
 	user.timezone = timezone

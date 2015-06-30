@@ -1,3 +1,6 @@
+import datetime
+import pytz
+
 from mock import patch
 
 from smskeeper import cliMsg, keeper_constants
@@ -32,6 +35,32 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call jesus tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertIn("digest of things", self.getOutput(mock))
+
+	# Make sure that we ignore all messages without zip codes for 20 seconds during tutorial
+	def test_tutorial_only_barfs_after_20_seconds(self, dateMock):
+		self.setupUser(dateMock)
+
+		now = datetime.datetime.now(pytz.utc)
+		self.setNow(dateMock, now)
+
+		# Activation message asks for their name
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
+			self.assertEquals(self.getTestUser().name, "UnitTests")
+
+		# Immediatly after, should ignore
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "blah is this thing")
+			self.assertEquals("", self.getOutput(mock))
+
+		later = now + datetime.timedelta(seconds=30)
+		self.setNow(dateMock, later)
+
+		# Immediatly after, should ignore
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "blah is this thing2")
+			self.assertIn("Sorry", self.getOutput(mock))
 
 	def test_tutorial_remind_nicety(self, dateMock):
 		self.setupUser(dateMock)

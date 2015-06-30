@@ -81,6 +81,12 @@ class User(models.Model):
 			return self.name
 		return self.phone_number
 
+	def getFirstName(self):
+		if self.name:
+			return self.name.split(' ')[0]
+		else:
+			return None
+
 	def setState(self, state, override=False, stateData=None, saveCurrent=False):
 		if self.state == keeper_constants.STATE_STOPPED:
 			logger.error("User %s: Tried to set state but was stopped" % (self.id))
