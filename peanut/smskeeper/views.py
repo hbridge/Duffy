@@ -20,7 +20,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
@@ -467,6 +467,8 @@ def signup_from_website(request):
 					"source": source,
 					"referred": True if referrerCode else False
 				})
+				if 'no-js' in source:
+					return HttpResponseRedirect('http://aseem.dev.getkeeper.com/')
 		else:
 			response['result'] = False
 	else:
