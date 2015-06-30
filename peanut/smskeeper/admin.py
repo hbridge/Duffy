@@ -1,4 +1,5 @@
 import pytz
+import datetime
 
 from django.contrib import admin
 from django.db.models import Q
@@ -72,6 +73,9 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj.remind_timestamp = tz.localize(obj.remind_timestamp.replace(tzinfo=None))
 		if obj.remind_last_notified:
 			obj.remind_last_notified = tz.localize(obj.remind_last_notified.replace(tzinfo=None))
+
+		obj.manually_updated = True
+		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
 		obj.save()
 
 	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'remind_last_notified_tz_aware', 'added_tz_aware', 'hidden', 'product_id', 'updated')
