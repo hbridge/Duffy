@@ -4,14 +4,16 @@ from smskeeper import keeper_constants
 
 dateFilter = date.today() - timedelta(days=7)
 
-activatedUsersAll= User.objects.filter(activated__lt=dateFilter)
-activatedUsersFB = User.objects.filter(activated__lt=dateFilter, signup_data_json__icontains='fb')
+productIdList = [0]
 
-usersAll = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__activated__lt=dateFilter, user__completed_tutorial=True).exclude(user__state=keeper_constants.STATE_STOPPED).distinct()
+activatedUsersAll= User.objects.filter(activated__lt=dateFilter, product_id__in=productIdList)
+activatedUsersFB = User.objects.filter(activated__lt=dateFilter, product_id__in=productIdList, signup_data_json__icontains='fb')
 
-usersFB = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__completed_tutorial=True, user__in=activatedUsersFB, user__signup_data_json__icontains='fb').exclude(user__state=keeper_constants.STATE_STOPPED).distinct()
+usersAll = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__product_id__in=productIdList, user__activated__lt=dateFilter, user__completed_tutorial=True).exclude(user__state=keeper_constants.STATE_STOPPED).distinct()
 
-usersStopped = User.objects.filter(activated__lt=dateFilter, state=keeper_constants.STATE_STOPPED)
+usersFB = Message.objects.values('user__name').filter(incoming=True, added__gt=dateFilter, user__product_id__in=productIdList, user__completed_tutorial=True, user__in=activatedUsersFB, user__signup_data_json__icontains='fb').exclude(user__state=keeper_constants.STATE_STOPPED).distinct()
+
+usersStopped = User.objects.filter(activated__lt=dateFilter, product_id__in=productIdList, state=keeper_constants.STATE_STOPPED)
 
 print "Total users activated: %s (FB: %s)" %(len(activatedUsersAll), len(activatedUsersFB))
 print "Active users: %s (FB: %s)"%(len(usersAll), len(usersFB))
@@ -41,3 +43,17 @@ entries = Entry.objects.values_list('creator__id', 'creator__name').exclude(labe
 
 for entry in entries:
     print "%s %s: %s"%(entry[0], entry[1],entry[2])
+
+
+# query to get last n reminder inputs
+
+from smskeeper.models import Message, Entry
+import json
+
+reminderMsgs = Message.objects.filter(msg_json__icontains='remind me', incoming=True).exclude(msg_json__icontains='#').order_by('-added')
+reminderMsgs = Entry.objects.filter(label='#reminders', hidden=False).order_by('-added')[:200]
+
+print len(reminderMsgs)
+
+for msg in reminderMsgs:
+    print json.loads(msg.orig_text)[0]
