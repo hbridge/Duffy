@@ -478,8 +478,6 @@ def snooze(user, msg, keeperNumber, justSentEntries=None):
 	entries = fuzzyMatchEntries(user, msgWithoutTiming, keeperNumber, justSentEntries)
 	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
-	print "snooze called entries found: %d" % len(entries)
-
 	for entry in entries:
 		reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=True)
 
@@ -499,6 +497,7 @@ def snooze(user, msg, keeperNumber, justSentEntries=None):
 
 	return True
 
+
 def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 	cleanedCommand = msg_util.cleanCommand(msg)
 	phrases = cleanedCommand.split("and")
@@ -509,7 +508,6 @@ def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 		# e.g. "call bob and sue"
 		phrases.append(cleanedCommand)
 
-	print "cleanedCommand %s phrases %s" % (cleanedCommand, phrases)
 	for phrase in phrases:
 		# This could be put into a regex
 		phrase = phrase.strip()
