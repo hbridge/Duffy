@@ -83,6 +83,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if lastMessageOut.added < cutoff:
 				response = "Sorry, I didn't understand that, what's your zipcode?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
+				return True
 			else:
 				# else ignore
 				return True
