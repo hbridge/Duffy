@@ -271,6 +271,10 @@ def cleanedDoneCommand(msg):
 
 	return cleaned
 
+def cleanCommand(msg):
+	cleaned = cleanedDoneCommand(msg)
+	cleaned = re.sub("(?i)snooze","", cleaned)
+	return cleaned
 
 # Returns a string which converts "my" to "your" and "i" to "you"
 def warpReminderText(msg):

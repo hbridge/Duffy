@@ -1,5 +1,5 @@
 import random
-import datetime
+import re
 import pytz
 import logging
 from fuzzywuzzy import fuzz
@@ -445,51 +445,62 @@ def clearAll(entries):
 
 
 def done(user, msg, keeperNumber, justSentEntries=None):
-	msgBack = ""
-	foundEntry = False
-	cleanedDoneCommand = msg_util.cleanedDoneCommand(msg)
+	entries = fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries)
+	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
-	donePhrases = cleanedDoneCommand.split("and")
-
-	if len(donePhrases) > 1:
-		# only append on the original if we see that it got split up
-		donePhrases.append(cleanedDoneCommand)
-
-	for phrase in donePhrases:
-		# This could be put into a regex
-		if phrase == "" or phrase == "all" or phrase == "everything" or phrase == "every thing" or phrase == "both":
-			if justSentEntries:
-				entries = justSentEntries
-			else:
-				# Do we want to include all here?
-				entries = user_util.pendingTodoEntries(user, includeAll=False)
-			msgBack = clearAll(entries)
-			logging.info("User %s: I think this is a done command for all entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
-			foundEntry = True
-		else:
-			bestMatch, score = getBestEntryMatch(user, phrase)
-
-			if score >= 60:
-				# We got a great hit to something so it was probably specific, just hide that one
-				bestMatch.hidden = True
-				bestMatch.save()
-
-				logger.info("User %s: I think this is a done command decided to hide entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
-
-				msgBack = u"Nice! Checked that off \u2705"
-				foundEntry = True
-
-	if not foundEntry:
+	msgBack = None
+	if len(entries) == 0:
 		logger.info("User %s: I think this is a done command but couldn't find a good enough entry. pausing" % (user.id))
-		# If the score is low, it probably means we didn't match a specific one, so pause
 		paused = unknown(user, msg, keeperNumber, sendMsg=False)
 		if not paused:
-			msgBack = "Sorry, I'm not sure which entry you mean"
+			if len(todayEntries) == 0:
+				msgBack = "Sorry, I'm not sure what entry you mean. You don't have any tasks today."
+			else:
+				msgBack = "Sorry, I'm not sure what entry you mean."
+	elif len(entries) == 1:
+		msgBack = "Nice! Checked that off :white_check_mark:"
+	elif len(entries) > 1:
+		msgBack = "Nice! Checked those off :white_check_mark:"
+
+	for entry in entries:
+		entry.hidden = True
+		entry.save()
 
 	if msgBack:
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 		return True
 	return False
+
+
+def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
+	cleanedCommand = msg_util.cleanCommand(msg)
+	phrases = cleanedCommand.split("and")
+	entries = set()
+
+	if len(phrases) > 1:
+		# append the original if it got split up since the actual entry might include "and"
+		# e.g. "call bob and sue"
+		phrases.append(cleanedCommand)
+
+	for phrase in phrases:
+		# This could be put into a regex
+		if phrase == "" or re.match("all$|everything$|every thing$|both$", phrase, re.I):
+			if justSentEntries:
+				entries = justSentEntries
+			else:
+				# Do we want to include all here?
+				entries = user_util.pendingTodoEntries(user, includeAll=False)
+			logging.info("User %s: Fuzzy matching multiple entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
+			break
+		else:
+			bestMatch, score = getBestEntryMatch(user, phrase)
+			if score >= 60:
+				logger.info("User %s: Fuzzy matching entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
+				entries.add(bestMatch)
+
+	if len(entries) == 0:
+		logger.info("User %s: Couldn't find a good fuzzy match." % (user.id))
+	return entries
 
 
 def unknown(user, msg, keeperNumber, sendMsg=True):
