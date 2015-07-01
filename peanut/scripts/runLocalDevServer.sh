@@ -1,7 +1,7 @@
 #/bin/bash
 # run from peanut directory
 
-rabbitmq-server
+rabbitmq-server &
 ./scripts/celery.sh stop local
 ./scripts/celery.sh start local
 rm /tmp/mysql.sock
