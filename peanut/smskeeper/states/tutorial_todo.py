@@ -77,11 +77,11 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			logger.debug("postalCodes were none for: %s" % msg)
 			lastMessageOut = Message.objects.filter(user=user, incoming=False).order_by("added").last()
-			cutoff = date_util.now(pytz.utc) - datetime.timedelta(seconds=20)
+			cutoff = date_util.now(pytz.utc) - datetime.timedelta(minutes=2)
 
-			# If we last sent a message over 20 seconds ago, then send back I'm not sure
+			# If we last sent a message over 2 minutes ago, then send back I'm not sure
 			if lastMessageOut.added < cutoff:
-				response = "Sorry, I didn't understand that, what's your zipcode?"
+				response = "Got it, but first thing, what's your zipcode?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
 				return True
 			else:

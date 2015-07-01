@@ -451,7 +451,7 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 
 	msgBack = None
 	if len(entries) == 0:
-		logger.info("User %s: I think this is a done command but couldn't find a good enough entry. pausing" % (user.id))
+		logger.info("User %s: I think '%s' is a done command but couldn't find a good enough entry. pausing" % (user.id, msg))
 		paused = unknown(user, msg, keeperNumber, sendMsg=False)
 		if not paused:
 			if len(todayEntries) == 0:

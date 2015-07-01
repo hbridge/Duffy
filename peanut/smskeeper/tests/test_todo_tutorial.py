@@ -37,7 +37,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("digest of things", self.getOutput(mock))
 
 	# Make sure that we ignore all messages without zip codes for 20 seconds during tutorial
-	def test_tutorial_only_barfs_after_20_seconds(self, dateMock):
+	def test_tutorial_only_barfs_after_2_minutes(self, dateMock):
 		self.setupUser(dateMock)
 
 		now = datetime.datetime.now(pytz.utc)
@@ -54,13 +54,13 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "blah is this thing")
 			self.assertEquals("", self.getOutput(mock))
 
-		later = now + datetime.timedelta(seconds=30)
+		later = now + datetime.timedelta(minutes=5)
 		self.setNow(dateMock, later)
 
 		# Immediatly after, should ignore
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "blah is this thing2")
-			self.assertIn("Sorry", self.getOutput(mock))
+			self.assertIn("what's your zipcode?", self.getOutput(mock))
 
 	def test_tutorial_remind_nicety(self, dateMock):
 		self.setupUser(dateMock)

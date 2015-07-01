@@ -279,6 +279,13 @@ def getBestNattyResult(nattyResults):
 	# Make sure it's "at " (with a space) since Saturday will match
 	nattyResults = sorted(nattyResults, key=lambda x: "at " in x.textUsed, reverse=True)
 
+	# Filter out stuff that was only using term "now"
+	nattyResults = filter(lambda x: x.textUsed.lower() != "now", nattyResults)
+
+	# Filter out something that has just "now"
+	if len(nattyResults) == 0:
+		return None
+
 	return nattyResults[0]
 
 
