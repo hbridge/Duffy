@@ -36,7 +36,8 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
 		actions.help(user, msg, keeperNumber)
 		return True
-	elif msg_util.isQuestion(msg) and user.completed_tutorial:
+	elif msg_util.isQuestion(msg) and user.completed_tutorial and not msg_util.isDigestCommand(msg):
+		# HACKY: Doing digest check here, probably should be in a better spot
 		logger.info("User %s: I think '%s' is a question" % (user.id, msg))
 		actions.unknown(user, msg, keeperNumber)
 		return True
