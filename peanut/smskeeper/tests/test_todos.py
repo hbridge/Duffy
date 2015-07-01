@@ -388,7 +388,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
 
-
 	# Make sure we clear pending even not after daily digest
 	def test_done_all_not_after_daily_digest(self, dateMock):
 		self.setupUser(dateMock)
@@ -410,6 +409,25 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[0].hidden)
 		self.assertTrue(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
+
+	# Make sure we send instructions
+	def test_instructions_after_first_daily_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_INSTRUCTIONS), self.getOutput(mock))
+
+		# make sure it only goes out once
+		self.setNow(dateMock, self.WED_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_INSTRUCTIONS), self.getOutput(mock))
+
 
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_week(self, dateMock):

@@ -548,7 +548,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, 'tell me more')
-			self.assertIn(keeper_constants.HELP_MESSAGES[0], self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_constants.HELP_MESSAGES[0]), self.getOutput(mock))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, 'tell me more')
 			self.assertEqual('', self.getOutput(mock))
@@ -569,4 +569,3 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Who is the bestests", cli=True)
 			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
-

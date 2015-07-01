@@ -120,6 +120,10 @@ def isFetchCommand(msg, user):
 	return False
 
 
+def isDigestCommand(msg):
+	return re.match("(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today", msg, re.I) is not None
+
+
 def isCommonListName(msg):
 	for reString in keeper_constants.COMMON_LIST_RES:
 		if re.match(reString, msg) is not None:

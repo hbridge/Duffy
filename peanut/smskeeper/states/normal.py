@@ -6,6 +6,7 @@ from smskeeper.models import Entry, Message
 
 from smskeeper import sms_util, msg_util
 from smskeeper import actions, keeper_constants
+from smskeeper import async
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,9 @@ def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
 	elif msg_util.isSnoozeCommand(msg):
 		logger.info("User %s: I think '%s' is a snooze command" % (user.id, msg))
 		actions.snooze(user, msg, keeperNumber)
+	elif msg_util.isDigestCommand(msg):
+		logger.info("User %s: I think '%s' is a digest command" % (user.id, msg))
+		async.sendAllRemindersForUserId.delay(user.id)
 	elif len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
 	else:

@@ -167,8 +167,6 @@ def getDigestMessageForUser(user, pendingEntries, isAll):
 			msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
 		msg += "\n"
 
-	msg += "\nTo check a task off this list, tell me what you're done with, like 'Done with calling Mom'"
-
 	return msg
 
 
@@ -179,32 +177,33 @@ def sendDigestForUserId(userId):
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 	if len(pendingEntries) > 0:
-		msg = getDigestMessageForUser(user, pendingEntries, False)
+		sendDigestForUserWithPendingEntries(user, pendingEntries, isAll=False)
 
+
+def sendDigestForUserWithPendingEntries(user, pendingEntries, isAll):
+	if len(pendingEntries) > 0:
+		msg = getDigestMessageForUser(user, pendingEntries, isAll)
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
 		user.save()
+
+		if tips.isUserEligibleForMiniTip(user, tips.DIGEST_TIP_ID):
+			digestTip = tips.tipWithId(tips.DIGEST_TIP_ID)
+			sendTipToUser(digestTip, user, user.getKeeperNumber())
 
 
 @app.task
 def sendAllRemindersForUserId(userId):
 	user = User.objects.get(id=userId)
-
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=True)
 
 	if len(pendingEntries) > 0:
-		msg = getDigestMessageForUser(user, pendingEntries, True)
-		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
-
-		# Now set to reminder sent, incase they send back done message
-		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
-		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
-		user.save()
+		sendDigestForUserWithPendingEntries(user, pendingEntries, isAll=True)
 	else:
-		sms_util.sendMsg(user, "You have no pending tasks", None, user.getKeeperNumber())
+		sms_util.sendMsg(user, "You have no pending tasks.", None, user.getKeeperNumber())
 
 
 @app.task
@@ -222,13 +221,7 @@ def processDailyDigest():
 		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 		if len(pendingEntries) > 0:
-			msg = getDigestMessageForUser(user, pendingEntries, False)
-			sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
-
-			# Now set to reminder sent, incase they send back done message
-			user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
-			user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
-			user.save()
+			sendDigestForUserWithPendingEntries(user, pendingEntries, isAll=False)
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
 			userNow = date_util.now(user.getTimezone())
 			if userNow.weekday() == 0:  # Monday

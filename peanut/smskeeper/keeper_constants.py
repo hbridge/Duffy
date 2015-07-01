@@ -96,19 +96,6 @@ REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
 
-HELP_MESSAGES = [
-	u"I'm an automated digital assistant. I can remind you when you need to get things done.",
-	u"Send me what you need to get done (and when) and I'll txt you back at the right time.",
-	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
-]
-
-
-HELP_MESSAGES_OLD = [
-	u'There are a few things I can help you with. \U0001F4AA' + "\n" +
-	u"I can remember lists \U0001F4DD of things for you, and I can send you reminders at a specific time \u23F0",
-	u"What would you like to learn more about? Lists or reminders?"
-]
-
 LISTS_HELP_SUBJECT = "lists"
 REMINDERS_HELP_SUBJECT = "reminders"
 
@@ -162,7 +149,7 @@ COMMON_LIST_RES = [
 
 KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 KEEPER_TODO_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper_todo.vcf"
-PHOTOS_TIP_URL="https://s3.amazonaws.com/smskeeper/PhotosTip.png"
+PHOTOS_TIP_URL = "https://s3.amazonaws.com/smskeeper/PhotosTip.png"
 KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
@@ -201,5 +188,23 @@ REMINDER_DIGEST_HEADERS = [
 	"Hope you're having a great weekend!"
 ]
 
+REMINDER_DIGEST_INSTRUCTIONS = (
+	":white_check_mark: To check a task off, tell me what you're done with, like 'Done with calling Mom'"
+	+ "\n:sleeping_symbol: To snooze a task, just tell me when I should remind you, like 'Snooze buy flip flops to Saturday'"
+)
+
 REMINDER_DIGEST_EMPTY_MONDAY = ":sunrise: Happy Monday! Looks like I'm not tracking anything for you this week. Let me know what you need to get done."
 REMINDER_DIGEST_EMPTY_FRIDAY = ":party_popper: TGIF! Looks like I'm not tracking anything for you this weekend. Let me know if you have any errands etc to get done. :runner:"
+
+HELP_MESSAGES = [
+	u":raising_hand: Hi! I'm an automated digital assistant here to help you get things done.",
+	u"Send me what you need to get done (and when) and I'll txt you back at the right time.",
+	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
+	REMINDER_DIGEST_INSTRUCTIONS
+]
+
+HELP_MESSAGES_OLD = [
+	u'There are a few things I can help you with. \U0001F4AA' + "\n" +
+	u"I can remember lists \U0001F4DD of things for you, and I can send you reminders at a specific time \u23F0",
+	u"What would you like to learn more about? Lists or reminders?"
+]

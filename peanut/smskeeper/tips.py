@@ -48,6 +48,7 @@ DONE_TIP1_ID = "mini-done1"
 DONE_TIP2_ID = "mini-done2"
 DONE_TIP3_ID = "mini-done3"
 
+DIGEST_TIP_ID = "mini-digest"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
@@ -94,6 +95,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		DONE_TIP3_ID,
 		"Btw, let me know when you're done",
+		type=MINI_TIP_TYPE
+	),
+	KeeperTip(
+		DIGEST_TIP_ID,
+		keeper_constants.REMINDER_DIGEST_INSTRUCTIONS,
 		type=MINI_TIP_TYPE
 	),
 ]
@@ -189,6 +195,10 @@ def getSentTipIds(user):
 	if user.sent_tips:
 		return user.sent_tips.split(",")
 	return []
+
+
+def isUserEligibleForMiniTip(user, miniTipId):
+	return miniTipId not in getSentTipIds(user)
 
 
 def logTipSent(user, tip, customSentDate, isMini, sentTips):

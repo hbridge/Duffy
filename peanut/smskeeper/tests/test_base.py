@@ -6,6 +6,7 @@ from django.conf import settings
 
 from smskeeper.models import User, ZipData, VerbData
 from smskeeper import keeper_constants
+import emoji
 
 # turn off mixpanel for tests
 settings.MIXPANEL_TOKEN = None
@@ -79,6 +80,9 @@ class SMSKeeperBaseCase(TestCase):
 			})
 
 		return events
+
+	def renderTextConstant(self, constant):
+		return emoji.emojize(constant, True)
 
 	# Day, hasDate, hasTime
 	# These should all in UTC
