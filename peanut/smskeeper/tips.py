@@ -23,7 +23,8 @@ class KeeperTip():
 		result = self.message
 		result = result.replace(":NAME:", user.name)
 		result = result.replace(":APP_URL:", user.getWebAppURL())
-		result += "\n\n" + SMSKEEPER_TIP_FOOTER
+		if self.type == FULL_TIP_TYPE:
+			result += "\n\n" + SMSKEEPER_TIP_FOOTER
 		return result
 
 	# Mini tips are little sentences sent after first actions
