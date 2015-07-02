@@ -182,8 +182,8 @@ REMINDER_DIGEST_HEADERS = [
 	":sunrise: Happy Monday!",
 	"Good Tuesday to you!",
 	"Welcome to Wednesday.",
-	"Ohai Thursday! :cat:"
-	"TGIF! :party_popper:"
+	"Ohai Thursday! :cat:",
+	"TGIF! :party_popper:",
 	"Hope you're having a great weekend!",
 	"Hope you're having a great weekend!"
 ]
