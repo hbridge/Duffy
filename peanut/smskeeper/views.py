@@ -19,7 +19,6 @@ from common.models import ContactEntry
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -27,7 +26,6 @@ from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
 
-from smskeeper.states import not_activated
 from smskeeper import analytics
 
 from smskeeper.serializers import EntrySerializer
@@ -35,6 +33,7 @@ from smskeeper.serializers import MessageSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
+
 
 logger = logging.getLogger(__name__)
 
@@ -113,15 +112,14 @@ def mykeeper(request, key):
 
 @login_required(login_url='/admin/login/')
 def history(request):
-	return renderReact(request, 'history')
+	return renderReact(request, 'history', 'history.html', context={"classifications": Message.Classifications()})
 
 
-def renderReact(request, appName, templateFile="react_app.html", user=None):
+def renderReact(request, appName, templateFile="react_app.html", user=None, context=dict()):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		if not user:
 			user = form.cleaned_data['user']
-		context = dict()
 
 		phoneNumToContactDict = getNameFromContactsDB([user.phone_number])
 
@@ -147,9 +145,11 @@ def getMessagesForUser(user):
 			if not message_dict.get("From", None):
 				message_dict["From"] = user.phone_number
 			message_dict["added"] = message.added
-			messages_dicts.append(message_dict)
 			if message_dict.get("From") == user.phone_number:
 				message_dict["incoming"] = True
+				message_dict["classification"] = message.classification
+
+			messages_dicts.append(message_dict)
 
 	return messages_dicts
 
@@ -176,11 +176,10 @@ def message_feed(request):
 
 
 class MessageDetail(generics.RetrieveUpdateAPIView):
-	authentication_classes = (authentication.SessionAuthentication,)
-	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (authentication.BasicAuthentication,)
+	permission_classes = (permissions.AllowAny,)
 	queryset = Message.objects.all()
 	serializer_class = MessageSerializer
-
 
 def entry_feed(request):
 	form = UserIdForm(api_util.getRequestData(request))

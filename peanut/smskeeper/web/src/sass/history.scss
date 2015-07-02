@@ -1,1 +1,22 @@
 @import "_common";
+
+.classifier {
+	font-size: 75%;
+	height: 100%;
+	margin-left: 10px;
+	margin-top: 2px;
+	display: table;
+	background-color: #65DC5F;
+	background-color: rgba(83, 219, 70, 0.25);
+	padding-right: 5px;
+	input {
+		margin-left: 10px;
+
+	}
+}
+
+@media screen and (max-width: 700px) {
+    .classifier {
+        display: none !important;
+    }
+}

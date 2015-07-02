@@ -401,6 +401,36 @@ class Message(models.Model):
 		recipient = msgInfo.get("To", None)
 		return sender, recipient
 
+	@classmethod
+	def Classifications(cls):
+		return ([
+			{
+				"text": "Create Todo",
+				"value": "createtodo"
+			},
+			{
+				"text": "Done",
+				"value": "completetodo"
+			},
+			{
+				"text": "Fetch Digest",
+				"value": "fetchdigest"
+			},
+			{
+				"text": "Nicety",
+				"value": "nicety"
+			},
+			{
+				"text": "Correction",
+				"value": "timecorrection"
+			},
+			{
+				"text": "Stop",
+				"value": "stop"
+			},
+
+		])
+
 
 class MessageMedia:
 	url = None

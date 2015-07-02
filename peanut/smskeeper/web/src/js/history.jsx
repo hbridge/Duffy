@@ -32,6 +32,15 @@ var MessageListRow = React.createClass({
 			'outgoing': !message.incoming,
 		});
 
+
+    var classificationChooser = null;
+    if (message.incoming) {
+      classificationChooser = <ClassificationChooser
+        selectedValue={message.classification}
+        onClassificationChange={this.handleClassificationChange}
+      />;
+    }
+
 		return (
 			<div id={ this.getId() } className="message">
         <div className="messageHeader">
@@ -47,12 +56,76 @@ var MessageListRow = React.createClass({
             <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
           </div>
         </div>
+        {classificationChooser}
+
       </div>
     );
   },
 
   handleClick: function(e) {
 		this.props.onMessageClicked(this.props.message, this.getId());
+  },
+
+  handleClassificationChange: function(newClassification) {
+    $.ajax({
+      url: "/smskeeper/message/" + this.props.message.id + "/",
+      dataType: 'json',
+      type: 'PATCH',
+      data: {classification: newClassification},
+      success: function(data) {
+        console.log("successfully updated classification");
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  }
+
+});
+
+var ClassificationChooser = React.createClass({
+  getInitialState: function() {
+    if (this.props.selectedValue) {
+      console.log("get initial state initial prop " + this.props.selectedValue);
+    }
+    return {selectedValue: this.props.selectedValue}
+  },
+
+  componentDidMount: function() {
+    this.setState({selectedValue: this.props.selectedValue});
+  },
+
+  render: function() {
+    var createOption = function(option, index) {
+      var br = null; // add a break every 3 options
+      if (index > 1 && (index + 1) % 3 == 0) {
+        br = <br />
+      }
+      return (
+        <input type="radio" value={option.value} checked={this.state.selectedValue == option.value}>
+          {option.text} {br}
+        </input>);
+    }.bind(this);
+
+    var classifierClasses = classNames({
+      "classifier": true,
+    });
+
+    return (
+      <div className={classifierClasses}>
+        <form onChange={this.handleChange} action="">
+        { CLASSIFICATION_OPTIONS.map(createOption) }
+        </form>
+      </div>
+    );
+  },
+
+  handleChange: function(e) {
+    //e.preventDefault();
+    var selectedValue = e.target.value;
+    console.log("classification changed to: " + selectedValue);
+    this.setState({selectedValue: selectedValue})
+    this.props.onClassificationChange(selectedValue);
   }
 });
 
@@ -232,7 +305,9 @@ var KeeperApp = React.createClass({
   componentDidMount: function() {
     this.loadDataFromServer();
     var loadFunc = this.loadDataFromServer;
-    setInterval(function () {loadFunc()}, 2000);
+    if (!DEVELOPMENT) {
+      setInterval(function () {loadFunc()}, 2000);
+    }
   },
 
   handleCommentSubmit: function(data) {

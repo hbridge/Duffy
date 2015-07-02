@@ -1,0 +1,15 @@
+{% extends 'react_app.html' %}
+
+{% block extra_includes %}
+<title>History</title>
+<script type='text/javascript'>
+CLASSIFICATION_OPTIONS = [
+{% for classification in classifications %}
+	{
+		text: "{{classification.text}}",
+		value: "{{classification.value}}"
+	},
+{% endfor %}
+];
+</script>
+{% endblock %}

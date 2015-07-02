@@ -52,13 +52,13 @@
 .incoming
 {
 	background-color: #7D7;
-	float: left;
+  display: inline-block;
 }
 
 .outgoing
 {
 	background-color: #DDD;
-	float: left;
+  display: inline-block;
 }
 
 .clear {
