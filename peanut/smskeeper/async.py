@@ -57,7 +57,10 @@ def shouldRemindNow(entry):
 def processReminder(entry):
 	isSharedReminder = (len(entry.users.all()) > 1)
 
-	for user in entry.users.all():
+	users = set(entry.users.all())
+	users.add(entry.creator)
+
+	for user in users:
 		if user.state == keeper_constants.STATE_STOPPED:
 			pass
 		elif isSharedReminder and user.id == entry.creator.id:
