@@ -408,6 +408,14 @@ class MessageMedia:
 		self.mediaType = mediaType
 
 
+class MessageClassification(models.Model):
+	message = models.ForeignKey(Message, db_index=True)
+	messageText = models.TextField(null=True)
+	classification = models.CharField(max_length=100, db_index=True, blank=True)
+	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
+	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+
+
 class Contact(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	target = models.ForeignKey(User, db_index=True, related_name="contact_target")
