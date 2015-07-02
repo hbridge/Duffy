@@ -68,12 +68,15 @@ class ReminderAdmin(admin.ModelAdmin):
 				obj.remind_last_notified = obj.remind_last_notified.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
 		return obj
 
-	def save_model(self, request, obj, form, chage):
+	def fix_timezones(self, obj):
 		# Time comes in as utc, so we need to convert back to user's timezone
 		tz = obj.creator.getTimezone()
 		obj.remind_timestamp = tz.localize(obj.remind_timestamp.replace(tzinfo=None))
 		if obj.remind_last_notified:
 			obj.remind_last_notified = tz.localize(obj.remind_last_notified.replace(tzinfo=None))
+
+	def save_model(self, request, obj, form, chage):
+		self.fix_timezones(obj)
 
 		obj.manually_updated = True
 		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
@@ -95,3 +98,8 @@ class ToCheck(ReminderAdmin):
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
 		return qs.filter(manually_check=True)
+
+	def save_model(self, request, obj, form, chage):
+		self.fix_timezones(obj)
+
+		obj.save()
