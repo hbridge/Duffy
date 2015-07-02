@@ -306,6 +306,7 @@ class Entry(models.Model):
 	manually_updated_timestamp = models.DateTimeField(null=True, blank=True)
 
 	manually_check = models.BooleanField(default=False)
+	manually_approved_timestamp = models.DateTimeField(null=True, blank=True)
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)

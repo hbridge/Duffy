@@ -775,20 +775,24 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 	def test_only_day_of_month(self, nattyMock, dateMock):
 		self.setupUser(dateMock)  # This is on June 2nd
 
+		nattyMock.reset_mock()
 		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 4th")
 
-		arg, kargs = nattyMock.call_args
+		# We have to look at the 2nd to last since natty gets called twice during a create
+		arg, kargs = nattyMock.call_args_list[0]
 		self.assertEquals("Remind me about pooping at 9pm on June 4th", arg[0])
 
+		nattyMock.reset_mock()
 		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 1st")
 
 		# Should be first of next month
-		arg, kargs = nattyMock.call_args
+		arg, kargs = nattyMock.call_args_list[0]
 		self.assertEquals("Remind me about pooping at 9pm on July 1st", arg[0])
 
+		nattyMock.reset_mock()
 		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 20th")
 
-		arg, kargs = nattyMock.call_args
+		arg, kargs = nattyMock.call_args_list[-2]
 		self.assertEquals("Remind me about pooping at 9pm on June 20th", arg[0])
 
 	def test_ish(self, dateMock):
@@ -809,3 +813,14 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEqual("pay your bills", Entry.objects.get(label="#reminders").text)
 
+	# Make sure that msgs with 2 date info in them get marked for manual check
+	def test_manual_check(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me Thursday that I need to poop at 6pm")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		self.assertTrue(entry.manually_check)

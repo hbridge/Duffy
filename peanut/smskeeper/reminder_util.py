@@ -90,6 +90,11 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	cleanedText = msg_util.warpReminderText(cleanedText)  # I to your
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
+	# If our entry has timing information in it, then mark it for manual checking
+	# This helps for things like "remind me thursday about pooping at 6pm"
+	if getNattyResult(user, cleanedText):
+		entry.manually_check = True
+
 	entry.remind_timestamp = nattyResult.utcTime
 	entry.remind_last_notified = None
 
@@ -359,16 +364,18 @@ def getBestNattyResult(nattyResults):
 
 
 def getNattyResult(user, msg):
-	# Deal with legacy stuff
-	if '#remind' in msg:
-		msg = msg.replace("#reminder", "remind me")
-		msg = msg.replace("#remind", "remind me")
+	msgCopy = msg
 
-	nattyMsg = fixMsgForNatty(msg, user)
+	# Deal with legacy stuff
+	if '#remind' in msgCopy:
+		msgCopy = msgCopy.replace("#reminder", "remind me")
+		msgCopy = msgCopy.replace("#remind", "remind me")
+
+	nattyMsg = fixMsgForNatty(msgCopy, user)
 	nattyResult = getBestNattyResult(natty_util.getNattyInfo(nattyMsg, user.getTimezone()))
 
 	if not nattyResult:
-		nattyResult = natty_util.NattyResult(None, msg, None, False, False)
+		nattyResult = natty_util.NattyResult(None, msgCopy, None, False, False)
 
 	# Deal with situation where a time wasn't specified
 	if not nattyResult.hadTime:

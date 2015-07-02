@@ -21,7 +21,6 @@ def activate_to_list(modeladmin, request, users):
 		user_util.activate(user, keeper_constants.FIRST_INTRO_MESSAGE_NO_MAGIC, False, keeper_constants.STATE_TUTORIAL_LIST, user.getKeeperNumber())
 activate_to_list.short_description = "Activate to List Tutorial"
 
-
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
 	list_display = ('id', 'activated', 'phone_number', 'name', 'state', 'completed_tutorial', 'state_data', 'print_last_message_date', 'total_msgs_from', 'history')
@@ -92,8 +91,18 @@ class ToCheck(Reminder):
 		proxy = True
 
 
+def mark_as_approved(modeladmin, request, entries):
+	for entry in entries:
+		entry.manually_check = False
+		entry.manually_approved_timestamp = datetime.datetime.now(pytz.utc)
+		entry.save()
+mark_as_approved.short_description = "Mark as approved"
+
+
 @admin.register(ToCheck)
 class ToCheck(ReminderAdmin):
+
+	actions = [mark_as_approved]
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
@@ -101,5 +110,8 @@ class ToCheck(ReminderAdmin):
 
 	def save_model(self, request, obj, form, chage):
 		self.fix_timezones(obj)
+
+		obj.manually_check = False
+		obj.manually_approved_timestamp = datetime.datetime.now(pytz.utc)
 
 		obj.save()
