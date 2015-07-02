@@ -48,6 +48,7 @@ def process(user, msg, requestDict, keeperNumber):
 				user.save()
 				return False
 			else:
+				logger.info("User %s: I'm confused with '%s', it could be a new reminder but not sure. pausing" % (user.id, msg))
 				paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
 				if not paused:
 					doCreate = True

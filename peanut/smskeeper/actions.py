@@ -483,7 +483,7 @@ def snooze(user, msg, keeperNumber, justSentEntries=None):
 
 	msgBack = None
 	if len(entries) == 0:
-		logger.info("User %s: I think this is a snooze command but couldn't find a good enough entry." % (user.id))
+		logger.info("User %s: I think this is a snooze command but couldn't find a good enough entry. pausing" % (user.id))
 		paused = unknown(user, msg, keeperNumber, sendMsg=False)
 		if not paused:
 			msgBack = "Sorry, I'm not sure what entry you mean."

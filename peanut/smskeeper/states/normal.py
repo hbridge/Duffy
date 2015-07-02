@@ -80,7 +80,12 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 
 
 def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
-	if msg_util.isDoneCommand(msg):
+	if msg_util.isRemindCommand(msg):
+		logger.info("User %s: I think '%s' is a remind command" % (user.id, msg))
+		user.setState(keeper_constants.STATE_REMIND)
+		user.save()
+		return False  # Reprocess
+	elif msg_util.isDoneCommand(msg):
 		logger.info("User %s: I think '%s' is a done command" % (user.id, msg))
 		actions.done(user, msg, keeperNumber)
 	elif msg_util.isSnoozeCommand(msg):

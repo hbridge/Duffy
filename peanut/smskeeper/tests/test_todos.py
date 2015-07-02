@@ -835,4 +835,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertTrue(entries[0].hidden)
 
+	# Hit bug where if "done" was in a message but it was really a new entry, we barfed
+	def test_remind_override_done(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to get my nails done tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+
 
