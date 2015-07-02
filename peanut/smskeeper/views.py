@@ -224,12 +224,13 @@ def send_sms(request):
 		msg = form.cleaned_data['msg']
 		keeperNumber = form.cleaned_data['from_num']
 		direction = form.cleaned_data['direction']
+		media = None # add a link here to send to users
 
 		if not keeperNumber:
 			keeperNumber = user.getKeeperNumber()
 
 		if direction == "ToUser":
-			sms_util.sendMsg(user, msg, None, keeperNumber, manual=True)
+			sms_util.sendMsg(user, msg, media, keeperNumber, manual=True)
 		else:
 			requestDict = dict()
 			requestDict["Body"] = msg
