@@ -1,3 +1,4 @@
+
 import pytz
 import datetime
 
@@ -83,14 +84,14 @@ class ReminderAdmin(admin.ModelAdmin):
 	search_fields = ['creator__id']
 
 
-class Todo(Reminder):
+class ToCheck(Reminder):
 	class Meta:
 		proxy = True
 
 
-@admin.register(Todo)
-class TodoAdmin(ReminderAdmin):
+@admin.register(ToCheck)
+class ToCheck(ReminderAdmin):
 
 	def queryset(self, request):
-		qs = super(TodoAdmin, self).queryset(request)
-		return qs.filter(creator__product_id=1).order_by("hidden", "remind_timestamp")
+		qs = super(ToCheck, self).queryset(request)
+		return qs.filter(manually_check=True)
