@@ -18,3 +18,17 @@ class EntrySerializer(serializers.ModelSerializer):
 			'added',
 			'updated'
 		)
+
+class MessageSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = models.Message
+		fields = (
+			'id',
+			'user',
+			'msg_json',
+			'incoming',
+			'manual',
+			'classification',
+			'added',
+			'updated'
+		)

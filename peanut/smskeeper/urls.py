@@ -18,4 +18,5 @@ urlpatterns = patterns(
 	url(r'^signup_from_website', 'smskeeper.views.signup_from_website'),
 	url(r'^entry/$', views.EntryList.as_view()),
 	url(r'^entry/(?P<pk>[0-9]+)/$', views.EntryDetail.as_view()),
+	url(r'^message/(?P<pk>[0-9]+)/$', views.MessageDetail.as_view()),
 )

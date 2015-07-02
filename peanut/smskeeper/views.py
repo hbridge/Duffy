@@ -31,6 +31,7 @@ from smskeeper.states import not_activated
 from smskeeper import analytics
 
 from smskeeper.serializers import EntrySerializer
+from smskeeper.serializers import MessageSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
@@ -172,6 +173,13 @@ def message_feed(request):
 		return HttpResponse(json.dumps(getMessagesResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+class MessageDetail(generics.RetrieveUpdateAPIView):
+	authentication_classes = (authentication.SessionAuthentication,)
+	permission_classes = (permissions.IsAuthenticated,)
+	queryset = Message.objects.all()
+	serializer_class = MessageSerializer
 
 
 def entry_feed(request):
