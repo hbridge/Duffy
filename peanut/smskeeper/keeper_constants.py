@@ -71,7 +71,7 @@ LAST_ACTION_KEY = "lastAction"
 ENTRY_ID_DATA_KEY = "entryId"
 FROM_TUTORIAL_KEY = "fromtutorial"
 
-ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
+ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
 
 FIRST_INTRO_MESSAGE_NO_MAGIC = "Oh hello. I'm ready for you."
 FIRST_INTRO_MESSAGE_MAGIC = "Ah. You used the magic phrase. Smooth."
