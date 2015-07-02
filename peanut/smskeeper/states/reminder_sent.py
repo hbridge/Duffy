@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import msg_util, actions
+from smskeeper import msg_util, actions, reminder_util
 from smskeeper import keeper_constants
 from smskeeper.models import Entry
 
@@ -23,8 +23,6 @@ def process(user, msg, requestDict, keeperNumber):
 		user.save()
 		return False  # Reprocess
 
-	query = msg.lower()
-
 	if msg_util.isDoneCommand(msg):
 		msgSent = actions.done(user, msg, keeperNumber, entries)
 
@@ -32,20 +30,22 @@ def process(user, msg, requestDict, keeperNumber):
 			user.setState(keeper_constants.STATE_NORMAL)
 			user.save()
 		return True
-	# If its a snooze
-	elif len(entries) == 1 and ("again" in query or "snooze" in query):
+	# If its a snooze or followup
+	elif len(entries) == 1:
 		entry = entries[0]
-		logger.debug("User %s: In reminder-sent, doing snooze on entry %s with msg %s" % (user.id, entry.id, msg))
+		nattyResult = reminder_util.getNattyResult(user, msg)
+		if reminder_util.isSnooze(user, entry, msg, nattyResult):
+			logger.debug("User %s: In reminder-sent, doing snooze on entry %s with msg %s" % (user.id, entry.id, msg))
 
-		user.setState(keeper_constants.STATE_REMIND)
-		user.setStateData(keeper_constants.IS_SNOOZE_KEY, True)
-		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entries[0].id)
-		user.save()
+			user.setState(keeper_constants.STATE_REMIND)
+			user.setStateData(keeper_constants.IS_SNOOZE_KEY, True)
+			user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entries[0].id)
+			user.save()
 
-		return False  # Reprocess by state remind
-	else:
-		logging.info("User %s: I don't think this is a done or followup command, so kicking out" % (user.id))
+			return False  # Reprocess by state remind
 
-		user.setState(keeper_constants.STATE_NORMAL)
-		user.save()
-		return False  # Reprocess
+	logging.info("User %s: I don't think this is a done or followup command, so kicking out" % (user.id))
+
+	user.setState(keeper_constants.STATE_NORMAL)
+	user.save()
+	return False  # Reprocess

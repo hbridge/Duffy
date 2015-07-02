@@ -298,6 +298,34 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the snoozedEntry is now an hour later
 		self.assertEqual(snoozedEntry.remind_timestamp.hour, (self.MON_8AM + datetime.timedelta(hours=1)).hour)
 
+	# Make sure that we can say "remind me in 1 hour" for a snooze
+	def test_snooze_with_remind_me(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.get(label="#reminders")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processReminder(entry)
+			self.assertIn("go poop", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "remind me in 1 hour")
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		self.assertEqual(1, len(entries))
+
+		snoozedEntry = entries[0]
+		# Make sure the entries are the same
+		self.assertEqual(entry.id, snoozedEntry.id)
+
+		# Make sure the snoozedEntry is now an hour later
+		self.assertEqual(snoozedEntry.remind_timestamp.hour, (self.MON_8AM + datetime.timedelta(hours=1)).hour)
+
 	# Test snooze functionality by setting a reminder, firing the reminder, then sending back a snooze message
 	def test_snooze_again_at_number_please(self, dateMock):
 		self.setupUser(dateMock)

@@ -29,7 +29,7 @@ def process(user, msg, requestDict, keeperNumber):
 	if not entry:
 		sendFollowup = False
 
-		if not validTime(nattyResult) or user.isInTutorial():
+		if not reminder_util.validTime(nattyResult) or user.isInTutorial():
 			sendFollowup = True
 
 		doCreate = False
@@ -107,7 +107,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# This message could be a correction or something else.  Might need more logic here
 				sendCompletionResponse(user, entry, False, keeperNumber)
 		"""
-		if isFollowup(user, entry, nattyResult):
+		if reminder_util.isFollowup(user, entry, msg, nattyResult):
 			isSnooze = user.getStateData(keeper_constants.IS_SNOOZE_KEY)
 			logger.info("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
 			reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)
@@ -125,61 +125,10 @@ def process(user, msg, requestDict, keeperNumber):
 	return True
 
 
-# Returns True if the the user entered any type of timing information
-def validTime(nattyResult):
-	return nattyResult.hadDate or nattyResult.hadTime
-
-
-def getLastActionTime(user):
-	if user.getStateData(keeper_constants.LAST_ACTION_KEY):
-		return datetime.datetime.utcfromtimestamp(user.getStateData(keeper_constants.LAST_ACTION_KEY)).replace(tzinfo=pytz.utc)
-	else:
-		return None
-
-
 def unixTime(dt):
 	epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=pytz.utc)
 	delta = dt - epoch
 	return int(delta.total_seconds())
-
-
-# Returns True if this message has a valid time and it doesn't look like another remind command
-# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup
-# Like "remind me again in 5 minutes"
-# If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
-# Otherwise False
-def isFollowup(user, entry, nattyResult):
-	now = date_util.now(pytz.utc)
-	if validTime(nattyResult):
-		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
-		lastActionTime = getLastActionTime(user)
-		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=2)) else False
-
-		# Covers cases where there the cleanedText is "in" or "around"
-		if len(cleanedText) <= 2:
-			logger.info("User %s: I think this is a followup to %s bc its less than 2 letters" % (user.id, entry.id))
-			return True
-		# If they write "no, remind me sunday instead" then want to process as followup
-		elif msg_util.startsWithNo(nattyResult.queryWithoutTiming):
-			logger.info("User %s: I think this is a followup to %s bc it starts with a No" % (user.id, entry.id))
-			return True
-		elif user.getStateData(keeper_constants.IS_SNOOZE_KEY):
-			logger.info("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
-			return True
-		# If we were just editing this entry and the query has only a couple words
-		# unless it's a snooze command, in which case it may refer to a different entry
-		elif isRecentAction and len(cleanedText.split(' ')) < 3 and not msg_util.isSnoozeCommand(nattyResult.queryWithoutTiming):
-			logger.info("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
-			return True
-		else:
-			bestEntry, score = actions.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
-			# This could be a new entry due to todos
-			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
-			if bestEntry and bestEntry.id == entry.id and score > 60 and isRecentAction:
-				logger.info("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
-				return True
-
-	return False
 
 
 def dealWithTutorialEdgecases(user, msg, keeperNumber):
@@ -209,7 +158,7 @@ def getPreviousEntry(user):
 # Things like "ok great"
 def looksLikeValidEntry(msg, nattyResult):
 	words = msg.split(' ')
-	if not validTime(nattyResult) and len(words) < 4 and msg_util.isOkPhrase(msg):
+	if not reminder_util.validTime(nattyResult) and len(words) < 4 and msg_util.isOkPhrase(msg):
 		return False
 	return True
 
@@ -221,7 +170,7 @@ def shouldCreateReminder(user, nattyResult, msg):
 		return True
 	if msg_util.isRemindCommand(msg):
 		return True
-	if not validTime(nattyResult):
+	if not reminder_util.validTime(nattyResult):
 		return False
 
 	return True
