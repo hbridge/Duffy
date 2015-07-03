@@ -498,7 +498,7 @@ def message_classification_csv(request):
 	for message in classified_messages:
 		if message.classification == "nocategory" or not message.getBody():
 			continue
-		response += '"%s", %s\n' % (cleanBodyText(message.getBody()), message.classification)
+		response += '"%s",%s\n' % (cleanBodyText(message.getBody()), message.classification)
 
 	return HttpResponse(response, content_type="text/text", status=200)
 
