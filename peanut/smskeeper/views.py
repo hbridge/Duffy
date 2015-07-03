@@ -491,27 +491,12 @@ def message_classification_csv(request):
 		classification__isnull=False).exclude(classification__in='nocategory').order_by("id")
 
 	# column headers
-	response = "text, "
-	for classification in Message.Classifications():
-		classificationValue = classification['value']
-		if classificationValue == "nocategory":
-			continue
-		response += "%s, " % (classificationValue)
-	response += "\n"
+	response = "text, classification\n"
 
 	# message rows
 	for message in classified_messages:
 		if message.classification == "nocategory" or not message.getBody():
 			continue
-		response += "%s, " % (message.getBody().replace("\n", " "))
-		for classification in Message.Classifications():
-			classificationValue = classification['value']
-			if classificationValue == "nocategory":
-				continue
-			elif classificationValue == message.classification:
-				response += "1, "
-			else:
-				response += "0, "
-		response += "\n"
+		response += "%s, %s\n" % (message.getBody().replace("\n", " "), message.classification)
 
 	return HttpResponse(response, content_type="text/text", status=200)
