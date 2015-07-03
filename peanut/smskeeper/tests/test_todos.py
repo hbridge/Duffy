@@ -71,12 +71,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	def test_weekend_no_time(self, dateMock):
 		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to buy detergent this weekend")
-			if (datetime.datetime.now(self.getTestUser().getTimezone()).weekday() == 4):  # Its Friday, so check for tmr
-				self.assertIn("tomorrow", self.getOutput(mock))
-			else:
-				self.assertIn("Sat", self.getOutput(mock))
+			self.assertIn("Sat", self.getOutput(mock))
 			self.assertNotIn("9 am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
@@ -84,12 +84,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	def test_weekend_with_time(self, dateMock):
 		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to prep dinner sat at 5 pm")
-			if (datetime.datetime.now(self.getTestUser().getTimezone()).weekday() == 4):  # Its Friday, so check for tmr
-				self.assertIn("tomorrow", self.getOutput(mock))
-			else:
-				self.assertIn("Sat", self.getOutput(mock))
+			self.assertIn("Sat", self.getOutput(mock))
 			self.assertIn("by 5pm", self.getOutput(mock))
 
 	def test_today(self, dateMock):
