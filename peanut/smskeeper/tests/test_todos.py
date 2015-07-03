@@ -845,5 +845,24 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to get my nails done tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
+	# Hit bug where if "done" was in a message but it was really a new entry, we barfed
+	def test_digest_fetch(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Tell Brandon you didn't get his email tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "write check for guymon heat and air today")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tasks")
+			self.assertIn("Brandon", self.getOutput(mock))
+			self.assertIn("guymon", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tasks for today")
+			self.assertNotIn("Brandon", self.getOutput(mock))
+			self.assertIn("guymon", self.getOutput(mock))
+
 
 

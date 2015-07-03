@@ -121,7 +121,7 @@ def isFetchCommand(msg, user):
 
 
 def isDigestCommand(msg):
-	return re.match("(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today", msg, re.I) is not None
+	return re.match("(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", msg, re.I) is not None
 
 
 def isCommonListName(msg):
