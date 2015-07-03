@@ -483,3 +483,35 @@ def signup_from_website(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@login_required(login_url='/admin/login/')
+def message_classification_csv(request):
+	classified_messages = Message.objects.filter(
+		classification__isnull=False).exclude(classification__in='nocategory').order_by("id")
+
+	# column headers
+	response = "text, "
+	for classification in Message.Classifications():
+		classificationValue = classification['value']
+		if classificationValue == "nocategory":
+			continue
+		response += "%s, " % (classificationValue)
+	response += "\n"
+
+	# message rows
+	for message in classified_messages:
+		if message.classification == "nocategory" or not message.getBody():
+			continue
+		response += "%s, " % (message.getBody().replace("\n", " "))
+		for classification in Message.Classifications():
+			classificationValue = classification['value']
+			if classificationValue == "nocategory":
+				continue
+			elif classificationValue == message.classification:
+				response += "1, "
+			else:
+				response += "0, "
+		response += "\n"
+
+	return HttpResponse(response, content_type="text/text", status=200)
