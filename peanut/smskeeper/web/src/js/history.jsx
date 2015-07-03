@@ -4,6 +4,8 @@ var $ = require('jquery');
 var JQueryUI = require('jquery-ui')
 var classNames = require('classnames');
 
+var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
+
 var formatDate = function(d){
   return d.toDateString() + " " + d.getHours() + ":" + d.getMinutes();
 }
@@ -85,9 +87,6 @@ var MessageListRow = React.createClass({
 
 var ClassificationChooser = React.createClass({
   getInitialState: function() {
-    if (this.props.selectedValue) {
-      console.log("get initial state initial prop " + this.props.selectedValue);
-    }
     return {selectedValue: this.props.selectedValue}
   },
 
@@ -305,7 +304,7 @@ var KeeperApp = React.createClass({
   componentDidMount: function() {
     this.loadDataFromServer();
     var loadFunc = this.loadDataFromServer;
-    if (!DEVELOPMENT) {
+    if (!DevelopmentMode) {
       setInterval(function () {loadFunc()}, 2000);
     }
   },
