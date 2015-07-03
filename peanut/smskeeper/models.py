@@ -419,6 +419,10 @@ class Message(models.Model):
 				"value": "completetodo"
 			},
 			{
+				"text": "Delete/Cancel",
+				"value": "deletereminder"
+			},
+			{
 				"text": "Fetch Digest",
 				"value": "fetchdigest"
 			},
@@ -427,12 +431,24 @@ class Message(models.Model):
 				"value": "nicety"
 			},
 			{
+				"text": "Nicety (Silent)",
+				"value": "silentnicety"
+			},
+			{
 				"text": "Correction",
 				"value": "timecorrection"
 			},
 			{
+				"text": "Snooze",
+				"value": "snooze"
+			},
+			{
 				"text": "Stop",
 				"value": "stop"
+			},
+			{
+				"text": "NoCategory",
+				"value": "nocategory"
 			},
 
 		])
