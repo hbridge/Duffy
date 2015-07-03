@@ -92,8 +92,10 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 
 	# If our entry has timing information in it, then mark it for manual checking
 	# This helps for things like "remind me thursday about pooping at 6pm"
-	if getNattyResult(user, cleanedText):
-		entry.manually_check = True
+	# TODO(Derek): Once we're confident, put a check in here:
+	# tempResult = getNattyResult(user, cleanedText)
+	# if not(validTime(tempResult):
+	entry.manually_check = True
 
 	entry.remind_timestamp = nattyResult.utcTime
 	entry.remind_last_notified = None
