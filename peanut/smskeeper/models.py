@@ -443,6 +443,10 @@ class Message(models.Model):
 				"value": "snooze"
 			},
 			{
+				"text": "Help",
+				"value": "help"
+			},
+			{
 				"text": "Stop",
 				"value": "stop"
 			},
