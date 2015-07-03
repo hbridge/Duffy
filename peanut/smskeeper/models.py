@@ -360,6 +360,9 @@ class Message(models.Model):
 	# calculated attributes
 	messageDict = None
 
+	def getBody(self):
+		return self.getMessageAttribute("Body")
+
 	def getMessageAttribute(self, attribute):
 		if self.messageDict is None:
 			self.messageDict = json.loads(self.msg_json)

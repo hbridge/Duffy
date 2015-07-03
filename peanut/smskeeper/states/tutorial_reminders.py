@@ -75,6 +75,7 @@ def process(user, msg, requestDict, keeperNumber):
 			logger.debug("postalCodes were none for: %s" % msg)
 			response = "Sorry, I didn't understand that, what's your zipcode?"
 			sms_util.sendMsg(user, response, None, keeperNumber)
+			return True
 
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's set your first reminder. \u23F0", u"What's a recent thing you wanted to be reminded of? Like 'Remind me to order birthday cake this weekend'. Give it a try - just start with 'Remind me...'!"], keeperNumber)
 
