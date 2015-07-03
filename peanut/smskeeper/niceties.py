@@ -77,7 +77,7 @@ SMSKEEPER_NICETIES = [
 		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
 	Nicety(
-		"thats all( for now)?|see you later|i have to go",
+		"thats all( for now)?$|see you later$|i have to go$",
 		[u"Ok, I'm here if you need me! \U0001F603"]
 	),
 	Nicety(
