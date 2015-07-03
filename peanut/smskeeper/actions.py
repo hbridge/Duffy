@@ -316,12 +316,14 @@ def setName(user, msg, keeperNumber):
 
 
 def setZipcode(user, msg, keeperNumber):
-	timezone = msg_util.timezoneForMsg(msg)
-	if timezone is None:
+	zipcode = msg_util.getZipcode(msg)
+
+	if zipcode is None:
 		sms_util.sendMsg(user, "I'm sorry, I don't know that zipcode", None, keeperNumber)
 		return True
 
-	user.timezone = timezone
+	user.zipcode = zipcode
+	user.timezone = msg_util.timezoneForZipcode(zipcode)
 	user.save()
 	sms_util.sendMsg(user, helper_util.randomAcknowledgement(), None, keeperNumber)
 

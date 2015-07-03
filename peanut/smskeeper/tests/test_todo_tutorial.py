@@ -30,6 +30,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
 			self.assertIn("Let's add something you need to get done.", self.getOutput(mock))
+			self.assertEqual(self.getTestUser().zipcode, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call jesus tomorrow")

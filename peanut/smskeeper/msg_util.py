@@ -136,16 +136,7 @@ def isSetZipcodeCommand(msg):
 	return re.match("my zip ?code is (\d{5}(\-\d{4})?)", msg, re.I) is not None
 
 
-def hasZipCode(msg):
-	postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
-
-	if postalCodes is None:
-		return False
-	else:
-		return True
-
-
-def timezoneForMsg(msg):
+def getZipcode(msg):
 	postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
 
 	if postalCodes is None:
@@ -153,6 +144,10 @@ def timezoneForMsg(msg):
 
 	zipCode = str(postalCodes.groups()[0])
 	logger.debug("Found zipcode: %s   from groups:  %s   and user entry: %s" % (zipCode, postalCodes.groups(), msg))
+	return zipCode
+
+
+def timezoneForZipcode(zipCode):
 	zipDataResults = ZipData.objects.filter(zip_code=zipCode)
 
 	if len(zipDataResults) == 0:
