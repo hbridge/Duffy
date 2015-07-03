@@ -504,5 +504,5 @@ def message_classification_csv(request):
 
 
 def cleanBodyText(text):
-	result = re.sub(r'[\n"\u201d]', '', text)
+	result = re.sub(ur'[\n"\u201d]', '', text)
 	return result
