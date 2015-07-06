@@ -44,7 +44,7 @@ class Nicety():
 
 
 SMSKEEPER_NICETIES = [
-	Nicety("hi$|hello|hey", ["Hi there."]),
+	Nicety("hi$|hello (keeper)?$|hey (keeper)?$", ["Hi there."]),
 	Nicety("no thanks|not now|maybe later|great to meet you too|nice to meet you too", None),
 	Nicety("yes$|no$|y$|n$|nope$", None),
 	Nicety(u"cool$|ok$|great$|k+$|sweet$|hah(a)?|lol$|okay$|(thats )?awesome|\U0001F44D", None),
@@ -115,10 +115,6 @@ SMSKEEPER_NICETIES = [
 	Nicety(
 		"bye(bye)?|keep in touch",
 		[u"\U0001F44B See ya! Lmk if you need anything!"]
-	),
-	Nicety(
-		"done$|did it",
-		[":thumbsup:", u"Nice!", u"Sweet!", ":party_popper:"]
 	),
 	Nicety(
 		"have a(n)? [\w]+ day",
