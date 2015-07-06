@@ -506,3 +506,11 @@ def message_classification_csv(request):
 def cleanBodyText(text):
 	result = re.sub(ur'[\n"\u201d]', '', text)
 	return result
+
+
+def classified_users(request):
+	user_list = []
+	for i in range(1000, 1150):
+		user_list.append(i)
+
+	return HttpResponse(json.dumps({"users": user_list}), content_type="text/text", status=200)

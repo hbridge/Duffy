@@ -19,5 +19,6 @@ urlpatterns = patterns(
 	url(r'^entry/$', views.EntryList.as_view()),
 	url(r'^entry/(?P<pk>[0-9]+)/$', views.EntryDetail.as_view()),
 	url(r'^message/(?P<pk>[0-9]+)/$', views.MessageDetail.as_view()),
-	url(r'^message_classification.csv$', 'smskeeper.views.message_classification_csv'),
+	url(r'^message_classification[.]csv$', 'smskeeper.views.message_classification_csv'),
+	url(r'^classified_users$', 'smskeeper.views.classified_users'),
 )
