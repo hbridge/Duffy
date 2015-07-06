@@ -96,7 +96,8 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
 
 	elif step == 2:
-		time.sleep(1)
+		if keeper_constants.isRealKeeperNumber(keeperNumber):
+			time.sleep(1)
 		sms_util.sendMsgs(
 			user,
 			[
