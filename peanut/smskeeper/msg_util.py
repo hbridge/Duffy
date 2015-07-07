@@ -25,7 +25,7 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?", re.I)
-done_re = re.compile(r"\b(done|finished|called|bought|did|picked|went|got|had|completed)\b", re.I)
+done_re = re.compile(r"\b(done|check off|check it off|finished|called|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -35,7 +35,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
-ok_words = ["nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats"]
+no_op_words = ["nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
@@ -63,6 +63,7 @@ punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
 	if unicodedata.category(unichr(i)).startswith('P'))
 
 
+# Lowercase
 def cleanMsgText(msg):
 	cleaned = msg.strip().lower()
 	cleaned = cleaned.translate(punctuation_tbl)
@@ -177,6 +178,13 @@ def zipResultToTimeZone(zipDataResult):
 		return pytz.utc
 
 
+# Returns the msg without any punctuation, stripped of spaces and all lowercase
+def simplifiedMsg(msg):
+	newMsg = ''.join(ch for ch in msg if ch.isalnum() or ch == ' ')
+	return cleanedMsg(newMsg.lower())
+
+
+# Returns the msg lowercase and stripped of spaces and punc
 def cleanedMsg(msg):
 	return msg.strip(string.punctuation).strip().lower()
 
@@ -192,15 +200,16 @@ def isRemindCommand(msg):
 def isOkPhrase(msg):
 	words = cleanedMsg(msg).split(' ')
 	for word in words:
-		if word in ok_words:
+		if word in no_op_words:
 			return True
 
 	return False
 
 
 def isDoneCommand(msg):
+	simpleMsg = simplifiedMsg(msg)
 	# First look with local regex
-	if (done_re.search(msg.lower()) is not None):
+	if (done_re.search(simpleMsg) is not None):
 		return True
 
 	"""
@@ -282,10 +291,12 @@ def cleanedDoneCommand(msg):
 
 	return cleaned
 
-def cleanCommand(msg):
-	cleaned = cleanedDoneCommand(msg)
-	cleaned = re.sub("(?i)snooze","", cleaned)
+
+# Returns a string which doesn't have any "snooze" phrases in it
+def cleanedSnoozeCommand(msg):
+	cleaned = re.sub("(?i)snooze", "", msg)
 	return cleaned
+
 
 # Returns a string which converts "my" to "your" and "i" to "you"
 def warpReminderText(msg):

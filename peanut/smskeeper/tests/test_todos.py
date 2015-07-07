@@ -388,6 +388,46 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
 
+	def test_wierd_done_msg(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		# Digest should kicks off
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I already did. Thanks Keeper!")
+
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Make sure first and third were cleared
+		entries = Entry.objects.all()
+		self.assertTrue(entries[0].hidden)
+
+	def test_check_off_done_msg(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "I need to go buy some stuff this weekend")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		# Digest should kicks off
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Check off run!")
+
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Make sure first and third were cleared
+		entries = Entry.objects.all()
+		self.assertTrue(entries[0].hidden)
+		self.assertFalse(entries[1].hidden)
+
 	# Make sure we clear pending even not after daily digest
 	def test_done_all_not_after_daily_digest(self, dateMock):
 		self.setupUser(dateMock)

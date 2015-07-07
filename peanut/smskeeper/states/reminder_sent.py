@@ -44,7 +44,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 			return False  # Reprocess by state remind
 
-	logging.info("User %s: I don't think this is a done or followup command, so kicking out" % (user.id))
+	logging.info("User %s: I don't think this is a done or followup command to the most recent reminder, so kicking out" % (user.id))
 
 	user.setState(keeper_constants.STATE_NORMAL)
 	user.save()

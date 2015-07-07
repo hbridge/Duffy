@@ -44,7 +44,7 @@ class Nicety():
 
 
 SMSKEEPER_NICETIES = [
-	Nicety("hi$|hello (keeper)?$|hey (keeper)?$", ["Hi there."]),
+	Nicety("hi$|hello( keeper)?$|hey( keeper)?$", ["Hi there."]),
 	Nicety("no thanks|not now|maybe later|great to meet you too|nice to meet you too", None),
 	Nicety("yes$|no$|y$|n$|nope$", None),
 	Nicety(u"cool$|ok$|great$|k+$|sweet$|hah(a)?|lol$|okay$|(thats )?awesome|\U0001F44D", None),

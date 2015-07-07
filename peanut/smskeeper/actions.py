@@ -425,12 +425,15 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 	msgBack = None
 	if len(entries) == 0:
 		logger.info("User %s: I think '%s' is a done command but couldn't find a good enough entry. pausing" % (user.id, msg))
-		paused = unknown(user, msg, keeperNumber, sendMsg=False)
-		if not paused:
-			if len(todayEntries) == 0:
-				msgBack = "Sorry, I'm not sure what entry you mean. You don't have any tasks today."
-			else:
+
+		if len(todayEntries) == 0:
+			# no entries, ignore
+			pass
+		else:
+			paused = unknown(user, msg, keeperNumber, sendMsg=False)
+			if not paused:
 				msgBack = "Sorry, I'm not sure what entry you mean."
+
 	elif len(entries) == 1:
 		msgBack = "Nice! Checked that off :white_check_mark:"
 	elif len(entries) > 1:
