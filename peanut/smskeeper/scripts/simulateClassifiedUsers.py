@@ -1,4 +1,4 @@
-# to run use ./manage.py test smskeeper.scripts.test_parsing
+# to run use ./manage.py test smskeeper.scripts.simulateClassifiedUsers
 
 import urllib2
 from urllib2 import URLError
@@ -12,14 +12,9 @@ from smskeeper import keeper_constants
 from smskeeper.models import User
 import mechanize
 
-from datetime import datetime
 from datetime import timedelta
 from smskeeper import async
 from dateutil import parser
-import pytz
-
-
-from common import date_util
 
 
 @patch('common.date_util.utcnow')
