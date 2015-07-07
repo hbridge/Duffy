@@ -12,14 +12,13 @@ from smskeeper import keeper_constants
 from smskeeper.models import User
 import mechanize
 
-from datetime import datetime
 from datetime import timedelta
 from smskeeper import async
 from dateutil import parser
-import pytz
+import copy
 
-
-from common import date_util
+from smskeeper import user_util
+from smskeeper.scripts import importZipdata
 
 
 @patch('common.date_util.utcnow')
@@ -27,6 +26,9 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 	def test_parse_accuracy(self, dateMock):
 		self.setupAuthenticatedBrowser()
+
+		print "Importing zip data..."
+		importZipdata.loadZipDataFromTGZ("./smskeeper/data/zipdata.tgz")
 
 		print "Getting list of classified users..."
 		try:
@@ -43,11 +45,16 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		testPhoneNumInt = 16505550000
 		for user_id in classified_users:
+			# deactivate the old user, if there is one
+			if self.user:
+				self.user.state = keeper_constants.STATE_SUSPENDED
+				self.user.save()
+
 			print "\nReplaying user %d with testPhoneNumInt: %d" % (user_id, testPhoneNumInt)
+			# uncomment temporary for testing
 			# setup the user
-			#if testPhoneNumInt >= 16505550002:
-			# TODO temporary for testing
-			#break
+			# if testPhoneNumInt >= 16505550002:
+			# break
 
 			if testPhoneNumInt >= 16505560000:
 				raise NameError('too many test users')
@@ -68,42 +75,48 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 			# replay them one by one, checking for unknown in each pass
 			for message in messages:
+				if not message.get("incoming", False):
+					continue
+
 				# set the time/state correctly for the message
+
 				message_date = parser.parse(message["added"])
 				if self.mockedDate > message_date:
 					self.setNow(dateMock, message_date)
 				elif self.mockedDate < message_date:
-					lastState = self.user.state
-					while self.mockedDate < message_date - timedelta(minutes=2):
-						newTime = self.mockedDate + timedelta(minutes=2)
+					while self.mockedDate < message_date:
+						nextEventDate = self.getNextEventDate()
 						# print "dateMock %s message_date %s newTime %s" % (self.mockedDate, message_date, newTime)
-						self.setNow(dateMock, newTime)
-						with patch('smskeeper.sms_util.recordOutput') as mock:
-							async.processDailyDigest()
-							async.sendTips()
-							async.processAllReminders()
-							output = self.getOutput(mock)
-							if output != "":
-								print "Keeper (%s): %s" % (self.mockedDate.strftime("%m/%d %H:%M"), self.getOutput(mock))
-						if self.user.state != lastState:
-							print "state changed to: %s" % self.user.state
-							lastState = self.user.state
+						if nextEventDate <= message_date:
+							self.setNow(dateMock, nextEventDate)
+							with patch('smskeeper.sms_util.recordOutput') as mock:
+								async.processDailyDigest()
+								async.sendTips()
+								async.processAllReminders()
+								output = self.getOutput(mock)
+								if output != "":
+									print "Keeper (%s): %s" % (
+										self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
+										self.getOutput(mock)
+									)
+							# nudge the time by a second or we go into an infinite loop
+							self.setNow(dateMock, nextEventDate + timedelta(seconds=1))
+						else:
+							break
 
-				if not message.get("incoming", False):
-					continue
-
-				with patch('smskeeper.msg_util.timezoneForZipcode') as mock_tz:
-					mock_tz.return_value = "PST"
-					with patch('smskeeper.sms_util.recordOutput') as mock:
-						cliMsg.msg(self.testPhoneNumber, message["Body"])
-						print "%s (%s, %s): %s" % (
-							self.testPhoneNumber,
-							self.mockedDate.strftime("%m/%d %H:%M"),
-							self.user.state, message["Body"]
-						)
-						output = self.getOutput(mock)
-						if output != "":
-							print "Keeper: %s" % (self.getOutput(mock))
+				self.setNow(dateMock, message_date)
+				# with patch('smskeeper.msg_util.timezoneForZipcode') as mock_tz:
+				# 	mock_tz.return_value = "PST"
+				with patch('smskeeper.sms_util.recordOutput') as mock:
+					cliMsg.msg(self.testPhoneNumber, message["Body"])
+					print "%s (%s, %s): %s" % (
+						self.testPhoneNumber,
+						self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
+						self.user.state, message["Body"]
+					)
+					output = self.getOutput(mock)
+					if output != "":
+						print "Keeper: %s" % (self.getOutput(mock))
 
 				message_count += 1
 				self.user = User.objects.get(id=self.user.id)
@@ -111,7 +124,6 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					unknown_count += 1
 					self.user.paused = False
 					self.user.save()
-
 		print (
 			"----------\n"
 			+ "%d messages" % message_count
@@ -128,3 +140,25 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		self.browser['username'] = 'henry'
 		self.browser['password'] = 'duffy'
 		self.browser.submit()
+
+	def getNextEventDate(self):
+		# figure out when to adjust the clock to, the next todo, next digest, or next tips
+		pendingTodos = user_util.pendingTodoEntries(self.user, includeAll=True, after=self.mockedDate)
+		if len(pendingTodos) > 0:
+			nextReminderDate = pendingTodos[0].remind_timestamp
+		else:
+			nextReminderDate = self.mockedDate + timedelta(days=30)
+
+		localMockedDate = self.mockedDate.astimezone(self.user.getTimezone())
+		nextDigestDate = copy.copy(localMockedDate)
+		nextDigestDate = nextDigestDate.replace(
+			hour=keeper_constants.TODO_DIGEST_HOUR,
+			minute=keeper_constants.TODO_DIGEST_MINUTE,
+			second=0
+		)
+		if nextDigestDate < localMockedDate:  # if the next digest date is in the past, it should be tomorrow
+			nextDigestDate += timedelta(days=1)
+
+		# we have the next time events, set the time to the first and simulate events
+		times = sorted([nextReminderDate, nextDigestDate])
+		return times[0]
