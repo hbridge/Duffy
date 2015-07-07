@@ -41,6 +41,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		message_count = 0
 		unknown_count = 0
+		unknown_classifications = {}
 
 		testPhoneNumInt = 16505550000
 		for user_id in classified_users:
@@ -123,6 +124,11 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					unknown_count += 1
 					self.user.paused = False
 					self.user.save()
+					correct_classification = message["classification"]
+					class_list = unknown_classifications.get(correct_classification, [])
+					class_list.append(message["Body"])
+					unknown_classifications[correct_classification] = class_list
+
 		print (
 			"----------\n"
 			+ "%d messages" % message_count
@@ -130,6 +136,11 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			+ "\n%.02f unknown rate" % (float(unknown_count) / float(message_count))
 			+ "\n\n"
 		)
+
+		for key in unknown_classifications.keys():
+			message_list = unknown_classifications[key]
+			print "\n\n%s: %d messages missed:\n%s" % (key, len(message_list), "\n".join(message_list))
+
 
 	def setupAuthenticatedBrowser(self):
 		print "Logging in to prod..."
