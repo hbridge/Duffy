@@ -1,9 +1,10 @@
-import datetime
 import pytz
 from smskeeper.models import Entry
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from smskeeper import time_utils
+
+from common import date_util
 
 
 class KeeperTip():
@@ -116,7 +117,7 @@ def isEligibleForTip(user):
 		return False
 
 	# figure out if it's the right local time for tips
-	now = datetime.datetime.now(pytz.utc)
+	now = date_util.now(pytz.utc)
 	localdt = now.astimezone(user.getTimezone())  # we do this to get around mocking, as tests mock datetime.now()
 	localHour = localdt.hour
 	# print "now: %s usernow: %s usertz: %s sendhour: %d" % (now, localdt, user.getTimezone(), SMSKEEPER_TIP_HOUR)
@@ -126,11 +127,11 @@ def isEligibleForTip(user):
 	# only send tips if the user has been active or last tip was sent > their preference for days
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
 	if not user.last_tip_sent:
-		dt_activated = datetime.datetime.now(pytz.utc) - user.activated  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
+		dt_activated = date_util.now(pytz.utc) - user.activated  # must use date_util.now and not utcnow as the test mocks datetime.now
 		if dt_activated.total_seconds() >= 3 * 60 * 60:  # if it's been at least 3 hours since they signed up, send them the first tip
 			return True
 	else:
-		dt_tip_sent = datetime.datetime.now(pytz.utc) - user.last_tip_sent  # must use datetime.datetime.now and not utcnow as the test mocks datetime.now
+		dt_tip_sent = date_util.now(pytz.utc) - user.last_tip_sent  # must use date_util.now and not utcnow as the test mocks datetime.now
 		# print "dt_activated: %s" % dt_tip_sent
 		if dt_tip_sent.total_seconds() >= tip_frequency_seconds:
 			return True
@@ -180,7 +181,7 @@ def tipWithId(tipId):
 
 # isMini means that its a mini message so we don't record the last time it was sent, just that it was
 def markTipSent(user, tip, customSentDate=None, isMini=False):
-	date = customSentDate if customSentDate is not None else datetime.datetime.now(pytz.utc)
+	date = customSentDate if customSentDate is not None else date_util.now(pytz.utc)
 	sentTips = getSentTipIds(user)
 	if tip.id not in sentTips:
 		sentTips.append(tip.id)
@@ -212,7 +213,7 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 		lastMessageHoursAgo = None
 
 	# figure out local hour for the user
-	now = datetime.datetime.now(pytz.utc)
+	now = date_util.now(pytz.utc)
 	localdt = now.astimezone(user.getTimezone())
 	localHour = localdt.hour
 

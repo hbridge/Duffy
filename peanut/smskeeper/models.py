@@ -1,6 +1,5 @@
 import logging
 import json
-import datetime
 
 import pytz
 
@@ -8,7 +7,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.html import format_html
 
-from common import api_util
+from common import api_util, date_util
 from smskeeper import keeper_constants
 
 from django.conf import settings
@@ -116,7 +115,7 @@ class User(models.Model):
 			self.next_state = None
 			self.next_state_data = None
 
-		self.last_state_change = datetime.datetime.now(pytz.utc)
+		self.last_state_change = date_util.now(pytz.utc)
 
 		logger.debug("User %s: End of setState.  new state:  %s %s  and next state: %s %s" % (self.id, self.state, self.state_data, self.next_state, self.next_state_data))
 
@@ -191,7 +190,7 @@ class User(models.Model):
 	# Meant to double check data
 	def setActivated(self, isActivated, customActivatedDate=None, tutorialState=keeper_constants.STATE_TUTORIAL_REMIND):
 		if isActivated:
-			self.activated = customActivatedDate if customActivatedDate is not None else datetime.datetime.now(pytz.utc)
+			self.activated = customActivatedDate if customActivatedDate is not None else date_util.now(pytz.utc)
 			if self.isTutorialComplete():
 				self.setState(keeper_constants.STATE_NORMAL)
 			else:
