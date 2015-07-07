@@ -298,12 +298,12 @@ def fixMsgForNatty(msg, user):
 	newMsg = newMsg.replace("around", "at")
 
 	# Fix "again at 3" situation where natty doesn't like that...wtf
-	againAt = re.search(r'.*again at ([0-9])', newMsg)
+	againAt = re.search(r'.*again at ([0-9])', newMsg, re.IGNORECASE)
 	if againAt:
 		newMsg = newMsg.replace("again at", "at")
 
 	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg)
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg, re.IGNORECASE)
 	if threeDigitsWithAP:
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
@@ -311,7 +311,7 @@ def fixMsgForNatty(msg, user):
 		newMsg = newMsg.replace(oldtime, newtime)
 
 	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
-	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg)
+	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg, re.IGNORECASE)
 	if threeDigitsWithAT:
 		oldtime = threeDigitsWithAT.group("time")
 		newtime = oldtime[0] + ":" + oldtime[1:]
@@ -319,7 +319,7 @@ def fixMsgForNatty(msg, user):
 		newMsg = newMsg.replace(oldtime, newtime)
 
 	# Change '4th' to 'June 4th'
-	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg)
+	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg, re.IGNORECASE)
 	if dayOfMonth:
 		localtime = date_util.now(user.getTimezone())
 
@@ -336,7 +336,7 @@ def fixMsgForNatty(msg, user):
 		newMsg = newMsg.replace("the %s" % dayStr, "%s %s" % (monthName, dayStr))
 
 	# Take anything like 7ish and just make 7
-	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg)
+	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg, re.IGNORECASE)
 	if ish:
 		time = ish.group("time")
 		newMsg = newMsg.replace(time + "ish", time)

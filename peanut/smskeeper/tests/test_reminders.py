@@ -556,8 +556,15 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			entry = Entry.objects.filter(label="#reminders").last()
 			self.assertEqual("call hubby", entry.text)
 
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me tomorrow morning 530 Am goto Zeus appointment")
+			self.assertIn("by 5:30", self.getOutput(mock))
+
+			entry = Entry.objects.filter(label="#reminders").last()
+			self.assertIn("Zeus", entry.text)
+
 		# Make sure two seperate entries were create
-		self.assertEquals(2, len(Entry.objects.filter(label="#reminders")))
+		self.assertEquals(3, len(Entry.objects.filter(label="#reminders")))
 
 	# Make sure first 3 tips are "done", and 4th is snooze
 	def test_mini_tips(self, dateMock):
