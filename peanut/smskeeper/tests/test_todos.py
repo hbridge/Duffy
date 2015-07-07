@@ -1,5 +1,3 @@
-import datetime
-
 from mock import patch
 
 from smskeeper import cliMsg, async, keeper_constants

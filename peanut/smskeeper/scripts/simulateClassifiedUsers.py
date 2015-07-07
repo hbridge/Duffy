@@ -1,4 +1,4 @@
-# to run use ./manage.py test smskeeper.scripts.test_parsing
+# to run use ./manage.py test smskeeper.scripts.simulateClassifiedUsers
 
 import urllib2
 from urllib2 import URLError
@@ -19,7 +19,6 @@ import copy
 
 from smskeeper import user_util
 from smskeeper.scripts import importZipdata
-
 
 @patch('common.date_util.utcnow')
 class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):

@@ -1,14 +1,18 @@
 import datetime
-from smskeeper import time_utils
-import random
-import re
-
-import pytz
-from smskeeper import keeper_constants
-from smskeeper import msg_util
 import humanize
 import emoji
+import random
+import re
+import pytz
+import logging
 
+from smskeeper import keeper_constants
+from smskeeper import msg_util
+from smskeeper import time_utils
+
+from common import date_util
+
+logger = logging.getLogger(__name__)
 
 class Nicety():
 	reStr = None
@@ -146,12 +150,13 @@ def custom_nicety_for(regexp):
 @custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ok )?(ty|thx|thz|thks|thnx|thanx)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(["You're welcome.", "Happy to help.", "No problem.", "Sure thing."])
-	if time_utils.isDateOlderThan(user.last_feedback_prompt, keeper_constants.FEEDBACK_FREQUENCY_DAYS) and user.activated < datetime.datetime.now(pytz.utc) - datetime.timedelta(days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS):
-		user.last_feedback_prompt = datetime.datetime.now(pytz.utc)
+	if time_utils.isDateOlderThan(user.last_feedback_prompt, keeper_constants.FEEDBACK_FREQUENCY_DAYS) and user.activated < date_util.now(pytz.utc) - datetime.timedelta(days=keeper_constants.FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS):
+		user.last_feedback_prompt = date_util.now(pytz.utc)
 		user.save()
+		logger.info("Asked to talk to user: %s" % (user.id))
 		return "%s %s" % (base, keeper_constants.FEEDBACK_PHRASE)
 	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
-		user.last_share_upsell = datetime.datetime.now(pytz.utc)
+		user.last_share_upsell = date_util.now(pytz.utc)
 		user.save()
 		return "%s %s %s!" % (base, keeper_constants.SHARE_UPSELL_PHRASE, user.getInviteUrl())
 	else:
