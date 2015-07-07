@@ -35,7 +35,7 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
-no_op_words = ["nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
+no_op_words = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
@@ -388,6 +388,20 @@ def isFetchHandleCommand(msg):
 
 def isMagicPhrase(msg):
 	return 'trapper keeper' in msg.lower() or 'trapperkeeper' in msg.lower()
+
+
+# Remove words from a msg
+# So if starts out "hi there keeper" and list was "hi", returns "there keeper"
+def removeWordsFromMsg(msg, wordsToRemove):
+	wordsLeft = list()
+	for word in msg.split(' '):
+		if word.lower not in wordsToRemove:
+			wordsLeft.append(word)
+	return ' '.join(wordsLeft)
+
+
+def removeNoOpWords(msg):
+	return removeWordsFromMsg(msg, no_op_words)
 
 
 def nameInSetName(msg, tutorial=False):

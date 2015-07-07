@@ -46,6 +46,8 @@ def process(user, msg, requestDict, keeperNumber):
 		if nameFromPhrase:
 			user.name = nameFromPhrase
 		else:
+			msg = msg_util.removeNoOpWords(msg)
+
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
