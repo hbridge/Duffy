@@ -12,10 +12,20 @@ from smskeeper import keeper_constants
 from smskeeper.models import User
 import mechanize
 
+from datetime import datetime
+from datetime import timedelta
+from smskeeper import async
+from dateutil import parser
+import pytz
 
+
+from common import date_util
+
+
+@patch('common.date_util.utcnow')
 class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
-	def test_parse_accuracy(self):
+	def test_parse_accuracy(self, dateMock):
 		self.setupAuthenticatedBrowser()
 
 		print "Getting list of classified users..."
@@ -33,8 +43,12 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		testPhoneNumInt = 16505550000
 		for user_id in classified_users:
-			print "Replaying user %d with testPhoneNumInt: %d" % (user_id, testPhoneNumInt)
+			print "\nReplaying user %d with testPhoneNumInt: %d" % (user_id, testPhoneNumInt)
 			# setup the user
+			#if testPhoneNumInt >= 16505550002:
+			# TODO temporary for testing
+			#break
+
 			if testPhoneNumInt >= 16505560000:
 				raise NameError('too many test users')
 			self.testPhoneNumber = "+%d" % testPhoneNumInt
@@ -49,8 +63,32 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				print "Could not connect to prod server for messages: %@" % (e)
 				messages_response = {"messages": []}
 
+			messages = json.loads(messages_response)["messages"]
+			self.setNow(dateMock, parser.parse(messages[0]["added"]))
+
 			# replay them one by one, checking for unknown in each pass
-			for message in json.loads(messages_response)["messages"]:
+			for message in messages:
+				# set the time/state correctly for the message
+				message_date = parser.parse(message["added"])
+				if self.mockedDate > message_date:
+					self.setNow(dateMock, message_date)
+				elif self.mockedDate < message_date:
+					lastState = self.user.state
+					while self.mockedDate < message_date - timedelta(minutes=2):
+						newTime = self.mockedDate + timedelta(minutes=2)
+						# print "dateMock %s message_date %s newTime %s" % (self.mockedDate, message_date, newTime)
+						self.setNow(dateMock, newTime)
+						with patch('smskeeper.sms_util.recordOutput') as mock:
+							async.processDailyDigest()
+							async.sendTips()
+							async.processAllReminders()
+							output = self.getOutput(mock)
+							if output != "":
+								print "Keeper (%s): %s" % (self.mockedDate.strftime("%m/%d %H:%M"), self.getOutput(mock))
+						if self.user.state != lastState:
+							print "state changed to: %s" % self.user.state
+							lastState = self.user.state
+
 				if not message.get("incoming", False):
 					continue
 
@@ -58,8 +96,14 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					mock_tz.return_value = "PST"
 					with patch('smskeeper.sms_util.recordOutput') as mock:
 						cliMsg.msg(self.testPhoneNumber, message["Body"])
-						print "%s: %s" % (self.testPhoneNumber, message["Body"])
-						print "Keeper: %s" % (self.getOutput(mock))
+						print "%s (%s, %s): %s" % (
+							self.testPhoneNumber,
+							self.mockedDate.strftime("%m/%d %H:%M"),
+							self.user.state, message["Body"]
+						)
+						output = self.getOutput(mock)
+						if output != "":
+							print "Keeper: %s" % (self.getOutput(mock))
 
 				message_count += 1
 				self.user = User.objects.get(id=self.user.id)

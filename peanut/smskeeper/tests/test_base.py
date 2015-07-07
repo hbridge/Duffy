@@ -15,6 +15,7 @@ settings.MIXPANEL_TOKEN = None
 class SMSKeeperBaseCase(TestCase):
 	testPhoneNumber = "+16505555550"
 	user = None
+	mockedDate = None
 
 	def setUp(self):
 		try:
@@ -106,3 +107,4 @@ class SMSKeeperBaseCase(TestCase):
 
 	def setNow(self, dateMock, date):
 		dateMock.return_value = date
+		self.mockedDate = date
