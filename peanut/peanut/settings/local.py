@@ -12,5 +12,9 @@ STATICFILES_DIRS = (
 
 KEEPER_NUMBER = "test"
 
+
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	BROKER_URL = "amqp://guest:guest@localhost:5672"
+
+import logging
+logging.getLogger('django.db.backends').setLevel(logging.ERROR)

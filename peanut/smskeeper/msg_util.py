@@ -22,10 +22,7 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile(
-	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?"
-	+ "|i need to .+"
-	+ "|dont (let me )?forget .+"
-	+ "|do my .+",
+	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?",
 	re.I
 )
 done_re = re.compile(r"\b(done|check off|check it off|finished|texted|txted|walked|worked|left|packed|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
@@ -41,6 +38,7 @@ set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 no_op_words = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
+stop_re = re.compile(r'stop$|cancel$|leave me alone|stop .+ me|.*dont text me.*', re.I)
 
 
 def hasLabel(msg):
@@ -375,7 +373,7 @@ def extractPhoneNumbers(msg):
 
 
 def isStopCommand(msg):
-	return 'cancel' == msg.lower() or 'stop' == msg.lower()
+	return stop_re.match(msg) is not None
 
 
 def isCreateHandleCommand(msg):
