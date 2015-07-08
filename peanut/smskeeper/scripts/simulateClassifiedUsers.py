@@ -89,8 +89,11 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 						# print "dateMock %s message_date %s newTime %s" % (self.mockedDate, message_date, newTime)
 						if nextEventDate <= message_date:
 							self.setNow(dateMock, nextEventDate)
+							# run async jobs
 							with patch('smskeeper.sms_util.recordOutput') as mock:
-								async.processDailyDigest()
+								with patch('smskeeper.async.getWeatherPhraseForZip') as weatherMock:
+									weatherMock.return_value = "mock forecast"
+									async.processDailyDigest()
 								async.sendTips()
 								async.processAllReminders()
 								output = self.getOutput(mock)
