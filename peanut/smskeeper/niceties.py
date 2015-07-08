@@ -240,8 +240,13 @@ def renderShareRequest(user, requestDict, keeperNumber):
 
 
 @custom_nicety_for(r'what(s| is) my name|keeper')
-def renderShareRequest(user, requestDict, keeperNumber):
+def renderNameQuery(user, requestDict, keeperNumber):
 	return "%s!" % (user.name.title())
+
+@custom_nicety_for(r'(my name isnt|my names not|im not) roger')
+def renderRogerConfusion(user, requestDict, keeperNumber):
+	return "I know, it's just an expression %s!" % (user.name.title())
+
 
 # for nicety in SMSKEEPER_NICETIES:
 # 	print nicety
