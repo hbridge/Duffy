@@ -85,8 +85,12 @@ SMSKEEPER_NICETIES = [
 		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
 	Nicety(
-		"thats (all|it)( for (right )?now)?$|see you later$|i have to go$|(nothing|not) ((right|for) now|at the moment)",
+		"see you later|i have to go",
 		[u"Ok, I'm here if you need me! \U0001F603"]
+	),
+	Nicety(
+		"thats (all|it)( for (right )?now)?|(nothing|not) ((right|for) now|at the moment)",
+		None
 	),
 	Nicety(
 		"are you( a)? real( person)?|are you human|are you an? (computer|machine)|are you an ai",
