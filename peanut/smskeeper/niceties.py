@@ -176,6 +176,10 @@ SMSKEEPER_NICETIES = [
 		"good (morning|evening|afternoon|day)",
 		["Thanks, same to you! :smiling_face_with_smiling_eyes:"]
 	),
+	Nicety(
+		"how much .* cost|is .+ free",
+		["My help is free! :person_raising_both_hands_in_celebration: Msg and data rates may apply."]
+	),
 ]
 
 

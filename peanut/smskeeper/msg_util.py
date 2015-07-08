@@ -320,7 +320,7 @@ def isDeleteCommand(msg):
 
 def isHelpCommand(msg):
 	cleaned = cleanMsgText(msg)
-	return re.match('[?]$|huh$|help$|what$|how do you work|what.* (can|do) you do|tell me more', cleaned) is not None
+	return re.match('[?]$|huh$|help$|what$|how do.* work|what.* (can|do) you do|tell me more', cleaned) is not None
 
 
 def isPrintHashtagsCommand(msg):
