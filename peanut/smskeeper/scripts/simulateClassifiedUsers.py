@@ -129,7 +129,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					self.user.save()
 					correct_classification = message["classification"]
 					class_list = unknown_classifications.get(correct_classification, [])
-					class_list.append(message["Body"])
+					message["uid"] = user_id  # pass this through for printing out
+					class_list.append(message)
 					unknown_classifications[correct_classification] = class_list
 
 		print (
@@ -142,8 +143,9 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		for key in unknown_classifications.keys():
 			message_list = unknown_classifications[key]
-			print "\n\n%s: %d messages missed:\n%s" % (key, len(message_list), "\n- ".join(message_list))
-
+			print "\n\n%s: %d messages missed:\n" % (key, len(message_list))
+			for message in message_list:
+				print "- %s (%s)" % (message["Body"], message["uid"])
 
 	def setupAuthenticatedBrowser(self):
 		print "Logging in to prod..."
