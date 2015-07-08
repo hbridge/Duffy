@@ -139,7 +139,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		for key in unknown_classifications.keys():
 			message_list = unknown_classifications[key]
-			print "\n\n%s: %d messages missed:\n%s" % (key, len(message_list), "\n".join(message_list))
+			print "\n\n%s: %d messages missed:\n%s" % (key, len(message_list), "\n- ".join(message_list))
 
 
 	def setupAuthenticatedBrowser(self):

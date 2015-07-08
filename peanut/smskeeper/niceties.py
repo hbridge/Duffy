@@ -53,24 +53,28 @@ SMSKEEPER_NICETIES = [
 	Nicety("yes$|no$|y$|n$|nope$", None),
 	Nicety(u"cool$|ok$|great$|k+$|sweet$|hah(a)?|lol$|okay$|(thats )?awesome|\U0001F44D", None),
 	Nicety(
-		"how are you( today)?|how're you|hows it going",
+		"me too|i agree|agreed|i have a question",
+		None
+	),
+	Nicety(
+		".*how are you( today)?|how're you|hows it going",
 		[u"I'm good, thanks for asking! \U0001F603", u"Can't complain! \U0001F603"]
 	),
 	Nicety(
-		"i hate you|you suck|this is stupid|youre stupid",
-		["Well that's not very nice.", "I'm doing my best."]
+		"i hate you|you suck|this is stupid|you[\S]{0,2} (stupid|fat|dumb|ugly)",
+		["Well that's not very nice. :pouting_face:", "I'm doing my best. :disappointed_face:", ":broken_heart:"]
 	),
 	Nicety(
 		"whats your name|who are you|what do you call yourself",
 		["Keeper!"]
 	),
 	Nicety(
-		"tell me a joke",
+		".*(you )?tell me a joke",
 		[u"I don't think you'd appreciate my humor. \U0001F609"]
 	),
 	Nicety(
-		"i love you|youre (pretty )?(cool|neat|smart)|youre the (best|greatest)",
-		[u"You're pretty cool too! \U0001F60E"]
+		"i love you|.*you[\S]{0,2} ((pretty|so) )?(cool|neat|smart|(the (best|greatest)))|you rock",
+		[u"You're pretty cool too! :sunglasses:"]
 	),
 	Nicety(
 		"hows the weather|whats the weather",
@@ -81,11 +85,15 @@ SMSKEEPER_NICETIES = [
 		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
 	Nicety(
-		"thats all( for now)?$|see you later$|i have to go$",
+		"thats (all|it)( for (right )?now)?$|see you later$|i have to go$|(nothing|not) ((right|for) now|at the moment)",
 		[u"Ok, I'm here if you need me! \U0001F603"]
 	),
 	Nicety(
 		"are you( a)? real( person)?|are you human|are you an? (computer|machine)|are you an ai",
+		["Do you think I am?"]
+	),
+	Nicety(
+		"(is this|are you).* (human|ai|a machine|automated|computer|person)",
 		["Do you think I am?"]
 	),
 	Nicety(
@@ -118,11 +126,55 @@ SMSKEEPER_NICETIES = [
 	),
 	Nicety(
 		"bye(bye)?|keep in touch",
-		[u"\U0001F44B See ya! Lmk if you need anything!"]
+		[u":wave: See ya! Lmk if you need anything!"]
 	),
 	Nicety(
 		"have a(n)? [\w]+ day",
 		["Thanks, you too! :smile:"]
+	),
+	Nicety(
+		"(can you |please )?call me|can i call you",
+		["Sorry, I can only txt at the moment."]
+	),
+	Nicety(
+		"are we friends|can we be friends",
+		["I like to think so! :smiling_face_with_smiling_eyes:"]
+	),
+	Nicety(
+		"will you be my friend",
+		["Certainly! But I'm not very smart yet. :hatching_chick:"]
+	),
+	Nicety(
+		"can .* motivational support",
+		["Go go go! :chequered_flag:", "You can do it! :face_with_ok_gesture:", "To infinity, and beyond! :rocket:"]
+	),
+	Nicety(
+		"do you (like|love) me",
+		["I think you're pretty cool! :sunglasses:"]
+	),
+	Nicety(
+		"do you like .+",
+		["I love it! ", "Sometimes, it depends on the day.", "It's ok.", "Meh."]
+	),
+	Nicety(
+		"whats (up|going on|new)",
+		["Chillin :sunglasses:", "Workin hard. :information_desk_person:", "Nothing much. :bath:"]
+	),
+	Nicety(
+		"this is (weird|strange|odd|different)",
+		["You're telling me!"]
+	),
+	Nicety(
+		"can i call you .+|i('m| am) going to call you .+",
+		["You can call me whatever you'd like! :information_desk_person:"]
+	),
+	Nicety(
+		"(will you )?marry me|can we be together|will you go out with me|be mine$",
+		["Sorry, I'm already taken! :bride_with_veil: I'm here to help you remember stuff though!"]
+	),
+	Nicety(
+		"good (morning|evening|afternoon|day)",
+		["Thanks, same to you! :smiling_face_with_smiling_eyes:"]
 	),
 ]
 
@@ -163,7 +215,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		return base
 
 
-@custom_nicety_for(r'how old are you|whats your birthday|when were you born')
+@custom_nicety_for(r'how old are (you|u)|whats your birthday|when were you born')
 def renderBirthdayInquiry(user, requestDict, keeperNumber):
 	delta = datetime.date.today() - keeper_constants.KEEPER_BIRTHDAY
 	deltaText = humanize.naturaldelta(delta)
@@ -180,6 +232,16 @@ except:
 @custom_nicety_for(EMOJI_NICETY_RE)
 def renderRandomEmoji(user, requestDict, keeperNumber):
 	return random.choice(emoji.EMOJI_UNICODE.values())
+
+
+@custom_nicety_for(r'what is your link|how do i share (you|keeper|this)')
+def renderShareRequest(user, requestDict, keeperNumber):
+	return ":clapping_hands_sign: Please send them to %s and thanks!" % (user.getInviteUrl())
+
+
+@custom_nicety_for(r'what(s| is) my name|keeper')
+def renderShareRequest(user, requestDict, keeperNumber):
+	return "%s!" % (user.name.title())
 
 # for nicety in SMSKEEPER_NICETIES:
 # 	print nicety
