@@ -41,7 +41,7 @@ set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 no_op_words = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
-stop_re = re.compile(r'stop$|cancel$|leave me alone|stop .+ me|.*dont text me.*', re.I)
+stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
 
 
 def hasLabel(msg):
