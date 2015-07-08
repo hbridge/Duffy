@@ -389,21 +389,24 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_wierd_done_msg(self, dateMock):
 		self.setupUser(dateMock)
 
-		self.setNow(dateMock, self.MON_8AM)
-		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+		phrases = ["Check off list", "Tasks done already", "I already did. Thanks Keeper!", "Done with that", "Got it done"]
 
-		self.setNow(dateMock, self.TUE_9AM)
-		async.processDailyDigest()
+		for donePhrase in phrases:
+			self.setNow(dateMock, self.MON_8AM)
+			cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
 
-		# Digest should kicks off
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "I already did. Thanks Keeper!")
+			self.setNow(dateMock, self.TUE_9AM)
+			async.processDailyDigest()
 
-			self.assertIn("Nice!", self.getOutput(mock))
+			# Digest should kicks off
+			with patch('smskeeper.sms_util.recordOutput') as mock:
+				cliMsg.msg(self.testPhoneNumber, donePhrase)
 
-		# Make sure first and third were cleared
-		entries = Entry.objects.all()
-		self.assertTrue(entries[0].hidden)
+				self.assertIn("Nice!", self.getOutput(mock), donePhrase)
+
+			# Make sure first and third were cleared
+			entry = Entry.objects.last()
+			self.assertTrue(entry.hidden)
 
 	def test_check_off_done_msg(self, dateMock):
 		self.setupUser(dateMock)

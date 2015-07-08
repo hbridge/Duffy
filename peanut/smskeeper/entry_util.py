@@ -7,14 +7,15 @@ logger = logging.getLogger(__name__)
 
 from fuzzywuzzy import fuzz
 
-extraDoneWords = ["all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper"]
+extraDoneWords = ["all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "got", "done"]
 
 
 def getInterestingWords(phrase):
 	interestingWords = list()
 	for word in phrase.split(' '):
 		if word not in extraDoneWords:
-			interestingWords.append(word)
+			if word:  # Make sure the word isn't blank
+				interestingWords.append(word)
 	return interestingWords
 
 
@@ -43,6 +44,7 @@ def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 	elif len(phrases) == 1:
 		phrase = msg_util.simplifiedMsg(phrases[0])
 		interestingWords = getInterestingWords(phrase)
+
 		# These are the words left over after stripping out the "done" word
 		# If true, its a "I did all" type command
 		if (phrase == "" or
