@@ -22,7 +22,10 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile(
-	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?",
+	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by | about |)?"
+	+ "|i (need|want|have) to "
+	+ "|dont (let me )?forget (to )?"
+	+ "|do my ",
 	re.I
 )
 done_re = re.compile(r"\b(done|check off|check it off|finished|texted|txted|walked|worked|left|packed|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)

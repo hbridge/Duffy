@@ -8,7 +8,7 @@ import test_base
 import emoji
 from smskeeper import time_utils
 from common import date_util
-
+from datetime import timedelta
 
 @patch('common.date_util.utcnow')
 class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
@@ -47,7 +47,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("9 am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEquals("you need to pick up your sox", entry.text)
+		self.assertEquals("pick up your sox", entry.text)
 
 	def test_two_entries(self, dateMock):
 		self.setupUser(dateMock)
@@ -55,15 +55,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "I want to pick up my sox tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
+		self.setNow(dateMock, self.mockedDate + timedelta(hours=1))  # prevent squashing
 		firstEntry = Entry.objects.filter(label="#reminders").last()
-		self.assertEquals("you want to pick up your sox", firstEntry.text)
+		self.assertEquals("pick up your sox", firstEntry.text)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to buy tickets next week")
 			self.assertIn("Mon", self.getOutput(mock))
 
 		secondEntry = Entry.objects.filter(label="#reminders").last()
-		self.assertEquals("you need to buy tickets", secondEntry.text)
+		self.assertEquals("buy tickets", secondEntry.text)
 
 		self.assertNotEqual(firstEntry.id, secondEntry.id)
 
@@ -78,7 +79,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("9 am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEquals("you need to buy detergent", entry.text)
+		self.assertEquals("buy detergent", entry.text)
 
 	def test_weekend_with_time(self, dateMock):
 		self.setupUser(dateMock)
@@ -143,7 +144,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "Thanks!")
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 5 minute")
-		cliMsg.msg(self.testPhoneNumber, "I need to buy sox in 1 minute")
+		cliMsg.msg(self.testPhoneNumber, "I need to buy a dozen sox in 1 minute")
 
 		self.assertEqual(2, len(Entry.objects.filter(label="#reminders")))
 
@@ -327,7 +328,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Digest should kicks off
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("you need to run", self.getOutput(mock))
+			self.assertIn("run", self.getOutput(mock))
 
 	# Make sure we create a new entry instead of a followup
 	def test_snooze_all_after_daily_digest(self, dateMock):
