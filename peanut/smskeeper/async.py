@@ -4,6 +4,7 @@ import pytz
 import time
 import os
 import sys
+import pywapi
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -148,14 +149,22 @@ def shouldIncludeEntry(entry):
 	return False
 
 
-def getDigestMessageForUser(user, pendingEntries, isAll):
+def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
 	now = date_util.now(pytz.utc)
+	msg = ""
 
-	if not isAll:
-		header_phrase = keeper_constants.REMINDER_DIGEST_HEADERS[now.weekday()]
-		msg = u"%s\nYour tasks for today: \U0001F4DD\n" % (header_phrase)
-	else:
+	if isAll:
 		msg = u"Your current tasks: \U0001F4DD\n"
+	else:
+		headerPhrase = keeper_constants.REMINDER_DIGEST_HEADERS[now.weekday()]
+		msg += u"%s\n" % (headerPhrase)
+
+		if user.zipcode:
+			weatherPhrase = getWeatherPhraseForZip(user.zipcode, weatherDataCache)
+			if weatherPhrase:
+				msg += u"\n%s\n\n" % (weatherPhrase)
+
+		msg += u"Your tasks for today: \U0001F4DD\n"
 
 	if len(pendingEntries) == 0:
 		return None, []
@@ -175,17 +184,18 @@ def getDigestMessageForUser(user, pendingEntries, isAll):
 
 @app.task
 def sendDigestForUserId(userId):
+	weatherDataCache = dict()
 	user = User.objects.get(id=userId)
 
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 	if len(pendingEntries) > 0:
-		sendDigestForUserWithPendingEntries(user, pendingEntries, isAll=False)
+		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False)
 
 
-def sendDigestForUserWithPendingEntries(user, pendingEntries, isAll):
+def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, isAll):
 	if len(pendingEntries) > 0:
-		msg = getDigestMessageForUser(user, pendingEntries, isAll)
+		msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll)
 		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 
 		# Now set to reminder sent, incase they send back done message
@@ -200,17 +210,20 @@ def sendDigestForUserWithPendingEntries(user, pendingEntries, isAll):
 
 @app.task
 def sendAllRemindersForUserId(userId):
+	weatherDataCache = dict()
+
 	user = User.objects.get(id=userId)
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=True)
 
 	if len(pendingEntries) > 0:
-		sendDigestForUserWithPendingEntries(user, pendingEntries, isAll=True)
+		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, True)
 	else:
 		sms_util.sendMsg(user, "You have no pending tasks.", None, user.getKeeperNumber())
 
 
 @app.task
 def processDailyDigest():
+	weatherDataCache = dict()
 	for user in User.objects.all():
 		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
 			continue
@@ -224,7 +237,7 @@ def processDailyDigest():
 		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 		if len(pendingEntries) > 0:
-			sendDigestForUserWithPendingEntries(user, pendingEntries, isAll=False)
+			sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False)
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
 			userNow = date_util.now(user.getTimezone())
 			if userNow.weekday() == 0:  # Monday
@@ -260,6 +273,74 @@ def sendTipToUser(tip, user, keeperNumber):
 
 def str_now_1():
 	return str(datetime.now())
+
+weatherCodes = {
+	"0": u'\U0001F300',
+	"1": u'\U0001F300',
+	"2": u'\U0001F300\U0001F300',
+	"3": u'\U000026A1\U000026A1\U00002614',
+	"4": u'\U000026A1\U00002614',
+	"5": u'\U0001F4A7\U00002744',
+	"6": u'\U0001F4A7\U000026AA',
+	"7": u'\U00002744\U000026AA',
+	"8": u'\U0001F4A7',
+	"9": u'\U00002614',
+	"10": u'\U000026C4\U00002614',
+	"11": u'\U00002614',
+	"12": u'\U00002614',
+	"13": u'\U00002744',
+	"14": u'\U00002744\U0001F4A7',
+	"15": u'\U00002744\U0001F4A8',
+	"16": u'\U00002744',
+	"17": u'\U0001F4A7\U00002614',
+	"18": u'\U00002744',
+	"19": u'\U0001F301',
+	"20": u'\U0001F301',
+	"21": u'\U0001F301',
+	"22": u'\U0001F301',
+	"23": u'\U0001F4A8\U0001F4A8',
+	"24": u'\U0001F4A8',
+	"25": u'\U000026C4',
+	"26": u'\U00002601\U00002601',
+	"27": u'\U00002601',
+	"28": u'\U00002601\U000026C5',
+	"29": u'\U00002601',
+	"30": u'\U000026C5',
+	"31": u'\U00002601',
+	"32": u'\U0001F31E\U0001F31E',
+	"33": u'\U00002601',
+	"34": u'\U0001F31E',
+	"35": u'\U00002614',
+	"36": u'\U0001F630\U0001F4A6',
+	"37": u'\U000026A1\U00002614',
+	"38": u'\U000026A1\U00002614',
+	"39": u'\U000026A1\U00002614',
+	"40": u'\U00002614',
+	"41": u'\U00002744\U00002744\U00002744',
+	"42": u'\U00002744\U0001F4A7',
+	"43": u'\U00002744\U00002744\U00002744',
+	"44": u'\U000026C5',
+	"45": u'\U000026A1\U00002614',
+	"46": u'\U00002744\U0001F4A7',
+	"47": u'\U000026A1\U00002614',
+	"3200": u'\U00002601',
+}
+
+
+def getWeatherPhraseForZip(zipCode, weatherDataCache):
+	if zipCode in weatherDataCache:
+		data = weatherDataCache[zipCode]
+	else:
+		try:
+			data = pywapi.get_weather_from_yahoo(zipCode, 'imperial')
+			weatherDataCache[zipCode] = data
+		except:
+			data = None
+
+	if data:
+		return "Today's forecast: %s | High %s and low %s" % (weatherCodes[data["forecasts"][0]["code"]], data["forecasts"][0]["high"], data["forecasts"][0]["low"])
+	else:
+		return None
 
 
 @app.task
