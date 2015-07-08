@@ -94,9 +94,9 @@ def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
 	elif msg_util.isDigestCommand(msg):
 		logger.info("User %s: I think '%s' is a digest command" % (user.id, msg))
 		if "today" in msg.lower():
-			async.sendDigestForUserId(user.id)
+			async.sendDigestForUserId(user.id, keeperNumber)
 		else:
-			async.sendAllRemindersForUserId(user.id)
+			async.sendAllRemindersForUserId(user.id, keeperNumber)
 	elif len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
 	else:

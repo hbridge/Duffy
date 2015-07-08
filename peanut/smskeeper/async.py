@@ -183,20 +183,21 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
 
 
 @app.task
-def sendDigestForUserId(userId):
+def sendDigestForUserId(userId, overrideKeeperNumber=None):
 	weatherDataCache = dict()
 	user = User.objects.get(id=userId)
 
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 	if len(pendingEntries) > 0:
-		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False)
+		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False, overrideKeeperNumber=overrideKeeperNumber)
 
 
-def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, isAll):
+def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, isAll, overrideKeeperNumber=None):
 	if len(pendingEntries) > 0:
+		keeperNumber = user.getKeeperNumber() if overrideKeeperNumber is None else overrideKeeperNumber
 		msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll)
-		sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
+		sms_util.sendMsg(user, msg, None, overrideKeeperNumber)
 
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
@@ -209,14 +210,14 @@ def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, 
 
 
 @app.task
-def sendAllRemindersForUserId(userId):
+def sendAllRemindersForUserId(userId, overrideKeeperNumber=None):
 	weatherDataCache = dict()
 
 	user = User.objects.get(id=userId)
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=True)
 
 	if len(pendingEntries) > 0:
-		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, True)
+		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, True, overrideKeeperNumber=overrideKeeperNumber)
 	else:
 		sms_util.sendMsg(user, "You have no pending tasks.", None, user.getKeeperNumber())
 
