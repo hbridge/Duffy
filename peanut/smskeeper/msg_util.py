@@ -9,12 +9,9 @@ import string
 import pytz
 import emoji
 
-from django.db.models import Q
-
 from models import Entry
 from smskeeper import keeper_constants
-from models import ZipData, VerbData
-
+from models import ZipData
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +21,13 @@ freeform_fetch_res = [
 	re.compile("what([']| i)s on (my )?#?(?P<label>[\S]+)( list)?", re.I),
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
-reminder_re = re.compile("(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?", re.I)
+reminder_re = re.compile(
+	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by )?"
+	+ "|i need to .+"
+	+ "|dont (let me )?forget .+"
+	+ "|do my .+",
+	re.I
+)
 done_re = re.compile(r"\b(done|check off|check it off|finished|texted|txted|walked|worked|left|packed|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
@@ -59,8 +62,10 @@ def isLabel(msg):
 	return (' ' in stripedMsg) is False and stripedMsg.startswith("#")
 
 # from http://stackoverflow.com/questions/11066400/remove-punctuation-from-unicode-formatted-strings
-punctuation_tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
-	if unicodedata.category(unichr(i)).startswith('P'))
+punctuation_tbl = dict.fromkeys(
+	i for i in xrange(sys.maxunicode)
+	if unicodedata.category(unichr(i)).startswith('P')
+)
 
 
 # Lowercase
