@@ -222,7 +222,7 @@ def sendAllRemindersForUserId(userId):
 
 
 @app.task
-def processDailyDigest(startAtId=None):
+def processDailyDigest(startAtId=None, minuteOverride=None):
 	weatherDataCache = dict()
 
 	if startAtId:
@@ -234,7 +234,7 @@ def processDailyDigest(startAtId=None):
 		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
 			continue
 
-		if not user.isDigestTime(date_util.now(pytz.utc)):
+		if not user.isDigestTime(date_util.now(pytz.utc), minuteOverride):
 			continue
 
 		if not user.completed_tutorial:

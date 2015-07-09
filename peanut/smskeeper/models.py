@@ -247,13 +247,17 @@ class User(models.Model):
 		return signupObj.get(field, None)
 
 	# Returns true if the user should be sent the digest at the given utc time
-	def isDigestTime(self, utcTime):
+	def isDigestTime(self, utcTime, minuteOverride=None):
 		localTime = utcTime.astimezone(self.getTimezone())
 
 		# By default only send if its 9 am
 		# Later on might make this per-user specific
-		if localTime.hour == keeper_constants.TODO_DIGEST_HOUR and localTime.minute == keeper_constants.TODO_DIGEST_MINUTE:
-			return True
+		if localTime.hour == keeper_constants.TODO_DIGEST_HOUR:
+			if minuteOverride:
+				if localTime.minute == minuteOverride:
+					return True
+			elif localTime.minute == keeper_constants.TODO_DIGEST_MINUTE:
+				return True
 		return False
 
 	def __unicode__(self):
