@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 # Enter this state after a message was just sent to the user
 # See if its a done command. If not, send back for normal processing
 def process(user, msg, requestDict, keeperNumber):
-	entries = user.getLastSentEntries()
+	entries = user.getLastEntries()
 
 	if len(entries) == 0:
 		logging.info("User %s: Couldn't find any entries with ids %s, kicking to normal" % (user.id, [x.id for x in entries]))

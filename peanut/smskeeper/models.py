@@ -245,9 +245,9 @@ class User(models.Model):
 				return True
 		return False
 
-	def getLastSentEntries(self):
-		if self.getStateData(keeper_constants.LAST_SENT_ENTRIES_IDS_KEY):
-			entryIds = self.getStateData(keeper_constants.LAST_SENT_ENTRIES_IDS_KEY)
+	def getLastEntries(self):
+		if self.getStateData(keeper_constants.LAST_ENTRIES_IDS_KEY):
+			entryIds = self.getStateData(keeper_constants.LAST_ENTRIES_IDS_KEY)
 		elif self.getStateData(keeper_constants.ENTRY_IDS_DATA_KEY):
 			entryIds = self.getStateData(keeper_constants.ENTRY_IDS_DATA_KEY)
 		elif self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
@@ -257,19 +257,6 @@ class User(models.Model):
 
 		entries = Entry.objects.filter(id__in=entryIds)
 		return entries
-
-	def getLastEditedEntry(self):
-		if self.getStateData(keeper_constants.LAST_EDITED_ENTRY_ID_KEY):
-			entryId = self.getStateData(keeper_constants.LAST_EDITED_ENTRY_ID_KEY)
-		elif self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
-			entryId = self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)
-		else:
-			return None
-
-		try:
-			return Entry.objects.get(id=entryId)
-		except Entry.DoesNotExist:
-			return None
 
 	def __unicode__(self):
 		if self.name:

@@ -430,6 +430,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[0].hidden)
 		self.assertFalse(entries[1].hidden)
 
+	"""
+	Removing this test since we're changing the functionality
+	Now a non-specific done command only looks at the most recent stuff (created or sent out)
 	# Make sure we clear pending even not after daily digest
 	def test_done_all_not_after_daily_digest(self, dateMock):
 		self.setupUser(dateMock)
@@ -451,6 +454,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[0].hidden)
 		self.assertTrue(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
+	"""
 
 	# Make sure we send instructions
 	def test_instructions_after_first_daily_digest(self, dateMock):
@@ -905,5 +909,23 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "tasks for today")
 			self.assertNotIn("Brandon", self.getOutput(mock))
 			self.assertIn("guymon", self.getOutput(mock))
+
+	def test_done_only_affects_last_created(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+		cliMsg.msg(self.testPhoneNumber, "I want to pick up my sox tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		cliMsg.msg(self.testPhoneNumber, "I need to buy tickets next week")
+
+		cliMsg.msg(self.testPhoneNumber, "Done with that")
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		self.assertFalse(entries[0].hidden)
+		self.assertTrue(entries[1].hidden)
 
 

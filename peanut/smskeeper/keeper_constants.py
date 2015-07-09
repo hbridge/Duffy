@@ -73,8 +73,9 @@ ENTRY_IDS_DATA_KEY = "entryIDs"
 # FROM_TUTORIAL_KEY = "fromtutorial"
 TUTORIAL_STEP_KEY = "todo-tutorial-step"
 
-LAST_SENT_ENTRIES_IDS_KEY = "lastSentEntryIds"
-LAST_EDITED_ENTRY_ID_KEY = "lastEditedEntryId"
+#LAST_SENT_ENTRIES_IDS_KEY = "lastSentEntryIds"
+#LAST_EDITED_ENTRY_ID_KEY = "lastEditedEntryId"
+LAST_ENTRIES_IDS_KEY = "lastEntriesIds"
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
 

@@ -17,7 +17,20 @@ def process(user, msg, requestDict, keeperNumber):
 		return True
 
 	nattyResult = reminder_util.getNattyResult(user, msg)
-	entry = user.getLastEditedEntry()
+	entries = user.getLastEntries()
+
+	if len(entries) > 1:
+		logger.info("In remind state but last entries is more than 1 so going to ignore them")
+		entry = None
+	elif len(entries) == 1:
+		entry = entries[0]
+	else:
+		entry = None
+
+	# If this is a done or snooze command so kick out to normal which will deal with it
+	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or msg_util.isDoneCommand(msg)):
+		user.setState(keeper_constants.STATE_NORMAL)
+		return False
 
 	# If this doesn't look valid then ignore (starts with ok or "sounds good")
 	if not looksLikeValidEntry(msg, nattyResult):
@@ -30,11 +43,6 @@ def process(user, msg, requestDict, keeperNumber):
 		reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, False)
 		reminder_util.sendCompletionResponse(user, entry, False, keeperNumber)
 		return True
-
-	# If this is a snooze command then kick out to normal which will deal with it
-	if msg_util.isSnoozeCommand(msg):
-		user.setState(keeper_constants.STATE_NORMAL)
-		return False
 
 	doCreate = False
 	# Now, see if this looks like a valid new reminder like it has time info or "remind me"
@@ -50,7 +58,9 @@ def process(user, msg, requestDict, keeperNumber):
 			if not paused:
 				doCreate = True
 		else:
-			# If we didn't go through normal just now, then try that first. We might end up back here though.
+			# If we didn't go through normal just now, then try that first.
+			# The message could be a valid done command
+			# We might end up back here though which we deal with above
 			user.setState(keeper_constants.STATE_NORMAL)
 			return False
 
@@ -61,7 +71,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		entry = reminder_util.createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
 		# We set this so it knows what entry was created
-		user.setStateData(keeper_constants.LAST_EDITED_ENTRY_ID_KEY, entry.id)
+		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
 		reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
