@@ -46,7 +46,8 @@ def process(user, msg, requestDict, keeperNumber):
 
 	doCreate = False
 	# Now, see if this looks like a valid new reminder like it has time info or "remind me"
-	if shouldCreateReminder(user, nattyResult, msg):
+	# Or if we're in the tutorial
+	if shouldCreateReminder(user, nattyResult, msg) or not user.isTutorialComplete():
 		doCreate = True
 	else:
 		# This doesn't look valid for some reason
