@@ -38,10 +38,22 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
-no_op_words = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
+stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
+
+noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
-stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
+
+nonInterestingWords = ["actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "got"]
+
+
+def getInterestingWords(phrase):
+	interestingWords = list()
+	for word in phrase.lower().split(' '):
+		if word.lower() not in nonInterestingWords and word.lower() not in noOpWords:
+			if word:  # Make sure the word isn't blank
+				interestingWords.append(word)
+	return interestingWords
 
 
 def hasLabel(msg):
@@ -206,7 +218,7 @@ def isRemindCommand(msg):
 def isOkPhrase(msg):
 	words = cleanedMsg(msg).split(' ')
 	for word in words:
-		if word in no_op_words:
+		if word in noOpWords:
 			return True
 
 	return False
@@ -407,7 +419,7 @@ def removeWordsFromMsg(msg, wordsToRemove):
 
 
 def removeNoOpWords(msg):
-	return removeWordsFromMsg(msg, no_op_words)
+	return removeWordsFromMsg(msg, noOpWords)
 
 
 def nameInSetName(msg, tutorial=False):

@@ -122,8 +122,7 @@ def processReminder(entry):
 
 				# Now set to reminder sent, incase they send back done message
 				user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
-				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-				user.save()
+				user.setStateData(keeper_constants.LAST_SENT_ENTRIES_IDS_KEY, [entry.id])
 
 	entry.save()
 
@@ -201,8 +200,7 @@ def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, 
 
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
-		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, [x.id for x in pendingEntries])
-		user.save()
+		user.setStateData(keeper_constants.LAST_SENT_ENTRIES_IDS_KEY, [x.id for x in pendingEntries])
 
 		if tips.isUserEligibleForMiniTip(user, tips.DIGEST_TIP_ID):
 			digestTip = tips.tipWithId(tips.DIGEST_TIP_ID)

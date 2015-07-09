@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def process(user, msg, requestDict, keeperNumber):
-	step = user.getStateData("step")
+	step = user.getStateData(keeper_constants.TUTORIAL_STEP_KEY)
 
 	if step:
 		step = int(step)
@@ -64,7 +64,7 @@ def process(user, msg, requestDict, keeperNumber):
 			],
 			keeperNumber
 		)
-		user.setStateData("step", 1)
+		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 1)
 	elif step == 1:
 		zipcode = msg_util.getZipcode(msg)
 
@@ -93,9 +93,9 @@ def process(user, msg, requestDict, keeperNumber):
 
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
 
-		user.setStateData("step", 2)
-		user.setState(keeper_constants.STATE_REMIND, saveCurrent=True)
-		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
+		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
+		user.setState(keeper_constants.STATE_REMIND)
+		user.setNextState(keeper_constants.STATE_TUTORIAL_TODO)
 
 	elif step == 2:
 		if keeper_constants.isRealKeeperNumber(keeperNumber):
@@ -111,10 +111,7 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsg(user, u"Oh and I'll also send you a morning \U0001F304 digest of things you need to get done that day.", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
 
-		entryId = user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)
 		user.setState(keeper_constants.STATE_REMIND)
-		# The remind state will pass this to us...so pass it back
-		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entryId)
 
 		analytics.logUserEvent(
 			user,

@@ -1,14 +1,13 @@
 import datetime
 import logging
 import re
-
-from common import date_util
 import pytz
+
 from smskeeper import keeper_constants
 from smskeeper import msg_util, actions
 from smskeeper import reminder_util
-from smskeeper.models import Entry
 
+from common import date_util
 
 logger = logging.getLogger(__name__)
 
@@ -18,110 +17,61 @@ def process(user, msg, requestDict, keeperNumber):
 		return True
 
 	nattyResult = reminder_util.getNattyResult(user, msg)
-	entry = getPreviousEntry(user)
+	entry = user.getLastEditedEntry()
 
-	# If this doesn't look valid then ignore
+	# If this doesn't look valid then ignore (starts with ok or "sounds good")
 	if not looksLikeValidEntry(msg, nattyResult):
 		logger.info("User %s: Skipping msg '%s' because it doesn't look valid to me" % (user.id, msg))
 		return True
 
-	# Create a new reminder
-	if not entry:
-		sendFollowup = False
+	# If this is a follow up, update that entry
+	if reminder_util.isFollowup(user, entry, msg, nattyResult):
+		logger.info("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
+		reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, False)
+		reminder_util.sendCompletionResponse(user, entry, False, keeperNumber)
+		return True
 
-		if not reminder_util.validTime(nattyResult) or user.isInTutorial():
-			sendFollowup = True
+	# If this is a snooze command then kick out to normal which will deal with it
+	if msg_util.isSnoozeCommand(msg):
+		user.setState(keeper_constants.STATE_NORMAL)
+		return False
 
-		doCreate = False
-
-		if shouldCreateReminder(user, nattyResult, msg):
-			doCreate = True
-		else:
-			# HACKY
-			# So right here we're confused on what to do.
-			# lastAction only is set by us, so if we are here again and are confused... try normal
-			# route first
-			# If that doesn't work, it'll clear this field
-			lastAction = user.getStateData("lastAction")
-			if lastAction:
-				user.setState(keeper_constants.STATE_NORMAL)
-				user.save()
-				return False
-			else:
-				logger.info("User %s: I'm confused with '%s', it could be a new reminder but not sure. pausing" % (user.id, msg))
-				paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
-				if not paused:
-					doCreate = True
-
-		if doCreate:
-			entry = reminder_util.createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
-
-			"""
-			Temp comment out by Derek due to taking out shared reminders
-			# See if the entry didn't create. This means there's unresolved handes
-			if not entry:
-				return False  # Send back for reprocessing by unknown handles state
-			"""
-
-			reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
-
-			# If we came from the tutorial, then set state and return False so we go back for reprocessing
-			if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
-				# Note, some behind the scene magic sets the state and state_data for us.  So this call
-				# is kind of overwritten.  Done so the tutorial state can worry about its state and formatting
-				user.setState(keeper_constants.STATE_TUTORIAL_REMIND)
-				# We set this so it knows what entry was created
-				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-				user.save()
-				return False
-
-			# Always save the entryId state since we always come back into this state.
-			# If they don't enter timing info then we kick out
-			user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-			user.save()
+	doCreate = False
+	# Now, see if this looks like a valid new reminder like it has time info or "remind me"
+	if shouldCreateReminder(user, nattyResult, msg):
+		doCreate = True
 	else:
-		# If we have an entry id, then that means we are doing a follow up
-		# See if what they entered is a valid time and if so, assign it.
-		# If not, kick out to normal mode and re-process
-
-		"""
-		Temp comment out by Derek due to taking out shared reminders
-		if user.getStateData("fromUnresolvedHandles"):
-			logger.info("User %s: Going to deal with unresolved handles for entry %s and user %s" % (user.id, entry.id, user.id))
-
-			# Mark it that we're not coming back from unresolved handle
-			# So incase there's a followup we don't, re-enter this section
-			user.setStateData("fromUnresolvedHandles", False)
-			user.save()
-
-			unresolvedHandles = user.getStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY)
-			# See if we have all the handles resolved
-			if len(unresolvedHandles) == 0:
-				for handle in user.getStateData(keeper_constants.RESOLVED_HANDLES_DATA_KEY):
-					contact = Contact.fetchByHandle(user, handle)
-					entry.users.add(contact.target)
-
-				sendCompletionResponse(user, entry, False, keeperNumber)
-
-			else:
-				# This message could be a correction or something else.  Might need more logic here
-				sendCompletionResponse(user, entry, False, keeperNumber)
-		"""
-		if reminder_util.isFollowup(user, entry, msg, nattyResult):
-			isSnooze = user.getStateData(keeper_constants.IS_SNOOZE_KEY)
-			logger.info("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
-			reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze)
-			reminder_util.sendCompletionResponse(user, entry, False, keeperNumber)
-
-			return True
+		# This doesn't look valid for some reason
+		# So right here we're confused on what to do since we don't think we should create a reminder
+		# If we just came from normal then we know it would have been processed for done msgs, etc...pause
+		if user.last_state and user.last_state == keeper_constants.STATE_NORMAL:
+			logger.info("User %s: I'm confused with '%s', it could be a new reminder but not sure. pausing" % (user.id, msg))
+			paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
+			if not paused:
+				doCreate = True
 		else:
-			# Send back for reprocessing
+			# If we didn't go through normal just now, then try that first. We might end up back here though.
 			user.setState(keeper_constants.STATE_NORMAL)
-			user.save()
 			return False
 
+	if doCreate:
+		sendFollowup = False
+		if not reminder_util.validTime(nattyResult) or not user.isTutorialComplete():
+			sendFollowup = True
+
+		entry = reminder_util.createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
+		# We set this so it knows what entry was created
+		user.setStateData(keeper_constants.LAST_EDITED_ENTRY_ID_KEY, entry.id)
+
+		reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+
+		# If we came from the tutorial, then set state and return False so we go back for reprocessing
+		if not user.isTutorialComplete():
+			user.setState(keeper_constants.STATE_TUTORIAL_TODO)
+			return False
+
+	# This is used by remind_util to see if something is a followup
 	user.setStateData(keeper_constants.LAST_ACTION_KEY, unixTime(date_util.now(pytz.utc)))
-	user.save()
 	return True
 
 
@@ -134,7 +84,7 @@ def unixTime(dt):
 def dealWithTutorialEdgecases(user, msg, keeperNumber):
 	# If we're coming from the tutorial and we find a message with a zipcode in it...just ignore the whole message
 	# Would be great not to have a hack here
-	if user.getStateData(keeper_constants.FROM_TUTORIAL_KEY):
+	if not user.isTutorialComplete():
 		postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
 		if postalCodes:
 			# ignore the message
@@ -142,20 +92,10 @@ def dealWithTutorialEdgecases(user, msg, keeperNumber):
 	return False
 
 
-def getPreviousEntry(user):
-	entry = None
-	if user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
-		entryId = int(user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY))
-		try:
-			entry = Entry.objects.get(id=entryId)
-		except Entry.DoesNotExist:
-			pass
-
-	return entry
-
-
 # If we don't have a valid time and its less than 4 words, don't count as a valid entry
 # Things like "ok great"
+# Eventually we might want to move this over to looking at interesting words.
+# Right now that's tough since we'd filter out valid done commands
 def looksLikeValidEntry(msg, nattyResult):
 	words = msg.split(' ')
 	if not reminder_util.validTime(nattyResult) and len(words) < 4 and msg_util.isOkPhrase(msg):
@@ -163,14 +103,45 @@ def looksLikeValidEntry(msg, nattyResult):
 	return True
 
 
-# Method to determine if we create a new reminder.
-# If its tutorial, def do it.  But if there's no timing info, then don't
+# Method to determine if we create a new reminder
+# If they
+# But if there's no timing info, then don't
 def shouldCreateReminder(user, nattyResult, msg):
-	if user.isInTutorial():
-		return True
 	if msg_util.isRemindCommand(msg):
 		return True
 	if not reminder_util.validTime(nattyResult):
 		return False
 
 	return True
+
+"""
+Temp comment out by Derek due to taking out shared reminders
+# See if the entry didn't create. This means there's unresolved handes
+if not entry:
+	return False  # Send back for reprocessing by unknown handles state
+"""
+
+
+"""
+Temp comment out by Derek due to taking out shared reminders
+if user.getStateData("fromUnresolvedHandles"):
+	logger.info("User %s: Going to deal with unresolved handles for entry %s and user %s" % (user.id, entry.id, user.id))
+
+	# Mark it that we're not coming back from unresolved handle
+	# So incase there's a followup we don't, re-enter this section
+	user.setStateData("fromUnresolvedHandles", False)
+	user.save()
+
+	unresolvedHandles = user.getStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY)
+	# See if we have all the handles resolved
+	if len(unresolvedHandles) == 0:
+		for handle in user.getStateData(keeper_constants.RESOLVED_HANDLES_DATA_KEY):
+			contact = Contact.fetchByHandle(user, handle)
+			entry.users.add(contact.target)
+
+		sendCompletionResponse(user, entry, False, keeperNumber)
+
+	else:
+		# This message could be a correction or something else.  Might need more logic here
+		sendCompletionResponse(user, entry, False, keeperNumber)
+"""

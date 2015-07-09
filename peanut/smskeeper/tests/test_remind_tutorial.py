@@ -63,7 +63,6 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me at 4pm")
-
 			self.assertIn("Sat by 4pm", self.getOutput(mock))
 
 		# Make sure there's only 1 created

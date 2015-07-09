@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def process(user, msg, requestDict, keeperNumber):
-	step = user.getStateData("step")
+	step = user.getStateData(keeper_constants.TUTORIAL_STEP_KEY)
 
 	if step:
 		step = int(step)
@@ -58,7 +58,7 @@ def process(user, msg, requestDict, keeperNumber):
 			],
 			keeperNumber
 		)
-		user.setStateData("step", 1)
+		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 1)
 	elif step == 1:
 		zipcode = msg_util.getZipcode(msg)
 
@@ -79,25 +79,19 @@ def process(user, msg, requestDict, keeperNumber):
 
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's set your first reminder. \u23F0", u"What's a recent thing you wanted to be reminded of? Like 'Remind me to order birthday cake this weekend'. Give it a try - just start with 'Remind me...'!"], keeperNumber)
 
-		# Setup the next state along with data saying we're going to it from the tutorial
+		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 		user.setState(keeper_constants.STATE_REMIND)
-		user.setStateData(keeper_constants.FROM_TUTORIAL_KEY, True)
-
-		# Make sure that we come back to the tutorial and don't goto NORMAL
 		user.setNextState(keeper_constants.STATE_TUTORIAL_REMIND)
-		user.setNextStateData("step", 2)
 	elif step == 2:
 		# Coming back from remind state so wait a second
-		time.sleep(1)
+		if keeper_constants.isRealKeeperNumber(keeperNumber):
+			time.sleep(1)
 		sms_util.sendMsgs(user, [u"K that's all set, what other reminders do you want to setup for next few days? Calls \U0001f4f1, emails \U0001F4E7, errands \U0001F45C?  I'm here to help! \U0001F60A"], keeperNumber)
 		delayedTime = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
 		sms_util.sendMsg(user, "FYI, I can also help you with other things. Just txt me 'Tell me more'", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
 
-		entryId = user.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)
 		user.setState(keeper_constants.STATE_REMIND)
-		# The remind state will pass this to us...so pass it back
-		user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entryId)
 
 		analytics.logUserEvent(
 			user,

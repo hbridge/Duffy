@@ -115,6 +115,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				count += 1
 
 				if processed:
+					user.last_state = user.state
+					user.save()
 					logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
 			if count == 10:

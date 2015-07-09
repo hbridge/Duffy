@@ -418,7 +418,9 @@ def clearAll(entries):
 	return msgBack
 
 
-def done(user, msg, keeperNumber, justSentEntries=None):
+def done(user, msg, keeperNumber):
+	justSentEntries = user.getLastSentEntries()
+
 	entries = entry_util.fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries)
 	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
@@ -449,7 +451,9 @@ def done(user, msg, keeperNumber, justSentEntries=None):
 	return False
 
 
-def snooze(user, msg, keeperNumber, justSentEntries=None):
+def snooze(user, msg, keeperNumber):
+	justSentEntries = user.getLastSentEntries()
+
 	nattyResult = reminder_util.getNattyResult(user, msg)
 	msgWithoutTiming = nattyResult.queryWithoutTiming
 	entries = entry_util.fuzzyMatchEntries(user, msgWithoutTiming, keeperNumber, justSentEntries)

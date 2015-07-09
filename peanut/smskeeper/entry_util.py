@@ -7,19 +7,8 @@ logger = logging.getLogger(__name__)
 
 from fuzzywuzzy import fuzz
 
-extraDoneWords = ["all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "got", "done"]
 
-
-def getInterestingWords(phrase):
-	interestingWords = list()
-	for word in phrase.split(' '):
-		if word not in extraDoneWords:
-			if word:  # Make sure the word isn't blank
-				interestingWords.append(word)
-	return interestingWords
-
-
-def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
+def fuzzyMatchEntries(user, msg, keeperNumber, lastSentEntries):
 	# Clean the messages up
 	cleanedCommand = msg_util.cleanedDoneCommand(msg)
 	cleanedCommand = msg_util.cleanedSnoozeCommand(cleanedCommand)
@@ -43,26 +32,28 @@ def fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries):
 				entries.add(bestMatch)
 	elif len(phrases) == 1:
 		phrase = msg_util.simplifiedMsg(phrases[0])
-		interestingWords = getInterestingWords(phrase)
+		interestingWords = msg_util.getInterestingWords(phrase)
 
-		# These are the words left over after stripping out the "done" word
-		# If true, its a "I did all" type command
-		if (phrase == "" or
-			len(interestingWords) == 0 or
-			niceties.getNicety(phrase)):
+		# Is it a "done with all". Determine by looking if there's any interesting words
+		if (len(interestingWords) == 0 or niceties.getNicety(phrase)):
 			# If we just sent some entries, then use those
-			if justSentEntries:
-				entries = justSentEntries
+			if len(lastSentEntries) > 0:
+				entries = lastSentEntries
 			else:
 				# If not, just say done to all pending tasks
 				entries = user_util.pendingTodoEntries(user, includeAll=False)
-			logging.info("User %s: Fuzzy matching multiple entries %s since the phrase was short" % (user.id, [x.id for x in entries]))
+			logging.info("User %s: Fuzzy matching 'all' since there were no interesting words. Affected ids: %s" % (user.id, [x.id for x in entries]))
+
+		# If its not an "all" command, then try to match on something
 		else:
-			# If its not an "all" command, then try to match on something
-			bestMatch, score = getBestEntryMatch(user, ' '.join(interestingWords))
+			interestingPhrase = ' '.join(interestingWords)
+
+			bestMatch, score = getBestEntryMatch(user, interestingPhrase)
 			if score >= 60:
-				logger.info("User %s: Fuzzy matching entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
+				logger.info("User %s: Fuzzy matching entry '%s' (%s) with '%s' due to score of %s" % (user.id, bestMatch.text, bestMatch.id, interestingPhrase, score))
 				entries.add(bestMatch)
+			else:
+				logger.info("User %s: Didn't find match, using interesting words: '%s'" % (user.id, interestingPhrase))
 
 	if len(entries) == 0:
 		logger.info("User %s: Couldn't find a good fuzzy match." % (user.id))

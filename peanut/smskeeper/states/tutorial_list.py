@@ -98,7 +98,8 @@ def process(user, msg, requestDict, keeperNumber):
 			return True
 
 		# time.sleep so the response to add Action goes out first
-		time.sleep(1)
+		if keeper_constants.isRealKeeperNumber(keeperNumber):
+			time.sleep(1)
 		sms_util.sendMsgs(
 			user,
 			[

@@ -907,4 +907,3 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("guymon", self.getOutput(mock))
 
 
-

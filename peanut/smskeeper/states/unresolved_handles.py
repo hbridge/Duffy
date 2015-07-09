@@ -50,8 +50,8 @@ def process(user, msg, requestDict, keeperNumber):
 
 			if len(unresolvedHandles) == 0:  # we're done resolving handles
 				#  sms_util.sendMsg(user, "Great. I've shared that with %s" % (", ".join(resolvedHandles)), None, keeperNumber)
-				user.setNextStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
-				user.setNextStateData(keeper_constants.RESOLVED_HANDLES_DATA_KEY, resolvedHandles)
+				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
+				user.setStateData(keeper_constants.RESOLVED_HANDLES_DATA_KEY, resolvedHandles)
 				user.setState(keeper_constants.STATE_NORMAL)
 				user.save()
 				return False
@@ -63,7 +63,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:  # the user responded with something other than a phone number, kick back for reprocessing
 			# but mark that there's stuff still unresolved
 			unresolvedHandles = user.getStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY)
-			user.setNextStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
+			user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
 			user.setState(keeper_constants.STATE_NORMAL)
 			user.save()
 			return False

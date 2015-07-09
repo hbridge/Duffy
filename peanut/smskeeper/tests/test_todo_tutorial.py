@@ -175,3 +175,29 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "I'm Billy")
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Billy")
+
+	"""
+	def test_tutorial_no_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		# Activation message asks for their name
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
+			self.assertEquals(self.getTestUser().name, "UnitTests")
+
+		# Activation message asks for their zip
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "10012")
+			self.assertIn("Let's add something you need to get done.", self.getOutput(mock))
+			self.assertEqual(self.getTestUser().zipcode, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Need to call bobby")
+			self.assertIn("reminded by?", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
+	"""
+

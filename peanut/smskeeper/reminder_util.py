@@ -32,15 +32,22 @@ def getLastActionTime(user):
 # Returns true if thislook slike a snooze command
 # If we find "again" or "snooze"
 # or if the cleaned Text is blank
-def isSnooze(user, entry, msg, nattyResult):
+def isSnoozeForEntry(user, msg, entry, nattyResult):
 	query = msg.lower()
 	if validTime(nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)
+		interestingWords = msg_util.getInterestingWords(cleanedText)
+
+		if len(interestingWords) > 0:
+			bestEntry, score = entry_util.getBestEntryMatch(user, ' '.join(interestingWords))
+			if bestEntry and bestEntry.id != entry.id and score > 60:
+				return False
+
 		if "again" in query or "snooze" in query:
-			logger.info("User %s: I think this is a snooze to %s bc we found 'again' or 'snooze'" % (user.id, entry.id))
+			logger.info("User %s: I think this is a snooze bc we found 'again' or 'snooze'" % (user.id))
 			return True
-		elif len(cleanedText) <= 2:
-			logger.info("User %s: I think this is a followup to %s bc its less than 2 letters" % (user.id, entry.id))
+		elif len(interestingWords) == 0:
+			logger.info("User %s: I think this is a snooze bc there's no interesting words" % (user.id))
 			return True
 
 	return False
@@ -53,9 +60,14 @@ def isSnooze(user, entry, msg, nattyResult):
 # Otherwise False
 def isFollowup(user, entry, msg, nattyResult):
 	now = date_util.now(pytz.utc)
+
+	if not entry:
+		return False
+
 	if validTime(nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 		lastActionTime = getLastActionTime(user)
+		interestingWords = msg_util.getInterestingWords(cleanedText)
 		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=2)) else False
 
 		# Covers cases where there the cleanedText is "in" or "around"
@@ -66,13 +78,13 @@ def isFollowup(user, entry, msg, nattyResult):
 		elif msg_util.startsWithNo(nattyResult.queryWithoutTiming):
 			logger.info("User %s: I think this is a followup to %s bc it starts with a No" % (user.id, entry.id))
 			return True
-		elif user.getStateData(keeper_constants.IS_SNOOZE_KEY):
+		elif isSnoozeForEntry(user, msg, entry, nattyResult):
 			logger.info("User %s: I think this is a followup to %s bc its a snooze" % (user.id, entry.id))
 			return True
-		# If we were just editing this entry and the query has only a couple words
+		# If we were just editing this entry and the query has nearly no interesting words
 		# unless it's a snooze command, in which case it may refer to a different entry
-		elif isRecentAction and len(cleanedText.split(' ')) < 3 and not msg_util.isSnoozeCommand(nattyResult.queryWithoutTiming):
-			logger.info("User %s: I think this is a followup to %s bc we updated it recently" % (user.id, entry.id))
+		elif isRecentAction and len(interestingWords) < 2 and not msg_util.isSnoozeCommand(nattyResult.queryWithoutTiming):
+			logger.info("User %s: I think this is a followup to %s bc we updated it recently and no interesting words" % (user.id, entry.id))
 			return True
 		else:
 			bestEntry, score = entry_util.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
@@ -105,31 +117,6 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 
 	logger.info("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))
 
-	"""
-	Temp remove due to pausing shared reminders
-	# Don't do any of this logic in the tutorial state, shouldn't be correct
-	if not isTutorial(user):
-		handle = msg_util.getReminderHandle(nattyResult.queryWithoutTiming)  # Grab "me" or "mom"
-
-		if handle and handle != "me":
-			# If we ever handle multiple handles... we need to create seperate entries to deal with snoozes
-			contact = Contact.fetchByHandle(user, handle)
-
-			if contact is None:
-				logger.info("User %s: Didn't find handle %s and msg %s on entry %s" % (user.id, handle, msg, entry.id))
-				# We couldn't find the handle so go into unresolved state
-				# Set data for ourselves for when we come back
-				user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
-				user.setStateData("fromUnresolvedHandles", True)
-				user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
-				user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])
-				user.save()
-				return False
-			else:
-				logger.info("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
-				# We found the handle, so share the entry with the user.
-				entry.users.add(contact.target)
-	"""
 	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
 
 	analytics.logUserEvent(
@@ -138,7 +125,7 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 		{
 			"Needed Followup": sendFollowup,
 			"Was Suspicious Hour": suspiciousHour,
-			"In tutorial": user.isInTutorial(),
+			"In tutorial": not user.isTutorialComplete(),
 			"Is shared": len(entry.users.all()) > 1,
 			"interface": keeperNumber,
 		}
@@ -201,7 +188,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 		"Updated Reminder",
 		{
 			"Was Suspicious Hour": suspiciousHour,
-			"In tutorial": user.isInTutorial(),
+			"In tutorial": not user.isTutorialComplete(),
 			"Is shared": len(entry.users.all()) > 1,
 			"Type": "Snooze" if isSnooze else "Time Correction"
 		}
@@ -252,7 +239,7 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 
 	# Tutorial gets a special followup message
 	if sendFollowup:
-		if user.isInTutorial():
+		if not user.isTutorialComplete():
 			toSend = toSend + " (If that time doesn't work, just tell me what time is better)"
 		else:
 			toSend = toSend + "\n\n"
@@ -384,3 +371,30 @@ def getNattyResult(user, msg):
 		nattyResult = dealWithDefaultTime(user, nattyResult)
 
 	return nattyResult
+
+
+"""
+Temp remove due to pausing shared reminders
+# Don't do any of this logic in the tutorial state, shouldn't be correct
+if not isTutorial(user):
+	handle = msg_util.getReminderHandle(nattyResult.queryWithoutTiming)  # Grab "me" or "mom"
+
+	if handle and handle != "me":
+		# If we ever handle multiple handles... we need to create seperate entries to deal with snoozes
+		contact = Contact.fetchByHandle(user, handle)
+
+		if contact is None:
+			logger.info("User %s: Didn't find handle %s and msg %s on entry %s" % (user.id, handle, msg, entry.id))
+			# We couldn't find the handle so go into unresolved state
+			# Set data for ourselves for when we come back
+			user.setStateData(keeper_constants.ENTRY_ID_DATA_KEY, entry.id)
+			user.setStateData("fromUnresolvedHandles", True)
+			user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES, saveCurrent=True)
+			user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, [handle])
+			user.save()
+			return False
+		else:
+			logger.info("User %s: Didn't find handle %s and entry %s...goint to unresolved" % (user.id, handle, entry.id))
+			# We found the handle, so share the entry with the user.
+			entry.users.add(contact.target)
+"""

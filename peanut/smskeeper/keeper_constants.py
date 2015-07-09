@@ -62,14 +62,19 @@ GENERIC_ERROR_MESSAGES = [
 UNRESOLVED_HANDLES_DATA_KEY = "unresolvedHandles"
 RESOLVED_HANDLES_DATA_KEY = "resolvedHandles"
 FROM_UNRESOLVED_HANDLES_DATA_KEY = "fromUnresolvedHandles"
-ENTRY_IDS_DATA_KEY = "entryIDs"
 IMPLICIT_LABEL_STATE_DATA_KEY = "implicitLabel"
 
-IS_SNOOZE_KEY = "isFollowup"
+
 LAST_ACTION_KEY = "lastAction"
 
+# IS_SNOOZE_KEY = "isFollowup"
 ENTRY_ID_DATA_KEY = "entryId"
-FROM_TUTORIAL_KEY = "fromtutorial"
+ENTRY_IDS_DATA_KEY = "entryIDs"
+# FROM_TUTORIAL_KEY = "fromtutorial"
+TUTORIAL_STEP_KEY = "todo-tutorial-step"
+
+LAST_SENT_ENTRIES_IDS_KEY = "lastSentEntryIds"
+LAST_EDITED_ENTRY_ID_KEY = "lastEditedEntryId"
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
 

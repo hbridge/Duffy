@@ -79,11 +79,10 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 	return True
 
 
-def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
+def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
 	if msg_util.isRemindCommand(msg):
 		logger.info("User %s: I think '%s' is a remind command" % (user.id, msg))
 		user.setState(keeper_constants.STATE_REMIND)
-		user.save()
 		return False  # Reprocess
 	elif msg_util.isDoneCommand(msg):
 		logger.info("User %s: I think '%s' is a done command" % (user.id, msg))
@@ -102,7 +101,6 @@ def dealWithNormalMsg(user, msg, requestDict, keeperNumber):
 	else:
 		logger.info("User %s: I think '%s' is something else so doing remind state" % (user.id, msg))
 		user.setState(keeper_constants.STATE_REMIND)
-		user.save()
 		return False  # Reprocess
 	return True
 
@@ -119,7 +117,7 @@ def process(user, msg, requestDict, keeperNumber):
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")
 		if user.product_id == keeper_constants.TODO_PRODUCT_ID:
-			return dealWithNormalMsg(user, msg, requestDict, keeperNumber)
+			return dealWithTodoProductMsg(user, msg, requestDict, keeperNumber)
 
 		# Below here is legacy stuff, lists, pictures
 		# STATE_REMIND
@@ -140,10 +138,8 @@ def process(user, msg, requestDict, keeperNumber):
 			logger.info("User %s: I think '%s' is a fetch command" % (user.id, msg))
 			label = msg_util.labelInFetch(msg)
 			actions.fetch(user, label, keeperNumber)
-			user.setState(
-				keeper_constants.STATE_IMPLICIT_LABEL,
-				stateData={keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY: label}
-			)
+			user.setState(keeper_constants.STATE_IMPLICIT_LABEL)
+			user.setStateData(keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY, label)
 		# STATE_NORMAL
 		elif msg_util.isClearCommand(msg) and numMedia == 0:
 			logger.info("User %s: I think '%s' is a clear command" % (user.id, msg))
@@ -166,15 +162,13 @@ def process(user, msg, requestDict, keeperNumber):
 			logger.info("User %s: I think '%s' is a delete command" % (user.id, msg))
 			label, indices = msg_util.parseDeleteCommand(msg)
 			actions.deleteIndicesFromLabel(user, label, indices, keeperNumber)
-			user.setState(
-				keeper_constants.STATE_IMPLICIT_LABEL,
-				stateData={keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY: label}
-			)
+			user.setState(keeper_constants.STATE_IMPLICIT_LABEL)
+			user.setStateData(keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY, label)
 		elif msg_util.isAddTextCommand(msg) or numMedia > 0:
 			logger.info("User %s: I think '%s' is a add text command" % (user.id, msg))
 			return dealWithAdd(user, msg, requestDict, keeperNumber)
 		else:  # catch all, we're not sure
-			return dealWithNormalMsg(user, msg, requestDict, keeperNumber)
+			return dealWithTodoProductMsg(user, msg, requestDict, keeperNumber)
 
 		return True
 	except:

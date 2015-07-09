@@ -89,34 +89,29 @@ class User(models.Model):
 		else:
 			return None
 
-	def setState(self, state, override=False, stateData=None, saveCurrent=False):
+	def setState(self, state, override=False, saveCurrent=False):
 		if self.state == keeper_constants.STATE_STOPPED:
 			logger.error("User %s: Tried to set state but was stopped" % (self.id))
 			return
 
-		logger.debug("User %s: Start of setState   %s %s %s %s" % (self.id, state, override, stateData, saveCurrent))
+		logger.debug("User %s: Start of setState   %s %s" % (self.id, state, override))
 		logger.debug("User %s: Starting state:  %s %s   and next state: %s %s" % (self.id, self.state, self.state_data, self.next_state, self.next_state_data))
-		currentState = self.state
-		currentStateData = self.state_data
+
+		self.last_state = self.state
+		self.last_state_change = date_util.now(pytz.utc)
 
 		# next state means that we want to override the wishes of the current state and do something different
 		# it should all be configured already
 		if not override and self.next_state:
 			self.state = self.next_state
-			self.state_data = self.next_state_data
 		else:
 			# Normal flow, if there's no next state already defined
 			self.state = state
-			self.state_data = None if stateData is None else json.dumps(stateData)
 
 		if saveCurrent:
-			self.next_state = currentState
-			self.next_state_data = currentStateData
+			self.next_state = self.last_state
 		else:
 			self.next_state = None
-			self.next_state_data = None
-
-		self.last_state_change = date_util.now(pytz.utc)
 
 		logger.debug("User %s: End of setState.  new state:  %s %s  and next state: %s %s" % (self.id, self.state, self.state_data, self.next_state, self.next_state_data))
 
@@ -124,6 +119,7 @@ class User(models.Model):
 
 	def setNextState(self, nextState):
 		self.next_state = nextState
+		self.save()
 
 	def getStateData(self, key):
 		if self.state_data:
@@ -144,14 +140,6 @@ class User(models.Model):
 		self.save()
 		logger.debug("User %s: Setting state data %s %s" % (self.id, key, value))
 
-	def setNextStateData(self, key, value):
-		if self.next_state_data:
-			data = json.loads(self.next_state_data)
-		else:
-			data = dict()
-		data[key] = value
-
-		self.next_state_data = json.dumps(data)
 
 	def getTimezone(self):
 		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
@@ -200,9 +188,6 @@ class User(models.Model):
 			self.activated = None
 			self.setState(keeper_constants.STATE_NOT_ACTIVATED)
 		self.save()
-
-	def isInTutorial(self):
-		return False if self.getStateData(keeper_constants.FROM_TUTORIAL_KEY) is None else True
 
 	def isTutorialComplete(self):
 		return self.completed_tutorial
@@ -259,6 +244,32 @@ class User(models.Model):
 			elif localTime.minute == keeper_constants.TODO_DIGEST_MINUTE:
 				return True
 		return False
+
+	def getLastSentEntries(self):
+		if self.getStateData(keeper_constants.LAST_SENT_ENTRIES_IDS_KEY):
+			entryIds = self.getStateData(keeper_constants.LAST_SENT_ENTRIES_IDS_KEY)
+		elif self.getStateData(keeper_constants.ENTRY_IDS_DATA_KEY):
+			entryIds = self.getStateData(keeper_constants.ENTRY_IDS_DATA_KEY)
+		elif self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
+			entryIds = [self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)]
+		else:
+			return []
+
+		entries = Entry.objects.filter(id__in=entryIds)
+		return entries
+
+	def getLastEditedEntry(self):
+		if self.getStateData(keeper_constants.LAST_EDITED_ENTRY_ID_KEY):
+			entryId = self.getStateData(keeper_constants.LAST_EDITED_ENTRY_ID_KEY)
+		elif self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
+			entryId = self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)
+		else:
+			return None
+
+		try:
+			return Entry.objects.get(id=entryId)
+		except Entry.DoesNotExist:
+			return None
 
 	def __unicode__(self):
 		if self.name:
