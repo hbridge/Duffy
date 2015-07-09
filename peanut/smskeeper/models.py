@@ -29,6 +29,7 @@ class User(models.Model):
 
 	STATE_CHOICES = [(x, x) for x in keeper_constants.ALL_STATES]
 	state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.STATE_NOT_ACTIVATED)
+	last_state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.STATE_NOT_ACTIVATED)
 
 	state_data = models.TextField(null=True, blank=True)
 
