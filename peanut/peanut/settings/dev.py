@@ -23,6 +23,15 @@ DATABASES = {
 	}
 }
 
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"
+
+
 # Configuration for speeding up tests.
 if 'test' in sys.argv:
 	DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
@@ -31,6 +40,8 @@ if 'test' in sys.argv:
 	CELERY_ALWAYS_EAGER = True
 	CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 	BROKER_BACKEND = 'memory'
+
+	MIGRATION_MODULES = DisableMigrations()
 
 	PASSWORD_HASHERS = (
 		'django.contrib.auth.hashers.MD5PasswordHasher',
