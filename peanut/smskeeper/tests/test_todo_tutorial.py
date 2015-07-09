@@ -37,28 +37,6 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertIn("digest of things", self.getOutput(mock))
 
-	def test_tutorial_no_time(self, dateMock):
-		self.setupUser(dateMock)
-
-		# Activation message asks for their name
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
-			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
-			self.assertEquals(self.getTestUser().name, "UnitTests")
-
-		# Activation message asks for their zip
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertIn("Let's add something you need to get done.", self.getOutput(mock))
-			self.assertEqual(self.getTestUser().zipcode, "10012")
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "buy flip flops")
-			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("digest of things", self.getOutput(mock))
-
-		self.assertEquals(1, len(Entry.objects.filter(label="#reminders")))
-
 	# Make sure that we ignore all messages without zip codes for 20 seconds during tutorial
 	def test_tutorial_only_barfs_after_2_minutes(self, dateMock):
 		self.setupUser(dateMock)
@@ -198,28 +176,22 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "Billy")
 
-	"""
 	def test_tutorial_no_time(self, dateMock):
 		self.setupUser(dateMock)
 
-		# Activation message asks for their name
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
-			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
-			self.assertEquals(self.getTestUser().name, "UnitTests")
-
-		# Activation message asks for their zip
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertIn("Let's add something you need to get done.", self.getOutput(mock))
-			self.assertEqual(self.getTestUser().zipcode, "10012")
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Need to call bobby")
 			self.assertIn("reminded by?", self.getOutput(mock))
+			self.assertNotIn("It's that easy. ", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
-	"""
+			self.assertNotIn("If that time doesn't work", self.getOutput(mock))
+			self.assertIn("It's that easy. ", self.getOutput(mock))
+
+
 

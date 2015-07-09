@@ -5,7 +5,7 @@ import pytz
 
 from smskeeper import keeper_constants
 from smskeeper import msg_util, actions
-from smskeeper import reminder_util
+from smskeeper import reminder_util, sms_util
 
 from common import date_util
 
@@ -41,8 +41,14 @@ def process(user, msg, requestDict, keeperNumber):
 	if reminder_util.isFollowup(user, entry, msg, nattyResult):
 		logger.info("User %s: Doing followup on entry %s with msg %s" % (user.id, entry.id, msg))
 		reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, False)
+
 		reminder_util.sendCompletionResponse(user, entry, False, keeperNumber)
-		return True
+
+		if not user.isTutorialComplete():
+			user.setState(keeper_constants.STATE_TUTORIAL_TODO)
+			return False
+		else:
+			return True
 
 	doCreate = False
 	# Now, see if this looks like a valid new reminder like it has time info or "remind me"
@@ -74,7 +80,14 @@ def process(user, msg, requestDict, keeperNumber):
 		# We set this so it knows what entry was created
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
-		reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+		# If we're in the tutorial and they didn't give a time, then give a different follow up
+		if not reminder_util.validTime(nattyResult) and not user.isTutorialComplete():
+			sms_util.sendMsg(user, "Great, and when would you like to be reminded by?", None, keeperNumber)
+
+			# Return here and we should come back
+			return True
+		else:
+			reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
 		# If we came from the tutorial, then set state and return False so we go back for reprocessing
 		if not user.isTutorialComplete():

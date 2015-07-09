@@ -39,14 +39,14 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
-			# Since there was no time given, should have picked a time in the near future
-			self.assertIn("tomorrow", self.getOutput(mock))
+			# Since there was no time given, should have followed up
+			self.assertIn("reminded by?", self.getOutput(mock))
 
-			# This is the key here, make sure we have the extra message
-			self.assertIn("If that time doesn't work", self.getOutput(mock))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
 
 	@patch('common.date_util.utcnow')
 	def test_tutorial_remind_followup(self, dateMock):
@@ -79,13 +79,8 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "94117")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
-
-			# Since there was no time given, should have picked a time in the near future
+			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
-
-			# This is the key here, make sure we have the extra message
-			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
 	def test_tutorial_zip_code(self):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_REMIND)
