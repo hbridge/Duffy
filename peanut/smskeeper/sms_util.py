@@ -49,7 +49,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 	if type(msgText) == unicode:
 		msgText = msgText.encode('utf-8')
 
-	if keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_WEB_NUM] or "test" in keeperNumber:
+	if keeperNumber is None or keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_WEB_NUM] or "test" in keeperNumber:
 		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
 	else:

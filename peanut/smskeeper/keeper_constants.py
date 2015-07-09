@@ -177,6 +177,9 @@ TODO_DIGEST_MINUTE = 0
 
 
 def isRealKeeperNumber(keeperNumber):
+	if keeperNumber is None:
+		return False
+
 	return keeperNumber != SMSKEEPER_CLI_NUM and "test" not in keeperNumber
 
 
