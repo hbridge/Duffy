@@ -222,9 +222,15 @@ def sendAllRemindersForUserId(userId):
 
 
 @app.task
-def processDailyDigest():
+def processDailyDigest(startAtId=None):
 	weatherDataCache = dict()
-	for user in User.objects.all():
+
+	if startAtId:
+		users = User.objects.filter(id__gt=startAtId)
+	else:
+		users = User.objects.all()
+
+	for user in users:
 		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
 			continue
 
@@ -338,7 +344,11 @@ def getWeatherPhraseForZip(zipCode, weatherDataCache):
 			data = None
 
 	if data:
-		return "Today's forecast: %s | High %s and low %s" % (weatherCodes[data["forecasts"][0]["code"]], data["forecasts"][0]["high"], data["forecasts"][0]["low"])
+		if "forecasts" in data:
+			return "Today's forecast: %s | High %s and low %s" % (weatherCodes[data["forecasts"][0]["code"]], data["forecasts"][0]["high"], data["forecasts"][0]["low"])
+		else:
+			logger.error("Didn't find forecase for zip %s" % zipCode)
+			return None
 	else:
 		return None
 

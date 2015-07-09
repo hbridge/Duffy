@@ -168,7 +168,7 @@ TODO_PRODUCT_ID = 1
 
 # This is local time, so 9am
 TODO_DIGEST_HOUR = 9
-TODO_DIGEST_MINUTE = 0
+TODO_DIGEST_MINUTE = 17
 
 
 def isRealKeeperNumber(keeperNumber):
