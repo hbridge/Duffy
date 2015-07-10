@@ -115,12 +115,15 @@ class ToCheck(ReminderAdmin):
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
-		return qs.filter(manually_check=True)
+		return qs.filter(manually_check=True).exclude(hidden=True)
 
 	def save_model(self, request, obj, form, chage):
 		self.fix_timezones(obj)
 
 		obj.manually_check = False
 		obj.manually_approved_timestamp = datetime.datetime.now(pytz.utc)
+
+		obj.manually_updated = True
+		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
 
 		obj.save()
