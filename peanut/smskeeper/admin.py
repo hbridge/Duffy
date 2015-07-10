@@ -37,6 +37,13 @@ class Reminder(Entry):
 		proxy = True
 
 
+def mark_as_hidden(modeladmin, request, entries):
+	for entry in entries:
+		entry.hidden = True
+		entry.save()
+mark_as_hidden.short_description = "Mark as hidden"
+
+
 @admin.register(Reminder)
 class ReminderAdmin(admin.ModelAdmin):
 
@@ -85,6 +92,8 @@ class ReminderAdmin(admin.ModelAdmin):
 	readonly_fields = ['added_tz_aware']
 	search_fields = ['creator__id']
 
+	actions = [mark_as_hidden]
+
 
 class ToCheck(Reminder):
 	class Meta:
@@ -102,7 +111,7 @@ mark_as_approved.short_description = "Mark as approved"
 @admin.register(ToCheck)
 class ToCheck(ReminderAdmin):
 
-	actions = [mark_as_approved]
+	actions = [mark_as_approved, mark_as_hidden]
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
