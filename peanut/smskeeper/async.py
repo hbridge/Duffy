@@ -196,7 +196,7 @@ def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, 
 	if len(pendingEntries) > 0:
 		keeperNumber = user.getKeeperNumber() if overrideKeeperNumber is None else overrideKeeperNumber
 		msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll)
-		sms_util.sendMsg(user, msg, None, overrideKeeperNumber)
+		sms_util.sendMsg(user, msg, None, keeperNumber)
 
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
@@ -204,7 +204,7 @@ def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, 
 
 		if tips.isUserEligibleForMiniTip(user, tips.DIGEST_TIP_ID):
 			digestTip = tips.tipWithId(tips.DIGEST_TIP_ID)
-			sendTipToUser(digestTip, user, user.getKeeperNumber())
+			sendTipToUser(digestTip, user, keeperNumber)
 
 
 @app.task
@@ -243,6 +243,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 
 		if len(pendingEntries) > 0:
 			sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False)
+		"""
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
 			userNow = date_util.now(user.getTimezone())
 			if userNow.weekday() == 0:  # Monday
@@ -253,7 +254,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
 				if len(pendingThisWeekend) == 0:
 					sms_util.sendMsg(user, keeper_constants.REMINDER_DIGEST_EMPTY_FRIDAY, None, user.getKeeperNumber())
-
+		"""
 
 @app.task
 def sendTips(overrideKeeperNumber=None):
