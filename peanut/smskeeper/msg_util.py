@@ -44,7 +44,7 @@ noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's",
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
-nonInterestingWords = ["till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "task", "all"]
+nonInterestingWords = ["are", "my", "till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "task", "all"]
 
 
 def getInterestingWords(phrase):
