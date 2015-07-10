@@ -28,6 +28,10 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		if msg_util.isDoneCommand(msg):
 			logger.info("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
 			return False
+
+		if msg_util.isRemindCommand(msg):
+			logger.info("User %s: I think '%s' is a nicety but its also a remind command, booting out" % (user.id, msg))
+			return False
 		nicety = niceties.getNicety(msg)
 		logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
 		actions.nicety(user, nicety, requestDict, keeperNumber)
