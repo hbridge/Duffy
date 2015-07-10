@@ -284,6 +284,10 @@ def fixMsgForNatty(msg, user):
 	# Replace 'around' with 'at' since natty recognizes that better
 	newMsg = newMsg.replace("around", "at")
 
+	# Remove o'clock
+	newMsg = newMsg.replace("o'clock", "")
+	newMsg = newMsg.replace("oclock", "")
+
 	# Fix "again at 3" situation where natty doesn't like that...wtf
 	againAt = re.search(r'.*again at ([0-9])', newMsg, re.IGNORECASE)
 	if againAt:
