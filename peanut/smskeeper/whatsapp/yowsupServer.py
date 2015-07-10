@@ -23,7 +23,7 @@ from yowsup import env
 # import logging
 # logging.basicConfig(level=logging.DEBUG)  # uncomment for debug info
 
-CREDENTIALS = ("3584573970584", "2Vqf6AGTedRERwMVm3WdnU0DCbs=")
+from django.conf import settings
 
 if __name__ == "__main__":
 	layers = (
@@ -46,8 +46,8 @@ if __name__ == "__main__":
 	)
 
 	stack = YowStack(layers)
-	stack.setProp(KeeperLayer.KEEPER_NUMBER, "%s@s.whatsapp.net" % CREDENTIALS[0])
-	stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, CREDENTIALS)  # setting credentials
+	stack.setProp(KeeperLayer.KEEPER_NUMBER, "%s@s.whatsapp.net" % settings.WHATSAPP_CREDENTIALS[0])
+	stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, settings.WHATSAPP_CREDENTIALS)  # setting credentials
 	stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])  # whatsapp server address
 	stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)
 	stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())  # info about us as WhatsApp client
