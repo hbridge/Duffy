@@ -286,6 +286,12 @@ def fixMsgForNatty(msg, user):
 	newMsg = newMsg.replace("before", "at")
 	newMsg = newMsg.replace("after", "at")
 
+	by = re.search(r'(?P<phrase>by [0-9]+)', newMsg, re.IGNORECASE)
+	if by:
+		phrase = by.group("phrase")
+		newPhrase = phrase.replace("by", "at")
+		newMsg = newMsg.replace(phrase, newPhrase)
+
 	# Remove o'clock
 	newMsg = newMsg.replace("o'clock", "")
 	newMsg = newMsg.replace("oclock", "")
