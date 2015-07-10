@@ -193,5 +193,18 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("If that time doesn't work", self.getOutput(mock))
 			self.assertIn("It's that easy. ", self.getOutput(mock))
 
+	# Hit bug where a done command in the tutorial was bouncing out
+	def test_tutorial_done_in_reminder(self, dateMock):
+		self.setupUser(dateMock)
+
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "help bobby get his shit done")
+			self.assertIn("reminded by?", self.getOutput(mock))
+			self.assertNotIn("It's that easy. ", self.getOutput(mock))
+
+
 
 

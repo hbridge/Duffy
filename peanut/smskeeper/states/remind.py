@@ -28,7 +28,7 @@ def process(user, msg, requestDict, keeperNumber):
 		entry = None
 
 	# If this is a done or snooze command so kick out to normal which will deal with it
-	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or msg_util.isDoneCommand(msg)):
+	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or msg_util.isDoneCommand(msg)) and user.isTutorialComplete():
 		user.setState(keeper_constants.STATE_NORMAL)
 		return False
 
