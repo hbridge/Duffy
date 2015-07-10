@@ -283,6 +283,8 @@ def fixMsgForNatty(msg, user):
 
 	# Replace 'around' with 'at' since natty recognizes that better
 	newMsg = newMsg.replace("around", "at")
+	newMsg = newMsg.replace("before", "at")
+	newMsg = newMsg.replace("after", "at")
 
 	# Remove o'clock
 	newMsg = newMsg.replace("o'clock", "")

@@ -831,7 +831,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertTrue(entry.manually_check)
 
-		# Make sure that msgs with 2 date info in them get marked for manual check
+	# Bug with o'clock which breaks up the time
 	def test_removes_oclock(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -840,3 +840,13 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to deposit Wells Fargo check 12 o'clock today")
 			self.assertIn("today by 12pm", self.getOutput(mock))
+
+	def test_handles_before_and_after(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Finish packing tomorrow before 4pm")
+			self.assertIn("tomorrow by 4pm", self.getOutput(mock))
+
