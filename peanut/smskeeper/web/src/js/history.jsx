@@ -22,6 +22,9 @@ var MessageListRow = React.createClass({
   render: function() {
     var message = this.props.message;
 		var body = message.Body;
+    if (message.manual) {
+      body = "(MANUAL) " + body;
+    }
     var date = new Date(message.added);
     var mediaUrl = message.MediaUrls;
     if (!mediaUrl && message.MediaUrl0) {

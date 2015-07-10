@@ -146,8 +146,9 @@ def getMessagesForUser(user):
 			if not message_dict.get("From", None):
 				message_dict["From"] = user.phone_number
 			message_dict["added"] = message.added
-			if message_dict.get("From") == user.phone_number:
-				message_dict["incoming"] = True
+			message_dict["incoming"] = message.incoming
+			message_dict["manual"] = message.manual
+			if message.incoming:
 				message_dict["classification"] = message.classification
 
 			messages_dicts.append(message_dict)
