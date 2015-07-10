@@ -70,13 +70,22 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 	return False
 
 
-def processMessage(phoneNumber, msg, requestDict, keeperNumber):
+def getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber):
+	# normalize the phone number
+	normalized = phoneNumber.replace(keeper_constants.WHATSAPP_NUMBER_SUFFIX, "")
+	if not normalized[0] == '+':
+		normalized = "+%s" % normalized
 	try:
-		user = User.objects.get(phone_number=phoneNumber)
-		newUser = False
+		user = User.objects.get(phone_number=normalized)
+		isNewUser = False
 	except User.DoesNotExist:
-		user = user_util.createUser(phoneNumber, {}, keeperNumber, None)
-		newUser = True
+		user = user_util.createUser(normalized, {}, keeperNumber, None)
+		isNewUser = True
+	return user, isNewUser
+
+
+def processMessage(phoneNumber, msg, requestDict, keeperNumber):
+	user, isNewUser = getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber)
 
 	# This is true if this is from a manual entry off the history page
 	manual = "Manual" in requestDict
@@ -105,7 +114,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	if not user.paused:
 		# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
-		if not newUser:
+		if not isNewUser:
 			processed = processBasicMessages(user, msg, requestDict, keeperNumber)
 
 		if not processed:

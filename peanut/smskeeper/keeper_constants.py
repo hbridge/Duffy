@@ -171,6 +171,7 @@ SMSKEEPER_WEB_NUM = "web"
 
 REMINDER_PRODUCT_ID = 0
 TODO_PRODUCT_ID = 1
+WHATSAPP_TODO_PRODUCT_ID = 2
 
 # This is local time, so 9am
 TODO_DIGEST_HOUR = 9
@@ -217,3 +218,6 @@ HELP_MESSAGES_OLD = [
 	u"I can remember lists \U0001F4DD of things for you, and I can send you reminders at a specific time \u23F0",
 	u"What would you like to learn more about? Lists or reminders?"
 ]
+
+WHATSAPP_NUMBER_SUFFIX = "@s.whatsapp.net"
+WHATSAPP_LOCAL_PROXY_PORT = 8081

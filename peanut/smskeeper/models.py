@@ -212,7 +212,10 @@ class User(models.Model):
 		if not settings.KEEPER_NUMBER_DICT:
 			raise NameError("Keeper number dict not set")
 		elif self.product_id not in settings.KEEPER_NUMBER_DICT:
-			raise NameError("Keeper number not set for product id %s" % self.product_id)
+			raise NameError(
+				"Keeper number not set for product id %s, keeperNumberDict:%s"
+				% (self.product_id, settings.KEEPER_NUMBER_DICT)
+			)
 		else:
 			return settings.KEEPER_NUMBER_DICT[self.product_id]
 

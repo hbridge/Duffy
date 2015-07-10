@@ -16,6 +16,7 @@ from strand import notifications_util
 from common import slack_logger
 
 from peanut.celery import app
+from smskeeper.whatsapp import whatsapp_util
 
 DELAY_SECONDS_PER_WORD = 0.2
 MIN_DELAY_SECONDS = 1
@@ -52,6 +53,11 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 	if keeperNumber is None or keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_WEB_NUM] or "test" in keeperNumber:
 		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
+	elif whatsapp_util.isWhatsappNumber(keeperNumber):
+		logger.info("User %s: sending whatsapp message: %s" % (userId, msgText))
+		whatsapp_util.sendMessage(user.phone_number, msgText, mediaUrl, keeperNumber)
+		message.save()
+		slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
 	else:
 		if user.getKeeperNumber() != keeperNumber:
 			logger.error("User %s: This user's keeperNumber %s doesn't match the keeperNumber passed into asyncSendMsg: %s... fixing" % (user.id, user.getKeeperNumber(), keeperNumber))

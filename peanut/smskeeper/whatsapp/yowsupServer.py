@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from yowsupLayer import EchoLayer
+from yowsupLayer import KeeperLayer
 from yowsup.layers.auth import YowAuthenticationProtocolLayer
 from yowsup.layers.protocol_messages import YowMessagesProtocolLayer
 from yowsup.layers.protocol_receipts import YowReceiptProtocolLayer
@@ -18,11 +18,12 @@ CREDENTIALS = ("3584573970584", "2Vqf6AGTedRERwMVm3WdnU0DCbs=")
 
 if __name__ == "__main__":
 	layers = (
-		EchoLayer,
+		KeeperLayer,
 		(YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer)
 	) + YOWSUP_CORE_LAYERS
 
 	stack = YowStack(layers)
+	stack.setProp(KeeperLayer.KEEPER_NUMBER, "%s@s.whatsapp.net" % CREDENTIALS[0])
 	stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, CREDENTIALS)  # setting credentials
 	stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])  # whatsapp server address
 	stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)
