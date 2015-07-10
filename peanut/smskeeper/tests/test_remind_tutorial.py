@@ -42,7 +42,7 @@ class SMSKeeperRemindTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call mom")
 
 			# Since there was no time given, should have followed up
-			self.assertIn("reminded by?", self.getOutput(mock))
+			self.assertIn("reminded?", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tomorrow")

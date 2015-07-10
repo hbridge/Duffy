@@ -82,7 +82,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		# If we're in the tutorial and they didn't give a time, then give a different follow up
 		if not reminder_util.validTime(nattyResult) and not user.isTutorialComplete():
-			sms_util.sendMsg(user, "Great, and when would you like to be reminded by?", None, keeperNumber)
+			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
 
 			# Return here and we should come back
 			return True

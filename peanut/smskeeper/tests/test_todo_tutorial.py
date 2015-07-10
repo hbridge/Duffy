@@ -184,7 +184,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Need to call bobby")
-			self.assertIn("reminded by?", self.getOutput(mock))
+			self.assertIn("reminded?", self.getOutput(mock))
 			self.assertNotIn("It's that easy. ", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -202,7 +202,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "help bobby get his shit done")
-			self.assertIn("reminded by?", self.getOutput(mock))
+			self.assertIn("reminded?", self.getOutput(mock))
 			self.assertNotIn("It's that easy. ", self.getOutput(mock))
 
 
