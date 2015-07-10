@@ -243,7 +243,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 
 		if len(pendingEntries) > 0:
 			sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False)
-		"""
+
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
 			userNow = date_util.now(user.getTimezone())
 			if userNow.weekday() == 0:  # Monday
@@ -254,7 +254,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
 				if len(pendingThisWeekend) == 0:
 					sms_util.sendMsg(user, keeper_constants.REMINDER_DIGEST_EMPTY_FRIDAY, None, user.getKeeperNumber())
-		"""
+
 
 @app.task
 def sendTips(overrideKeeperNumber=None):
