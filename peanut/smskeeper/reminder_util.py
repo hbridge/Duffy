@@ -281,16 +281,17 @@ def dealWithDefaultTime(user, nattyResult):
 def fixMsgForNatty(msg, user):
 	newMsg = msg
 
-	# Replace 'around' with 'at' since natty recognizes that better
-	newMsg = newMsg.replace("around", "at")
-	newMsg = newMsg.replace("before", "at")
-	newMsg = newMsg.replace("after", "at")
+	# Remove these words if they show up with timing info, like:
+	# Remind me today before 6 turns into today 6
+	words = ["around", "before", "after", "for", "by"]
 
-	by = re.search(r'(?P<phrase>by [0-9]+)', newMsg, re.IGNORECASE)
-	if by:
-		phrase = by.group("phrase")
-		newPhrase = phrase.replace("by", "at")
-		newMsg = newMsg.replace(phrase, newPhrase)
+	for word in words:
+		search = re.search(r'(?P<phrase>%s [0-9]+)' % word, newMsg, re.IGNORECASE)
+
+		if search:
+			phrase = search.group("phrase")
+			newPhrase = phrase.replace(word, "").strip()
+			newMsg = newMsg.replace(phrase, newPhrase)
 
 	# Remove o'clock
 	newMsg = newMsg.replace("o'clock", "")
