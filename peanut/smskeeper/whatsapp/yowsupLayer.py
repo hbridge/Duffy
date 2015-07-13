@@ -65,7 +65,7 @@ class KeeperLayer(YowInterfaceLayer, asyncore.dispatcher_with_send):
 
 	@ProtocolEntityCallback("receipt")
 	def onReceipt(self, entity):
-		ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", "delivery", entity.getFrom())
+		ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", entity.getType(), entity.getFrom())
 		self.toLower(ack)
 
 	def onEvent(self, ev):
