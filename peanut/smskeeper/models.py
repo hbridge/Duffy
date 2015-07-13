@@ -368,6 +368,16 @@ class Message(models.Model):
 	def getBody(self):
 		return self.getMessageAttribute("Body")
 
+	@classmethod
+	def getPastMsgsForClassification(cls, classification):
+		pastMsgs = set()
+		pastMessages = Message.objects.filter(classification=classification)
+		for message in pastMessages:
+			data = json.loads(message.msg_json)
+			if "Body" in data:
+				pastMsgs.add(data["Body"])
+		return pastMsgs
+
 	def getMessageAttribute(self, attribute):
 		if self.messageDict is None:
 			self.messageDict = json.loads(self.msg_json)

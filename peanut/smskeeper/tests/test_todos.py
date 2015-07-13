@@ -1,7 +1,7 @@
 from mock import patch
 
 from smskeeper import cliMsg, async, keeper_constants
-from smskeeper.models import Entry
+from smskeeper.models import Entry, Message
 
 import test_base
 
@@ -9,6 +9,7 @@ import emoji
 from smskeeper import time_utils
 from common import date_util
 from datetime import timedelta
+
 
 @patch('common.date_util.utcnow')
 class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
@@ -928,4 +929,71 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[0].hidden)
 		self.assertTrue(entries[1].hidden)
 
+	def test_stop_classification(self, dateMock):
+		phrase1 = "Please stop texting me"
+		phrase2 = "please stop texting me!"  # Slightly different
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.TUE_9AM)
+
+		# Come up with new "stop" phrase
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, phrase1)
+			self.assertEqual("", self.getOutput(mock))
+
+		# Make sure we barfed
+		user = self.getTestUser()
+		self.assertTrue(user.paused)
+
+		message = Message.objects.get(msg_json__contains=phrase1)
+		message.classification = "stop"
+		message.save()
+
+		user.paused = False
+		user.save()
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, phrase2)
+			self.assertIn("I won't", self.getOutput(mock))
+
+		user = self.getTestUser()
+		self.assertEqual(keeper_constants.STATE_STOPPED, user.state)
+		self.assertFalse(user.paused)
+
+	def test_done_classification(self, dateMock):
+		phrase1 = "done and done"
+		phrase2 = "done and done!"  # Slightly different
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+		cliMsg.msg(self.testPhoneNumber, "I want to pick up my sox tomorrow")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		# Come up with new "done" phrase
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, phrase1)
+			self.assertEquals("", self.getOutput(mock))
+
+		# Make sure we barfed
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertFalse(entries[0].hidden)
+		user = self.getTestUser()
+		self.assertTrue(user.paused)
+
+		message = Message.objects.get(msg_json__contains=phrase1)
+		message.classification = "done"
+		message.save()
+
+		user.paused = False
+		user.save()
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, phrase2)
+			self.assertIn("Nice", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertTrue(entries[0].hidden)
+		self.assertFalse(user.paused)
 

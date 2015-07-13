@@ -9,7 +9,7 @@ import string
 import pytz
 import emoji
 
-from models import Entry
+from models import Entry, Message
 from smskeeper import keeper_constants
 from models import ZipData
 
@@ -39,6 +39,8 @@ tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
 stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
+
+digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
 noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
@@ -139,10 +141,6 @@ def isFetchCommand(msg, user):
 	return False
 
 
-def isDigestCommand(msg):
-	return re.match("(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", msg, re.I) is not None
-
-
 def isCommonListName(msg):
 	for reString in keeper_constants.COMMON_LIST_RES:
 		if re.match(reString, msg) is not None:
@@ -215,6 +213,56 @@ def isRemindCommand(msg):
 	return (reminder_re.search(msg.lower()) is not None)
 
 
+# Note: This does a very slow opperation by fetching all past messages
+# of a classification then doing the comparison one at a time.
+# This is done so we can run our "simplified msg" algo on each msg.  This might
+# get slow going forward though if we get lots of classifications
+def isMsgClassified(msg, classification):
+	simpleMsg = simplifiedMsg(msg)
+
+	pastMsgs = Message.getPastMsgsForClassification(classification)
+	for pastMsg in pastMsgs:
+		simplePastMsg = simplifiedMsg(pastMsg)
+
+		if simpleMsg == simplePastMsg:
+			return True
+
+	return False
+
+
+def isDoneCommand(msg):
+	simpleMsg = simplifiedMsg(msg)
+
+	# Note: Need a re search for done
+	matches = done_re.search(simpleMsg) is not None
+	if matches:
+		return True
+
+	return isMsgClassified(simpleMsg, "done")
+
+
+def isStopCommand(msg):
+	simpleMsg = simplifiedMsg(msg)
+
+	# Note: Need a re match for stop
+	found = stop_re.match(simpleMsg) is not None
+	if found:
+		return True
+
+	return isMsgClassified(simpleMsg, "stop")
+
+
+def isDigestCommand(msg):
+	simpleMsg = simplifiedMsg(msg)
+
+	# Note: Need a re match for stop
+	found = digest_re.match(simpleMsg) is not None
+	if found:
+		return True
+
+	return isMsgClassified(simpleMsg, "fetchdigest")
+
+
 def isOkPhrase(msg):
 	words = cleanedMsg(msg).split(' ')
 	for word in words:
@@ -224,24 +272,9 @@ def isOkPhrase(msg):
 	return False
 
 
-def isDoneCommand(msg):
-	simpleMsg = simplifiedMsg(msg)
-	# First look with local regex
-	if (done_re.search(simpleMsg) is not None):
-		return True
-
-	"""
-	# Then look in db
-	for word in msg.lower().split(' '):
-		word = word.strip(string.punctuation).strip()
-		dbWords = VerbData.objects.filter(Q(past=word) | Q(past_participle=word))
-		if len(dbWords) > 0:
-			return True
-	"""
-
-
 def isSnoozeCommand(msg):
 	return re.match("snooze", msg, re.I) is not None
+
 
 def getFirstWord(msg):
 	words = msg.split(' ')
@@ -385,11 +418,6 @@ def extractPhoneNumbers(msg):
 			remaining_str = remaining_str.replace(match.raw_string, "")
 
 	return phone_numbers, remaining_str
-
-
-def isStopCommand(msg):
-	return stop_re.match(msg) is not None
-
 
 def isCreateHandleCommand(msg):
 	phoneNumbers, remaining_str = extractPhoneNumbers(msg)
