@@ -72,6 +72,7 @@ class ReminderAdmin(admin.ModelAdmin):
 			obj.remind_timestamp = obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
 			if obj.remind_last_notified:
 				obj.remind_last_notified = obj.remind_last_notified.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+
 		return obj
 
 	def fix_timezones(self, obj):
@@ -88,7 +89,7 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
 		obj.save()
 
-	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'remind_last_notified_tz_aware', 'added_tz_aware', 'hidden', 'product_id', 'updated')
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_to_be_sent', 'hidden', 'updated')
 	readonly_fields = ['added_tz_aware']
 	search_fields = ['creator__id']
 

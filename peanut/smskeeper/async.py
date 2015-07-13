@@ -33,11 +33,11 @@ def shouldRemindNow(entry):
 	if entry.hidden:
 		return False
 
-	now = date_util.now(pytz.utc)
-
 	# Don't remind if we have already send one out
-	if entry.remind_last_notified:
+	if not entry.remind_to_be_sent:
 		return False
+
+	now = date_util.now(pytz.utc)
 
 	# Don't remind if its too far in the past
 	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
@@ -57,6 +57,7 @@ def shouldRemindNow(entry):
 
 def updateEntryAfterProcessing(entry):
 	entry.remind_last_notified = date_util.now(pytz.utc)
+	entry.remind_to_be_sent = False  # By default after processing we don't send again
 
 	if entry.remind_recur == keeper_constants.RECUR_ONE_TIME:
 		entry.hidden = True
@@ -186,11 +187,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
 
 	for entry in pendingEntries:
 		if user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
-
-
 			updateEntryAfterProcessing(entry)
-
-			entry.save()
 		msg += u"\U0001F538 " + entry.text
 
 		if entry.remind_timestamp > now:

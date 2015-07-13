@@ -110,7 +110,6 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	entry.manually_check = True
 
 	entry.remind_timestamp = nattyResult.utcTime
-	entry.remind_last_notified = None
 
 	entry.orig_text = json.dumps([msg])
 	entry.save()
@@ -165,7 +164,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 
 	logger.info("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
 	entry.remind_timestamp = newDate.astimezone(pytz.utc)
-	entry.remind_last_notified = None
+	entry.remind_to_be_sent = True
 
 	entry.manually_check = True
 	entry.hidden = False
