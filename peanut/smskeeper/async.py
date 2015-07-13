@@ -80,7 +80,7 @@ def processReminder(entry):
 			sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 			entry.remind_last_notified = date_util.now(pytz.utc)
 
-			isOneTime =  entry.remind_recur == keeper_constants.RECUR_ONE_TIME
+			isOneTime = entry.remind_recur == keeper_constants.RECUR_ONE_TIME
 			if isOneTime:
 				entry.hidden = True
 
@@ -175,6 +175,12 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
 	for entry in pendingEntries:
 		if user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 			entry.remind_last_notified = date_util.now(pytz.utc)
+
+			# This is similar code to above in processEntry. Might want to bring together
+			isOneTime = entry.remind_recur == keeper_constants.RECUR_ONE_TIME
+			if isOneTime:
+				entry.hidden = True
+
 			entry.save()
 		msg += u"\U0001F538 " + entry.text
 
