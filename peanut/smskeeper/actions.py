@@ -426,17 +426,17 @@ def done(user, msg, keeperNumber):
 
 	msgBack = None
 	if len(entries) == 0:
-		if msg_util.isMsgClassified(msg, "done"):
-			logger.info("User %s: I think '%s' is a classified done command, marking off recent" % (user.id, msg))
-			entries = justSentEntries
+		if len(todayEntries) == 0:
+			# no entries, ignore
+			pass
 		else:
-			# We really don't know what this is
-			logger.info("User %s: I think '%s' is a done command but couldn't find a good enough entry. pausing" % (user.id, msg))
-
-			if len(todayEntries) == 0:
-				# no entries, ignore
-				pass
+			if msg_util.isMsgClassified(msg, "done"):
+				logger.info("User %s: I think '%s' is a classified done command, marking off recent" % (user.id, msg))
+				entries = justSentEntries
 			else:
+				# We really don't know what this is
+				logger.info("User %s: I think '%s' is a done command but couldn't find a good enough entry. pausing" % (user.id, msg))
+
 				paused = unknown(user, msg, keeperNumber, sendMsg=False)
 				if not paused:
 					msgBack = "Sorry, I'm not sure what entry you mean."
