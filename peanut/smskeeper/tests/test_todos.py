@@ -983,7 +983,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(user.paused)
 
 		message = Message.objects.get(msg_json__contains=phrase1)
-		message.classification = "done"
+		message.classification = keeper_constants.CLASS_COMPLETE_TODO
 		message.save()
 
 		user.paused = False

@@ -431,7 +431,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "Done",
-				"value": "completetodo"
+				"value": keeper_constants.CLASS_COMPLETE_TODO
 			},
 			{
 				"text": "Delete/Cancel",
