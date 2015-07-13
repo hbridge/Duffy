@@ -439,7 +439,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "Fetch Digest",
-				"value": "fetchdigest"
+				"value": keeper_constants.CLASS_FETCH_DIGEST
 			},
 			{
 				"text": "Nicety",
@@ -463,7 +463,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "Stop",
-				"value": "stop"
+				"value": keeper_constants.CLASS_STOP
 			},
 			{
 				"text": "NoCategory",

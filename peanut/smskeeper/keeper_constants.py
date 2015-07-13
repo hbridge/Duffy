@@ -223,4 +223,7 @@ WHATSAPP_NUMBER_SUFFIX = "@s.whatsapp.net"
 WHATSAPP_LOCAL_PROXY_PORT = 8081
 
 CLASS_COMPLETE_TODO = "completetodo"
+CLASS_STOP = "stop"
+CLASS_FETCH_DIGEST = "fetchdigest"
+
 

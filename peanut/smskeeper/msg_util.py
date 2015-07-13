@@ -249,7 +249,7 @@ def isStopCommand(msg):
 	if found:
 		return True
 
-	return isMsgClassified(simpleMsg, "stop")
+	return isMsgClassified(simpleMsg, keeper_constants.CLASS_STOP)
 
 
 def isDigestCommand(msg):
@@ -260,7 +260,7 @@ def isDigestCommand(msg):
 	if found:
 		return True
 
-	return isMsgClassified(simpleMsg, "fetchdigest")
+	return isMsgClassified(simpleMsg, keeper_constants.CLASS_FETCH_DIGEST)
 
 
 def isOkPhrase(msg):
