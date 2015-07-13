@@ -430,8 +430,12 @@ class Message(models.Model):
 				"value": "createtodo"
 			},
 			{
-				"text": "Done",
-				"value": keeper_constants.CLASS_COMPLETE_TODO
+				"text": "Done (all)",
+				"value": keeper_constants.CLASS_COMPLETE_TODO_ALL
+			},
+			{
+				"text": "Done (specific)",
+				"value": keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
 			},
 			{
 				"text": "Delete/Cancel",

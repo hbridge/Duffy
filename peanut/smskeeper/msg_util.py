@@ -238,7 +238,7 @@ def isDoneCommand(msg):
 	if matches:
 		return True
 
-	return isMsgClassified(simpleMsg, keeper_constants.CLASS_COMPLETE_TODO)
+	return isMsgClassified(simpleMsg, keeper_constants.CLASS_COMPLETE_TODO_ALL)
 
 
 def isStopCommand(msg):
