@@ -864,3 +864,4 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual("poop by frisco", entry.text)
 
 
+

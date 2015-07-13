@@ -80,10 +80,14 @@ def processReminder(entry):
 			sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
 			entry.remind_last_notified = date_util.now(pytz.utc)
 
+			isOneTime =  entry.remind_recur == keeper_constants.RECUR_ONE_TIME
+			if isOneTime:
+				entry.hidden = True
+
 			# Only do fancy things like snooze if they've actually gone through the tutorial
 			if user.completed_tutorial:
 				# Hack for now until we figure out better tips for
-				if tips.DONE_TIP1_ID not in tips.getSentTipIds(user):
+				if tips.DONE_TIP1_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -92,7 +96,7 @@ def processReminder(entry):
 					tip = tips.tipWithId(tips.DONE_TIP1_ID)
 					sms_util.sendMsg(user, tip.renderMini(), None, user.getKeeperNumber())
 					tips.markTipSent(user, tip, isMini=True)
-				elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user):
+				elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -101,7 +105,7 @@ def processReminder(entry):
 					tip = tips.tipWithId(tips.DONE_TIP2_ID)
 					sms_util.sendMsg(user, tip.renderMini(), None, user.getKeeperNumber())
 					tips.markTipSent(user, tip, isMini=True)
-				elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user):
+				elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -110,7 +114,7 @@ def processReminder(entry):
 					tip = tips.tipWithId(tips.DONE_TIP3_ID)
 					sms_util.sendMsg(user, tip.renderMini(), None, user.getKeeperNumber())
 					tips.markTipSent(user, tip, isMini=True)
-				elif tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
+				elif tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
