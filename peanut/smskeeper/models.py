@@ -362,6 +362,7 @@ class Message(models.Model):
 	incoming = models.BooleanField(default=None)
 	manual = models.BooleanField(default=None)
 	classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
+	auto_classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
