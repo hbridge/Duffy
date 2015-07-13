@@ -1,3 +1,4 @@
+import datetime
 from mock import patch
 
 from smskeeper import cliMsg, async, keeper_constants
@@ -1020,5 +1021,68 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertNotIn("wake up", self.getOutput(mock))
 			self.assertNotIn("Let me", self.getOutput(mock))
+
+	def test_weekly_reminder(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am every monday")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		entry.remind_recur = keeper_constants.RECUR_WEEKLY
+		entry.save()
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		# Should be nothing for digest
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertEquals("", self.getOutput(mock))
+
+		# Go forward a week...and now it should work
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(weeks=1))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(weeks=1))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
+
+	def test_daily_reminder(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am everyday")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		entry.remind_recur = keeper_constants.RECUR_DAILY
+		entry.save()
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		# Should be in the digest
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		# Should be sent out at 10 am
+		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=1))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
 
 

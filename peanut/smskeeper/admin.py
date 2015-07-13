@@ -114,6 +114,9 @@ class ToCheck(ReminderAdmin):
 
 	actions = [mark_as_approved, mark_as_hidden]
 
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_to_be_sent', 'updated')
+
+
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
 		return qs.filter(manually_check=True).exclude(hidden=True)

@@ -61,10 +61,12 @@ def updateEntryAfterProcessing(entry):
 
 	if entry.remind_recur == keeper_constants.RECUR_ONE_TIME:
 		entry.hidden = True
-		entry.remind_to_be_sent = False
 	elif entry.remind_recur == keeper_constants.RECUR_WEEKLY:
 		entry.remind_to_be_sent = True
-		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(week=1)
+		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(weeks=1)
+	elif entry.remind_recur == keeper_constants.RECUR_DAILY:
+		entry.remind_to_be_sent = True
+		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(days=1)
 
 	entry.save()
 
