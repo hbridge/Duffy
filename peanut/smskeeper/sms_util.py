@@ -18,9 +18,6 @@ from common import slack_logger
 from peanut.celery import app
 from smskeeper.whatsapp import whatsapp_util
 
-DELAY_SECONDS_PER_WORD = 0.2
-MIN_DELAY_SECONDS = 1
-
 logger = get_task_logger(__name__)
 
 
@@ -96,7 +93,7 @@ def sendMsgs(user, msgList, keeperNumber, sendMessageDividers=True):
 
 		# calc the time for the next message
 		wordcount = len(msgTxt.split(" "))
-		seconds_delay += max(wordcount * DELAY_SECONDS_PER_WORD, MIN_DELAY_SECONDS)
+		seconds_delay += max(wordcount * keeper_constants.DELAY_SECONDS_PER_WORD, keeper_constants.MIN_DELAY_SECONDS)
 
 		# modify the message text if we're supposed to send dividers
 		if sendMessageDividers and len(msgList) > 1:

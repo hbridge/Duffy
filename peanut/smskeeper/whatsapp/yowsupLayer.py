@@ -2,6 +2,9 @@ from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_receipts.protocolentities import OutgoingReceiptProtocolEntity
 from yowsup.layers.protocol_acks.protocolentities import OutgoingAckProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from yowsup.layers.protocol_chatstate.protocolentities import ChatstateProtocolEntity
+from yowsup.layers.protocol_chatstate.protocolentities import OutgoingChatstateProtocolEntity
+from yowsup.layers.protocol_presence.protocolentities import SubscribePresenceProtocolEntity
 
 from yowsup.layers.network.layer import YowNetworkLayer
 import asyncore
@@ -9,6 +12,7 @@ import socket
 import json
 import urllib
 import urllib2
+from time import sleep
 
 import os
 import sys
@@ -85,7 +89,6 @@ class KeeperLayer(YowInterfaceLayer, asyncore.dispatcher_with_send):
 		if pair is not None:
 			sock, addr = pair
 			logger.info("WhatsappLocalProxyServer local connection from: %s", repr(addr))
-			print 'Incoming connection from %s' % repr(addr)
 			handler = LocalNetworkHandler(sock, self)
 
 	def handle_close(self, reason="Connection Closed"):
@@ -110,15 +113,32 @@ class LocalNetworkHandler(asyncore.dispatcher_with_send):
 		self.keeperLayer = keeperLayer
 
 	def handle_read(self):
+		# set typing indicator
 		data = self.recv(8192)
-		logger.info("WhatsappLocalProxyServer received message: %s", data)
+		logger.info("WhatsappLocalProxyServer received message: %s, len(data):%d", data, len(data))
+		if len(data) == 0:
+			return
 		try:
 			message = json.loads(data)
 			if type(message["Body"]) == unicode:
 				message["Body"] = message["Body"].encode("utf-8")
 		except Exception as e:
-			logger.error("Error parsing json: %s" % (e.strerror))
+			logger.error("Error parsing json: %s, data: %s" % (e, data))
 			return
+
+		# set typing state
+		entity = SubscribePresenceProtocolEntity(message["To"])  # todo this may not be necessary
+		self.keeperLayer.toLower(entity)
+
+		typingState = OutgoingChatstateProtocolEntity(ChatstateProtocolEntity.STATE_TYPING, message["To"])
+		self.keeperLayer.toLower(typingState)
+
+		# wait for 200ms /word
+		wordcount = len(message["Body"].split(" "))
+		seconds_delay = max(wordcount * keeper_constants.DELAY_SECONDS_PER_WORD, keeper_constants.MIN_DELAY_SECONDS)
+		sleep(seconds_delay)
+
+		# send outgoing message
 		outgoingMessageProtocolEntity = TextMessageProtocolEntity(
 			message["Body"],
 			to=message["To"]

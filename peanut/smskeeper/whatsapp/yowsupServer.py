@@ -8,6 +8,8 @@ from yowsup.layers.protocol_acks import YowAckProtocolLayer
 from yowsup.layers.protocol_media import YowMediaProtocolLayer
 from yowsup.layers.protocol_iq import YowIqProtocolLayer
 from yowsup.layers.protocol_calls import YowCallsProtocolLayer
+from yowsup.layers.protocol_chatstate import YowChatstateProtocolLayer
+from yowsup.layers.protocol_presence import YowPresenceProtocolLayer
 from yowsup.layers.network import YowNetworkLayer
 from yowsup.layers.coder import YowCoderLayer
 from yowsup.layers.axolotl import YowAxolotlLayer
@@ -35,7 +37,9 @@ if __name__ == "__main__":
 			YowAckProtocolLayer,
 			YowMediaProtocolLayer,
 			YowIqProtocolLayer,
-			YowCallsProtocolLayer
+			YowCallsProtocolLayer,
+			YowChatstateProtocolLayer,
+			YowPresenceProtocolLayer
 		),
 		YowAxolotlLayer,  # we don't use basic layers because of disconnects, see https://github.com/tgalal/yowsup/issues/873
 		YowLoggerLayer,
