@@ -33,11 +33,11 @@ def shouldRemindNow(entry):
 	if entry.hidden:
 		return False
 
-	now = date_util.now(pytz.utc)
-
 	# Don't remind if we have already send one out
-	if entry.remind_last_notified:
+	if not entry.remind_to_be_sent:
 		return False
+
+	now = date_util.now(pytz.utc)
 
 	# Don't remind if its too far in the past
 	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
@@ -53,6 +53,20 @@ def shouldRemindNow(entry):
 		return (now + datetime.timedelta(minutes=10) > entry.remind_timestamp)
 	else:
 		return (now >= entry.remind_timestamp)
+
+
+def updateEntryAfterProcessing(entry):
+	entry.remind_last_notified = date_util.now(pytz.utc)
+	entry.remind_to_be_sent = False  # By default after processing we don't send again
+
+	if entry.remind_recur == keeper_constants.RECUR_ONE_TIME:
+		entry.hidden = True
+		entry.remind_to_be_sent = False
+	elif entry.remind_recur == keeper_constants.RECUR_WEEKLY:
+		entry.remind_to_be_sent = True
+		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(week=1)
+
+	entry.save()
 
 
 def processReminder(entry):
@@ -78,12 +92,15 @@ def processReminder(entry):
 				msg = "Hi! Friendly reminder: %s" % entry.text
 
 			sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
-			entry.remind_last_notified = date_util.now(pytz.utc)
+
+			updateEntryAfterProcessing(entry)
+
+			isOneTime = entry.remind_recur == keeper_constants.RECUR_ONE_TIME
 
 			# Only do fancy things like snooze if they've actually gone through the tutorial
 			if user.completed_tutorial:
 				# Hack for now until we figure out better tips for
-				if tips.DONE_TIP1_ID not in tips.getSentTipIds(user):
+				if tips.DONE_TIP1_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -92,7 +109,7 @@ def processReminder(entry):
 					tip = tips.tipWithId(tips.DONE_TIP1_ID)
 					sms_util.sendMsg(user, tip.renderMini(), None, user.getKeeperNumber())
 					tips.markTipSent(user, tip, isMini=True)
-				elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user):
+				elif tips.DONE_TIP2_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -101,7 +118,7 @@ def processReminder(entry):
 					tip = tips.tipWithId(tips.DONE_TIP2_ID)
 					sms_util.sendMsg(user, tip.renderMini(), None, user.getKeeperNumber())
 					tips.markTipSent(user, tip, isMini=True)
-				elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user):
+				elif tips.DONE_TIP3_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -110,7 +127,7 @@ def processReminder(entry):
 					tip = tips.tipWithId(tips.DONE_TIP3_ID)
 					sms_util.sendMsg(user, tip.renderMini(), None, user.getKeeperNumber())
 					tips.markTipSent(user, tip, isMini=True)
-				elif tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user):
+				elif tips.SNOOZE_TIP_ID not in tips.getSentTipIds(user) and not isOneTime:
 					# Hack for tests.  Could get rid of by refactoring reminder stuff into own async and using
 					# sms_util for sending list of msgs
 					if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
@@ -170,8 +187,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
 
 	for entry in pendingEntries:
 		if user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
-			entry.remind_last_notified = date_util.now(pytz.utc)
-			entry.save()
+			updateEntryAfterProcessing(entry)
 		msg += u"\U0001F538 " + entry.text
 
 		if entry.remind_timestamp > now:

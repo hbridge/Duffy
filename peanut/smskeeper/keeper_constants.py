@@ -162,7 +162,7 @@ SHARE_UPSELL_FREQUENCY_DAYS = 3
 SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them to"
 
 FEEDBACK_FREQUENCY_DAYS = 15
-FEEDBACK_PHRASE = u"Btw, Would you be ok if one of my my minions \U0001F638 contacted you to get more info on your experience with me?"
+FEEDBACK_PHRASE = u"Btw, Would you be ok if one of my minions \U0001F638 contacted you to get more info on your experience with me?"
 FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS = 3
 
 SMSKEEPER_TEST_NUM = "test"
@@ -221,6 +221,24 @@ HELP_MESSAGES_OLD = [
 
 WHATSAPP_NUMBER_SUFFIX = "@s.whatsapp.net"
 WHATSAPP_LOCAL_PROXY_PORT = 8081
-
 DELAY_SECONDS_PER_WORD = 0.2
 MIN_DELAY_SECONDS = 1
+
+CLASS_COMPLETE_TODO_ALL = "completetodo-all"
+CLASS_COMPLETE_TODO_SPECIFIC = "completetodo-specific"
+CLASS_STOP = "stop"
+CLASS_FETCH_DIGEST = "fetchdigest"
+
+RECUR_DEFAULT = "default"
+RECUR_ONE_TIME = "one-time"
+RECUR_WEEKLY = "weekly"
+RECUR_WEEKDAYS = "weekdays"
+RECUR_DAILY = "daily"
+
+RECURRENCE_CHOICES = [
+	RECUR_DEFAULT,
+	RECUR_ONE_TIME,
+	RECUR_WEEKLY,
+	RECUR_WEEKDAYS,
+	RECUR_DAILY
+]

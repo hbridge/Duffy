@@ -306,6 +306,10 @@ class Entry(models.Model):
 
 	remind_timestamp = models.DateTimeField(null=True, blank=True)
 	remind_last_notified = models.DateTimeField(null=True, blank=True)
+	remind_to_be_sent = models.BooleanField(default=True, db_index=True)
+
+	RECURRENCE_CHOICES = [(x, x) for x in keeper_constants.RECURRENCE_CHOICES]
+	remind_recur = models.CharField(max_length=100, choices=RECURRENCE_CHOICES, default=keeper_constants.RECUR_DEFAULT)
 
 	hidden = models.BooleanField(default=False)
 
@@ -430,8 +434,12 @@ class Message(models.Model):
 				"value": "createtodo"
 			},
 			{
-				"text": "Done",
-				"value": "completetodo"
+				"text": "Done (all)",
+				"value": keeper_constants.CLASS_COMPLETE_TODO_ALL
+			},
+			{
+				"text": "Done (specific)",
+				"value": keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
 			},
 			{
 				"text": "Delete/Cancel",
@@ -439,7 +447,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "Fetch Digest",
-				"value": "fetchdigest"
+				"value": keeper_constants.CLASS_FETCH_DIGEST
 			},
 			{
 				"text": "Nicety",
@@ -463,7 +471,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "Stop",
-				"value": "stop"
+				"value": keeper_constants.CLASS_STOP
 			},
 			{
 				"text": "NoCategory",

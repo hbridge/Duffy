@@ -179,7 +179,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(ret)
 
 		# Make it look like we just sent out a reminder by setting last_notified and updated
-		entry.remind_last_notified = datetime.datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
+		entry.remind_to_be_sent = False
 		entry.updated = datetime.datetime(2020, 01, 01, 9, 50, 1, tzinfo=pytz.utc)
 
 		# Now set for a minute later and make sure we don't fire again
@@ -190,7 +190,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Now set the remind timestamp  like it was snoozed for an hour one minute later
 		# Should fire
 		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 10, 51, 0, tzinfo=pytz.utc)
-		entry.remind_last_notified = None
+		entry.remind_to_be_sent = True
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 10, 51, 1, tzinfo=pytz.utc)
 		ret = async.shouldRemindNow(entry)
 		self.assertTrue(ret)
@@ -217,7 +217,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(ret)
 
 		# Make it look like we just sent out a reminder by setting last_notified and updated
-		entry.remind_last_notified = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
+		entry.remind_to_be_sent = False
 		entry.updated = datetime.datetime(2020, 01, 01, 10, 15, 1, tzinfo=pytz.utc)
 
 		# Now we're past the actual time, but we were just notified, so shouldn't fire
@@ -227,8 +227,8 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		# Now set the remind timestamp  like it was snoozed for an hour one minute later
 		# Should fire
-		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 11, 16, 0, tzinfo=pytz.utc)
-		entry.remind_last_notified = None
+		entry.remind_timestamp = datetime.datetime(2020, 01, 01, 11, 16, 1, tzinfo=pytz.utc)
+		entry.remind_to_be_sent = True
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 11, 16, 1, tzinfo=pytz.utc)
 		ret = async.shouldRemindNow(entry)
 		self.assertTrue(ret)
@@ -862,5 +862,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 
 		self.assertEqual("poop by frisco", entry.text)
+
 
 

@@ -430,7 +430,7 @@ def done(user, msg, keeperNumber):
 			# no entries, ignore
 			pass
 		else:
-			if msg_util.isMsgClassified(msg, "done"):
+			if msg_util.isMsgClassified(msg, keeper_constants.CLASS_COMPLETE_TODO_ALL):
 				logger.info("User %s: I think '%s' is a classified done command, marking off recent" % (user.id, msg))
 				entries = justSentEntries
 			else:

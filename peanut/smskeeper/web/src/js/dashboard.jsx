@@ -273,9 +273,9 @@ var DashboardApp = React.createClass({
 
     var now = new Date();
     var yest = new Date();
-    var twoweeks = new Date();
+    var oneweek = new Date();
     yest.setDate(yest.getDate() - 1);
-    twoweeks.setDate(twoweeks.getDate() - 14);
+    oneweek.setDate(oneweek.getDate() - 7);
 
     var users = this.state.users;
     var filter = this.state.filter;
@@ -301,8 +301,8 @@ var DashboardApp = React.createClass({
     var nonActivatedUsers = filterUsers(users, false, null, null);
     var recentlyActivatedUsers = filterUsers(users, true, now, yest);
     var allActivated = filterUsers(users, true, yest, new Date(0));
-    var normalUsers = filterUsersByActivity(allActivated, now, twoweeks);
-    var oldUsers = filterUsersByActivity(allActivated, twoweeks, new Date(0));
+    var normalUsers = filterUsersByActivity(allActivated, now, oneweek);
+    var oldUsers = filterUsersByActivity(allActivated, oneweek, new Date(0));
 
 		return (
       <div>
@@ -310,7 +310,7 @@ var DashboardApp = React.createClass({
         <DailyTable stats={ this.state.daily_stats} />
         <UserTable users={ pausedUsers } showActivated={ true } title={"Paused (" + pausedUsers.length  + ")"}/>
         <UserTable users={ normalUsers } showActivated={ true } title={"Active (" + normalUsers.length  + ")"}/>
-        <div>{ oldUsers.length } users inactive for more than 2 weeks </div>
+        <div>{ oldUsers.length } users inactive for more than 1 week </div>
         <UserTable users={ recentlyActivatedUsers } showActivated={ true } title={"Recently Activated (" + recentlyActivatedUsers.length + ")"}/>
         <UserTable users={ nonActivatedUsers } showActivated={ false } title={ "Not activated (" + nonActivatedUsers.length + ")"}/>
       </div>
