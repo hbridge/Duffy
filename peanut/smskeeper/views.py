@@ -225,7 +225,7 @@ def send_sms(request):
 		msg = form.cleaned_data['msg']
 		keeperNumber = form.cleaned_data['from_num']
 		direction = form.cleaned_data['direction']
-		media = None # add a link here to send to users
+		media = None  # add a link here to send to users
 
 		if not keeperNumber:
 			keeperNumber = user.getKeeperNumber()
@@ -233,14 +233,16 @@ def send_sms(request):
 		if direction == "ToUser":
 			sms_util.sendMsg(user, msg, media, keeperNumber, manual=True)
 		else:
+			if (user.paused):
+				user.paused = False
+				user.save()
 			requestDict = dict()
 			requestDict["Body"] = msg
 			requestDict["To"] = keeperNumber
 			requestDict["From"] = user.phone_number
 			requestDict["Manual"] = True
 			processing_util.processMessage(user.phone_number, msg, requestDict, keeperNumber)
-
-		return HttpResponse(json.dumps(getMessagesResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
+		return HttpResponse(json.dumps({"result": "success"}), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 

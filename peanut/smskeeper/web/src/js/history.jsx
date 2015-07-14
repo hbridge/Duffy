@@ -3,6 +3,28 @@ var React = require('react')
 var $ = require('jquery');
 var JQueryUI = require('jquery-ui')
 var classNames = require('classnames');
+mui = require('material-ui'),
+  ThemeManager = new mui.Styles.ThemeManager(),
+  RaisedButton = mui.RaisedButton;
+  CircularProgress = mui.CircularProgress;
+  TextField = mui.TextField;
+  RadioButtonGroup = mui.RadioButtonGroup;
+  RadioButton = mui.RadioButton;
+  Toggle = mui.Toggle;
+  Paper = mui.Paper;
+  Toolbar = mui.Toolbar;
+  ToolbarGroup = mui.ToolbarGroup;
+  ToolbarTitle = mui.ToolbarTitle;
+  DropDownIcon = mui.DropDownIcon;
+  ToolbarSeparator = mui.ToolbarSeparator;
+  SvgIcon = mui.SvgIcon;
+var injectTapEventPlugin = require("react-tap-event-plugin");
+
+//Needed for onTouchTap
+//Can go away when react 1.0 release
+//Check this repo:
+//https://github.com/zilverline/react-tap-event-plugin
+injectTapEventPlugin();
 
 var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 
@@ -242,39 +264,111 @@ var ResendMessageView = React.createClass({
 });
 
 var CommentForm = React.createClass({
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({paused: nextProps.paused});
+  },
+
+  getInitialState: function() {
+    return {loading: false, simulateOn: false};
+  },
+
   handlePostMsgSubmit: function(e) {
     e.preventDefault();
-    var text = React.findDOMNode(this.refs.text).value.trim();
-    var direction = React.findDOMNode(this.refs.direction).value;
+    var text = this.refs.text.getValue().trim();
+    var direction = this.refs.simulateUserToggle.isToggled() ? "ToKeeper" : "ToUser";
     if (!text) {
       return;
     }
     this.props.onCommentSubmit({msg: text, user_id: USER.id, direction: direction});
-    React.findDOMNode(this.refs.text).value = '';
-    return;
+    this.refs.text.setValue('');
   },
+
   handleTogglePause: function(e) {
     e.preventDefault();
-    this.props.onTogglePaused({user_id: USER.id});
-    return;
+    this.setState({loading:true});
+    $.ajax({
+      url: "/smskeeper/toggle_paused",
+      dataType: 'json',
+      type: 'POST',
+      data: {user_id: USER.id},
+      success: function(data) {
+        console.log("toggle paused: " + data.paused);
+        this.setState({paused: data.paused, loading:false});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("toggle_paused", status, err.toString());
+        this.setState({loading: false});
+      }.bind(this)
+    });
   },
+
+  handleMoreAction: function(e, selectedIndex, menuItem) {
+    console.log("more action selected: %d: %s", selectedIndex, menuItem.payload);
+    window.open(menuItem.payload, '_blank');
+  },
+
+  handleSimulateToggled: function(e, toggled) {
+    this.setState({simulateOn:toggled})
+  },
+
   render: function() {
-    var pausedText = this.props.paused ? "Unpause" : "Pause"
+    var sendText = "Send";
+    if (this.state.simulateOn) {
+      sendText = this.state.paused ? "Unpause & Simulate" : "Simulate";
+    }
+    var userPausedText = this.state.paused ? "Paused" : "Normal";
+    var pausedText = this.state.paused ? "Unpause" : "Pause";
+    var pauseElement = <RaisedButton
+      ref='pauseButton'
+      label={ pausedText }
+      primary={ !this.state.paused }
+      secondary= { this.state.paused }
+      onClick={this.handleTogglePause}
+    />;
+    if (this.state.loading) {
+      pauseElement = <CircularProgress mode="indeterminate" />;
+    }
+
+    var toolbarBackround = this.state.paused ? "#F5CFCF" : "#DBDBDB";
+    var iconMenuItems = [
+      { payload: "/admin/smskeeper/reminder/?q=" + USER.id, text: 'Reminders' },
+      { payload: '/' + USER.key + '?internal=1', text: 'KeeperApp' }
+    ];
+
     return (
-      <span>
-      <form className="commentForm" onSubmit={this.handlePostMsgSubmit}>
-        <input type="text" placeholder="Say something..." ref="text" className="commentBox"/>
-        <input type="submit" value="Post" className="largeButton" />
-        <br/>
-        <select ref="direction">
-          <option value="ToUser">Keeper to {USER.name}</option>
-          <option value="ToKeeper">{USER.name} to Keeper</option>
-        </select>
-      </form>
-      <form onSubmit={this.handleTogglePause}>
-        <input type="submit" value={pausedText} className="largeButton" />
-      </form>
-      </span>
+      <Paper zDepth={1} className="controlPanel">
+        <Toolbar style={{backgroundColor: toolbarBackround, padding: "0px 10px"}}>
+          <ToolbarGroup key={0} float="left">
+            <ToolbarTitle text={userPausedText} />
+          </ToolbarGroup>
+          <ToolbarGroup key={1} float="right">
+            { pauseElement }
+            <DropDownIcon menuItems={iconMenuItems} onChange={this.handleMoreAction}>
+              <ToolbarTitle text="•••"/>
+            </DropDownIcon>
+          </ToolbarGroup>
+        </Toolbar>
+
+        <div className="sendForm">
+          <TextField ref="text" hintText="Text to send..." multiLine={true} style={{width: '100%'}}/>
+          <Toggle
+            ref='simulateUserToggle'
+            name="SimulateUser"
+            label="Simulate user"
+            style={{width: '10em'}}
+            onToggle={this.handleSimulateToggled}
+            />
+          <br />
+
+          <RaisedButton
+            ref='sendButton'
+            label={ sendText }
+            secondary={true}
+            onClick={this.handlePostMsgSubmit}
+            className="submitButton"
+          />
+        </div>
+      </Paper>
     );
   }
 });
@@ -319,25 +413,11 @@ var KeeperApp = React.createClass({
       type: 'POST',
       data: data,
       success: function(data) {
-        this.processDataFromServer(data);
+        // the data that comes back from the server is just success
+        this.loadDataFromServer();
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("send_sms", status, err.toString());
-      }.bind(this)
-    });
-  },
-
-  handleTogglePause: function(data) {
-    $.ajax({
-      url: "/smskeeper/toggle_paused",
-      dataType: 'json',
-      type: 'POST',
-      data: data,
-      success: function(data) {
-        this.processDataFromServer(data);
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error("toggle_paused", status, err.toString());
       }.bind(this)
     });
   },
@@ -354,12 +434,13 @@ var KeeperApp = React.createClass({
         onMessageClicked = { this.onMessageClicked }/>
 		}.bind(this);
 
+    console.log("rendering %d messages", this.state.messages.length);
 		return (
       <div>
   			<div id="messages">
   			   { this.state.messages.map(createItem) }
         </div>
-        <CommentForm onCommentSubmit={this.handleCommentSubmit} onTogglePaused={this.handleTogglePause} paused={this.state.paused}/>
+        <CommentForm onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused}/>
       </div>
 		);
 	},
@@ -371,6 +452,18 @@ var KeeperApp = React.createClass({
     }
   },
 
+  getChildContext: function() {
+    return {
+      muiTheme: ThemeManager.getCurrentTheme()
+    };
+  },
+
 });
+
+// Important!
+KeeperApp.childContextTypes = {
+  muiTheme: React.PropTypes.object
+};
+
 
 React.render(<KeeperApp />, document.getElementById("keeper_app"));
