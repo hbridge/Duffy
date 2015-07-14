@@ -77,10 +77,6 @@ SMSKEEPER_NICETIES = [
 		[u"You're pretty cool too! :sunglasses:"]
 	),
 	Nicety(
-		"hows the weather|whats the weather",
-		[u"It's always sunny in cyberspace \U0001F31E"]
-	),
-	Nicety(
 		"I(m| am) sorry|apologies|I apologize|sry",
 		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
 	),
