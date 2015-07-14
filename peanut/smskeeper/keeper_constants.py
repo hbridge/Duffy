@@ -235,6 +235,7 @@ CLASS_COMPLETE_TODO_ALL = "completetodo-all"
 CLASS_COMPLETE_TODO_SPECIFIC = "completetodo-specific"
 CLASS_STOP = "stop"
 CLASS_FETCH_DIGEST = "fetchdigest"
+CLASS_FETCH_WEATHER = "fetchweather"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"

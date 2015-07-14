@@ -475,6 +475,10 @@ class Message(models.Model):
 				"value": keeper_constants.CLASS_STOP
 			},
 			{
+				"text": "Get weather",
+				"value": keeper_constants.CLASS_FETCH_WEATHER
+			},
+			{
 				"text": "NoCategory",
 				"value": "nocategory"
 			},

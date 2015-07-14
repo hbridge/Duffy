@@ -9,7 +9,7 @@ import django
 from smskeeper.models import Entry, Contact, User
 from smskeeper import analytics
 
-from common import slack_logger, date_util
+from common import slack_logger, date_util, weather_util
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -482,6 +482,14 @@ def snooze(user, msg, keeperNumber):
 		reminder_util.sendCompletionResponse(user, entries[0], False, keeperNumber)
 
 	return True
+
+
+def fetchWeather(user, msg, keeperNumber):
+	weatherPhrase = weather_util.getWeatherPhraseForZip(user.zipcode, dict())
+	if weatherPhrase:
+		sms_util.sendMsg(user, weatherPhrase, None, keeperNumber)
+	else:
+		sms_util.sendMsg(user, "I'm sorry, I don't know the weather right now", None, keeperNumber)
 
 
 def unknown(user, msg, keeperNumber, sendMsg=True):

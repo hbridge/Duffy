@@ -42,6 +42,8 @@ stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't
 
 digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
+weather_re = re.compile(r"what('s| is) the weather", re.I)
+
 noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
@@ -263,6 +265,17 @@ def isDigestCommand(msg):
 	return isMsgClassified(simpleMsg, keeper_constants.CLASS_FETCH_DIGEST)
 
 
+def isFetchWeatherCommand(msg):
+	simpleMsg = simplifiedMsg(msg)
+
+	# Note: Need a re match for stop
+	found = weather_re.match(simpleMsg) is not None
+	if found:
+		return True
+
+	return isMsgClassified(simpleMsg, keeper_constants.CLASS_FETCH_DIGEST)
+
+
 def isOkPhrase(msg):
 	words = cleanedMsg(msg).split(' ')
 	for word in words:
@@ -287,8 +300,16 @@ def getFirstWord(msg):
 
 def isQuestion(msg):
 	firstWord = getFirstWord(msg)
+
+	# Each of these calls are expensive, so this will be slow.
+	# Should be fixed up once it gets too bad
 	if isRemindCommand(msg):
 		return False
+	if isFetchWeatherCommand(msg):
+		return False
+	if isDigestCommand(msg):
+		return False
+
 	return ("?" in msg) or firstWord in ["who", "what", "where", "when", "why", "how", "what's", "whats", "is", "are"]
 
 

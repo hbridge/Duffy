@@ -90,6 +90,9 @@ def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
 	elif msg_util.isSnoozeCommand(msg):
 		logger.info("User %s: I think '%s' is a snooze command" % (user.id, msg))
 		actions.snooze(user, msg, keeperNumber)
+	elif msg_util.isFetchWeatherCommand(msg):
+		logger.info("User %s: I think '%s' is a fetch weather command" % (user.id, msg))
+		actions.fetchWeather(user, msg, keeperNumber)
 	elif msg_util.isDigestCommand(msg):
 		logger.info("User %s: I think '%s' is a digest command" % (user.id, msg))
 		if "today" in msg.lower():
