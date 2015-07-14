@@ -19,7 +19,7 @@ from smskeeper import tips, sms_util, user_util, msg_util
 from smskeeper.models import Entry, Message, User
 from smskeeper import keeper_constants
 
-from common import date_util
+from common import date_util, weather_util
 
 logger = get_task_logger(__name__)
 
@@ -167,13 +167,11 @@ def shouldIncludeEntry(entry):
 	return False
 
 
-def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
+def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested):
 	now = date_util.now(pytz.utc)
 	msg = ""
 
-	if isAll:
-		msg = u"Your current tasks: \U0001F4DD\n"
-	else:
+	if not userRequested:  # Include a header and weather if not user requested
 		headerPhrase = keeper_constants.REMINDER_DIGEST_HEADERS[now.weekday()]
 		msg += u"%s\n" % (headerPhrase)
 
@@ -182,40 +180,34 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll):
 			if weatherPhrase:
 				msg += u"\n%s\n\n" % (weatherPhrase)
 
-		msg += u"Your tasks for today: \U0001F4DD\n"
-
 	if len(pendingEntries) == 0:
-		return None, []
+		msg += keeper_constants.REMINDER_DIGEST_EMPTY[now.weekday()]
+	else:
+		if userRequested:  # This shows all tasks so we don't mention today
+			msg += u"Your current tasks: \U0001F4DD\n"
+		else:
+			msg += u"Your tasks for today: \U0001F4DD\n"
 
-	for entry in pendingEntries:
-		if user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
-			updateEntryAfterProcessing(entry)
-		msg += u"\U0001F538 " + entry.text
+		for entry in pendingEntries:
+			# If this is the digest and this reminder was timed to this day and time...then process it (mark it as sent)
+			if not userRequested and user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
+				updateEntryAfterProcessing(entry)
+			msg += u"\U0001F538 " + entry.text
 
-		if entry.remind_timestamp > now:
-			msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
-		msg += "\n"
+			if entry.remind_timestamp > now + datetime.timedelta(minutes=1):  # Need an extra minute since some 9am reminders are really 9:00:30
+				msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
+			msg += "\n"
 
 	return msg
 
 
-@app.task
-def sendDigestForUserId(userId, overrideKeeperNumber=None):
-	weatherDataCache = dict()
-	user = User.objects.get(id=userId)
+def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, overrideKeeperNumber=None):
+	keeperNumber = user.getKeeperNumber() if overrideKeeperNumber is None else overrideKeeperNumber
 
-	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
+	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
+	sms_util.sendMsg(user, msg, None, keeperNumber)
 
 	if len(pendingEntries) > 0:
-		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False, overrideKeeperNumber=overrideKeeperNumber)
-
-
-def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, isAll, overrideKeeperNumber=None):
-	if len(pendingEntries) > 0:
-		keeperNumber = user.getKeeperNumber() if overrideKeeperNumber is None else overrideKeeperNumber
-		msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, isAll)
-		sms_util.sendMsg(user, msg, None, keeperNumber)
-
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [x.id for x in pendingEntries])
@@ -226,16 +218,20 @@ def sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, 
 
 
 @app.task
-def sendAllRemindersForUserId(userId, overrideKeeperNumber=None):
-	weatherDataCache = dict()
+def sendDigestForUserId(userId, overrideKeeperNumber=None):
+	user = User.objects.get(id=userId)
+	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
+	sendDigestForUser(user, pendingEntries, dict(), False, overrideKeeperNumber=overrideKeeperNumber)
+
+
+# This method is different since we pass True for the userRequested
+@app.task
+def sendAllRemindersForUserId(userId, overrideKeeperNumber=None):
 	user = User.objects.get(id=userId)
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=True)
 
-	if len(pendingEntries) > 0:
-		sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, True, overrideKeeperNumber=overrideKeeperNumber)
-	else:
-		sms_util.sendMsg(user, "You have no pending tasks.", None, user.getKeeperNumber())
+	sendDigestForUser(user, pendingEntries, dict(), True, overrideKeeperNumber=overrideKeeperNumber)
 
 
 @app.task
@@ -260,18 +256,9 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 		if len(pendingEntries) > 0:
-			sendDigestForUserWithPendingEntries(user, pendingEntries, weatherDataCache, False)
-
+			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
 		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
-			userNow = date_util.now(user.getTimezone())
-			if userNow.weekday() == 0:  # Monday
-				pendingThisWeek = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=5))
-				if len(pendingThisWeek) == 0:
-					sms_util.sendMsg(user, keeper_constants.REMINDER_DIGEST_EMPTY_MONDAY, None, user.getKeeperNumber())
-			elif userNow.weekday() == 4:  # Friday
-				pendingThisWeekend = user_util.pendingTodoEntries(user, includeAll=True, before=userNow + datetime.timedelta(days=4))
-				if len(pendingThisWeekend) == 0:
-					sms_util.sendMsg(user, keeper_constants.REMINDER_DIGEST_EMPTY_FRIDAY, None, user.getKeeperNumber())
+			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
 
 
 @app.task
@@ -356,7 +343,7 @@ def getWeatherPhraseForZip(zipCode, weatherDataCache):
 		data = weatherDataCache[zipCode]
 	else:
 		try:
-			data = pywapi.get_weather_from_yahoo(zipCode, 'imperial')
+			data = weather_util.getWeatherForZip(zipCode)
 			weatherDataCache[zipCode] = data
 		except:
 			data = None

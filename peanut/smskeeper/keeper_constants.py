@@ -203,8 +203,15 @@ REMINDER_DIGEST_INSTRUCTIONS = (
 	+ "\n:sleeping_symbol: To snooze a task, just tell me when I should remind you, like 'Snooze buy flip flops to Saturday'"
 )
 
-REMINDER_DIGEST_EMPTY_MONDAY = ":sunrise: Happy Monday! Looks like I'm not tracking anything for you this week. Let me know what you need to get done."
-REMINDER_DIGEST_EMPTY_FRIDAY = ":party_popper: TGIF! Looks like I'm not tracking anything for you this weekend. Let me know if you have any errands etc to get done. :runner:"
+REMINDER_DIGEST_EMPTY = [
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
+	"Looks like I'm not tracking anything for you today. Let me know what you need to get done."
+]
 
 HELP_MESSAGES = [
 	u":raising_hand: Hi! I'm an automated digital assistant here to help you get things done.",
