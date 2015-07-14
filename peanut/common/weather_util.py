@@ -68,7 +68,7 @@ def getWeatherPhraseForZip(zipCode, weatherDataCache):
 
 	if data:
 		if "forecasts" in data:
-			return "Today's forecast: %s %s | High %s and low %s" % (data["forecasts"][0]["text"], weatherCodes[data["forecasts"][0]["code"]], data["forecasts"][0]["high"], data["forecasts"][0]["low"])
+			return "Today's forecast: %s %s. \nTemp: High %s | Low %s" % (data["forecasts"][0]["text"], weatherCodes[data["forecasts"][0]["code"]], data["forecasts"][0]["high"], data["forecasts"][0]["low"])
 		else:
 			logger.error("Didn't find forecast for zip %s" % zipCode)
 			return None
