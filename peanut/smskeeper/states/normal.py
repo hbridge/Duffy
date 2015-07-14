@@ -1,6 +1,7 @@
 import random
 import re
 import logging
+import time
 
 from smskeeper.models import Entry, Message
 
@@ -66,8 +67,15 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 		firstListItem = False
 	entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True, True)
 
+	label = entries[0].label
 	if firstListItem:
-		sms_util.sendMsg(user, "Just type '%s' to get these back" % (entries[0].label.replace("#", "")), None, keeperNumber)
+		sms_util.sendMsg(user, "Just type '%s' to get these back" % (label.replace("#", "")), None, keeperNumber)
+	else:
+		if keeper_constants.isRealKeeperNumber(keeperNumber):
+			time.sleep(1)
+		actions.fetch(user, label, keeperNumber)
+		user.setState(keeper_constants.STATE_IMPLICIT_LABEL)
+		user.setStateData(keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY, label)
 
 	if len(unresolvedHandles) > 0:
 		user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
