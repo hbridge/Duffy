@@ -27,6 +27,8 @@ class User(models.Model):
 	activated = models.DateTimeField(null=True, blank=True)
 	paused = models.BooleanField(default=False)
 
+	last_paused_timestamp = models.DateTimeField(null=True, blank=True)
+
 	STATE_CHOICES = [(x, x) for x in keeper_constants.ALL_STATES]
 	state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.STATE_NOT_ACTIVATED)
 	last_state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.STATE_NOT_ACTIVATED)

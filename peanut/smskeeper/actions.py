@@ -496,6 +496,7 @@ def unknown(user, msg, keeperNumber, sendMsg=True):
 	now = date_util.now(pytz.timezone("US/Eastern"))
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM and not settings.DEBUG:
 		user.paused = True
+		user.last_paused_timestamp = date_util.now(pytz.utc)
 		user.save()
 		postMsg = "User %s paused after: '%s'   @derek @aseem @henry" % (user.id, msg)
 		slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)

@@ -66,6 +66,10 @@ class ReminderAdmin(admin.ModelAdmin):
 		else:
 			return ""
 
+	def reminder_sent(self, obj):
+		return not obj.remind_to_be_sent
+	reminder_sent.boolean = True
+
 	def get_object(self, request, object_id):
 		obj = super(ReminderAdmin, self).get_object(request, object_id)
 		if obj is not None:
@@ -89,7 +93,7 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
 		obj.save()
 
-	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_to_be_sent', 'hidden', 'updated')
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'reminder_sent', 'hidden', 'updated')
 	readonly_fields = ['added_tz_aware']
 	search_fields = ['creator__id']
 
