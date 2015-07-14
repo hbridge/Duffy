@@ -205,6 +205,35 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("reminded?", self.getOutput(mock))
 			self.assertNotIn("It's that easy. ", self.getOutput(mock))
 
+	def test_tutorial_time_not_given_same_day(self, dateMock):
+		self.setupUser(dateMock)
 
+		self.setNow(dateMock, self.MON_10AM)
 
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Do homework when the cable guy leaves")
+			self.assertIn("reminded?", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "5:30 P.M")
+			self.assertIn("today by 5:30pm", self.getOutput(mock))
+
+	def test_tutorial_time_not_given_next_day(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10PM)
+
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Do homework when the cable guy leaves")
+			self.assertIn("reminded?", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "5:30 P.M")
+			self.assertIn("tomorrow by 5:30pm", self.getOutput(mock))
 
