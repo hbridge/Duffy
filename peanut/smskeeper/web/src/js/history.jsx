@@ -3,6 +3,8 @@ var React = require('react')
 var $ = require('jquery');
 var JQueryUI = require('jquery-ui')
 var classNames = require('classnames');
+var emoji = require("node-emoji");
+console.log(emoji);
 mui = require('material-ui'),
   ThemeManager = new mui.Styles.ThemeManager(),
   RaisedButton = mui.RaisedButton;
@@ -311,6 +313,31 @@ var CommentForm = React.createClass({
     this.setState({simulateOn:toggled})
   },
 
+  emojize: function(str) {
+    newstr = str;
+    var matches = str.match(/[:]\S+[:]/g);
+    if (!matches) return str;
+    for (var match of matches) {
+      var emoji_lookup = match.replace(/[:]/g, "");
+      var emoji_char = emoji.get(emoji_lookup);
+      if (emoji_char) {
+        newstr = newstr.replace(match, emoji_char);
+        console.log("replaced %s with %s", match, emoji_char);
+      } else {
+        console.log("no match for %s", emoji_lookup);
+      }
+    }
+    return newstr;
+  },
+
+  handleTextChanged: function(e) {
+    var originalText = this.refs.text.getValue();
+    var emojifiedText = this.emojize(originalText);
+    if (originalText != emojifiedText) {
+      this.refs.text.setValue(emojifiedText);
+    }
+  },
+
   render: function() {
     var sendText = "Send";
     if (this.state.simulateOn) {
@@ -350,7 +377,13 @@ var CommentForm = React.createClass({
         </Toolbar>
 
         <div className="sendForm">
-          <TextField ref="text" hintText="Text to send..." multiLine={true} style={{width: '100%'}}/>
+          <TextField
+            ref="text"
+            hintText="Text to send..."
+            multiLine={true}
+            style={{width: '100%'}}
+            onChange={this.handleTextChanged}
+            />
           <Toggle
             ref='simulateUserToggle'
             name="SimulateUser"
@@ -375,7 +408,7 @@ var CommentForm = React.createClass({
 
 var KeeperApp = React.createClass({
   getInitialState: function() {
-    return {messages: [], selectedMessage: null };
+    return {messages: [], selectedMessage: null, maxRowsToShow: 100 };
   },
 
   processDataFromServer: function(data) {
@@ -422,23 +455,52 @@ var KeeperApp = React.createClass({
     });
   },
 
+  handleShowAll: function(e) {
+    e.preventDefault();
+    this.setState({maxRowsToShow: 100000});
+  },
+
   onMessageClicked: function(message, rowId) {
     console.log("selectedRowId" + rowId);
   },
 
 	render: function() {
-		var createItem = function(item, index) {
-			return <MessageListRow message={ item }
-        key= { index }
-        index= { index }
-        onMessageClicked = { this.onMessageClicked }/>
-		}.bind(this);
+    var loading = null;
+    var showAll = null;
+    if (this.state.messages.length == 0) {
+      loading =
+      <div>
+        <p>
+        loading...
+        </p>
+        <CircularProgress mode="indeterminate" size={2.0} style={{textAlign: "center"}}/>
+      </div>
+    } else if (this.state.maxRowsToShow < this.state.messages.length) {
+      showAll = <RaisedButton
+                  ref='showAll'
+                  label="Show All"
+                  secondary={true}
+                  onClick={this.handleShowAll}
+                  className="showAllButton"
+                />
+    }
 
-    console.log("rendering %d messages", this.state.messages.length);
+    var messageRows = [];
+    for (var i = Math.max(0, this.state.messages.length - this.state.maxRowsToShow); i < this.state.messages.length; i++) {
+      messageRows.push(
+        <MessageListRow message={ this.state.messages[i] }
+        key= { i }
+        index= { i }
+        onMessageClicked = { this.onMessageClicked }/>
+      )
+    }
+
 		return (
       <div>
+        { loading }
+        { showAll }
   			<div id="messages">
-  			   { this.state.messages.map(createItem) }
+  			   { messageRows }
         </div>
         <CommentForm onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused}/>
       </div>
