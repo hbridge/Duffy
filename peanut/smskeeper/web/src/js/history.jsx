@@ -317,7 +317,8 @@ var CommentForm = React.createClass({
     newstr = str;
     var matches = str.match(/[:]\S+[:]/g);
     if (!matches) return str;
-    for (var match of matches) {
+    for (var i = 0; i < matches.count; i++) {
+      var match = matches[i];
       var emoji_lookup = match.replace(/[:]/g, "");
       var emoji_char = emoji.get(emoji_lookup);
       if (emoji_char) {

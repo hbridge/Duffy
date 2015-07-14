@@ -8,6 +8,7 @@
     "backbone-react-component": "^0.8.1",
     "classnames": "^1.2.2",
     "fixed-data-table": "^0.3.0",
+    "gulp-ignore": "^1.2.1",
     "jquery": "^2.1.4",
     "jquery-ui": "^1.10.5",
     "material-ui": "^0.10.1",
