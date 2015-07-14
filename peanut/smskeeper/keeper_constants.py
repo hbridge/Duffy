@@ -189,13 +189,13 @@ def isTestKeeperNumber(keeperNumber):
 	return "test" in SMSKEEPER_TEST_NUM
 
 REMINDER_DIGEST_HEADERS = [
-	":sunrise: Happy Monday!",
-	"Good Tuesday to you!",
-	"Welcome to Wednesday.",
-	"Ohai Thursday! :cat:",
-	"TGIF! :party_popper:",
-	"Hope you're having a great weekend!",
-	"Hope you're having a great weekend!"
+	u":sunrise: Happy Monday!",
+	u"Hello, Tuesday! \U000026F2",
+	u"Wednesday is here!",
+	u"Ohai Thursday! :cat:",
+	u"TGIF! :party_popper:",
+	u"It's Saturday! \U0001F344",
+	u"Sunday funday! \U0001F366"
 ]
 
 REMINDER_DIGEST_INSTRUCTIONS = (
@@ -204,13 +204,13 @@ REMINDER_DIGEST_INSTRUCTIONS = (
 )
 
 REMINDER_DIGEST_EMPTY = [
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done.",
-	"Looks like I'm not tracking anything for you today. Let me know what you need to get done."
+	u"No tasks for today. Let's start the week off right by tracking all you have to do! \U0001F60E",
+	u"Tasks for today: 0. You must be really efficient! \U0001F4AD",
+	u"I got no tasks for ya. Need me to track anything today? \U0001F60E",
+	u"A weekday without tasks? Surely, there is something you need me to track? \U0001F62E",
+	u"No tasks for today. Then, again Fridays really shouldn't even be a work day. \U0001F61B",
+	u"Your task for today: Do nothing! PS: if you really need to do something, I'm here \U0001F60E",
+	u"No tasks on a Sunday? I won't tell anyone \U0001F636"
 ]
 
 HELP_MESSAGES = [
