@@ -90,9 +90,12 @@ def isFollowup(user, entry, msg, nattyResult):
 			bestEntry, score = entry_util.getBestEntryMatch(user, nattyResult.queryWithoutTiming)
 			# This could be a new entry due to todos
 			# Check to see if there's a fuzzy match to the last entry.  If so, treat as followup
-			if bestEntry and bestEntry.id == entry.id and score > 60 and isRecentAction:
-				logger.info("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
-				return True
+			if score > 60 and bestEntry and bestEntry.id == entry.id:
+				if isRecentAction:
+					logger.info("User %s: I think '%s' is a followup because it matched entry id %s with score %s" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
+					return True
+				else:
+					logger.info("User %s: I think '%s' looks like a followup because it matched entry id %s with score %s but it wasn't recent so not thinking as such" % (user.id, nattyResult.queryWithoutTiming, bestEntry.id, score))
 
 	return False
 
@@ -347,8 +350,15 @@ def getBestNattyResult(nattyResults):
 	if len(nattyResults) == 0:
 		return None
 
+	now = date_util.now(pytz.utc)
+
+	nattyResults = filter(lambda x: x.utcTime >= now, nattyResults)
+
 	# Sort by the date, we want to soonest first
 	nattyResults = sorted(nattyResults, key=lambda x: x.utcTime)
+
+	# Sort by if there was a time in the date or not
+	nattyResults = sorted(nattyResults, key=lambda x: 0 if x.hadTime else 1)
 
 	# prefer anything that has "at" in the text
 	# Make sure it's "at " (with a space) since Saturday will match
@@ -357,7 +367,6 @@ def getBestNattyResult(nattyResults):
 	# Filter out stuff that was only using term "now"
 	nattyResults = filter(lambda x: x.textUsed.lower() != "now", nattyResults)
 
-	# Filter out something that has just "now"
 	if len(nattyResults) == 0:
 		return None
 

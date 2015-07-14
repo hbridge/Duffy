@@ -28,7 +28,7 @@ class NattyResult():
 		self.hadTime = hadTime
 
 	def __str__(self):
-		return "=%s '%s' '%s' %s %s=" % (self.utcTime, self.queryWithoutTiming, self.textUsed, self.hadDate, self.hadTime)
+		return "=%s '%s' '%s' hadDate:%s hadTime:%s=" % (self.utcTime, self.queryWithoutTiming, self.textUsed, self.hadDate, self.hadTime)
 
 
 # Helper method to get a startDate and a new filtered query from Natty.
