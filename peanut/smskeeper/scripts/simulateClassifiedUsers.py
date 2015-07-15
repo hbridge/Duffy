@@ -10,6 +10,7 @@ import json
 from smskeeper import cliMsg
 from smskeeper import keeper_constants
 from smskeeper.models import User
+from smskeeper.models import Message
 import mechanize
 
 from datetime import timedelta
@@ -19,6 +20,8 @@ import copy
 
 from smskeeper import user_util
 from smskeeper.scripts import importZipdata
+
+MAX_USERS_TO_SIMULATE = 1
 
 @patch('common.date_util.utcnow')
 class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
@@ -44,7 +47,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		unknown_classifications = {}
 
 		testPhoneNumInt = 16505550000
-		for user_id in classified_users:
+		for user_id in classified_users[:MAX_USERS_TO_SIMULATE]:
 			# deactivate the old user, if there is one
 			if self.user:
 				self.user.state = keeper_constants.STATE_SUSPENDED
@@ -91,7 +94,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 							self.setNow(dateMock, nextEventDate)
 							# run async jobs
 							with patch('smskeeper.sms_util.recordOutput') as mock:
-								with patch('smskeeper.async.getWeatherPhraseForZip') as weatherMock:
+								with patch('common.weather_util.getWeatherPhraseForZip') as weatherMock:
 									weatherMock.return_value = "mock forecast"
 									async.processDailyDigest()
 								async.sendTips()
@@ -133,19 +136,166 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					class_list.append(message)
 					unknown_classifications[correct_classification] = class_list
 
+				# set the correct classification for the message objct
+				lastMessageObject = self.user.getMessages(incoming=True, ascending=False)[0]
+				lastMessageObject.classification = message["classification"]
+				lastMessageObject.save()
+
 		print (
-			"----------\n"
+			"\n\n *** Unknown Rate ***\n"
 			+ "%d messages" % message_count
 			+ "\n%d unknown" % unknown_count
 			+ "\n%.02f unknown rate" % (float(unknown_count) / float(message_count))
-			+ "\n\n"
+			+ "\n"
 		)
 
+		print "\n*** Unknown Messages by Classification ***"
 		for key in unknown_classifications.keys():
 			message_list = unknown_classifications[key]
-			print "\n\n%s: %d messages missed:\n" % (key, len(message_list))
+			print "\n%s: %d messages missed:\n" % (key, len(message_list))
 			for message in message_list:
 				print "- %s (%s)" % (message["Body"], message["uid"])
+
+		self.printMisclassifictions()
+
+	def printMisclassifictions(self):
+		print "\n\n******* Accuracy *******"
+		truePositivesByClass = {}
+		trueNegativesByClass = {}
+		falseNegativesByClass = {}
+		falsePositivesByClass = {}
+
+		allClasses = map(lambda x: x["value"], Message.Classifications())
+
+		print "All messages count %d" % Message.objects.all().count()
+		unclassified_count = 0
+		classified_count = 0
+
+		for message in Message.objects.all():
+			# skip messages we don't have a manual classification for, messages we explicity said NoCategory
+			# for, or unkown messages, which are broken out above
+			if (not message.classification
+						or message.classification == keeper_constants.CLASS_NONE
+						or not message.auto_classification):
+				unclassified_count += 1
+				continue
+
+			classified_count += 1
+			truePositives = truePositivesByClass.get(message.classification, [])
+			# falseNegatives[classB] = instances where the correct class was classB, but we thought it was something else
+			# falsePositives[classA] = instances where the correct class was something else, but we mistook it for classA
+			falseNegativesForClass = falseNegativesByClass.get(message.classification, [])
+			falsePositivesForClass = falsePositivesByClass.get(message.auto_classification, [])
+
+			if message.classification == message.auto_classification:
+				truePositives.append(message.getBody())
+				self.setMessageTrueNegativeForClasses(
+					message.getBody(),
+					[otherClass for otherClass in allClasses if otherClass != message.classification],
+					trueNegativesByClass
+				)
+			else:
+				falseNegativesForClass.append(message.getBody())
+				falsePositivesForClass.append(message.getBody())
+				self.setMessageTrueNegativeForClasses(
+					message.getBody(),
+					[otherClass for otherClass in allClasses if (otherClass != message.classification and otherClass != message.auto_classification)],
+					trueNegativesByClass
+				)
+
+			# set the results dicts based on new results
+			truePositivesByClass[message.classification] = truePositives
+			falsePositivesByClass[message.auto_classification] = falsePositivesForClass
+			falseNegativesByClass[message.classification] = falseNegativesForClass
+
+		print "Unclassified, Unknown, and NoCategory count: %d" % unclassified_count
+		print "Classified messages tested for accuracy: %d" % classified_count
+
+		allTp = sum(map(lambda arr: len(arr), truePositivesByClass.values()))
+		allTn = sum(map(lambda arr: len(arr), trueNegativesByClass.values()))
+		allFp = sum(map(lambda arr: len(arr), falsePositivesByClass.values()))
+		allFn = sum(map(lambda arr: len(arr), falseNegativesByClass.values()))
+		self.printCategorySummary("Overall", allTp, allTn, allFn, allFp)
+
+		for classification in allClasses:
+			tp = len(truePositivesByClass.get(classification, []))
+			tn = len(trueNegativesByClass.get(classification, []))
+			fn = len(falseNegativesByClass.get(classification, []))
+			fp = len(falsePositivesByClass.get(classification, []))
+
+			if (tp + fn) == 0:
+				print "\nNo examples found for %s.  Skipping." % (classification)
+				continue
+			self.printCategorySummary(classification, tp, tn, fn, fp)
+
+		print "\n\n*** Misclassified Messages by Classification ***"
+		for classification in allClasses:
+			self.printMisclassifiedMessagesForClass(classification, falseNegativesByClass, falsePositivesByClass)
+
+	'''
+	Metric	    Formula
+	Accuracy    (TP + TN) / (TP + TN + FP + FN)
+	Precision	TP / (TP + FP)
+	Recall	    TP / (TP + FN)
+	F1-score	2 x P x R / (P + R)
+	'''
+	def printCategorySummary(self, classification, tp, tn, fn, fp):
+		if (tp + fp) > 0:
+			precision = float(tp) / float(tp + fp)
+		else:
+			precision = 0.0
+
+		if (tp + fn) > 0:
+			recall = float(tp) / float(tp + fn)
+		else:
+			recall = 0.0
+
+		print "\n%s results:" % (classification)
+		print "Accuracy %.02f (%d of %d classification decisions are correct)" % (
+			float(tp + tn) / float(tp + tn + fp + fn),
+			tp + tn,
+			tp + tn + fp + fn
+		)
+		print "Precision %.02f (%d of %d messages classified as %s were correct)" % (
+			precision,
+			tp,
+			tp + fp,
+			classification
+		)
+		print "Recall %.02f (%d of %d messages that actually are %s were found)" % (
+			recall,
+			tp,
+			tp + fn,
+			classification
+		)
+
+		if (precision + recall) > 0:
+			f1 = (2 * precision * recall) / (precision + recall)
+		else:
+			f1 = 0.0
+
+		print "F1 score: %.02f" % (
+			f1
+		)
+
+	def printMisclassifiedMessagesForClass(self, classification, falseNegativesByClass, falsePositivesByClass):
+		falseNegatives = falseNegativesByClass.get(classification, [])
+		falsePositives = falsePositivesByClass.get(classification, [])
+		if len(falseNegatives) > 0:
+			print "\n%s: messages that should have been interpreted as %s but were not:" % (classification, classification)
+			for msg in falseNegatives:
+				print " - %s" % msg
+
+		if len(falsePositives) > 0:
+			print "\n%s: messages that were erroneously interpreted as %s" % (classification, classification)
+			for msg in falsePositives:
+				print " - %s" % msg
+
+	def setMessageTrueNegativeForClasses(self, msg, classes, trueNegativesByClass):
+		for otherClass in classes:
+			trueNegatives = trueNegativesByClass.get(otherClass, [])
+			trueNegatives.append(msg)
+			trueNegativesByClass[otherClass] = trueNegatives
 
 	def setupAuthenticatedBrowser(self):
 		print "Logging in to prod..."
