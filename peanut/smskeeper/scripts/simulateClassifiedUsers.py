@@ -38,6 +38,9 @@ class MyLogger:
 			formatted = formatted.encode('utf-8')
 		self.fileHandle.write("%s\n" % formatted)
 
+	def finalize(self):
+		self.fileHandle.close()
+
 logger = MyLogger("/mnt/log/keeperSimulation.log")
 
 MAX_USERS_TO_SIMULATE = 10000
@@ -180,6 +183,9 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				logger.info("- %s (%s)" % (message["Body"], message["uid"]))
 
 		self.printMisclassifictions()
+
+		# close the file for writing
+		logger.finalize()
 
 	def printMisclassifictions(self):
 		logger.info("\n\n******* Accuracy *******")
