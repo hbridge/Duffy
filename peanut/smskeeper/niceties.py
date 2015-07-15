@@ -243,7 +243,7 @@ def renderShareRequest(user, requestDict, keeperNumber):
 	return ":clapping_hands_sign: Please send them to %s and thanks!" % (user.getInviteUrl())
 
 
-@custom_nicety_for(r'what(s| is) my name|keeper')
+@custom_nicety_for(r'what(s| is) my name|keeper$')
 def renderNameQuery(user, requestDict, keeperNumber):
 	return "%s!" % (user.name.title())
 
