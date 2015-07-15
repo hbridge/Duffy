@@ -1263,3 +1263,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "what is the weather Thursday?")
 			self.assertIn("Thursday's forecast: Partly Cloudy", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "what is the weather in 2 weeks?")
+			self.assertIn("I don't know", self.getOutput(mock))
