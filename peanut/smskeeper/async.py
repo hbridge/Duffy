@@ -230,10 +230,10 @@ def sendDigestForUserId(userId, overrideKeeperNumber=None):
 	user = User.objects.get(id=userId)
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
-	sendDigestForUser(user, pendingEntries, dict(), False, overrideKeeperNumber=overrideKeeperNumber)
+	sendDigestForUser(user, pendingEntries, dict(), True, overrideKeeperNumber=overrideKeeperNumber)
 
 
-# This method is different since we pass True for the userRequested
+# This method is different since we pass True for includeAll
 @app.task
 def sendAllRemindersForUserId(userId, overrideKeeperNumber=None):
 	user = User.objects.get(id=userId)
