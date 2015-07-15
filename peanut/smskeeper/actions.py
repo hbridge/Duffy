@@ -316,7 +316,7 @@ def setName(user, msg, keeperNumber):
 
 
 def setPostalCode(user, msg, keeperNumber):
-	postalCode = msg_util.getZipcode(msg)
+	postalCode = msg_util.getPostalCode(msg)
 
 	if postalCode is None:
 		sms_util.sendMsg(user, "I'm sorry, I don't know that postal code", None, keeperNumber)

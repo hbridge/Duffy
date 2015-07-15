@@ -60,7 +60,7 @@ def process(user, msg, requestDict, keeperNumber):
 		)
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 1)
 	elif step == 1:
-		postalCode = msg_util.getZipcode(msg)
+		postalCode = msg_util.getPostalCode(msg)
 
 		if postalCode:
 			timezone = msg_util.timezoneForPostalCode(postalCode)

@@ -109,6 +109,16 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "US/Pacific")
 
+	def test_tutorial_uk_postal_code(self, dateMock):
+		self.setupUser(dateMock)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "AB13")
+
+		user = self.getTestUser()
+		self.assertEqual(user.timezone, "Europe/London")
+
 	def test_name_with_punctuation(self, dateMock):
 		self.setupUser(dateMock)
 

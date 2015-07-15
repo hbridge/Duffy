@@ -155,15 +155,21 @@ def isSetZipcodeCommand(msg):
 	return re.match("my zip ?code is (\d{5}(\-\d{4})?)", msg, re.I) is not None
 
 
-def getZipcode(msg):
-	postalCodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
+def getPostalCode(msg):
+	zipcodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
 
-	if postalCodes is None:
-		return None
+	if zipcodes is not None:
+		zipCode = str(zipcodes.groups()[0])
+		logger.debug("Found zipcode: %s   from groups:  %s   and user entry: %s" % (zipCode, zipcodes.groups(), msg))
+		return zipCode
 
-	zipCode = str(postalCodes.groups()[0])
-	logger.debug("Found zipcode: %s   from groups:  %s   and user entry: %s" % (zipCode, postalCodes.groups(), msg))
-	return zipCode
+	# regex from http://en.wikipedia.orgwikiUK_postcodes#Validation
+	ukPostalCodes = re.findall(r'[A-Z]{1,2}[0-9R][0-9A-Z]?', msg)
+
+	if len(ukPostalCodes) > 0:
+		return ukPostalCodes[0]
+
+	return None
 
 
 def timezoneForPostalCode(postalCode):
@@ -194,6 +200,8 @@ def zipResultToTimeZone(zipDataResult):
 		return pytz.timezone('US/Hawaii')
 	elif zipDataResult.timezone == "UTC":
 		return pytz.utc
+	else:
+		return pytz.timezone(zipDataResult.timezone)
 
 
 # Returns the msg without any punctuation, stripped of spaces and all lowercase

@@ -58,17 +58,23 @@ def process(user, msg, requestDict, keeperNumber):
 				user.name = msg.strip(string.punctuation)
 
 		user.save()
+
+		if user.product_id == keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
+			postalCodeMessage = u"What's your postal/zip code? It'll help me remind you of things at the right time \U0001F553"
+		else:
+			postalCodeMessage = u"What's your zipcode? It'll help me remind you of things at the right time \U0001F553"
+
 		sms_util.sendMsgs(
 			user,
 			[
 				u"Great, nice to meet you %s! \U0001F44B" % user.getFirstName(),
-				u"What's your zipcode? It'll help me remind you of things at the right time \U0001F553"
+				postalCodeMessage
 			],
 			keeperNumber
 		)
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 1)
 	elif step == 1:
-		postalCode = msg_util.getZipcode(msg)
+		postalCode = msg_util.getPostalCode(msg)
 
 		if postalCode:
 			timezone = msg_util.timezoneForPostalCode(postalCode)
