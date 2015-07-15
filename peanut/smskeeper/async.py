@@ -48,6 +48,10 @@ def shouldRemindNow(entry):
 	if entry.creator.isDigestTime(entry.remind_timestamp):
 		return False
 
+	# If we're recurring and we're after the end date
+	if entry.remind_recur_end and entry.remind_timestamp > entry.remind_recur_end:
+		return False
+
 	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
 		# If we're within 10 minutes, so alarm goes off at 9:50 if remind is at 10
 		return (now + datetime.timedelta(minutes=10) > entry.remind_timestamp)
@@ -67,6 +71,10 @@ def updateEntryAfterProcessing(entry):
 	elif entry.remind_recur == keeper_constants.RECUR_DAILY:
 		entry.remind_to_be_sent = True
 		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(days=1)
+
+	# If we're past the recurrence timestamp, stop the reminder
+	if entry.remind_recur_end and entry.remind_timestamp > entry.remind_recur_end:
+		entry.hidden = True
 
 	entry.save()
 

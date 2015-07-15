@@ -313,6 +313,7 @@ class Entry(models.Model):
 
 	RECURRENCE_CHOICES = [(x, x) for x in keeper_constants.RECURRENCE_CHOICES]
 	remind_recur = models.CharField(max_length=100, choices=RECURRENCE_CHOICES, default=keeper_constants.RECUR_DEFAULT)
+	remind_recur_end = models.DateTimeField(null=True, blank=True)
 
 	hidden = models.BooleanField(default=False)
 

@@ -1132,6 +1132,69 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processAllReminders()
 			self.assertIn("wake up", self.getOutput(mock))
 
+	def test_daily_reminder_with_end(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am everyday")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		entry.remind_recur = keeper_constants.RECUR_DAILY
+		entry.remind_recur_end = self.WED_9AM
+		entry.save()
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		# Should be sent out at 10 am Tue
+		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=1))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertTrue(entry.hidden)
+
+		# Now that its Wed, it shouldn't go out
+		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=2))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertEqual("", self.getOutput(mock))
+
+	# Pretend that the async processing didn't mark something as hidden.
+	def test_daily_reminder_with_end_bug_in_processing(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am everyday")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		entry.remind_recur = keeper_constants.RECUR_DAILY
+		entry.remind_recur_end = self.WED_9AM
+		entry.save()
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("wake up", self.getOutput(mock))
+
+		# Explicitly don't run the job on Tuesday
+		entry = Entry.objects.get(label="#reminders")
+		self.assertFalse(entry.hidden)
+
+		# Now that its Wed, it shouldn't go out
+		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=2))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertEqual("", self.getOutput(mock))
+
+
 	weatherData = {'html_description': u'\n<img src="http://l.yimg.com/a/i/us/we/52/26.gif"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 78 F<BR />\n<BR /><b>Forecast:</b><BR />\nTue - Scattered Thunderstorms. High: 82 Low: 75<br />\nWed - PM Thunderstorms. High: 83 Low: 66<br />\nThu - Partly Cloudy. High: 83 Low: 67<br />\nFri - Mostly Sunny. High: 82 Low: 69<br />\nSat - Partly Cloudy. High: 84 Low: 73<br />\n<br />\n<a href="http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href="http://www.weather.com" >The Weather Channel</a>)<br/>\n', 'atmosphere': {'pressure': u'29.7', 'rising': u'2', 'visibility': u'10', 'humidity': u'66'}, 'title': u'Yahoo! Weather - New York, NY', 'condition': {'date': u'Tue, 14 Jul 2015 11:49 am EDT', 'text': u'Cloudy', 'code': u'26', 'temp': u'78', 'title': u'Conditions for New York, NY at 11:49 am EDT'}, 'forecasts': [{'code': u'38', 'text': u'Scattered Thunderstorms', 'high': u'82', 'low': u'75', 'date': u'14 Jul 2015', 'day': u'Tue'}, {'code': u'38', 'text': u'PM Thunderstorms', 'high': u'83', 'low': u'66', 'date': u'15 Jul 2015', 'day': u'Wed'}, {'code': u'30', 'text': u'Partly Cloudy', 'high': u'83', 'low': u'67', 'date': u'16 Jul 2015', 'day': u'Thu'}, {'code': u'34', 'text': u'Mostly Sunny', 'high': u'82', 'low': u'69', 'date': u'17 Jul 2015', 'day': u'Fri'}, {'code': u'30', 'text': u'Partly Cloudy', 'high': u'84', 'low': u'73', 'date': u'18 Jul 2015', 'day': u'Sat'}], 'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'mi', 'speed': u'mph', 'temperature': u'F', 'pressure': u'in'}, 'astronomy': {'sunset': u'8:25 pm', 'sunrise': u'5:33 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'3', 'chill': u'78'}}
 
 	@patch('common.weather_util.getWeatherForZip')
