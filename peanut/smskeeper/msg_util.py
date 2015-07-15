@@ -42,7 +42,7 @@ stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't
 
 digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
-weather_re = re.compile(r"what('s| is) the weather", re.I)
+weather_re = re.compile(r"what(s|'s| is) the weather", re.I)
 
 noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 

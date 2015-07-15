@@ -1257,11 +1257,11 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "what is the weather tomorrow?")
+			cliMsg.msg(self.testPhoneNumber, "what's the weather tomorrow?")
 			self.assertIn("Wednesday's forecast: PM Thunderstorms", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "what is the weather Thursday?")
+			cliMsg.msg(self.testPhoneNumber, "whats the weather Thursday?")
 			self.assertIn("Thursday's forecast: Partly Cloudy", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
