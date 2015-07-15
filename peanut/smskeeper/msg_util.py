@@ -273,7 +273,7 @@ def isFetchWeatherCommand(msg):
 	if found:
 		return True
 
-	return isMsgClassified(simpleMsg, keeper_constants.CLASS_FETCH_DIGEST)
+	return isMsgClassified(simpleMsg, keeper_constants.CLASS_FETCH_WEATHER)
 
 
 def isOkPhrase(msg):
