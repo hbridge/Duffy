@@ -36,7 +36,7 @@ def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
 		actions.nicety(user, nicety, requestDict, keeperNumber)
-		classification = keeper_constants.CLASS_SILENT_NICETY if nicety.responses is None else keeper_constants.CLASS_NICETY
+		classification = keeper_constants.CLASS_SILENT_NICETY if nicety.isSilent() else keeper_constants.CLASS_NICETY
 		return True, classification
 
 	classification = None

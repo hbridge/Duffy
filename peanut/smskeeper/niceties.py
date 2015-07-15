@@ -42,6 +42,9 @@ class Nicety():
 
 		return response
 
+	def isSilent(self):
+		return (self.responses is None and self.customRenderer is None)
+
 	def __str__(self):
 		string = "%s %s %s" % (self.reStr, self.responses, self.customRenderer)
 		return string.encode('utf-8')

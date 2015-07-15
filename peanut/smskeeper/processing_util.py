@@ -36,7 +36,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
 		actions.nicety(user, nicety, requestDict, keeperNumber)
 		classification = keeper_constants.CLASS_NICETY
-		if nicety.responses is None:
+		if nicety.isSilent():
 			classification = keeper_constants.CLASS_SILENT_NICETY
 		return True, classification
 	elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
