@@ -21,7 +21,17 @@ import copy
 from smskeeper import user_util
 from smskeeper.scripts import importZipdata
 
-MAX_USERS_TO_SIMULATE = 1
+import logging
+logging.disable(logging.DEBUG)
+logging.basicConfig(
+	filename='/mnt/log/keeperSimulation.log',
+	level=logging.INFO,
+	format='%(asctime)s %(levelname)s %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+MAX_USERS_TO_SIMULATE = 10000
+
 
 @patch('common.date_util.utcnow')
 class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
@@ -29,18 +39,18 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 	def test_parse_accuracy(self, dateMock):
 		self.setupAuthenticatedBrowser()
 
-		print "Importing zip data..."
+		logger.info("Importing zip data...")
 		importZipdata.loadZipDataFromTGZ("./smskeeper/data/zipdata.tgz")
 
-		print "Getting list of classified users..."
+		logger.info("Getting list of classified users...")
 		try:
 			response = urllib2.urlopen("http://prod.strand.duffyapp.com/smskeeper/classified_users").read()
 		except URLError as e:
-			print "Could not connect to prod server: %@" % (e)
+			logger.info("Could not connect to prod server: %@" % (e))
 			response = {"users": []}
 
 		classified_users = json.loads(response)["users"]
-		print "Replaying messages for %d users..." % len(classified_users)
+		logger.info("Replaying messages for %d users..." % min(len(classified_users), MAX_USERS_TO_SIMULATE))
 
 		message_count = 0
 		unknown_count = 0
@@ -53,7 +63,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				self.user.state = keeper_constants.STATE_SUSPENDED
 				self.user.save()
 
-			print "\nReplaying user %d with testPhoneNumInt: %d" % (user_id, testPhoneNumInt)
+			logger.info("\nReplaying user %d with testPhoneNumInt: %d" % (user_id, testPhoneNumInt))
 			# uncomment temporary for testing
 			# setup the user
 			# if testPhoneNumInt >= 16505550002:
@@ -70,7 +80,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				self.browser.open("http://prod.strand.duffyapp.com/smskeeper/message_feed?user_id=%d" % user_id)
 				messages_response = self.browser.response().read()
 			except URLError as e:
-				print "Could not connect to prod server for messages: %@" % (e)
+				logger.info("Could not connect to prod server for messages: %@" % (e))
 				messages_response = {"messages": []}
 
 			messages = json.loads(messages_response)["messages"]
@@ -89,7 +99,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				elif self.mockedDate < message_date:
 					while self.mockedDate < message_date:
 						nextEventDate = self.getNextEventDate()
-						# print "dateMock %s message_date %s newTime %s" % (self.mockedDate, message_date, newTime)
+						# logger.info("dateMock %s message_date %s newTime %s" % (self.mockedDate, message_date, newTime))
 						if nextEventDate <= message_date:
 							self.setNow(dateMock, nextEventDate)
 							# run async jobs
@@ -101,7 +111,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 								async.processAllReminders()
 								output = self.getOutput(mock)
 								if output != "":
-									print "Keeper (%s): %s" % (
+									logger.info(
+										"Keeper (%s): %s",
 										self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
 										self.getOutput(mock)
 									)
@@ -115,14 +126,15 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				# 	mock_tz.return_value = "PST"
 				with patch('smskeeper.sms_util.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, message["Body"])
-					print "%s (%s, %s): %s" % (
+					logger.info(
+						"%s (%s, %s): %s",
 						self.testPhoneNumber,
 						self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
 						self.user.state, message["Body"]
 					)
 					output = self.getOutput(mock)
 					if output != "":
-						print "Keeper: %s" % (self.getOutput(mock))
+						logger.info("Keeper: %s" % (self.getOutput(mock)))
 
 				message_count += 1
 				self.user = User.objects.get(id=self.user.id)
@@ -141,7 +153,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				lastMessageObject.classification = message["classification"]
 				lastMessageObject.save()
 
-		print (
+		logger.info(
 			"\n\n *** Unknown Rate ***\n"
 			+ "%d messages" % message_count
 			+ "\n%d unknown" % unknown_count
@@ -149,17 +161,17 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			+ "\n"
 		)
 
-		print "\n*** Unknown Messages by Classification ***"
+		logger.info("\n*** Unknown Messages by Classification ***")
 		for key in unknown_classifications.keys():
 			message_list = unknown_classifications[key]
-			print "\n%s: %d messages missed:\n" % (key, len(message_list))
+			logger.info("\n%s: %d messages missed:\n" % (key, len(message_list)))
 			for message in message_list:
-				print "- %s (%s)" % (message["Body"], message["uid"])
+				logger.info("- %s (%s)" % (message["Body"], message["uid"]))
 
 		self.printMisclassifictions()
 
 	def printMisclassifictions(self):
-		print "\n\n******* Accuracy *******"
+		logger.info("\n\n******* Accuracy *******")
 		truePositivesByClass = {}
 		trueNegativesByClass = {}
 		falseNegativesByClass = {}
@@ -167,7 +179,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		allClasses = map(lambda x: x["value"], Message.Classifications())
 
-		print "All messages count %d" % Message.objects.all().count()
+		logger.info("All messages count %d" % Message.objects.all().count())
 		unclassified_count = 0
 		classified_count = 0
 
@@ -208,8 +220,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			falsePositivesByClass[message.auto_classification] = falsePositivesForClass
 			falseNegativesByClass[message.classification] = falseNegativesForClass
 
-		print "Unclassified, Unknown, and NoCategory count: %d" % unclassified_count
-		print "Classified messages tested for accuracy: %d" % classified_count
+		logger.info("Unclassified, Unknown, and NoCategory count: %d" % unclassified_count)
+		logger.info("Classified messages tested for accuracy: %d" % classified_count)
 
 		allTp = sum(map(lambda arr: len(arr), truePositivesByClass.values()))
 		allTn = sum(map(lambda arr: len(arr), trueNegativesByClass.values()))
@@ -224,11 +236,11 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			fp = len(falsePositivesByClass.get(classification, []))
 
 			if (tp + fn) == 0:
-				print "\nNo examples found for %s.  Skipping." % (classification)
+				logger.info("\nNo examples found for %s.  Skipping." % (classification))
 				continue
 			self.printCategorySummary(classification, tp, tn, fn, fp)
 
-		print "\n\n*** Misclassified Messages by Classification ***"
+		logger.info("\n\n*** Misclassified Messages by Classification ***")
 		for classification in allClasses:
 			self.printMisclassifiedMessagesForClass(classification, falseNegativesByClass, falsePositivesByClass)
 
@@ -250,19 +262,22 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		else:
 			recall = 0.0
 
-		print "\n%s results:" % (classification)
-		print "Accuracy %.02f (%d of %d classification decisions are correct)" % (
+		logger.info("\n%s results:" % (classification))
+		logger.info(
+			"Accuracy %.02f (%d of %d classification decisions are correct)",
 			float(tp + tn) / float(tp + tn + fp + fn),
 			tp + tn,
 			tp + tn + fp + fn
 		)
-		print "Precision %.02f (%d of %d messages classified as %s were correct)" % (
+		logger.info(
+			"Precision %.02f (%d of %d messages classified as %s were correct)",
 			precision,
 			tp,
 			tp + fp,
 			classification
 		)
-		print "Recall %.02f (%d of %d messages that actually are %s were found)" % (
+		logger.info(
+			"Recall %.02f (%d of %d messages that actually are %s were found)",
 			recall,
 			tp,
 			tp + fn,
@@ -274,22 +289,20 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		else:
 			f1 = 0.0
 
-		print "F1 score: %.02f" % (
-			f1
-		)
+		logger.info("F1 score: %.02f", f1)
 
 	def printMisclassifiedMessagesForClass(self, classification, falseNegativesByClass, falsePositivesByClass):
 		falseNegatives = falseNegativesByClass.get(classification, [])
 		falsePositives = falsePositivesByClass.get(classification, [])
 		if len(falseNegatives) > 0:
-			print "\n%s: messages that should have been interpreted as %s but were not:" % (classification, classification)
+			logger.info("\n%s: messages that should have been interpreted as %s but were not:" % (classification, classification))
 			for msg in falseNegatives:
-				print " - %s" % msg
+				logger.info(" - %s" % msg)
 
 		if len(falsePositives) > 0:
-			print "\n%s: messages that were erroneously interpreted as %s" % (classification, classification)
+			logger.info("\n%s: messages that were erroneously interpreted as %s" % (classification, classification))
 			for msg in falsePositives:
-				print " - %s" % msg
+				logger.info(" - %s" % msg)
 
 	def setMessageTrueNegativeForClasses(self, msg, classes, trueNegativesByClass):
 		for otherClass in classes:
@@ -298,7 +311,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			trueNegativesByClass[otherClass] = trueNegatives
 
 	def setupAuthenticatedBrowser(self):
-		print "Logging in to prod..."
+		logger.info("Logging in to prod...")
 		self.browser = mechanize.Browser()
 		self.browser.open('http://prod.strand.duffyapp.com/admin/login/')
 		self.browser.form = self.browser.forms().next()
