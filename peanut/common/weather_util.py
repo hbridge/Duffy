@@ -63,7 +63,7 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		data = weatherDataCache[wxcode]
 	else:
 		try:
-			data = getWeatherForZip(wxcode)
+			data = getWeatherForWxCode(wxcode)
 			weatherDataCache[wxcode] = data
 		except:
 			data = None
@@ -93,5 +93,5 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		return None
 
 
-def getWeatherForZip(wxcode):
+def getWeatherForWxCode(wxcode):
 	return pywapi.get_weather_from_yahoo(wxcode, 'imperial')

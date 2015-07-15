@@ -37,7 +37,7 @@ def main(argv):
 				zipcode = z
 
 		if zipcode:
-			timezone = msg_util.timezoneForPostalCode(zipcode)
+			timezone, wxcode = msg_util.dataForPostalCode(zipcode)
 
 			if timezone:
 				user.postal_code = zipcode

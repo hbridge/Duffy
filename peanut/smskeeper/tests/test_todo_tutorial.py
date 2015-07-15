@@ -122,6 +122,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "Europe/London")
+		self.assertEqual(user.wxcode, "UKXX0333")
 
 	def test_name_with_punctuation(self, dateMock):
 		self.setupUser(dateMock)

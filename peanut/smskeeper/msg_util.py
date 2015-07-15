@@ -172,14 +172,15 @@ def getPostalCode(msg):
 	return None
 
 
-def timezoneForPostalCode(postalCode):
+def dataForPostalCode(postalCode):
 	zipDataResults = ZipData.objects.filter(postal_code=postalCode)
 
 	if len(zipDataResults) == 0:
 		logger.debug("Couldn't find db entry for %s" % postalCode)
 		return None
 	else:
-		return zipResultToTimeZone(zipDataResults[0])
+		zipDataResult = zipDataResults[0]
+		return (zipResultToTimeZone(zipDataResult), zipDataResult.wxcode)
 
 
 def zipResultToTimeZone(zipDataResult):

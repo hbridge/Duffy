@@ -1203,7 +1203,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 						{'code': u'30', 'text': u'Partly Cloudy', 'high': u'84', 'low': u'73', 'date': u'18 Jul 2015', 'day': u'Sat'}],
 					'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'mi', 'speed': u'mph', 'temperature': u'F', 'pressure': u'in'}, 'astronomy': {'sunset': u'8:25 pm', 'sunrise': u'5:33 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'3', 'chill': u'78'}}
 
-	@patch('common.weather_util.getWeatherForZip')
+	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_in_digest(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
@@ -1217,7 +1217,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertIn("forecast: Scattered Thunderstorms", self.getOutput(mock))
 
-	@patch('common.weather_util.getWeatherForZip')
+	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_not_in_requested_digest(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
@@ -1232,7 +1232,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("forecast:", self.getOutput(mock))
 			self.assertIn(keeper_constants.REMINDER_DIGEST_EMPTY[0], self.getOutput(mock))
 
-	@patch('common.weather_util.getWeatherForZip')
+	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_on_request(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
@@ -1246,7 +1246,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "what is the weather?")
 			self.assertIn("forecast: Scattered Thunderstorms", self.getOutput(mock))
 
-	@patch('common.weather_util.getWeatherForZip')
+	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_on_request_tomorrow(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()

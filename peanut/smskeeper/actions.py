@@ -323,7 +323,9 @@ def setPostalCode(user, msg, keeperNumber):
 		return True
 
 	user.postal_code = postalCode
-	user.timezone = msg_util.timezoneForPostalCode(postalCode)
+	timezone, wxcode = msg_util.dataForPostalCode(postalCode)
+	user.timezone = timezone
+	user.wxcode = wxcode
 	user.save()
 	sms_util.sendMsg(user, helper_util.randomAcknowledgement(), None, keeperNumber)
 
