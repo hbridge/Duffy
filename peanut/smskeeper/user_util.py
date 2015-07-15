@@ -11,6 +11,7 @@ from smskeeper import keeper_constants
 from smskeeper import sms_util
 from smskeeper import analytics
 from smskeeper import time_utils
+from smskeeper.whatsapp import whatsapp_util
 
 from smskeeper.models import Entry, User
 
@@ -24,6 +25,10 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId=None):
 		for pid, num in settings.KEEPER_NUMBER_DICT.iteritems():
 			if num == keeperNumber:
 				productId = pid
+
+		if whatsapp_util.isWhatsappNumber(keeperNumber):
+			productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
+
 		if productId is None:
 			logger.error("Tried looking for a productId for number %s but couldn't find for incoming phone num %s" % (keeperNumber, phoneNumber))
 			if keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM:

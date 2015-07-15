@@ -143,7 +143,6 @@ class User(models.Model):
 		self.save()
 		logger.debug("User %s: Setting state data %s %s" % (self.id, key, value))
 
-
 	def getTimezone(self):
 		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
 		# Note: 3 letter entries are to handle the early accounts. All new accounts use the full string
