@@ -118,7 +118,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "UnitTests")
 			self.assertIn("postal/zip code", self.getOutput(mock))
 
-		cliMsg.msg(self.testPhoneNumber, "AB13")
+		cliMsg.msg(self.testPhoneNumber, "Ab13")
 
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "Europe/London")

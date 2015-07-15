@@ -164,10 +164,10 @@ def getPostalCode(msg):
 		return zipCode
 
 	# regex from http://en.wikipedia.orgwikiUK_postcodes#Validation
-	ukPostalCodes = re.findall(r'[A-Z]{1,2}[0-9R][0-9A-Z]?', msg)
+	ukPostalCodes = re.findall(r'\b[A-Z]{1,2}[0-9R][0-9A-Z]?\b', msg.upper())
 
 	if len(ukPostalCodes) > 0:
-		return ukPostalCodes[0]
+		return ukPostalCodes[0].upper()
 
 	return None
 

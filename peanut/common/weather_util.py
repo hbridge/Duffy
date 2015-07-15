@@ -58,13 +58,13 @@ weatherCodes = {
 }
 
 
-def getWeatherPhraseForZip(user, zipCode, utcDate, weatherDataCache):
-	if zipCode in weatherDataCache:
-		data = weatherDataCache[zipCode]
+def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
+	if wxcode in weatherDataCache:
+		data = weatherDataCache[wxcode]
 	else:
 		try:
-			data = getWeatherForZip(zipCode)
-			weatherDataCache[zipCode] = data
+			data = getWeatherForZip(wxcode)
+			weatherDataCache[wxcode] = data
 		except:
 			data = None
 
@@ -87,11 +87,11 @@ def getWeatherPhraseForZip(user, zipCode, utcDate, weatherDataCache):
 
 			return "%s's forecast: %s %s | High %s and low %s" % (dayTerm, data["forecasts"][dayIndex]["text"], weatherCodes[data["forecasts"][dayIndex]["code"]], data["forecasts"][dayIndex]["high"], data["forecasts"][dayIndex]["low"])
 		else:
-			logger.error("User %s: Didn't find forecast for zip %s" % (user.id, zipCode))
+			logger.error("User %s: Didn't find forecast for zip %s" % (user.id, wxcode))
 			return None
 	else:
 		return None
 
 
-def getWeatherForZip(zipCode):
-	return pywapi.get_weather_from_yahoo(zipCode, 'imperial')
+def getWeatherForZip(wxcode):
+	return pywapi.get_weather_from_yahoo(wxcode, 'imperial')
