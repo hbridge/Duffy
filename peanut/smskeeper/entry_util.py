@@ -19,6 +19,8 @@ def fuzzyMatchEntries(user, msg, keeperNumber, lastSentEntries):
 	phrases = cleanedCommand.split("and")
 	entries = set()
 
+	contextual = False
+
 	if len(phrases) > 1:
 		# append the original if it got split up since the actual entry might include "and"
 		# e.g. "call bob and sue"
@@ -42,6 +44,7 @@ def fuzzyMatchEntries(user, msg, keeperNumber, lastSentEntries):
 			else:
 				# If not, just say done to all pending tasks
 				entries = user_util.pendingTodoEntries(user, includeAll=False)
+			contextual = True
 			logging.info("User %s: Fuzzy matching 'all' since there were no interesting words. Affected ids: %s" % (user.id, [x.id for x in entries]))
 
 		# If its not an "all" command, then try to match on something
@@ -57,7 +60,7 @@ def fuzzyMatchEntries(user, msg, keeperNumber, lastSentEntries):
 
 	if len(entries) == 0:
 		logger.info("User %s: Couldn't find a good fuzzy match." % (user.id))
-	return list(entries)
+	return list(entries), contextual
 
 
 def getBestEntryMatch(user, msg, entries=None):

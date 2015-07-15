@@ -1024,8 +1024,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 				"classification": keeper_constants.CLASS_FETCH_WEATHER
 			},
 			{
+				"message": "remind me to test done all class 1 hour",
+				"classification": keeper_constants.CLASS_CREATE_TODO
+			},
+			{
 				"message": "todos",
 				"classification": keeper_constants.CLASS_FETCH_DIGEST
+			},
+			{
+				"message": "done",
+				"classification": keeper_constants.CLASS_COMPLETE_TODO_ALL
 			},
 			{
 				"message": "ok",
@@ -1033,6 +1041,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			},
 			{
 				"message": "hi",
+				"classification": keeper_constants.CLASS_NICETY
+			},
+			{
+				"message": "thanks",
 				"classification": keeper_constants.CLASS_NICETY
 			},
 		]
