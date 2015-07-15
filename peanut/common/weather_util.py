@@ -1,6 +1,8 @@
 import pywapi
 import logging
 
+from common import date_util
+
 logger = logging.getLogger(__name__)
 
 weatherCodes = {
@@ -56,7 +58,7 @@ weatherCodes = {
 }
 
 
-def getWeatherPhraseForZip(zipCode, weatherDataCache):
+def getWeatherPhraseForZip(user, zipCode, utcDate, weatherDataCache):
 	if zipCode in weatherDataCache:
 		data = weatherDataCache[zipCode]
 	else:
@@ -68,9 +70,24 @@ def getWeatherPhraseForZip(zipCode, weatherDataCache):
 
 	if data:
 		if "forecasts" in data:
-			return "Today's forecast: %s %s. \nTemp: High %s | Low %s" % (data["forecasts"][0]["text"], weatherCodes[data["forecasts"][0]["code"]], data["forecasts"][0]["high"], data["forecasts"][0]["low"])
+			now = date_util.now(user.getTimezone())
+			txAwareDate = utcDate.astimezone(user.getTimezone())
+
+			if txAwareDate.day == now.day:
+				dayTerm = "Today"
+				dayIndex = 0
+			else:
+				dayTerm = txAwareDate.strftime("%A")
+				dayDiff = txAwareDate - now
+				dayIndex = dayDiff.days
+
+			if dayIndex >= len(data["forecasts"]):
+				logger.error("User %s: DayIndex %s is to large for data %s" % (user.id, dayIndex, data["forecasts"]))
+				return "Sorry, I don't know the weather for that day"
+
+			return "%s's forecast: %s %s | High %s and low %s" % (dayTerm, data["forecasts"][dayIndex]["text"], weatherCodes[data["forecasts"][dayIndex]["code"]], data["forecasts"][dayIndex]["high"], data["forecasts"][dayIndex]["low"])
 		else:
-			logger.error("Didn't find forecast for zip %s" % zipCode)
+			logger.error("User %s: Didn't find forecast for zip %s" % (user.id, zipCode))
 			return None
 	else:
 		return None

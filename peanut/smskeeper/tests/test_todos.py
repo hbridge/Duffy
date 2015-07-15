@@ -1194,8 +1194,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processAllReminders()
 			self.assertEqual("", self.getOutput(mock))
 
-
-	weatherData = {'html_description': u'\n<img src="http://l.yimg.com/a/i/us/we/52/26.gif"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 78 F<BR />\n<BR /><b>Forecast:</b><BR />\nTue - Scattered Thunderstorms. High: 82 Low: 75<br />\nWed - PM Thunderstorms. High: 83 Low: 66<br />\nThu - Partly Cloudy. High: 83 Low: 67<br />\nFri - Mostly Sunny. High: 82 Low: 69<br />\nSat - Partly Cloudy. High: 84 Low: 73<br />\n<br />\n<a href="http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href="http://www.weather.com" >The Weather Channel</a>)<br/>\n', 'atmosphere': {'pressure': u'29.7', 'rising': u'2', 'visibility': u'10', 'humidity': u'66'}, 'title': u'Yahoo! Weather - New York, NY', 'condition': {'date': u'Tue, 14 Jul 2015 11:49 am EDT', 'text': u'Cloudy', 'code': u'26', 'temp': u'78', 'title': u'Conditions for New York, NY at 11:49 am EDT'}, 'forecasts': [{'code': u'38', 'text': u'Scattered Thunderstorms', 'high': u'82', 'low': u'75', 'date': u'14 Jul 2015', 'day': u'Tue'}, {'code': u'38', 'text': u'PM Thunderstorms', 'high': u'83', 'low': u'66', 'date': u'15 Jul 2015', 'day': u'Wed'}, {'code': u'30', 'text': u'Partly Cloudy', 'high': u'83', 'low': u'67', 'date': u'16 Jul 2015', 'day': u'Thu'}, {'code': u'34', 'text': u'Mostly Sunny', 'high': u'82', 'low': u'69', 'date': u'17 Jul 2015', 'day': u'Fri'}, {'code': u'30', 'text': u'Partly Cloudy', 'high': u'84', 'low': u'73', 'date': u'18 Jul 2015', 'day': u'Sat'}], 'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'mi', 'speed': u'mph', 'temperature': u'F', 'pressure': u'in'}, 'astronomy': {'sunset': u'8:25 pm', 'sunrise': u'5:33 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'3', 'chill': u'78'}}
+	weatherData = {'html_description': u'\n<img src="http://l.yimg.com/a/i/us/we/52/26.gif"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 78 F<BR />\n<BR /><b>Forecast:</b><BR />\nTue - Scattered Thunderstorms. High: 82 Low: 75<br />\nWed - PM Thunderstorms. High: 83 Low: 66<br />\nThu - Partly Cloudy. High: 83 Low: 67<br />\nFri - Mostly Sunny. High: 82 Low: 69<br />\nSat - Partly Cloudy. High: 84 Low: 73<br />\n<br />\n<a href="http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href="http://www.weather.com" >The Weather Channel</a>)<br/>\n', 'atmosphere': {'pressure': u'29.7', 'rising': u'2', 'visibility': u'10', 'humidity': u'66'}, 'title': u'Yahoo! Weather - New York, NY', 'condition': {'date': u'Tue, 14 Jul 2015 11:49 am EDT', 'text': u'Cloudy', 'code': u'26', 'temp': u'78', 'title': u'Conditions for New York, NY at 11:49 am EDT'},
+					'forecasts': [
+						{'code': u'38', 'text': u'Scattered Thunderstorms', 'high': u'82', 'low': u'75', 'date': u'14 Jul 2015', 'day': u'Tue'},
+						{'code': u'38', 'text': u'PM Thunderstorms', 'high': u'83', 'low': u'66', 'date': u'15 Jul 2015', 'day': u'Wed'},
+						{'code': u'30', 'text': u'Partly Cloudy', 'high': u'83', 'low': u'67', 'date': u'16 Jul 2015', 'day': u'Thu'},
+						{'code': u'34', 'text': u'Mostly Sunny', 'high': u'82', 'low': u'69', 'date': u'17 Jul 2015', 'day': u'Fri'},
+						{'code': u'30', 'text': u'Partly Cloudy', 'high': u'84', 'low': u'73', 'date': u'18 Jul 2015', 'day': u'Sat'}],
+					'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'mi', 'speed': u'mph', 'temperature': u'F', 'pressure': u'in'}, 'astronomy': {'sunset': u'8:25 pm', 'sunrise': u'5:33 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'3', 'chill': u'78'}}
 
 	@patch('common.weather_util.getWeatherForZip')
 	def test_weather_in_digest(self, weatherMock, dateMock):
@@ -1239,3 +1245,21 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "what is the weather?")
 			self.assertIn("forecast: Scattered Thunderstorms", self.getOutput(mock))
+
+	@patch('common.weather_util.getWeatherForZip')
+	def test_weather_on_request_tomorrow(self, weatherMock, dateMock):
+		self.setupUser(dateMock)
+		user = self.getTestUser()
+		user.zipcode = "10012"
+		user.save()
+
+		weatherMock.return_value = self.weatherData
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "what is the weather tomorrow?")
+			self.assertIn("Wednesday's forecast: PM Thunderstorms", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "what is the weather Thursday?")
+			self.assertIn("Thursday's forecast: Partly Cloudy", self.getOutput(mock))

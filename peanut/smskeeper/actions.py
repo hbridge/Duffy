@@ -487,7 +487,14 @@ def snooze(user, msg, keeperNumber):
 
 
 def fetchWeather(user, msg, keeperNumber):
-	weatherPhrase = weather_util.getWeatherPhraseForZip(user.zipcode, dict())
+	nattyResult = reminder_util.getNattyResult(user, msg)
+
+	if nattyResult.hadDate:
+		date = nattyResult.utcTime
+	else:
+		date = date_util.now(pytz.utc)
+
+	weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.zipcode, date, dict())
 	if weatherPhrase:
 		sms_util.sendMsg(user, weatherPhrase, None, keeperNumber)
 	else:

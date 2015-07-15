@@ -184,7 +184,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 		msg += u"%s\n" % (headerPhrase)
 
 		if user.zipcode:
-			weatherPhrase = weather_util.getWeatherPhraseForZip(user.zipcode, weatherDataCache)
+			weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.zipcode, date_util.now(pytz.utc), weatherDataCache)
 			if weatherPhrase:
 				msg += u"\n%s\n\n" % (weatherPhrase)
 
