@@ -133,7 +133,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 							break
 
 				self.setNow(dateMock, message_date)
-				# with patch('smskeeper.msg_util.timezoneForZipcode') as mock_tz:
+				# with patch('smskeeper.msg_util.timezoneForPostalCode') as mock_tz:
 				# 	mock_tz.return_value = "PST"
 				with patch('smskeeper.sms_util.recordOutput') as mock:
 					cliMsg.msg(self.testPhoneNumber, message["Body"])

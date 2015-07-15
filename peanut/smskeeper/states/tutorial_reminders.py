@@ -63,7 +63,7 @@ def process(user, msg, requestDict, keeperNumber):
 		zipcode = msg_util.getZipcode(msg)
 
 		if zipcode:
-			timezone = msg_util.timezoneForZipcode(zipcode)
+			timezone = msg_util.timezoneForPostalCode(zipcode)
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)

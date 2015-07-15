@@ -323,7 +323,7 @@ def setZipcode(user, msg, keeperNumber):
 		return True
 
 	user.zipcode = zipcode
-	user.timezone = msg_util.timezoneForZipcode(zipcode)
+	user.timezone = msg_util.timezoneForPostalCode(zipcode)
 	user.save()
 	sms_util.sendMsg(user, helper_util.randomAcknowledgement(), None, keeperNumber)
 
