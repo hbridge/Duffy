@@ -423,6 +423,7 @@ def done(user, msg, keeperNumber):
 
 	entries = entry_util.fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries)
 	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
+	isAll = False
 
 	msgBack = None
 	if len(entries) == 0:
@@ -433,6 +434,7 @@ def done(user, msg, keeperNumber):
 			if msg_util.isMsgClassified(msg, keeper_constants.CLASS_COMPLETE_TODO_ALL):
 				logger.info("User %s: I think '%s' is a classified done command, marking off recent" % (user.id, msg))
 				entries = justSentEntries
+				isAll = True
 			else:
 				# We really don't know what this is
 				logger.info("User %s: I think '%s' is a done command but couldn't find a good enough entry. pausing" % (user.id, msg))
@@ -452,8 +454,8 @@ def done(user, msg, keeperNumber):
 
 	if msgBack:
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
-		return True
-	return False
+		return True, isAll
+	return False, isAll
 
 
 def snooze(user, msg, keeperNumber):

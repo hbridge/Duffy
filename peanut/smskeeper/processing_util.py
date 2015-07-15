@@ -22,41 +22,44 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 	if msg_util.isStopCommand(msg):
 		stopped.dealWithStop(user, msg, keeperNumber)
 		logger.info("User %s: I think '%s' is a stop command, state is now %s" % (user.id, msg, user.state))
-		return True
+		return True, keeper_constants.CLASS_STOP
 	elif niceties.getNicety(msg):
 		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
 		if msg_util.isDoneCommand(msg):
 			logger.info("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
-			return False
+			return False, None
 
 		if msg_util.isRemindCommand(msg):
 			logger.info("User %s: I think '%s' is a nicety but its also a remind command, booting out" % (user.id, msg))
-			return False
+			return False, None
 		nicety = niceties.getNicety(msg)
 		logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
 		actions.nicety(user, nicety, requestDict, keeperNumber)
-		return True
+		classification = keeper_constants.CLASS_NICETY
+		if nicety.responses is None:
+			classification = keeper_constants.CLASS_SILENT_NICETY
+		return True, classification
 	elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
 		logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
 		actions.help(user, msg, keeperNumber)
-		return True
+		return True, keeper_constants.CLASS_HELP
 	elif msg_util.isQuestion(msg) and user.completed_tutorial and not msg_util.isDigestCommand(msg):
 		# HACKY: Doing digest check here, probably should be in a better spot
 		logger.info("User %s: I think '%s' is a question, pausing" % (user.id, msg))
 		actions.unknown(user, msg, keeperNumber)
-		return True
+		return True, None
 	elif msg_util.isSetTipFrequencyCommand(msg):
 		logger.info("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
 		actions.setTipFrequency(user, msg, keeperNumber)
-		return True
+		return True, keeper_constants.CLASS_CHANGE_SETTING
 	elif msg_util.nameInSetName(msg) and user.completed_tutorial:
 		logger.info("User %s: I think '%s' is a set name command" % (user.id, msg))
 		actions.setName(user, msg, keeperNumber)
-		return True
+		return True, keeper_constants.CLASS_CHANGE_SETTING
 	elif msg_util.isSetZipcodeCommand(msg) and user.completed_tutorial:
 		logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
 		actions.setZipcode(user, msg, keeperNumber)
-		return True
+		return True, keeper_constants.CLASS_CHANGE_SETTING
 	# If this starts to get too agressive, then move into reminder code where we see if there's
 	# timing information
 	elif msg_util.startsWithNo(msg):
@@ -65,9 +68,9 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("User %s: I think '%s' starts with a frustration word, pausing" % (user.id, msg))
 		paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
 		if paused:
-			return True
+			return True, None
 
-	return False
+	return False, None
 
 
 def getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber):
@@ -115,14 +118,16 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	if not user.paused:
 		# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
 		if not isNewUser:
-			processed = processBasicMessages(user, msg, requestDict, keeperNumber)
-
-		if not processed:
+			processed, classification = processBasicMessages(user, msg, requestDict, keeperNumber)
+		if processed:
+			messageObject.auto_classification = classification
+			messageObject.save()
+		else:
 			count = 0
 			while not processed and count < 10:
 				stateModule = stateCallbacks[user.state]
 				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
-				processed = stateModule.process(user, msg, requestDict, keeperNumber)
+				processed, classification = stateModule.process(user, msg, requestDict, keeperNumber)
 				if processed is None:
 					raise TypeError("modules must return True or False for processed")
 				count += 1
@@ -130,6 +135,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				if processed:
 					user.last_state = user.state
 					user.save()
+					messageObject.auto_classification = classification
+					messageObject.save()
 					logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
 			if count == 10:

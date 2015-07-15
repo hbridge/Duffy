@@ -32,7 +32,8 @@ def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
 		actions.nicety(user, nicety, requestDict, keeperNumber)
-		return True
+		classification = keeper_constants.CLASS_SILENT_NICETY if nicety.responses is None else keeper_constants.CLASS_NICETY
+		return True, classification
 
 	# Tutorial stuff
 	if step == 0:
@@ -45,7 +46,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
-				return True
+				return True, keeper_constants.CLASS_NONE
 			else:
 				user.name = msg.strip(string.punctuation)
 
@@ -67,7 +68,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True
+				return True, keeper_constants.CLASS_NONE
 			else:
 				user.zipcode = zipcode
 				user.timezone = timezone
@@ -95,7 +96,7 @@ def process(user, msg, requestDict, keeperNumber):
 					u"I didn't understand that \U0001F61E. Try saying it as 'Add ITEM to LIST'"
 				],
 				keeperNumber)
-			return True
+			return True, None
 
 		# time.sleep so the response to add Action goes out first
 		if keeper_constants.isRealKeeperNumber(keeperNumber):
@@ -122,7 +123,7 @@ def process(user, msg, requestDict, keeperNumber):
 				],
 				keeperNumber
 				)
-			return True
+			return True, None
 
 		sms_util.sendMsgs(
 			user,
@@ -146,7 +147,7 @@ def process(user, msg, requestDict, keeperNumber):
 				],
 				keeperNumber
 				)
-			return True
+			return True, None
 
 		sms_util.sendMsgs(
 			user,
@@ -172,4 +173,4 @@ def process(user, msg, requestDict, keeperNumber):
 		analytics.setUserInfo(user)
 
 	user.save()
-	return True
+	return True, None

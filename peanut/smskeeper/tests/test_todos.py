@@ -1004,6 +1004,44 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[0].hidden)
 		self.assertFalse(user.paused)
 
+	def test_record_auto_classification(self, dateMock):
+		self.setupUser(dateMock)
+		messagesToTest = [
+			{
+				"message": "remind me to test classification in 1 hour",
+				"classification": keeper_constants.CLASS_CREATE_TODO
+			},
+			{
+				"message": "snooze test classification 2 hours",
+				"classification": keeper_constants.CLASS_SNOOZE
+			},
+			{
+				"message": "done with test classification",
+				"classification": keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
+			},
+			{
+				"message": "what is the weather",
+				"classification": keeper_constants.CLASS_FETCH_WEATHER
+			},
+			{
+				"message": "todos",
+				"classification": keeper_constants.CLASS_FETCH_DIGEST
+			},
+			{
+				"message": "ok",
+				"classification": keeper_constants.CLASS_SILENT_NICETY
+			},
+			{
+				"message": "hi",
+				"classification": keeper_constants.CLASS_NICETY
+			},
+		]
+
+		for i, message in enumerate(messagesToTest):
+			cliMsg.msg(self.testPhoneNumber, message["message"])
+			messages = self.user.getMessages(incoming=True)
+			self.assertEquals(messages[i].auto_classification, message["classification"])
+
 	def test_one_time_reminder(self, dateMock):
 		self.setupUser(dateMock)
 

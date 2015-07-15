@@ -16,24 +16,25 @@ def process(user, msg, requestDict, keeperNumber):
 		# Couldn't find entry so try sending back through normal flow
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()
-		return False  # Reprocess
+		return False, None  # Reprocess
 
 	if msg_util.isDoneCommand(msg):
-		msgSent = actions.done(user, msg, keeperNumber)
+		msgSent, isAll = actions.done(user, msg, keeperNumber)
 
 		if msgSent:
 			user.setState(keeper_constants.STATE_NORMAL)
 			user.save()
-		return True
+		classification = keeper_constants.CLASS_COMPLETE_TODO_ALL if isAll else keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
+		return True, classification
 	# Could be a snooze for the most recent entry
 	elif len(entries) == 1:
 		entry = entries[0]
 		nattyResult = reminder_util.getNattyResult(user, msg)
 		if reminder_util.isSnoozeForEntry(user, msg, entry, nattyResult):
 			actions.snooze(user, msg, keeperNumber)
-			return True
+			return True, keeper_constants.CLASS_SNOOZE
 
 	logging.info("User %s: I don't think this is a done or followup command to the most recent reminder, so kicking out" % (user.id))
 	user.setState(keeper_constants.STATE_NORMAL)
 
-	return False  # Reprocess
+	return False, None  # Reprocess

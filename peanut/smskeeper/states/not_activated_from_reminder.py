@@ -30,4 +30,4 @@ def process(user, msg, requestDict, keeperNumber):
 			postMsg = "User %s paused after: %s" % (user.id, msg)
 			slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 
-	return True
+	return True, None

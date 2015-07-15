@@ -50,4 +50,4 @@ def process(user, msg, requestDict, keeperNumber):
 	"""
 	user_util.activate(user, "", None, keeperNumber)
 
-	return True
+	return True, None

@@ -6,4 +6,4 @@ def process(user, msg, requestDict, keeperNumber):
 	user.setState(keeper_constants.STATE_NORMAL)
 	user.save()
 
-	return False
+	return False, None

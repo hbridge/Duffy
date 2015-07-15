@@ -82,38 +82,43 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, map(lambda entry: entry.id, entries))
 		user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
 		user.save()
-		return False
+		return False, None
 
-	return True
+	return True, None
 
 
 def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
 	if msg_util.isRemindCommand(msg):
 		logger.info("User %s: I think '%s' is a remind command" % (user.id, msg))
 		user.setState(keeper_constants.STATE_REMIND)
-		return False  # Reprocess
+		return False, None  # Reprocess
 	elif msg_util.isDoneCommand(msg):
 		logger.info("User %s: I think '%s' is a done command" % (user.id, msg))
-		actions.done(user, msg, keeperNumber)
+		msgSent, isAll = actions.done(user, msg, keeperNumber)
+		classification = keeper_constants.CLASS_COMPLETE_TODO_ALL if isAll else keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
+		return True, classification
 	elif msg_util.isSnoozeCommand(msg):
 		logger.info("User %s: I think '%s' is a snooze command" % (user.id, msg))
 		actions.snooze(user, msg, keeperNumber)
+		return True, keeper_constants.CLASS_SNOOZE
 	elif msg_util.isFetchWeatherCommand(msg):
 		logger.info("User %s: I think '%s' is a fetch weather command" % (user.id, msg))
 		actions.fetchWeather(user, msg, keeperNumber)
+		return True, keeper_constants.CLASS_FETCH_WEATHER
 	elif msg_util.isDigestCommand(msg):
 		logger.info("User %s: I think '%s' is a digest command" % (user.id, msg))
 		if "today" in msg.lower():
 			async.sendDigestForUserId(user.id, keeperNumber)
 		else:
 			async.sendAllRemindersForUserId(user.id, keeperNumber)
+		return True, keeper_constants.CLASS_FETCH_DIGEST
 	elif len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
+		return True, keeper_constants.CLASS_SILENT_NICETY
 	else:
 		logger.info("User %s: I think '%s' is something else so doing remind state" % (user.id, msg))
 		user.setState(keeper_constants.STATE_REMIND)
-		return False  # Reprocess
-	return True
+		return False, None  # Reprocess
 
 
 #   Main logic for processing a message
@@ -138,7 +143,7 @@ def process(user, msg, requestDict, keeperNumber):
 			user.setState(keeper_constants.STATE_REMIND)
 			user.save()
 			# Reprocess
-			return False
+			return False, keeper_constants.CLASS_CREATE_TODO
 		# STATE_NORMAL
 		elif msg_util.isPrintHashtagsCommand(msg):
 			logger.info("User %s: I think '%s' is a print hashtags command" % (user.id, msg))
@@ -181,7 +186,7 @@ def process(user, msg, requestDict, keeperNumber):
 		else:  # catch all, we're not sure
 			return dealWithTodoProductMsg(user, msg, requestDict, keeperNumber)
 
-		return True
+		return True, None
 	except:
 		logger.warning("User %s: and msg '%s' got exception" % (user.id, msg))
 		sms_util.sendMsg(user, random.choice(keeper_constants.GENERIC_ERROR_MESSAGES), None, keeperNumber)

@@ -427,7 +427,7 @@ var KeeperApp = React.createClass({
         this.processDataFromServer(data);
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("message_feed", status, err.toString());
+        console.error("message_feed error %s %s", status, err.toString());
       }.bind(this)
     });
   },

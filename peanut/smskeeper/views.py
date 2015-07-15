@@ -150,6 +150,7 @@ def getMessagesForUser(user):
 			message_dict["manual"] = message.manual
 			if message.incoming:
 				message_dict["classification"] = message.classification
+				message_dict["auto_classification"] = message.auto_classification
 
 			messages_dicts.append(message_dict)
 

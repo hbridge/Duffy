@@ -435,7 +435,7 @@ class Message(models.Model):
 		return ([
 			{
 				"text": "Create Todo",
-				"value": "createtodo"
+				"value": keeper_constants.CLASS_CREATE_TODO
 			},
 			{
 				"text": "Done (all)",
@@ -447,7 +447,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "Delete/Cancel",
-				"value": "deletereminder"
+				"value": keeper_constants.CLASS_DELETE
 			},
 			{
 				"text": "Fetch Digest",
@@ -455,23 +455,23 @@ class Message(models.Model):
 			},
 			{
 				"text": "Nicety",
-				"value": "nicety"
+				"value": keeper_constants.CLASS_NICETY
 			},
 			{
 				"text": "Nicety (Silent)",
-				"value": "silentnicety"
+				"value": keeper_constants.CLASS_SILENT_NICETY
 			},
 			{
 				"text": "Correction",
-				"value": "timecorrection"
+				"value": keeper_constants.CLASS_CORRECTION
 			},
 			{
 				"text": "Snooze",
-				"value": "snooze"
+				"value": keeper_constants.CLASS_SNOOZE
 			},
 			{
 				"text": "Help",
-				"value": "help"
+				"value": keeper_constants.CLASS_HELP
 			},
 			{
 				"text": "Stop",
@@ -483,7 +483,7 @@ class Message(models.Model):
 			},
 			{
 				"text": "NoCategory",
-				"value": "nocategory"
+				"value": keeper_constants.CLASS_NONE
 			},
 
 		])

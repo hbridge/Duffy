@@ -54,22 +54,22 @@ def process(user, msg, requestDict, keeperNumber):
 				user.setStateData(keeper_constants.RESOLVED_HANDLES_DATA_KEY, resolvedHandles)
 				user.setState(keeper_constants.STATE_NORMAL)
 				user.save()
-				return False
+				return False, None
 			else:
 				resolveNextHandle(user, unresolvedHandles, keeperNumber)
 
 			user.save()
-			return True
+			return True, keeper_constants.CLASS_NONE
 		else:  # the user responded with something other than a phone number, kick back for reprocessing
 			# but mark that there's stuff still unresolved
 			unresolvedHandles = user.getStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY)
 			user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
 			user.setState(keeper_constants.STATE_NORMAL)
 			user.save()
-			return False
+			return False, None
 
 	# We haven't started resolving yet, pick the first and start resolving
 	else:
 		resolveNextHandle(user, user.getStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY), keeperNumber)
 
-	return True
+	return True, keeper_constants.CLASS_NONE

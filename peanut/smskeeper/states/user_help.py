@@ -11,7 +11,7 @@ def process(user, msg, requestDict, keeperNumber):
 		numMedia = int(requestDict["NumMedia"])
 		if numMedia > 0:
 			user.setState(keeper_constants.STATE_NORMAL)
-			return False
+			return False, None
 
 	cleanedMsg = msg.lower()
 	subject = None
@@ -68,4 +68,4 @@ def process(user, msg, requestDict, keeperNumber):
 	if not processed:
 		user.setState(keeper_constants.STATE_NORMAL)
 
-	return processed
+	return processed, keeper_constants.CLASS_HELP

@@ -32,7 +32,7 @@ def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
 		actions.nicety(user, nicety, requestDict, keeperNumber)
-		return True
+		return True, None
 
 	# Tutorial stuff
 	if step == 0:
@@ -45,7 +45,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
-				return True
+				return True, None
 			else:
 				user.name = msg.strip(string.punctuation)
 
@@ -67,7 +67,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True
+				return True, None
 			else:
 				user.zipcode = zipcode
 				user.timezone = timezone
@@ -75,7 +75,7 @@ def process(user, msg, requestDict, keeperNumber):
 			logger.debug("postalCodes were none for: %s" % msg)
 			response = "Sorry, I didn't understand that, what's your zipcode?"
 			sms_util.sendMsg(user, response, None, keeperNumber)
-			return True
+			return True, None
 
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's set your first reminder. \u23F0", u"What's a recent thing you wanted to be reminded of? Like 'Remind me to order birthday cake this weekend'. Give it a try - just start with 'Remind me...'!"], keeperNumber)
 
@@ -103,4 +103,4 @@ def process(user, msg, requestDict, keeperNumber):
 		analytics.setUserInfo(user)
 
 	user.save()
-	return True
+	return True, None

@@ -18,7 +18,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setState(keeper_constants.STATE_NORMAL)
 		if not keeper_constants.isTestKeeperNumber(keeperNumber):
 			logger.error("Processing implicit label state without an implicit label")
-		return False
+		return False, None
 
 	processed = False
 	if msg_util.isClearCommand(msg):
@@ -39,4 +39,4 @@ def process(user, msg, requestDict, keeperNumber):
 	if not processed:
 		user.setState(keeper_constants.STATE_NORMAL)
 
-	return processed
+	return processed, None

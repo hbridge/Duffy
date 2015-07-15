@@ -36,8 +36,10 @@ def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
 		actions.nicety(user, nicety, requestDict, keeperNumber)
-		return True
+		classification = keeper_constants.CLASS_SILENT_NICETY if nicety.responses is None else keeper_constants.CLASS_NICETY
+		return True, classification
 
+	classification = None
 	# Tutorial stuff
 	if step == 0:
 		# First see if they did a phrase like "my name is Billy"
@@ -51,7 +53,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
-				return True
+				return True, keeper_constants.CLASS_NONE
 			else:
 				user.name = msg.strip(string.punctuation)
 
@@ -73,7 +75,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True
+				return True, keeper_constants.CLASS_NONE
 			else:
 				user.zipcode = zipcode
 				user.timezone = timezone
@@ -86,10 +88,10 @@ def process(user, msg, requestDict, keeperNumber):
 			if lastMessageOut.added < cutoff:
 				response = "Got it, but first thing, what's your zipcode?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True
+				return True, keeper_constants.CLASS_NONE
 			else:
 				# else ignore
-				return True
+				return True, keeper_constants.CLASS_NONE
 
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
 
@@ -110,6 +112,7 @@ def process(user, msg, requestDict, keeperNumber):
 		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
 		sms_util.sendMsg(user, u"Oh and I'll also send your daily tasks in the morning \U0001F304 with weather forecast for that day \U0001F31E.", None, keeperNumber, eta=delayedTime)
 		user.setTutorialComplete()
+		classification = keeper_constants.CLASS_CREATE_TODO
 
 		user.setState(keeper_constants.STATE_REMIND)
 
@@ -123,4 +126,4 @@ def process(user, msg, requestDict, keeperNumber):
 		analytics.setUserInfo(user)
 
 	user.save()
-	return True
+	return True, classification

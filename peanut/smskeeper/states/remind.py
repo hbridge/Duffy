@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def process(user, msg, requestDict, keeperNumber):
 	if dealWithTutorialEdgecases(user, msg, keeperNumber):
-		return True
+		return True, keeper_constants.CLASS_NONE
 
 	nattyResult = reminder_util.getNattyResult(user, msg)
 	entries = user.getLastEntries()
@@ -30,12 +30,12 @@ def process(user, msg, requestDict, keeperNumber):
 	# If this is a done or snooze command so kick out to normal which will deal with it
 	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or msg_util.isDoneCommand(msg)) and user.isTutorialComplete():
 		user.setState(keeper_constants.STATE_NORMAL)
-		return False
+		return False, None
 
 	# If this doesn't look valid then ignore (starts with ok or "sounds good")
 	if not looksLikeValidEntry(msg, nattyResult):
 		logger.info("User %s: Skipping msg '%s' because it doesn't look valid to me" % (user.id, msg))
-		return True
+		return True, keeper_constants.CLASS_SILENT_NICETY
 
 	# If this is a follow up, update that entry
 	if reminder_util.isFollowup(user, entry, msg, nattyResult):
@@ -46,9 +46,9 @@ def process(user, msg, requestDict, keeperNumber):
 
 		if not user.isTutorialComplete():
 			user.setState(keeper_constants.STATE_TUTORIAL_TODO)
-			return False
+			return False, None
 		else:
-			return True
+			return True, keeper_constants.CLASS_CORRECTION
 
 	doCreate = False
 	# Now, see if this looks like a valid new reminder like it has time info or "remind me"
@@ -69,7 +69,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# The message could be a valid done command
 			# We might end up back here though which we deal with above
 			user.setState(keeper_constants.STATE_NORMAL)
-			return False
+			return False, None
 
 	if doCreate:
 		sendFollowup = False
@@ -85,18 +85,18 @@ def process(user, msg, requestDict, keeperNumber):
 			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
 
 			# Return here and we should come back
-			return True
+			return True, keeper_constants.CLASS_CREATE_TODO
 		else:
 			reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
 
 		# If we came from the tutorial, then set state and return False so we go back for reprocessing
 		if not user.isTutorialComplete():
 			user.setState(keeper_constants.STATE_TUTORIAL_TODO)
-			return False
+			return False, None
 
 	# This is used by remind_util to see if something is a followup
 	user.setStateData(keeper_constants.LAST_ACTION_KEY, unixTime(date_util.now(pytz.utc)))
-	return True
+	return True, keeper_constants.CLASS_CREATE_TODO
 
 
 def unixTime(dt):

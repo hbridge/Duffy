@@ -23,9 +23,10 @@ def process(user, msg, requestDict, keeperNumber):
 				"Hours Paused": time_utils.totalHoursAgo(user.last_state_change),
 			}
 		)
+		return True, keeper_constants.CLASS_STOP
 
 	# Ignore other messages
-	return True
+	return True, keeper_constants.CLASS_NONE
 
 
 # Hack, this kinda stands out where the processing_util calls this
@@ -45,4 +46,3 @@ def dealWithStop(user, msg, keeperNumber):
 
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 		user.save()
-

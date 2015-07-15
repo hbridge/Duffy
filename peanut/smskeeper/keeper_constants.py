@@ -231,11 +231,20 @@ WHATSAPP_LOCAL_PROXY_PORT = 8081
 DELAY_SECONDS_PER_WORD = 0.2
 MIN_DELAY_SECONDS = 1
 
+CLASS_CREATE_TODO = "createtodo"
 CLASS_COMPLETE_TODO_ALL = "completetodo-all"
 CLASS_COMPLETE_TODO_SPECIFIC = "completetodo-specific"
-CLASS_STOP = "stop"
+CLASS_DELETE = "deletereminder"
 CLASS_FETCH_DIGEST = "fetchdigest"
+CLASS_NICETY = "nicety"
+CLASS_SILENT_NICETY = "silentnicety"
+CLASS_CORRECTION = "timecorrection"
+CLASS_SNOOZE = "snooze"
+CLASS_HELP = "help"
+CLASS_STOP = "stop"
 CLASS_FETCH_WEATHER = "fetchweather"
+CLASS_NONE = "nocategory"
+CLASS_CHANGE_SETTING = "changesetting"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"
