@@ -12,10 +12,10 @@ import test_base
 @patch('common.date_util.utcnow')
 class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
-	def setupUser(self, dateMock):
+	def setupUser(self, dateMock, productId = 1):
 		# All tests start at Tuesday 8am
 		self.setNow(dateMock, self.TUE_8AM)
-		super(SMSKeeperTodoTutorialCase, self).setupUser(True, False, keeper_constants.STATE_TUTORIAL_TODO, productId=1)
+		super(SMSKeeperTodoTutorialCase, self).setupUser(True, False, keeper_constants.STATE_TUTORIAL_TODO, productId=productId)
 
 	def test_tutorial_remind_normal(self, dateMock):
 		self.setupUser(dateMock)
@@ -110,10 +110,14 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(user.timezone, "US/Pacific")
 
 	def test_tutorial_uk_postal_code(self, dateMock):
-		self.setupUser(dateMock)
+		self.setupUser(dateMock, productId=2)
 
 		# Activation message asks for their name
-		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		# Make sure that we have the UK specific language for this user
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("postal/zip code", self.getOutput(mock))
+
 		cliMsg.msg(self.testPhoneNumber, "AB13")
 
 		user = self.getTestUser()

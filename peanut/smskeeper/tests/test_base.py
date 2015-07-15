@@ -30,7 +30,7 @@ class SMSKeeperBaseCase(TestCase):
 
 		self.setupVerbData()
 
-		settings.KEEPER_NUMBER_DICT = {0: "test0", 1: "test1"}
+		settings.KEEPER_NUMBER_DICT = {0: "test0", 1: "test1", 2: "test@s.whatsapp.net"}
 
 	def setupZipCodeData(self):
 		ZipData.objects.create(city="San Francisco", state="CA", country_code="US", wxcode="94117", postal_code="94117", timezone="PST", area_code="415")
