@@ -60,6 +60,10 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
 		actions.setPostalCode(user, msg, keeperNumber)
 		return True, keeper_constants.CLASS_CHANGE_SETTING
+	elif msg_util.isFetchWeatherCommand(msg):
+		logger.info("User %s: I think '%s' is a fetch weather command" % (user.id, msg))
+		actions.fetchWeather(user, msg, keeperNumber)
+		return True, keeper_constants.CLASS_FETCH_WEATHER
 	# If this starts to get too agressive, then move into reminder code where we see if there's
 	# timing information
 	elif msg_util.startsWithNo(msg):
