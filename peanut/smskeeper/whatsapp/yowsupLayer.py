@@ -14,6 +14,8 @@ import urllib
 import urllib2
 from time import sleep
 
+from django.conf import settings
+
 import os
 import sys
 parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0], "..")
@@ -26,7 +28,7 @@ from smskeeper import keeper_constants
 import logging
 logger = logging.getLogger(__name__)
 
-INCOMING_SMS_URL = 'http://localhost:7500/smskeeper/incoming_sms/'
+INCOMING_SMS_URL = settings.WHATSAPP_SMS_URL
 
 
 class KeeperLayer(YowInterfaceLayer, asyncore.dispatcher_with_send):
@@ -35,7 +37,6 @@ class KeeperLayer(YowInterfaceLayer, asyncore.dispatcher_with_send):
 	def __init__(self):
 		YowInterfaceLayer.__init__(self)
 		asyncore.dispatcher.__init__(self)
-
 
 	@ProtocolEntityCallback("message")
 	def onMessage(self, messageProtocolEntity):

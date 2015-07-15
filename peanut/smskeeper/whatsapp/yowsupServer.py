@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 
 from yowsupLayer import KeeperLayer
 from yowsup.layers.auth import YowAuthenticationProtocolLayer
@@ -22,12 +23,13 @@ from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
 from yowsup import env
 
-# import logging
-# logging.basicConfig(level=logging.DEBUG)  # uncomment for debug info
-
 from django.conf import settings
 
 if __name__ == "__main__":
+	logging.basicConfig(filename='/mnt/log/whatsapp.log',
+						level=logging.DEBUG,
+						format='%(asctime)s %(levelname)s %(message)s')
+
 	layers = (
 		KeeperLayer,
 		(  # these protocol layers are parallel layers

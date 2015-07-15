@@ -90,5 +90,6 @@ KEEPER_NUMBER = "+18452088586"
 # Keeper number by product id
 KEEPER_NUMBER_DICT = {0: "+18452088586", 1: "+18452088586", 2: "3584573970584@s.whatsapp.net"}
 WHATSAPP_CREDENTIALS = ("3584573970584", "2Vqf6AGTedRERwMVm3WdnU0DCbs=")
+WHATSAPP_SMS_URL = "http://dev.duffyapp.com/smskeeper/incoming_sms"
 
 MIXPANEL_TOKEN = "d309a366da36d3f897ad2772390d1679"
