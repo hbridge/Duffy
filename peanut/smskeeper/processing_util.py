@@ -36,7 +36,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
 		actions.nicety(user, nicety, requestDict, keeperNumber)
 		classification = keeper_constants.CLASS_NICETY
-		if nicety.isSilent():
+		if nicety.responses is None:
 			classification = keeper_constants.CLASS_SILENT_NICETY
 		return True, classification
 	elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
@@ -58,7 +58,7 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		return True, keeper_constants.CLASS_CHANGE_SETTING
 	elif msg_util.isSetZipcodeCommand(msg) and user.completed_tutorial:
 		logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
-		actions.setZipcode(user, msg, keeperNumber)
+		actions.setPostalCode(user, msg, keeperNumber)
 		return True, keeper_constants.CLASS_CHANGE_SETTING
 	# If this starts to get too agressive, then move into reminder code where we see if there's
 	# timing information

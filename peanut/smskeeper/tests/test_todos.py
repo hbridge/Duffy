@@ -1024,16 +1024,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 				"classification": keeper_constants.CLASS_FETCH_WEATHER
 			},
 			{
-				"message": "remind me to test done all class 1 hour",
-				"classification": keeper_constants.CLASS_CREATE_TODO
-			},
-			{
 				"message": "todos",
 				"classification": keeper_constants.CLASS_FETCH_DIGEST
-			},
-			{
-				"message": "done",
-				"classification": keeper_constants.CLASS_COMPLETE_TODO_ALL
 			},
 			{
 				"message": "ok",
@@ -1041,10 +1033,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			},
 			{
 				"message": "hi",
-				"classification": keeper_constants.CLASS_NICETY
-			},
-			{
-				"message": "thanks",
 				"classification": keeper_constants.CLASS_NICETY
 			},
 		]
@@ -1219,7 +1207,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_weather_in_digest(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
-		user.zipcode = "10012"
+		user.wxcode = "10012"
 		user.save()
 
 		weatherMock.return_value = self.weatherData
@@ -1233,7 +1221,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_weather_not_in_requested_digest(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
-		user.zipcode = "10012"
+		user.wxcode = "10012"
 		user.save()
 
 		weatherMock.return_value = self.weatherData
@@ -1248,7 +1236,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_weather_on_request(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
-		user.zipcode = "10012"
+		user.wxcode = "10012"
 		user.save()
 
 		weatherMock.return_value = self.weatherData
@@ -1262,7 +1250,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	def test_weather_on_request_tomorrow(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
 		user = self.getTestUser()
-		user.zipcode = "10012"
+		user.wxcode = "10012"
 		user.save()
 
 		weatherMock.return_value = self.weatherData

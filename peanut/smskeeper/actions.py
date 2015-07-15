@@ -315,21 +315,21 @@ def setName(user, msg, keeperNumber):
 	)
 
 
-def setZipcode(user, msg, keeperNumber):
-	zipcode = msg_util.getZipcode(msg)
+def setPostalCode(user, msg, keeperNumber):
+	postalCode = msg_util.getZipcode(msg)
 
-	if zipcode is None:
-		sms_util.sendMsg(user, "I'm sorry, I don't know that zipcode", None, keeperNumber)
+	if postalCode is None:
+		sms_util.sendMsg(user, "I'm sorry, I don't know that postal code", None, keeperNumber)
 		return True
 
-	user.zipcode = zipcode
-	user.timezone = msg_util.timezoneForPostalCode(zipcode)
+	user.postal_code = postalCode
+	user.timezone = msg_util.timezoneForPostalCode(postalCode)
 	user.save()
 	sms_util.sendMsg(user, helper_util.randomAcknowledgement(), None, keeperNumber)
 
 	analytics.logUserEvent(
 		user,
-		"Changed Zipcode",
+		"Changed PostalCode",
 		None
 	)
 
@@ -423,6 +423,7 @@ def done(user, msg, keeperNumber):
 
 	entries, contextual = entry_util.fuzzyMatchEntries(user, msg, keeperNumber, justSentEntries)
 	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
+	isAll = False
 
 	msgBack = None
 	if len(entries) == 0:
@@ -433,7 +434,7 @@ def done(user, msg, keeperNumber):
 			if msg_util.isMsgClassified(msg, keeper_constants.CLASS_COMPLETE_TODO_ALL):
 				logger.info("User %s: I think '%s' is a classified done command, marking off recent" % (user.id, msg))
 				entries = justSentEntries
-				contextual = True
+				isAll = True
 			else:
 				# We really don't know what this is
 				logger.info("User %s: I think '%s' is a done command but couldn't find a good enough entry. pausing" % (user.id, msg))
@@ -453,8 +454,8 @@ def done(user, msg, keeperNumber):
 
 	if msgBack:
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
-		return True, contextual
-	return False, contextual
+		return True, isAll
+	return False, isAll
 
 
 def snooze(user, msg, keeperNumber):
@@ -493,7 +494,7 @@ def fetchWeather(user, msg, keeperNumber):
 	else:
 		date = date_util.now(pytz.utc)
 
-	weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.zipcode, date, dict())
+	weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.wxcode, date, dict())
 	if weatherPhrase:
 		sms_util.sendMsg(user, weatherPhrase, None, keeperNumber)
 	else:

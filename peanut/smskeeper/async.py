@@ -183,8 +183,8 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 		headerPhrase = keeper_constants.REMINDER_DIGEST_HEADERS[now.weekday()]
 		msg += u"%s\n" % (headerPhrase)
 
-		if user.zipcode:
-			weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.zipcode, date_util.now(pytz.utc), weatherDataCache)
+		if user.wxcode:
+			weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.wxcode, date_util.now(pytz.utc), weatherDataCache)
 			if weatherPhrase:
 				msg += u"\n%s\n\n" % (weatherPhrase)
 

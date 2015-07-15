@@ -68,16 +68,16 @@ def process(user, msg, requestDict, keeperNumber):
 		)
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 1)
 	elif step == 1:
-		zipcode = msg_util.getZipcode(msg)
+		postalCode = msg_util.getZipcode(msg)
 
-		if zipcode:
-			timezone = msg_util.timezoneForPostalCode(zipcode)
+		if postalCode:
+			timezone = msg_util.timezoneForPostalCode(postalCode)
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE
 			else:
-				user.zipcode = zipcode
+				user.postal_code = postalCode
 				user.timezone = timezone
 		else:
 			logger.debug("postalCodes were none for: %s" % msg)

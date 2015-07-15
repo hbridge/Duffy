@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def main(argv):
 	print "Starting..."
-	users = User.objects.filter(zipcode__isnull=True).exclude(state="stopped")
+	users = User.objects.filter(postal_code__isnull=True).exclude(state="stopped")
 
 	for user in users:
 		messages = Message.objects.filter(user=user, incoming=True).order_by('added')[:10]
@@ -40,7 +40,7 @@ def main(argv):
 			timezone = msg_util.timezoneForPostalCode(zipcode)
 
 			if timezone:
-				user.zipcode = zipcode
+				user.postal_code = zipcode
 				user.save()
 
 if __name__ == "__main__":

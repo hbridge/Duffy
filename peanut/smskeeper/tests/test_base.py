@@ -33,9 +33,9 @@ class SMSKeeperBaseCase(TestCase):
 		settings.KEEPER_NUMBER_DICT = {0: "test0", 1: "test1"}
 
 	def setupZipCodeData(self):
-		ZipData.objects.create(city="San Francisco", state="CA", country_code="US", postal_code="94117", timezone="PST", area_code="415")
-		ZipData.objects.create(city="Manhattan", state="NY", country_code="US", postal_code="10012", timezone="EST", area_code="212")
-		ZipData.objects.create(city="New York", state="NY", country_code="US", postal_code="10012", timezone="EST", area_code="212")
+		ZipData.objects.create(city="San Francisco", state="CA", country_code="US", wxcode="94117", postal_code="94117", timezone="PST", area_code="415")
+		ZipData.objects.create(city="Manhattan", state="NY", country_code="US", wxcode="10012", postal_code="10012", timezone="EST", area_code="212")
+		ZipData.objects.create(city="New York", state="NY", country_code="US", wxcode="10012", postal_code="10012", timezone="EST", area_code="212")
 
 	def setupVerbData(self):
 		VerbData.objects.create(past="done")

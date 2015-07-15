@@ -70,7 +70,7 @@ def process(user, msg, requestDict, keeperNumber):
 				sms_util.sendMsg(user, response, None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE
 			else:
-				user.zipcode = zipcode
+				user.postal_code = zipcode
 				user.timezone = timezone
 		else:
 			logger.debug("postalCodes were none for: %s" % msg)
