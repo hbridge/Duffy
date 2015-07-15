@@ -21,14 +21,24 @@ import copy
 from smskeeper import user_util
 from smskeeper.scripts import importZipdata
 
-import logging
-logging.disable(logging.DEBUG)
-logging.basicConfig(
-	filename='/mnt/log/keeperSimulation.log',
-	level=logging.INFO,
-	format='%(asctime)s %(levelname)s %(message)s'
-)
-logger = logging.getLogger(__name__)
+from datetime import datetime
+
+
+class MyLogger:
+	filePath = None
+	fileHandle = None
+
+	def __init__(self, filePath):
+		self.filePath = filePath
+		self.fileHandle = open(filePath, 'w')
+
+	def info(self, formatStr, *args):
+		formatted = formatStr % args
+		if type(formatted) == unicode:
+			formatted = formatted.encode('utf-8')
+		self.fileHandle.write("%s\n" % formatted)
+
+logger = MyLogger("/mnt/log/keeperSimulation.log")
 
 MAX_USERS_TO_SIMULATE = 10000
 
@@ -37,6 +47,7 @@ MAX_USERS_TO_SIMULATE = 10000
 class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 	def test_parse_accuracy(self, dateMock):
+		logger.info("Starting simulation on %s", datetime.now())
 		self.setupAuthenticatedBrowser()
 
 		logger.info("Importing zip data...")
