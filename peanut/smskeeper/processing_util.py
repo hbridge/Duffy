@@ -43,11 +43,6 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
 		actions.help(user, msg, keeperNumber)
 		return True, keeper_constants.CLASS_HELP
-	elif msg_util.isQuestion(msg) and user.completed_tutorial and not msg_util.isDigestCommand(msg):
-		# HACKY: Doing digest check here, probably should be in a better spot
-		logger.info("User %s: I think '%s' is a question, pausing" % (user.id, msg))
-		actions.unknown(user, msg, keeperNumber)
-		return True, None
 	elif msg_util.isSetTipFrequencyCommand(msg):
 		logger.info("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
 		actions.setTipFrequency(user, msg, keeperNumber)
@@ -64,6 +59,11 @@ def processBasicMessages(user, msg, requestDict, keeperNumber):
 		logger.info("User %s: I think '%s' is a fetch weather command" % (user.id, msg))
 		actions.fetchWeather(user, msg, keeperNumber)
 		return True, keeper_constants.CLASS_FETCH_WEATHER
+	elif msg_util.isQuestion(msg) and user.completed_tutorial and not msg_util.isDigestCommand(msg):
+		# HACKY: Doing digest check here, probably should be in a better spot
+		logger.info("User %s: I think '%s' is a question, pausing" % (user.id, msg))
+		actions.unknown(user, msg, keeperNumber)
+		return True, None
 	# If this starts to get too agressive, then move into reminder code where we see if there's
 	# timing information
 	elif msg_util.startsWithNo(msg):
