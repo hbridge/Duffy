@@ -17,10 +17,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# Returns True if the the user entered any type of timing information
-def validTime(nattyResult):
-	return nattyResult.hadDate or nattyResult.hadTime
-
 
 def getLastActionTime(user):
 	if user.getStateData(keeper_constants.LAST_ACTION_KEY):
@@ -34,7 +30,7 @@ def getLastActionTime(user):
 # or if the cleaned Text is blank
 def isSnoozeForEntry(user, msg, entry, nattyResult):
 	query = msg.lower()
-	if validTime(nattyResult):
+	if nattyResult.validTime():
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 
@@ -64,7 +60,7 @@ def isFollowup(user, entry, msg, nattyResult):
 	if not entry:
 		return False
 
-	if validTime(nattyResult):
+	if nattyResult.validTime():
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 		lastActionTime = getLastActionTime(user)
 		interestingWords = msg_util.getInterestingWords(cleanedText)

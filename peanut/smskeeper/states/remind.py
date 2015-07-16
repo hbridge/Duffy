@@ -28,7 +28,8 @@ def process(user, msg, requestDict, keeperNumber):
 		entry = None
 
 	# If this is a done or snooze command so kick out to normal which will deal with it
-	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or msg_util.isDoneCommand(msg)) and user.isTutorialComplete():
+	# Hacky, theres a lot of exception cases here
+	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or (not nattyResult.validTime() and msg_util.isDoneCommand(msg))) and user.isTutorialComplete():
 		user.setState(keeper_constants.STATE_NORMAL)
 		return False, None
 
@@ -73,7 +74,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	if doCreate:
 		sendFollowup = False
-		if not reminder_util.validTime(nattyResult) or not user.isTutorialComplete():
+		if not nattyResult.validTime() or not user.isTutorialComplete():
 			sendFollowup = True
 
 		entry = reminder_util.createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
@@ -81,7 +82,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
 		# If we're in the tutorial and they didn't give a time, then give a different follow up
-		if not reminder_util.validTime(nattyResult) and not user.isTutorialComplete():
+		if not nattyResult.validTime() and not user.isTutorialComplete():
 			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
 
 			# Return here and we should come back
@@ -122,7 +123,7 @@ def dealWithTutorialEdgecases(user, msg, keeperNumber):
 # Right now that's tough since we'd filter out valid done commands
 def looksLikeValidEntry(msg, nattyResult):
 	words = msg.split(' ')
-	if not reminder_util.validTime(nattyResult) and len(words) < 4 and msg_util.isOkPhrase(msg):
+	if not nattyResult.validTime() and len(words) < 4 and msg_util.isOkPhrase(msg):
 		return False
 	return True
 
@@ -133,7 +134,7 @@ def looksLikeValidEntry(msg, nattyResult):
 def shouldCreateReminder(user, nattyResult, msg):
 	if msg_util.isRemindCommand(msg):
 		return True
-	if not reminder_util.validTime(nattyResult):
+	if not nattyResult.validTime():
 		return False
 
 	return True

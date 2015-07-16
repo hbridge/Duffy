@@ -1267,3 +1267,22 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "what is the weather in 2 weeks?")
 			self.assertIn("I don't know", self.getOutput(mock))
+
+	# Had a bug where a done command would be preferred instead of remind
+	def test_remind_doesnt_count_as_done(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.TUE_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me to go do some stuff tomorrow")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Put all the wedding stuff in my trunk and return it at 7:50 am")
+			self.assertIn("tomorrow at 7:50am", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind md put sox on at 8:50 am")
+			self.assertIn("tomorrow at 8:50am", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(3, len(entries))

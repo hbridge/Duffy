@@ -27,6 +27,9 @@ class NattyResult():
 		self.hadDate = hadDate
 		self.hadTime = hadTime
 
+	def validTime(self):
+		return self.hadDate or self.hadTime
+
 	def __str__(self):
 		return "=%s '%s' '%s' hadDate:%s hadTime:%s=" % (self.utcTime, self.queryWithoutTiming, self.textUsed, self.hadDate, self.hadTime)
 

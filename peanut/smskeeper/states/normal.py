@@ -5,9 +5,10 @@ import time
 
 from smskeeper.models import Entry, Message
 
-from smskeeper import sms_util, msg_util
+from smskeeper import sms_util, msg_util, reminder_util
 from smskeeper import actions, keeper_constants
 from smskeeper import async
+
 
 logger = logging.getLogger(__name__)
 
@@ -88,11 +89,13 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 
 
 def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
+	nattyResult = reminder_util.getNattyResult(user, msg)
 	if msg_util.isRemindCommand(msg):
 		logger.info("User %s: I think '%s' is a remind command" % (user.id, msg))
 		user.setState(keeper_constants.STATE_REMIND)
 		return False, None  # Reprocess
-	elif msg_util.isDoneCommand(msg):
+	# Hacky, theres a lot of exception cases here
+	elif msg_util.isDoneCommand(msg) and not nattyResult.validTime():
 		logger.info("User %s: I think '%s' is a done command" % (user.id, msg))
 		msgSent, isAll = actions.done(user, msg, keeperNumber)
 		classification = keeper_constants.CLASS_COMPLETE_TODO_ALL if isAll else keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
