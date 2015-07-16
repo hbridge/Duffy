@@ -91,7 +91,11 @@ def postMessage(message, channel):
                 for n in range(numMedia):
                     param = 'MediaUrl' + str(n)
                     text += "\n<" + msgContent[param] + "|" + param + ">"
-            params['icon_emoji'] = ':raising_hand:'
+
+            if message.user.product_id == keeper_constants.WHATSAPP_PRODUCT_ID:
+                params['icon_emoji'] = ':sparkle:'
+            else:
+                params['icon_emoji'] = ':raising_hand:'
 
         else:
             if message.user.name:
