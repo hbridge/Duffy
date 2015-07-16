@@ -92,7 +92,7 @@ def postMessage(message, channel):
                     param = 'MediaUrl' + str(n)
                     text += "\n<" + msgContent[param] + "|" + param + ">"
 
-            if message.user.product_id == keeper_constants.WHATSAPP_PRODUCT_ID:
+            if message.user.product_id == keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
                 params['icon_emoji'] = ':sparkle:'
             else:
                 params['icon_emoji'] = ':raising_hand:'
