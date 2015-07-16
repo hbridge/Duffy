@@ -226,6 +226,8 @@ HELP_MESSAGES_OLD = [
 	u"What would you like to learn more about? Lists or reminders?"
 ]
 
+KEEPER_PROD_PHONE_NUMBERS = ["+14792026561", "+14792086270", "3584573970819@s.whatsapp.net"]
+
 WHATSAPP_NUMBER_SUFFIX = "@s.whatsapp.net"
 WHATSAPP_LOCAL_PROXY_PORT = 8081
 DELAY_SECONDS_PER_WORD = 0.2

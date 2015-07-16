@@ -200,7 +200,6 @@ TWILIO_SMSKEEPER_PHONE_NUM = "+14792026561"
 # TODO(Derek): Migrate use of this over to keeper_constants
 SMSKEEPER_TEST_NUM = "test"
 SMSKEEPER_CLI_NUM = "cli"
-KEEPER_PROD_PHONE_NUMBERS = ["+14792026561", "+14792086270"]
 
 # for SMSing to India (Twilio gets blocked in India often)
 PLIVO_AUTH_ID = "MANWVIM2VMNDRJNDRMN2"

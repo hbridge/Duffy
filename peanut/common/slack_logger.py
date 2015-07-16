@@ -4,7 +4,8 @@ import traceback
 
 from django.conf import settings
 import requests
-from peanut.settings import constants
+
+from smskeeper import keeper_constants
 
 import logging
 
@@ -117,7 +118,7 @@ def isProdMessage(message):
 
 
 def isProdNumber(number):
-    return number in constants.KEEPER_PROD_PHONE_NUMBERS
+    return number in keeper_constants.KEEPER_PROD_PHONE_NUMBERS
 
 
 def postUserReport(uid, recentMessages):
