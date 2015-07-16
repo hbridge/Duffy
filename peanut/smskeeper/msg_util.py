@@ -277,8 +277,8 @@ def isDigestCommand(msg):
 def isFetchWeatherCommand(msg):
 	simpleMsg = simplifiedMsg(msg)
 
-	# Note: Need a re match for stop
-	found = weather_re.match(simpleMsg) is not None
+	# Note: Need a re search for weather
+	found = weather_re.search(simpleMsg) is not None
 	if found:
 		return True
 
