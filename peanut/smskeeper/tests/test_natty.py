@@ -42,15 +42,14 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEqual(entry.remind_timestamp.hour, 23)  # 1 pm Hawaii in UTC
 
-	def test_natty_two_times_by_words(self):
+	@patch('common.date_util.utcnow')
+	def test_natty_two_times_by_words(self, dateMock):
 		self.setupUser(True, True)
 
-		inTwoHours = self.getUserNow() + datetime.timedelta(hours=2)
-
+		self.setNow(dateMock, self.MON_8AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tuesday morning in two hours")
-			correctString = msg_util.naturalize(self.getUserNow(), inTwoHours)
-			self.assertIn(correctString, self.getOutput(mock))
+			self.assertIn("by 10am", self.getOutput(mock))
 
 	"""
 	Commenting out these tests for now because we're explictly not supporting these cases right now.

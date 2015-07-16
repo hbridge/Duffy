@@ -8,6 +8,8 @@ from smskeeper.models import User, ZipData, VerbData
 from smskeeper import keeper_constants
 import emoji
 
+from common import date_util
+
 # turn off mixpanel for tests
 settings.MIXPANEL_TOKEN = None
 
@@ -47,7 +49,8 @@ class SMSKeeperBaseCase(TestCase):
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		self.user.completed_tutorial = tutorialComplete
 		if activated:
-			self.user.activated = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+			dt = date_util.now(pytz.utc)
+			self.user.activated = datetime.datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
 		if productId:
 			self.user.product_id = productId
 		self.user.state = state
@@ -56,11 +59,6 @@ class SMSKeeperBaseCase(TestCase):
 
 	def getTestUser(self):
 		return User.objects.get(id=self.user.id)
-
-	def getUserNow(self):
-		now = datetime.datetime.now(pytz.utc)
-		# This could be sped up with caching
-		return now.astimezone(self.getTestUser().getTimezone())
 
 	def getOutput(self, mock):
 		output = u""
@@ -92,12 +90,15 @@ class SMSKeeperBaseCase(TestCase):
 	MON_9AM = datetime.datetime(2015, 6, 1, 13, 0, 0, tzinfo=pytz.utc)
 	MON_10AM = datetime.datetime(2015, 6, 1, 14, 0, 0, tzinfo=pytz.utc)
 	MON_11AM = datetime.datetime(2015, 6, 1, 15, 0, 0, tzinfo=pytz.utc)
+	MON_2PM = datetime.datetime(2015, 6, 1, 18, 0, 0, tzinfo=pytz.utc)
 	MON_3PM = datetime.datetime(2015, 6, 1, 19, 0, 0, tzinfo=pytz.utc)
 	MON_8PM = datetime.datetime(2015, 6, 2, 0, 0, 0, tzinfo=pytz.utc)
 	MON_10PM = datetime.datetime(2015, 6, 2, 2, 0, 0, tzinfo=pytz.utc)
+	TUE_5AM = datetime.datetime(2015, 6, 2, 9, 0, 0, tzinfo=pytz.utc)
 	TUE_8AM = datetime.datetime(2015, 6, 2, 12, 0, 0, tzinfo=pytz.utc)
 	TUE_9AM = datetime.datetime(2015, 6, 2, 13, 0, 0, tzinfo=pytz.utc)
 	TUE_1AM = datetime.datetime(2015, 6, 2, 5, 0, 0, tzinfo=pytz.utc)
+	TUE_2PM = datetime.datetime(2015, 6, 2, 18, 0, 0, tzinfo=pytz.utc)
 	TUE_3PM = datetime.datetime(2015, 6, 2, 19, 0, 0, tzinfo=pytz.utc)
 	TUE_10PM = datetime.datetime(2015, 6, 3, 2, 0, 0, tzinfo=pytz.utc)
 	TUE_850AM = datetime.datetime(2015, 6, 2, 12, 50, 0, tzinfo=pytz.utc)

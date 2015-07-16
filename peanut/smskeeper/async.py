@@ -222,7 +222,8 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 		if tips.isUserEligibleForMiniTip(user, tips.DIGEST_TIP_ID):
 			digestTip = tips.tipWithId(tips.DIGEST_TIP_ID)
-			sendTipToUser(digestTip, user, keeperNumber)
+			sms_util.sendMsg(user, digestTip.renderMini(), None, user.getKeeperNumber())
+			tips.markTipSent(user, digestTip, isMini=True)
 
 
 @app.task

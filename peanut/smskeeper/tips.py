@@ -128,11 +128,10 @@ def isEligibleForTip(user):
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour
 	if not user.last_tip_sent:
 		dt_activated = date_util.now(pytz.utc) - user.activated  # must use date_util.now and not utcnow as the test mocks datetime.now
-		if dt_activated.total_seconds() >= 3 * 60 * 60:  # if it's been at least 3 hours since they signed up, send them the first tip
+		if dt_activated.total_seconds() > 3 * 60 * 60:  # if it's been at least 3 hours since they signed up, send them the first tip
 			return True
 	else:
 		dt_tip_sent = date_util.now(pytz.utc) - user.last_tip_sent  # must use date_util.now and not utcnow as the test mocks datetime.now
-		# print "dt_activated: %s" % dt_tip_sent
 		if dt_tip_sent.total_seconds() >= tip_frequency_seconds:
 			return True
 	return False
@@ -236,3 +235,12 @@ def getKeeperVCard(user):
 		return keeper_constants.KEEPER_TODO_VCARD_URL
 	else:
 		return keeper_constants.KEEPER_VCARD_URL
+
+
+def getTipFromId(tipId):
+	for tip in SMSKEEPER_TIPS:
+		if tip.id == tipId:
+			return tip
+	return None
+
+

@@ -8,7 +8,10 @@ from smskeeper import cliMsg, keeper_constants
 from smskeeper import async
 from smskeeper import tips
 
+from common import date_util
+
 import test_base
+
 
 
 @patch('common.date_util.utcnow')
@@ -27,7 +30,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		self.setMockDatetimeDaysAhead(mock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS, tips.SMSKEEPER_TIP_HOUR)
 
 	def setupUser(self, activated, tutorialComplete, timezoneString, dateMock):
-		self.setNow(dateMock, datetime.datetime.now(pytz.utc))
+		self.setNow(dateMock, self.MON_11AM)
 		test_base.SMSKeeperBaseCase.setupUser(self, activated, tutorialComplete)
 
 		self.user.timezone = timezoneString  # put the user in UTC by default, makes most tests easier
@@ -90,6 +93,42 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertNotIn(tips.SMSKEEPER_TIPS[1].render(self.user), self.getOutput(mock))
+
+	def testTipSameDaySignupAllMiniTipsGoFirst(self, dateMock):
+		self.setNow(dateMock, self.MON_11AM)
+		self.setupUser(True, True, "UTC", dateMock)
+
+		# Set product_id = 1, so daily digests are enabled.
+		user = self.getTestUser()
+		user.product_id = 1
+		user.activated = dateMock.return_value
+		user.save()
+
+		# Now set the time to first tip delivery time later that day
+		self.setNow(dateMock, self.MON_2PM)
+
+		# Try to send a tip on first day's 6pm timeslot
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertEqual('', self.getOutput(mock))
+
+		# Now create an entry, so morning digest has something to send
+		cliMsg.msg(self.testPhoneNumber, "remind me to poop tmrw")
+
+		# Now send out digest and its minitip
+		self.setNow(dateMock, self.TUE_5AM) # set clock ahead by 15 hours to 9am
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn('To snooze a task', self.getOutput(mock))		
+
+		# Now send out the vcard later that day
+		self.setNow(dateMock, self.TUE_2PM)
+		
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.sendTips(constants.SMSKEEPER_TEST_NUM)
+			self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
+
+
 
 	def testTipsSkipIneligibleUsers(self, dateMock):
 		# unactivated users don't get tips
