@@ -782,7 +782,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 	def test_only_day_of_month(self, nattyMock, dateMock):
 		self.setupUser(dateMock)  # This is on June 2nd
 
-		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on the 4th")
+		cliMsg.msg(self.testPhoneNumber, "Remind me about pooping at 9pm on The 4th")
 
 		# We have to look at the 2nd to last since natty gets called twice during a create
 		arg, kargs = nattyMock.call_args_list[0]
@@ -871,4 +871,14 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to be in warrenton by 4:45 pm to meet heather today")
 			self.assertIn("today at 4:45pm", self.getOutput(mock))
+
+	# Hit bug where "by" was swapped out from baby
+	def test_baby_after(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind to go shopping for my baby after 6pm")
+			self.assertIn("today by 6pm", self.getOutput(mock))
 

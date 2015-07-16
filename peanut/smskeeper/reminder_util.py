@@ -286,6 +286,11 @@ def dealWithDefaultTime(user, nattyResult):
 	return nattyResult
 
 
+def replace(msg, toRemove, toPutIn):
+	swap = re.compile(toRemove, re.IGNORECASE)
+	return swap.sub(toPutIn, msg)
+
+
 # Remove and replace troublesome strings for Natty
 # This is meant to just be used to change up the string for processing, not used later for
 def fixMsgForNatty(msg, user):
@@ -296,21 +301,21 @@ def fixMsgForNatty(msg, user):
 	words = ["around", "before", "after", "for", "by"]
 
 	for word in words:
-		search = re.search(r'(?P<phrase>%s [0-9]+)' % word, newMsg, re.IGNORECASE)
+		search = re.search(r'\b(?P<phrase>%s [0-9]+)' % word, newMsg, re.IGNORECASE)
 
 		if search:
 			phrase = search.group("phrase")
-			newPhrase = phrase.replace(word, "").strip()
-			newMsg = newMsg.replace(phrase, newPhrase)
+			newPhrase = replace(phrase, word, "").strip()
+			newMsg = replace(newMsg, phrase, newPhrase)
 
 	# Remove o'clock
-	newMsg = newMsg.replace("o'clock", "")
-	newMsg = newMsg.replace("oclock", "")
+	newMsg = replace(newMsg, "o'clock", "")
+	newMsg = replace(newMsg, "oclock", "")
 
 	# Fix "again at 3" situation where natty doesn't like that...wtf
 	againAt = re.search(r'.*again at ([0-9])', newMsg, re.IGNORECASE)
 	if againAt:
-		newMsg = newMsg.replace("again at", "at")
+		newMsg = replace(newMsg, "again at", "at")
 
 	# Fix 3 digit numbers with timing info like "520p"
 	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg, re.IGNORECASE)
@@ -318,7 +323,7 @@ def fixMsgForNatty(msg, user):
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
 
-		newMsg = newMsg.replace(oldtime, newtime)
+		newMsg = replace(newMsg, oldtime, newtime)
 
 	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
 	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg, re.IGNORECASE)
@@ -326,7 +331,7 @@ def fixMsgForNatty(msg, user):
 		oldtime = threeDigitsWithAT.group("time")
 		newtime = oldtime[0] + ":" + oldtime[1:]
 
-		newMsg = newMsg.replace(oldtime, newtime)
+		newMsg = replace(newMsg, oldtime, newtime)
 
 	# Change '4th' to 'June 4th'
 	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg, re.IGNORECASE)
@@ -343,13 +348,13 @@ def fixMsgForNatty(msg, user):
 			monthName = localtime.strftime("%B")
 
 		# Turn 'the 9th' into 'June 9th'
-		newMsg = newMsg.replace("the %s" % dayStr, "%s %s" % (monthName, dayStr))
+		newMsg = replace(newMsg, "the %s" % dayStr, "%s %s" % (monthName, dayStr))
 
 	# Take anything like 7ish and just make 7
 	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg, re.IGNORECASE)
 	if ish:
 		time = ish.group("time")
-		newMsg = newMsg.replace(time + "ish", time)
+		newMsg = replace(newMsg, time + "ish", time)
 
 	return newMsg
 
