@@ -28,7 +28,7 @@ reminder_re = re.compile(
 	+ "|do my ",
 	re.I
 )
-done_re = re.compile(r"\b(done|check off|sent|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
+done_re = re.compile(r"\b(done|check off|sent|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -42,7 +42,7 @@ stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't
 
 digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
-weather_re = re.compile(r"what(s|'s| is) the weather", re.I)
+weather_re = re.compile(r"\bweather\b", re.I)
 
 noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
