@@ -59,6 +59,7 @@ KEEPER_NUMBER = "+14792026561"
 KEEPER_NUMBER_DICT = {0: "+14792026561", 1: "+14792086270", 2: "3584573970819@s.whatsapp.net"}
 WHATSAPP_CREDENTIALS = ("3584573970819", "YtxpW7n5lMfJBZFSyANUbceCr1o=")
 WHATSAPP_SMS_URL = "http://prod.strand.duffyapp.com/smskeeper/incoming_sms"
+WHATSAPP_PRESENCE_NAME = u"\U0001F64B Keeper"
 
 SLACK_LOGGING_URL = "https://hooks.slack.com/services/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"
 USER_HISTORY_PATH = "http://prod.strand.duffyapp.com/smskeeper/history?user_id="

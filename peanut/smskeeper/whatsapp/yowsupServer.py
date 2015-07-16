@@ -11,6 +11,7 @@ from yowsup.layers.protocol_iq import YowIqProtocolLayer
 from yowsup.layers.protocol_calls import YowCallsProtocolLayer
 from yowsup.layers.protocol_chatstate import YowChatstateProtocolLayer
 from yowsup.layers.protocol_presence import YowPresenceProtocolLayer
+from yowsup.layers.protocol_profiles import YowProfilesProtocolLayer
 from yowsup.layers.network import YowNetworkLayer
 from yowsup.layers.coder import YowCoderLayer
 from yowsup.layers.axolotl import YowAxolotlLayer
@@ -25,10 +26,15 @@ from yowsup import env
 
 from django.conf import settings
 
+# uncomment for debug info
+# logging.basicConfig(level=logging.DEBUG)
+
 if __name__ == "__main__":
-	logging.basicConfig(filename='/mnt/log/whatsapp.log',
-						level=logging.DEBUG,
-						format='%(asctime)s %(levelname)s %(message)s')
+	logging.basicConfig(
+		filename='/mnt/log/whatsapp.log',
+		level=logging.DEBUG,
+		format='%(asctime)s %(levelname)s %(message)s'
+	)
 
 	layers = (
 		KeeperLayer,
@@ -41,7 +47,8 @@ if __name__ == "__main__":
 			YowIqProtocolLayer,
 			YowCallsProtocolLayer,
 			YowChatstateProtocolLayer,
-			YowPresenceProtocolLayer
+			YowPresenceProtocolLayer,
+			YowProfilesProtocolLayer
 		),
 		YowAxolotlLayer,  # we don't use basic layers because of disconnects, see https://github.com/tgalal/yowsup/issues/873
 		YowLoggerLayer,

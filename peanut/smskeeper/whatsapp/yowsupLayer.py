@@ -5,6 +5,8 @@ from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocol
 from yowsup.layers.protocol_chatstate.protocolentities import ChatstateProtocolEntity
 from yowsup.layers.protocol_chatstate.protocolentities import OutgoingChatstateProtocolEntity
 from yowsup.layers.protocol_presence.protocolentities import SubscribePresenceProtocolEntity
+from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
+from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 
 from yowsup.layers.network.layer import YowNetworkLayer
 import asyncore
@@ -84,6 +86,17 @@ class KeeperLayer(YowInterfaceLayer, asyncore.dispatcher_with_send):
 		elif ev.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECT:
 			# close socket
 			self.handle_close("Network Layer Disconnected")
+
+	# this gets called right after we successfully log in
+	@ProtocolEntityCallback("success")
+	def onSuccess(self, entity):
+		# set keeper's name
+		entity = PresenceProtocolEntity(name=settings.WHATSAPP_PRESENCE_NAME.encode('utf-8'))
+		self.toLower(entity)
+
+		# set keeper's status
+		statusEntity = SetStatusIqProtocolEntity(text=keeper_constants.WHATSAPP_STATUS.encode('utf-8'))
+		self.toLower(statusEntity)
 
 	def handle_accept(self):
 		pair = self.accept()

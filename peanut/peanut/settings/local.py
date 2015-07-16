@@ -18,3 +18,5 @@ class CELERY_CONFIG(BASE_CELERY_CONFIG):
 
 import logging
 logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+
+WHATSAPP_SMS_URL = "http://localhost:7500/smskeeper/incoming_sms"
