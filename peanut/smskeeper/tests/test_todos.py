@@ -1081,6 +1081,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
 			self.assertIn("Wake up", self.getOutput(mock))
+			self.assertNotIn("Just let", self.getOutput(mock))
 
 		"""
 		Commenting out since now we're pinging every day
