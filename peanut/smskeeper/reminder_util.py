@@ -356,6 +356,9 @@ def fixMsgForNatty(msg, user):
 		time = ish.group("time")
 		newMsg = replace(newMsg, time + "ish", time)
 
+	# Deal with "an hour"
+	newMsg = replace(newMsg, r"\ban hour\b", "1 hour")
+
 	return newMsg
 
 

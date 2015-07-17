@@ -882,3 +882,28 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind to go shopping for my baby after 6pm")
 			self.assertIn("today by 6pm", self.getOutput(mock))
 
+	# Hit bug where we didn't recognize "for an hour"
+	def test_snooze_for_an_hour(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 10am")
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("go poop", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "snooze for an hour")
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(1, len(entries))
+		entry = entries[0]
+
+		# Make sure the snoozedEntry is now an hour later
+		self.assertEqual(entry.remind_timestamp.hour, (self.MON_10AM + datetime.timedelta(hours=1)).hour)
+
+
+
+
