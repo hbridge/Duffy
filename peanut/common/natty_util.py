@@ -5,6 +5,8 @@ import urllib
 import logging
 from urllib2 import URLError
 import pytz
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 
 from common import date_util
@@ -142,6 +144,10 @@ def processQuery(query, timezone):
 
 			column = entry["column"]
 			newQuery = getNewQuery(query, usedText, column)
+
+			# They said a specific date but its in the past...so it needs to be bumped by a year
+			if "EXPLICIT_DATE" in entry["syntaxTree"] and startDate < now:
+				startDate = startDate + relativedelta(years=1)  # Must use relativedelta due to leapyears
 
 			# RELATIVE_DATE  shows up for in 2 days, or Wed
 			# EXPLICIT_DATE  shows up for July 1

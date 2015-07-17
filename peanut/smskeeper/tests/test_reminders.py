@@ -35,12 +35,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "reminders")
-			self.assertIn("poop", self.getOutput(mock))
+			self.assertIn("Poop", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "clear reminders")
 			cliMsg.msg(self.testPhoneNumber, "reminders")
-			self.assertNotIn("poop", self.getOutput(mock))
+			self.assertNotIn("Poop", self.getOutput(mock))
 
 	# This test is here to make sure the ordering of fetch vs reminders is correct
 	def test_reminders_fetch(self, dateMock):
@@ -105,7 +105,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "reminders")
 
 			# Make sure pee shows up as a seperate entry
-			self.assertIn("pee", self.getOutput(mock))
+			self.assertIn("Pee", self.getOutput(mock))
 
 	def test_reminders_defaults(self, dateMock):
 		self.setupUser(dateMock)
@@ -136,7 +136,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 
-		self.assertEqual("remind kate about her list", entry.text)
+		self.assertEqual("Remind kate about her list", entry.text)
 		self.assertEqual(18, entry.remind_timestamp.hour)
 
 	def test_reminders_tomorrow_9_am(self, dateMock):
@@ -147,7 +147,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("tomorrow", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEqual("go poop", entry.text)
+		self.assertEqual("Go poop", entry.text)
 
 		# 9 am ETC, so 13 UTC
 		self.assertEqual(13, entry.remind_timestamp.hour)
@@ -159,7 +159,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 
-		self.assertIn("poop, then poop again", entry.text)
+		self.assertIn("Poop, then poop again", entry.text)
 
 	def test_func_should_remind_now_even(self, dateMock):
 		self.setupUser(dateMock)
@@ -243,7 +243,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("by 10am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEqual("add 1.25 hrs", entry.text)
+		self.assertEqual("Add 1.25 hrs", entry.text)
 
 		# 10 am ETC, so 14 UTC
 		self.assertEqual(14, entry.remind_timestamp.hour)
@@ -265,7 +265,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("by 4pm", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEqual("email Itai about city year intro to lightsail via Nate", entry.text)
+		self.assertEqual("Email Itai about city year intro to lightsail via Nate", entry.text)
 
 		# 4 pm ETC, so 18 UTC
 		self.assertEqual(20, entry.remind_timestamp.hour)
@@ -283,7 +283,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("go poop", self.getOutput(mock))
+			self.assertIn("Go poop", self.getOutput(mock))
 
 		cliMsg.msg(self.testPhoneNumber, "snooze for 1 hour")
 
@@ -311,7 +311,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("go poop", self.getOutput(mock))
+			self.assertIn("Go poop", self.getOutput(mock))
 
 		cliMsg.msg(self.testPhoneNumber, "remind me in 1 hour")
 
@@ -339,7 +339,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("go poop", self.getOutput(mock))
+			self.assertIn("Go poop", self.getOutput(mock))
 
 		cliMsg.msg(self.testPhoneNumber, "remind me again at 3 please")
 
@@ -401,7 +401,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure we didn't create a new entry
 		self.assertEqual(1, len(entries))
 		entry = entries[0]
-		self.assertEqual("poop", entry.text)
+		self.assertEqual("Poop", entry.text)
 
 		# Look for Friday 2 pm
 		self.assertEqual(origEntry.remind_timestamp.day, entry.remind_timestamp.day)
@@ -437,9 +437,22 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the times are the same
 		self.assertEqual(origEntry.remind_timestamp.hour, newEntry.remind_timestamp.hour)
 
+	def test_day_of_month_without_specific_month(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I also need you to remind me to say happy birthday to a friend on the 3rd at 12 am")
+			self.assertIn("by 12am", self.getOutput(mock))
+
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertEqual(entry.remind_timestamp.day, 3)  # 6 EST, so 10 UTC
+
 	"""
 	TO MAKE PASS:
-
+	"""
+	"""
 	# Test cases which have two times, but the closer one (we normally default to) is incorrect
 	# Assume that the correct time always starts at the begining of the msg
 	def test_first_time_correct(self, dateMock):
@@ -467,15 +480,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(1, len(entries))
 		self.assertEqual(entries[0].remind_timestamp.hour, 22)  # 6 EST, so 10 UTC
 
-	def test_day_of_month_without_specific_month(self, dateMock):
-		self.setupUser(dateMock)
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "I also need you to remind me to say happy birthday to a friend on the 11th at 12 am")
-			self.assertIn("by 12am", self.getOutput(mock))
-
-		entry = Entry.objects.filter(label="#reminders").last()
-		self.assertEqual(entry.remind_timestamp.day, 11)  # 6 EST, so 10 UTC
 	def test_single_number(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -506,6 +510,20 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind me Cheer practice from 5:30-7:30")
 			self.assertIn("by 5:30pm", self.getOutput(mock))
+
+
+	# Hit bug where next sunday was returning tmr
+	# Issue appears to be if "one" appears before a day of the week and it has an ending word
+	# No good ideas how to fix this
+	def test_done_next_sunday(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to get my nails done next Sunday, please")
+			self.assertIn("Sun", self.getOutput(mock))
+
 	"""
 
 	# Covers the case of "100 and" which with a bad regex got turned into "1:00 and" due to the a
@@ -546,7 +564,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("at 5:20pm", self.getOutput(mock))
 
 			entry = Entry.objects.filter(label="#reminders").last()
-			self.assertEqual("buy stuff", entry.text)
+			self.assertEqual("Buy stuff", entry.text)
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -554,7 +572,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("by 9:30", self.getOutput(mock))
 
 			entry = Entry.objects.filter(label="#reminders").last()
-			self.assertEqual("call hubby", entry.text)
+			self.assertEqual("Call hubby", entry.text)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me tomorrow morning 530 Am goto Zeus appointment")
@@ -598,7 +616,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop2 in 1 minute")
 		entry = Entry.objects.filter(label="#reminders").last()
 		# Make sure we grabbed the correct reminder
-		self.assertEqual(entry.text, "go poop2")
+		self.assertEqual(entry.text, "Go poop2")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
 			self.assertIn("Btw, you can always snooze", self.getOutput(mock))
@@ -607,7 +625,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop3 in 1 minute")
 		entry = Entry.objects.filter(label="#reminders").last()
 		# Make sure we grabbed the correct reminder
-		self.assertEqual(entry.text, "go poop3")
+		self.assertEqual(entry.text, "Go poop3")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
 			self.assertNotIn("Btw, you can always snooze", self.getOutput(mock))
@@ -808,7 +826,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to poop 7ish")
 			self.assertIn("later today by 7pm", self.getOutput(mock))
 
-		self.assertEqual("poop", Entry.objects.get(label="#reminders").text)
+		self.assertEqual("Poop", Entry.objects.get(label="#reminders").text)
 
 	def test_message_warp(self, dateMock):
 		self.setupUser(dateMock)
@@ -817,7 +835,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "remind me to pay my bills tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
-		self.assertEqual("pay your bills", Entry.objects.get(label="#reminders").text)
+		self.assertEqual("Pay your bills", Entry.objects.get(label="#reminders").text)
 
 	# Make sure that msgs with 2 date info in them get marked for manual check
 	def test_manual_check(self, dateMock):
@@ -861,7 +879,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.get(label="#reminders")
 
-		self.assertEqual("poop by frisco", entry.text)
+		self.assertEqual("Poop by frisco", entry.text)
 
 	def test_today_should_be_ignored(self, dateMock):
 		self.setupUser(dateMock)
@@ -893,7 +911,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("go poop", self.getOutput(mock))
+			self.assertIn("Go poop", self.getOutput(mock))
 
 		cliMsg.msg(self.testPhoneNumber, "snooze for an hour")
 
@@ -903,6 +921,28 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		# Make sure the snoozedEntry is now an hour later
 		self.assertEqual(entry.remind_timestamp.hour, (self.MON_10AM + datetime.timedelta(hours=1)).hour)
+
+	# Hit bug where we were getting back Jan 18th of this year
+	def test_date_should_be_in_future(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me January 18 @ 2:00 pm that I have a dentist appointment")
+			self.assertIn("January 18th", self.getOutput(mock))
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.year, self.MON_10AM.year + 1)
+
+	def test_keeper_first_word_removed_if_keeper(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "keeper Remind me to get my nails done Sunday")
+		entry = Entry.objects.get(label="#reminders")
+
+		self.assertEqual("Get your nails done", entry.text)
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)

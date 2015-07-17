@@ -1,8 +1,7 @@
-import datetime
 from mock import patch
 
 from smskeeper.models import Entry
-from smskeeper import msg_util, cliMsg, keeper_constants
+from smskeeper import cliMsg
 from common import natty_util
 
 import test_base
@@ -16,7 +15,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
-		self.assertIn(u'poop\u2019s', entry.text)
+		self.assertIn(u'Poop\u2019s', entry.text)
 
 	# Set a user first the Eastern and make sure it comes back as a utc time for 3 pm Eastern
 	# Then set the user's timezone to be Pacific and make sure natty returns a time for 3pm Pactific in UTC

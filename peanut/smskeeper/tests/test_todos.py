@@ -49,7 +49,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("9 am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEquals("pick up your sox", entry.text)
+		self.assertEquals("Pick up your sox", entry.text)
 
 	def test_two_entries(self, dateMock):
 		self.setupUser(dateMock)
@@ -59,14 +59,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.mockedDate + timedelta(hours=1))  # prevent squashing
 		firstEntry = Entry.objects.filter(label="#reminders").last()
-		self.assertEquals("pick up your sox", firstEntry.text)
+		self.assertEquals("Pick up your sox", firstEntry.text)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to buy tickets next week")
 			self.assertIn("Mon", self.getOutput(mock))
 
 		secondEntry = Entry.objects.filter(label="#reminders").last()
-		self.assertEquals("buy tickets", secondEntry.text)
+		self.assertEquals("Buy tickets", secondEntry.text)
 
 		self.assertNotEqual(firstEntry.id, secondEntry.id)
 
@@ -81,7 +81,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("9 am", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEquals("buy detergent", entry.text)
+		self.assertEquals("Buy detergent", entry.text)
 
 	def test_weekend_with_time(self, dateMock):
 		self.setupUser(dateMock)
@@ -220,7 +220,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "done with email")
 
-		entry = Entry.objects.get(text="send email to alex")
+		entry = Entry.objects.get(text="Send email to alex")
 		days, hours = time_utils.daysAndHoursAgo(entry.remind_timestamp)
 		self.assertTrue(entry.hidden)
 
@@ -234,7 +234,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "snooze email for 1 week")
 
-		entry = Entry.objects.get(text="send email to alex")
+		entry = Entry.objects.get(text="Send email to alex")
 		dt = entry.remind_timestamp - date_util.now()
 		self.assertTrue(dt.days == 7, "Days != 7.  Days == %d, Today: %s Remind TS %s" % (dt.days, date_util.now(), entry.remind_timestamp))
 
@@ -272,7 +272,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done!")
 			# When we respond to a reminder just sent, we don't include the text
-			self.assertNotIn("go poop", self.getOutput(mock))
+			self.assertNotIn("Go poop", self.getOutput(mock))
 
 		# Make sure the last entry was hidden
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -333,7 +333,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Digest should kicks off
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("run", self.getOutput(mock))
+			self.assertIn("Run", self.getOutput(mock))
 
 	# Make sure we create a new entry instead of a followup
 	def test_snooze_all_after_daily_digest(self, dateMock):
@@ -347,9 +347,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("run with your dad", self.getOutput(mock))
-			self.assertIn("go poop in the yard", self.getOutput(mock))
-			self.assertNotIn("buy some stuff", self.getOutput(mock))
+			self.assertIn("Run with your dad", self.getOutput(mock))
+			self.assertIn("Go poop in the yard", self.getOutput(mock))
+			self.assertNotIn("Buy some stuff", self.getOutput(mock))
 
 		# Digest should kicks off
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -373,9 +373,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("run with your dad", self.getOutput(mock))
-			self.assertIn("go poop in the yard", self.getOutput(mock))
-			self.assertNotIn("buy some stuff", self.getOutput(mock))
+			self.assertIn("Run with your dad", self.getOutput(mock))
+			self.assertIn("Go poop in the yard", self.getOutput(mock))
+			self.assertNotIn("Buy some stuff", self.getOutput(mock))
 
 		# Digest should kicks off
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -384,7 +384,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Nice!", self.getOutput(mock))
 
 			# We don't send back individals
-			self.assertNotIn("poop", self.getOutput(mock))
+			self.assertNotIn("Poop", self.getOutput(mock))
 
 		# Make sure first and third were cleared
 		entries = Entry.objects.all()
@@ -579,7 +579,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Fri", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEqual(entry.text, "take brick to the vet")
+		self.assertEqual(entry.text, "Take brick to the vet")
 
 	def test_can_you(self, dateMock):
 		self.setupUser(dateMock)
@@ -590,7 +590,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Mon", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
-		self.assertEqual(entry.text, "get a resume")
+		self.assertEqual(entry.text, "Get a resume")
 
 	# Make sure we fuzzy match after taking out the done with.
 	# If we didn't, then this test would fail
@@ -606,8 +606,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("call charu", self.getOutput(mock))
-			self.assertIn("go poop", self.getOutput(mock))
+			self.assertIn("Call charu", self.getOutput(mock))
+			self.assertIn("Go poop", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done with charu")
@@ -1057,13 +1057,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		self.setNow(dateMock, self.TUE_9AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertNotIn("wake up", self.getOutput(mock))
+			self.assertNotIn("Wake up", self.getOutput(mock))
 
 	def test_weekly_reminder(self, dateMock):
 		self.setupUser(dateMock)
@@ -1080,7 +1080,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		"""
 		Commenting out since now we're pinging every day
@@ -1096,12 +1096,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(weeks=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(weeks=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 	def test_daily_reminder(self, dateMock):
 		self.setupUser(dateMock)
@@ -1118,19 +1118,19 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		# Should be in the digest
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		# Should be sent out at 10 am
 		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 	def test_daily_reminder_with_end(self, dateMock):
 		self.setupUser(dateMock)
@@ -1148,13 +1148,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		# Should be sent out at 10 am Tue
 		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		entry = Entry.objects.get(label="#reminders")
 		self.assertTrue(entry.hidden)
@@ -1182,7 +1182,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
-			self.assertIn("wake up", self.getOutput(mock))
+			self.assertIn("Wake up", self.getOutput(mock))
 
 		# Explicitly don't run the job on Tuesday
 		entry = Entry.objects.get(label="#reminders")
