@@ -904,6 +904,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the snoozedEntry is now an hour later
 		self.assertEqual(entry.remind_timestamp.hour, (self.MON_10AM + datetime.timedelta(hours=1)).hour)
 
+	"""
+	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
+	def test_tomorrow_afternoon(self, dateMock):
+		self.setupUser(dateMock)
 
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me tomorrow afternoon at 1:10 to take the mower to Nana's")
+			self.assertIn("tomorrow at 1:10pm", self.getOutput(mock))
+	"""
 
 

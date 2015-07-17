@@ -368,7 +368,7 @@ def getBestNattyResult(nattyResults):
 
 	now = date_util.now(pytz.utc)
 
-	nattyResults = filter(lambda x: x.utcTime >= now, nattyResults)
+	nattyResults = filter(lambda x: x.utcTime >= now - datetime.timedelta(seconds=10), nattyResults)
 
 	# Sort by the date, we want to soonest first
 	nattyResults = sorted(nattyResults, key=lambda x: x.utcTime)

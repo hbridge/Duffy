@@ -61,7 +61,7 @@ def process(user, msg, requestDict, keeperNumber):
 		# So right here we're confused on what to do since we don't think we should create a reminder
 		# If we just came from normal then we know it would have been processed for done msgs, etc...pause
 		if user.last_state and user.last_state == keeper_constants.STATE_NORMAL:
-			logger.info("User %s: I'm confused with '%s', it could be a new reminder but not sure. pausing" % (user.id, msg))
+			logger.info("User %s: I'm confused with '%s', it could be a new reminder but not sure. nattyResult: %s.  ausing" % (user.id, msg, nattyResult))
 			paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
 			if not paused:
 				doCreate = True
