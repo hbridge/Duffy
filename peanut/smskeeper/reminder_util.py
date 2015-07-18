@@ -298,14 +298,19 @@ def fixMsgForNatty(msg, user):
 
 	# Remove these words if they show up with timing info, like:
 	# Remind me today before 6 turns into today 6
-	words = ["around", "before", "after", "for", "by"]
+	words = {
+		"around": "at",
+		"before": "at",
+		"after": "at",
+		"for": "",  # For an hour
+		"by": "at"}
 
-	for word in words:
+	for word, replaceWith in words.iteritems():
 		search = re.search(r'\b(?P<phrase>%s [0-9]+)' % word, newMsg, re.IGNORECASE)
 
 		if search:
 			phrase = search.group("phrase")
-			newPhrase = replace(phrase, word, "").strip()
+			newPhrase = replace(phrase, word, replaceWith).strip()
 			newMsg = replace(newMsg, phrase, newPhrase)
 
 	# Remove o'clock

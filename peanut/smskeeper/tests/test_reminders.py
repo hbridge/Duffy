@@ -249,13 +249,14 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(14, entry.remind_timestamp.hour)
 
 	# Make sure we swap out around for "at"
-	# Don't want to use mocks for this one since we want to test the whole flow
 	def test_around(self, dateMock):
 		self.setupUser(dateMock)
 
+		self.setNow(dateMock, self.MON_9AM)
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "can you remind me next Thursday around 9am")
-			self.assertNotIn("tomorrow", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "Can You Remind Me Around 8 To Put Medicine, Pillow, Minion In Suitcase")
+			self.assertIn("by 8pm", self.getOutput(mock))
 
 	def test_single_low_number(self, dateMock):
 		self.setupUser(dateMock)
