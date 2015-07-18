@@ -28,7 +28,7 @@ reminder_re = re.compile(
 	+ "|do my ",
 	re.I
 )
-done_re = re.compile(r"\b(done|check off|sent|messaged|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
+done_re = re.compile(r"\b(done|check off|sent|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
