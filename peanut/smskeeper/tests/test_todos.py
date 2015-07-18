@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from mock import patch
 
 from smskeeper import cliMsg, async, keeper_constants
@@ -1194,6 +1195,35 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
 			self.assertEqual("", self.getOutput(mock))
+
+	def test_monthly_reminder(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me pay bills on the 16th of every month")
+
+		entry = Entry.objects.get(label="#reminders")
+
+		entry.remind_recur = keeper_constants.RECUR_MONTHLY
+		entry.save()
+
+		self.setNow(dateMock, datetime.datetime(2015, 6, 16, 13, 0, 0, tzinfo=pytz.utc))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Pay bills", self.getOutput(mock))
+
+		# Shouldn't be in the digest
+		self.setNow(dateMock, datetime.datetime(2015, 7, 15, 13, 0, 0, tzinfo=pytz.utc))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Pay bills", self.getOutput(mock))
+
+		# Should be
+		self.setNow(dateMock, datetime.datetime(2015, 7, 16, 13, 0, 0, tzinfo=pytz.utc))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Pay bills", self.getOutput(mock))
 
 	weatherData = {'html_description': u'\n<img src="http://l.yimg.com/a/i/us/we/52/26.gif"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 78 F<BR />\n<BR /><b>Forecast:</b><BR />\nTue - Scattered Thunderstorms. High: 82 Low: 75<br />\nWed - PM Thunderstorms. High: 83 Low: 66<br />\nThu - Partly Cloudy. High: 83 Low: 67<br />\nFri - Mostly Sunny. High: 82 Low: 69<br />\nSat - Partly Cloudy. High: 84 Low: 73<br />\n<br />\n<a href="http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href="http://www.weather.com" >The Weather Channel</a>)<br/>\n', 'atmosphere': {'pressure': u'29.7', 'rising': u'2', 'visibility': u'10', 'humidity': u'66'}, 'title': u'Yahoo! Weather - New York, NY', 'condition': {'date': u'Tue, 14 Jul 2015 11:49 am EDT', 'text': u'Cloudy', 'code': u'26', 'temp': u'78', 'title': u'Conditions for New York, NY at 11:49 am EDT'},
 					'forecasts': [
