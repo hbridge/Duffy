@@ -859,37 +859,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[0].hidden)
 		self.assertFalse(entries[1].hidden)
 
-	# Hit a bug where we didn't see this was a done command and got caught in the done
-	# state paused
-	def test_done_command_unknown_then_real_done(self, dateMock):
-		self.setupUser(dateMock)
-
-		self.setNow(dateMock, self.MON_9AM)
-
-		cliMsg.msg(self.testPhoneNumber, "Tell Brandon you didn't get his email tomorrow")
-		cliMsg.msg(self.testPhoneNumber, "write check for guymon heat and air wednesday")
-
-		# Process another entry
-		entry = Entry.objects.filter(label="#reminders").last()
-		async.processReminder(entry)
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Told Brandon about email")
-			self.assertEquals("", self.getOutput(mock))
-			self.assertTrue(self.getTestUser().paused)
-
-		user = self.getTestUser()
-		user.paused = False
-		user.save()
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "done with brandon email")
-			self.assertIn("Nice!", self.getOutput(mock))
-			self.assertFalse(self.getTestUser().paused)
-
-		entries = Entry.objects.filter(label="#reminders")
-		self.assertTrue(entries[0].hidden)
-
 	# Hit bug where if "done" was in a message but it was really a new entry, we barfed
 	def test_remind_override_done(self, dateMock):
 		self.setupUser(dateMock)
