@@ -64,7 +64,7 @@ def isFollowup(user, entry, msg, nattyResult):
 		cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
 		lastActionTime = getLastActionTime(user)
 		interestingWords = msg_util.getInterestingWords(cleanedText)
-		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=2)) else False
+		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=5)) else False
 
 		# Covers cases where there the cleanedText is "in" or "around"
 		if len(cleanedText) <= 2:
