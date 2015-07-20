@@ -177,7 +177,7 @@ def dataForPostalCode(postalCode):
 
 	if len(zipDataResults) == 0:
 		logger.debug("Couldn't find db entry for %s" % postalCode)
-		return None
+		return None, None
 	else:
 		zipDataResult = zipDataResults[0]
 		return (zipResultToTimeZone(zipDataResult), zipDataResult.wxcode)
