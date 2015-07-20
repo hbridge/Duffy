@@ -7,74 +7,13 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo, suspended
-from smskeeper import msg_util, actions, niceties, user_util
+from smskeeper import msg_util, user_util
 
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
+from smskeeper.engine import Engine
 
 logger = logging.getLogger(__name__)
-
-
-# Process basic and important things like STOP, "hey there", "thanks", etc
-# Need hacks for if those commands might be used later on though
-def processBasicMessages(user, msg, requestDict, keeperNumber):
-	# Always look for a stop command first and deal with that
-	if msg_util.isStopCommand(msg):
-		stopped.dealWithStop(user, msg, keeperNumber)
-		logger.info("User %s: I think '%s' is a stop command, state is now %s" % (user.id, msg, user.state))
-		return True, keeper_constants.CLASS_STOP
-	elif niceties.getNicety(msg):
-		# Hack(Derek): Make if its a nicety that also could be considered done...let that through
-		if msg_util.isDoneCommand(msg):
-			logger.info("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
-			return False, None
-
-		if msg_util.isRemindCommand(msg):
-			logger.info("User %s: I think '%s' is a nicety but its also a remind command, booting out" % (user.id, msg))
-			return False, None
-		nicety = niceties.getNicety(msg)
-		logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
-		actions.nicety(user, nicety, requestDict, keeperNumber)
-		classification = keeper_constants.CLASS_NICETY
-		if nicety.responses is None:
-			classification = keeper_constants.CLASS_SILENT_NICETY
-		return True, classification
-	elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
-		logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
-		actions.help(user, msg, keeperNumber)
-		return True, keeper_constants.CLASS_HELP
-	elif msg_util.isSetTipFrequencyCommand(msg):
-		logger.info("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
-		actions.setTipFrequency(user, msg, keeperNumber)
-		return True, keeper_constants.CLASS_CHANGE_SETTING
-	elif msg_util.nameInSetName(msg) and user.completed_tutorial:
-		logger.info("User %s: I think '%s' is a set name command" % (user.id, msg))
-		actions.setName(user, msg, keeperNumber)
-		return True, keeper_constants.CLASS_CHANGE_SETTING
-	elif msg_util.isSetZipcodeCommand(msg) and user.completed_tutorial:
-		logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
-		actions.setPostalCode(user, msg, keeperNumber)
-		return True, keeper_constants.CLASS_CHANGE_SETTING
-	elif msg_util.isFetchWeatherCommand(msg):
-		logger.info("User %s: I think '%s' is a fetch weather command" % (user.id, msg))
-		actions.fetchWeather(user, msg, keeperNumber)
-		return True, keeper_constants.CLASS_FETCH_WEATHER
-	elif msg_util.isQuestion(msg) and user.completed_tutorial and not msg_util.isDigestCommand(msg):
-		# HACKY: Doing digest check here, probably should be in a better spot
-		logger.info("User %s: I think '%s' is a question, pausing" % (user.id, msg))
-		actions.unknown(user, msg, keeperNumber)
-		return True, None
-	# If this starts to get too agressive, then move into reminder code where we see if there's
-	# timing information
-	elif msg_util.startsWithNo(msg):
-		# If the user does "don't" or "cancel that reminder" then pause if its daytime.
-		# otherwise, let it go through for now
-		logger.info("User %s: I think '%s' starts with a frustration word, pausing" % (user.id, msg))
-		paused = actions.unknown(user, msg, keeperNumber, sendMsg=False)
-		if paused:
-			return True, None
-
-	return False, None
 
 
 def getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber):
@@ -119,10 +58,12 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
 
+	classification = None
 	if not user.paused:
 		# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
 		if not isNewUser:
-			processed, classification = processBasicMessages(user, msg, requestDict, keeperNumber)
+			keeperEngine = Engine()
+			processed, classification = keeperEngine.process(user, msg, requestDict, keeperNumber)
 		if processed:
 			messageObject.auto_classification = classification
 			messageObject.save()
@@ -151,7 +92,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	analytics.logUserEvent(
 		user,
 		"Incoming",
-		{"Is Stop": msg_util.isStopCommand(msg)}
+		{"Is Stop": classification != keeper_constants.CLASS_STOP}
 	)
 
 

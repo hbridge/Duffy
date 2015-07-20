@@ -12,6 +12,8 @@ import emoji
 from models import Entry, Message
 from smskeeper import keeper_constants
 from models import ZipData
+from smskeeper.chunk import Chunk
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +39,6 @@ handle_re = re.compile('@[a-zA-Z0-9]+\Z')
 # We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
-
-stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
 
 digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
@@ -229,13 +229,12 @@ def isRemindCommand(msg):
 # This is done so we can run our "simplified msg" algo on each msg.  This might
 # get slow going forward though if we get lots of classifications
 def isMsgClassified(msg, classification):
-	simpleMsg = simplifiedMsg(msg)
+	msgChunk = Chunk(msg)
 
-	pastMsgs = Message.getPastMsgsForClassification(classification)
-	for pastMsg in pastMsgs:
-		simplePastMsg = simplifiedMsg(pastMsg)
-
-		if simpleMsg == simplePastMsg:
+	pastMessages = Message.getClassifiedAs(classification)
+	for pastMessage in pastMessages:
+		pastChunk = Chunk(pastMessage.getBody())
+		if msgChunk.normalizedText() == pastChunk.normalizedText():
 			return True
 
 	return False
@@ -250,17 +249,6 @@ def isDoneCommand(msg):
 		return True
 
 	return isMsgClassified(simpleMsg, keeper_constants.CLASS_COMPLETE_TODO_ALL)
-
-
-def isStopCommand(msg):
-	simpleMsg = simplifiedMsg(msg)
-
-	# Note: Need a re match for stop
-	found = stop_re.match(simpleMsg) is not None
-	if found:
-		return True
-
-	return isMsgClassified(simpleMsg, keeper_constants.CLASS_STOP)
 
 
 def isDigestCommand(msg):
