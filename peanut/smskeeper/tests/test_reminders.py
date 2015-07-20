@@ -125,7 +125,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10PM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "#remind ahchuu today")
-			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("today by 11pm", self.getOutput(mock))
 
 	def test_reminders_middle_of_sentence(self, dateMock):
 		self.setupUser(dateMock)

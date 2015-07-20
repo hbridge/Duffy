@@ -116,7 +116,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "bowling later today")
 			# Should be 9 am next day, so in 11 hours
-			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("today by 11pm", self.getOutput(mock))
 
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_hides(self, dateMock):
@@ -1258,6 +1258,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "what's the weather tomorrow?")
+			self.assertIn("Wednesday's forecast: PM Thunderstorms", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "weather tomorrow afternoon")
 			self.assertIn("Wednesday's forecast: PM Thunderstorms", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:

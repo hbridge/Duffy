@@ -216,9 +216,7 @@ def getDefaultTime(user, isToday=False):
 		elif userNow.hour >= 14 and userNow.hour < 17:
 			replaceTime = userNow.replace(hour=21, minute=0, second=0)
 		else:
-			# If after 5 pm, remind 9 am next day
-			replaceTime = userNow + datetime.timedelta(days=1)
-			replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
+			replaceTime = userNow.replace(hour=23, minute=0, second=0)
 	else:
 		# Remind 9 am next day
 		replaceTime = userNow + datetime.timedelta(days=1)
@@ -274,7 +272,7 @@ def dealWithDefaultTime(user, nattyResult):
 		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
 
 		# If the user says 'today', then this should match up.
-		if tzAwareDate.day == tzAwareNow.day and "today" in nattyResult.textUsed:
+		if tzAwareDate.day == tzAwareNow.day and "today" in nattyResult.textUsed.lower():
 			nattyResult.utcTime = getDefaultTime(user, isToday=True)
 
 			# We set this to say we had a date so we swap in the time correctly if its a followup

@@ -71,14 +71,14 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 	if data:
 		if "forecasts" in data:
 			now = date_util.now(user.getTimezone())
-			txAwareDate = utcDate.astimezone(user.getTimezone())
+			tzAwareDate = utcDate.astimezone(user.getTimezone())
 
-			if txAwareDate.day == now.day:
+			if tzAwareDate.day == now.day:
 				dayTerm = "Today"
 				dayIndex = 0
 			else:
-				dayTerm = txAwareDate.strftime("%A")
-				dayDiff = txAwareDate - now
+				dayTerm = tzAwareDate.strftime("%A")
+				dayDiff = tzAwareDate.date() - now.date()
 				dayIndex = dayDiff.days
 
 			if dayIndex >= len(data["forecasts"]):
