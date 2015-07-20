@@ -131,7 +131,7 @@ def process(user, msg, requestDict, keeperNumber):
 	try:
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")
-		if user.product_id == keeper_constants.TODO_PRODUCT_ID:
+		if user.product_id >= keeper_constants.TODO_PRODUCT_ID:
 			return dealWithTodoProductMsg(user, msg, requestDict, keeperNumber)
 
 		# Below here is legacy stuff, lists, pictures
