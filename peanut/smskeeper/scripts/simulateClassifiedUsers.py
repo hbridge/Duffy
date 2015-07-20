@@ -347,8 +347,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		localMockedDate = self.mockedDate.astimezone(self.user.getTimezone())
 		nextDigestDate = copy.copy(localMockedDate)
 		nextDigestDate = nextDigestDate.replace(
-			hour=keeper_constants.TODO_DIGEST_HOUR,
-			minute=keeper_constants.TODO_DIGEST_MINUTE,
+			hour=self.user.getDigestHour(),
+			minute=self.user.getDigestMinute(),
 			second=0
 		)
 		if nextDigestDate < localMockedDate:  # if the next digest date is in the past, it should be tomorrow

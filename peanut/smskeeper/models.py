@@ -55,6 +55,9 @@ class User(models.Model):
 	sent_tips = models.TextField(null=True, db_index=False, blank=True)
 	disable_tips = models.BooleanField(default=False)
 
+	digest_hour = models.IntegerField(default=9)
+	digest_minute = models.IntegerField(default=0)
+
 	tip_frequency_days = models.IntegerField(default=keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
 	last_tip_sent = models.DateTimeField(null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
@@ -242,13 +245,19 @@ class User(models.Model):
 
 		# By default only send if its 9 am
 		# Later on might make this per-user specific
-		if localTime.hour == keeper_constants.TODO_DIGEST_HOUR:
+		if localTime.hour == self.getDigestHour():
 			if minuteOverride:
 				if localTime.minute == minuteOverride:
 					return True
-			elif localTime.minute == keeper_constants.TODO_DIGEST_MINUTE:
+			elif localTime.minute == self.getDigestMinute():
 				return True
 		return False
+
+	def getDigestHour(self):
+		return self.digest_hour
+
+	def getDigestMinute(self):
+		return self.digest_minute
 
 	def getLastEntries(self):
 		if self.getStateData(keeper_constants.LAST_ENTRIES_IDS_KEY):

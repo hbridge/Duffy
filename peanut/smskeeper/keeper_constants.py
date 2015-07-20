@@ -173,11 +173,6 @@ REMINDER_PRODUCT_ID = 0
 TODO_PRODUCT_ID = 1
 WHATSAPP_TODO_PRODUCT_ID = 2
 
-# This is local time, so 9am
-TODO_DIGEST_HOUR = 9
-TODO_DIGEST_MINUTE = 0
-
-
 def isRealKeeperNumber(keeperNumber):
 	if keeperNumber is None:
 		return False
