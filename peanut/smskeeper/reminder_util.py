@@ -17,7 +17,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 def getLastActionTime(user):
 	if user.getStateData(keeper_constants.LAST_ACTION_KEY):
 		return datetime.datetime.utcfromtimestamp(user.getStateData(keeper_constants.LAST_ACTION_KEY)).replace(tzinfo=pytz.utc)
@@ -300,11 +299,12 @@ def fixMsgForNatty(msg, user):
 		"around": "at",
 		"before": "at",
 		"after": "at",
+		"by": "at",
 		"for": "",  # For an hour
-		"by": "at"}
+	}
 
 	for word, replaceWith in words.iteritems():
-		search = re.search(r'\b(?P<phrase>%s [0-9]+)' % word, newMsg, re.IGNORECASE)
+		search = re.search(r'\b(?P<phrase>%s ?[0-9]+)' % word, newMsg, re.IGNORECASE)
 
 		if search:
 			phrase = search.group("phrase")
@@ -315,13 +315,20 @@ def fixMsgForNatty(msg, user):
 	newMsg = replace(newMsg, "o'clock", "")
 	newMsg = replace(newMsg, "oclock", "")
 
+	# This might cause issues if there's an email address or other things using @
+	# Need trailing space incase they do @230
+	newMsg = replace(newMsg, "@", "at ")
+
+	# Make sure there's only 1 space between things, because a few regexes require that
+	newMsg = replace(newMsg, "  ", " ")
+
 	# Fix "again at 3" situation where natty doesn't like that...wtf
 	againAt = re.search(r'.*again at ([0-9])', newMsg, re.IGNORECASE)
 	if againAt:
 		newMsg = replace(newMsg, "again at", "at")
 
 	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg, re.IGNORECASE)
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) (p|a|pm|am)\b', newMsg, re.IGNORECASE)
 	if threeDigitsWithAP:
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
