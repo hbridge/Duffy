@@ -19,7 +19,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("what's your name?", self.getOutput(mock))
 
 		user = User.objects.get(phone_number=self.testPhoneNumber)
-		self.assertEqual(keeper_constants.REMINDER_PRODUCT_ID, user.product_id)
+		self.assertEqual(keeper_constants.TODO_PRODUCT_ID, user.product_id)
 
 	def test_first_connect_product1(self):
 		with patch('smskeeper.sms_util.recordOutput') as mock:

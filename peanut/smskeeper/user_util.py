@@ -22,9 +22,7 @@ logger = logging.getLogger(__name__)
 
 def createUser(phoneNumber, signupDataJson, keeperNumber, productId=None):
 	if keeperNumber and productId is None:
-		for pid, num in settings.KEEPER_NUMBER_DICT.iteritems():
-			if num == keeperNumber:
-				productId = pid
+		productId = keeper_constants.TODO_PRODUCT_ID
 
 		if whatsapp_util.isWhatsappNumber(keeperNumber):
 			productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
