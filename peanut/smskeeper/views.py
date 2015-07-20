@@ -436,20 +436,13 @@ def signup_from_website(request):
 					user_util.activate(target_user, "", None, target_user.getKeeperNumber())
 
 			except User.DoesNotExist:
-				if 'reminders1' in exp:
-					productId = 0
-				else:
-					productId = 1
+				productId = 1
+				tutorial = None
 
 				target_user = user_util.createUser(phoneNum, json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}), None, productId)
+				user_util.activate(target_user, "", tutorial, target_user.getKeeperNumber())
 
 				logger.debug("User %s: Just created user with productId %s and keeperNumber %s" % (target_user.id, target_user.product_id, target_user.getKeeperNumber()))
-
-				if 'list-webapp1' in exp:
-					tutorial = keeper_constants.STATE_TUTORIAL_LIST
-				else:
-					tutorial = None
-				user_util.activate(target_user, "", tutorial, target_user.getKeeperNumber())
 
 				"""
 				Comment out code to try always activating users

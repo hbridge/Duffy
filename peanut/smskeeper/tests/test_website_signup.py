@@ -12,6 +12,7 @@ import json
 
 class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 
+	# This now should be product id 1
 	def test_signup_product_id_0(self):
 		request = self.createRequest('+16505759014', exp='reminders1')
 		response = views.signup_from_website(request) #httpresponse
@@ -21,8 +22,8 @@ class SMSKeeperWebsiteSignupCase(test_base.SMSKeeperBaseCase):
 		users = User.objects.all()
 		self.assertEquals(1, len(users))
 
-		self.assertEquals(users[0].product_id, keeper_constants.REMINDER_PRODUCT_ID)
-		self.assertEquals(users[0].state, keeper_constants.STATE_TUTORIAL_REMIND)
+		self.assertEquals(users[0].product_id, keeper_constants.TODO_PRODUCT_ID)
+		self.assertEquals(users[0].state, keeper_constants.STATE_TUTORIAL_TODO)
 
 
 	def test_signup_product_id_1(self):
