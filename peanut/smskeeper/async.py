@@ -75,6 +75,9 @@ def updateEntryAfterProcessing(entry):
 	elif entry.remind_recur == keeper_constants.RECUR_MONTHLY:
 		entry.remind_to_be_sent = True
 		entry.remind_timestamp = entry.remind_timestamp + relativedelta(months=1)
+	elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_DAYS:
+		entry.remind_to_be_sent = True
+		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(days=2)
 
 	# If we're past the recurrence timestamp, stop the reminder
 	if entry.remind_recur_end and entry.remind_timestamp > entry.remind_recur_end:
