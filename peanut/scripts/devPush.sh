@@ -16,6 +16,8 @@ sudo stop duffy-celery
 sudo start duffy-celery
 sudo stop duffy-celery-beat
 sudo start duffy-celery-beat
+sudo stop duffy-whatsapp
+sudo start duffy-whatsapp
 
 #source /home/ubuntu/env/bin/activate; python /home/ubuntu/dev/Duffy/peanut/tests/black_box_api_tests.py dev.duffyapp.com 653
 
