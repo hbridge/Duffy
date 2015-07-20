@@ -67,3 +67,38 @@ print len(reminderMsgs)
 
 for msg in reminderMsgs:
     print json.loads(msg.orig_text)[0]
+
+
+# query to get a blacklist of words that are follow "Remind" for shared reminders
+
+from smskeeper.models import Message
+import json, operator
+
+reminderMsgs = Message.objects.filter(msg_json__icontains='remind', incoming=True).exclude(msg_json__icontains='#').order_by('-added')
+
+print len(reminderMsgs)
+
+wordList = dict()
+
+for msg in reminderMsgs:
+    body = json.loads(msg.msg_json)['Body']
+    index = body.lower().find('remind ')
+    if index >= 0:
+        splitSpring = body[index:].split()
+        if len(splitSpring) > 1:
+            #print str(msg.id) + " " + splitSpring[0] + ": " + splitSpring[1]
+            if splitSpring[1] in wordList:
+                wordList[splitSpring[1]] += 1
+            else:
+                wordList[splitSpring[1]] = 1
+    #else:
+    #    print str(index) + " " + body
+
+
+sortedList = sorted(wordList.items(), key=operator.itemgetter(1), reverse=True)
+
+for entry, count in sortedList:
+    print entry + " " + str(count)
+
+
+
