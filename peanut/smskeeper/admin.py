@@ -4,6 +4,7 @@ import datetime
 
 from django.contrib import admin
 from django.db.models import Q
+from django.utils import safestring
 
 from smskeeper.models import User, Entry
 from smskeeper import keeper_constants
@@ -115,11 +116,22 @@ mark_as_approved.short_description = "Mark as approved"
 
 @admin.register(ToCheck)
 class ToCheck(ReminderAdmin):
+	# regular stuff
+	class Media:
+		js = (
+			'//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',  # jquery
+			'smskeeper/admin.js',
+		)
+
+	def approve_button(self, obj):
+		# This uses javascript from admin.js
+		return safestring.mark_safe('<input type="button" onclick="approveEntry(\'%s\');" value="Approve"/>' % (obj.id))
+	approve_button.short_description = 'Approve'
+	approve_button.allow_tags = True
 
 	actions = [mark_as_approved, mark_as_hidden]
 
-	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'reminder_sent', 'updated')
-
+	list_display = ('id', 'approve_button', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'reminder_sent', 'updated')
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)

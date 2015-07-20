@@ -16,8 +16,11 @@ class EntrySerializer(serializers.ModelSerializer):
 			'remind_last_notified',
 			'hidden',
 			'added',
-			'updated'
+			'updated',
+			'manually_check',
+			'manually_approved_timestamp'
 		)
+
 
 class MessageSerializer(serializers.ModelSerializer):
 	class Meta:
