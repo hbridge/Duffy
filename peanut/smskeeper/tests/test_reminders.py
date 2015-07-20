@@ -945,6 +945,21 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEqual("Get your nails done", entry.text)
 
+	# Hit a bug where a followup was found to be "invalid" for some reason
+	# Also time correction wasn't working if today wasn't in the phrase
+	def test_followup_same_day(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Dermatologist appointment at 7:45pm Monday")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Monday the 1st")  # This should be today
+			self.assertIn("later today at 7:45pm", self.getOutput(mock))
+
+
+
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
 	def test_tomorrow_afternoon(self, dateMock):

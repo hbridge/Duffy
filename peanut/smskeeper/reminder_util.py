@@ -274,7 +274,7 @@ def dealWithDefaultTime(user, nattyResult):
 		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
 
 		# If the user says 'today', then this should match up.
-		if tzAwareDate.day == tzAwareNow.day:
+		if tzAwareDate.day == tzAwareNow.day and "today" in nattyResult.textUsed:
 			nattyResult.utcTime = getDefaultTime(user, isToday=True)
 
 			# We set this to say we had a date so we swap in the time correctly if its a followup
@@ -346,7 +346,7 @@ def fixMsgForNatty(msg, user):
 		dayStr = dayOfMonth.group("time")
 		number = int(filter(str.isdigit, str(dayStr)))
 
-		if number <= localtime.day:
+		if number < localtime.day:
 			# They said 1st while it was June 2nd, so return July 1st
 			monthName = (localtime + relativedelta.relativedelta(months=1)).strftime("%B")
 		else:
