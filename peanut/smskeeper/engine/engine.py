@@ -6,10 +6,12 @@ from smskeeper import keeper_constants
 from smskeeper import actions
 from smskeeper.chunk import Chunk
 from smskeeper.engine.stop import StopAction
+from smskeeper.engine.fetch_weather import FetchWeatherAction
+from smskeeper.engine.question import QuestionAction
 
 logger = logging.getLogger(__name__)
 
-ENGINE_ACTIONS = [StopAction()]
+ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction()]
 
 
 class Engine:
@@ -29,6 +31,7 @@ class Engine:
 				bestScore = actionScore
 			elif actionScore == bestScore:
 				bestActions.append(ENGINE_ACTIONS[i])
+			logger.debug("User %s: Action %s got score %s" % (user.id, ENGINE_ACTIONS[i].ACTION_CLASS, actionScore))
 
 		if len(bestActions) > 0 and bestScore >= 0.5:
 			if (bestActions > 1):
@@ -36,13 +39,15 @@ class Engine:
 			else:
 				action = bestActions[0]
 
+			logger.debug("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
+
 			action.execute(chunk, user)
 			return True, action.ACTION_CLASS
 		else:
 			return self.processBasicMessages(user, msg, requestDict, keeperNumber)
 
 	def tieBreakActions(self, actions):
-		actionOrder = [StopAction]
+		actionOrder = [StopAction, FetchWeatherAction, QuestionAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:
@@ -87,15 +92,6 @@ class Engine:
 			logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
 			actions.setPostalCode(user, msg, keeperNumber)
 			return True, keeper_constants.CLASS_CHANGE_SETTING
-		elif msg_util.isFetchWeatherCommand(msg):
-			logger.info("User %s: I think '%s' is a fetch weather command" % (user.id, msg))
-			actions.fetchWeather(user, msg, keeperNumber)
-			return True, keeper_constants.CLASS_FETCH_WEATHER
-		elif msg_util.isQuestion(msg) and user.completed_tutorial and not msg_util.isDigestCommand(msg):
-			# HACKY: Doing digest check here, probably should be in a better spot
-			logger.info("User %s: I think '%s' is a question, pausing" % (user.id, msg))
-			actions.unknown(user, msg, keeperNumber)
-			return True, None
 		# If this starts to get too agressive, then move into reminder code where we see if there's
 		# timing information
 		elif msg_util.startsWithNo(msg):

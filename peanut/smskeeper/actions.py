@@ -488,21 +488,6 @@ def snooze(user, msg, keeperNumber):
 	return True
 
 
-def fetchWeather(user, msg, keeperNumber):
-	nattyResult = reminder_util.getNattyResult(user, msg)
-
-	if nattyResult.hadDate:
-		date = nattyResult.utcTime
-	else:
-		date = date_util.now(pytz.utc)
-
-	weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.wxcode, date, dict())
-	if weatherPhrase:
-		sms_util.sendMsg(user, weatherPhrase, None, keeperNumber)
-	else:
-		sms_util.sendMsg(user, "I'm sorry, I don't know the weather right now", None, keeperNumber)
-
-
 def unknown(user, msg, keeperNumber, sendMsg=True):
 	now = date_util.now(pytz.timezone("US/Eastern"))
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM and not settings.DEBUG:

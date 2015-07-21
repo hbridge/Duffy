@@ -12,13 +12,17 @@ class StopAction(Action):
 	def getScore(self, chunk, user):
 		stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
 		score = 0.0
-		if stop_re.match(chunk.normalizedText()) is not None or StopAction.HasHistoricalMatchForChunk(chunk):
+
+		if stop_re.match(chunk.normalizedText()) is not None:
+			score = .9
+
+		if StopAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
 		return score
 
 	def execute(self, chunk, user):
-		sms_util.sendMsg(user, u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'", None, user.getKeeperNumber())
+		sms_util.sendMsg(user, u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'")
 
 		if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
 			time.sleep(1)

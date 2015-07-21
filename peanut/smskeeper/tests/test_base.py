@@ -45,7 +45,10 @@ class SMSKeeperBaseCase(TestCase):
 		VerbData.objects.create(past="got")
 
 	# TODO(Derek): Eventually activated and tutorialComplete should go away
-	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL, productId=None):
+	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL, productId=None, dateMock=None):
+		if dateMock:
+			self.setNow(dateMock, self.TUE_8AM)
+
 		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
 		self.user.completed_tutorial = tutorialComplete
 		if activated:
@@ -55,6 +58,7 @@ class SMSKeeperBaseCase(TestCase):
 			self.user.product_id = productId
 		self.user.state = state
 		self.user.save()
+
 		return self.user
 
 	def getTestUser(self):
@@ -97,6 +101,7 @@ class SMSKeeperBaseCase(TestCase):
 	TUE_5AM = datetime.datetime(2015, 6, 2, 9, 0, 0, tzinfo=pytz.utc)
 	TUE_8AM = datetime.datetime(2015, 6, 2, 12, 0, 0, tzinfo=pytz.utc)
 	TUE_9AM = datetime.datetime(2015, 6, 2, 13, 0, 0, tzinfo=pytz.utc)
+	TUE_10AM = datetime.datetime(2015, 6, 2, 14, 0, 0, tzinfo=pytz.utc)
 	TUE_1AM = datetime.datetime(2015, 6, 2, 5, 0, 0, tzinfo=pytz.utc)
 	TUE_2PM = datetime.datetime(2015, 6, 2, 18, 0, 0, tzinfo=pytz.utc)
 	TUE_3PM = datetime.datetime(2015, 6, 2, 19, 0, 0, tzinfo=pytz.utc)

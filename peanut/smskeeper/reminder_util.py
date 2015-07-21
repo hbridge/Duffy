@@ -1,8 +1,6 @@
 import datetime
 import json
-import re
 
-from dateutil import relativedelta
 from peanut.settings import constants
 import pytz
 from smskeeper import analytics
@@ -204,25 +202,6 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 	)
 
 
-def getDefaultTime(user, isToday=False):
-	userNow = date_util.now(user.getTimezone())
-
-	if isToday:
-		# If before 2 pm, remind at 6 pm
-		if userNow.hour < 14:
-			replaceTime = userNow.replace(hour=18, minute=0, second=0)
-		# If between 2 pm and 5 pm, remind at 9 pm
-		elif userNow.hour >= 14 and userNow.hour < 17:
-			replaceTime = userNow.replace(hour=21, minute=0, second=0)
-		else:
-			replaceTime = userNow.replace(hour=23, minute=0, second=0)
-	else:
-		# Remind 9 am next day
-		replaceTime = userNow + datetime.timedelta(days=1)
-		replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
-	return replaceTime
-
-
 #  Send off a response like "I'll remind you Sunday at 9am" or "I'll remind mom Sunday at 9am"
 def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
@@ -255,6 +234,25 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 	sms_util.sendMsg(user, toSend, None, keeperNumber)
 
 
+def getDefaultTime(user, isToday=False):
+	userNow = date_util.now(user.getTimezone())
+
+	if isToday:
+		# If before 2 pm, remind at 6 pm
+		if userNow.hour < 14:
+			replaceTime = userNow.replace(hour=18, minute=0, second=0)
+		# If between 2 pm and 5 pm, remind at 9 pm
+		elif userNow.hour >= 14 and userNow.hour < 17:
+			replaceTime = userNow.replace(hour=21, minute=0, second=0)
+		else:
+			replaceTime = userNow.replace(hour=23, minute=0, second=0)
+	else:
+		# Remind 9 am next day
+		replaceTime = userNow + datetime.timedelta(days=1)
+		replaceTime = replaceTime.replace(hour=9, minute=0, second=0)
+	return replaceTime
+
+
 # If we got a natty result with no time, then we need to pick one.
 # If there was no date, pick the default time (could be 9am tmr or later today)
 # If there a date, then see if its today.  If so, pick best default time for today.
@@ -283,132 +281,16 @@ def dealWithDefaultTime(user, nattyResult):
 	return nattyResult
 
 
-def replace(msg, toRemove, toPutIn):
-	swap = re.compile(toRemove, re.IGNORECASE)
-	return swap.sub(toPutIn, msg)
-
-
-# Remove and replace troublesome strings for Natty
-# This is meant to just be used to change up the string for processing, not used later for
-def fixMsgForNatty(msg, user):
-	newMsg = msg
-
-	# Remove these words if they show up with timing info, like:
-	# Remind me today before 6 turns into today 6
-	words = {
-		"around": "at",
-		"before": "at",
-		"after": "at",
-		"by": "at",
-		"for": "",  # For an hour
-	}
-
-	for word, replaceWith in words.iteritems():
-		search = re.search(r'\b(?P<phrase>%s ?[0-9]+)' % word, newMsg, re.IGNORECASE)
-
-		if search:
-			phrase = search.group("phrase")
-			newPhrase = replace(phrase, word, replaceWith).strip()
-			newMsg = replace(newMsg, phrase, newPhrase)
-
-	# Remove o'clock
-	newMsg = replace(newMsg, "o'clock", "")
-	newMsg = replace(newMsg, "oclock", "")
-
-	# This might cause issues if there's an email address or other things using @
-	# Need trailing space incase they do @230
-	newMsg = replace(newMsg, "@", "at ")
-
-	# Make sure there's only 1 space between things, because a few regexes require that
-	newMsg = replace(newMsg, "  ", " ")
-
-	# Fix "again at 3" situation where natty doesn't like that...wtf
-	againAt = re.search(r'.*again at ([0-9])', newMsg, re.IGNORECASE)
-	if againAt:
-		newMsg = replace(newMsg, "again at", "at")
-
-	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) (p|a|pm|am)\b', newMsg, re.IGNORECASE)
-	if threeDigitsWithAP:
-		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
-		newtime = oldtime[0] + ":" + oldtime[1:]
-
-		newMsg = replace(newMsg, oldtime, newtime)
-
-	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
-	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg, re.IGNORECASE)
-	if threeDigitsWithAT:
-		oldtime = threeDigitsWithAT.group("time")
-		newtime = oldtime[0] + ":" + oldtime[1:]
-
-		newMsg = replace(newMsg, oldtime, newtime)
-
-	# Change '4th' to 'June 4th'
-	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg, re.IGNORECASE)
-	if dayOfMonth:
-		localtime = date_util.now(user.getTimezone())
-
-		dayStr = dayOfMonth.group("time")
-		number = int(filter(str.isdigit, str(dayStr)))
-
-		if number < localtime.day:
-			# They said 1st while it was June 2nd, so return July 1st
-			monthName = (localtime + relativedelta.relativedelta(months=1)).strftime("%B")
-		else:
-			monthName = localtime.strftime("%B")
-
-		# Turn 'the 9th' into 'June 9th'
-		newMsg = replace(newMsg, "the %s" % dayStr, "%s %s" % (monthName, dayStr))
-
-	# Take anything like 7ish and just make 7
-	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg, re.IGNORECASE)
-	if ish:
-		time = ish.group("time")
-		newMsg = replace(newMsg, time + "ish", time)
-
-	# Deal with "an hour"
-	newMsg = replace(newMsg, r"\ban hour\b", "1 hour")
-
-	return newMsg
-
-
-def getBestNattyResult(nattyResults):
-	if len(nattyResults) == 0:
-		return None
-
-	now = date_util.now(pytz.utc)
-
-	nattyResults = filter(lambda x: x.utcTime >= now - datetime.timedelta(seconds=10), nattyResults)
-
-	# Sort by the date, we want to soonest first
-	nattyResults = sorted(nattyResults, key=lambda x: x.utcTime)
-
-	# Sort by if there was a time in the date or not
-	nattyResults = sorted(nattyResults, key=lambda x: 0 if x.hadTime else 1)
-
-	# prefer anything that has "at" in the text
-	# Make sure it's "at " (with a space) since Saturday will match
-	nattyResults = sorted(nattyResults, key=lambda x: "at " in x.textUsed, reverse=True)
-
-	# Filter out stuff that was only using term "now"
-	nattyResults = filter(lambda x: x.textUsed.lower() != "now", nattyResults)
-
-	if len(nattyResults) == 0:
-		return None
-
-	return nattyResults[0]
-
-
 def getNattyResult(user, msg):
 	msgCopy = msg
 
 	# Deal with legacy stuff
+	# Doesn't really belong here
 	if '#remind' in msgCopy:
 		msgCopy = msgCopy.replace("#reminder", "remind me")
 		msgCopy = msgCopy.replace("#remind", "remind me")
 
-	nattyMsg = fixMsgForNatty(msgCopy, user)
-	nattyResult = getBestNattyResult(natty_util.getNattyInfo(nattyMsg, user.getTimezone()))
+	nattyResult = natty_util.getNattyResult(msgCopy, user)
 
 	if not nattyResult:
 		nattyResult = natty_util.NattyResult(None, msgCopy, None, False, False)
@@ -418,6 +300,7 @@ def getNattyResult(user, msg):
 		nattyResult = dealWithDefaultTime(user, nattyResult)
 
 	return nattyResult
+
 
 
 """

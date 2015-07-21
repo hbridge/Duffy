@@ -213,6 +213,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		user.last_feedback_prompt = date_util.now(pytz.utc)
 		user.save()
 		logger.info("Asked to talk to user: %s" % (user.id))
+
 		return "%s %s" % (base, keeper_constants.FEEDBACK_PHRASE)
 	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
 		user.last_share_upsell = date_util.now(pytz.utc)

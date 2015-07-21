@@ -73,9 +73,12 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 			user.save()
 
 
-def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
+def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
+
+	if keeperNumber is None:
+		keeperNumber = user.getKeeperNumber()
 
 	msg = msg_util.renderMsg(msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
@@ -85,9 +88,12 @@ def sendMsg(user, msg, mediaUrl, keeperNumber, eta=None, manual=False):
 		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual)
 
 
-def sendMsgs(user, msgList, keeperNumber, sendMessageDividers=True):
+def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
+
+	if keeperNumber is None:
+		keeperNumber = user.getKeeperNumber()
 
 	seconds_delay = 0
 	for i, msgTxt in enumerate(msgList):
