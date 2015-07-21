@@ -19,6 +19,7 @@ module.exports = React.createClass({
 	render: function() {
 		console.log(USER.timezone)
 
+		localTime = null;
 		if (USER.timezone) {
 			localmoment = moment(this.state.currentDate).tz(USER.timezone);
 			localTime = localmoment.format('dddd h:mm:ss a');
