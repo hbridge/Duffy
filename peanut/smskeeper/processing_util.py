@@ -92,7 +92,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	analytics.logUserEvent(
 		user,
 		"Incoming",
-		{"Is Stop": classification != keeper_constants.CLASS_STOP}
+		{"Is Stop": classification == keeper_constants.CLASS_STOP}
 	)
 
 

@@ -380,6 +380,9 @@ def warpReminderText(msg):
 	if getFirstWord(warpedText).lower() == "keeper":
 		warpedText = ' '.join(warpedText.split(' ')[1:])
 
+	if getFirstWord(warpedText).lower() == "that":
+		warpedText = ' '.join(warpedText.split(' ')[1:])
+
 	# Capitalize the first letter of the first word
 	if len(warpedText) > 1:
 		warpedText = warpedText[0].upper() + warpedText[1:]
