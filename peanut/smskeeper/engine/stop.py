@@ -9,11 +9,12 @@ from smskeeper import analytics
 class StopAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_STOP
 
+	stopRegex = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
+
 	def getScore(self, chunk, user):
-		stop_re = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
 		score = 0.0
 
-		if stop_re.match(chunk.normalizedText()) is not None:
+		if self.stopRegex.match(chunk.normalizedText()) is not None:
 			score = .9
 
 		if StopAction.HasHistoricalMatchForChunk(chunk):

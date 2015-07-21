@@ -28,15 +28,6 @@ class QuestionAction(Action):
 		if not user.isTutorialComplete():
 			score = 0.0
 
-		if msg_util.isSetTipFrequencyCommand(chunk.originalText):
-			score = 0.0
-
-		if msg_util.nameInSetName(chunk.originalText):
-			score = 0.0
-
-		if msg_util.isSetZipcodeCommand(chunk.originalText):
-			score = 0.0
-
 		return score
 
 	def execute(self, chunk, user):

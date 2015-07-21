@@ -30,15 +30,17 @@ reminder_re = re.compile(
 	+ "|do my ",
 	re.I
 )
+
+# We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
+tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
+set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
+
+
 done_re = re.compile(r"\b(done|check .*off|check off|told|mark off|mark .*off|sent|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed)\b", re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
 handle_re = re.compile('@[a-zA-Z0-9]+\Z')
-
-# We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
-tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
-set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
 digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
@@ -149,10 +151,6 @@ def isCommonListName(msg):
 	return False
 
 
-def isSetZipcodeCommand(msg):
-	return re.match("my zip ?code is (\d{5}(\-\d{4})?)", msg, re.I) is not None
-
-
 def getPostalCode(msg):
 	zipcodes = re.search(r'.*(\d{5}(\-\d{4})?)', msg)
 
@@ -212,10 +210,6 @@ def simplifiedMsg(msg):
 # Returns the msg lowercase and stripped of spaces and punc
 def cleanedMsg(msg):
 	return msg.strip(string.punctuation).strip().lower()
-
-tipRE = re.compile('.*send me tips')
-def isSetTipFrequencyCommand(msg):
-	return not hasLabel(msg) and tipRE.match(msg.strip().lower())
 
 
 def isRemindCommand(msg):
@@ -339,6 +333,21 @@ def cleanedSnoozeCommand(msg):
 	return cleaned
 
 
+def nameInSetName(msg, tutorial=False):
+	if tutorial:
+		match = tutorial_name_re.match(msg.strip())
+	else:
+		match = set_name_re.match(msg.strip())
+
+	if match:
+		name = match.group('name')
+		name = name.strip(string.punctuation)
+
+		return name
+	return None
+
+
+
 # Returns a string which converts "my" to "your" and "i" to "you"
 def warpReminderText(msg):
 	i_words = re.compile(r'\bi\b', re.IGNORECASE)
@@ -445,20 +454,6 @@ def removeWordsFromMsg(msg, wordsToRemove):
 
 def removeNoOpWords(msg):
 	return removeWordsFromMsg(msg, noOpWords)
-
-
-def nameInSetName(msg, tutorial=False):
-	if tutorial:
-		match = tutorial_name_re.match(msg.strip())
-	else:
-		match = set_name_re.match(msg.strip())
-
-	if match:
-		name = match.group('name')
-		name = name.strip(string.punctuation)
-
-		return name
-	return None
 
 
 # Returns back (textWithoutLabel, label, listOfHandles)

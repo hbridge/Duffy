@@ -10,10 +10,11 @@ from smskeeper.engine.question import QuestionAction
 from smskeeper.engine.nicety import NicetyAction
 from smskeeper.engine.silent_nicety import SilentNicetyAction
 from smskeeper.engine.help import HelpAction
+from smskeeper.engine.change_setting import ChangeSettingAction
 
 logger = logging.getLogger(__name__)
 
-ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction()]
+ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction()]
 
 
 class Engine:
@@ -49,7 +50,7 @@ class Engine:
 			return self.processBasicMessages(user, msg, requestDict, keeperNumber)
 
 	def tieBreakActions(self, actions):
-		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, QuestionAction]
+		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, ChangeSettingAction, QuestionAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:
@@ -61,21 +62,7 @@ class Engine:
 # Process basic and important things like STOP, "hey there", "thanks", etc
 # Need hacks for if those commands might be used later on though
 	def processBasicMessages(self, user, msg, requestDict, keeperNumber):
-		if msg_util.isSetTipFrequencyCommand(msg):
-			logger.info("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
-			actions.setTipFrequency(user, msg, keeperNumber)
-			return True, keeper_constants.CLASS_CHANGE_SETTING
-		elif msg_util.nameInSetName(msg) and user.completed_tutorial:
-			logger.info("User %s: I think '%s' is a set name command" % (user.id, msg))
-			actions.setName(user, msg, keeperNumber)
-			return True, keeper_constants.CLASS_CHANGE_SETTING
-		elif msg_util.isSetZipcodeCommand(msg) and user.completed_tutorial:
-			logger.info("User %s: I think '%s' is a set zip command" % (user.id, msg))
-			actions.setPostalCode(user, msg, keeperNumber)
-			return True, keeper_constants.CLASS_CHANGE_SETTING
-		# If this starts to get too agressive, then move into reminder code where we see if there's
-		# timing information
-		elif msg_util.startsWithNo(msg):
+		if msg_util.startsWithNo(msg):
 			# If the user does "don't" or "cancel that reminder" then pause if its daytime.
 			# otherwise, let it go through for now
 			logger.info("User %s: I think '%s' starts with a frustration word, pausing" % (user.id, msg))
