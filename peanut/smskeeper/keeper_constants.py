@@ -177,7 +177,7 @@ def isRealKeeperNumber(keeperNumber):
 	if keeperNumber is None:
 		return False
 
-	return keeperNumber != SMSKEEPER_CLI_NUM and "test" not in keeperNumber
+	return keeperNumber != SMSKEEPER_CLI_NUM and "test" not in keeperNumber and "web" not in keeperNumber
 
 
 def isTestKeeperNumber(keeperNumber):

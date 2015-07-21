@@ -30,6 +30,7 @@ def recordOutput(msgText, doPrint=False):
 
 @app.task
 def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
+	logger.info("User %s: asyncSendMsg to keeperNumber: %s", userId, keeperNumber)
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -38,6 +39,8 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 
 	if user.state == keeper_constants.STATE_STOPPED:
 		logger.warning("User %s: Tried to send msg '%s' but they are in state stopped" % (user.id, msgText))
+		return
+	if keeperNumber == "web":  # don't record responses to web messages in history
 		return
 
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
