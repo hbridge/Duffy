@@ -19,10 +19,13 @@ module.exports = React.createClass({
 	render: function() {
 		console.log(USER.timezone)
 
-		localmoment = moment(this.state.currentDate).tz(USER.timezone)
+		if (USER.timezone) {
+			localmoment = moment(this.state.currentDate).tz(USER.timezone);
+			localTime = localmoment.format('dddd h:mm:ss a');
+		}
 		return (
 			<div className="topLevel">
-			<p><b>Name: {USER.name}</b> | Local Time (non-DST aware): {localmoment.format('dddd h:mm:ss a')} | Zip: {USER.postal_code} </p>
+			<p>Name: {USER.name} | Local Time (non-DST aware): { localTime } | Zip: {USER.postal_code} </p>
 			</div>
 			);
 	}
