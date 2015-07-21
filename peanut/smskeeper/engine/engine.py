@@ -37,7 +37,7 @@ class Engine:
 
 		for score, actions in sortedActionsByScore.iteritems():
 			if score >= 0.5:
-				if (actions > 1):
+				if len(actions) > 1:
 					actions = self.tieBreakActions(actions)
 
 				for action in actions:
