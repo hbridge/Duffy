@@ -1,6 +1,5 @@
 from smskeeper import actions, msg_util
 from smskeeper import keeper_constants
-from smskeeper import niceties
 from .action import Action
 
 
@@ -27,12 +26,6 @@ class QuestionAction(Action):
 			score = 0.0
 
 		if not user.isTutorialComplete():
-			score = 0.0
-
-		if niceties.getNicety(chunk.originalText):
-			score = 0.0
-
-		if msg_util.isHelpCommand(chunk.originalText):
 			score = 0.0
 
 		if msg_util.isSetTipFrequencyCommand(chunk.originalText):

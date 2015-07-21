@@ -366,11 +366,6 @@ def isDeleteCommand(msg):
 	return delete_re.match(msg) is not None
 
 
-def isHelpCommand(msg):
-	cleaned = cleanMsgText(msg)
-	return re.match('[?]$|huh$|help$|what$|how do.* work|what.* (can|do) you do|tell me more', cleaned) is not None
-
-
 def isPrintHashtagsCommand(msg):
 	cleaned = msg.strip().lower()
 	return cleaned in ['#', '#hashtag', 'lists', 'my lists']

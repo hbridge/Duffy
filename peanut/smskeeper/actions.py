@@ -287,19 +287,6 @@ def setTipFrequency(user, msg, keeperNumber):
 	)
 
 
-def help(user, msg, keeperNumber):
-	sms_util.sendMsgs(user, keeper_constants.HELP_MESSAGES, keeperNumber)
-	analytics.logUserEvent(
-		user,
-		"Requested Help",
-		{
-			"Message": msg.lower()
-		}
-	)
-
-	#user.setState(keeper_constants.STATE_HELP)
-
-
 def setName(user, msg, keeperNumber):
 	name = msg_util.nameInSetName(msg)
 	if name and name != "":

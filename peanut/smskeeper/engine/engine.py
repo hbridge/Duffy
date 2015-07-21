@@ -9,10 +9,11 @@ from smskeeper.engine.fetch_weather import FetchWeatherAction
 from smskeeper.engine.question import QuestionAction
 from smskeeper.engine.nicety import NicetyAction
 from smskeeper.engine.silent_nicety import SilentNicetyAction
+from smskeeper.engine.help import HelpAction
 
 logger = logging.getLogger(__name__)
 
-ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction()]
+ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction()]
 
 
 class Engine:
@@ -48,7 +49,7 @@ class Engine:
 			return self.processBasicMessages(user, msg, requestDict, keeperNumber)
 
 	def tieBreakActions(self, actions):
-		actionOrder = [StopAction, FetchWeatherAction, NicetyAction, SilentNicetyAction, QuestionAction]
+		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, QuestionAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:
@@ -60,11 +61,7 @@ class Engine:
 # Process basic and important things like STOP, "hey there", "thanks", etc
 # Need hacks for if those commands might be used later on though
 	def processBasicMessages(self, user, msg, requestDict, keeperNumber):
-		if msg_util.isHelpCommand(msg) and user.completed_tutorial:
-			logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
-			actions.help(user, msg, keeperNumber)
-			return True, keeper_constants.CLASS_HELP
-		elif msg_util.isSetTipFrequencyCommand(msg):
+		if msg_util.isSetTipFrequencyCommand(msg):
 			logger.info("For user %s I think '%s' is a set tip frequency command" % (user.id, msg))
 			actions.setTipFrequency(user, msg, keeperNumber)
 			return True, keeper_constants.CLASS_CHANGE_SETTING
