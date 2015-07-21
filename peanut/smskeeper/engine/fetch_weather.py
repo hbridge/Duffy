@@ -36,3 +36,5 @@ class FetchWeatherAction(Action):
 			sms_util.sendMsg(user, weatherPhrase)
 		else:
 			sms_util.sendMsg(user, "I'm sorry, I don't know the weather right now")
+
+		return True

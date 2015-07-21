@@ -32,3 +32,4 @@ class QuestionAction(Action):
 
 	def execute(self, chunk, user):
 		actions.unknown(user, chunk.originalText, user.getKeeperNumber())
+		return True

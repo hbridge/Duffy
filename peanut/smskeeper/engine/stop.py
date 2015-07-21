@@ -36,3 +36,4 @@ class StopAction(Action):
 
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 		user.save()
+		return True

@@ -243,6 +243,7 @@ CLASS_FETCH_WEATHER = "fetchweather"
 CLASS_NONE = "nocategory"
 CLASS_CHANGE_SETTING = "changesetting"
 CLASS_QUESTION = "question"
+CLASS_FRUSTRATION = "frustration"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"

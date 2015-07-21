@@ -133,11 +133,14 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.name, "UnitTests")
 
+	# Had bug where we were thinking this was a set name phrase
 	def test_name_with_phrase(self, dateMock):
 		self.setupUser(dateMock)
 
 		# Activation message asks for their name
-		cliMsg.msg(self.testPhoneNumber, "My names kelly.")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "My names kelly.")
+			self.assertIn("What's your zipcode?", self.getOutput(mock))
 
 		user = self.getTestUser()
 		self.assertEqual(user.name, "kelly")

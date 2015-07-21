@@ -38,3 +38,4 @@ class SilentNicetyAction(Action):
 			"Sent Nicety",
 			None
 		)
+		return True

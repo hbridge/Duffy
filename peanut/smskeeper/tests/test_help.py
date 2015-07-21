@@ -1,13 +1,11 @@
 from mock import patch
 
 from smskeeper import cliMsg, keeper_constants
-from smskeeper.models import Entry
 
 import test_base
 
 
 class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
-
 
 	def test_help(self):
 		self.setupUser(True, True)

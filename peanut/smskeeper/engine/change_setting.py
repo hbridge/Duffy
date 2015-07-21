@@ -27,6 +27,9 @@ class ChangeSettingAction(Action):
 		if msg_util.nameInSetName(normalizedText, tutorial=False):
 			score = .9
 
+		if not user.isTutorialComplete():
+			score = 0
+
 		return score
 
 	def execute(self, chunk, user):
@@ -41,6 +44,8 @@ class ChangeSettingAction(Action):
 		if msg_util.nameInSetName(chunk.originalText, tutorial=False):
 			name = msg_util.nameInSetName(chunk.originalText, tutorial=False)
 			self.setName(user, name)
+
+		return True
 
 	def setTipFrequency(self, user, msg):
 		old_tip_frequency = user.tip_frequency_days

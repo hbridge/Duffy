@@ -27,3 +27,4 @@ class HelpAction(Action):
 				"Message": chunk.originalText.lower()
 			}
 		)
+		return True
