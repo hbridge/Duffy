@@ -274,7 +274,7 @@ def processQuery(query, timezone):
 			# EXPLICIT_DATE  shows up for July 1
 			# RELATIVE_TIME  shows up for "in an hour" so hasDate should be true (since its today)
 			# tonight        is a hack
-			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"] or "tonight" in usedText
+			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"] or "tonight" in usedText.lower()
 
 			hasTime = "EXPLICIT_TIME" in entry["syntaxTree"] or not isNattyDefaultTime(startDate)
 			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime))

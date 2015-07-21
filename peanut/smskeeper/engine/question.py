@@ -22,9 +22,6 @@ class QuestionAction(Action):
 		if msg_util.isRemindCommand(chunk.originalText):
 			score = 0.0
 
-		if msg_util.isDigestCommand(chunk.originalText):
-			score = 0.0
-
 		if not user.isTutorialComplete():
 			score = 0.0
 

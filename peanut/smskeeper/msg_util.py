@@ -25,9 +25,9 @@ freeform_fetch_res = [
 ]
 reminder_re = re.compile(
 	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by | about |)?"
-	+ "|i (need|want|have) to "
-	+ "|dont (let me )?forget (to )?"
-	+ "|do my ",
+	+ "|^i (need|want|have) to "
+	+ "|^dont (let me )?forget (to )?"
+	+ "|^do my ",
 	re.I
 )
 
@@ -41,8 +41,6 @@ delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
 handle_re = re.compile('@[a-zA-Z0-9]+\Z')
-
-digest_re = re.compile(r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today", re.I)
 
 noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's", "sounds", "good", "else", "thats", "that"]
 
@@ -232,6 +230,7 @@ def isMsgClassified(msg, classification):
 	return False
 
 
+# TODO(Derek): Once we're all moved over to the new engine, move this into done.py
 def isDoneCommand(msg):
 	simpleMsg = simplifiedMsg(msg)
 
@@ -241,17 +240,6 @@ def isDoneCommand(msg):
 		return True
 
 	return isMsgClassified(simpleMsg, keeper_constants.CLASS_COMPLETE_TODO_ALL)
-
-
-def isDigestCommand(msg):
-	simpleMsg = simplifiedMsg(msg)
-
-	# Note: Need a re match for stop
-	found = digest_re.match(simpleMsg) is not None
-	if found:
-		return True
-
-	return isMsgClassified(simpleMsg, keeper_constants.CLASS_FETCH_DIGEST)
 
 
 def isOkPhrase(msg):

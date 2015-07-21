@@ -12,7 +12,7 @@ class FetchWeatherAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_FETCH_WEATHER
 
 	def getScore(self, chunk, user):
-		weather_re = re.compile(r"\bweather\b", re.I)
+		weather_re = re.compile(r"\b(weather|forecast)\b", re.I)
 		score = 0.0
 
 		if weather_re.search(chunk.normalizedText()) is not None:

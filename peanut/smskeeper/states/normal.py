@@ -104,13 +104,6 @@ def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
 		logger.info("User %s: I think '%s' is a snooze command" % (user.id, msg))
 		actions.snooze(user, msg, keeperNumber)
 		return True, keeper_constants.CLASS_SNOOZE
-	elif msg_util.isDigestCommand(msg):
-		logger.info("User %s: I think '%s' is a digest command" % (user.id, msg))
-		if "today" in msg.lower():
-			async.sendDigestForUserId(user.id, keeperNumber)
-		else:
-			async.sendAllRemindersForUserId(user.id, keeperNumber)
-		return True, keeper_constants.CLASS_FETCH_DIGEST
 	elif len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
 		return True, keeper_constants.CLASS_SILENT_NICETY

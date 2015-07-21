@@ -11,10 +11,11 @@ from smskeeper.engine.silent_nicety import SilentNicetyAction
 from smskeeper.engine.help import HelpAction
 from smskeeper.engine.change_setting import ChangeSettingAction
 from smskeeper.engine.frustration import FrustrationAction
+from smskeeper.engine.fetch_digest import FetchDigestAction
 
 logger = logging.getLogger(__name__)
 
-ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction()]
+ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction(), FetchDigestAction()]
 
 
 class Engine:
@@ -41,18 +42,18 @@ class Engine:
 					actions = self.tieBreakActions(actions)
 
 				for action in actions:
-					logger.debug("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
+					logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
 					processed = action.execute(chunk, user)
 
 					if not processed:
-						logger.debug("User %s: I tried processing %s but it returned False, going onto next" % (user.id, action.ACTION_CLASS))
+						logger.info("User %s: I tried processing %s but it returned False, going onto next" % (user.id, action.ACTION_CLASS))
 					else:
 						return True, action.ACTION_CLASS
 		return False, None
 
 	def tieBreakActions(self, actions):
 		sortedActions = list()
-		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, ChangeSettingAction, QuestionAction, FrustrationAction]
+		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, FetchDigestAction, ChangeSettingAction, QuestionAction, FrustrationAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:
