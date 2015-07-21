@@ -610,7 +610,8 @@ var KeeperApp = React.createClass({
     );
 
     // then add the rest of the lists
-    for (key in this.state.lists) {
+    for (var i = 0; i < this.state.lists.count; i++) {
+      key = this.state.lists[i];
       listNodes.push(
         <List label={ key }
           entries={ this.state.lists[key] }
