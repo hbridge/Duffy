@@ -1,17 +1,18 @@
 import logging
 
 from smskeeper import msg_util
-from smskeeper import niceties
 from smskeeper import keeper_constants
 from smskeeper import actions
 from smskeeper.chunk import Chunk
 from smskeeper.engine.stop import StopAction
 from smskeeper.engine.fetch_weather import FetchWeatherAction
 from smskeeper.engine.question import QuestionAction
+from smskeeper.engine.nicety import NicetyAction
+from smskeeper.engine.silent_nicety import SilentNicetyAction
 
 logger = logging.getLogger(__name__)
 
-ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction()]
+ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction()]
 
 
 class Engine:
@@ -47,7 +48,7 @@ class Engine:
 			return self.processBasicMessages(user, msg, requestDict, keeperNumber)
 
 	def tieBreakActions(self, actions):
-		actionOrder = [StopAction, FetchWeatherAction, QuestionAction]
+		actionOrder = [StopAction, FetchWeatherAction, NicetyAction, SilentNicetyAction, QuestionAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:
@@ -59,24 +60,7 @@ class Engine:
 # Process basic and important things like STOP, "hey there", "thanks", etc
 # Need hacks for if those commands might be used later on though
 	def processBasicMessages(self, user, msg, requestDict, keeperNumber):
-		# Always look for a stop command first and deal with that
-		if niceties.getNicety(msg):
-			# Hack(Derek): Make if its a nicety that also could be considered done...let that through
-			if msg_util.isDoneCommand(msg):
-				logger.info("User %s: I think '%s' is a nicety but its also a done command, booting out" % (user.id, msg))
-				return False, None
-
-			if msg_util.isRemindCommand(msg):
-				logger.info("User %s: I think '%s' is a nicety but its also a remind command, booting out" % (user.id, msg))
-				return False, None
-			nicety = niceties.getNicety(msg)
-			logger.info("User %s: I think '%s' is a nicety" % (user.id, msg))
-			actions.nicety(user, nicety, requestDict, keeperNumber)
-			classification = keeper_constants.CLASS_NICETY
-			if nicety.responses is None:
-				classification = keeper_constants.CLASS_SILENT_NICETY
-			return True, classification
-		elif msg_util.isHelpCommand(msg) and user.completed_tutorial:
+		if msg_util.isHelpCommand(msg) and user.completed_tutorial:
 			logger.info("For user %s I think '%s' is a help command" % (user.id, msg))
 			actions.help(user, msg, keeperNumber)
 			return True, keeper_constants.CLASS_HELP

@@ -391,21 +391,6 @@ def deleteIndicesFromLabel(user, label, indices, keeperNumber):
 		sms_util.sendMsg(user, 'Sorry, I\'m not sure which list you\'re referring to. Try "delete NUMBER from list"', None, keeperNumber)
 
 
-# Deal with a nicety message
-# Might respond with something, might not
-def nicety(user, nicety, requestDict, keeperNumber):
-	response = nicety.getResponse(user, requestDict, keeperNumber)
-	if response:
-		sms_util.sendMsg(user, response, None, keeperNumber)
-
-	# log that the user sent a nicety regardless of whether Keeper responds
-	analytics.logUserEvent(
-		user,
-		"Sent Nicety",
-		None
-	)
-
-
 def clearAll(entries):
 	# Assume this is done, or done with and clear all
 	if len(entries) > 1:
