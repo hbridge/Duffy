@@ -287,6 +287,10 @@ def resend_msg(request):
 			keeperNumber = message.user.getKeeperNumber()
 
 		if (message.incoming):
+			if (message.user.paused):
+				message.user.paused = False
+				message.user.save()
+
 			requestDict = json.loads(message.msg_json)
 			requestDict["Manual"] = True
 			processing_util.processMessage(message.user.phone_number, requestDict["Body"], requestDict, keeperNumber)
