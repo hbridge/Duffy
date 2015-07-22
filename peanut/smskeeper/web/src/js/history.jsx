@@ -142,10 +142,21 @@ var KeeperApp = React.createClass({
   },
 
   componentWillUpdate: function(nextProps, nextState) {
+    console.log("component will update");
+
+    if (this.state.messages.length > 0) {
+      var lastSeenMessageId = this.state.messages.at(this.state.messages.length - 1).get("id");
+      var newestRemoteMessageId = nextProps.model.messages.at(nextProps.model.messages.length - 1).get("id");
+      if (lastSeenMessageId == newestRemoteMessageId
+        && nextState.paused == nextProps.model.paused) {
+          console.log('no new messages. not re-rendering.');
+          return;
+      }
+    }
+
     nextState.messages = nextProps.model.messages;
     nextState.paused = nextProps.model.paused;
   },
-
 });
 
 // Important!
