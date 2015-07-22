@@ -25,7 +25,7 @@ from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
 
-from smskeeper import analytics
+from smskeeper import analytics, helper_util
 
 from smskeeper.serializers import EntrySerializer
 from smskeeper.serializers import MessageSerializer
@@ -438,7 +438,13 @@ def signup_from_website(request):
 					user_util.activate(target_user, "", None, target_user.getKeeperNumber())
 
 			except User.DoesNotExist:
-				productId = 1
+
+				if  helper_util.isUSRegionCode(phoneNum):
+					productId = keeper_constants.TODO_PRODUCT_ID
+					response['medium'] = 'sms'
+				else:
+					productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
+					response['medium'] = 'whatsapp'
 				tutorial = None
 
 				target_user = user_util.createUser(phoneNum, json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}), None, productId)

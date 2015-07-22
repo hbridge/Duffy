@@ -8,4 +8,4 @@ STATICFILES_DIRS = (
 )
 
 # Keeper number by product id
-KEEPER_NUMBER_DICT = {1: "+19252414750", 0: "+19252414750"}
+KEEPER_NUMBER_DICT = {1: "+19252414750", 0: "+19252414750", 2: "3584573970584@s.whatsapp.net"}
