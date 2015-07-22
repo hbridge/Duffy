@@ -100,7 +100,7 @@ var ClassificationChooser = React.createClass({
         br = <br />
       }
       return (
-        <input type="radio" value={option.value} checked={this.state.model.classification == option.value}>
+        <input type="radio" key={option.value} value={option.value} defaultChecked={this.state.model.classification == option.value}>
           {option.text} {br}
         </input>);
     }.bind(this);

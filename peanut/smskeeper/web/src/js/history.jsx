@@ -50,9 +50,9 @@ var KeeperApp = React.createClass({
   },
 
   componentDidMount: function() {
-    if (!DevelopmentMode) {
+    //if (!DevelopmentMode) {
       setInterval(function () {this.getModel().fetch()}.bind(this), 2000);
-    }
+    //}
   },
 
   handleCommentSubmit: function(data) {
@@ -141,18 +141,22 @@ var KeeperApp = React.createClass({
     };
   },
 
-  componentWillUpdate: function(nextProps, nextState) {
-    console.log("component will update");
-
+  shouldComponentUpdate: function(nextProps, nextState) {
+    console.log("should componnent update");
     if (this.state.messages.length > 0) {
       var lastSeenMessageId = this.state.messages.at(this.state.messages.length - 1).get("id");
       var newestRemoteMessageId = nextProps.model.messages.at(nextProps.model.messages.length - 1).get("id");
       if (lastSeenMessageId == newestRemoteMessageId
         && nextState.paused == nextProps.model.paused) {
           console.log('no new messages. not re-rendering.');
-          return;
+          return false
       }
     }
+    return true;
+  },
+
+  componentWillUpdate: function(nextProps, nextState) {
+    console.log("component will update");
 
     nextState.messages = nextProps.model.messages;
     nextState.paused = nextProps.model.paused;

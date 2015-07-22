@@ -38,6 +38,7 @@ module.exports = React.createClass({
       var checkbox = <Checkbox
         name={option.value}
         value={option.value}
+        key={option.value}
         defaultChecked={option.value == this.state.selectedClassification}
         onCheck={this.categorizationChecked}
       />
