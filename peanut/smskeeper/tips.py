@@ -167,6 +167,9 @@ def selectNextFullTip(user):
 					break
 			if not hasShared:
 				return tipWithId(tipId)
+		elif tipId == "vcard":
+			if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
+				return tipWithId(tipId)
 		else:
 			return tipWithId(tipId)
 
