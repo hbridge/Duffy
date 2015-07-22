@@ -10,7 +10,7 @@ var Entry = Model.Entry;
 var EntryList = Model.EntryList;
 var EntryListView = require("./controls/EntryListView.jsx");
 
-var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
+DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 
 if (DevelopmentMode || USER.id <= 3 || Utils.getUrlParameter("internal")) {
   mixpanelToken = "d309a366da36d3f897ad2772390d1679";
@@ -18,7 +18,7 @@ if (DevelopmentMode || USER.id <= 3 || Utils.getUrlParameter("internal")) {
 } else {
   mixpanelToken = "165ffa12b4eac14005ec6d97872a9c63";
 }
-var mixpanel = Mixpanel.init(mixpanelToken);
+mixpanel = Mixpanel.init(mixpanelToken);
 
 var masonryOptions = {
     transitionDuration: 0
