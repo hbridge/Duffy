@@ -274,7 +274,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 
 		if len(pendingEntries) > 0:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
-		elif user.product_id == keeper_constants.TODO_PRODUCT_ID:
+		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
 
 
