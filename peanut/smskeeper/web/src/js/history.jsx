@@ -25,6 +25,13 @@ var injectTapEventPlugin = require("react-tap-event-plugin");
 var SendControl = require('./controls/send_controls.jsx');
 var MessageListRow = require('./controls/message_row.jsx');
 var UserInfo = require('./controls/user_info_view.jsx');
+var MessageActions = require('./controls/message_actions.jsx');
+var Model = require('./model/Model.jsx');
+var HistoryStore = Model.HistoryStore;
+var Message = Model.Message;
+var MessageList = Model.MessageList;
+var Backbone = require('backbone');
+var BackboneReactComponent = require('backbone-react-component');
 
 //Needed for onTouchTap
 //Can go away when react 1.0 release
@@ -33,37 +40,18 @@ var UserInfo = require('./controls/user_info_view.jsx');
 injectTapEventPlugin();
 
 var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
+var firstLoadComplete = false;
 
 var KeeperApp = React.createClass({
+  mixins: [BackboneReactComponent],
+
   getInitialState: function() {
-    return {messages: [], selectedMessage: null, maxRowsToShow: 100 };
-  },
-
-  processDataFromServer: function(data) {
-    console.log("Got data from the server:");
-    console.log(data);
-    this.setState({messages : data.messages, paused : data.paused});
-  },
-
-  loadDataFromServer: function() {
-    $.ajax({
-      url: "/smskeeper/message_feed?user_id=" + USER.id,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.processDataFromServer(data);
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error("message_feed error %s %s", status, err.toString());
-      }.bind(this)
-    });
+    return {messages: [], selectedMessage: null, maxRowsToShow: 100};
   },
 
   componentDidMount: function() {
-    this.loadDataFromServer();
-    var loadFunc = this.loadDataFromServer;
     if (!DevelopmentMode) {
-      setInterval(function () {loadFunc()}, 2000);
+      setInterval(function () {this.getModel().fetch()}.bind(this), 2000);
     }
   },
 
@@ -75,7 +63,7 @@ var KeeperApp = React.createClass({
       data: data,
       success: function(data) {
         // the data that comes back from the server is just success
-        this.loadDataFromServer();
+        this.getModel().fetch();
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("send_sms", status, err.toString());
@@ -90,6 +78,8 @@ var KeeperApp = React.createClass({
 
   onMessageClicked: function(message, rowId) {
     console.log("selectedRowId" + rowId);
+    this.setState({selectedMessage: message});
+    this.refs.messageActions.show(message);
   },
 
 	render: function() {
@@ -105,21 +95,22 @@ var KeeperApp = React.createClass({
       </div>
     } else if (this.state.maxRowsToShow < this.state.messages.length) {
       showAll = <RaisedButton
-                  ref='showAll'
-                  label="Show All"
-                  secondary={true}
-                  onClick={this.handleShowAll}
-                  className="showAllButton"
-                />
+        ref='showAll'
+        label="Show All"
+        secondary={true}
+        onClick={this.handleShowAll}
+        className="showAllButton"
+      />
     }
 
     var messageRows = [];
     for (var i = Math.max(0, this.state.messages.length - this.state.maxRowsToShow); i < this.state.messages.length; i++) {
       messageRows.push(
-        <MessageListRow message={ this.state.messages[i] }
+        <MessageListRow model={ this.state.messages.at([i]) }
         key= { i }
         index= { i }
-        onMessageClicked = { this.onMessageClicked }/>
+        onMessageClicked = { this.onMessageClicked }
+        messageActionDialog={this.refs.messageActions}/>
       )
     }
 
@@ -127,6 +118,7 @@ var KeeperApp = React.createClass({
       <div>
         { loading }
         { showAll }
+        <MessageActions ref="messageActions" onClassificationChange={this.handleClassificationChange} />
   			<div id="messages">
   			   { messageRows }
         </div>
@@ -137,24 +129,33 @@ var KeeperApp = React.createClass({
 	},
 
   componentDidUpdate: function() {
-    if (!this.props.firstLoadComplete) {
+    if (!firstLoadComplete) {
       $("html,body").scrollTop($(document).height());
-      this.props.firstLoadComplete = true;
+      firstLoadComplete = true;
     }
   },
 
   getChildContext: function() {
     return {
-      muiTheme: ThemeManager.getCurrentTheme()
+      muiTheme: ThemeManager.getCurrentTheme(),
     };
+  },
+
+  componentWillUpdate: function(nextProps, nextState) {
+    nextState.messages = nextProps.model.messages;
+    nextState.paused = nextProps.model.paused;
   },
 
 });
 
 // Important!
 KeeperApp.childContextTypes = {
-  muiTheme: React.PropTypes.object
+  muiTheme: React.PropTypes.object,
+  hasParentBackboneMixin: React.PropTypes.bool.isRequired, // have to repeat these from the mixin because we're using the muiTheme
+  parentModel: React.PropTypes.any,
+  parentCollection: React.PropTypes.any
 };
 
-
-React.render(<KeeperApp />, document.getElementById("keeper_app"));
+var historyStore = new HistoryStore({userId: USER.id});
+historyStore.fetch();
+React.render(<KeeperApp model={ historyStore }/>, document.getElementById("keeper_app"));

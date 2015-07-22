@@ -5,6 +5,7 @@
 
 var gulp     = require('gulp');
 var config   = require('../config');
+process.env.NODE_ENV = 'development';
 
 gulp.task('watch', ['watchify'], function() {
   gulp.watch(config.sass.src, ['sass']);
