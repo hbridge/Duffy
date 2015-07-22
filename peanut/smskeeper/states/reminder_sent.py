@@ -30,7 +30,7 @@ def process(user, msg, requestDict, keeperNumber):
 	elif len(entries) == 1:
 		entry = entries[0]
 		nattyResult = reminder_util.getNattyResult(user, msg)
-		if reminder_util.isSnoozeForEntry(user, msg, entry, nattyResult):
+		if reminder_util.isFollowup(user, entry, msg, nattyResult):
 			actions.snooze(user, msg, keeperNumber)
 			return True, keeper_constants.CLASS_SNOOZE
 
