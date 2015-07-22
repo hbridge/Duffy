@@ -50,9 +50,10 @@ var KeeperApp = React.createClass({
   },
 
   componentDidMount: function() {
-    //if (!DevelopmentMode) {
+    this.lastSeenMessageId = 0;
+    if (!DevelopmentMode) {
       setInterval(function () {this.getModel().fetch()}.bind(this), 2000);
-    //}
+    }
   },
 
   handleCommentSubmit: function(data) {
@@ -142,16 +143,28 @@ var KeeperApp = React.createClass({
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
-    console.log("should componnent update");
+    // console.log("this.state.messages");
+    // console.log(this.state.messages)
+    // console.log("this.props.model");
+    // console.log(this.props.model)
+    // console.log("nextState.messages");
+    // console.log(nextState.messages)
+    // console.log("nextProps.model");
+    // console.log(nextProps.model)
+
     if (this.state.messages.length > 0) {
-      var lastSeenMessageId = this.state.messages.at(this.state.messages.length - 1).get("id");
-      var newestRemoteMessageId = nextProps.model.messages.at(nextProps.model.messages.length - 1).get("id");
-      if (lastSeenMessageId == newestRemoteMessageId
+      var newestRemoteMessageId = nextProps.model.messages.last().get("id");
+      console.log("last: " + this.lastSeenMessageId + " newesst:" + newestRemoteMessageId);
+      if (this.lastSeenMessageId == newestRemoteMessageId
         && nextState.paused == nextProps.model.paused) {
-          console.log('no new messages. not re-rendering.');
           return false
+      } else {
+        this.lastSeenMessageId = newestRemoteMessageId;
       }
     }
+
+    console.log('new messages. re-rendering.');
+
     return true;
   },
 
