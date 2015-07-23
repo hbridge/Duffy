@@ -20,13 +20,26 @@ mui = require('material-ui'),
 var AdminEntryRow = React.createClass({
 	mixins: [BackboneReactComponent],
 	render: function(){
+		var checkbox = <Checkbox
+	      name={this.state.model.id}
+	      value={this.state.model.id}
+	      key={this.state.model.id}
+	      defaultChecked={this.state.model.hidden}
+	      onCheck={this.onEntryChecked}
+    	/>
 		return (
+
 			<ListItem
 				primaryText={ this.state.model.text }
 				secondaryText={ moment(this.state.model.remind_timestamp).format('llll')}
 				secondaryTextLines={1}
+				leftCheckbox={ checkbox }
 			/>
 		)
+	},
+	onEntryChecked: function(e, checked) {
+		var result = this.getModel().save({hidden: checked});
+		console.log("onEntryChecked result " + result);
 	},
 });
 
