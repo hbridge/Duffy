@@ -443,8 +443,8 @@ class Message(models.Model):
 				"value": keeper_constants.CLASS_CREATE_TODO
 			},
 			{
-				"text": "Done (all)",
-				"value": keeper_constants.CLASS_COMPLETE_TODO_ALL
+				"text": "Done (most recent)",
+				"value": keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT
 			},
 			{
 				"text": "Done (specific)",
@@ -467,12 +467,12 @@ class Message(models.Model):
 				"value": keeper_constants.CLASS_SILENT_NICETY
 			},
 			{
-				"text": "Correction",
-				"value": keeper_constants.CLASS_CORRECTION
+				"text": "Change time (most recent)",
+				"value": keeper_constants.CLASS_CHANGETIME_MOST_RECENT
 			},
 			{
-				"text": "Snooze",
-				"value": keeper_constants.CLASS_SNOOZE
+				"text": "Change time (specific)",
+				"value": keeper_constants.CLASS_CHANGETIME_SPECIFIC
 			},
 			{
 				"text": "Help",
