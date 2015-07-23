@@ -149,6 +149,8 @@ def getMessagesForUser(user):
 			if message.incoming:
 				message_dict["classification"] = message.classification
 				message_dict["auto_classification"] = message.auto_classification
+				if message.classification_scores_json:
+					message_dict["classification_scores"] = json.loads(message.classification_scores_json)
 
 			messages_dicts.append(message_dict)
 

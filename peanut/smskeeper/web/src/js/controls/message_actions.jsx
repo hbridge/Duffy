@@ -11,6 +11,33 @@ mui = require('material-ui'),
   ListDivider = mui.ListDivider;
   Checkbox = mui.Checkbox;
 
+var OptionListItem = React.createClass({
+  render: function() {
+    var checkbox = <Checkbox
+      name={this.props.option.value}
+      value={this.props.option.value}
+      key={this.props.option.value}
+      defaultChecked={this.props.selected}
+      onCheck={this.props.onChecked}
+    />
+    var text = this.props.option.text;
+    if (this.props.message && this.props.message.get("classification_scores")) {
+      score = this.props.message.get("classification_scores")[this.props.option.value];
+      if (score != undefined) {
+        text = text + " (" + score.toFixed(1) + ")"
+      }
+    }
+
+    return (
+      <ListItem
+        primaryText={text}
+        leftCheckbox={checkbox}
+      />
+    );
+  },
+});
+
+
 module.exports = React.createClass({
   getInitialState: function(){
     return {selectedClassification: null};
@@ -35,18 +62,15 @@ module.exports = React.createClass({
 
     // categorization options
     var createOption = function(option, index) {
-      var checkbox = <Checkbox
-        name={option.value}
-        value={option.value}
-        key={option.value}
-        defaultChecked={option.value == this.state.selectedClassification}
-        onCheck={this.categorizationChecked}
-      />
-      return (
-        <ListItem primaryText={option.text} leftCheckbox={checkbox}/>
+      return(
+        <OptionListItem
+          option={option}
+          message={this.state.message}
+          selected={option.value == this.state.selectedClassification}
+          onChecked={this.categorizationChecked}
+        />
       );
     }.bind(this);
-
 
     // dialog buttons
     standardActions = [
