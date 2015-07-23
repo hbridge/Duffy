@@ -62,7 +62,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	if not user.paused:
 		count = 0
 		processed = False
-		while not processed and count < 10:
+		continueProcessing = True
+		while not processed and continueProcessing and count < 10:
 			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
 				keeperEngine = Engine(Engine.DEFAULT, 0.0)
 				processed, classification, actionScores = keeperEngine.process(user, msg)
@@ -76,6 +77,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				# Can't simply say !STATE_NORMAL because of TUTORIAL
 				if user.state == keeper_constants.STATE_REMINDER_SENT:
 					user.setState(keeper_constants.STATE_NORMAL)
+				continueProcessing = False
 			else:
 				stateModule = stateCallbacks[user.state]
 				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
