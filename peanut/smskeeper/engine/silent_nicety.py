@@ -13,6 +13,9 @@ class SilentNicetyAction(Action):
 
 		nicety = niceties.getNicety(chunk.originalText)
 
+		if len(chunk.originalText.split(' ')) == 1:
+			score = .3
+
 		# We have both nicety and silent nicety right now...so make sure we don't think
 		# we're a silent one if there's responses
 		# Kinda hacky

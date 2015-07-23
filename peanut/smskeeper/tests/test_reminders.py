@@ -976,6 +976,17 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "something else important tomorrow @330")
 			self.assertIn("tomorrow by 3:30pm", self.getOutput(mock))
 
+	# Had bug where if the word appointment showed up before timing info, natty barfed
+	def test_appointment(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 3:20 planned parenthood")
+			self.assertIn("tomorrow at 3:20pm", self.getOutput(mock))
+
+
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
 	def test_tomorrow_afternoon(self, dateMock):

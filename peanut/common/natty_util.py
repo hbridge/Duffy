@@ -112,6 +112,10 @@ def fixMsgForNatty(msg, user):
 	if againAt:
 		newMsg = replace(newMsg, "again at", "at")
 
+	# WTF hack. Natty doesn't like appointment shoing up before timing info like "appointment tomorrow"
+	# for now, replace with apt
+	newMsg = replace(newMsg, "appointment", "appt")
+
 	# Fix 3 digit numbers with timing info like "520p"
 	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) (p|a|pm|am)\b', newMsg, re.IGNORECASE)
 	if threeDigitsWithAP:

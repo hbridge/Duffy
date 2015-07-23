@@ -173,6 +173,20 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("(1)", self.getOutput(mock))
 	"""
 	# See if we get into the paused state when we enter an invalid command during daytime hours
+	def test_ignore_one_word(self, dateMock):
+		self.setupUser(True, True, dateMock=dateMock)
+
+		# Set us to middle of the day so we get paused
+		self.setNow(dateMock, self.TUE_3PM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "blah")
+			# And that we got no response
+			self.assertEqual("", self.getOutput(mock))
+			self.assertFalse(self.getTestUser().isPaused())
+
+
+	# See if we get into the paused state when we enter an invalid command during daytime hours
 	def test_sets_paused_when_daytime(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
 
