@@ -4,6 +4,7 @@ from smskeeper import msg_util, cliMsg, keeper_constants
 
 import test_base
 
+"""
 
 class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 	def test_delete_parsing(self):
@@ -113,3 +114,5 @@ class SMSKeeperDeleteCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("foo2", self.getOutput(mock))
 			self.assertNotIn("foo3", self.getOutput(mock))
 			self.assertNotIn("foo5", self.getOutput(mock))
+
+"""

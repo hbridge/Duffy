@@ -7,8 +7,10 @@ import string
 from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import msg_util
-from smskeeper import analytics, niceties, actions
+from smskeeper import analytics
 from smskeeper.models import Message
+
+from smskeeper.engine import Engine
 
 from common import date_util
 
@@ -32,11 +34,10 @@ def process(user, msg, requestDict, keeperNumber):
 		}
 	)
 
-	# Deal with one off things before we get to tutorial
-	nicety = niceties.getNicety(msg)
-	if nicety:
-		actions.nicety(user, nicety, requestDict, keeperNumber)
-		classification = keeper_constants.CLASS_SILENT_NICETY if nicety.isSilent() else keeper_constants.CLASS_NICETY
+	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
+	processed, classification = keeperEngine.process(user, msg)
+
+	if processed:
 		return True, classification
 
 	classification = None
@@ -100,13 +101,24 @@ def process(user, msg, requestDict, keeperNumber):
 				# else ignore
 				return True, keeper_constants.CLASS_NONE
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
+		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops tmr' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
-		user.setState(keeper_constants.STATE_REMIND)
-		user.setNextState(keeper_constants.STATE_TUTORIAL_TODO)
-
 	elif step == 2:
+		postalCode = msg_util.getPostalCode(msg)
+
+		if postalCode:
+			# ignore
+			return True, keeper_constants.CLASS_NONE
+
+		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
+		processed, classification = keeperEngine.process(user, msg)
+
+		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
+		# Then we'll come back here and once we get a followup, we'll post the last text
+		if not processed:
+			return True, keeper_constants.CLASS_NONE
+
 		if keeper_constants.isRealKeeperNumber(keeperNumber):
 			time.sleep(1)
 		sms_util.sendMsgs(
@@ -121,7 +133,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.setTutorialComplete()
 		classification = keeper_constants.CLASS_CREATE_TODO
 
-		user.setState(keeper_constants.STATE_REMIND)
+		user.setState(keeper_constants.STATE_NORMAL)
 
 		analytics.logUserEvent(
 			user,

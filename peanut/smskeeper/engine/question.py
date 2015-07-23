@@ -18,10 +18,6 @@ class QuestionAction(Action):
 		if QuestionAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
-		if msg_util.isRemindCommand(chunk.originalText):
-			score = 0.0
-
 		if not user.isTutorialComplete():
 			score = 0.0
 

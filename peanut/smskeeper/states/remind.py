@@ -29,9 +29,9 @@ def process(user, msg, requestDict, keeperNumber):
 
 	# If this is a done or snooze command so kick out to normal which will deal with it
 	# Hacky, theres a lot of exception cases here
-	if not msg_util.isRemindCommand(msg) and (msg_util.isSnoozeCommand(msg) or (not nattyResult.validTime() and msg_util.isDoneCommand(msg))) and user.isTutorialComplete():
-		user.setState(keeper_constants.STATE_NORMAL)
-		return False, None
+	#if not msg_util.isRemindCommand(msg) and (not nattyResult.validTime() and msg_util.isDoneCommand(msg)) and user.isTutorialComplete():
+	#	user.setState(keeper_constants.STATE_NORMAL)
+	#	return False, None
 
 	# If this doesn't look valid then ignore (starts with ok or "sounds good")
 	if not looksLikeValidEntry(msg, nattyResult):
@@ -132,8 +132,8 @@ def looksLikeValidEntry(msg, nattyResult):
 # If they
 # But if there's no timing info, then don't
 def shouldCreateReminder(user, nattyResult, msg):
-	if msg_util.isRemindCommand(msg):
-		return True
+	#if msg_util.isRemindCommand(msg):
+	#	return True
 	if not nattyResult.validTime():
 		return False
 

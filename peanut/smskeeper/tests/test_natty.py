@@ -12,7 +12,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 	def test_unicode_natty(self):
 		self.setupUser(True, True)
 
-		cliMsg.msg(self.testPhoneNumber, u'#remind poop\u2019s tmr')
+		cliMsg.msg(self.testPhoneNumber, u'remind me poop\u2019s tmr')
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 		self.assertIn(u'Poop\u2019s', entry.text)
@@ -22,24 +22,20 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 	def test_natty_timezone(self):
 		self.setupUser(True, True)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "#remind poop 3pm tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "remind me poop 3pm tomorrow")
 
 		entry = Entry.fetchEntries(user=self.user, label="#reminders")[0]
 
 		self.assertEqual(entry.remind_timestamp.hour, 19)  # 3 pm Eastern in UTC
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "clear #reminders")
-			self.assertIn("cleared", self.getOutput(mock))
-
 		self.user.timezone = "PST-2"  # This is not the default
 		self.user.save()
-		cliMsg.msg(self.testPhoneNumber, "#remind poop 1pm tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "remind me buy sox 1pm tomorrow")
 
-		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(2, len(entries))
 
-		self.assertEqual(entry.remind_timestamp.hour, 23)  # 1 pm Hawaii in UTC
+		self.assertEqual(entries[1].remind_timestamp.hour, 23)  # 1 pm Hawaii in UTC
 
 	@patch('common.date_util.utcnow')
 	def test_natty_two_times_by_words(self, dateMock):
@@ -115,11 +111,9 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 	def test_natty_user_queries(self):
 		self.setupUser(True, True)
 
-		cliMsg.msg(self.testPhoneNumber, "#remind to cancel Saturday, 5/30 class this Friday at 2pm")
+		cliMsg.msg(self.testPhoneNumber, "remind me to cancel Saturday, 5/30 class this Friday at 2pm")
 		entry = Entry.fetchEntries(user=self.user, label="#reminders", hidden=False)[0]
 		self.assertEqual(entry.remind_timestamp.hour, 18)  # 2pm Eastern in UTC
-
-		cliMsg.msg(self.testPhoneNumber, "clear #reminders")
 
 		"""
 		Not supporting queries with two times where one could be sooner than the other and wrong

@@ -11,11 +11,12 @@ from .action import Action
 class FetchWeatherAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_FETCH_WEATHER
 
+	weatherRegex = re.compile(r"\b(weather|forecast)\b", re.I)
+
 	def getScore(self, chunk, user):
-		weather_re = re.compile(r"\b(weather|forecast)\b", re.I)
 		score = 0.0
 
-		if weather_re.search(chunk.normalizedText()) is not None:
+		if self.weatherRegex.search(chunk.normalizedText()) is not None:
 			score = .9
 
 		if FetchWeatherAction.HasHistoricalMatchForChunk(chunk):

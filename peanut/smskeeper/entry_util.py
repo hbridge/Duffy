@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import msg_util, user_util, niceties
+from smskeeper import msg_util, niceties
 
 from smskeeper.models import Entry
 logger = logging.getLogger(__name__)
@@ -8,18 +8,18 @@ logger = logging.getLogger(__name__)
 from fuzzywuzzy import fuzz
 
 
-def fuzzyMatchEntries(user, msg, keeperNumber, lastSentEntries):
-	# Clean the messages up
-	cleanedCommand = msg_util.cleanedDoneCommand(msg)
-	cleanedCommand = msg_util.cleanedSnoozeCommand(cleanedCommand)
+def isWildcardPhrase(msg):
+	interestingWords = msg_util.getInterestingWords(msg)
+	print interestingWords
+	# Is it a "done with all". Determine by looking if there's any interesting words
+	if (len(interestingWords) == 0 or niceties.getNicety(msg)):
+		return True
+	return False
 
-	# Removes punctuation, etc
-	cleanedCommand = msg_util.simplifiedMsg(cleanedCommand)
 
+def fuzzyMatchEntries(user, cleanedCommand, minScore=60):
 	phrases = cleanedCommand.split("and")
 	entries = set()
-
-	contextual = False
 
 	if len(phrases) > 1:
 		# append the original if it got split up since the actual entry might include "and"
@@ -28,39 +28,25 @@ def fuzzyMatchEntries(user, msg, keeperNumber, lastSentEntries):
 
 		for phrase in phrases:
 			phrase = phrase.strip()
+			interestingPhrase = ' '.join(msg_util.getInterestingWords(phrase))
+
 			bestMatch, score = getBestEntryMatch(user, phrase)
-			if score >= 60:
-				logger.info("User %s: Fuzzy matching entry '%s' (%s) due to score of %s" % (user.id, bestMatch.text, bestMatch.id, score))
+			if score >= minScore:
+				logger.info("User %s: Fuzzy matching entry '%s' (%s) due to score of %s (min %s)" % (user.id, bestMatch.text, bestMatch.id, score, minScore))
 				entries.add(bestMatch)
 	elif len(phrases) == 1:
-		phrase = msg_util.simplifiedMsg(phrases[0])
-		interestingWords = msg_util.getInterestingWords(phrase)
+		interestingPhrase = ' '.join(msg_util.getInterestingWords(cleanedCommand))
 
-		# Is it a "done with all". Determine by looking if there's any interesting words
-		if (len(interestingWords) == 0 or niceties.getNicety(phrase)):
-			# If we just sent some entries, then use those
-			if len(lastSentEntries) > 0:
-				entries = lastSentEntries
-			else:
-				# If not, just say done to all pending tasks
-				entries = user_util.pendingTodoEntries(user, includeAll=False)
-			contextual = True
-			logging.info("User %s: Fuzzy matching 'all' since there were no interesting words. Affected ids: %s" % (user.id, [x.id for x in entries]))
-
-		# If its not an "all" command, then try to match on something
+		bestMatch, score = getBestEntryMatch(user, interestingPhrase)
+		if score >= minScore:
+			logger.info("User %s: Fuzzy matching entry '%s' (%s) with '%s' due to score of %s (min %s)" % (user.id, bestMatch.text, bestMatch.id, interestingPhrase, score, minScore))
+			entries.add(bestMatch)
 		else:
-			interestingPhrase = ' '.join(interestingWords)
-
-			bestMatch, score = getBestEntryMatch(user, interestingPhrase)
-			if score >= 60:
-				logger.info("User %s: Fuzzy matching entry '%s' (%s) with '%s' due to score of %s" % (user.id, bestMatch.text, bestMatch.id, interestingPhrase, score))
-				entries.add(bestMatch)
-			else:
-				logger.info("User %s: Didn't find match, using interesting words: '%s'" % (user.id, interestingPhrase))
+			logger.info("User %s: Didn't find match, using interesting words: '%s'" % (user.id, interestingPhrase))
 
 	if len(entries) == 0:
 		logger.info("User %s: Couldn't find a good fuzzy match." % (user.id))
-	return list(entries), contextual
+	return list(entries)
 
 
 def getBestEntryMatch(user, msg, entries=None):

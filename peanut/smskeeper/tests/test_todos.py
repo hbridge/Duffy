@@ -684,7 +684,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Some unkown phrase, we shouldn't get anything back
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Done with the other thing")
+			cliMsg.msg(self.testPhoneNumber, "Done with buying sox")
 			self.assertEquals("", self.getOutput(mock))
 
 		# Make sure nothing was hidden
@@ -723,11 +723,24 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Some unkown phrase, we shouldn't get anything back
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "don't do that, do later today")
+			cliMsg.msg(self.testPhoneNumber, "don't do that, dummy")
 			self.assertEquals("", self.getOutput(mock))
 
 		# Makae sure we're now paused
 		self.assertTrue(self.getTestUser().paused)
+
+	# Make sure we do correction even when frustrated if there's a time in there
+	def test_corrects_even_when_frustrated(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "buy stuff tomorrow")
+
+		# Some unkown phrase, we shouldn't get anything back
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "don't do that, do later today")
+			self.assertIn("later today by 6pm", self.getOutput(mock))
 
 	# Make sure we do a create for an unkonwn phrase if its early (8 am)
 	def test_create_unknown_night_creates(self, dateMock):
@@ -745,18 +758,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Makae sure we're now paused
 		self.assertFalse(self.getTestUser().paused)
-
-	# Make sure we fuzzy match after taking out the done with.
-	# If we didn't, then this test would fail
-	def test_not_real_followup(self, dateMock):
-		self.setupUser(dateMock)
-
-		self.setNow(dateMock, self.MON_8AM)
-		cliMsg.msg(self.testPhoneNumber, "Remind me to call charu tomorrow")
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "nothing blah")
-			self.assertEqual("", self.getOutput(mock))
 
 	# Make sure if we type "in an hour" after it thinks its another day, it picks same day
 	def test_in_an_hour(self, dateMock):
@@ -836,7 +837,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind me to go poop")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_REMIND)
+			self.assertNotEqual(self.getTestUser().state, keeper_constants.STATE_SUSPENDED)
 
 	# Hit a bug where we were running the actions.done code twice, so extra entries
 	# could be cleared by accident
@@ -937,9 +938,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(keeper_constants.STATE_STOPPED, user.state)
 		self.assertFalse(user.paused)
 
+	# Make sure that when we classify a message as a completetodo then resend, it works
 	def test_done_classification(self, dateMock):
-		phrase1 = "done and done"
-		phrase2 = "done and done!"  # Slightly different
+		phrase1 = "done and newword"
+		phrase2 = "done and newword!"  # Slightly different
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
@@ -960,7 +962,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(user.paused)
 
 		message = Message.objects.get(msg_json__contains=phrase1)
-		message.classification = keeper_constants.CLASS_COMPLETE_TODO_ALL
+		message.classification = keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT
 		message.save()
 
 		user.paused = False
@@ -983,7 +985,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			},
 			{
 				"message": "snooze test classification 2 hours",
-				"classification": keeper_constants.CLASS_SNOOZE
+				"classification": keeper_constants.CLASS_CHANGETIME_SPECIFIC
 			},
 			{
 				"message": "done with test classification",

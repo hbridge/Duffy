@@ -6,8 +6,8 @@ from datetime import timedelta
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, not_activated_from_reminder, tutorial_list, tutorial_reminders, remind, reminder_sent, normal, unresolved_handles, unknown_command, implicit_label, stopped, user_help, tutorial_todo, suspended
-from smskeeper import msg_util, user_util
+from smskeeper.states import not_activated, unknown_command, stopped, tutorial_todo, suspended
+from smskeeper import actions, user_util
 
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
@@ -60,22 +60,27 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	classification = None
 	if not user.paused:
-		# If we're not a new user, process basic stuff. New users skip this so we don't filter on nicetys
-		if not isNewUser:
-			keeperEngine = Engine()
-			processed, classification = keeperEngine.process(user, msg, requestDict, keeperNumber)
-		if processed:
-			messageObject.auto_classification = classification
-			messageObject.save()
-		else:
-			count = 0
-			while not processed and count < 10:
+		count = 0
+		processed = False
+		while not processed and count < 10:
+			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
+				keeperEngine = Engine(Engine.DEFAULT, 0.0)
+				processed, classification = keeperEngine.process(user, msg)
+
+				messageObject.auto_classification = classification
+				messageObject.save()
+
+				# Reset the state so we know something happened since the reminder was sent
+				# Hacky since we need to know all the states we could be in
+				# Can't simply say !STATE_NORMAL because of TUTORIAL
+				if user.state == keeper_constants.STATE_REMINDER_SENT:
+					user.setState(keeper_constants.STATE_NORMAL)
+			else:
 				stateModule = stateCallbacks[user.state]
 				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
 				processed, classification = stateModule.process(user, msg, requestDict, keeperNumber)
 				if processed is None:
 					raise TypeError("modules must return True or False for processed")
-				count += 1
 
 				if processed:
 					user.last_state = user.state
@@ -84,8 +89,20 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 					messageObject.save()
 					logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
+			count += 1
 			if count == 10:
 				logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
+
+		if not processed:
+			paused = actions.unknown(user, msg, user.getKeeperNumber(), sendMsg=False)
+			if not paused:
+				# Its late at night
+				keeperEngine = Engine(Engine.LATE_NIGHT, 0.0)
+				processed, classification = keeperEngine.process(user, msg)
+
+				messageObject.auto_classification = classification
+				messageObject.save()
+
 	else:
 		logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))
 
@@ -98,24 +115,16 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED: not_activated,
-	keeper_constants.STATE_TUTORIAL_LIST: tutorial_list,
-	keeper_constants.STATE_TUTORIAL_REMIND: tutorial_reminders,
-	keeper_constants.STATE_NORMAL: normal,
-	keeper_constants.STATE_REMIND: remind,
-	keeper_constants.STATE_REMINDER_SENT: reminder_sent,
-	keeper_constants.STATE_UNRESOLVED_HANDLES: unresolved_handles,
 	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
-	keeper_constants.STATE_IMPLICIT_LABEL: implicit_label,
+	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_SUSPENDED: suspended,
-	keeper_constants.STATE_HELP: user_help,
-	keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER: not_activated_from_reminder,
-	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,
 }
+
 
 # Checks for duplicate message
 def isDuplicateMsg(user, msg):
-	incomingMsg = Message.objects.filter(user=user, incoming=True, added__gt=date_util.now(pytz.utc)-timedelta(minutes=2)).order_by('-added')
+	incomingMsg = Message.objects.filter(user=user, incoming=True, added__gt=date_util.now(pytz.utc) - timedelta(minutes=2)).order_by('-added')
 	if len(incomingMsg) > 0:
 		if incomingMsg[0].msg_json:
 			content = json.loads(incomingMsg[0].msg_json)

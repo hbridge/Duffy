@@ -122,8 +122,6 @@ def fetch(user, label, keeperNumber):
 		raise NameError("label is blank")
 
 	# We support many different remind commands, but every one actually does REMIND_LABEL
-	if msg_util.isRemindCommand(label):
-		label = keeper_constants.REMIND_LABEL
 	entries = Entry.fetchEntries(user=user, label=label)
 	clearMsg = "\n\nYou can say 'clear' to clear or 'delete NUMBER' to delete an item.\nManage lists at %s" % (user.getWebAppURL())
 	mediaUrls = list()
@@ -363,34 +361,6 @@ def done(user, msg, keeperNumber):
 		sms_util.sendMsg(user, msgBack, None, keeperNumber)
 		return True, isAll
 	return False, isAll
-
-
-def snooze(user, msg, keeperNumber):
-	justSentEntries = user.getLastEntries()
-
-	nattyResult = reminder_util.getNattyResult(user, msg)
-	msgWithoutTiming = nattyResult.queryWithoutTiming
-	entries, contextual = entry_util.fuzzyMatchEntries(user, msgWithoutTiming, keeperNumber, justSentEntries)
-	todayEntries = user_util.pendingTodoEntries(user, includeAll=False)
-
-	for entry in entries:
-		reminder_util.updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=True)
-
-	msgBack = None
-	if len(entries) == 0:
-		logger.info("User %s: I think this is a snooze command but couldn't find a good enough entry. pausing" % (user.id))
-		paused = unknown(user, msg, keeperNumber, sendMsg=False)
-		if not paused:
-			msgBack = "Sorry, I'm not sure what entry you mean."
-			if len(todayEntries) == 0:
-				msgBack += " You don't have any tasks today."
-			sms_util.sendMsg(user, msgBack, None, keeperNumber)
-		else:
-			return False
-	else:
-		reminder_util.sendCompletionResponse(user, entries[0], False, keeperNumber)
-
-	return True
 
 
 def unknown(user, msg, keeperNumber, sendMsg=True):

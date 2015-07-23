@@ -89,22 +89,7 @@ def dealWithAdd(user, msg, requestDict, keeperNumber):
 
 
 def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
-	nattyResult = reminder_util.getNattyResult(user, msg)
-	if msg_util.isRemindCommand(msg):
-		logger.info("User %s: I think '%s' is a remind command" % (user.id, msg))
-		user.setState(keeper_constants.STATE_REMIND)
-		return False, None  # Reprocess
-	# Hacky, theres a lot of exception cases here
-	elif msg_util.isDoneCommand(msg) and not nattyResult.validTime():
-		logger.info("User %s: I think '%s' is a done command" % (user.id, msg))
-		msgSent, isAll = actions.done(user, msg, keeperNumber)
-		classification = keeper_constants.CLASS_COMPLETE_TODO_ALL if isAll else keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
-		return True, classification
-	elif msg_util.isSnoozeCommand(msg):
-		logger.info("User %s: I think '%s' is a snooze command" % (user.id, msg))
-		actions.snooze(user, msg, keeperNumber)
-		return True, keeper_constants.CLASS_SNOOZE
-	elif len(msg.split(' ')) <= 1:
+	if len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
 		return True, keeper_constants.CLASS_SILENT_NICETY
 	else:
@@ -124,19 +109,9 @@ def process(user, msg, requestDict, keeperNumber):
 	try:
 		if re.match("yippee ki yay motherfucker", msg):
 			raise NameError("intentional exception")
+
 		if user.product_id >= keeper_constants.TODO_PRODUCT_ID:
 			return dealWithTodoProductMsg(user, msg, requestDict, keeperNumber)
-
-		# Below here is legacy stuff, lists, pictures
-		# STATE_REMIND
-		elif msg_util.isRemindCommand(msg) and not msg_util.isClearCommand(msg) and not msg_util.isFetchCommand(msg, user):
-			logger.info("User %s: I think '%s' is a remind command" % (user.id, msg))
-			# TODO  Fix this state so the logic isn't so complex
-			user.setState(keeper_constants.STATE_REMIND)
-			user.save()
-			# Reprocess
-			return False, keeper_constants.CLASS_CREATE_TODO
-		# STATE_NORMAL
 		elif msg_util.isPrintHashtagsCommand(msg):
 			logger.info("User %s: I think '%s' is a print hashtags command" % (user.id, msg))
 			# this must come before the isLabel() hashtag fetch check or we will try to look for a #hashtags list

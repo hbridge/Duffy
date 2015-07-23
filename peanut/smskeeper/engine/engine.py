@@ -12,32 +12,51 @@ from smskeeper.engine.help import HelpAction
 from smskeeper.engine.change_setting import ChangeSettingAction
 from smskeeper.engine.frustration import FrustrationAction
 from smskeeper.engine.fetch_digest import FetchDigestAction
+from smskeeper.engine.changetime_most_recent import ChangetimeMostRecentAction
+from smskeeper.engine.changetime_specific import ChangetimeSpecificAction
+from smskeeper.engine.create_todo import CreateTodoAction
+from smskeeper.engine.complete_todo_most_recent import CompleteTodoMostRecentAction
+from smskeeper.engine.complete_todo_specific import CompleteTodoSpecificAction
 
 logger = logging.getLogger(__name__)
 
-ENGINE_ACTIONS = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction(), FetchDigestAction()]
-
 
 class Engine:
-	def process(self, user, msg, requestDict, keeperNumber):
+	actionList = None
+	minScore = 0.0
+
+	DEFAULT = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction(), FetchDigestAction(), ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(), CompleteTodoMostRecentAction(), CompleteTodoSpecificAction()]
+	TUTORIAL_BASIC = [StopAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), FrustrationAction()]
+	TUTORIAL_STEP_2 = [ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(tutorial=True)]
+
+	LATE_NIGHT = [CreateTodoAction(lateNight=True)]
+
+	def __init__(self, actionList, minScore):
+		self.actionList = actionList
+		self.minScore = minScore
+
+	def process(self, user, msg):
 		# if the user
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None
 
+		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, msg))
+
 		chunk = Chunk(msg)
 		actionsByScore = dict()
-		for action in ENGINE_ACTIONS:
+
+		for action in self.actionList:
 			score = action.getScore(chunk, user)
 			if score not in actionsByScore:
 				actionsByScore[score] = list()
 			actionsByScore[score].append(action)
-			logger.debug("User %s: Action %s got score %s" % (user.id, action.ACTION_CLASS, score))
+			logger.info("User %s: Action %s got score %s" % (user.id, action.ACTION_CLASS, score))
 
 		sortedActionsByScore = collections.OrderedDict(sorted(actionsByScore.items(), reverse=True))
 
 		for score, actions in sortedActionsByScore.iteritems():
-			if score >= 0.5:
+			if score > self.minScore:
 				if len(actions) > 1:
 					actions = self.tieBreakActions(actions)
 
@@ -49,11 +68,12 @@ class Engine:
 						logger.info("User %s: I tried processing %s but it returned False, going onto next" % (user.id, action.ACTION_CLASS))
 					else:
 						return True, action.ACTION_CLASS
-		return False, None
+
+		return False, keeper_constants.CLASS_UNKNOWN
 
 	def tieBreakActions(self, actions):
 		sortedActions = list()
-		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, FetchDigestAction, ChangeSettingAction, QuestionAction, FrustrationAction]
+		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, FetchDigestAction, ChangeSettingAction, ChangetimeSpecificAction, ChangetimeMostRecentAction, CompleteTodoSpecificAction, CompleteTodoMostRecentAction, CreateTodoAction, QuestionAction, FrustrationAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:

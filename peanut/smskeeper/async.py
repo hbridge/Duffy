@@ -234,6 +234,7 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 			tips.markTipSent(user, digestTip, isMini=True)
 
 
+
 @app.task
 def sendDigestForUserId(userId, overrideKeeperNumber=None):
 	user = User.objects.get(id=userId)

@@ -229,14 +229,16 @@ DELAY_SECONDS_PER_WORD = 0.2
 MIN_DELAY_SECONDS = 1
 
 CLASS_CREATE_TODO = "createtodo"
-CLASS_COMPLETE_TODO_ALL = "completetodo-all"
+CLASS_COMPLETE_TODO_MOST_RECENT = "completetodo-most-recent"
 CLASS_COMPLETE_TODO_SPECIFIC = "completetodo-specific"
 CLASS_DELETE = "deletereminder"
 CLASS_FETCH_DIGEST = "fetchdigest"
 CLASS_NICETY = "nicety"
 CLASS_SILENT_NICETY = "silentnicety"
+# TODO(Derek): Move this over to snooze
 CLASS_CORRECTION = "timecorrection"
-CLASS_SNOOZE = "snooze"
+CLASS_CHANGETIME_SPECIFIC = "changetime-specific"
+CLASS_CHANGETIME_MOST_RECENT = "changetime-most-recent"
 CLASS_HELP = "help"
 CLASS_STOP = "stop"
 CLASS_FETCH_WEATHER = "fetchweather"
@@ -244,6 +246,8 @@ CLASS_NONE = "nocategory"
 CLASS_CHANGE_SETTING = "changesetting"
 CLASS_QUESTION = "question"
 CLASS_FRUSTRATION = "frustration"
+
+CLASS_UNKNOWN = "unknown"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"

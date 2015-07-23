@@ -24,8 +24,6 @@ class NicetyAction(Action):
 			score = 1.0
 
 		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
-		if msg_util.isRemindCommand(chunk.originalText):
-			score = 0.0
 
 		if msg_util.isDoneCommand(chunk.originalText):
 			score = 0.0

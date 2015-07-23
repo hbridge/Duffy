@@ -47,6 +47,8 @@ noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's",
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
 nonInterestingWords = ["morning", "evening", "tonight", "today", "to", "this", "but", "i", "before", "after", "instead", "those", "things", "thing", "tonight", "today", "works", "better", "are", "my", "till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "task", "all"]
+nonInterestingWords.extend(noOpWords)
+nonInterestingWords.extend(REMINDER_FRINGE_TERMS)
 
 
 def getInterestingWords(phrase):
@@ -210,10 +212,6 @@ def cleanedMsg(msg):
 	return msg.strip(string.punctuation).strip().lower()
 
 
-def isRemindCommand(msg):
-	return (reminder_re.search(msg.lower()) is not None)
-
-
 # Note: This does a very slow opperation by fetching all past messages
 # of a classification then doing the comparison one at a time.
 # This is done so we can run our "simplified msg" algo on each msg.  This might
@@ -239,7 +237,7 @@ def isDoneCommand(msg):
 	if matches:
 		return True
 
-	return isMsgClassified(simpleMsg, keeper_constants.CLASS_COMPLETE_TODO_ALL)
+	return isMsgClassified(simpleMsg, keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT)
 
 
 def isOkPhrase(msg):
@@ -249,10 +247,6 @@ def isOkPhrase(msg):
 			return True
 
 	return False
-
-
-def isSnoozeCommand(msg):
-	return re.match("snooze", msg, re.I) is not None
 
 
 def getFirstWord(msg):

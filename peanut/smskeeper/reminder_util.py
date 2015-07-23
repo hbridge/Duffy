@@ -76,7 +76,7 @@ def isFollowup(user, entry, msg, nattyResult):
 			return True
 		# If we were just editing this entry and the query has nearly no interesting words
 		# unless it's a snooze command, in which case it may refer to a different entry
-		elif isRecentAction and len(interestingWords) < 2 and not msg_util.isSnoozeCommand(nattyResult.queryWithoutTiming):
+		elif isRecentAction and len(interestingWords) < 2:
 			logger.info("User %s: I think this is a followup to %s bc we updated it recently and no interesting words" % (user.id, entry.id))
 			return True
 		else:
@@ -257,7 +257,7 @@ def getDefaultTime(user, isToday=False):
 # If there was no date, pick the default time (could be 9am tmr or later today)
 # If there a date, then see if its today.  If so, pick best default time for today.
 # If not today, then pick that day and set to the default time (9am)
-def dealWithDefaultTime(user, nattyResult):
+def fillInWithDefaultTime(user, nattyResult):
 	if nattyResult.hadTime:
 		return nattyResult
 
@@ -281,6 +281,12 @@ def dealWithDefaultTime(user, nattyResult):
 	return nattyResult
 
 
+def getDefaultNattyResult(msg, user):
+	nattyResult = natty_util.NattyResult(None, msg, None, False, False)
+	return fillInWithDefaultTime(user, nattyResult)
+
+
+# TODO(Derek): To be deleted
 def getNattyResult(user, msg):
 	msgCopy = msg
 
@@ -297,7 +303,7 @@ def getNattyResult(user, msg):
 
 	# Deal with situation where a time wasn't specified
 	if not nattyResult.hadTime:
-		nattyResult = dealWithDefaultTime(user, nattyResult)
+		nattyResult = fillInWithDefaultTime(user, nattyResult)
 
 	return nattyResult
 
