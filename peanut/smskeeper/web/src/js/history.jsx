@@ -32,6 +32,8 @@ var Message = Model.Message;
 var MessageList = Model.MessageList;
 var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
+var AdminEntriesView = require('./controls/AdminEntriesView.jsx');
+var EntryList = Model.EntryList;
 
 //Needed for onTouchTap
 //Can go away when react 1.0 release
@@ -125,6 +127,7 @@ var KeeperApp = React.createClass({
         </div>
         <UserInfo />
         <SendControl onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused}/>
+        <AdminEntriesView collection={entryList} />
       </div>
 		);
 	},
@@ -184,6 +187,8 @@ KeeperApp.childContextTypes = {
   parentCollection: React.PropTypes.any
 };
 
+var entryList = new EntryList();
+entryList.fetch();
 var historyStore = new HistoryStore({userId: USER.id});
 historyStore.fetch();
 React.render(<KeeperApp model={ historyStore }/>, document.getElementById("keeper_app"));
