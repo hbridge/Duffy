@@ -139,16 +139,15 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				# with patch('smskeeper.msg_util.timezoneForPostalCode') as mock_tz:
 				# 	mock_tz.return_value = "PST"
 				with patch('smskeeper.sms_util.recordOutput') as mock:
-					cliMsg.msg(self.testPhoneNumber, message["Body"])
 					logger.info(
 						"%s (%s, %s): %s",
 						self.testPhoneNumber,
 						self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
 						self.user.state, message["Body"]
 					)
+					cliMsg.msg(self.testPhoneNumber, message["Body"])
+
 					output = self.getOutput(mock)
-					if output != "":
-						logger.info("Keeper: %s" % (self.getOutput(mock)))
 
 				message_count += 1
 				self.user = User.objects.get(id=self.user.id)
@@ -166,6 +165,16 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				lastMessageObject = self.user.getMessages(incoming=True, ascending=False)[0]
 				lastMessageObject.classification = message["classification"]
 				lastMessageObject.save()
+
+				if output != "":
+					scoreStr = ""
+					if lastMessageObject.classification_scores_json:
+						scores = json.loads(lastMessageObject.classification_scores_json)
+
+						for action, score in scores.iteritems():
+							if score > 0:
+								scoreStr += "%s: %s  " % (action, score)
+					logger.info("Keeper: %s (%s)" % (self.getOutput(mock), scoreStr))
 
 		logger.info(
 			"\n\n *** Unknown Rate ***\n"
