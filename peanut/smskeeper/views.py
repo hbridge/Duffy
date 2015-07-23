@@ -149,8 +149,6 @@ def getMessagesForUser(user):
 			if message.incoming:
 				message_dict["classification"] = message.classification
 				message_dict["auto_classification"] = message.auto_classification
-				if message.classification_scores_json:
-					message_dict["classification_scores"] = json.loads(message.classification_scores_json)
 
 			messages_dicts.append(message_dict)
 
@@ -522,4 +520,12 @@ def classified_users(request):
 	for i in range(1000, 1150):
 		user_list.append(i)
 
-	return HttpResponse(json.dumps({"users": user_list}), content_type="text/text", status=200)
+	users = User.objects.filter(id__in=user_list)
+	classifiedUserIds = list()
+
+	# We filter by product 1 users since we want to correctly emulate them in the tutorial
+	for user in users:
+		if user.product_id == keeper_constants.TODO_PRODUCT_ID:
+			classifiedUserIds.append(user.id)
+
+	return HttpResponse(json.dumps({"users": classifiedUserIds}), content_type="text/text", status=200)

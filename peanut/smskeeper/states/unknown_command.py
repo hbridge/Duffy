@@ -22,4 +22,4 @@ def process(user, msg, requestDict, keeperNumber):
 	user.state = keeper_constants.STATE_NORMAL
 	user.save()
 
-	return processed, keeper_constants.CLASS_NONE
+	return processed, keeper_constants.CLASS_NONE, dict()

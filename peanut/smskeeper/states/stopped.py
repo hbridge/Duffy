@@ -21,7 +21,7 @@ def process(user, msg, requestDict, keeperNumber):
 				"Hours Paused": time_utils.totalHoursAgo(user.last_state_change),
 			}
 		)
-		return True, keeper_constants.CLASS_STOP
+		return True, keeper_constants.CLASS_STOP, dict()
 
 	# Ignore other messages
-	return True, keeper_constants.CLASS_NONE
+	return True, keeper_constants.CLASS_NONE, dict()

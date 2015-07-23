@@ -124,6 +124,38 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(user.timezone, "Europe/London")
 		self.assertEqual(user.wxcode, "UKXX0333")
 
+	def test_tutorial_uk_postal_code_space(self, dateMock):
+		self.setupUser(dateMock, productId=2)
+
+		# Activation message asks for their name
+		# Make sure that we have the UK specific language for this user
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("postal/zip code", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "N2H 4K8")
+
+		user = self.getTestUser()
+		self.assertEqual(user.timezone, "Europe/London")
+		self.assertEqual(user.wxcode, "UKXX0333")
+
+	# Had a bug where 'work' matched the UK postal codes so broke the tutorial
+	def test_does_not_match_work(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		# Activation message asks for their name
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "94117")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Work Friday at 8:00am")
+			self.assertIn("Fri", self.getOutput(mock))
+
+		# Make sure now messages are still though of as a reminder
+		self.assertEquals(1, len(Entry.objects.filter(label="#reminders")))
+
 	def test_name_with_punctuation(self, dateMock):
 		self.setupUser(dateMock)
 

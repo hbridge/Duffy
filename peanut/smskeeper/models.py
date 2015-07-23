@@ -65,6 +65,8 @@ class User(models.Model):
 	last_share_upsell = models.DateTimeField(null=True, blank=True)
 	last_feedback_prompt = models.DateTimeField(null=True, blank=True)
 
+	overrideKeeperNumber = None
+
 	def history(self):
 		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
 
@@ -214,6 +216,9 @@ class User(models.Model):
 		return url
 
 	def getKeeperNumber(self):
+		if self.overrideKeeperNumber:
+			return self.overrideKeeperNumber
+
 		if not settings.KEEPER_NUMBER_DICT:
 			raise NameError("Keeper number dict not set")
 		elif self.product_id not in settings.KEEPER_NUMBER_DICT:

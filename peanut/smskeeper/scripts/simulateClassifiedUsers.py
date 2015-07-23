@@ -138,9 +138,9 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				self.setNow(dateMock, message_date)
 				# with patch('smskeeper.msg_util.timezoneForPostalCode') as mock_tz:
 				# 	mock_tz.return_value = "PST"
+
 				with patch('smskeeper.sms_util.recordOutput') as mock:
-					logger.info(
-						"%s (%s, %s): %s",
+					printStr = "%s (%s, %s): %s" % (
 						self.testPhoneNumber,
 						self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
 						self.user.state, message["Body"]
@@ -150,8 +150,10 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					output = self.getOutput(mock)
 
 				message_count += 1
+				gotPaused = False
 				self.user = User.objects.get(id=self.user.id)
 				if self.user.paused:
+					gotPaused = True
 					unknown_count += 1
 					self.user.paused = False
 					self.user.save()
@@ -164,17 +166,28 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 				# set the correct classification for the message objct
 				lastMessageObject = self.user.getMessages(incoming=True, ascending=False)[0]
 				lastMessageObject.classification = message["classification"]
+				lastMessageObject.manual = message["manual"]
 				lastMessageObject.save()
 
-				if output != "":
-					scoreStr = ""
-					if lastMessageObject.classification_scores_json:
-						scores = json.loads(lastMessageObject.classification_scores_json)
+				# Figure out the scores then print out what the user said
+				scoreStr = ""
+				if lastMessageObject.classification_scores_json:
+					scores = json.loads(lastMessageObject.classification_scores_json)
 
-						for action, score in scores.iteritems():
-							if score > 0:
-								scoreStr += "%s: %s  " % (action, score)
-					logger.info("Keeper: %s (%s)" % (self.getOutput(mock), scoreStr))
+					for action, score in scores.iteritems():
+						if score > 0:
+							scoreStr += "%s: %s  " % (action, score)
+
+					printStr += " (%s)" % scoreStr
+				logger.info(printStr)
+
+				if output != "":
+					logger.info("Keeper: %s" % (self.getOutput(mock)))
+				else:
+					if gotPaused:
+						logger.info("Keeper: GOT PAUSED")
+					else:
+						logger.info("Keeper: IGNORED")
 
 		logger.info(
 			"\n\n *** Unknown Rate ***\n"
@@ -208,8 +221,12 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		logger.info("All messages count %d" % Message.objects.all().count())
 		unclassified_count = 0
 		classified_count = 0
+		manual_count = 0
 
 		for message in Message.objects.all():
+			if message.manual:
+				manual_count += 1
+				continue
 			# skip messages we don't have a manual classification for, messages we explicity said NoCategory
 			# for, or unkown messages, which are broken out above
 			if (not message.classification
@@ -247,6 +264,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			falseNegativesByClass[message.classification] = falseNegativesForClass
 
 		logger.info("Unclassified, Unknown, and NoCategory count: %d" % unclassified_count)
+		logger.info("Manual messages ignored: %d" % manual_count)
 		logger.info("Classified messages tested for accuracy: %d" % classified_count)
 
 		allTp = sum(map(lambda arr: len(arr), truePositivesByClass.values()))

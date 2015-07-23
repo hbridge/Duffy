@@ -60,14 +60,13 @@ class Engine:
 				if len(actions) > 1:
 					actions = self.tieBreakActions(actions)
 
-				for action in actions:
-					logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
-					processed = action.execute(chunk, user)
+				# Pick the first one after sorting
+				# Later on we might want to look at the 'processed' return code
+				action = actions[0]
+				logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
+				processed = action.execute(chunk, user)
 
-					if not processed:
-						logger.info("User %s: I tried processing %s but it returned False, going onto next" % (user.id, action.ACTION_CLASS))
-					else:
-						return True, action.ACTION_CLASS, self.getActionScores(sortedActionsByScore)
+				return processed, action.ACTION_CLASS, self.getActionScores(sortedActionsByScore)
 
 		return False, keeper_constants.CLASS_UNKNOWN, self.getActionScores(sortedActionsByScore)
 

@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def process(user, msg, requestDict, keeperNumber):
+	actionScores = dict()
 	step = user.getStateData(keeper_constants.TUTORIAL_STEP_KEY)
 
 	if step:
@@ -35,10 +36,10 @@ def process(user, msg, requestDict, keeperNumber):
 	)
 
 	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
-	processed, classification, sortedActionsByScore = keeperEngine.process(user, msg)
+	processed, classification, actionScores = keeperEngine.process(user, msg)
 
 	if processed:
-		return True, classification
+		return True, classification, actionScores
 
 	classification = None
 	# Tutorial stuff
@@ -54,7 +55,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE
+				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				user.name = msg.strip(string.punctuation)
 
@@ -82,7 +83,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE
+				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				user.postal_code = postalCode
 				user.timezone = timezone
@@ -96,28 +97,29 @@ def process(user, msg, requestDict, keeperNumber):
 			if lastMessageOut.added < cutoff:
 				response = "Got it, but first thing, what's your zipcode?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE
+				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				# else ignore
-				return True, keeper_constants.CLASS_NONE
+				return True, keeper_constants.CLASS_NONE, actionScores
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
+		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops tmr' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
 		postalCode = msg_util.getPostalCode(msg)
 
 		if postalCode:
+			logger.info("User %s: Ignoring '%s' since I think it has a postal code of '%s' in it and I have one already" % (user.id, msg, postalCode))
 			# ignore
-			return True, keeper_constants.CLASS_NONE
+			return True, keeper_constants.CLASS_NONE, actionScores
 
 		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
-		processed, classification, sortedActionsByScore = keeperEngine.process(user, msg)
+		finishedWithCreate, classification, actionScores = keeperEngine.process(user, msg)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text
-		if not processed:
-			return True, keeper_constants.CLASS_NONE
+		if not finishedWithCreate:
+			return True, keeper_constants.CLASS_CREATE_TODO, actionScores
 
 		if keeper_constants.isRealKeeperNumber(keeperNumber):
 			time.sleep(1)
@@ -145,4 +147,4 @@ def process(user, msg, requestDict, keeperNumber):
 		analytics.setUserInfo(user)
 
 	user.save()
-	return True, classification
+	return True, classification, actionScores

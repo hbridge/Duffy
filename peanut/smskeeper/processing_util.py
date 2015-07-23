@@ -47,6 +47,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	if user.getKeeperNumber() != keeperNumber and keeper_constants.isRealKeeperNumber(keeperNumber):
 		logger.error("User %s: Recieved message '%s' to number %s but user should be sending to %s" % (user.id, msg, keeperNumber, user.getKeeperNumber()))
 		keeperNumber = user.getKeeperNumber()
+	elif not keeper_constants.isRealKeeperNumber(keeperNumber):
+		user.overrideKeeperNumber = keeperNumber
 
 	processed = False
 	# convert message to unicode
@@ -81,7 +83,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 			else:
 				stateModule = stateCallbacks[user.state]
 				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
-				processed, classification = stateModule.process(user, msg, requestDict, keeperNumber)
+				processed, classification, actionScores = stateModule.process(user, msg, requestDict, keeperNumber)
 				if processed is None:
 					raise TypeError("modules must return True or False for processed")
 
@@ -89,6 +91,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 					user.last_state = user.state
 					user.save()
 					messageObject.auto_classification = classification
+					messageObject.classification_scores_json = json.dumps(actionScores)
 					messageObject.save()
 					logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
