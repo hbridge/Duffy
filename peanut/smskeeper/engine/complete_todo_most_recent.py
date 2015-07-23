@@ -13,7 +13,7 @@ class CompleteTodoMostRecentAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		cleanedText = msg_util.cleanedDoneCommand(chunk.normalizedText())
+		cleanedText = msg_util.cleanedDoneCommand(chunk.normalizedTextWithoutTiming(user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 
 		justNotified = (user.state == keeper_constants.STATE_REMINDER_SENT)

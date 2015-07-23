@@ -13,7 +13,7 @@ class CompleteTodoSpecificAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		cleanedText = msg_util.cleanedDoneCommand(chunk.normalizedText())
+		cleanedText = msg_util.cleanedDoneCommand(chunk.normalizedTextWithoutTiming(user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 
 		regexHit = msg_util.done_re.search(chunk.normalizedText()) is not None

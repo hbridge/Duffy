@@ -25,10 +25,7 @@ class ChangetimeMostRecentAction(Action):
 
 		justNotified = (user.state == keeper_constants.STATE_REMINDER_SENT)
 
-		if nattyResult:
-			cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)
-		else:
-			cleanedText = msg_util.cleanedReminder(chunk.normalizedText())
+		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(interestingWords), 80)
 

@@ -986,6 +986,25 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 3:20 planned parenthood")
 			self.assertIn("tomorrow at 3:20pm", self.getOutput(mock))
 
+	# Test situation where the reminder time is before the current time with no am/pm
+	# Had bug where we were returning times in the past
+	def test_followup_back_in_time_and_no_am_pm(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8PM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 3:20 planned parenthood")
+			self.assertIn("tomorrow at 3:20pm", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_10PM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me at 2:50.")
+			self.assertIn("tomorrow at 2:50pm", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(1, len(entries))
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)

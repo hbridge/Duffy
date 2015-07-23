@@ -10,7 +10,6 @@ from fuzzywuzzy import fuzz
 
 def isWildcardPhrase(msg):
 	interestingWords = msg_util.getInterestingWords(msg)
-	print interestingWords
 	# Is it a "done with all". Determine by looking if there's any interesting words
 	if (len(interestingWords) == 0 or niceties.getNicety(msg)):
 		return True
@@ -18,7 +17,7 @@ def isWildcardPhrase(msg):
 
 
 def fuzzyMatchEntries(user, cleanedCommand, minScore=60):
-	phrases = cleanedCommand.split("and")
+	phrases = cleanedCommand.split(" and ")
 	entries = set()
 
 	if len(phrases) > 1:
@@ -32,20 +31,20 @@ def fuzzyMatchEntries(user, cleanedCommand, minScore=60):
 
 			bestMatch, score = getBestEntryMatch(user, phrase)
 			if score >= minScore:
-				logger.info("User %s: Fuzzy matching entry '%s' (%s) due to score of %s (min %s)" % (user.id, bestMatch.text, bestMatch.id, score, minScore))
+				logger.debug("User %s: Fuzzy matching entry '%s' (%s) due to score of %s (min %s)" % (user.id, bestMatch.text, bestMatch.id, score, minScore))
 				entries.add(bestMatch)
 	elif len(phrases) == 1:
 		interestingPhrase = ' '.join(msg_util.getInterestingWords(cleanedCommand))
 
 		bestMatch, score = getBestEntryMatch(user, interestingPhrase)
 		if score >= minScore:
-			logger.info("User %s: Fuzzy matching entry '%s' (%s) with '%s' due to score of %s (min %s)" % (user.id, bestMatch.text, bestMatch.id, interestingPhrase, score, minScore))
+			logger.debug("User %s: Fuzzy matching entry '%s' (%s) with '%s' due to score of %s (min %s)" % (user.id, bestMatch.text, bestMatch.id, interestingPhrase, score, minScore))
 			entries.add(bestMatch)
 		else:
-			logger.info("User %s: Didn't find match, using interesting words: '%s'" % (user.id, interestingPhrase))
+			logger.debug("User %s: Didn't find match, using interesting words: '%s'" % (user.id, interestingPhrase))
 
 	if len(entries) == 0:
-		logger.info("User %s: Couldn't find a good fuzzy match." % (user.id))
+		logger.debug("User %s: Couldn't find a good fuzzy match." % (user.id))
 	return list(entries)
 
 

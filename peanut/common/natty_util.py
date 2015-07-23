@@ -47,7 +47,12 @@ def getNattyResult(msg, user):
 
 	now = date_util.now(pytz.utc)
 
+	startlen = len(nattyResults)
 	nattyResults = filter(lambda x: x.utcTime >= now - datetime.timedelta(seconds=10), nattyResults)
+	endlen = len(nattyResults)
+
+	if startlen != endlen:
+		logger.debug("User %s: Filtered out %s entries due to them being behind in time. Have %s left" % (user.id, startlen - endlen, endlen))
 
 	# Sort by the date, we want to soonest first
 	nattyResults = sorted(nattyResults, key=lambda x: x.utcTime)
@@ -60,7 +65,12 @@ def getNattyResult(msg, user):
 	nattyResults = sorted(nattyResults, key=lambda x: "at " in x.textUsed, reverse=True)
 
 	# Filter out stuff that was only using term "now"
+	startlen = len(nattyResults)
 	nattyResults = filter(lambda x: x.textUsed.lower() != "now", nattyResults)
+	endlen = len(nattyResults)
+
+	if startlen != endlen:
+		logger.debug("User %s: Filtered out %s entries due them having 'now' in them. Have %s left" % (user.id, startlen - endlen, endlen))
 
 	if len(nattyResults) == 0:
 		return None
@@ -227,6 +237,8 @@ def processQuery(query, timezone):
 
 	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
 
+	logger.debug("Hitting natty url: %s" % nattyUrl)
+
 	# TODO: Move this to a cleaner solution
 	if hasattr(settings, "LOCAL"):
 		nattyUrl = "http://dev.duffyapp.com:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
@@ -254,12 +266,15 @@ def processQuery(query, timezone):
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
-
 				# If it has am or pm in the used text, then assume tomorrow
 				if "m" in usedText.lower():
 					startDate = startDate + datetime.timedelta(days=1)
+				elif startDate > now - datetime.timedelta(hours=24) and startDate < now - datetime.timedelta(hours=12):
+					# This is between 12 and 24 hours in the past, so:
+					# Its 6pm, we say "3", natty returns "3am", we want to return 3am, so 24 hours
+					startDate = startDate + datetime.timedelta(days=1)
 				else:
-					# otherwise, its 8 so assume 12 hours from now
+					# Its 6pm, we say "8", natty returns "8am", we want to return 8pm, so 12 hours
 					startDate = startDate + datetime.timedelta(hours=12)
 
 			tzAwareStartDate = startDate.astimezone(timezone)
