@@ -35,7 +35,7 @@ def process(user, msg, requestDict, keeperNumber):
 	)
 
 	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
-	processed, classification = keeperEngine.process(user, msg)
+	processed, classification, sortedActionsByScore = keeperEngine.process(user, msg)
 
 	if processed:
 		return True, classification
@@ -112,7 +112,7 @@ def process(user, msg, requestDict, keeperNumber):
 			return True, keeper_constants.CLASS_NONE
 
 		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
-		processed, classification = keeperEngine.process(user, msg)
+		processed, classification, sortedActionsByScore = keeperEngine.process(user, msg)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text

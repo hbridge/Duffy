@@ -377,6 +377,7 @@ class Message(models.Model):
 	classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
 	auto_classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
 
+	classification_scores_json = models.CharField(max_length=1000, null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
 

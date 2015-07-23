@@ -65,9 +65,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		while not processed and count < 10:
 			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
 				keeperEngine = Engine(Engine.DEFAULT, 0.0)
-				processed, classification = keeperEngine.process(user, msg)
+				processed, classification, actionScores = keeperEngine.process(user, msg)
 
 				messageObject.auto_classification = classification
+				messageObject.classification_scores_json = json.dumps(actionScores)
 				messageObject.save()
 
 				# Reset the state so we know something happened since the reminder was sent
@@ -98,9 +99,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 			if not paused:
 				# Its late at night
 				keeperEngine = Engine(Engine.LATE_NIGHT, 0.0)
-				processed, classification = keeperEngine.process(user, msg)
+				processed, classification, actionScores = keeperEngine.process(user, msg)
 
 				messageObject.auto_classification = classification
+				messageObject.classification_scores_json = json.dumps(actionScores)
 				messageObject.save()
 
 	else:
@@ -120,7 +122,6 @@ stateCallbacks = {
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_SUSPENDED: suspended,
 }
-
 
 # Checks for duplicate message
 def isDuplicateMsg(user, msg):

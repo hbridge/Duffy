@@ -67,9 +67,9 @@ class Engine:
 					if not processed:
 						logger.info("User %s: I tried processing %s but it returned False, going onto next" % (user.id, action.ACTION_CLASS))
 					else:
-						return True, action.ACTION_CLASS
+						return True, action.ACTION_CLASS, self.getActionScores(sortedActionsByScore)
 
-		return False, keeper_constants.CLASS_UNKNOWN
+		return False, keeper_constants.CLASS_UNKNOWN, self.getActionScores(sortedActionsByScore)
 
 	def tieBreakActions(self, actions):
 		sortedActions = list()
@@ -81,3 +81,10 @@ class Engine:
 		return sortedActions
 
 		raise NameError("Couldn't tie break")
+
+	def getActionScores(self, sortedActionsByScore):
+		result = dict()
+		for score, actions in sortedActionsByScore.iteritems():
+			for action in actions:
+				result[action.ACTION_CLASS] = score
+		return result
