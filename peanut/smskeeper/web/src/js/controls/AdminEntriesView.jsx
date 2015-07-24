@@ -45,9 +45,7 @@ module.exports = React.createClass({
 		    	</ToolbarGroup>
 	    	</Toolbar>
 
-	      		{ this.props.collection.reminders().map(createEntry) }
-
-	        <AdminEntryDialog ref="entryDialog" />
+      		{ this.props.collection.reminders().map(createEntry) }
       	</Paper>
       	</div>
     );
