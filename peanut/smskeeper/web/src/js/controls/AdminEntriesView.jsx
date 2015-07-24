@@ -18,7 +18,6 @@ mui = require('material-ui'),
  Card = mui.Card;
  CardTitle = mui.CardTitle;
 
-AdminEntryDialog = require('./AdminModifyEntryDialog.jsx');
 AdminEntryCard = require('./AdminEntryCard.jsx');
 
 
