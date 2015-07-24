@@ -17,7 +17,7 @@ class FetchDigestAction(Action):
 		score = 0.0
 
 		if self.digestRegex.search(chunk.normalizedText()) is not None:
-			score = 0.9
+			score = 0.8
 
 		if FetchDigestAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0

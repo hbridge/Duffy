@@ -91,14 +91,19 @@ class SMSKeeperBaseCase(TestCase):
 
 	# Day, hasDate, hasTime
 	# These should all in UTC
+	MON_2AM = datetime.datetime(2015, 6, 1, 6, 0, 0, tzinfo=pytz.utc)
+	MON_6AM = datetime.datetime(2015, 6, 1, 10, 0, 0, tzinfo=pytz.utc)
 	MON_8AM = datetime.datetime(2015, 6, 1, 12, 0, 0, tzinfo=pytz.utc)
 	MON_9AM = datetime.datetime(2015, 6, 1, 13, 0, 0, tzinfo=pytz.utc)
 	MON_10AM = datetime.datetime(2015, 6, 1, 14, 0, 0, tzinfo=pytz.utc)
 	MON_11AM = datetime.datetime(2015, 6, 1, 15, 0, 0, tzinfo=pytz.utc)
+	MON_1PM = datetime.datetime(2015, 6, 1, 17, 0, 0, tzinfo=pytz.utc)
 	MON_2PM = datetime.datetime(2015, 6, 1, 18, 0, 0, tzinfo=pytz.utc)
 	MON_3PM = datetime.datetime(2015, 6, 1, 19, 0, 0, tzinfo=pytz.utc)
+	MON_6PM = datetime.datetime(2015, 6, 1, 22, 0, 0, tzinfo=pytz.utc)
 	MON_8PM = datetime.datetime(2015, 6, 2, 0, 0, 0, tzinfo=pytz.utc)
 	MON_10PM = datetime.datetime(2015, 6, 2, 2, 0, 0, tzinfo=pytz.utc)
+	TUE_1AM = datetime.datetime(2015, 6, 2, 5, 0, 0, tzinfo=pytz.utc)
 	TUE_5AM = datetime.datetime(2015, 6, 2, 9, 0, 0, tzinfo=pytz.utc)
 	TUE_8AM = datetime.datetime(2015, 6, 2, 12, 0, 0, tzinfo=pytz.utc)
 	TUE_9AM = datetime.datetime(2015, 6, 2, 13, 0, 0, tzinfo=pytz.utc)

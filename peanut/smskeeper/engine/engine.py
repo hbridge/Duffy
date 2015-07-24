@@ -1,5 +1,6 @@
 import logging
 import collections
+import operator
 
 from smskeeper import keeper_constants
 from smskeeper.chunk import Chunk
@@ -51,11 +52,15 @@ class Engine:
 			if score not in actionsByScore:
 				actionsByScore[score] = list()
 			actionsByScore[score].append(action)
-			logger.info("User %s: Action %s got score %s" % (user.id, action.ACTION_CLASS, score))
 
 		sortedActionsByScore = collections.OrderedDict(sorted(actionsByScore.items(), reverse=True))
+		actionScores = self.getActionScores(sortedActionsByScore)
+
+		for action, score in sorted(actionScores.items(), key=operator.itemgetter(1), reverse=True):
+			logger.info("User %s: Action %s got score %s" % (user.id, action, score))
 
 		for score, actions in sortedActionsByScore.iteritems():
+
 			if score > self.minScore:
 				if len(actions) > 1:
 					actions = self.tieBreakActions(actions)
@@ -66,9 +71,9 @@ class Engine:
 				logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
 				processed = action.execute(chunk, user)
 
-				return processed, action.ACTION_CLASS, self.getActionScores(sortedActionsByScore)
+				return processed, action.ACTION_CLASS, actionScores
 
-		return False, keeper_constants.CLASS_UNKNOWN, self.getActionScores(sortedActionsByScore)
+		return False, keeper_constants.CLASS_UNKNOWN, actionScores
 
 	def tieBreakActions(self, actions):
 		sortedActions = list()

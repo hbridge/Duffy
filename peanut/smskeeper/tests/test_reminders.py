@@ -987,7 +987,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("tomorrow at 3:20pm", self.getOutput(mock))
 
 	# Test situation where the reminder time is before the current time with no am/pm
-	# Had bug where we were returning times in the past
 	def test_followup_back_in_time_and_no_am_pm(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -1005,6 +1004,133 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(1, len(entries))
+
+	"""
+	def test_early_morning_tomorrow_behind(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+
+		# Its 2am and I say tomorrow at 1. Should be 1pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 1 planned parenthood")
+			self.assertIn("later today by 1pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_1PM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_1PM.hour)
+
+	def test_early_morning_tomorrow_after(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		# Its 2am and I say tomorrow at 3. Should be 3pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 3 planned parenthood")
+			self.assertIn("later today by 3pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_3PM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_3PM.hour)
+
+	def test_early_morning_tomorrow_am_behind(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+
+		# Its 2am and I say tomorrow at 1. Should be 1pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 1am planned parenthood")
+			self.assertIn("tomorrow by 1am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.TUE_1AM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.TUE_1AM.hour)
+
+	def test_early_morning_tomorrow_am_after(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+
+		# Its 2am and I say tomorrow at 1. Should be 1pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 8am planned parenthood")
+			self.assertIn("later today by 8am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_8AM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_8AM.hour)
+
+	def test_early_morning_tomorrow_pm_behind(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+
+		# Its 2am and I say tomorrow at 1. Should be 1pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 1pm planned parenthood")
+			self.assertIn("later today by 1pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_1PM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_1PM.hour)
+
+	def test_early_morning_tomorrow_pm_after(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		# Its 2am and I say tomorrow at 3. Should be 3pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment tomorrow at 3pm planned parenthood")
+			self.assertIn("later today by 3pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_3PM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_3PM.hour)
+
+	def test_early_morning_today_behind_no_am_or_pm(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		# Its 2am and I say "at 1". Should be 1pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment at 1 planned parenthood")
+			self.assertIn("later today by 1pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_1PM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_1PM.hour)
+
+	def test_early_morning_today_after_no_am_or_pm(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		# Its 2am and I say "at 1". Should be 1pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment at 8 planned parenthood")
+			self.assertIn("later today by 8am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_8AM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_8AM.hour)
+
+	def test_early_morning_later_morning(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		# Its 2am and I say "at 6". Should be 6am later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment at 6 planned parenthood")
+			self.assertIn("later today by 6am", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_6AM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_6AM.hour)
+
+	def test_early_morning_afternoon(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		# Its 2am and I say at 6pm. Should be 6pm later that day
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I have an appointment at 6pm planned parenthood")
+			self.assertIn("later today by 6pm", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertEqual(entry.remind_timestamp.day, self.MON_6PM.day)
+		self.assertEqual(entry.remind_timestamp.hour, self.MON_6PM.hour)
+
+	"""
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)

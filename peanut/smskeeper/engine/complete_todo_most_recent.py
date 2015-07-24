@@ -3,6 +3,7 @@ import logging
 from smskeeper import msg_util, sms_util, entry_util
 from smskeeper import keeper_constants
 from .action import Action
+from smskeeper import niceties
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,9 @@ class CompleteTodoMostRecentAction(Action):
 				score = 0.9
 			else:
 				score = 0.7
+
+		if regexHit and niceties.getNicety(' '.join(interestingWords)):
+			score = 0.6
 
 		if chunk.getNattyResult(user):
 			score = 0.0

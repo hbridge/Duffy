@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 from celery.schedules import crontab
 import datetime
@@ -216,11 +217,12 @@ LOGGING = {
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
         },
-        # 'console': {
-        #    'level': 'DEBUG',
-        #    'class': 'logging.StreamHandler',
-        #    'formatter': 'simple'
-        # },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'stream': sys.stdout
+        },
     },
     'loggers': {
         # Silence SuspiciousOperation.DisallowedHost exception ('Invalid
@@ -231,7 +233,7 @@ LOGGING = {
             'propagate': False,
         },
         'django': {
-            'handlers': ['djangofile', 'djangoerror', 'mail_admins', 'slackerror'],  # , 'console'],
+            'handlers': ['djangofile', 'djangoerror', 'mail_admins', 'slackerror'],
             'propagate': True,
             'level': 'DEBUG',
         },

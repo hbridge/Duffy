@@ -1,6 +1,8 @@
 import datetime
 import pytz
 from mock import patch
+import logging
+import sys
 
 from smskeeper import cliMsg, async, keeper_constants
 from smskeeper.models import Entry, Message
@@ -11,6 +13,9 @@ import emoji
 from smskeeper import time_utils
 from common import date_util
 from datetime import timedelta
+
+logger = logging.getLogger()
+logger.level = logging.DEBUG
 
 
 @patch('common.date_util.utcnow')
@@ -1292,3 +1297,30 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(3, len(entries))
+
+		# Make sure first reminder we send snooze tip, then second we don't
+	def test_done_with_nicety(self, dateMock):
+		stream_handler = logging.StreamHandler(sys.stdout)
+		logger.addHandler(stream_handler)
+
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 11")
+
+		self.setNow(dateMock, self.MON_11AM)
+		# Make sure the snooze tip came through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Thank you done")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertTrue(entry.hidden)
+
