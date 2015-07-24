@@ -100,15 +100,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
 
 		if not processed:
-			paused = actions.unknown(user, msg, user.getKeeperNumber(), sendMsg=False)
-			if not paused:
-				# Its late at night
-				keeperEngine = Engine(Engine.LATE_NIGHT, 0.0)
-				processed, classification, actionScores = keeperEngine.process(user, msg)
-
-				messageObject.auto_classification = classification
-				messageObject.classification_scores_json = json.dumps(actionScores)
-				messageObject.save()
+			actions.unknown(user, msg, user.getKeeperNumber())
 
 	else:
 		logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))

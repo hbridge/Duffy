@@ -14,11 +14,9 @@ logger = logging.getLogger(__name__)
 class CreateTodoAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CREATE_TODO
 
-	lateNight = False
 	tutorial = False
 
-	def __init__(self, lateNight=False, tutorial=False):
-		self.lateNight = lateNight
+	def __init__(self, tutorial=False):
 		self.tutorial = tutorial
 
 	def getScore(self, chunk, user):
@@ -34,9 +32,6 @@ class CreateTodoAction(Action):
 			score = 0.5
 
 		if self.tutorial:
-			score = 0.7
-
-		if self.lateNight:
 			score = 0.7
 
 		if nattyResult and regexHit:

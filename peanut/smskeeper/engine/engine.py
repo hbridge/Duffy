@@ -30,8 +30,6 @@ class Engine:
 	TUTORIAL_BASIC = [StopAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), FrustrationAction()]
 	TUTORIAL_STEP_2 = [ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(tutorial=True)]
 
-	LATE_NIGHT = [CreateTodoAction(lateNight=True)]
-
 	def __init__(self, actionList, minScore):
 		self.actionList = actionList
 		self.minScore = minScore

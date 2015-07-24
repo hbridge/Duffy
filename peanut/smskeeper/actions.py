@@ -324,22 +324,26 @@ def clearAll(entries):
 
 
 def unknown(user, msg, keeperNumber, sendMsg=True):
+	postMsg = "User %s paused after: '%s'" % (user.id, msg)
+
 	now = date_util.now(pytz.timezone("US/Eastern"))
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM:
+		postMsg += "   @derek @aseem @henry"  # Add ourselves to get alerted during the day
 		user.paused = True
 		user.last_paused_timestamp = date_util.now(pytz.utc)
 		user.save()
-		postMsg = "User %s paused after: '%s'   @derek @aseem @henry" % (user.id, msg)
-		slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
-		logger.info("Putting user %s into paused state due to the message %s" % (user.id, msg))
+		logger.info("User %s: Putting into paused state due to the message %s" % (user.id, msg))
 		ret = True
 	else:
 		if sendMsg:
 			sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
 			user.setState(keeper_constants.STATE_UNKNOWN_COMMAND)
 			user.save()
-			logger.info("For user %s I couldn't figure out '%s'" % (user.id, msg))
+			logger.info("User %s: (At night) I couldn't figure out '%s'" % (user.id, msg))
 		ret = False
+
+	slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
+
 	analytics.logUserEvent(
 		user,
 		"Sent Unknown Command",

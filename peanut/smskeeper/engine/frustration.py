@@ -10,7 +10,7 @@ class FrustrationAction(Action):
 		score = 0.0
 
 		if msg_util.startsWithNo(chunk.normalizedText()):
-			score = 0.9
+			score = 0.4
 
 		if FrustrationAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
@@ -18,5 +18,5 @@ class FrustrationAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		paused = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False)
-		return paused
+		actions.unknown(user, chunk.originalText, user.getKeeperNumber())
+		return True
