@@ -1134,9 +1134,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processAllReminders()
 			self.assertIn("Wake up", self.getOutput(mock))
 
-		entry = Entry.objects.get(label="#reminders")
-		self.assertTrue(entry.hidden)
-
 		# Now that its Wed, it shouldn't go out
 		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=2))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1144,6 +1141,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual("", self.getOutput(mock))
 
 	# Pretend that the async processing didn't mark something as hidden.
+	# This is simply here to validate that this bug is tracked
 	def test_daily_reminder_with_end_bug_in_processing(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -1163,7 +1161,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Wake up", self.getOutput(mock))
 
 		# Explicitly don't run the job on Tuesday
-		entry = Entry.objects.get(label="#reminders")
+		entry = Entry.objects.filter(label="#reminders").first()
 		self.assertFalse(entry.hidden)
 
 		# Now that its Wed, it shouldn't go out
@@ -1300,9 +1298,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_with_nicety(self, dateMock):
-		stream_handler = logging.StreamHandler(sys.stdout)
-		logger.addHandler(stream_handler)
-
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
@@ -1326,9 +1321,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 	# If they snooze and don't give a time, just say tomorrow with followup
 	def test_snooze_no_time(self, dateMock):
-		stream_handler = logging.StreamHandler(sys.stdout)
-		logger.addHandler(stream_handler)
-
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
@@ -1351,3 +1343,114 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "snooze go poop ")
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
+
+	def test_snooze_one_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
+		entry = Entry.objects.get(label="#reminders")
+		entry.remind_recur = keeper_constants.RECUR_ONE_TIME
+		entry.save()
+
+		self.setNow(dateMock, self.MON_3PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		# Should only be one since a new reminder shouldn't have been created
+		self.assertEqual(1, len(entries))
+		entry = entries[0]
+		self.assertFalse(entry.hidden)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze 3 hours")
+			self.assertIn("6pm", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_6PM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Go poop", self.getOutput(mock))
+
+	def test_snooze_weekly(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
+		entry = Entry.objects.get(label="#reminders")
+		entry.remind_recur = keeper_constants.RECUR_WEEKLY
+		entry.save()
+
+		self.setNow(dateMock, self.MON_3PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		# Should be 2 since a new reminder should have been created
+		self.assertEqual(2, len(entries))
+		entry = entries[0]
+		self.assertFalse(entry.hidden)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze 3 hours")
+			self.assertIn("6pm", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_6PM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Go poop", self.getOutput(mock))
+
+		# Make sure a week later, the reminder is back at 3pm
+		self.setNow(dateMock, self.MON_3PM + datetime.timedelta(days=7))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+	# Make sure we can say "done" to a weekly task and the task still shows up next time
+	def test_done_weekly(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
+		entry = Entry.objects.get(label="#reminders")
+		entry.remind_recur = keeper_constants.RECUR_WEEKLY
+		entry.save()
+
+		self.setNow(dateMock, self.MON_3PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "done go poop")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Go poop", self.getOutput(mock))
+
+		# Make sure a week later, the reminder is back at 3pm
+		self.setNow(dateMock, self.MON_3PM + datetime.timedelta(days=7))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Go poop", self.getOutput(mock))

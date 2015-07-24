@@ -43,5 +43,5 @@ class ChangetimeSpecificAction(ChangetimeAction):
 		msg = msg_util.cleanedSnoozeCommand(msg)
 
 		entries = entry_util.fuzzyMatchEntries(user, chunk.normalizedTextWithoutTiming(user), 80)
-
+		entries = filter(lambda x: not x.hidden, entries)
 		return entries

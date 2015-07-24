@@ -62,28 +62,31 @@ def shouldRemindNow(entry):
 
 def updateEntryAfterProcessing(entry):
 	entry.remind_last_notified = date_util.now(pytz.utc)
-	entry.remind_to_be_sent = False  # By default after processing we don't send again
-
-	if entry.remind_recur == keeper_constants.RECUR_ONE_TIME:
-		entry.hidden = True
-	elif entry.remind_recur == keeper_constants.RECUR_WEEKLY:
-		entry.remind_to_be_sent = True
-		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(weeks=1)
-	elif entry.remind_recur == keeper_constants.RECUR_DAILY:
-		entry.remind_to_be_sent = True
-		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(days=1)
-	elif entry.remind_recur == keeper_constants.RECUR_MONTHLY:
-		entry.remind_to_be_sent = True
-		entry.remind_timestamp = entry.remind_timestamp + relativedelta(months=1)
-	elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_DAYS:
-		entry.remind_to_be_sent = True
-		entry.remind_timestamp = entry.remind_timestamp + datetime.timedelta(days=2)
-
-	# If we're past the recurrence timestamp, stop the reminder
-	if entry.remind_recur_end and entry.remind_timestamp > entry.remind_recur_end:
-		entry.hidden = True
-
+	entry.remind_to_be_sent = False
 	entry.save()
+
+	# Create a new reminder entry if this one is recurring
+	# We don't re-use the old one so people can 'done' it or 'snooze'
+	if entry.remind_recur != keeper_constants.RECUR_DEFAULT and entry.remind_recur != keeper_constants.RECUR_ONE_TIME:
+		if entry.remind_recur == keeper_constants.RECUR_WEEKLY:
+			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(weeks=1)
+		elif entry.remind_recur == keeper_constants.RECUR_DAILY:
+			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=1)
+		elif entry.remind_recur == keeper_constants.RECUR_MONTHLY:
+			newRemindTimestamp = entry.remind_timestamp + relativedelta(months=1)
+		elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_DAYS:
+			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=2)
+
+		# If we don't have a remind end or if the new remind stamp is before the end, create a new entry
+		if ((entry.remind_recur_end and newRemindTimestamp and newRemindTimestamp < entry.remind_recur_end or not entry.remind_recur_end)):
+			newEntry = Entry(creator=entry.creator, label=entry.label, text=entry.text, orig_text=entry.orig_text, remind_recur=entry.remind_recur, remind_recur_end=entry.remind_recur_end, created_from_entry_id=entry.id)
+			newEntry.remind_timestamp = newRemindTimestamp
+
+			# Not copying over 'users', will need to do that for shared reminders
+			newEntry.save()
+			logger.info("User %s: Created new entry %s since its recurring for next time %s" % (newEntry.creator.id, newEntry.id, newEntry.remind_timestamp))
+
+	return entry
 
 
 def processReminder(entry):
@@ -217,12 +220,29 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 	return msg
 
 
+def cleanUpRecurringReminders(user, pendingEntries):
+	now = date_util.now(user.getTimezone()) - datetime.timedelta(minutes=1)
+	for entry in pendingEntries:
+		# This is a recurring reminder that is in the past, hide it
+		if entry.remind_recur != keeper_constants.RECUR_DEFAULT and entry.remind_timestamp < now:
+			entry.hidden = True
+			entry.save()
+
+	return filter(lambda x: not x.hidden, pendingEntries)
+
+
 def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, overrideKeeperNumber=None):
 	keeperNumber = user.getKeeperNumber() if overrideKeeperNumber is None else overrideKeeperNumber
 
+	# Not great at this low level but want to make sure it always gets called
+	# This removes all
+	pendingEntries = cleanUpRecurringReminders(user, pendingEntries)
+
+	# We send the message here
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
 	sms_util.sendMsg(user, msg, None, keeperNumber)
 
+	# Do post-message processing with pending reminders
 	if len(pendingEntries) > 0:
 		# Now set to reminder sent, incase they send back done message
 		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
@@ -232,7 +252,6 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 			digestTip = tips.tipWithId(tips.DIGEST_TIP_ID)
 			sms_util.sendMsg(user, digestTip.renderMini(), None, user.getKeeperNumber())
 			tips.markTipSent(user, digestTip, isMini=True)
-
 
 
 @app.task

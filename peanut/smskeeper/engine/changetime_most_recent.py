@@ -52,7 +52,9 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 
 	# execute is in the parent ChangetimeAction
 	def getEntriesToExecuteOn(self, chunk, user):
-		return user.getLastEntries()
+		entries = user.getLastEntries()
+		entries = filter(lambda x: not x.hidden, entries)
+		return entries
 
 	def getLastActionTime(self, user):
 		if user.getStateData(keeper_constants.LAST_ACTION_KEY):
