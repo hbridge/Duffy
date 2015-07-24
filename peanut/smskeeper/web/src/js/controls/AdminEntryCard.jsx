@@ -151,7 +151,8 @@ module.exports = React.createClass({
 
 		// see if hidden toggle changed
 		if (this.refs.hidden.isChecked() != this.state.model.hidden) {
-			changed = true;
+			console.log("hidden changed");
+			entryChanged = true;
 			changes.hidden = this.refs.hidden.isChecked();
 		}
 
