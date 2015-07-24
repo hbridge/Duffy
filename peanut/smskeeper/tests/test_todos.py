@@ -1324,3 +1324,30 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
+	# If they snooze and don't give a time, just say tomorrow with followup
+	def test_snooze_no_time(self, dateMock):
+		stream_handler = logging.StreamHandler(sys.stdout)
+		logger.addHandler(stream_handler)
+
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
+
+		self.setNow(dateMock, self.MON_11AM)
+		# This tries it under "most recent"
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze go poop")
+			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("If that time doesn't work", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processDailyDigest()
+
+		self.setNow(dateMock, self.TUE_10AM)
+		# This tries it under "specific" since we just sent the reminder
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze go poop ")
+			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("If that time doesn't work", self.getOutput(mock))

@@ -1016,6 +1016,30 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("by 12:30pm", self.getOutput(mock))
 
 	"""
+	def test_time_ranges(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Work at 11:45am-8pm today.")
+			self.assertIn("at 11:45am", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Work at 12-4 today.")
+			self.assertIn("by 12pm", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remember I work 10 to 2 today")
+			self.assertIn("by 10am", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Work 6-11:30")
+			self.assertIn("by 6pm", self.getOutput(mock))
+
+	"""
+	"""
 	def test_early_morning_tomorrow_behind(self, dateMock):
 		self.setupUser(dateMock)
 		self.setNow(dateMock, self.MON_2AM)
@@ -1163,6 +1187,15 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "For Saturday: call Gene about Ric")
+			self.assertIn("Sat", self.getOutput(mock))
+
+	def test_w_2(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Buy deodorant shampoo conditioner flea dip and collars notebooks and send w-2 forms by 3 pm")
 			self.assertIn("Sat", self.getOutput(mock))
 	"""
 

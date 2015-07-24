@@ -3,16 +3,16 @@ import re
 import pytz
 import datetime
 
-from smskeeper import entry_util, reminder_util, actions, sms_util, msg_util
+from smskeeper import entry_util, msg_util
 from smskeeper import keeper_constants
-from .action import Action
+from .changetime import ChangetimeAction
 
 from common import date_util
 
 logger = logging.getLogger(__name__)
 
 
-class ChangetimeMostRecentAction(Action):
+class ChangetimeMostRecentAction(ChangetimeAction):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGETIME_MOST_RECENT
 
 	snoozeRegex = re.compile(r"\b(snooze|again)\b", re.I)
@@ -50,29 +50,9 @@ class ChangetimeMostRecentAction(Action):
 
 		return score
 
-	def execute(self, chunk, user):
-		entries = user.getLastEntries()
-
-		if len(entries) == 0:
-			logger.info("User %s: I think this is a changetime command but couldn't find a good enough entry. kicking out" % (user.id))
-			paused = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False)
-			if not paused:
-				msgBack = "Sorry, I'm not sure what entry you mean."
-				sms_util.sendMsg(user, msgBack, None, user.getKeeperNumber())
-		else:
-			nattyResult = chunk.getNattyResult(user)
-
-			if nattyResult is None:
-				nattyResult = reminder_util.getDefaultNattyResult(chunk.originalText, user)
-			else:
-				# Note: Don't like this here, should it be done automatically?
-				nattyResult = reminder_util.fillInWithDefaultTime(user, nattyResult)
-
-			for entry in entries:
-				reminder_util.updateReminderEntry(user, nattyResult, chunk.originalText, entry, user.getKeeperNumber(), isSnooze=True)
-			reminder_util.sendCompletionResponse(user, entries[0], False, user.getKeeperNumber())
-
-		return True
+	# execute is in the parent ChangetimeAction
+	def getEntriesToExecuteOn(self, chunk, user):
+		return user.getLastEntries()
 
 	def getLastActionTime(self, user):
 		if user.getStateData(keeper_constants.LAST_ACTION_KEY):

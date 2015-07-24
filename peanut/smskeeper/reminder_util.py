@@ -160,12 +160,13 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 		newDate = newDate.replace(day=nattyTzTime.day)
 
 	# Only update with a date or time if Natty found one
-	if nattyResult.hadDate:
+	# Or if its a snooze. Snoozes are relative to user's now so its ok to swap everything out
+	if nattyResult.hadDate or isSnooze:
 		newDate = newDate.replace(year=nattyTzTime.year)
 		newDate = newDate.replace(month=nattyTzTime.month)
 		newDate = newDate.replace(day=nattyTzTime.day)
 
-	if nattyResult.hadTime:
+	if nattyResult.hadTime or isSnooze:
 		newDate = newDate.replace(hour=nattyTzTime.hour)
 		newDate = newDate.replace(minute=nattyTzTime.minute)
 		newDate = newDate.replace(second=nattyTzTime.second)
