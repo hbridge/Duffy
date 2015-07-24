@@ -94,10 +94,11 @@ INTRO_MESSAGES_PAID = [
 ]
 
 UNKNOWN_COMMAND_PHRASES = [
-	u"Sorry, I'm not sure what you mean \U0001F633\nType HELP for help. To notify my minions, say REPORT",
-	u"I'm still pretty new \U0001F423 and I don't understand that.\n\n Say HELP to see what I can do or REPORT and I'll poke one of my lackeys. \U0001F449",
-	u"I hope you have a map, 'cause I'm lost. \U0001F615 Say HELP for instructions or REPORT to notify the stooges."
+	u"ZZZZ \U0001F62A....so tired. Talk more in the morning! \U0001F60C",
+	u"So sleepy. Let's play the silent game... with eyes closed \U0001F606",
+	u"\U0001F4A4 I'll be much more responsive in the morning",
 ]
+
 REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
