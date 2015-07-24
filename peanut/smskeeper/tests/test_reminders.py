@@ -841,7 +841,13 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "remind me to pay my bills tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
 
-		self.assertEqual("Pay your bills", Entry.objects.get(label="#reminders").text)
+		self.assertEqual("Pay your bills", Entry.objects.filter(label="#reminders").last().text)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me I'm supposed to pay my bills tmr")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		self.assertEqual("You're supposed to pay your bills", Entry.objects.filter(label="#reminders").last().text)
 
 	# Make sure that msgs with 2 date info in them get marked for manual check
 	def test_manual_check(self, dateMock):

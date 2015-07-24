@@ -331,14 +331,16 @@ def nameInSetName(msg, tutorial=False):
 	return None
 
 
-
 # Returns a string which converts "my" to "your" and "i" to "you"
 def warpReminderText(msg):
-	i_words = re.compile(r'\bi\b', re.IGNORECASE)
+	i_words = re.compile(r'\bi ', re.IGNORECASE)
 	warpedText = i_words.sub(r'you', msg)
 
 	my_words = re.compile(r'\bmy\b', re.IGNORECASE)
 	warpedText = my_words.sub('your', warpedText)
+
+	im_words = re.compile(r'\b(i\'m|im)\b', re.IGNORECASE)
+	warpedText = im_words.sub('you\'re', warpedText)
 
 	# Remove first word if its keeper. This is hacky and should be generalized in a routine
 	# to clean up reminder text
