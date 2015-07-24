@@ -6,6 +6,8 @@ import phonenumbers
 import logging
 import string
 import re
+from time import time
+from operator import add
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -21,6 +23,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
 from smskeeper.models import User, Entry, Message
@@ -32,7 +35,6 @@ from smskeeper.serializers import MessageSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
-
 
 logger = logging.getLogger(__name__)
 
@@ -346,13 +348,40 @@ def getUserDataDict(user, phoneNumToContactDict):
 
 @login_required(login_url='/admin/login/')
 def dashboard_feed(request):
-	users = User.objects.all().order_by("id")
+
+	###### measuring perf
+	n = len(connection.queries)
+	start = time()
+	######
+
+	users = list()
+	daily_stats = {}
+	for days_ago in [1, 3, 7, 30]:
+		date_filter = date.today() - timedelta(days=days_ago)
+		daily_stats[days_ago] = {}
+		for direction in ["incoming", "outgoing"]:
+			incoming = (direction == "incoming")
+			messages = Message.objects.filter(incoming=incoming, added__gt=date_filter)
+			message_count = messages.count()
+			msg_users = messages.values_list('user').distinct()
+			if days_ago == 7:
+				users = msg_users
+			user_count = msg_users.count()
+			daily_stats[days_ago][direction] = {
+				"messages": message_count,
+				"user_count": user_count
+			}
+
+
+	all_users = User.objects.all().order_by("id")
 	user_dicts = []
 	phoneNumList = list()
-	for user in users:
+	for user in all_users:
 		phoneNumList.append(user.phone_number)
 
 	phoneNumToContactDict = getNameFromContactsDB(phoneNumList)
+
+	users = User.objects.filter(id__in=users)
 
 	for user in users:
 		userData = getUserDataDict(user, phoneNumToContactDict)
@@ -378,21 +407,28 @@ def dashboard_feed(request):
 
 	user_dicts = sorted(user_dicts, key=lambda k: k['message_stats']['incoming']['last'], reverse=True)
 
-	daily_stats = {}
-	for days_ago in [1, 3, 7, 30]:
-		date_filter = date.today() - timedelta(days=days_ago)
-		daily_stats[days_ago] = {}
-		for direction in ["incoming", "outgoing"]:
-			incoming = (direction == "incoming")
-			messages = Message.objects.filter(incoming=incoming, added__gt=date_filter)
-			message_count = messages.count()
-			user_count = messages.values('user').distinct().count()
-			daily_stats[days_ago][direction] = {
-				"messages": message_count,
-				"user_count": user_count
-			}
+	##### measuring perf
+	total_time = time() - start
 
-	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats}, cls=DjangoJSONEncoder)
+	db_queries = len(connection.queries) - n
+	if db_queries:
+		db_time = reduce(add, [float(q['time'])
+							   for q in connection.queries[n:]])
+	else:
+		db_time = 0.0
+
+	# and backout python time
+	python_time = total_time - db_time
+
+	stats = {
+		'total_time': total_time,
+		'python_time': python_time,
+		'db_time': db_time,
+		'db_queries': db_queries,
+	}
+	##### End of measurement code
+	
+	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats, "stats": stats}, cls=DjangoJSONEncoder)
 	return HttpResponse(responseJson, content_type="text/json", status=200)
 
 
