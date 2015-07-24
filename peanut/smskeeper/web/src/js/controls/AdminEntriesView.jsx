@@ -21,6 +21,7 @@ mui = require('material-ui'),
 AdminEntryCard = require('./AdminEntryCard.jsx');
 
 
+
 module.exports = React.createClass({
   mixins: [BackboneReactComponent],
   render: function() {
@@ -39,7 +40,7 @@ module.exports = React.createClass({
 		    		<ToolbarTitle text="Active Reminders" />
 		    	</ToolbarGroup>
 		    	<ToolbarGroup key={1} float="right">
-			    	<DropDownIcon menuItems={[]} onChange={this.handleMoreAction}>
+			    	<DropDownIcon menuItems={this.getElipsisMenuItems()} onChange={this.handleMoreAction}>
 			    	<ToolbarTitle text="•••"/>
 			    	</DropDownIcon>
 		    	</ToolbarGroup>
@@ -50,4 +51,24 @@ module.exports = React.createClass({
       	</div>
     );
   },
+
+  refreshEntries: function() {
+    console.log("refreshing entries");
+    this.getCollection().fetch();
+  },
+
+  getElipsisMenuItems: function() {
+    var elipsisMenuItems = [
+      { payload: "refresh", text: 'Refresh' },
+    ];
+    return elipsisMenuItems;
+  },
+
+  handleMoreAction: function(e, selectedIndex, menuItem) {
+    if (menuItem.payload == "refresh") {
+      this.refreshEntries();
+    } else {
+      console.log("unrecognized more action");
+    }
+  }
 });
