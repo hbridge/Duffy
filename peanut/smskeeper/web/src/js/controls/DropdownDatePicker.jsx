@@ -1,4 +1,14 @@
-var DatePicker = React.createClass({
+var React = require('react')
+var $ = require('jquery');
+var classNames = require('classnames');
+var emoji = require("node-emoji");
+var moment = require("moment");
+
+mui = require('material-ui'),
+  DropDownMenu = mui.DropDownMenu;
+
+
+module.exports = React.createClass({
 	getInitialState: function() {
 		return {date: this.props.initialDate};
 	},
@@ -9,7 +19,7 @@ var DatePicker = React.createClass({
 		<div>
 			<DropDownMenu
 				ref="monthMenu"
-				menuItems={monthMenuItems}
+				menuItems={this.getMonthMenuOptions()}
 				selectedIndex={moment(this.state.date).month()}
 				onChange={this.onMonthChange}
 			/>
@@ -20,6 +30,15 @@ var DatePicker = React.createClass({
 				onChange={this.onDayChange}
 			/>
 		</div>);
+	},
+
+	getMonthMenuOptions: function() {
+		var options = [];
+		for (var i = 0; i < 12; i++) {
+			var monthMoment = moment().month(i);
+			options.push({payload: i, text: monthMoment.format('MMM')});
+		}
+		return options;
 	},
 
 	getDayMenuOptions: function() {
