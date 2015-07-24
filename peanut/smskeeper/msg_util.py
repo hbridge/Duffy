@@ -547,7 +547,7 @@ def getNaturalTime(time):
 # This would be great to find a library to do
 def naturalize(now, futureTime, includeTime=True):
 	delta = futureTime - now
-	deltaHours = delta.seconds / 3600
+	deltaHours = delta.total_seconds() / 3600
 
 	time = getNaturalTime(futureTime)
 	dayOfWeek = futureTime.strftime("%a")

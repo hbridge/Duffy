@@ -1021,6 +1021,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "text selena at 1230")
 			self.assertIn("by 12:30pm", self.getOutput(mock))
 
+	# Had a bug where a date far in the future was returning text of 'today'
+	def test_far_date(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Sept 24 call chancery about divorce")
+			self.assertIn("September 24th", self.getOutput(mock))
+
 	"""
 	def test_time_ranges(self, dateMock):
 		self.setupUser(dateMock)
