@@ -338,7 +338,7 @@ def getUserDataDict(user, phoneNumToContactDict):
 		"tutorial_step": user.tutorial_step,
 		"product_id": user.product_id,
 		"completed_tutorial": user.completed_tutorial,
-		"timezone": user.timezone,
+		"timezone": str(user.getTimezone()),
 		"postal_code": user.postal_code,
 	}
 	return userData

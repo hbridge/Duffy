@@ -15,33 +15,11 @@ mui = require('material-ui'),
  ToolbarGroup = mui.ToolbarGroup;
  ToolbarTitle = mui.ToolbarTitle;
  Paper = mui.Paper;
+ Card = mui.Card;
+ CardTitle = mui.CardTitle;
 
-
-var AdminEntryRow = React.createClass({
-	mixins: [BackboneReactComponent],
-	render: function(){
-		var checkbox = <Checkbox
-	      name={this.state.model.id}
-	      value={this.state.model.id}
-	      key={this.state.model.id}
-	      defaultChecked={this.state.model.hidden}
-	      onCheck={this.onEntryChecked}
-    	/>
-		return (
-
-			<ListItem
-				primaryText={ this.state.model.text }
-				secondaryText={ moment(this.state.model.remind_timestamp).format('llll')}
-				secondaryTextLines={1}
-				leftCheckbox={ checkbox }
-			/>
-		)
-	},
-	onEntryChecked: function(e, checked) {
-		var result = this.getModel().save({hidden: checked});
-		console.log("onEntryChecked result " + result);
-	},
-});
+AdminEntryDialog = require('./AdminModifyEntryDialog.jsx');
+AdminEntryCard = require('./AdminEntryCard.jsx');
 
 
 module.exports = React.createClass({
@@ -49,11 +27,13 @@ module.exports = React.createClass({
   render: function() {
     var createEntry = function(entry, index) {
       return (
-        <AdminEntryRow model={ entry } key={ entry.id } />
+        <AdminEntryCard model={ entry } key={ entry.id } />
       );
     }.bind(this);
 
     return (
+		<div>
+
     	<Paper zDepth={1} className="controlPanel">
 	    	<Toolbar>
 		    	<ToolbarGroup key={0} float="left">
@@ -65,10 +45,12 @@ module.exports = React.createClass({
 			    	</DropDownIcon>
 		    	</ToolbarGroup>
 	    	</Toolbar>
-	        <List>
-	      	  { this.props.collection.reminders().map(createEntry) }
-	        </List>
-      </Paper>
+
+	      		{ this.props.collection.reminders().map(createEntry) }
+
+	        <AdminEntryDialog ref="entryDialog" />
+      	</Paper>
+      	</div>
     );
   },
 });
