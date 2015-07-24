@@ -39,43 +39,45 @@ module.exports = React.createClass({
 	    if (this.state.expanded) {
 	    	expandedElems = (
 	    		<Paper zDepth={0} className="controlPanel">
-		    		<CardActions>
-
-		    		<TextField
-			            ref="text"
-			            defaultValue={this.state.model.text}
-			            hintText="Entry text"
-			            multiLine={true}
-			            style={{width: '80%'}}
-	            	/>
-	            	<DatePicker
-	            		ref="date"
-	            		defaultDate={this.getAdminLocalDate()}
-	  					hintText="Reminder date"
-	  					style={{width: "20%"}}
-	  					autoOk={true}
-	  					minDate={new Date()}
-	  				/>
-	  				<TimePicker
-	  					ref="time"
-	            		defaultTime={this.getAdminLocalDate()}
-	  					hintText="Reminder date"
-	  					format="24hr"
-	  					style={{width: "20%"}}
-	  				/>
-	  				<div style="height: 10px" className="smallVerticalSpacer"/>
-	  				<Checkbox
-	  					ref="hidden"
-	  					label="Hidden"
-	  				/>
-	  				<div style="height: 10px" className="mediumVerticalSpacer"/>
-	  				<RaisedButton
-	  					label="Save"
-	  					secondary={true}
-	  					className="submitButton"
-	  					onClick={this.onSave}
-	  				/>
-
+	    			<CardText>
+	    				Original Messages: {this.state.model.orig_text} <br />
+	    				Added Date: {moment.tz(this.state.model.added, USER.timezone).format('llll')}
+	    			</CardText>
+	    			<CardActions>
+			    		<TextField
+				            ref="text"
+				            defaultValue={this.state.model.text}
+				            hintText="Entry text"
+				            multiLine={true}
+				            style={{width: '80%'}}
+		            	/>
+		            	<DatePicker
+		            		ref="date"
+		            		defaultDate={this.getAdminLocalDate()}
+		  					hintText="Reminder date"
+		  					style={{width: "20%"}}
+		  					autoOk={true}
+		  					minDate={new Date()}
+		  				/>
+		  				<TimePicker
+		  					ref="time"
+		            		defaultTime={this.getAdminLocalDate()}
+		  					hintText="Reminder date"
+		  					format="24hr"
+		  					style={{width: "20%"}}
+		  				/>
+		  				<div style="height: 10px" className="smallVerticalSpacer"/>
+		  				<Checkbox
+		  					ref="hidden"
+		  					label="Hidden"
+		  				/>
+		  				<div style="height: 10px" className="mediumVerticalSpacer"/>
+		  				<RaisedButton
+		  					label="Save"
+		  					secondary={true}
+		  					className="submitButton"
+		  					onClick={this.onSave}
+		  				/>
 		    	</CardActions>
 	    	</Paper>
 	    	);
