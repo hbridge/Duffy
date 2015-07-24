@@ -1005,6 +1005,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(1, len(entries))
 
+	# Natty doesn't like 'for saturday'. Leaving this commented out for now until we fix that
+	def test_four_numbers(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "text selena at 1230")
+			self.assertIn("by 12:30pm", self.getOutput(mock))
+
 	"""
 	def test_early_morning_tomorrow_behind(self, dateMock):
 		self.setupUser(dateMock)
@@ -1142,6 +1152,18 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me tomorrow afternoon at 1:10 to take the mower to Nana's")
 			self.assertIn("tomorrow at 1:10pm", self.getOutput(mock))
+	"""
+
+	"""
+	# Natty doesn't like 'for saturday'. Leaving this commented out for now until we fix that
+	def test_for_saturday(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "For Saturday: call Gene about Ric")
+			self.assertIn("Sat", self.getOutput(mock))
 	"""
 
 

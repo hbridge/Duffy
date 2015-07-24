@@ -135,7 +135,9 @@ def fixMsgForNatty(msg, user):
 		newMsg = replace(newMsg, oldtime, newtime)
 
 	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
-	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})', newMsg, re.IGNORECASE)
+	# We don't want to just swap in all 3 numbers tho, like $100
+	# We also need to watch out for at 1230, so make sure its exactly 3 numbers
+	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})([^0-9]|\b)', newMsg, re.IGNORECASE)
 	if threeDigitsWithAT:
 		oldtime = threeDigitsWithAT.group("time")
 		newtime = oldtime[0] + ":" + oldtime[1:]

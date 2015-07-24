@@ -258,7 +258,7 @@ LOGGING = {
             'propagate': True,
         },
         'smskeeper': {
-            'handlers': ['duffyfile', 'djangoerror', 'mail_admins', 'slackerror'],
+            'handlers': ['duffyfile', 'djangoerror', 'mail_admins', 'slackerror', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
