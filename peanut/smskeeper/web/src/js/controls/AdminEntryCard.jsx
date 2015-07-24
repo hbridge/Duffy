@@ -10,9 +10,6 @@ mui = require('material-ui'),
   FlatButton = mui.FlatButton;
   RaisedButton = mui.RaisedButton;
   Dialog = mui.Dialog;
-  List = mui.List;
-  ListItem = mui.ListItem;
-  ListDivider = mui.ListDivider;
   Checkbox = mui.Checkbox;
   TextField = mui.TextField;
   DropDownMenu = mui.DropDownMenu;
@@ -23,6 +20,16 @@ mui = require('material-ui'),
   DatePicker = mui.DatePicker;
   TimePicker = mui.TimePicker;
   Checkbox = mui.Checkbox;
+
+var recurMenuItems = [
+	{payload: "default", text: "none (default)"},
+	{payload: "one-time", text: "one-time"},
+	{payload: "daily", text: "daily"},
+	{payload: "every-2-days", text: "every-2-days"},
+	{payload: "weekdays", text: "weekdays"},
+	{payload: "weekly", text: "weekly"},
+	{payload: "monthly", text: "monthly"},
+];
 
 module.exports = React.createClass({
 	mixins: [BackboneReactComponent],
@@ -66,6 +73,11 @@ module.exports = React.createClass({
 		  					format="24hr"
 		  					style={{width: "20%"}}
 		  				/>
+		  				<DropDownMenu
+							ref="recur"
+							menuItems={recurMenuItems}
+							selectedIndex={this.getSelectedRecurIndex()}
+						/>
 		  				<div style="height: 10px" className="smallVerticalSpacer"/>
 		  				<Checkbox
 		  					ref="hidden"
@@ -83,11 +95,16 @@ module.exports = React.createClass({
 	    	);
 	    }
 
+	    var subtitle = moment.tz(this.state.model.remind_timestamp, USER.timezone).format('llll');
+	    if (this.state.model.remind_recur && this.state.model.remind_recur != "default") {
+	    	subtitle = subtitle + " (recurs " + this.state.model.remind_recur + ")";
+	    }
+
     	return(
     		<Card>
 	  			<CardTitle
 		  			title={ this.state.model.text }
-		  			subtitle={ moment.tz(this.state.model.remind_timestamp, USER.timezone).format('llll')}
+		  			subtitle={ subtitle }
 		  			onTouchTap={ this.onTapCardTitle }
 		  			style={{margin: "10px"}}
 		  			titleStyle={{fontSize: "14pt"}}
@@ -113,6 +130,18 @@ module.exports = React.createClass({
 		var adminLocalDate = adminmoment.toDate();
 		console.log("adminLocalDate: "+ adminLocalDate);
 		return adminLocalDate;
+	},
+
+	getSelectedRecurIndex: function() {
+		if (!this.state.model.remind_recur) return 0;
+
+		for (var i = 0; i < recurMenuItems.length; i++) {
+			if (recurMenuItems[i].payload == this.state.model.remind_recur) {
+				return i;
+			}
+		}
+		console.error("remind recur index not found");
+		return 0;
 	},
 
 	onSave: function(e) {
@@ -149,6 +178,15 @@ module.exports = React.createClass({
 			changes.remind_timestamp = newMoment.toISOString();
 		}
 
+		// se if recur has changed
+		console.log(this.refs.recur.state.selectedIndex);
+		if (this.refs.recur.state.selectedIndex != this.getSelectedRecurIndex()) {
+			console.log("hidden changed");
+			var newRecurValue = recurMenuItems[this.refs.recur.state.selectedIndex].payload;
+			entryChanged = true;
+			changes.remind_recur = newRecurValue;
+		}
+
 		// see if hidden toggle changed
 		if (this.refs.hidden.isChecked() != this.state.model.hidden) {
 			console.log("hidden changed");
@@ -156,11 +194,13 @@ module.exports = React.createClass({
 			changes.hidden = this.refs.hidden.isChecked();
 		}
 
-
 		if (entryChanged) {
+			changes.manually_updated = true;
+			changes.manually_updated_timestamp = moment().toISOString();
 			var result = this.props.model.save(changes);
 			console.log("save result:")
 			console.log(result);
+			this.setState({expanded: false});
 		}
 	},
 });
