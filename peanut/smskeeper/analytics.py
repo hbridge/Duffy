@@ -14,6 +14,7 @@ def logUserEvent(user, eventName, parametersDict=None):
 		parametersDict['User Source'] = user.getSignupData('source'),
 		parametersDict['User Experiment'] = user.getSignupData('exp'),
 		parametersDict['User Paid'] = user.getSignupData('paid')
+		parametersDict["In tutorial"] = not user.isTutorialComplete()
 
 		if user.activated:
 			accountActivatedDays, hours = time_utils.daysAndHoursAgo(user.activated)

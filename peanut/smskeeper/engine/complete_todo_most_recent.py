@@ -4,6 +4,7 @@ from smskeeper import msg_util, sms_util, entry_util
 from smskeeper import keeper_constants
 from .action import Action
 from smskeeper import niceties
+from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
 
@@ -54,5 +55,14 @@ class CompleteTodoMostRecentAction(Action):
 
 		if msgBack:
 			sms_util.sendMsg(user, msgBack)
+
+		analytics.logUserEvent(
+			user,
+			"Completed Todo",
+			{
+				"Done Type": "Contextual",
+				"Todo Count": len(entries)
+			}
+		)
 
 		return True

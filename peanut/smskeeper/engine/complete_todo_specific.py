@@ -2,6 +2,7 @@ import logging
 
 from smskeeper import msg_util, entry_util, sms_util, actions
 from smskeeper import keeper_constants
+from smskeeper import analytics
 from .action import Action
 
 logger = logging.getLogger(__name__)
@@ -53,4 +54,14 @@ class CompleteTodoSpecificAction(Action):
 			logger.info("User %s: I thought '%s' was a completetodo specific command but couldn't find an entry to match on, pausing" % (user.id, chunk.originalText))
 			paused = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False)
 			return paused
+
+		analytics.logUserEvent(
+			user,
+			"Completed Todo",
+			{
+				"Done Type": "Specific",
+				"Todo Count": len(entries)
+			}
+		)
+
 		return True
