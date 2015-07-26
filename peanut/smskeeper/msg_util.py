@@ -334,7 +334,7 @@ def nameInSetName(msg, tutorial=False):
 # Returns a string which converts "my" to "your" and "i" to "you"
 def warpReminderText(msg):
 	i_words = re.compile(r'\bi ', re.IGNORECASE)
-	warpedText = i_words.sub(r'you', msg)
+	warpedText = i_words.sub(r'you ', msg)
 
 	my_words = re.compile(r'\bmy\b', re.IGNORECASE)
 	warpedText = my_words.sub('your', warpedText)
