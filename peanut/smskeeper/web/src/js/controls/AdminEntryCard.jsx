@@ -153,6 +153,7 @@ module.exports = React.createClass({
 		var newText = this.refs.text.getValue();
 		if (newText != this.state.model.text) {
 			console.log("text changed");
+			entryChanged = true;
 			changes.text = newText;
 		}
 
