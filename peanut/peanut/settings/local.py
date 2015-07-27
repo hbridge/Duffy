@@ -21,3 +21,6 @@ logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 
 WHATSAPP_SMS_URL = "http://localhost:7500/smskeeper/incoming_sms"
 WHATSAPP_CREDENTIALS = ("", "")
+
+if len(sys.argv) > 2:  # If we're running an individual test
+	logging.disable(logging.DEBUG)

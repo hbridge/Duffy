@@ -6,7 +6,6 @@ from common import date_util
 from smskeeper import reminder_util, sms_util, msg_util
 from smskeeper import keeper_constants
 from .action import Action
-import re
 import collections
 
 
@@ -18,6 +17,9 @@ reTypeRes = {
 	keeper_constants.RECUR_WEEKLY: r'.* (every|each) (week|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|.*weekly',
 	keeper_constants.RECUR_MONTHLY: r'.* (every|each) month|.* once a month|.* monthly'
 }
+
+# things that match this RE will get a boost for create
+beginsWithRe = r'(remind|buy) '
 
 
 class CreateTodoAction(Action):
@@ -48,6 +50,9 @@ class CreateTodoAction(Action):
 
 		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
+
+		if score < 0.9 and chunk.matches(beginsWithRe):
+			score += 0.1
 
 		return score
 
