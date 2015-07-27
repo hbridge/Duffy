@@ -573,12 +573,13 @@ def classified_users(request):
 
 @login_required(login_url='/admin/login/')
 def approved_todos(request):
-	entries = Entry.objects.filter(manually_check=0, remind_recur=keeper_constants.RECUR_DEFAULT).order_by("-added")[:1000]
+	entries = Entry.objects.prefetch_related('creator').filter(manually_check=0, remind_recur=keeper_constants.RECUR_DEFAULT).order_by("-added")[:1000]
 
 	entryList = list()
 
 	for entry in entries:
 		s = EntrySerializer(entry)
+		s.data["timezone"] = str(entry.creator.getTimezone())
 		entryList.append(s.data)
 
 	return HttpResponse(json.dumps({"entries": entryList}, cls=DuffyJsonEncoder), content_type="text/text", status=200)
