@@ -36,6 +36,8 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
 
+from common.api_util import DuffyJsonEncoder
+
 logger = logging.getLogger(__name__)
 
 
@@ -427,7 +429,7 @@ def dashboard_feed(request):
 		'db_queries': db_queries,
 	}
 	##### End of measurement code
-	
+
 	responseJson = json.dumps({"users": user_dicts, "daily_stats": daily_stats, "stats": stats}, cls=DjangoJSONEncoder)
 	return HttpResponse(responseJson, content_type="text/json", status=200)
 
@@ -567,3 +569,16 @@ def classified_users(request):
 			classifiedUserIds.append(user.id)
 
 	return HttpResponse(json.dumps({"users": classifiedUserIds}), content_type="text/text", status=200)
+
+
+@login_required(login_url='/admin/login/')
+def approved_todos(request):
+	entries = Entry.objects.filter(manually_check=0, remind_recur=keeper_constants.RECUR_DEFAULT).order_by("-added")[:1000]
+
+	entryList = list()
+
+	for entry in entries:
+		s = EntrySerializer(entry)
+		entryList.append(s.data)
+
+	return HttpResponse(json.dumps({"entries": entryList}, cls=DuffyJsonEncoder), content_type="text/text", status=200)
