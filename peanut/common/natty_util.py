@@ -127,7 +127,7 @@ def fixMsgForNatty(msg, user):
 	newMsg = replace(newMsg, "appointment", "appt")
 
 	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) (p|a|pm|am)\b', newMsg, re.IGNORECASE)
+	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg, re.IGNORECASE)
 	if threeDigitsWithAP:
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
@@ -225,6 +225,17 @@ def unixTime(dt):
 	delta = dt - epoch
 	return int(delta.total_seconds())
 
+amPmRegex = re.compile(r'.*(\d) ?(p|a|pm|am)\b', re.IGNORECASE)
+
+
+def isTomorrowInText(usedText):
+	tmrPhrases = ["tomorrow", "tmr", "tommarow"]
+
+	for phrase in tmrPhrases:
+		if phrase in usedText.split(' '):
+			return True
+	return False
+
 
 def processQuery(query, timezone):
 	# get startDate from Natty
@@ -265,11 +276,18 @@ def processQuery(query, timezone):
 			startDate = updatedTimeBasedOnUsedText(startDate, usedText, timezone)
 
 			now = date_util.now(pytz.utc)
+			tzAwareNow = date_util.now(timezone)
+
+			# If its between midnight and 4 am local time and there's tomorrow in the phrase
+			# Then move it back a day and do regular processing
+			if tzAwareNow.hour >= 0 and tzAwareNow.hour < 4 and isTomorrowInText(usedText) and startDate > now:
+				startDate = startDate - datetime.timedelta(days=1)
+
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
 				# If it has am or pm in the used text, then assume tomorrow
-				if "m" in usedText.lower():
+				if amPmRegex.search(usedText.lower()) is not None:
 					startDate = startDate + datetime.timedelta(days=1)
 				elif startDate > now - datetime.timedelta(hours=24) and startDate < now - datetime.timedelta(hours=12):
 					# This is between 12 and 24 hours in the past, so:

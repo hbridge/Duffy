@@ -1055,7 +1055,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("by 6pm", self.getOutput(mock))
 
 	"""
-	"""
+
 	def test_early_morning_tomorrow_behind(self, dateMock):
 		self.setupUser(dateMock)
 		self.setNow(dateMock, self.MON_2AM)
@@ -1180,7 +1180,6 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(entry.remind_timestamp.day, self.MON_6PM.day)
 		self.assertEqual(entry.remind_timestamp.hour, self.MON_6PM.hour)
 
-	"""
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
