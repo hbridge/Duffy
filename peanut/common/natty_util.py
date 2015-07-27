@@ -225,7 +225,8 @@ def unixTime(dt):
 	delta = dt - epoch
 	return int(delta.total_seconds())
 
-amPmRegex = re.compile(r'.*(\d) ?(p|a|pm|am)\b', re.IGNORECASE)
+# This regex needs to tell us if the user typed in an intent for a certain time of day (am or pm)
+amPmRegex = re.compile(r'(\d) ?(p|a|pm|am)\b|morning|evening|afternoon|night', re.IGNORECASE)
 
 
 def isTomorrowInText(usedText):

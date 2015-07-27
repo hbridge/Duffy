@@ -72,7 +72,7 @@ class CreateTodoAction(Action):
 		recurScores = collections.OrderedDict(
 			sorted(self.getRecurScores(chunk).items(), key=lambda t: t[1], reverse=True)
 		)
-		logger.info("User %d: create recurrence scores %s", chunk.normalizedText(), recurScores)
+		logger.info("User %s: create recurrence scores %s", chunk.normalizedText(), recurScores)
 		for frequency in recurScores.keys():
 			if recurScores[frequency] >= 0.5:
 				entry.remind_recur = frequency
