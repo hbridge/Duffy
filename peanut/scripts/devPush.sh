@@ -5,6 +5,7 @@ git fetch
 git rebase origin/master
 cd peanut
 DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test
+DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test smskeeper.tests.regress.reminders
 cd smskeeper/web
 npm install
 node_modules/.bin/gulp
