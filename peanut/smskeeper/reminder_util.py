@@ -150,6 +150,7 @@ def isReminderHourSuspicious(hourForUser):
 def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=False):
 	newDate = entry.remind_timestamp.astimezone(user.getTimezone())
 	nattyTzTime = nattyResult.utcTime.astimezone(user.getTimezone())
+	userNow = date_util.now(user.getTimezone())
 
 	# Edgecase: If the original entry had no time or date info and the nattyresult
 	# does have a time, then assume the date will be correct as well (should be today)
@@ -170,6 +171,18 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 		newDate = newDate.replace(hour=nattyTzTime.hour)
 		newDate = newDate.replace(minute=nattyTzTime.minute)
 		newDate = newDate.replace(second=nattyTzTime.second)
+
+	# Edgecase: Original reminder was for 5pm, user says 'remind me 7am', but we have no date so replace in
+	# When this happens, use natty's date as it'll be the default (probably tomorrow)
+	# Normally, isSnooze should be True, but we can't rely upon that.
+	if newDate < userNow:
+		if not nattyResult.hadDate:
+			newDate = newDate.replace(year=nattyTzTime.year)
+			newDate = newDate.replace(month=nattyTzTime.month)
+			newDate = newDate.replace(day=nattyTzTime.day)
+		else:
+			# Something really went wrong
+			logger.error("User %s: Setting entry %s to an incorrect time in the past.  old %s  and new  %s   nattyResult: %s" % (user.id, entry.id, entry.remind_timestamp, newDate, nattyResult))
 
 	logger.info("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
 	entry.remind_timestamp = newDate.astimezone(pytz.utc)

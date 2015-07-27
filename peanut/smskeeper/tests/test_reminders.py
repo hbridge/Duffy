@@ -1183,7 +1183,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 	# Had bugs where if we didn't have am/pm in the phrase
 	def test_early_morning_misc(self, dateMock):
 		self.setupUser(dateMock)
-		self.setNow(dateMock, self.MON_6PM)
+		self.setNow(dateMock, self.MON_5PM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
 			self.assertIn("tomorrow by 11:30am", self.getOutput(mock))
@@ -1191,6 +1191,24 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I need to bring the chainsaw In the morning")
 			self.assertIn("tomorrow by 8am", self.getOutput(mock))
+
+	def test_same_day_then_tomorrow(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Work tomorrow 10...however want to be reminded tonight by 5pm")
+			self.assertIn("later today by 5pm", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_5PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Work tomorrow", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_6PM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "reminder @7am please?")
+			self.assertIn("tomorrow by 7am", self.getOutput(mock))
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)

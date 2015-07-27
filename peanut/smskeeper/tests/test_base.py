@@ -100,6 +100,8 @@ class SMSKeeperBaseCase(TestCase):
 	MON_1PM = datetime.datetime(2015, 6, 1, 17, 0, 0, tzinfo=pytz.utc)
 	MON_2PM = datetime.datetime(2015, 6, 1, 18, 0, 0, tzinfo=pytz.utc)
 	MON_3PM = datetime.datetime(2015, 6, 1, 19, 0, 0, tzinfo=pytz.utc)
+	MON_4PM = datetime.datetime(2015, 6, 1, 20, 0, 0, tzinfo=pytz.utc)
+	MON_5PM = datetime.datetime(2015, 6, 1, 21, 0, 0, tzinfo=pytz.utc)
 	MON_6PM = datetime.datetime(2015, 6, 1, 22, 0, 0, tzinfo=pytz.utc)
 	MON_8PM = datetime.datetime(2015, 6, 2, 0, 0, 0, tzinfo=pytz.utc)
 	MON_10PM = datetime.datetime(2015, 6, 2, 2, 0, 0, tzinfo=pytz.utc)
