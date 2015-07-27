@@ -23,7 +23,10 @@ class StopAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		sms_util.sendMsg(user, u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'")
+		sms_util.sendMsgs(
+			user, 
+			[u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'",
+			u"If there is something I can do better, pls let me know. \U0001F423"])
 
 		if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
 			time.sleep(1)
