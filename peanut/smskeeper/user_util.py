@@ -3,6 +3,7 @@ import random
 import string
 import datetime
 import logging
+import pytz
 
 from django.conf import settings
 
@@ -16,6 +17,7 @@ from smskeeper.whatsapp import whatsapp_util
 from smskeeper.models import Entry, User
 
 from common import date_util
+from common import slack_logger
 
 logger = logging.getLogger(__name__)
 
@@ -122,3 +124,18 @@ def pendingTodoEntries(user, includeAll=False, before=None, after=None):
 		results = filter(lambda x: x.remind_timestamp > after, results)
 
 	return results
+
+
+def setPaused(user, paused, keeperNumber, reason):
+	user.paused = paused
+	infoText = "User %s: " % (user.id)
+	if (paused):
+		user.last_paused_timestamp = date_util.now(pytz.utc)
+		infoText += "paused, %s" % reason
+	else:
+		infoText += "unpaused, %s" % reason
+
+	logger.info(infoText)
+	user.save()
+
+	slack_logger.postManualAlert(user, infoText, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)

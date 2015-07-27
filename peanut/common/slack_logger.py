@@ -54,7 +54,7 @@ SLACK_URL = 'https://hooks.slack.com/services/T02MR1Q4C/B04N1B9FD/kmNcckB1QF7sGg
 
 
 def postManualAlert(user, msg, keeperNumber, channel):
-    if (isProdNumber(keeperNumber)):
+    if (isProdNumber(keeperNumber) or keeperNumber == 'web'):
         params = dict()
         params['icon_emoji'] = ':raising_hand:'
 
@@ -71,6 +71,8 @@ def postManualAlert(user, msg, keeperNumber, channel):
         params['link_names'] = 1
 
         requests.post(SLACK_URL, data=json.dumps(params))
+    else:
+        logger.info("User %s: non-prod interface %s. Slacklogger would have posted '%s'", user.id, keeperNumber, msg)
 
 
 def postMessage(message, channel):

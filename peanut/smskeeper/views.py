@@ -239,8 +239,7 @@ def send_sms(request):
 			sms_util.sendMsg(user, msg, media, keeperNumber, manual=True)
 		else:
 			if (user.paused):
-				user.paused = False
-				user.save()
+				user_util.setPaused(user, False, keeperNumber, "manual send")
 			requestDict = dict()
 			requestDict["Body"] = msg
 			requestDict["To"] = keeperNumber
@@ -258,13 +257,7 @@ def toggle_paused(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 
-		if user.isPaused():
-			user.paused = False
-			msg = "User %s just got unpaused" % (user.id)
-			slack_logger.postManualAlert(user, msg, keeper_constants.KEEPER_PROD_PHONE_NUMBERS[0], keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
-		else:
-			user.paused = True
-		user.save()
+		user_util.setPaused(user, not user.paused, user.getKeeperNumber(), "manual toggle")
 
 		return HttpResponse(json.dumps(getMessagesResponseForUser(user), cls=DjangoJSONEncoder), content_type="text/json", status=200)
 	else:
@@ -294,8 +287,7 @@ def resend_msg(request):
 
 		if (message.incoming):
 			if (message.user.paused):
-				message.user.paused = False
-				message.user.save()
+				user_util.setPaused(message.user, False, message.user.getKeeperNumber(), "manual resend")
 
 			requestDict = json.loads(message.msg_json)
 			requestDict["Manual"] = True
