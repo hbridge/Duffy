@@ -118,18 +118,13 @@ var KeeperApp = React.createClass({
   },
 
   submitCommandToServer: function(msg) {
-    $.ajax({
-      url: "/smskeeper/send_sms",
-      dataType: 'json',
-      type: 'POST',
-      data: {msg: msg, user_id: USER.id, direction: "ToKeeper", response_data: "entries", from_num: "web"},
-      success: function(entryData) {
+    Utils.SubmitCommandToServer(
+      msg,
+      function(entryData){
         this.getCollection().fetch();
       }.bind(this),
-      error: function(xhr, status, err) {
-        console.error("send_sms", status, err.toString());
-      }.bind(this)
-    });
+      null
+    );
   },
 
   componentDidMount: function() {

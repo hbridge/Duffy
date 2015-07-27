@@ -277,11 +277,11 @@ var CreateEntryFooter = React.createClass({
     if (text == "") return;
 
     if (this.props.isReminders) {
-      if (text.indexOf("#reminder") == -1) {
-        text = "#reminder " + text;
+      if (text.indexOf("Remind me to") == -1) {
+        text = "Remind me to " + text;
         console.log("reminder command: " + text);
       }
-      PostToSlack(USER.name, text, "#livesmskeeperfeed");
+      Utils.PostToSlack(USER.name, text, "#livesmskeeperfeed");
       SubmitCommandToServer(text);
 
     } else {
@@ -291,7 +291,7 @@ var CreateEntryFooter = React.createClass({
       this.getCollection().add([entry]);
       entry.save();
 
-      PostToSlack(USER.name, "Added " + text + " to " + entry.get('label'), "#livesmskeeperfeed");
+      Utils.PostToSlack(USER.name, "Added " + text + " to " + entry.get('label'), "#livesmskeeperfeed");
       mixpanel.track("Added Entries", {
         distinct_id: USER.id,
         interface: "web",
@@ -354,7 +354,7 @@ module.exports = React.createClass({
         entry.set("hidden", true);
         entry.save();
       });
-      PostToSlack(USER.name, "Cleared " + this.props.label, "#livesmskeeperfeed");
+      Utils.PostToSlack(USER.name, "Cleared " + this.props.label, "#livesmskeeperfeed");
     }
 
     mixpanel.track("Cleared Label", {

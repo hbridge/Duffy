@@ -40,5 +40,22 @@ var PostToSlack = function(username, text, channel){
   });
 }
 
+var SubmitCommandToServer = function(msg, onSuccess, onFailure) {
+  $.ajax({
+        url: "/smskeeper/send_sms",
+        dataType: 'json',
+        type: 'POST',
+        data: {msg: msg, user_id: USER.id, direction: "ToKeeper", response_data: "entries", from_num: "web"},
+        success: function(entryData) {
+          onSuccess(entryData);
+        },
+        error: function(xhr, status, err) {
+          if (onFailure) onFailure(xhr, status, err);
+          console.error("SubmitCommandToServer ", status, err.toString());
+        }
+      });
+}
+
 module.exports.PostToSlack = PostToSlack;
 module.exports.getUrlParameter = getUrlParameter;
+module.exports.SubmitCommandToServer = SubmitCommandToServer;

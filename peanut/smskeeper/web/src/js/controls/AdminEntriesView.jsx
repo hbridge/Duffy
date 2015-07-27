@@ -5,6 +5,10 @@ var emoji = require("node-emoji");
 var moment = require('moment');
 var BackboneReactComponent = require('backbone-react-component');
 var moment = require('moment');
+var Utils = require('../utils.js')
+var Bootstrap = require('react-bootstrap');
+  Button = Bootstrap.Button;
+  Input = Bootstrap.Input;
 
 mui = require('material-ui'),
  List = mui.List;
@@ -19,7 +23,6 @@ mui = require('material-ui'),
  CardTitle = mui.CardTitle;
 
 AdminEntryCard = require('./AdminEntryCard.jsx');
-
 
 
 module.exports = React.createClass({
@@ -45,9 +48,10 @@ module.exports = React.createClass({
 			    	</DropDownIcon>
 		    	</ToolbarGroup>
 	    	</Toolbar>
-
       		{ this.props.collection.reminders().map(createEntry) }
+          <CreateEntryInput />
       	</Paper>
+
       	</div>
     );
   },
@@ -71,4 +75,44 @@ module.exports = React.createClass({
       console.log("unrecognized more action");
     }
   }
+});
+
+
+var CreateEntryInput = React.createClass({
+  mixins: [BackboneReactComponent],
+  getInitialState: function(){
+    return {disabled: false}
+  },
+  render: function() {
+    var innerButton =
+    <Button onClick={this.createEntry} disabled={this.state.disabled}>
+      Create
+    </Button>;
+
+    return (
+      <form className='inputElement' onSubmit={this.createEntry}>
+        <Input
+          type='text'
+          ref='text'
+          buttonAfter={innerButton}
+          placeholder="poop tomorrow..."
+        />
+      </form>
+    );
+  },
+
+  createEntry: function(e) {
+    e.preventDefault();
+    var text = this.refs.text.getValue();
+    console.log("create entry with text: " + text);
+    Utils.SubmitCommandToServer(
+      "Remind me to " + text,
+      function(entryData){
+        this.getCollection().fetch();
+        this.refs.text.getInputDOMNode().value = "";
+      }.bind(this),
+      null
+    );
+
+  },
 });
