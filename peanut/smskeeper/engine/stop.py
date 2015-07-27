@@ -26,7 +26,7 @@ class StopAction(Action):
 		sms_util.sendMsgs(
 			user, 
 			[u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'",
-			u"If there is something I can do better, pls let me know. \U0001F423"])
+			u"I hate to see you go. Is there something I can do better? \U0001F423"])
 
 		if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
 			time.sleep(1)
