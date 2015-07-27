@@ -81,11 +81,11 @@ module.exports = React.createClass({
 var CreateEntryInput = React.createClass({
   mixins: [BackboneReactComponent],
   getInitialState: function(){
-    return {disabled: false}
+    return {sendDisabled: true}
   },
   render: function() {
     var innerButton =
-    <Button onClick={this.createEntry} disabled={this.state.disabled}>
+    <Button onClick={this.createEntry} disabled={this.state.sendDisabled}>
       Create
     </Button>;
 
@@ -96,9 +96,18 @@ var CreateEntryInput = React.createClass({
           ref='text'
           buttonAfter={innerButton}
           placeholder="poop tomorrow..."
+          onChange={this.textChanged}
         />
       </form>
     );
+  },
+
+  textChanged: function(e) {
+    if (this.refs.text.getValue().length > 0) {
+      this.setState({sendDisabled: false});
+    } else {
+      this.setState({sendDisabled: true});
+    }
   },
 
   createEntry: function(e) {
