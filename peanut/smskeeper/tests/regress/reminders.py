@@ -141,8 +141,8 @@ class SMSRemindersRegressionCase(test_base.SMSKeeperBaseCase):
 		print "New correct: (%s)" % len(newCorrect)
 
 		print "Still Failures: (%s)" % len(stillFailures)
-		#  for msg in stillFailures:
-		#  print msg
+		for msg in stillFailures:
+			print msg
 
 		print "New Failures: (%s)" % len(newFailures)
 		for msg in newFailures:

@@ -20,6 +20,9 @@ class CompleteTodoSpecificAction(Action):
 		regexHit = msg_util.done_re.search(chunk.normalizedText()) is not None
 		bestEntries = entry_util.fuzzyMatchEntries(user, ' '.join(interestingWords), 80)
 
+		if len(bestEntries) > 0 and len(interestingWords) >= 2:
+			score = 0.3
+
 		if regexHit and len(interestingWords) >= 2:
 			score = 0.5
 

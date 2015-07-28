@@ -191,6 +191,25 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
+	# Checks to make sure we can mark things as done even if they're not in the regex
+	# This assumes "blah" is a real verb but not in the regex
+	def test_fuzzy_match_done_specific_non_regex(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Go blah Tonya saturday")
+		cliMsg.msg(self.testPhoneNumber, "call court on the phone tomorrow")
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I blahed tonya")
+			self.assertIn("Nice!", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").first()
+		self.assertTrue(entry.hidden)
+
 	# Make sure we create a new entry instead of a followup
 	def test_create_new_after_reminder(self, dateMock):
 		self.setupUser(dateMock)
