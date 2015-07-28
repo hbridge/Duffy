@@ -118,7 +118,7 @@ def fixMsgForNatty(msg, user):
 	newMsg = replace(newMsg, "  ", " ")
 
 	# Fix "again at 3" situation where natty doesn't like that...wtf
-	againAt = re.search(r'.*again at ([0-9])', newMsg, re.IGNORECASE)
+	againAt = re.search(r'\bagain at ([0-9])', newMsg, re.IGNORECASE)
 	if againAt:
 		newMsg = replace(newMsg, "again at", "at")
 
@@ -137,7 +137,7 @@ def fixMsgForNatty(msg, user):
 	# Fix 3 digit numbers with timing info like "at 520". Not that we don't have p/a but we require 'at'
 	# We don't want to just swap in all 3 numbers tho, like $100
 	# We also need to watch out for at 1230, so make sure its exactly 3 numbers
-	threeDigitsWithAT = re.search(r'.*at (?P<time>\d{3})([^0-9]|\b)', newMsg, re.IGNORECASE)
+	threeDigitsWithAT = re.search(r'\bat (?P<time>\d{3})([^0-9]|\b)', newMsg, re.IGNORECASE)
 	if threeDigitsWithAT:
 		oldtime = threeDigitsWithAT.group("time")
 		newtime = oldtime[0] + ":" + oldtime[1:]
@@ -145,7 +145,7 @@ def fixMsgForNatty(msg, user):
 		newMsg = replace(newMsg, oldtime, newtime)
 
 	# Change '4th' to 'June 4th'
-	dayOfMonth = re.search(r'.*the (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg, re.IGNORECASE)
+	dayOfMonth = re.search(r'\bthe (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg, re.IGNORECASE)
 	if dayOfMonth:
 		localtime = date_util.now(user.getTimezone())
 
@@ -162,13 +162,21 @@ def fixMsgForNatty(msg, user):
 		newMsg = replace(newMsg, "the %s" % dayStr, "%s %s" % (monthName, dayStr))
 
 	# Take anything like 7ish and just make 7
-	ish = re.search(r'.* (?P<time>[0-9]+)ish', newMsg, re.IGNORECASE)
+	ish = re.search(r'\b(?P<time>[0-9]+)ish', newMsg, re.IGNORECASE)
 	if ish:
 		time = ish.group("time")
 		newMsg = replace(newMsg, time + "ish", time)
 
 	# Deal with "an hour"
 	newMsg = replace(newMsg, r"\ban hour\b", "1 hour")
+
+
+	# Take anything like 7 - 10 and turn into 7 to 10
+	timeRange = re.search(r'(?P<match>[0-9](a|p|am|pm)? *- *[0-9])', newMsg, re.IGNORECASE)
+	if timeRange:
+		match = timeRange.group("match")
+		newStr = replace(match, "-", " to ")
+		newMsg = replace(newMsg, match, newStr)
 
 	return newMsg
 
