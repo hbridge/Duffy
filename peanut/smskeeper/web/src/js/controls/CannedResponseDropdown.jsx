@@ -7,7 +7,8 @@ var Utils = require('../utils.js');
 var cannedResponses = [
 	"Psst:ear:... for faster responses, give me a day or a time :clock3: with every task that you enter. :sunglasses:",
 	"Psst:ear:... you can tell me \"Done with all\" to check off all tasks. :sunglasses:",
-	"Psst:ear:... you can say \"My zipcode is 12345\" to tell me when you move. :sunglasses:"
+	"Psst:ear:... you can say \"My zipcode is 12345\" to tell me when you move. :sunglasses:",
+  "I don't know how to do that yet :frowning:. I'll ask my minions :smiley_cat: to teach me."
 ];
 
 module.exports = React.createClass({
