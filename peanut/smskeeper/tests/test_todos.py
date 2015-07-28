@@ -210,6 +210,18 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").first()
 		self.assertTrue(entry.hidden)
 
+	# Make sure we create entries that start with a whitelisted "create" term
+	def test_whitelist_create_no_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "print shit out")
+			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("If that time doesn't work", self.getOutput(mock))
+
 	# Make sure we create a new entry instead of a followup
 	def test_create_new_after_reminder(self, dateMock):
 		self.setupUser(dateMock)

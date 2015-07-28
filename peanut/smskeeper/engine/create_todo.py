@@ -18,14 +18,15 @@ reTypeRes = {
 	keeper_constants.RECUR_MONTHLY: r'.* (every|each) month|.* once a month|.* monthly'
 }
 
-# things that match this RE will get a boost for create
-beginsWithRe = r'(remind|buy) '
-
 
 class CreateTodoAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CREATE_TODO
 
 	tutorial = False
+
+	# things that match this RE will get a boost for create
+	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
+	beginsWithRe = r'(remind|buy|print|fax|go|get|study|fix|make|schedule|fill|find|clean) '
 
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial
@@ -51,7 +52,7 @@ class CreateTodoAction(Action):
 		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.9 and chunk.matches(beginsWithRe):
+		if score < 0.9 and chunk.matches(self.beginsWithRe):
 			score += 0.1
 
 		return score

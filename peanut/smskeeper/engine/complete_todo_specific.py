@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 class CompleteTodoSpecificAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
 
+	# things that match this RE will get a boost for create
+	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
+	beginsWithRe = r'(done|check off) '
+
 	def getScore(self, chunk, user):
 		score = 0.0
 
@@ -34,6 +38,9 @@ class CompleteTodoSpecificAction(Action):
 
 		if CompleteTodoSpecificAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
+
+		if score < 0.9 and chunk.matches(self.beginsWithRe):
+			score += 0.1
 
 		return score
 

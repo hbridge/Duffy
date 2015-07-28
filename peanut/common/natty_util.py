@@ -127,7 +127,7 @@ def fixMsgForNatty(msg, user):
 	newMsg = replace(newMsg, "appointment", "appt")
 
 	# Fix 3 digit numbers with timing info like "520p"
-	threeDigitsWithAP = re.search(r'.* (?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg, re.IGNORECASE)
+	threeDigitsWithAP = re.search(r'\b(?P<time>\d{3}) ?(p|a|pm|am)\b', newMsg, re.IGNORECASE)
 	if threeDigitsWithAP:
 		oldtime = threeDigitsWithAP.group("time")  # This is the 520 part, the other is the 'p'
 		newtime = oldtime[0] + ":" + oldtime[1:]
