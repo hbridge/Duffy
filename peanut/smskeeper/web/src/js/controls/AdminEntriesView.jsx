@@ -10,21 +10,9 @@ var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
   ListGroup = Bootstrap.ListGroup;
-
-mui = require('material-ui'),
- List = mui.List;
- ListItem = mui.ListItem;
- ListDivider = mui.ListDivider;
- DropDownIcon = mui.DropDownIcon;
- Toolbar = mui.Toolbar;
- ToolbarGroup = mui.ToolbarGroup;
- ToolbarTitle = mui.ToolbarTitle;
- Paper = mui.Paper;
- Card = mui.Card;
- CardTitle = mui.CardTitle;
-
-
-
+  Panel = Bootstrap.Panel;
+  DropdownButton = Bootstrap.DropdownButton;
+  Glyphicon = Bootstrap.Glyphicon;
 AdminEntryCard = require('./AdminEntryCard.jsx');
 
 module.exports = React.createClass({
@@ -36,27 +24,27 @@ module.exports = React.createClass({
       );
     }.bind(this);
 
-    return (
-		<div>
+    var header = <div>
+      <span className="panelTitle">Active Reminders</span>
+      <Button
+        ref='refreshButton'
+        onClick={this.refreshEntries}
+        style={{float: "right"}}>
+        <Glyphicon glyph='refresh'/>
+      </Button>
+    </div>
 
-    	<Paper zDepth={1} className="controlPanel">
-	    	<Toolbar>
-		    	<ToolbarGroup key={0} float="left">
-		    		<ToolbarTitle text="Active Reminders" />
-		    	</ToolbarGroup>
-		    	<ToolbarGroup key={1} float="right">
-			    	<DropDownIcon menuItems={this.getElipsisMenuItems()} onChange={this.handleMoreAction}>
-			    	<ToolbarTitle text="•••"/>
-			    	</DropDownIcon>
-		    	</ToolbarGroup>
-	    	</Toolbar>
+    return (
+    	<Panel
+        header={header}
+        bsStyle={this.state.paused ? 'danger' : 'primary'}
+        className="controlPanel"
+      >
         <ListGroup>
       		{ this.props.collection.reminders().map(createEntry) }
         </ListGroup>
           <CreateEntryInput />
-      	</Paper>
-
-      	</div>
+      </Panel>
     );
   },
 
