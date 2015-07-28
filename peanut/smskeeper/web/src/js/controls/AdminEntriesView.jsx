@@ -9,6 +9,7 @@ var Utils = require('../utils.js')
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
+  ListGroup = Bootstrap.ListGroup;
 
 mui = require('material-ui'),
  List = mui.List;
@@ -21,6 +22,8 @@ mui = require('material-ui'),
  Paper = mui.Paper;
  Card = mui.Card;
  CardTitle = mui.CardTitle;
+
+
 
 AdminEntryCard = require('./AdminEntryCard.jsx');
 
@@ -47,7 +50,9 @@ module.exports = React.createClass({
 			    	</DropDownIcon>
 		    	</ToolbarGroup>
 	    	</Toolbar>
+        <ListGroup>
       		{ this.props.collection.reminders().map(createEntry) }
+        </ListGroup>
           <CreateEntryInput />
       	</Paper>
 

@@ -21,6 +21,12 @@ mui = require('material-ui'),
   TimePicker = mui.TimePicker;
   Checkbox = mui.Checkbox;
 
+var Bootstrap = require('react-bootstrap');
+  Button = Bootstrap.Button;
+  Input = Bootstrap.Input;
+  ListGroupItem = Bootstrap.ListGroupItem;
+TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
+
 var recurMenuItems = [
 	{payload: "default", text: "none (default)"},
 	{payload: "one-time", text: "one-time"},
@@ -30,6 +36,49 @@ var recurMenuItems = [
 	{payload: "weekly", text: "weekly"},
 	{payload: "monthly", text: "monthly"},
 ];
+
+
+// <CardActions>
+// 			    		<TextField
+// 				            ref="text"
+// 				            defaultValue={this.state.model.text}
+// 				            hintText="Entry text"
+// 				            multiLine={true}
+// 				            style={{width: '80%'}}
+// 		            	/>
+// 		            	<DatePicker
+// 		            		ref="date"
+// 		            		defaultDate={this.getAdminLocalDate()}
+// 		  					hintText="Reminder date"
+// 		  					style={{width: "20%"}}
+// 		  					autoOk={true}
+// 		  					minDate={new Date()}
+// 		  				/>
+// 		  				<TimePicker
+// 		  					ref="time"
+// 		            		defaultTime={this.getAdminLocalDate()}
+// 		  					hintText="Reminder date"
+// 		  					format="24hr"
+// 		  					style={{width: "20%"}}
+// 		  				/>
+// 		  				<DropDownMenu
+// 							ref="recur"
+// 							menuItems={recurMenuItems}
+// 							selectedIndex={this.getSelectedRecurIndex()}
+// 						/>
+// 		  				<div style="height: 10px" className="smallVerticalSpacer"/>
+// 		  				<Checkbox
+// 		  					ref="hidden"
+// 		  					label="Hidden"
+// 		  				/>
+// 		  				<div style="height: 10px" className="mediumVerticalSpacer"/>
+// 		  				<RaisedButton
+// 		  					label="Save"
+// 		  					secondary={true}
+// 		  					className="submitButton"
+// 		  					onClick={this.onSave}
+// 		  				/>
+// 		    	</CardActions>
 
 module.exports = React.createClass({
 	mixins: [BackboneReactComponent],
@@ -42,56 +91,54 @@ module.exports = React.createClass({
 	            style={{width: '100%'}}
 	        />
 
-	     var expandedElems = <div></div>;
+	    var expandedElems = null;
 	    if (this.state.expanded) {
 	    	expandedElems = (
-	    		<Paper zDepth={0} className="controlPanel">
-	    			<CardText>
+	    		<div>
+	    			<div>
+	    				<br />
 	    				Original Messages: {this.state.model.orig_text} <br />
 	    				Added Date: {moment.tz(this.state.model.added, USER.timezone).format('llll')}
-	    			</CardText>
-	    			<CardActions>
-			    		<TextField
-				            ref="text"
-				            defaultValue={this.state.model.text}
-				            hintText="Entry text"
-				            multiLine={true}
-				            style={{width: '80%'}}
-		            	/>
-		            	<DatePicker
-		            		ref="date"
-		            		defaultDate={this.getAdminLocalDate()}
-		  					hintText="Reminder date"
-		  					style={{width: "20%"}}
-		  					autoOk={true}
-		  					minDate={new Date()}
-		  				/>
-		  				<TimePicker
-		  					ref="time"
-		            		defaultTime={this.getAdminLocalDate()}
-		  					hintText="Reminder date"
-		  					format="24hr"
-		  					style={{width: "20%"}}
-		  				/>
-		  				<DropDownMenu
-							ref="recur"
-							menuItems={recurMenuItems}
-							selectedIndex={this.getSelectedRecurIndex()}
-						/>
-		  				<div style="height: 10px" className="smallVerticalSpacer"/>
-		  				<Checkbox
-		  					ref="hidden"
-		  					label="Hidden"
-		  				/>
-		  				<div style="height: 10px" className="mediumVerticalSpacer"/>
-		  				<RaisedButton
-		  					label="Save"
-		  					secondary={true}
-		  					className="submitButton"
-		  					onClick={this.onSave}
-		  				/>
-		    	</CardActions>
-	    	</Paper>
+	    			</div>
+	    			<form className='inputElement' onSubmit={this.createEntry}>
+		    			<Input
+			    			type='text'
+			    			ref='text'
+			    			defaultValue={this.state.model.text}
+			    			placeholder="Entry text"
+		    			/>
+		    			<TZDateTimePicker
+		    				ref="date"
+		    				initialMoment={moment.tz(this.state.model.remind_timestamp, USER.timezone)}
+		    				timezone={USER.timezone}
+		    			/>
+		    			<Input ref="recur"
+		    				type='select'
+		    				label="Type"
+		    				defaultValue={this.state.model.remind_recur}
+		    			>
+      						<option value='default'>Default Reminder</option>
+      						<option value='one-time'>One-time Reminder</option>
+      						<option value='daily'>Daily Reccurring</option>
+      						<option value='every-2-days'>Every 2 days Reccurring</option>
+      						<option value='weekdays'>Weekdays Reccurring</option>
+      						<option value='weekly'>Weekly Reccurring</option>
+      						<option value='monthly'>Monthly Reccurring</option>
+    					</Input>
+    					<Input ref="hidden" type='checkbox' label="Hidden" />
+    					<Button
+	    					onClick={this.onSave}
+	    					bsStyle="primary"
+	    				>
+	    					Save
+    					</Button>
+    					<Button
+	    					onClick={function(e){this.setState({expanded: false})}.bind(this)}
+	    				>
+	    					Cancel
+    					</Button>
+	    			</form>
+	    	</div>
 	    	);
 	    }
 
@@ -101,47 +148,19 @@ module.exports = React.createClass({
 	    }
 
     	return(
-    		<Card>
-	  			<CardTitle
-		  			title={ this.state.model.text }
-		  			subtitle={ subtitle }
-		  			onTouchTap={ this.onTapCardTitle }
-		  			style={{margin: "10px"}}
-		  			titleStyle={{fontSize: "14pt"}}
-	  			/>
+    		<ListGroupItem
+    			header={ this.state.model.text }
+    			onClick={ this.state.expanded ? null : this.onTapCardTitle }
+    		>
+    			{ subtitle }
 	  			{ expandedElems }
-	  		</Card>
+	  		</ListGroupItem>
 	  	);
 
 	},
 
 	onTapCardTitle: function(e) {
 		this.setState({expanded: !this.state.expanded});
-	},
-
-	// get the date of the reminder as if it were created in the Admin's local timezone
-	getAdminLocalDate: function() {
-		var usermoment = moment.tz(this.state.model.remind_timestamp, USER.timezone);
-		console.log("user moment: " + JSON.stringify(usermoment));
-		// get a the moment in the admin's TZ by parsing the date without TZ info
-		var adminmoment = moment(usermoment.format('YYYY-MM-DD HH:mm'));
-		console.log("admin moment: " + JSON.stringify(adminmoment));
-
-		var adminLocalDate = adminmoment.toDate();
-		console.log("adminLocalDate: "+ adminLocalDate);
-		return adminLocalDate;
-	},
-
-	getSelectedRecurIndex: function() {
-		if (!this.state.model.remind_recur) return 0;
-
-		for (var i = 0; i < recurMenuItems.length; i++) {
-			if (recurMenuItems[i].payload == this.state.model.remind_recur) {
-				return i;
-			}
-		}
-		console.error("remind recur index not found");
-		return 0;
 	},
 
 	onSave: function(e) {
@@ -157,18 +176,8 @@ module.exports = React.createClass({
 			changes.text = newText;
 		}
 
-		// create the new moment in the user's timezone, but set the absolute values
-		// from the control so it gets converted
-		var dateControlComponents = [
-			this.refs.date.getDate().getFullYear(),
-			this.refs.date.getDate().getMonth(),
-			this.refs.date.getDate().getDate(),
-		];
-		var newMoment = moment.tz(dateControlComponents, USER.timezone);
-		newMoment.set('hour', this.refs.time.getTime().getHours());
-		newMoment.set('minute', this.refs.time.getTime().getMinutes());
-
 		// see if the time for the entry changed
+		var newMoment = this.refs.date.getTimezoneMoment();
 		console.log("old moment: " + JSON.stringify(moment(this.state.model.remind_timestamp)));
 		console.log("new moment: " + JSON.stringify(newMoment));
 		if (newMoment.isSame(moment(this.state.model.remind_timestamp))) {
@@ -180,27 +189,30 @@ module.exports = React.createClass({
 		}
 
 		// se if recur has changed
-		console.log(this.refs.recur.state.selectedIndex);
-		if (this.refs.recur.state.selectedIndex != this.getSelectedRecurIndex()) {
-			console.log("hidden changed");
-			var newRecurValue = recurMenuItems[this.refs.recur.state.selectedIndex].payload;
+		var newRecurValue = this.refs.recur.getValue();
+		console.log("recur val: " + newRecurValue);
+		if (this.refs.recur.getValue() != this.state.model.remind_recur) {
+			console.log("recur changed");
 			entryChanged = true;
 			changes.remind_recur = newRecurValue;
 		}
 
 		// see if hidden toggle changed
-		if (this.refs.hidden.isChecked() != this.state.model.hidden) {
+		var newHiddenVal = this.refs.hidden.getInputDOMNode().checked;
+		console.log("hidden val: " + newHiddenVal);
+		if (newHiddenVal != this.state.model.hidden) {
 			console.log("hidden changed");
 			entryChanged = true;
-			changes.hidden = this.refs.hidden.isChecked();
+			changes.hidden = newHiddenVal;
 		}
+
+		console.log("new values: ", newText, newMoment, newRecurValue, newHiddenVal);
 
 		if (entryChanged) {
 			changes.manually_updated = true;
 			changes.manually_updated_timestamp = moment().toISOString();
 			var result = this.props.model.save(changes);
-			console.log("save result:")
-			console.log(result);
+			console.log("save result:", result)
 			this.setState({expanded: false});
 		}
 	},
