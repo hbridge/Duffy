@@ -24,7 +24,6 @@ mui = require('material-ui'),
 
 AdminEntryCard = require('./AdminEntryCard.jsx');
 
-
 module.exports = React.createClass({
   mixins: [BackboneReactComponent],
   render: function() {
@@ -84,17 +83,20 @@ var CreateEntryInput = React.createClass({
     return {sendDisabled: true}
   },
   render: function() {
-    var innerButton =
-    <Button onClick={this.createEntry} disabled={this.state.sendDisabled}>
-      Create
-    </Button>;
+    var createButton =
+      <Button
+        onClick={this.createEntry}
+        bsStyle="primary"
+        disabled={this.state.sendDisabled}>
+          Create
+      </Button>;
 
     return (
       <form className='inputElement' onSubmit={this.createEntry}>
         <Input
           type='text'
           ref='text'
-          buttonAfter={innerButton}
+          buttonAfter={createButton}
           placeholder="poop tomorrow..."
           onChange={this.textChanged}
         />
@@ -122,6 +124,5 @@ var CreateEntryInput = React.createClass({
       }.bind(this),
       null
     );
-
   },
 });
