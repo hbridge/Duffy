@@ -19,6 +19,11 @@ mui = require('material-ui'),
   ToolbarSeparator = mui.ToolbarSeparator;
   SvgIcon = mui.SvgIcon;
 
+var Bootstrap = require('react-bootstrap');
+  Button = Bootstrap.Button;
+  Input = Bootstrap.Input;
+var CannedResponseDropdown = require('./CannedResponseDropdown.jsx');
+
 module.exports = React.createClass({
   componentWillReceiveProps: function(nextProps) {
     this.setState({paused: nextProps.paused});
@@ -31,12 +36,12 @@ module.exports = React.createClass({
   handlePostMsgSubmit: function(e) {
     e.preventDefault();
     var text = this.refs.text.getValue().trim();
-    var direction = this.refs.simulateUserToggle.isToggled() ? "ToKeeper" : "ToUser";
+    var direction = this.state.simulateOn ? "ToKeeper" : "ToUser";
     if (!text) {
       return;
     }
+    this.refs.text.getInputDOMNode().value = '';
     this.props.onCommentSubmit({msg: text, user_id: USER.id, direction: direction});
-    this.refs.text.setValue('');
   },
 
   handleTogglePause: function(e) {
@@ -63,15 +68,21 @@ module.exports = React.createClass({
     window.open(menuItem.payload, '_blank');
   },
 
-  handleSimulateToggled: function(e, toggled) {
-    this.setState({simulateOn:toggled})
+  handleSimulateToggled: function(e) {
+    console.log(e);
+    var value = e.target.checked;
+    console.log("checkbox val" + value);
+    if (this.state.simulateOn != value){
+      this.setState({simulateOn: value})
+    }
   },
 
   handleTextChanged: function(e) {
+    e.preventDefault();
     var originalText = this.refs.text.getValue();
     var emojifiedText = Utils.Emojize(originalText);
     if (originalText != emojifiedText) {
-      this.refs.text.setValue(emojifiedText);
+      this.refs.text.getInputDOMNode().value = emojifiedText;
     }
   },
 
@@ -99,6 +110,9 @@ module.exports = React.createClass({
       { payload: '/' + USER.key + '?internal=1', text: 'KeeperApp' }
     ];
 
+    // CR menu
+    var crMenu = <CannedResponseDropdown onCannedResponseSelected={this.crSelected} />
+
     return (
       <Paper zDepth={1} className="controlPanel">
         <Toolbar style={{backgroundColor: toolbarBackround, padding: "0px 10px"}}>
@@ -113,33 +127,35 @@ module.exports = React.createClass({
           </ToolbarGroup>
         </Toolbar>
 
-        <div className="sendForm">
-          <TextField
-            ref="text"
-            hintText="Text to send..."
-            multiLine={true}
-            style={{width: '100%'}}
+        <form className='inputElement' onSubmit={this.createEntry}>
+          <Input
+            type='textarea'
+            ref='text'
+            placeholder="Text to send..."
+            addonBefore={crMenu}
             onChange={this.handleTextChanged}
-            />
-          <Toggle
-            ref='simulateUserToggle'
-            name="SimulateUser"
-            label="Simulate user"
-            style={{width: '10em'}}
-            onToggle={this.handleSimulateToggled}
-            />
-          <br />
-
-          <RaisedButton
-            ref='sendButton'
-            label={ sendText }
-            secondary={true}
-            onClick={this.handlePostMsgSubmit}
-            className="submitButton"
           />
-        </div>
+          <Input
+            type='checkbox'
+            ref='simulateUserToggle'
+            label='Simulate user'
+            onChange={this.handleSimulateToggled}
+          />
+          <Button
+            ref='sendButton'
+            onClick={this.createEntry}
+            bsStyle="primary"
+            disabled={this.state.sendDisabled}
+            onClick={this.handlePostMsgSubmit}>
+            {sendText}
+          </Button>
+        </form>
       </Paper>
     );
-  }
+  },
+
+  crSelected: function(text){
+    this.refs.text.getInputDOMNode().value = text;
+  },
 });
 
