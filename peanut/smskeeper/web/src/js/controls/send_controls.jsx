@@ -2,6 +2,7 @@ var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
 var emoji = require("node-emoji");
+var Utils = require("../utils.js");
 mui = require('material-ui'),
   ThemeManager = new mui.Styles.ThemeManager(),
   RaisedButton = mui.RaisedButton;
@@ -66,27 +67,9 @@ module.exports = React.createClass({
     this.setState({simulateOn:toggled})
   },
 
-  emojize: function(str) {
-    newstr = str;
-    var matches = str.match(/[:]\S+[:]/g);
-    if (!matches) return str;
-    for (var i = 0; i < matches.count; i++) {
-      var match = matches[i];
-      var emoji_lookup = match.replace(/[:]/g, "");
-      var emoji_char = emoji.get(emoji_lookup);
-      if (emoji_char) {
-        newstr = newstr.replace(match, emoji_char);
-        console.log("replaced %s with %s", match, emoji_char);
-      } else {
-        console.log("no match for %s", emoji_lookup);
-      }
-    }
-    return newstr;
-  },
-
   handleTextChanged: function(e) {
     var originalText = this.refs.text.getValue();
-    var emojifiedText = this.emojize(originalText);
+    var emojifiedText = Utils.Emojize(originalText);
     if (originalText != emojifiedText) {
       this.refs.text.setValue(emojifiedText);
     }

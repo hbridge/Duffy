@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var emoji = require("node-emoji");
 
 /* Gets parameters from URL */
 function getUrlParameter(sParam){
@@ -56,6 +57,27 @@ var SubmitCommandToServer = function(msg, onSuccess, onFailure) {
       });
 }
 
+
+var Emojize = function(str) {
+    newstr = str;
+    var matches = str.match(/[:]\S+[:]/g);
+    if (!matches || matches.count) {
+      return str;
+    }
+    for (var i = 0; i < matches.length; i++) {
+      var match = matches[i];
+      var emoji_lookup = match.replace(/[:]/g, "");
+      var emoji_char = emoji.get(emoji_lookup);
+      if (emoji_char) {
+        newstr = newstr.replace(match, emoji_char);
+      } else {
+        console.log("no match for %s", emoji_lookup);
+      }
+    }
+    return newstr;
+  }
+
 module.exports.PostToSlack = PostToSlack;
 module.exports.getUrlParameter = getUrlParameter;
 module.exports.SubmitCommandToServer = SubmitCommandToServer;
+module.exports.Emojize = Emojize;
