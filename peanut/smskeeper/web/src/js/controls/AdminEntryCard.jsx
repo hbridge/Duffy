@@ -5,80 +5,12 @@ var emoji = require("node-emoji");
 var moment = require("moment");
 var BackboneReactComponent = require('backbone-react-component');
 
-mui = require('material-ui'),
-  SvgIcon = mui.SvgIcon;
-  FlatButton = mui.FlatButton;
-  RaisedButton = mui.RaisedButton;
-  Dialog = mui.Dialog;
-  Checkbox = mui.Checkbox;
-  TextField = mui.TextField;
-  DropDownMenu = mui.DropDownMenu;
-  Card = mui.Card;
-  CardTitle = mui.CardTitle;
-  CardText = mui.CardText;
-  CardActions = mui.CardActions;
-  DatePicker = mui.DatePicker;
-  TimePicker = mui.TimePicker;
-  Checkbox = mui.Checkbox;
-
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
   ListGroupItem = Bootstrap.ListGroupItem;
 TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
 
-var recurMenuItems = [
-	{payload: "default", text: "none (default)"},
-	{payload: "one-time", text: "one-time"},
-	{payload: "daily", text: "daily"},
-	{payload: "every-2-days", text: "every-2-days"},
-	{payload: "weekdays", text: "weekdays"},
-	{payload: "weekly", text: "weekly"},
-	{payload: "monthly", text: "monthly"},
-];
-
-
-// <CardActions>
-// 			    		<TextField
-// 				            ref="text"
-// 				            defaultValue={this.state.model.text}
-// 				            hintText="Entry text"
-// 				            multiLine={true}
-// 				            style={{width: '80%'}}
-// 		            	/>
-// 		            	<DatePicker
-// 		            		ref="date"
-// 		            		defaultDate={this.getAdminLocalDate()}
-// 		  					hintText="Reminder date"
-// 		  					style={{width: "20%"}}
-// 		  					autoOk={true}
-// 		  					minDate={new Date()}
-// 		  				/>
-// 		  				<TimePicker
-// 		  					ref="time"
-// 		            		defaultTime={this.getAdminLocalDate()}
-// 		  					hintText="Reminder date"
-// 		  					format="24hr"
-// 		  					style={{width: "20%"}}
-// 		  				/>
-// 		  				<DropDownMenu
-// 							ref="recur"
-// 							menuItems={recurMenuItems}
-// 							selectedIndex={this.getSelectedRecurIndex()}
-// 						/>
-// 		  				<div style="height: 10px" className="smallVerticalSpacer"/>
-// 		  				<Checkbox
-// 		  					ref="hidden"
-// 		  					label="Hidden"
-// 		  				/>
-// 		  				<div style="height: 10px" className="mediumVerticalSpacer"/>
-// 		  				<RaisedButton
-// 		  					label="Save"
-// 		  					secondary={true}
-// 		  					className="submitButton"
-// 		  					onClick={this.onSave}
-// 		  				/>
-// 		    	</CardActions>
 
 module.exports = React.createClass({
 	mixins: [BackboneReactComponent],
