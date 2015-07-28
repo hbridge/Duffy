@@ -3,25 +3,12 @@ var $ = require('jquery');
 var classNames = require('classnames');
 var emoji = require("node-emoji");
 var Utils = require("../utils.js");
-mui = require('material-ui'),
-  ThemeManager = new mui.Styles.ThemeManager(),
-  RaisedButton = mui.RaisedButton;
-  CircularProgress = mui.CircularProgress;
-  TextField = mui.TextField;
-  RadioButtonGroup = mui.RadioButtonGroup;
-  RadioButton = mui.RadioButton;
-  Toggle = mui.Toggle;
-  Paper = mui.Paper;
-  Toolbar = mui.Toolbar;
-  ToolbarGroup = mui.ToolbarGroup;
-  ToolbarTitle = mui.ToolbarTitle;
-  DropDownIcon = mui.DropDownIcon;
-  ToolbarSeparator = mui.ToolbarSeparator;
-  SvgIcon = mui.SvgIcon;
-
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
+  ButtonGroup = Bootstrap.ButtonGroup;
   Input = Bootstrap.Input;
+  Panel = Bootstrap.Panel;
+  Glyphicon = Bootstrap.Glyphicon;
 var CannedResponseDropdown = require('./CannedResponseDropdown.jsx');
 
 module.exports = React.createClass({
@@ -63,9 +50,9 @@ module.exports = React.createClass({
     });
   },
 
-  handleMoreAction: function(e, selectedIndex, menuItem) {
-    console.log("more action selected: %d: %s", selectedIndex, menuItem.payload);
-    window.open(menuItem.payload, '_blank');
+  handleMoreAction: function(url) {
+    console.log("more action selected: %s", url);
+    window.open(url, '_blank');
   },
 
   handleSimulateToggled: function(e) {
@@ -92,41 +79,47 @@ module.exports = React.createClass({
       sendText = this.state.paused ? "Unpause & Simulate" : "Simulate";
     }
     var userPausedText = this.state.paused ? "Paused" : "Normal";
-    var pausedText = this.state.paused ? "Unpause" : "Pause";
-    var pauseElement = <RaisedButton
-      ref='pauseButton'
-      label={ pausedText }
-      primary={ !this.state.paused }
-      secondary= { this.state.paused }
-      onClick={this.handleTogglePause}
-    />;
-    if (this.state.loading) {
-      pauseElement = <CircularProgress mode="indeterminate" />;
-    }
+    var pauseButtonText = this.state.paused ? "Unpause" : "Pause";
 
-    var toolbarBackround = this.state.paused ? "#F5CFCF" : "#DBDBDB";
-    var iconMenuItems = [
-      { payload: "/admin/smskeeper/reminder/?q=" + USER.id, text: 'Reminders' },
-      { payload: '/' + USER.key + '?internal=1', text: 'KeeperApp' }
-    ];
+    if (this.state.loading) {
+      pauseElement = <Glyphicon glyph='refresh' style={{float: "right"}}/>;
+    } else {
+      pauseElement =
+      <ButtonGroup style={{float: "right"}}>
+        <Button
+            ref='pauseButton'
+            onClick={this.handleTogglePause}
+            bsStyle={this.state.paused ? 'success' : 'danger'}
+        >
+            {pauseButtonText}
+        </Button>
+        <DropdownButton
+          title='•••'
+          ref='crselect'
+          pullRight
+        >
+            <MenuItem eventKey="/admin/smskeeper/reminder/?q=" onSelect={this.handleMoreAction}>Reminders</MenuItem>
+            <MenuItem eventKey={'/' + USER.key + '?internal=1'} onSelect={this.handleMoreAction}>KeeperApp</MenuItem>
+        </DropdownButton>
+      </ButtonGroup>
+    }
 
     // CR menu
     var crMenu = <CannedResponseDropdown onCannedResponseSelected={this.crSelected} />
 
-    return (
-      <Paper zDepth={1} className="controlPanel">
-        <Toolbar style={{backgroundColor: toolbarBackround, padding: "0px 10px"}}>
-          <ToolbarGroup key={0} float="left">
-            <ToolbarTitle text={userPausedText} />
-          </ToolbarGroup>
-          <ToolbarGroup key={1} float="right">
-            { pauseElement }
-            <DropDownIcon menuItems={iconMenuItems} onChange={this.handleMoreAction}>
-              <ToolbarTitle text="•••"/>
-            </DropDownIcon>
-          </ToolbarGroup>
-        </Toolbar>
 
+    var header = <div>
+      <span className="panelTitle">{userPausedText}</span>
+      {pauseElement}
+    </div>
+
+    return (
+
+      <Panel
+        header={header}
+        bsStyle={this.state.paused ? 'danger' : 'primary'}
+        className="controlPanel"
+      >
         <form className='inputElement' onSubmit={this.createEntry}>
           <Input
             type='textarea'
@@ -150,7 +143,7 @@ module.exports = React.createClass({
             {sendText}
           </Button>
         </form>
-      </Paper>
+      </Panel>
     );
   },
 
