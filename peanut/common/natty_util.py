@@ -238,6 +238,20 @@ def isTomorrowInText(usedText):
 	return False
 
 
+# Looks through time options and figures out which is best
+# the phrase "for 1 hour" returns now and in an hour, so there use the second
+# the phrase "5 and 8" returns at 5 and 8, so return the first
+def getBestTimeFromChoices(choices):
+	if len(choices) > 1:
+		for choice in choices:
+			dt = datetime.datetime.fromtimestamp(choice)
+			if not isNattyDefaultTime(dt):
+				return datetime.datetime.fromtimestamp(choice).replace(tzinfo=pytz.utc)
+		return datetime.datetime.fromtimestamp(choices[0]).replace(tzinfo=pytz.utc)
+	else:
+		return datetime.datetime.fromtimestamp(choices[0]).replace(tzinfo=pytz.utc)
+
+
 def processQuery(query, timezone):
 	# get startDate from Natty
 	nattyPort = "7990"
@@ -270,8 +284,7 @@ def processQuery(query, timezone):
 		for entry in nattyJson:
 			usedText = entry["matchingValue"]
 
-			timestamp = entry["timestamps"][-1]
-			startDate = datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.utc)
+			startDate = getBestTimeFromChoices(entry["timestamps"])
 
 			# Correct for a few edgecases
 			startDate = updatedTimeBasedOnUsedText(startDate, usedText, timezone)
