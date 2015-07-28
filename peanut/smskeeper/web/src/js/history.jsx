@@ -146,6 +146,15 @@ var KeeperApp = React.createClass({
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
+    // console.log("this.state.messages");
+    // console.log(this.state.messages)
+    // console.log("this.props.model");
+    // console.log(this.props.model)
+    // console.log("nextState.messages");
+    // console.log(nextState.messages)
+    // console.log("nextProps.model");
+    // console.log(nextProps.model)
+
     var shouldUpdate = false;
     var newestRemoteMessageId = nextProps.model.messages.last().get("id");
 
@@ -160,12 +169,16 @@ var KeeperApp = React.createClass({
     }
     this.lastSeenMessageId = newestRemoteMessageId;
 
+    if (nextState.paused != nextProps.model.paused) {
+      shouldUpdate = true;
+      console.log('max rows changed, re-rendering');
+    }
+    if (this.state.maxRowsToShow != nextState.maxRowsToShow) {
+      shouldUpdate = true;
+      console.log('max rows changed, re-rendering');
+    }
 
-    if (nextState.paused != nextProps.model.paused) shouldUpdate = true;
-    if (nextState.maxRowsToShow != nextState.maxRowsToShow) shouldUpdate = true;
-    console.log('app state change of some sort, re-rendering');
-
-    return true;
+    return shouldUpdate;
   },
 
   componentWillUpdate: function(nextProps, nextState) {
