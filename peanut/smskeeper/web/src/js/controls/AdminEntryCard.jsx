@@ -9,6 +9,7 @@ var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
   ListGroupItem = Bootstrap.ListGroupItem;
+  Well = Bootstrap.Well;
 TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
 
 
@@ -27,11 +28,11 @@ module.exports = React.createClass({
 	    if (this.state.expanded) {
 	    	expandedElems = (
 	    		<div>
-	    			<div>
-	    				<br />
+	    			<br/>
+	    			<Well>
 	    				Original Messages: {this.state.model.orig_text} <br />
-	    				Added Date: {moment.tz(this.state.model.added, USER.timezone).format('llll')}
-	    			</div>
+	    				Added: {moment.tz(this.state.model.added, USER.timezone).format('llll')}
+	    			</Well>
 	    			<form className='inputElement' onSubmit={this.createEntry}>
 		    			<Input
 			    			type='text'

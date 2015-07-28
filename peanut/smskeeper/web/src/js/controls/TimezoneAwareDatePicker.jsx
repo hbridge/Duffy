@@ -38,6 +38,16 @@ module.exports = React.createClass({
 		console.log("localMoment: " + this.state.localMoment.format())
 		console.log("timezoneMoment : " + timezoneMoment.format())
 		return timezoneMoment;
+	},
+
+	shouldComponentUpdate: function(nextProps, nextState) {
+		if (!this.props.initialMoment.isSame(nextProps.initialMoment)
+			|| this.props.timezone != nextProps.timezone) {
+			console.log("component updating");
+			return true;
+		}
+
+		return false;
 	}
 
 });
