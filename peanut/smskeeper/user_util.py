@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase):
+	productId = keeper_constants.TODO_PRODUCT_ID
 	if keeperNumber and productId is None:
-		productId = keeper_constants.TODO_PRODUCT_ID
 		for pId, number in settings.KEEPER_NUMBER_DICT.iteritems():
 			if number == keeperNumber:
 				productId = pId
