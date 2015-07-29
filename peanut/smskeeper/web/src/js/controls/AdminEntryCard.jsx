@@ -16,14 +16,6 @@ TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
 module.exports = React.createClass({
 	mixins: [BackboneReactComponent],
 	render: function() {
-		var editText = <TextField
-	            ref="text"
-	            defaultValue={this.state.model.text}
-	            hintText="Entry text"
-	            multiLine={true}
-	            style={{width: '100%'}}
-	        />
-
 	    var expandedElems = null;
 	    if (this.state.expanded) {
 	    	expandedElems = (

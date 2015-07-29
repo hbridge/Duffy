@@ -11,7 +11,6 @@
     "gulp-ignore": "^1.2.1",
     "jquery": "^2.1.4",
     "jquery-ui": "^1.10.5",
-    "material-ui": "^0.10.1",
     "mixpanel": "^0.2.1",
     "moment": "^2.10.3",
     "moment-timezone": "^0.4.0",

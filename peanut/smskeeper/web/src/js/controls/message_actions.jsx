@@ -2,103 +2,93 @@ var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
 var emoji = require("node-emoji");
-mui = require('material-ui'),
-  SvgIcon = mui.SvgIcon;
-  FlatButton = mui.FlatButton;
-  Dialog = mui.Dialog;
-  List = mui.List;
-  ListItem = mui.ListItem;
-  ListDivider = mui.ListDivider;
-  Checkbox = mui.Checkbox;
-
-var OptionListItem = React.createClass({
-  render: function() {
-    var checkbox = <Checkbox
-      name={this.props.option.value}
-      value={this.props.option.value}
-      key={this.props.option.value}
-      defaultChecked={this.props.selected}
-      onCheck={this.props.onChecked}
-    />
-    var text = this.props.option.text;
-    if (this.props.message && this.props.message.get("classification_scores")) {
-      score = this.props.message.get("classification_scores")[this.props.option.value];
-      if (score != undefined) {
-        text = text + " (" + score.toFixed(1) + ")"
-      }
-    }
-
-    return (
-      <ListItem
-        primaryText={text}
-        leftCheckbox={checkbox}
-      />
-    );
-  },
-});
+var Bootstrap = require('react-bootstrap');
+  Modal = Bootstrap.Modal;
+  Button = Bootstrap.Button;
+  Input = Bootstrap.Input;
+  ListGroup = Bootstrap.ListGroup;
+  ListGroupItem = Bootstrap.ListGroupItem;
+  Well = Bootstrap.Well;
 
 
 module.exports = React.createClass({
   getInitialState: function(){
-    return {selectedClassification: null};
+    return {showModal: false, selectedClassification: null};
   },
 
   show: function(message) {
-    console.log("showing message actions for");
-    console.log(message);
-    this.setState({message: message, selectedClassification: message.get("classification")})
-    this.refs.dialog.show();
+    console.log("showing message actions for ", message);
+    this.setState({
+      showModal: true,
+      message: message,
+      selectedClassification: message.get("classification"),
+      showJson: false,
+    });
   },
+
   hide: function() {
-    this.refs.dialog.hide();
+    this.setState({showModal: false});
   },
 
   render: function() {
     // jsonElement for after show JSON is tapped
     var jsonElement = null;
     if (this.state.showJson) {
-      jsonElement = <div>{this.prettyPrintJson(JSON.stringify(this.state.message))}</div>;
+      jsonElement = <Well>{this.prettyPrintJson(JSON.stringify(this.state.message))}</Well>;
     }
 
     // categorization options
-    var createOption = function(option, index) {
+    var createCategoryOption = function(option, index) {
+      var text = option.text;
+      if (this.state.message && this.state.message.get("classification_scores")) {
+        var score = this.state.message.get("classification_scores")[option.value];
+        if (score != undefined) {
+          text = text + " (" + score.toFixed(1) + ")"
+        }
+      }
+
       return(
-        <OptionListItem
-          option={option}
+        <ListGroupItem
+          key={option.value}
+          eventKey="hi"
           message={this.state.message}
-          selected={option.value == this.state.selectedClassification}
-          onChecked={this.categorizationChecked}
-        />
+          active={option.value == this.state.selectedClassification}
+          onClick={function(e){this.categorizationSelected(e, option.value)}.bind(this)}
+        >
+          {text}
+        </ListGroupItem>
       );
     }.bind(this);
 
-    // dialog buttons
-    standardActions = [
-      { text: 'Cancel' },
-      { text: 'Submit', onTouchTap: this.onDialogSubmit, ref: 'submit' }
-    ];
+    var categorizationActions = null;
+    if (this.state.message && this.state.message.get("incoming")) {
+      categorizationActions = (
+      <div>
+      Categorize
+        <ListGroup>
+          { CLASSIFICATION_OPTIONS.map(createCategoryOption) }
+        </ListGroup>
+      </div>
+      );
+    }
 
     return(
-      <Dialog
-        ref="dialog"
-        className="dialog"
-        title="Message Actions"
-        actions={standardActions}
-        autoDetectWindowHeight={true}
-        autoScrollBodyContent={true}
-        contentStyle={{width: "90%", height: "90%"}}
-        contentInnerStyle={{maxHeight: "80vh"}}
-      >
-      <List>
-        <ListItem primaryText="Resend" onTouchTap={this.onResendTapped}/>
-        <ListItem primaryText="Show JSON" onTouchTap={this.onShowJSONTapped}/>
-      </List>
-      {jsonElement}
-      <ListDivider />
-      <List subheader="Categorize" ref="categoriesList">
-        { CLASSIFICATION_OPTIONS.map(createOption) }
-      </List>
-      </Dialog>
+        <Modal show={this.state.showModal} onHide={this.hide}>
+          <Modal.Header closeButton>
+            <Modal.Title>Message Actions</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ListGroup>
+              <ListGroupItem onClick={this.onResendTapped}>Resend</ListGroupItem>
+              <ListGroupItem onClick={this.onShowJSONTapped}>Show JSON</ListGroupItem>
+            </ListGroup>
+            {jsonElement}
+            {categorizationActions}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.onDialogSubmit}>Done</Button>
+          </Modal.Footer>
+        </Modal>
     );
   },
 
@@ -115,27 +105,27 @@ module.exports = React.createClass({
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
-    this.refs.dialog.dismiss();
+    this.hide();
   },
 
   onShowJSONTapped: function(e) {
     console.log("showJsonTapped");
-    this.setState({showJson: true})
+    this.setState({showJson: !this.state.showJson})
   },
 
   onDialogSubmit: function(e) {
-    console.log("submit");
+    console.log("Message actions submit");
     if (this.state.selectedClassification != this.state.message.get("classification")) {
       this.state.message.setClassification(this.state.selectedClassification);
     }
-    this.refs.dialog.dismiss();
+    this.hide();
   },
 
-  categorizationChecked: function(e, checked) {
-    var checkedValue = e.target.value;
-    console.log("categorization " + checkedValue + " checked: " + checked);
-    if (checkedValue != this.state.selectedClassification) {
-      this.setState({selectedClassification: checkedValue})
+  categorizationSelected: function(e, value) {
+    e.preventDefault();
+    console.log("categorization selected", value);
+    if (value != this.state.selectedClassification) {
+      this.setState({selectedClassification: value})
     }  else {
       this.setState({selectedClassification: null})
     }

@@ -1,25 +1,13 @@
 
 var React = require('react')
+React.initializeTouchEvents(true);
 var $ = require('jquery');
 var JQueryUI = require('jquery-ui')
 var classNames = require('classnames');
 var emoji = require("node-emoji");
-mui = require('material-ui');
-  ThemeManager = new mui.Styles.ThemeManager(),
-  RaisedButton = mui.RaisedButton;
-  CircularProgress = mui.CircularProgress;
-  TextField = mui.TextField;
-  RadioButtonGroup = mui.RadioButtonGroup;
-  RadioButton = mui.RadioButton;
-  Toggle = mui.Toggle;
-  Paper = mui.Paper;
-  Toolbar = mui.Toolbar;
-  ToolbarGroup = mui.ToolbarGroup;
-  ToolbarTitle = mui.ToolbarTitle;
-  DropDownIcon = mui.DropDownIcon;
-  ToolbarSeparator = mui.ToolbarSeparator;
-  SvgIcon = mui.SvgIcon;
-var injectTapEventPlugin = require("react-tap-event-plugin");
+
+var Bootstrap = require('react-bootstrap');
+  Button = Bootstrap.Button;
 
 // our modules
 var SendControl = require('./controls/send_controls.jsx');
@@ -34,12 +22,6 @@ var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
 var AdminEntriesView = require('./controls/AdminEntriesView.jsx');
 var EntryList = Model.EntryList;
-
-//Needed for onTouchTap
-//Can go away when react 1.0 release
-//Check this repo:
-//https://github.com/zilverline/react-tap-event-plugin
-injectTapEventPlugin();
 
 var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 var firstLoadComplete = false;
@@ -94,16 +76,15 @@ var KeeperApp = React.createClass({
         <p>
         loading...
         </p>
-        <CircularProgress mode="indeterminate" size={2.0} style={{textAlign: "center"}}/>
       </div>
     } else if (this.state.maxRowsToShow < this.state.messages.length) {
-      showAll = <RaisedButton
+      showAll = <Button
         ref='showAll'
-        label="Show All"
-        secondary={true}
+        bsStyle="primary"
         onClick={this.handleShowAll}
-        className="showAllButton"
-      />
+        className="showAllButton">
+        Show All
+      </Button>
     }
 
     var messageRows = [];
@@ -137,12 +118,6 @@ var KeeperApp = React.createClass({
       $("html,body").scrollTop($(document).height());
       firstLoadComplete = true;
     }
-  },
-
-  getChildContext: function() {
-    return {
-      muiTheme: ThemeManager.getCurrentTheme(),
-    };
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
@@ -188,14 +163,6 @@ var KeeperApp = React.createClass({
     nextState.paused = nextProps.model.paused;
   },
 });
-
-// Important!
-KeeperApp.childContextTypes = {
-  muiTheme: React.PropTypes.object,
-  hasParentBackboneMixin: React.PropTypes.bool.isRequired, // have to repeat these from the mixin because we're using the muiTheme
-  parentModel: React.PropTypes.any,
-  parentCollection: React.PropTypes.any
-};
 
 var entryList = new EntryList();
 entryList.fetch();

@@ -46,22 +46,21 @@ module.exports = React.createClass({
 		return (
 			<div id={ this.getId() } className="message">
         <MessageHeader message={message} />
-        <div className={ cssClasses } onClick={this.handleClick}>
+        <div className={ cssClasses }>
            <MessageBody text={body} />
           <div>
             <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
           </div>
         </div>
+        <Button bsSize='xsmall' onClick={this.showActions} className="messageActionsButton">Actions</Button>
         {classificationChooser}
 
       </div>
     );
   },
 
-  handleClick: function(e) {
-    if (this.state.model.incoming){
-		  this.props.onMessageClicked(this.getModel(), this.getId());
-    }
+  showActions: function(e) {
+		this.props.onMessageClicked(this.getModel(), this.getId());
   },
 });
 
@@ -100,7 +99,12 @@ var ClassificationChooser = React.createClass({
         br = <br />
       }
       return (
-        <input type="radio" key={option.value} value={option.value} defaultChecked={this.state.model.classification == option.value}>
+        <input
+          type="radio"
+          key={option.value}
+          value={option.value}
+          defaultChecked={this.state.model.classification == option.value}
+        >
           {option.text} {br}
         </input>);
     }.bind(this);
