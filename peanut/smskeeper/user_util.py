@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase):
 	if keeperNumber and productId is None:
+		productId = keeper_constants.TODO_PRODUCT_ID
 		for pId, number in settings.KEEPER_NUMBER_DICT.iteritems():
 			if number == keeperNumber:
 				productId = pId
-		productId = keeper_constants.TODO_PRODUCT_ID
 
 	if productId is None:
 		logger.error("Tried looking for a productId for number %s but couldn't find for incoming phone num %s" % (keeperNumber, phoneNumber))
