@@ -49,6 +49,14 @@ class CreateTodoAction(Action):
 		if nattyResult and regexHit:
 			score = 0.9
 
+		# Get scores for recurrence and set the first frequency with a score of > 0.9
+		recurScores = collections.OrderedDict(
+			sorted(self.getRecurScores(chunk).items(), key=lambda t: t[1], reverse=True)
+		)
+		for frequency in recurScores.keys():
+			if recurScores[frequency] >= 0.5:
+				score = recurScores[frequency]
+
 		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
@@ -86,7 +94,7 @@ class CreateTodoAction(Action):
 				break
 
 		# If we're in the tutorial and they didn't give a time, then give a different follow up
-		if not nattyResult.validTime() and not user.isTutorialComplete():
+		if not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT and not user.isTutorialComplete():
 			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
 			return False
 		else:

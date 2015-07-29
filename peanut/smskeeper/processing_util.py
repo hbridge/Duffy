@@ -6,7 +6,7 @@ from datetime import timedelta
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, unknown_command, stopped, tutorial_todo, suspended
+from smskeeper.states import not_activated, unknown_command, stopped, tutorial_todo, tutorial_medical, suspended
 from smskeeper import actions, user_util
 
 from smskeeper.models import User, Message
@@ -23,15 +23,15 @@ def getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber):
 		normalized = "+%s" % normalized
 	try:
 		user = User.objects.get(phone_number=normalized)
-		isNewUser = False
+		created = False
 	except User.DoesNotExist:
-		user = user_util.createUser(normalized, {}, keeperNumber, None)
-		isNewUser = True
-	return user, isNewUser
+		user = user_util.createUser(normalized, {}, keeperNumber, None, None)
+		created = True
+	return user, created
 
 
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
-	user, isNewUser = getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber)
+	user, created = getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber)
 
 	# This is true if this is from a manual entry off the history page
 	manual = "Manual" in requestDict
@@ -61,7 +61,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
 
 	classification = None
-	if not user.paused:
+	if not user.paused and not created:
 		count = 0
 		processed = False
 		continueProcessing = True
@@ -116,6 +116,7 @@ stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED: not_activated,
 	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
 	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,
+	keeper_constants.STATE_TUTORIAL_MEDICAL: tutorial_medical,
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_SUSPENDED: suspended,
 }

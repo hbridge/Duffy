@@ -18,6 +18,7 @@ STATE_NOT_ACTIVATED_FROM_REMINDER = 'not-activated-from-reminder'
 STATE_TUTORIAL_LIST = 'tutorial-list'
 STATE_TUTORIAL_REMIND = 'tutorial-remind'
 STATE_TUTORIAL_TODO = 'tutorial-todo'
+STATE_TUTORIAL_MEDICAL = 'tutorial-medical'
 STATE_NORMAL = 'normal'
 STATE_REMIND = 'remind'
 STATE_REMINDER_SENT = 'reminder-sent'
@@ -47,6 +48,7 @@ ALL_STATES = [
 	STATE_STOPPED,
 	STATE_SUSPENDED,
 	STATE_NOT_ACTIVATED_FROM_REMINDER,
+	STATE_TUTORIAL_MEDICAL,
 ]
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
@@ -92,6 +94,13 @@ INTRO_MESSAGES_PAID = [
 	"Let's start your 7-day free trial. You can send CANCEL to cancel anytime.",
 	"Let me show you how I can help you. First, what's your name?"
 ]
+
+INTRO_MESSAGES_MEDICAL = [
+	u"\U0001F44B Hi, I'm Keeper! I'm here to make sure you remember to take your medicine.",
+	"Let's start your 7-day free trial. You can send CANCEL to cancel anytime.",
+	"Let me show you how I can help you. First, what's your name?"
+]
+
 
 UNKNOWN_COMMAND_PHRASES = [
 	u"ZZZZ \U0001F62A....so tired. Talk more in the morning! \U0001F60C",
@@ -173,6 +182,7 @@ SMSKEEPER_WEB_NUM = "web"
 REMINDER_PRODUCT_ID = 0
 TODO_PRODUCT_ID = 1
 WHATSAPP_TODO_PRODUCT_ID = 2
+MEDICAL_PRODUCT_ID = 3
 
 def isRealKeeperNumber(keeperNumber):
 	if keeperNumber is None:

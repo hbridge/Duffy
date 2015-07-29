@@ -465,53 +465,20 @@ def signup_from_website(request):
 		if phoneNum:
 			# create account in database
 			try:
-				target_user = User.objects.get(phone_number=phoneNum)
-
-				if target_user.state == keeper_constants.STATE_NOT_ACTIVATED:
-					msg = "You are already on the list. Hang tight and I'll be in touch soon."
-					sms_util.sendMsg(target_user, msg, None, target_user.getKeeperNumber())
-				elif target_user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
-					user_util.activate(target_user, "", None, target_user.getKeeperNumber())
-
+				user = User.objects.get(phone_number=phoneNum)
 			except User.DoesNotExist:
-
-				if  helper_util.isUSRegionCode(phoneNum):
-					productId = keeper_constants.TODO_PRODUCT_ID
-					response['medium'] = 'sms'
-				else:
+				if not helper_util.isUSRegionCode(phoneNum):
 					productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
-					response['medium'] = 'whatsapp'
-				tutorial = None
-
-				target_user = user_util.createUser(phoneNum, json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}), None, productId)
-				user_util.activate(target_user, "", tutorial, target_user.getKeeperNumber())
-
-				logger.debug("User %s: Just created user with productId %s and keeperNumber %s" % (target_user.id, target_user.product_id, target_user.getKeeperNumber()))
-
-				"""
-				Comment out code to try always activating users
-				if referrerCode:
-					# First, activate this new user.
-					user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
-
-					# Next, activate the user who referred them, if they aren't activataed already
-					referrerCodeUsers = User.objects.filter(invite_code=referrerCode)
-					if len(referrerCodeUsers) == 1:
-						referrerCodeUser = referrerCodeUsers[0]
-						logger.debug("Found referring user %s" % (referrerCodeUser.id))
-						if referrerCodeUser.state == keeper_constants.STATE_NOT_ACTIVATED:
-							user_util.activate(referrerCodeUser, "You just jumped the line!", None, settings.KEEPER_NUMBER)
-					elif len(referrerCodeUser) > 1:
-						logger.error("Just found multiple users for referrerCode code %s" % referrerCode)
-					else:
-						logger.debug("Didn't find any referrerCodes for code %s" % referrerCode)
+				elif exp == "medical":
+					productId = keeper_constants.MEDICAL_PRODUCT_ID
 				else:
-					if source and "fb" in source:
-						user_util.activate(target_user, "", None, settings.KEEPER_NUMBER)
-					else:
-						not_activated.dealWithNonActivatedUser(target_user, settings.KEEPER_NUMBER)
-				"""
-				analytics.logUserEvent(target_user, "Website Signup", {
+					productId = keeper_constants.TODO_PRODUCT_ID
+
+				user = user_util.createUser(phoneNum, json.dumps({'source': source, 'referrer': referrerCode, 'paid': paid, 'exp': exp}), None, productId, None)
+
+				logger.debug("User %s: Just created user with productId %s and keeperNumber %s" % (user.id, user.product_id, user.getKeeperNumber()))
+
+				analytics.logUserEvent(user, "Website Signup", {
 					"source": source,
 					"referred": True if referrerCode else False
 				})

@@ -12,7 +12,6 @@ from smskeeper import keeper_constants
 from smskeeper import sms_util
 from smskeeper import analytics
 from smskeeper import time_utils
-from smskeeper.whatsapp import whatsapp_util
 
 from smskeeper.models import Entry, User
 
@@ -22,74 +21,62 @@ from common import slack_logger
 logger = logging.getLogger(__name__)
 
 
-def createUser(phoneNumber, signupDataJson, keeperNumber, productId=None):
+def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase):
 	if keeperNumber and productId is None:
+		for pId, number in settings.KEEPER_NUMBER_DICT.iteritems():
+			if number == keeperNumber:
+				productId = pId
 		productId = keeper_constants.TODO_PRODUCT_ID
 
-		if whatsapp_util.isWhatsappNumber(keeperNumber):
-			productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
-
-		if productId is None:
-			logger.error("Tried looking for a productId for number %s but couldn't find for incoming phone num %s" % (keeperNumber, phoneNumber))
-			if keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM:
-				productId = keeper_constants.TODO_PRODUCT_ID
-			else:
-				return None
+	if productId is None:
+		logger.error("Tried looking for a productId for number %s but couldn't find for incoming phone num %s" % (keeperNumber, phoneNumber))
+		if keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM:
+			productId = keeper_constants.TODO_PRODUCT_ID
+		else:
+			return None
 
 	user = User.objects.create(phone_number=phoneNumber, product_id=productId, signup_data_json=signupDataJson)
-	return user
 
+	if not user.invite_code:
+		user.invite_code = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
-# Options for tutorial state are:
-# keeper_constants.STATE_TUTORIAL_REMIND and keeper_constants.STATE_TUTORIAL_LIST
-def activate(userToActivate, introPhrase, tutorialState, keeperNumber):
-	if not tutorialState:
-		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
+	if not user.key:
+		user.key = "K" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
-	if userToActivate.product_id == keeper_constants.REMINDER_PRODUCT_ID:
-		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
-
-	userToActivate.setActivated(True, tutorialState=tutorialState)
-
-	if not userToActivate.invite_code:
-		userToActivate.invite_code = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
-		userToActivate.save()
-
-	if not userToActivate.key:
-		userToActivate.key = "K" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
-		userToActivate.save()
+	user.save()
 
 	msgsToSend = list()
 
 	if introPhrase:
 		msgsToSend.append(introPhrase)
 
-	# --- For Paid experiment ---
-	paid = ""
-	if userToActivate.signup_data_json:
-		signupData = json.loads(userToActivate.signup_data_json)
-		if "paid" in signupData:
-			paid = signupData["paid"]
-
-	if "1" in paid:
-		msgsToSend.extend(keeper_constants.INTRO_MESSAGES_PAID)
+	if productId == keeper_constants.TODO_PRODUCT_ID:
+		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
+		msgsToSend.extend(keeper_constants.INTRO_MESSAGES)
+	elif productId == keeper_constants.MEDICAL_PRODUCT_ID:
+		tutorialState = keeper_constants.STATE_TUTORIAL_MEDICAL
+		msgsToSend.extend(keeper_constants.INTRO_MESSAGES_MEDICAL)
 	else:
-		# --- end Paid experiment code --
+		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES)
 
-	logger.debug("User %s: Just activated user to tutorial %s and keeperNumber %s" % (userToActivate.id, tutorialState, keeperNumber))
+	user.setActivated(True, tutorialState=tutorialState)
 
-	sms_util.sendMsgs(userToActivate, msgsToSend, keeperNumber)
+	logger.debug("User %s: Just created user from keeperNumber %s to tutorial %s" % (user.id, keeperNumber, tutorialState))
+
+	sms_util.sendMsgs(user, msgsToSend)
 
 	analytics.logUserEvent(
-		userToActivate,
+		user,
 		"User Activated",
 		{
-			"Days Waiting": time_utils.daysAndHoursAgo(userToActivate.added)[0],
+			"Days Waiting": time_utils.daysAndHoursAgo(user.added)[0],
 			"Tutorial": tutorialState,
-			"Source": userToActivate.getSignupData('source')
+			"Source": user.getSignupData('source')
 		}
 	)
+
+	return user
 
 
 def shouldIncludeEntry(entry, includeAll):
