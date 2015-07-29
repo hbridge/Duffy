@@ -530,6 +530,31 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to get my nails done next Sunday, please")
 			self.assertIn("Sun", self.getOutput(mock))
 
+	def test_on_date(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me on Aug 5th that schools tomorrow")
+			self.assertIn("Aug 5th", self.getOutput(mock))
+
+	def test_date_with_dashes(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me on 8-5-15 that schools tomorrow")
+			self.assertIn("Aug 5th", self.getOutput(mock))
+
+	def test_time_with_space(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I need to take my pills at 9 45 am tomorrow")
+			self.assertIn("tomorrow at 9:45am", self.getOutput(mock))
+
+
 	"""
 
 	# Covers the case of "100 and" which with a bad regex got turned into "1:00 and" due to the a
@@ -1223,6 +1248,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "630pm")
 			self.assertIn("later today by 6:30pm", self.getOutput(mock))
+
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
