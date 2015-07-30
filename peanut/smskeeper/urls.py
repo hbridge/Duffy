@@ -22,4 +22,5 @@ urlpatterns = patterns(
 	url(r'^message_classification[.]csv$', 'smskeeper.views.message_classification_csv'),
 	url(r'^classified_users$', 'smskeeper.views.classified_users'),
 	url(r'^approved_todos$', 'smskeeper.views.approved_todos'),
+	url(r'^update_stripe_info', 'smskeeper.views.update_stripe_info'),
 )

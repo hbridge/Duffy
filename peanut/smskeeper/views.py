@@ -25,7 +25,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
-from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm
+from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
 from smskeeper.models import User, Entry, Message
 
 from smskeeper import analytics, helper_util
@@ -507,6 +507,25 @@ def message_classification_csv(request):
 		response += '"%s",%s\n' % (cleanBodyText(message.getBody()), message.classification)
 
 	return HttpResponse(response, content_type="text/text", status=200)
+
+
+@jsonp
+def update_stripe_info(request):
+	response = dict({'result': True})
+	form = StripeForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		stripe_data = form.cleaned_data['stripe_data']
+
+		user.stripe_data_json = stripe_data
+		user.save()
+
+		sms_util.sendMsg(user, "Thanks for subscribing! You can now schedule unlimited reminders :sunglasses:")
+		logger.info("Registered users %s for medical" % (user.id))
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
 
 
 def cleanBodyText(text):

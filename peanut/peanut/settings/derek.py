@@ -8,7 +8,7 @@ STATICFILES_DIRS = (
 	'/home/derek/Duffy/peanut/static',
 )
 
-KEEPER_NUMBER_DICT = {0: "+12488178301", 1: "+12488178301", 2: "+12488178301"}
+KEEPER_NUMBER_DICT = {0: "+12488178301", 1: "+12488178301", 2: "+12488178301", 3: "+12488178301"}
 
 if len(sys.argv) > 2:  # If we're running an individual test
 	logging.disable(logging.DEBUG)

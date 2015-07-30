@@ -2,9 +2,10 @@ from django import forms
 from smskeeper.models import User
 
 
-class UserIdMixin(forms.Form):
+class UserMixin(forms.Form):
 	def clean_user_id(self):
 		userId = self.cleaned_data['user_id']
+
 		if userId:
 			try:
 				user = User.objects.get(id=userId)
@@ -15,20 +16,38 @@ class UserIdMixin(forms.Form):
 
 		return self.cleaned_data['user_id']
 
+	def clean_key(self):
+		userKey = self.cleaned_data['key']
 
-class UserIdForm(UserIdMixin):
+		if userKey:
+			try:
+				user = User.objects.get(key=userKey)
+				self.cleaned_data['user'] = user
+
+			except User.DoesNotExist:
+				raise forms.ValidationError("User not found")
+
+		return self.cleaned_data['key']
+
+
+class UserIdForm(UserMixin):
 	user_id = forms.IntegerField(required=False)
+	key = forms.CharField(required=False)
 	development = forms.BooleanField(required=False)
 
 
-class SendSMSForm(UserIdMixin):
+class SendSMSForm(UserMixin):
 	user_id = forms.IntegerField(required=True)
 	msg = forms.CharField(required=True)
 	from_num = forms.CharField(required=False)
 	direction = forms.CharField(required=False)
 
 
-class ResendMsgForm(UserIdMixin):
+class StripeForm(UserIdForm):
+	stripe_data = forms.CharField(required=True)
+
+
+class ResendMsgForm(UserMixin):
 	msg_id = forms.IntegerField(required=True)
 	from_num = forms.CharField(required=False)
 

@@ -52,6 +52,8 @@ class User(models.Model):
 	postal_code = models.CharField(max_length=10, null=True, blank=True)
 	wxcode = models.CharField(max_length=10, null=True, blank=True)
 
+	stripe_data_json = models.TextField(null=True, blank=True)
+
 	sent_tips = models.TextField(null=True, db_index=False, blank=True)
 	disable_tips = models.BooleanField(default=False)
 
