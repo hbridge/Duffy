@@ -469,7 +469,7 @@ def signup_from_website(request):
 			except User.DoesNotExist:
 				if not helper_util.isUSRegionCode(phoneNum):
 					productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
-				elif exp == "medical":
+				elif "medical" in exp:
 					productId = keeper_constants.MEDICAL_PRODUCT_ID
 				else:
 					productId = keeper_constants.TODO_PRODUCT_ID
