@@ -102,7 +102,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# else ignore
 				return True, keeper_constants.CLASS_NONE, actionScores
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's create a reminder \u2705  What do you want to make sure you do and when?", u"You can say things like 'remind me to take my pill 10am everyday' or 'Make sure I've exercised twice a week each sunday'"], keeperNumber)
+		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's create a reminder \u2705  What medicine do you need and when?", u"You can say things like 'remind me to take vitamins at 10am everyday' or 'Remind me to take Ibuprofen 3 times a day'"], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
@@ -126,7 +126,9 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(
 			user,
 			[
-				u"It's that easy. I'll send you a reminder and you will have to tell me when you get it done.",
+				u"It's that easy. I'll send you a reminder and you can tell me when you get it done.",
+				u"I'm free to try for 7-days - and only $5/month for unlimited reminders. Please enter your payment info at pay.getkeeper.com/" + user.getWebsiteURLPath(),
+				u"Don't worry \U0001F60C, you can cancel anytime and I won't charge you if you cancel before 7-days.",
 			],
 			keeperNumber)
 
