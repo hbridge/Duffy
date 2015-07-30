@@ -127,7 +127,6 @@ def process(user, msg, requestDict, keeperNumber):
 			user,
 			[
 				u"It's that easy. I'll send you a reminder and you can tell me when you get it done.",
-				u"I'm free to try for 7-days - and only $5/month for unlimited reminders. Please enter your payment info at pay.getkeeper.com/" + user.getWebsiteURLPath(),
 				u"Don't worry \U0001F60C, you can cancel anytime and I won't charge you if you cancel before 7-days.",
 			],
 			keeperNumber)
