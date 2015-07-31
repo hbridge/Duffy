@@ -118,6 +118,7 @@ class SMSKeeperBaseCase(TestCase):
 	TUE_858AM = datetime.datetime(2015, 6, 2, 12, 58, 0, tzinfo=pytz.utc)
 	WED_9AM = datetime.datetime(2015, 6, 3, 13, 0, 0, tzinfo=pytz.utc)
 	FRI_9AM = datetime.datetime(2015, 6, 5, 13, 0, 0, tzinfo=pytz.utc)
+	SAT_9AM = datetime.datetime(2015, 6, 6, 13, 0, 0, tzinfo=pytz.utc)
 	SUNDAY_7PM = datetime.datetime(2015, 6, 7, 23, 0, 0, tzinfo=pytz.utc)
 
 	def setNow(self, dateMock, date):

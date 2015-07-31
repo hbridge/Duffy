@@ -146,6 +146,32 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
+	# Make sure the quetion tip goes out after 4 days of inactivity
+	def test_digest_question_tip(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		# Add a message and make it look like it was sent at the right time
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop")
+		message = Message.objects.get(id=1)
+		message.added = self.MON_8AM
+		message.save()
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("how useful", self.getOutput(mock))
+			self.assertIn("Monday", self.getOutput(mock))
+
+		# 4 days later
+		self.setNow(dateMock, self.FRI_9AM)
+
+		# Make sure the snooze tip came through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("how useful", self.getOutput(mock))
+
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_works_after_two_reminders(self, dateMock):
 		self.setupUser(dateMock)

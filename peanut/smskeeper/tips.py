@@ -51,6 +51,7 @@ DONE_TIP2_ID = "mini-done2"
 DONE_TIP3_ID = "mini-done3"
 
 DIGEST_TIP_ID = "mini-digest"
+DIGEST_QUESTION_TIP_ID = "mini-digest-question"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
@@ -102,6 +103,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		DIGEST_TIP_ID,
 		keeper_constants.REMINDER_DIGEST_INSTRUCTIONS,
+		type=MINI_TIP_TYPE
+	),
+	KeeperTip(
+		DIGEST_QUESTION_TIP_ID,
+		"btw, how useful do you find these morning txts? 1 (not useful) - 5 (very useful)",
 		type=MINI_TIP_TYPE
 	),
 ]

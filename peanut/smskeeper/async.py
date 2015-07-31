@@ -242,6 +242,15 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
 	sms_util.sendMsg(user, msg, None, keeperNumber)
 
+	if tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID):
+		cutoff = date_util.now(pytz.utc) - datetime.timedelta(days=4)
+		lastMessageIn = Message.objects.filter(user=user, incoming=True).order_by("added").last()
+
+		if lastMessageIn and lastMessageIn.added <= cutoff:
+			digestQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_TIP_ID)
+			sms_util.sendMsg(user, digestQuestionTip.renderMini(), None, user.getKeeperNumber())
+			tips.markTipSent(user, digestQuestionTip, isMini=True)
+
 	# Do post-message processing with pending reminders
 	if len(pendingEntries) > 0:
 		# Now set to reminder sent, incase they send back done message
