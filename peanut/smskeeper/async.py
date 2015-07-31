@@ -284,6 +284,9 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
 			continue
 
+		if user.product_id == keeper_constants.MEDICAL_PRODUCT_ID:
+			continue
+
 		if not user.isDigestTime(date_util.now(pytz.utc), minuteOverride):
 			continue
 
