@@ -46,7 +46,7 @@ noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's",
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by"]
 
-nonInterestingWords = ["morning", "evening", "tonight", "today", "to", "this", "but", "i", "before", "after", "instead", "those", "things", "thing", "tonight", "today", "works", "better", "are", "my", "till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "task", "all"]
+nonInterestingWords = ["sometime", "please", "morning", "evening", "tonight", "today", "to", "this", "but", "i", "before", "after", "instead", "those", "things", "thing", "tonight", "today", "works", "better", "are", "my", "till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "check", "off", "checkoff", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "task", "all"]
 nonInterestingWords.extend(noOpWords)
 nonInterestingWords.extend(REMINDER_FRINGE_TERMS)
 
