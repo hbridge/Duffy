@@ -28,6 +28,9 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 			if number == keeperNumber:
 				productId = pId
 
+	if productId == keeper_constants.REMINDER_PRODUCT_ID:
+		productId = keeper_constants.TODO_PRODUCT_ID
+
 	if productId is None:
 		logger.error("Tried looking for a productId for number %s but couldn't find for incoming phone num %s" % (keeperNumber, phoneNumber))
 		if keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM:

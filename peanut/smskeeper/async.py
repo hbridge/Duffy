@@ -46,7 +46,7 @@ def shouldRemindNow(entry):
 
 	# Ddon't send a reminder if this is during the digest time, since it'll be
 	# included in that
-	if entry.creator.isDigestTime(entry.remind_timestamp):
+	if entry.creator.isDigestTime(entry.remind_timestamp) and not entry.creator.product_id == keeper_constants.MEDICAL_PRODUCT_ID:
 		return False
 
 	# If we're recurring and we're after the end date
