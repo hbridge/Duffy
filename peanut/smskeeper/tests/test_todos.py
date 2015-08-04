@@ -268,16 +268,25 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "I dunno, what")
 			self.assertEqual("A stick", self.getOutput(mock))
 
-		self.setNow(dateMock, self.MON_10AM)
+		# make sure we get 2 jokes a day, this should work
+		self.setNow(dateMock, self.MON_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "tell me a joke")
-			self.assertIn("write another", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "another")
+			self.assertNotEqual("", self.getOutput(mock))
+			self.assertNotIn("ask me again", self.getOutput(mock))
+
+		# Now we should be out
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "gimmie another")
+			self.assertIn("ask me again", self.getOutput(mock))
 
 		# later that night...
 		self.setNow(dateMock, self.MON_10PM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "tell me a joke")
-			self.assertNotIn("write another", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
+			self.assertNotEqual("", self.getOutput(mock))
+			self.assertNotIn("ask me again", self.getOutput(mock))
 
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_works_after_two_reminders(self, dateMock):

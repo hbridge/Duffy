@@ -17,10 +17,12 @@ class JokeAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_JOKE
 
 	jokeRequestRegex = re.compile(r"\bjoke(s)?\b", re.I)
+	followupRegex = re.compile(r"\b(another)\b", re.I)
 
 	LAST_JOKE_SENT_KEY = "last-joke-sent"
 	JOKE_STEP_KEY = "step"
 	JOKE_NUM_KEY = "joke-num"
+	JOKE_COUNT_KEY = "joke-num"  # Jokes sent that day
 
 	JOKE_START = 0
 	JOKE_PART1_SENT = 1
@@ -30,12 +32,11 @@ class JokeAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		now = date_util.now(pytz.utc)
 		jokeState = (user.state == keeper_constants.STATE_JOKE_SENT)
 		regexHit = self.jokeRequestRegex.search(chunk.normalizedText()) is not None
 
 		recent = False
-		if self.getLastJokeSentTime(user) and abs((self.getLastJokeSentTime(user) - now).total_seconds()) < 120:
+		if self.secondsSinceLastJoke(user) < 120:
 			recent = True
 
 		if regexHit:
@@ -50,16 +51,23 @@ class JokeAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		now = date_util.now(pytz.utc)
-		regexHit = self.jokeRequestRegex.search(chunk.normalizedText()) is not None
+		requestHit = self.jokeRequestRegex.search(chunk.normalizedText()) is not None
+		followupHit = self.followupRegex.search(chunk.normalizedText()) is not None
+
+		regexHit = (requestHit or followupHit)
 
 		jokeNum = 0
 		if user.getStateData(self.JOKE_NUM_KEY):
 			jokeNum = int(user.getStateData(self.JOKE_NUM_KEY))
 
 		recent = False
-		if self.getLastJokeSentTime(user) and abs((self.getLastJokeSentTime(user) - now).total_seconds()) < 60 * 60 * 6:
+		if self.secondsSinceLastJoke(user) < 60 * 60 * 6:
 			recent = True
+
+		jokeCount = 0
+		if recent:
+			if user.getStateData(self.JOKE_COUNT_KEY):
+				jokeCount = int(user.getStateData(self.JOKE_COUNT_KEY))
 
 		# Figure out the step, but only use it if it was a recent joke
 		# Otherwise we'd skip ahead in other jokes
@@ -69,54 +77,48 @@ class JokeAction(Action):
 
 		joke = joke_list.getJoke(jokeNum)
 		if not joke:
-			sms_util.sendMsg(user, "Shoot, all out of jokes! I'll go work on some new ones, ask me again later")
+			sms_util.sendMsg(user, "Shoot, all out of jokes! I'll go work on some new ones, ask me again tomorrow")
+			return True
+
+		if regexHit and jokeCount >= 2:
+			sms_util.sendMsg(user, "Let me go write another, ask me again tomorrow")
 			return True
 
 		# See if they sent something after our joke is done
-		if recent and step == self.JOKE_DONE:
-			if regexHit:
-				sms_util.sendMsg(user, "Let me go write another, ask me again later")
+		# If its not a request for another joke, then do a simple reponse or ignore
+		if recent and not joke.takesResponse() and not regexHit:
+			# Probably a laugh
+			if step < self.SUNGLASSES_SENT:
+				sms_util.sendMsg(user, ":sunglasses:")
+				user.setStateData(self.JOKE_STEP_KEY, self.SUNGLASSES_SENT)
 			else:
-				# Probably a laugh
-				if step < self.SUNGLASSES_SENT:
-					sms_util.sendMsg(user, ":sunglasses:")
-					user.setStateData(self.JOKE_STEP_KEY, self.SUNGLASSES_SENT)
+				logger.debug("User %s: Ignoring msg '%s' because I already sent back sunglasses" % (user.id, chunk.originalText))
 			return True
 
 		if not joke.takesResponse():
 			joke.send(user)
-			user.setStateData(self.JOKE_NUM_KEY, jokeNum + 1)
-			user.setStateData(self.LAST_JOKE_SENT_KEY, date_util.unixTime(date_util.now(pytz.utc)))
-			user.setStateData(self.JOKE_STEP_KEY, self.JOKE_DONE)
+			self.jokeIsDone(user, jokeNum, jokeCount)
 		else:
 			jokeDone = joke.send(user, step, chunk.normalizedText())
 			user.setStateData(self.LAST_JOKE_SENT_KEY, date_util.unixTime(date_util.now(pytz.utc)))
 
 			if jokeDone:
-				user.setStateData(self.JOKE_NUM_KEY, jokeNum + 1)
-				user.setStateData(self.JOKE_STEP_KEY, self.JOKE_DONE)
+				self.jokeIsDone(user, jokeNum, jokeCount)
 			else:
 				user.setStateData(self.JOKE_STEP_KEY, self.JOKE_PART1_SENT)
 
 		return True
 
-	def getLastJokeSentTime(self, user):
+	def jokeIsDone(self, user, jokeNum, jokeCount):
+		user.setStateData(self.JOKE_NUM_KEY, jokeNum + 1)
+		user.setStateData(self.JOKE_STEP_KEY, self.JOKE_DONE)
+		user.setStateData(self.JOKE_COUNT_KEY, jokeCount + 1)
+		user.setStateData(self.LAST_JOKE_SENT_KEY, date_util.unixTime(date_util.now(pytz.utc)))
+
+	def secondsSinceLastJoke(self, user):
 		if user.getStateData(self.LAST_JOKE_SENT_KEY):
-			return datetime.datetime.utcfromtimestamp(user.getStateData(self.LAST_JOKE_SENT_KEY)).replace(tzinfo=pytz.utc)
+			now = date_util.now(pytz.utc)
+			lastJokeTime = datetime.datetime.utcfromtimestamp(user.getStateData(self.LAST_JOKE_SENT_KEY)).replace(tzinfo=pytz.utc)
+			return abs((lastJokeTime - now).total_seconds())
 		else:
-			return None
-
-	def sendJokePart1(self, chunk, user, jokeNum):
-		joke, response = self.jokes[jokeNum]
-		sms_util.sendMsg(user, joke)
-
-	def sendJokePart2(self, chunk, user, jokeNum):
-		joke, response = self.jokes[jokeNum]
-
-		if response:
-			if chunk.normalizedText() == joke.lower():
-				sms_util.sendMsg(user, "Haha, yup!")
-			else:
-				sms_util.sendMsg(user, response)
-
-
+			return 10000000  # Big number to say its been a while
