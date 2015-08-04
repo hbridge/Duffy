@@ -42,6 +42,8 @@ SHARING_TIP_ID = "sharing"
 VOICE_TIP_ID = "voice"
 VCARD_TIP_ID = "vcard"
 DONE_ALL_TIP_ID = "done-all"
+PILLS_TIP_ID = "pills"
+WEATHER_TIP_ID = "weather"
 
 SNOOZE_TIP_ID = "mini-snooze"
 
@@ -60,26 +62,24 @@ SMSKEEPER_TIPS = [
 		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
 		type=FULL_TIP_TYPE
 	),
-	KeeperTip(
-		WEB_APP_TIP_ID,
-		"Hi :NAME:! Here's a handy place to manage all the stuff I've saved for you :APP_URL: It works on your :computer: too!",
+	KeeperTip(  # mediaurl will be put in at render time
+		PILLS_TIP_ID,
+		"Pro tip: I can help remind you to take your medicine and other frequent tasks. :pill: Just say 'Remind me to take my medicine every day' etc",
 		type=FULL_TIP_TYPE
 	),
+	KeeperTip(  # mediaurl will be put in at render time
+		WEATHER_TIP_ID,
+		"Handy tip for you :NAME:, I can give you weather forecasts for tomorrow and this weekend. :sunny: :cloud: :umbrella: Try saying 'what's the weather tomorrow?'",
+		type=FULL_TIP_TYPE
+	),
+
+	# MINI TIPS
+
 	KeeperTip(
 		DONE_ALL_TIP_ID,
 		"Pro tip: You can also say 'Done with everything' to mark all items as done.",
 		type=MINI_TIP_TYPE
 	),
-	#KeeperTip(
-	#	PHOTOS_TIP_ID,
-	#	u"I \U0001F499 pics!",
-	#	type=FULL_TIP_TYPE,
-	#	mediaUrl=keeper_constants.PHOTOS_TIP_URL
-	#),
-	# KeeperTip(
-	# 	SHARING_TIP_ID,
-	# 	"Hey :NAME:! I can help you keep track of stuff with friends. For example, type: 'Avengers #movie @Bob' to start a list of movies to watch with Bob."
-	# ),
 	KeeperTip(
 		SNOOZE_TIP_ID,
 		"Btw, you can always snooze a reminder by saying 'snooze for 5 mins' or 'snooze till 9pm'",
