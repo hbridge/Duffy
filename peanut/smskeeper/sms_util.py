@@ -1,7 +1,6 @@
 import pytz
 import json
 
-from datetime import datetime
 from datetime import timedelta
 
 from twilio import TwilioRestException
@@ -13,7 +12,7 @@ from smskeeper import msg_util
 from smskeeper.models import Message, User
 
 from strand import notifications_util
-from common import slack_logger
+from common import slack_logger, date_util
 
 from peanut.celery import app
 from smskeeper.whatsapp import whatsapp_util
@@ -88,6 +87,22 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride)
 
 
+def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None):
+	if isinstance(msg, list):
+		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
+
+	if keeperNumber is None:
+		keeperNumber = user.getKeeperNumber()
+
+	msg = msg_util.renderMsg(msg)
+	if keeper_constants.isRealKeeperNumber(keeperNumber):
+		eta = date_util.now(pytz.utc) + timedelta(seconds=delaySeconds)
+		asyncSendMsg.apply_async((user.id, msg, None, keeperNumber, False), eta=eta)
+	else:
+		# If its CLI or TEST then keep it local and not async.
+		asyncSendMsg(user.id, msg, None, keeperNumber, False, False)
+
+
 def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
@@ -97,7 +112,7 @@ def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOve
 
 	seconds_delay = 0
 	for i, msgTxt in enumerate(msgList):
-		scheduledTime = datetime.now(pytz.utc) + timedelta(seconds=seconds_delay)
+		scheduledTime = date_util.now(pytz.utc) + timedelta(seconds=seconds_delay)
 		logger.debug("scheduling %s at time %s" % (msgTxt, scheduledTime))
 
 		# calc the time for the next message
@@ -110,3 +125,5 @@ def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOve
 
 		# Call the single method above so it does the right async logic
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime, stopOverride=stopOverride)
+
+	return seconds_delay
