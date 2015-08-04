@@ -257,6 +257,7 @@ CLASS_NONE = "nocategory"
 CLASS_CHANGE_SETTING = "changesetting"
 CLASS_QUESTION = "question"
 CLASS_FRUSTRATION = "frustration"
+CLASS_SURVEY_RESPONSE = "survey-response"
 
 CLASS_UNKNOWN = "unknown"
 
