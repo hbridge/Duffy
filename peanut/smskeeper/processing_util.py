@@ -66,7 +66,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		processed = False
 		continueProcessing = True
 		while not processed and continueProcessing and count < 10:
-			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
+			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT or user.state == keeper_constants.STATE_JOKE_SENT:
 				keeperEngine = Engine(Engine.DEFAULT, 0.0)
 				processed, classification, actionScores = keeperEngine.process(user, msg)
 
@@ -78,6 +78,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				# Hacky since we need to know all the states we could be in
 				# Can't simply say !STATE_NORMAL because of TUTORIAL
 				if user.state == keeper_constants.STATE_REMINDER_SENT:
+					user.setState(keeper_constants.STATE_NORMAL)
+
+				# Hacky, make sure if we don't actually serve up a joke or response, we end back in normal state
+				if user.state == keeper_constants.STATE_JOKE_SENT and classification != keeper_constants.CLASS_JOKE:
 					user.setState(keeper_constants.STATE_NORMAL)
 				continueProcessing = False
 			else:

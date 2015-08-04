@@ -14,6 +14,7 @@ from common import date_util
 
 logger = logging.getLogger(__name__)
 
+
 class Nicety():
 	reStr = None
 	responses = None
@@ -70,10 +71,6 @@ SMSKEEPER_NICETIES = [
 	Nicety(
 		"whats your name|who are you|what do you call yourself",
 		["Keeper!"]
-	),
-	Nicety(
-		".*(you )?tell me a joke",
-		[u"I don't think you'd appreciate my humor. \U0001F609"]
 	),
 	Nicety(
 		"i love you|.*you[\S]{0,2} ((pretty|so) )?(cool|neat|smart|(the (best|greatest)))|you rock",

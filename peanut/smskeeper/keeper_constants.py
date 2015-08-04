@@ -30,6 +30,7 @@ STATE_IMPLICIT_LABEL = 'implicit-label'
 STATE_STOPPED = 'stopped'
 STATE_SUSPENDED = 'suspended'
 STATE_HELP = 'help'
+STATE_JOKE_SENT = 'joke-sent'
 
 ALL_STATES = [
 	STATE_NORMAL,
@@ -49,6 +50,7 @@ ALL_STATES = [
 	STATE_SUSPENDED,
 	STATE_NOT_ACTIVATED_FROM_REMINDER,
 	STATE_TUTORIAL_MEDICAL,
+	STATE_JOKE_SENT,
 ]
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
@@ -258,6 +260,7 @@ CLASS_CHANGE_SETTING = "changesetting"
 CLASS_QUESTION = "question"
 CLASS_FRUSTRATION = "frustration"
 CLASS_SURVEY_RESPONSE = "survey-response"
+CLASS_JOKE = "joke"
 
 CLASS_UNKNOWN = "unknown"
 
