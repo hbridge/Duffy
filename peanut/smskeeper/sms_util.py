@@ -29,7 +29,7 @@ def recordOutput(msgText, doPrint=False):
 
 
 @app.task
-def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
+def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False, stopOverride=False):
 	logger.info("User %s: asyncSendMsg to keeperNumber: %s", userId, keeperNumber)
 	try:
 		user = User.objects.get(id=userId)
@@ -37,7 +37,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 		logger.error("User %s: Tried to send message to nonexistent user", userId)
 		return
 
-	if user.state == keeper_constants.STATE_STOPPED:
+	if user.state == keeper_constants.STATE_STOPPED and not stopOverride:
 		logger.warning("User %s: Tried to send msg '%s' but they are in state stopped" % (user.id, msgText))
 		return
 	if keeperNumber == "web":  # don't record responses to web messages in history
@@ -73,7 +73,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False):
 			user.save()
 
 
-def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False):
+def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False, stopOverride=False):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
@@ -85,10 +85,10 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False)
 		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
-		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual)
+		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride)
 
 
-def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True):
+def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 
@@ -109,4 +109,4 @@ def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True):
 			msgTxt = "%s (%d/%d)" % (msgTxt, i + 1, len(msgList))
 
 		# Call the single method above so it does the right async logic
-		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime)
+		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime, stopOverride=stopOverride)
