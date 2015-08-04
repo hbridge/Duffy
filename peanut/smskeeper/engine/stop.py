@@ -23,20 +23,16 @@ class StopAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		sms_util.sendMsgs(
-			user, 
-			[u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'",
-			u"I hate to see you go. Is there something I can do better? \U0001F423"])
+		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 
-		if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
-			time.sleep(1)
+		sms_util.sendMsgs(
+			user,
+			[u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'",
+			u"I hate to see you go. Is there something I can do better? \U0001F423"], stopOverride=True)
 
 		analytics.logUserEvent(
 			user,
 			"Stop/Start",
 			{"Action": "Stop"}
 		)
-
-		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
-		user.save()
 		return True
