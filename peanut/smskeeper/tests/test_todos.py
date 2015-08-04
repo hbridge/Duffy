@@ -177,6 +177,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "4")
 			self.assertIn("Got it, thanks", self.getOutput(mock))
 
+	# Had a bug where just 'remind me' would create an entry
+	def test_just_remind_me(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me?")
+			self.assertEqual("", self.getOutput(mock))
+
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_works_after_two_reminders(self, dateMock):
 		self.setupUser(dateMock)

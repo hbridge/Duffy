@@ -36,11 +36,12 @@ class CreateTodoAction(Action):
 
 		nattyResult = chunk.getNattyResult(user)
 		regexHit = msg_util.reminder_re.search(chunk.normalizedText()) is not None
+		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 
 		if nattyResult and not regexHit:
 			score = 0.5
 
-		if not nattyResult and regexHit:
+		if not nattyResult and regexHit and len(cleanedText) > 2:
 			score = 0.5
 
 		if self.tutorial:
