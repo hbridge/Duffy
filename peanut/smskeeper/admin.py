@@ -94,7 +94,7 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
 		obj.save()
 
-	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'reminder_sent', 'hidden', 'updated')
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_recur', 'reminder_sent', 'hidden', 'updated')
 	readonly_fields = ['added_tz_aware']
 	search_fields = ['creator__id']
 
@@ -131,7 +131,7 @@ class ToCheck(ReminderAdmin):
 
 	actions = [mark_as_approved, mark_as_hidden]
 
-	list_display = ('id', 'approve_button', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'reminder_sent', 'updated')
+	list_display = ('id', 'approve_button', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_recur', 'reminder_sent', 'updated')
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
