@@ -11,6 +11,7 @@ import collections
 
 logger = logging.getLogger(__name__)
 
+
 class CreateTodoAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CREATE_TODO
 
@@ -18,7 +19,7 @@ class CreateTodoAction(Action):
 
 	# things that match this RE will get a boost for create
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
-	beginsWithRe = r'(remind|buy|print|fax|go|get|study|fix|make|schedule|fill|find|clean) '
+	beginsWithRe = r'^(remind|buy|print|fax|go|get|study|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
 
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial

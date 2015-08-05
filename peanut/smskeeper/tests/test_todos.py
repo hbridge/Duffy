@@ -206,7 +206,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Make sure a response doesn't kick off anything
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "2")
-			self.assertIn("Got it, I'll only", self.getOutput(mock))
+			self.assertIn("Got it, I won't", self.getOutput(mock))
 
 		user = self.getTestUser()
 		self.assertEqual(user.digest_state, keeper_constants.DIGEST_STATE_LIMITED)
