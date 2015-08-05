@@ -31,6 +31,7 @@ STATE_STOPPED = 'stopped'
 STATE_SUSPENDED = 'suspended'
 STATE_HELP = 'help'
 STATE_JOKE_SENT = 'joke-sent'
+STATE_SURVEY_SENT = 'survey-sent'
 
 ALL_STATES = [
 	STATE_NORMAL,
@@ -51,6 +52,7 @@ ALL_STATES = [
 	STATE_NOT_ACTIVATED_FROM_REMINDER,
 	STATE_TUTORIAL_MEDICAL,
 	STATE_JOKE_SENT,
+	STATE_SURVEY_SENT,
 ]
 
 PHOTO_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/gif']
@@ -263,6 +265,10 @@ CLASS_SURVEY_RESPONSE = "survey-response"
 CLASS_JOKE = "joke"
 
 CLASS_UNKNOWN = "unknown"
+
+OUTGOING_DIGEST = "digest"
+OUTGOING_SURVEY = "survey"
+OUTGOING_REMINDER = "reminder"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"

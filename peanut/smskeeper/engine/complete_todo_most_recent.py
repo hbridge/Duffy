@@ -23,7 +23,8 @@ class CompleteTodoMostRecentAction(Action):
 		cleanedText = msg_util.cleanedDoneCommand(chunk.normalizedTextWithoutTiming(user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 
-		justNotified = (user.state == keeper_constants.STATE_REMINDER_SENT)
+		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
+
 		regexHit = msg_util.done_re.search(chunk.normalizedText()) is not None
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(interestingWords), 60)
 

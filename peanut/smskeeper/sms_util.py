@@ -28,7 +28,7 @@ def recordOutput(msgText, doPrint=False):
 
 
 @app.task
-def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False, stopOverride=False):
+def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, classification):
 	logger.info("User %s: asyncSendMsg to keeperNumber: %s", userId, keeperNumber)
 	try:
 		user = User.objects.get(id=userId)
@@ -44,7 +44,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False, stopOver
 
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
 	# Create the message now, but only save it if we know we successfully sent the message
-	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson), manual=manual)
+	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson), manual=manual, classification=classification)
 
 	if type(msgText) == unicode:
 		msgText = msgText.encode('utf-8')
@@ -72,7 +72,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual=False, stopOver
 			user.save()
 
 
-def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False, stopOverride=False):
+def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False, stopOverride=False, classification=None):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
@@ -81,10 +81,10 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 
 	msg = msg_util.renderMsg(msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
-		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual, stopOverride), eta=eta)
+		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
-		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride)
+		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification)
 
 
 def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None):
@@ -97,10 +97,10 @@ def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None):
 	msg = msg_util.renderMsg(msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
 		eta = date_util.now(pytz.utc) + timedelta(seconds=delaySeconds)
-		asyncSendMsg.apply_async((user.id, msg, None, keeperNumber, False), eta=eta)
+		asyncSendMsg.apply_async((user.id, msg, None, keeperNumber, False, None), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
-		asyncSendMsg(user.id, msg, None, keeperNumber, False, False)
+		asyncSendMsg(user.id, msg, None, keeperNumber, False, False, None)
 
 
 def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False):

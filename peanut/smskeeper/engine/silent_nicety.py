@@ -20,14 +20,10 @@ class SilentNicetyAction(Action):
 		# we're a silent one if there's responses
 		# Kinda hacky
 		if nicety and nicety.isSilent():
-			score = 1.0
+			score = 0.5
 
 		if SilentNicetyAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
-
-		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
-		if msg_util.isDoneCommand(chunk.originalText):
-			score = 0.0
+			score = 0.5
 
 		return score
 

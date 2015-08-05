@@ -111,7 +111,7 @@ def processReminder(entry):
 			else:
 				msg = "Hi! Friendly reminder: %s" % entry.text
 
-			sms_util.sendMsg(user, msg, None, user.getKeeperNumber())
+			sms_util.sendMsg(user, msg, classification=keeper_constants.OUTGOING_REMINDER)
 
 			updateEntryAfterProcessing(entry)
 
@@ -159,7 +159,6 @@ def processReminder(entry):
 					tips.markTipSent(user, tip, isMini=True)
 
 				# Now set to reminder sent, incase they send back done message
-				user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 				user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
 	entry.save()
@@ -240,7 +239,7 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 	# We send the message here
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
-	sms_util.sendMsg(user, msg, None, keeperNumber)
+	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_SURVEY)
 
 	if tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID):
 		cutoff = date_util.now(pytz.utc) - datetime.timedelta(days=4)
@@ -248,13 +247,12 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 		if lastMessageIn and lastMessageIn.added <= cutoff:
 			digestQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_TIP_ID)
-			sms_util.sendMsg(user, digestQuestionTip.renderMini(), None, user.getKeeperNumber())
+			sms_util.sendMsg(user, digestQuestionTip.renderMini(), classification=keeper_constants.OUTGOING_SURVEY)
 			tips.markTipSent(user, digestQuestionTip, isMini=True)
 
 	# Do post-message processing with pending reminders
 	if len(pendingEntries) > 0:
 		# Now set to reminder sent, incase they send back done message
-		user.setState(keeper_constants.STATE_REMINDER_SENT, override=True)
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [x.id for x in pendingEntries])
 
 		if tips.isUserEligibleForMiniTip(user, tips.DIGEST_TIP_ID):

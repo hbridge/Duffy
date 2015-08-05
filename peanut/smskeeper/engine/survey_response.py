@@ -11,18 +11,37 @@ logger = logging.getLogger(__name__)
 class SurveyResponseAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_SURVEY_RESPONSE
 
+	def isInt(self, word):
+		try:
+			int(word)
+			return True
+		except ValueError:
+			return False
+
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		justNotified = (user.state == keeper_constants.STATE_REMINDER_SENT)
+		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY)
 
 		try:
-			int(chunk.normalizedText())
+			hasInt = False
+			words = chunk.normalizedText().split(' ')
+
+			hasIntFirst = self.isInt(words[0])
+
+			for word in words:
+				if self.isInt(word):
+					hasInt = True
 
 			if justNotified:
-				score = 1.0
-			else:
-				score = .7
+				if hasInt:
+					if len(words) == 1:
+						score = 1.0
+					elif hasIntFirst:
+						score = .7
+				else:
+					score = 0.1
+
 		except ValueError:
 			pass
 

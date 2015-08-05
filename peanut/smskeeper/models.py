@@ -150,6 +150,15 @@ class User(models.Model):
 		self.save()
 		logger.debug("User %s: Setting state data %s %s" % (self.id, key, value))
 
+	def wasRecentlySentMsgOfClass(self, outgoingMsgClass, num=3):
+		recentOutgoing = Message.objects.filter(user=self, incoming=False).order_by("-added")[:num]
+
+		for msg in recentOutgoing:
+			if msg.classification and msg.classification == outgoingMsgClass:
+				return True
+
+		return False
+
 	def getTimezone(self):
 		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
 		# Note: 3 letter entries are to handle the early accounts. All new accounts use the full string
