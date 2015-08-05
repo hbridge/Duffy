@@ -275,10 +275,6 @@ def processQuery(query, timezone):
 
 	logger.debug("Hitting natty url: %s" % nattyUrl)
 
-	# TODO: Move this to a cleaner solution
-	if hasattr(settings, "LOCAL"):
-		nattyUrl = "http://dev.duffyapp.com:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams))
-
 	try:
 		nattyResult = urllib2.urlopen(nattyUrl).read()
 	except URLError as e:

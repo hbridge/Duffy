@@ -2,6 +2,8 @@
 # run from peanut directory
 
 rabbitmq-server &
+killall java
+mvn -f ../natty/pom.xml exec:java &
 ./scripts/celery.sh stop local
 ./scripts/celery.sh start local
 rm /tmp/mysql.sock
