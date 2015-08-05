@@ -563,6 +563,29 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertIn("Run", self.getOutput(mock))
 
+	# Make sure we don't send a digest if the user has it turned off
+	def test_digest_skips_if_not_default(self, dateMock):
+		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
+		user.save()
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "I need to run tomorrow")
+
+		self.setNow(dateMock, self.MON_9AM)
+		# Digest shouldn't print for this user
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertEqual("", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		# Digest shouldn't print for this user
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run", self.getOutput(mock))
+
 	# Make sure we create a new entry instead of a followup
 	def test_snooze_all_after_daily_digest(self, dateMock):
 		self.setupUser(dateMock)

@@ -60,6 +60,9 @@ class User(models.Model):
 	digest_hour = models.IntegerField(default=9)
 	digest_minute = models.IntegerField(default=0)
 
+	DIGEST_CHOICES = [(x, x) for x in [keeper_constants.DIGEST_STATE_DEFAULT, keeper_constants.DIGEST_STATE_LIMITED]]
+	digest_state = models.CharField(max_length=20, choices=DIGEST_CHOICES, default=keeper_constants.DIGEST_STATE_DEFAULT)
+
 	tip_frequency_days = models.IntegerField(default=keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS)
 	last_tip_sent = models.DateTimeField(null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)

@@ -304,7 +304,9 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 
 		if len(pendingEntries) > 0:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
-		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID:
+
+		# No pending entries, make sure they have digest state to default and product id 1
+		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID and user.digest_state == keeper_constants.DIGEST_STATE_DEFAULT:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
 
 

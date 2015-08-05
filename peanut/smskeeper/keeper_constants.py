@@ -203,6 +203,9 @@ def isRealKeeperNumber(keeperNumber):
 def isTestKeeperNumber(keeperNumber):
 	return "test" in SMSKEEPER_TEST_NUM
 
+DIGEST_STATE_DEFAULT = "default"
+DIGEST_STATE_LIMITED = "limited"
+
 REMINDER_DIGEST_HEADERS = [
 	u":sunrise: Happy Monday!",
 	u"Hello, Tuesday! \U000026F2",
