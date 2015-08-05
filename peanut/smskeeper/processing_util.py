@@ -74,6 +74,12 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				messageObject.classification_scores_json = json.dumps(actionScores)
 				messageObject.save()
 
+				# Reset the state so we know something happened since the reminder was sent
+				# Hacky since we need to know all the states we could be in
+				# Can't simply say !STATE_NORMAL because of TUTORIAL
+				if user.state == keeper_constants.STATE_REMINDER_SENT:
+					user.setState(keeper_constants.STATE_NORMAL)
+
 				continueProcessing = False
 			else:
 				stateModule = stateCallbacks[user.state]

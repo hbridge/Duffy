@@ -19,7 +19,7 @@ class ChangetimeSpecificAction(ChangetimeAction):
 		bestEntries = self.getEntriesToExecuteOn(chunk, user)
 		okEntries = self.getEntriesToExecuteOn(chunk, user, 65)
 		regexHit = self.snoozeRegex.search(chunk.normalizedText()) is not None
-		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
+		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST) or (user.state == keeper_constants.STATE_REMINDER_SENT)
 
 		if regexHit and len(bestEntries) > 0:
 			if justNotified:

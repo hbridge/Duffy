@@ -23,7 +23,7 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 		nattyResult = chunk.getNattyResult(user)
 		regexHit = self.snoozeRegex.search(chunk.normalizedText()) is not None
 
-		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
+		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST) or (user.state == keeper_constants.STATE_REMINDER_SENT)
 
 		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
