@@ -10,6 +10,7 @@ var Bootstrap = require('react-bootstrap');
   Panel = Bootstrap.Panel;
   Glyphicon = Bootstrap.Glyphicon;
 var CannedResponseDropdown = require('./CannedResponseDropdown.jsx');
+var EmojiTextInput = require('./EmojiTextInput.jsx');
 
 module.exports = React.createClass({
   componentWillReceiveProps: function(nextProps) {
@@ -27,7 +28,7 @@ module.exports = React.createClass({
     if (!text) {
       return;
     }
-    this.refs.text.getInputDOMNode().value = '';
+    this.refs.text.setValue('');
     this.props.onCommentSubmit({msg: text, user_id: USER.id, direction: direction});
   },
 
@@ -61,15 +62,6 @@ module.exports = React.createClass({
     console.log("checkbox val" + value);
     if (this.state.simulateOn != value){
       this.setState({simulateOn: value})
-    }
-  },
-
-  handleTextChanged: function(e) {
-    e.preventDefault();
-    var originalText = this.refs.text.getValue();
-    var emojifiedText = Utils.Emojize(originalText);
-    if (originalText != emojifiedText) {
-      this.refs.text.getInputDOMNode().value = emojifiedText;
     }
   },
 
@@ -121,13 +113,7 @@ module.exports = React.createClass({
         className="controlPanel"
       >
         <form className='inputElement' onSubmit={this.createEntry}>
-          <Input
-            type='textarea'
-            ref='text'
-            placeholder="Text to send..."
-            addonBefore={crMenu}
-            onChange={this.handleTextChanged}
-          />
+          <EmojiTextInput ref='text' addonBefore={crMenu}/>
           <Input
             type='checkbox'
             ref='simulateUserToggle'
@@ -148,7 +134,7 @@ module.exports = React.createClass({
   },
 
   crSelected: function(text){
-    this.refs.text.getInputDOMNode().value = text;
+    this.refs.text.setValue(text);
   },
 });
 
