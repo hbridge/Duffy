@@ -188,6 +188,11 @@ TODO_PRODUCT_ID = 1
 WHATSAPP_TODO_PRODUCT_ID = 2
 MEDICAL_PRODUCT_ID = 3
 
+
+def isAdminInterface(keeperNumber):
+	return "web" in keeperNumber
+
+
 def isRealKeeperNumber(keeperNumber):
 	if keeperNumber is None:
 		return False

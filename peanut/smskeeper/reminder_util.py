@@ -103,7 +103,8 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recu
 	# TODO(Derek): Once we're confident, put a check in here:
 	# tempResult = getNattyResult(user, cleanedText)
 	# if not(validTime(tempResult):
-	entry.manually_check = True
+	if not keeper_constants.isAdminInterface(keeperNumber):
+		entry.manually_check = True
 
 	# If the entry had no time or date information, mark it as default
 	if not nattyResult.hadTime and not nattyResult.hadDate:
