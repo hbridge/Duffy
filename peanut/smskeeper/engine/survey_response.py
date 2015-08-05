@@ -58,7 +58,7 @@ class SurveyResponseAction(Action):
 
 		if firstInt:
 			if firstInt < 3:
-				sms_util.sendMsg(user, "Got it, I'll only send your morning tasks on the days you have them")
+				sms_util.sendMsg(user, "Got it, I won't send you a morning txt when there are no tasks")
 				user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
 				user.save()
 			elif firstInt == 3:
