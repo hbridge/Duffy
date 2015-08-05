@@ -93,8 +93,8 @@ def isFollowup(user, entry, msg, nattyResult):
 	return False
 
 
-def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
-	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming)  # no "Remind me"
+def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recurrence=None):
+	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming, recurrence)  # no "Remind me", or recurrence text
 	cleanedText = msg_util.warpReminderText(cleanedText)  # I to your
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
@@ -112,6 +112,8 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber):
 	entry.remind_timestamp = nattyResult.utcTime
 
 	entry.orig_text = json.dumps([msg])
+	if recurrence is not None:
+		entry.remind_recur = recurrence
 	entry.save()
 
 	logger.info("User %s: Created entry %s and msg '%s' with timestamp %s from using nattyResult %s" % (user.id, entry.id, msg, nattyResult.utcTime, nattyResult))

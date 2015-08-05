@@ -31,6 +31,9 @@ reminder_re = re.compile(
 	re.I
 )
 
+# this is junk that sometimes get left in reminders and should be removed
+reminder_cleanup_re = re.compile(r'every ?$|of ?$', re.I)
+
 # We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
@@ -280,12 +283,18 @@ def getReminderHandle(msg):
 
 
 # Returns a string which doesn't have the "remind me" phrase in it
-def cleanedReminder(msg):
-	match = reminder_re.search(msg.lower())
-	if match:
-		cleaned = msg[:match.start()] + msg[match.end():]
-	else:
-		cleaned = msg
+def cleanedReminder(msg, recurrence=None):
+	cleaned = msg
+	regexesToRemove = [reminder_re]
+	if recurrence:
+		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
+
+	regexesToRemove.append(reminder_cleanup_re)
+
+	for regex in regexesToRemove:
+		match = regex.search(cleaned)
+		if match:
+			cleaned = cleaned[:match.start()] + cleaned[match.end():]
 
 	cleaned = cleaned.strip(string.punctuation).strip()
 	words = cleaned.split(' ')

@@ -39,3 +39,7 @@ class Chunk:
 	def matches(self, regex):
 		normalizedText = self.normalizeText(self.originalText)
 		return re.match(regex, normalizedText) is not None
+
+	def contains(self, regex):
+		normalizedText = self.normalizeText(self.originalText)
+		return re.search(regex, normalizedText) is not None

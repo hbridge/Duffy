@@ -45,6 +45,7 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.filter(label="#reminders").order_by("-added")[0]
 		self.assertEquals(keeper_constants.RECUR_DAILY, entry.remind_recur)
+		self.assertNotIn("every day", entry.text)
 
 	def test_every_week(self, dateMock):
 		self.setupUser(dateMock)
@@ -52,6 +53,8 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.filter(label="#reminders").order_by("-added")[0]
 		self.assertEquals(keeper_constants.RECUR_WEEKLY, entry.remind_recur)
+		self.assertNotIn("every", entry.text)
+		self.assertNotIn("Tuesday", entry.text)
 
 	def test_every_month(self, dateMock):
 		self.setupUser(dateMock)
@@ -59,6 +62,7 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.filter(label="#reminders").order_by("-added")[0]
 		self.assertEquals(keeper_constants.RECUR_MONTHLY, entry.remind_recur)
+		self.assertNotIn("month", entry.text)
 
 	def test_every_weekday(self, dateMock):
 		self.setupUser(dateMock)
@@ -66,6 +70,7 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.filter(label="#reminders").order_by("-added")[0]
 		self.assertEquals(keeper_constants.RECUR_WEEKDAYS, entry.remind_recur)
+		self.assertNotIn("monday-friday", entry.text)
 
 	def test_non_recur(self, dateMock):
 		self.setupUser(dateMock)

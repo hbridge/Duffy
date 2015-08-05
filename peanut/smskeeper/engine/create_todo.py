@@ -11,14 +11,6 @@ import collections
 
 logger = logging.getLogger(__name__)
 
-reTypeRes = {
-	keeper_constants.RECUR_DAILY: r'.* (every|each) (day|morning|evening|afternoon)|.* everyday',
-	keeper_constants.RECUR_WEEKDAYS: r'.*(every|each) weekday|.* m[-]f|.* monday[-]friday|.* mon[-]fri',
-	keeper_constants.RECUR_WEEKLY: r'.* (every|each) (week|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|.*weekly',
-	keeper_constants.RECUR_MONTHLY: r'.* (every|each) month|.* once a month|.* monthly'
-}
-
-
 class CreateTodoAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CREATE_TODO
 
@@ -79,20 +71,27 @@ class CreateTodoAction(Action):
 		if not nattyResult.validTime() or not user.isTutorialComplete():
 			sendFollowup = True
 
-		entry = reminder_util.createReminderEntry(user, nattyResult, chunk.originalText, sendFollowup, keeperNumber)
-		# We set this so it knows what entry was created
-		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
-
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
 		recurScores = collections.OrderedDict(
 			sorted(self.getRecurScores(chunk).items(), key=lambda t: t[1], reverse=True)
 		)
-		logger.info("User %s: create recurrence scores %s", chunk.normalizedText(), recurScores)
+		logger.info("User %s: create recurrence scores %s", user.id, recurScores)
+		recurFrequency = None
 		for frequency in recurScores.keys():
 			if recurScores[frequency] >= 0.5:
-				entry.remind_recur = frequency
-				entry.save()
+				recurFrequency = frequency
 				break
+
+		entry = reminder_util.createReminderEntry(
+			user,
+			nattyResult,
+			chunk.originalText,
+			sendFollowup,
+			keeperNumber,
+			recurrence=recurFrequency
+		)
+		# We set this so it knows what entry was created
+		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
 		# If we're in the tutorial and they didn't give a time, then give a different follow up
 		if not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT and not user.isTutorialComplete():
@@ -107,8 +106,8 @@ class CreateTodoAction(Action):
 
 	def getRecurScores(self, chunk):
 		results = {}
-		for frequency in reTypeRes.keys():
-			if chunk.matches(reTypeRes[frequency]):
+		for frequency in keeper_constants.RECUR_REGEXES.keys():
+			if chunk.contains(keeper_constants.RECUR_REGEXES[frequency]):
 				if frequency == keeper_constants.RECUR_WEEKDAYS:
 					# we want weekday to win out over weekly, and weekly's RE is more general
 					results[frequency] = 0.9
