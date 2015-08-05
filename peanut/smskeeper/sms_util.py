@@ -27,6 +27,7 @@ def recordOutput(msgText, doPrint=False):
 		print msgText
 
 
+# Note: Adding params here will break existing entries queued up
 @app.task
 def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, classification):
 	logger.info("User %s: asyncSendMsg to keeperNumber: %s", userId, keeperNumber)
@@ -103,7 +104,7 @@ def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None):
 		asyncSendMsg(user.id, msg, None, keeperNumber, False, False, None)
 
 
-def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False):
+def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False, classification=None):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 
@@ -124,6 +125,6 @@ def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOve
 			msgTxt = "%s (%d/%d)" % (msgTxt, i + 1, len(msgList))
 
 		# Call the single method above so it does the right async logic
-		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime, stopOverride=stopOverride)
+		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime, stopOverride=stopOverride, classification=classification)
 
 	return seconds_delay

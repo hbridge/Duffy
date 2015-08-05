@@ -66,7 +66,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		processed = False
 		continueProcessing = True
 		while not processed and continueProcessing and count < 10:
-			if user.state == keeper_constants.STATE_NORMAL:
+			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
 				keeperEngine = Engine(Engine.DEFAULT, 0.0)
 				processed, classification, actionScores = keeperEngine.process(user, msg)
 
@@ -77,6 +77,8 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 				# Reset the state so we know something happened since the reminder was sent
 				# Hacky since we need to know all the states we could be in
 				# Can't simply say !STATE_NORMAL because of TUTORIAL
+
+				# TODO(Derek): Remove this in a while once reminders have been processed...this state is now obsolete
 				if user.state == keeper_constants.STATE_REMINDER_SENT:
 					user.setState(keeper_constants.STATE_NORMAL)
 
