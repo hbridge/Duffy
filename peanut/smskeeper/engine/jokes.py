@@ -32,21 +32,25 @@ class JokeAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		jokeState = (user.state == keeper_constants.STATE_JOKE_SENT)
+		jokeLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 1)
+		jokeFewLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 3)
 		regexHit = self.jokeRequestRegex.search(chunk.normalizedText()) is not None
 
 		recent = False
 		if self.secondsSinceLastJoke(user) < 120:
 			recent = True
 
-		if regexHit:
-			score = .9
-
-		if jokeState:
-			score = .7
+		if jokeFewLastMsg:
+			score = .3
 
 		if recent:
 			score = .6
+
+		if jokeLastMsg:
+			score = .7
+
+		if regexHit:
+			score = .9
 
 		return score
 
@@ -61,18 +65,19 @@ class JokeAction(Action):
 			jokeNum = int(user.getStateData(self.JOKE_NUM_KEY))
 
 		recent = False
-		if self.secondsSinceLastJoke(user) < 60 * 60 * 6:
+		if self.secondsSinceLastJoke(user) < 120:
 			recent = True
+		jokeLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 1)
 
 		jokeCount = 0
-		if recent:
+		if jokeLastMsg:
 			if user.getStateData(self.JOKE_COUNT_KEY):
 				jokeCount = int(user.getStateData(self.JOKE_COUNT_KEY))
 
 		# Figure out the step, but only use it if it was a recent joke
 		# Otherwise we'd skip ahead in other jokes
 		step = self.JOKE_START
-		if user.getStateData(self.JOKE_STEP_KEY) and recent:
+		if user.getStateData(self.JOKE_STEP_KEY) and jokeLastMsg:
 			step = int(user.getStateData(self.JOKE_STEP_KEY))
 
 		joke = joke_list.getJoke(jokeNum)
@@ -86,7 +91,7 @@ class JokeAction(Action):
 
 		# See if they sent something after our joke is done
 		# If its not a request for another joke, then do a simple reponse or ignore
-		if recent and not joke.takesResponse() and not regexHit:
+		if recent and step == self.JOKE_DONE and not regexHit:
 			# Probably a laugh
 			if step < self.SUNGLASSES_SENT:
 				sms_util.sendMsg(user, ":sunglasses:")

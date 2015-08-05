@@ -250,6 +250,20 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
 
+		# Make sure if they don't answer, we end up back in normal state
+	def test_joke_correct_answer(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tell me a joke")
+			self.assertEqual("What do you call a boomerang that doesn't come back?", self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "A stick!")
+			self.assertIn("yup!", self.getOutput(mock))
+
 	def test_joke_with_laugh(self, dateMock):
 		self.setupUser(dateMock)
 

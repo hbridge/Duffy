@@ -274,6 +274,7 @@ CLASS_UNKNOWN = "unknown"
 OUTGOING_DIGEST = "digest"
 OUTGOING_SURVEY = "survey"
 OUTGOING_REMINDER = "reminder"
+OUTGOING_JOKE = "joke"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"
