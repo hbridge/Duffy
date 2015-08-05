@@ -48,5 +48,22 @@ class SurveyResponseAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		sms_util.sendMsg(user, "Got it, thanks.")
+		words = chunk.normalizedText().split(' ')
+
+		firstInt = None
+		for word in words:
+			if self.isInt(word):
+				firstInt = int(word)
+				break
+
+		if firstInt:
+			if firstInt < 3:
+				sms_util.sendMsg(user, "Got it, I'll only send your morning tasks on the days you have them")
+				user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
+				user.save()
+			elif firstInt == 3:
+				sms_util.sendMsg(user, "Got it, thanks.")
+			elif firstInt > 3:
+				sms_util.sendMsg(user, "Great to hear!")
+
 		return True

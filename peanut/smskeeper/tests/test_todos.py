@@ -175,7 +175,41 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Make sure a response doesn't kick off anything
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "4")
-			self.assertIn("Got it, thanks", self.getOutput(mock))
+			self.assertIn("Great to hear!", self.getOutput(mock))
+
+	# Make sure the digest survey question changes state if its a low answer
+	def test_digest_survey_answer_changes_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		# Add a message and make it look like it was sent at the right time
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop")
+		message = Message.objects.get(id=1)
+		message.added = self.MON_8AM
+		message.save()
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("how useful", self.getOutput(mock))
+			self.assertIn("Monday", self.getOutput(mock))
+
+		# 4 days later
+		self.setNow(dateMock, self.FRI_9AM)
+
+		# Make sure the snooze tip came through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("how useful", self.getOutput(mock))
+
+		# Make sure a response doesn't kick off anything
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "2")
+			self.assertIn("Got it, I'll only", self.getOutput(mock))
+
+		user = self.getTestUser()
+		self.assertEqual(user.digest_state, keeper_constants.DIGEST_STATE_LIMITED)
 
 	# Had bug where we weren't catching survey numbers when there were no tasks
 	def test_digest_survey_tip_no_tasks(self, dateMock):
@@ -210,7 +244,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Make sure a response doesn't kick off anything
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "4")
-			self.assertIn("Got it, thanks", self.getOutput(mock))
+			self.assertIn("Great to hear!", self.getOutput(mock))
 
 	# Had a bug where just 'remind me' would create an entry
 	def test_just_remind_me(self, dateMock):
