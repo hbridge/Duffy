@@ -81,7 +81,7 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 
 	msg = msg_util.renderMsg(msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
-		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual), eta=eta)
+		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual, stopOverride), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
 		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride)
