@@ -63,7 +63,7 @@
   },
   "browserify": {
     "transform": [
-      "reactify"
+      ["reactify", {"es6": true}]
     ],
     "reactify": "^1.1.1"
   },
