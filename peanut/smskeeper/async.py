@@ -239,7 +239,7 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 	# We send the message here
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
-	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_SURVEY)
+	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_DIGEST)
 
 	if tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID):
 		cutoff = date_util.now(pytz.utc) - datetime.timedelta(days=4)
