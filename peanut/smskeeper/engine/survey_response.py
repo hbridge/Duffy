@@ -65,5 +65,7 @@ class SurveyResponseAction(Action):
 				sms_util.sendMsg(user, "Got it, thanks.")
 			elif firstInt > 3:
 				sms_util.sendMsg(user, "Great to hear!")
+		else:
+			return False
 
 		return True
