@@ -35,13 +35,13 @@ class CreateTodoAction(Action):
 
 		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 
-		if nattyResult and containsReminderWord:
+		if nattyResult and not regexHit:
 			score = 0.5
 
 		if not nattyResult and regexHit and len(cleanedText) > 2:
 			score = 0.5
 
-		if nattyResult and not regexHit:
+		if nattyResult and containsReminderWord:
 			score = 0.6
 
 		if self.tutorial:
