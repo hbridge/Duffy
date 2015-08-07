@@ -1754,4 +1754,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processAllReminders()
 			self.assertIn("Go poop", self.getOutput(mock))
 
+	def test_question_and_remidners(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Why didn't I get my daily reminders yet?")
+			self.assertEqual("", self.getOutput(mock))
+
+		self.assertTrue(self.getTestUser().paused)
 

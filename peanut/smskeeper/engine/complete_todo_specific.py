@@ -13,7 +13,7 @@ class CompleteTodoSpecificAction(Action):
 
 	# things that match this RE will get a boost for create
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
-	beginsWithRe = r'(done|check off) '
+	beginsWithRe = r'^(done|check off) '
 
 	def getScore(self, chunk, user):
 		score = 0.0

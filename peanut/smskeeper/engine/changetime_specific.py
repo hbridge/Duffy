@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class ChangetimeSpecificAction(ChangetimeAction):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGETIME_SPECIFIC
 
-	beginsWithRe = r'(change|snooze|update) '
+	beginsWithRe = r'^(change|snooze|update) '
 
 	def getScore(self, chunk, user):
 		score = 0.0

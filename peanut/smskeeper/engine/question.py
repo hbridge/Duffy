@@ -13,7 +13,7 @@ class QuestionAction(Action):
 		question_re = ("?" in chunk.originalText) or firstWord in ["who", "what", "where", "when", "why", "how", "what's", "whats", "is", "are"]
 
 		if question_re:
-			score = .5
+			score = .7
 
 		if QuestionAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
