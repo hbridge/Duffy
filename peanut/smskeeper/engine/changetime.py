@@ -1,5 +1,4 @@
 import logging
-import re
 
 from smskeeper import reminder_util, actions, sms_util
 from .action import Action
@@ -8,11 +7,12 @@ logger = logging.getLogger(__name__)
 
 
 class ChangetimeAction(Action):
-	snoozeRegex = re.compile(r"\b(snooze|again)\b", re.I)
+	snoozeRegex = r"\b(snooze|again)\b"
 
 	def execute(self, chunk, user):
 		entries = self.getEntriesToExecuteOn(chunk, user)
-		regexHit = self.snoozeRegex.search(chunk.normalizedText()) is not None
+		snoozeRegexHit = chunk.matches(self.snoozeRegex)
+
 		justNotified = (user.last_state == "remindersent")
 
 		if len(entries) == 0:
@@ -31,7 +31,7 @@ class ChangetimeAction(Action):
 
 			for entry in entries:
 				# Snoozes are updated differently since we use the full natty result (instead of just swap out what the user typed in)
-				isSnooze = (regexHit or justNotified)
+				isSnooze = (snoozeRegexHit or justNotified)
 				reminder_util.updateReminderEntry(user, nattyResult, chunk.originalText, entry, user.getKeeperNumber(), isSnooze=isSnooze)
 
 			needFollowup = not nattyResult.validTime()

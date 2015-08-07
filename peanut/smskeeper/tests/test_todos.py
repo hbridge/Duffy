@@ -1624,6 +1624,25 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("tomorrow", self.getOutput(mock))
 			self.assertIn("If that time doesn't work", self.getOutput(mock))
 
+	# If they type something starting with snooze, always make sure it snoozes (even if tasks is in there)
+	def test_snooze_starts_with_snooze(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
+
+		self.setNow(dateMock, self.MON_11AM)
+		# This tries it under "most recent"
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze All Tasks")
+			self.assertIn("tomorrow", self.getOutput(mock))
+			self.assertIn("If that time doesn't work", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entry = Entry.objects.filter(label="#reminders").last()
+		self.assertTrue(entry.remind_timestamp.day, self.TUE_9AM.day)
+
 	def test_snooze_one_time(self, dateMock):
 		self.setupUser(dateMock)
 

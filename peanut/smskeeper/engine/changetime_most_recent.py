@@ -15,13 +15,15 @@ logger = logging.getLogger(__name__)
 class ChangetimeMostRecentAction(ChangetimeAction):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGETIME_MOST_RECENT
 
-	snoozeRegex = re.compile(r"\b(snooze|again)\b", re.I)
+	basicRegex = r"\b(snooze|again|change)\b"
+	beginsWithRegex = r'^(change|snooze|update) '
 
 	def getScore(self, chunk, user):
 		score = 0.0
 
 		nattyResult = chunk.getNattyResult(user)
-		regexHit = self.snoozeRegex.search(chunk.normalizedText()) is not None
+		basicRegexHit = chunk.matches(self.basicRegex)
+		beginsWithRegexHit = chunk.matches(self.beginsWithRegex)
 
 		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST) or (user.state == keeper_constants.STATE_REMINDER_SENT)
 
@@ -29,18 +31,21 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(interestingWords), 80)
 
-		if nattyResult and not regexHit:
+		if nattyResult and not basicRegexHit:
 			score = 0.2
 
-		if not nattyResult and regexHit:
+		if not nattyResult and basicRegexHit:
 			score = 0.2
 
 		if len(entries) == 0:
-			if nattyResult and regexHit:
+			if nattyResult and basicRegexHit:
 				if justNotified:
 					score = 0.9
 				else:
 					score = 0.7
+
+			if beginsWithRegexHit:
+				score = 0.9
 
 			if self.isFollowup(chunk, user):
 				score = 0.9
