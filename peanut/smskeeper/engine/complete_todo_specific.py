@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import msg_util, entry_util, sms_util, actions
+from smskeeper import entry_util, sms_util, actions, chunk_features
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from .action import Action
@@ -11,35 +11,33 @@ logger = logging.getLogger(__name__)
 class CompleteTodoSpecificAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
 
-	# things that match this RE will get a boost for create
-	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
-	beginsWithRe = r'^(done|check off) '
-
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		cleanedText = msg_util.cleanedDoneCommand(chunk.normalizedTextWithoutTiming(user))
-		interestingWords = msg_util.getInterestingWords(cleanedText)
+		features = chunk_features.ChunkFeatures(chunk, user)
 
-		regexHit = msg_util.done_re.search(chunk.normalizedText()) is not None
-		bestEntries = entry_util.fuzzyMatchEntries(user, ' '.join(interestingWords), 80)
+		numInterestingWords = features.numInterestingWords()
+		hasDoneWord = features.hasDoneWord()
+		beginsWithDoneWord = features.beginsWithDoneWord()
+		numBestEntries = features.numMatchingEntriesStrict()
+		hasTimingInfo = features.hasTimingInfo()
 
-		if len(bestEntries) > 0 and len(interestingWords) >= 2:
+		if numBestEntries > 0 and numInterestingWords >= 2:
 			score = 0.3
 
-		if regexHit and len(interestingWords) >= 2:
+		if hasDoneWord and numInterestingWords >= 2:
 			score = 0.5
 
-		if regexHit and len(bestEntries) > 0:
+		if hasDoneWord and numBestEntries > 0:
 			score = 0.9
 
-		if chunk.getNattyResult(user):
-			score = 0.0
+		if hasTimingInfo:
+			score -= .2
 
 		if CompleteTodoSpecificAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.9 and chunk.matches(self.beginsWithRe):
+		if score < 0.9 and beginsWithDoneWord:
 			score += 0.1
 
 		return score

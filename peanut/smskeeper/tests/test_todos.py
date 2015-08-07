@@ -1754,6 +1754,17 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processAllReminders()
 			self.assertIn("Go poop", self.getOutput(mock))
 
+	# Make sure we can say "done" to a weekly task and the task still shows up next time
+	def test_done_entry_has_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Court on the 5th of aug tomorrow")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "done with court August 5")
+			self.assertIn("Nice!", self.getOutput(mock))
+
 	def test_question_and_remidners(self, dateMock):
 		self.setupUser(dateMock)
 

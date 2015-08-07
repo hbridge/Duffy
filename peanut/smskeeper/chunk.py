@@ -5,6 +5,7 @@ from common import natty_util
 
 punctuationWhitelist = '-'
 
+
 class Chunk:
 	originalText = None
 	commandWords = []
