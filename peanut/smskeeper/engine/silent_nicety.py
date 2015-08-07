@@ -1,4 +1,3 @@
-from smskeeper import msg_util
 from smskeeper import keeper_constants
 from smskeeper import niceties
 from smskeeper import analytics
@@ -20,7 +19,7 @@ class SilentNicetyAction(Action):
 		# we're a silent one if there's responses
 		# Kinda hacky
 		if nicety and nicety.isSilent():
-			score = 0.5
+			score = 0.4
 
 		if SilentNicetyAction.HasHistoricalMatchForChunk(chunk):
 			score = 0.5

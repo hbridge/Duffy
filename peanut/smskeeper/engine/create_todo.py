@@ -20,7 +20,7 @@ class CreateTodoAction(Action):
 	# things that match this RE will get a boost for create
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	beginsWithRe = r'^(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
-	anyMatchRegex = r'\b(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
+	anyMatchRegex = r'(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
 
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial
@@ -30,7 +30,7 @@ class CreateTodoAction(Action):
 
 		nattyResult = chunk.getNattyResult(user)
 		regexHit = msg_util.reminder_re.search(chunk.normalizedText()) is not None
-		containsReminderWord = chunk.matches(self.anyMatchRegex)
+		containsReminderWord = chunk.contains(self.anyMatchRegex)
 		beginsWithReminderWord = chunk.matches(self.beginsWithRe)
 
 		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
