@@ -19,7 +19,8 @@ class CreateTodoAction(Action):
 
 	# things that match this RE will get a boost for create
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
-	beginsWithRe = r'^(remind|buy|print|fax|go|get|study|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
+	beginsWithRe = r'^(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
+	anyMatchRegex = r'\b(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
 
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial
@@ -29,13 +30,19 @@ class CreateTodoAction(Action):
 
 		nattyResult = chunk.getNattyResult(user)
 		regexHit = msg_util.reminder_re.search(chunk.normalizedText()) is not None
+		containsReminderWord = chunk.matches(self.anyMatchRegex)
+		beginsWithReminderWord = chunk.matches(self.beginsWithRe)
+
 		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 
-		if nattyResult and not regexHit:
+		if nattyResult and containsReminderWord:
 			score = 0.5
 
 		if not nattyResult and regexHit and len(cleanedText) > 2:
 			score = 0.5
+
+		if nattyResult and not regexHit:
+			score = 0.6
 
 		if self.tutorial:
 			score = 0.7
@@ -54,7 +61,7 @@ class CreateTodoAction(Action):
 		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.9 and chunk.matches(self.beginsWithRe):
+		if score < 0.9 and beginsWithReminderWord:
 			score += 0.1
 
 		return score

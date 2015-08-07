@@ -284,7 +284,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.state, keeper_constants.STATE_NORMAL)
 
-		# Make sure if they don't answer, we end up back in normal state
+	# Make sure if they don't answer, we end up back in normal state
 	def test_joke_correct_answer(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -352,17 +352,24 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual("A stick", self.getOutput(mock))
 
 		# make sure we get 2 jokes a day, this should work
-		self.setNow(dateMock, self.MON_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "another")
-			self.assertNotEqual("", self.getOutput(mock))
-			self.assertNotIn("ask me again", self.getOutput(mock))
+			self.assertEqual("What do you call two banana peels?", self.getOutput(mock))
+
+		# make sure we get 2 jokes a day, this should work
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "you tell me")
+			self.assertEqual("A pair of slippers", self.getOutput(mock))
 
 		# Now we should be out
-		self.setNow(dateMock, self.MON_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "gimmie another")
+			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
 			self.assertIn("ask me again", self.getOutput(mock))
+
+		# And we should ignore other things
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "my head hurts")
+			self.assertEqual("", self.getOutput(mock))
 
 		# later that night...
 		self.setNow(dateMock, self.MON_10PM)
@@ -370,6 +377,23 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
 			self.assertNotEqual("", self.getOutput(mock))
 			self.assertNotIn("ask me again", self.getOutput(mock))
+
+	def test_joke_then_reminder(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tell me a joke")
+			self.assertEqual("What do you call a boomerang that doesn't come back?", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I dunno, what")
+			self.assertEqual("A stick", self.getOutput(mock))
+
+		# make sure we get 2 jokes a day, this should work
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "haha, ok, please wake me up tomorrow at 8:30")
+			self.assertIn("by 8:30am", self.getOutput(mock))
 
 	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_works_after_two_reminders(self, dateMock):
