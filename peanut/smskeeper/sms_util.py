@@ -68,9 +68,7 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 			message.save()
 			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
 		except TwilioRestException as e:
-			logger.info("Got TwilioRestException for user %s with message %s.  Setting to state stopped" % (userId, e))
-			user.setState(keeper_constants.STATE_STOPPED)
-			user.save()
+			logger.error("Got TwilioRestException for user %s with message %s" % (userId, e))
 
 
 def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False, stopOverride=False, classification=None):
