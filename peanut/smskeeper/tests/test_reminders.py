@@ -1257,6 +1257,18 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "On Monday the 8th, text me at 7am reminding me to put the sailboat table in the car")
 			self.assertIn("Mon by 7am", self.getOutput(mock))
 
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me at 7:30 to update my apps today")
+			self.assertIn("later today by 7:30pm", self.getOutput(mock))
+
+	def test_seperate_day_and_time_but_same_day(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Every Monday text me at 7pm reminding me to take out the trash")
+			self.assertIn("later today by 7pm", self.getOutput(mock))
+
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
 	def test_tomorrow_afternoon(self, dateMock):

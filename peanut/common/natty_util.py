@@ -8,8 +8,6 @@ from urllib2 import URLError
 import pytz
 from dateutil import relativedelta
 
-from django.conf import settings
-
 from common import date_util
 
 logger = logging.getLogger(__name__)
@@ -22,13 +20,15 @@ class NattyResult():
 	hadDate = None
 	hadTime = None
 	isToday = None
+	explicitDate = None
 
-	def __init__(self, utcTime, queryWithoutTiming, textUsed, hadDate, hadTime):
+	def __init__(self, utcTime, queryWithoutTiming, textUsed, hadDate, hadTime, explicitDate=None):
 		self.utcTime = utcTime
 		self.queryWithoutTiming = queryWithoutTiming
 		self.textUsed = textUsed
 		self.hadDate = hadDate
 		self.hadTime = hadTime
+		self.explicitDate = explicitDate
 
 	def validTime(self):
 		return self.hadDate or self.hadTime
@@ -100,11 +100,25 @@ def getNattyResult(msg, user):
 			dateResult = uniqueResults[0]
 
 		if timeResult and dateResult:
-			combinedDt = datetime.datetime(dateResult.utcTime.year, dateResult.utcTime.month, dateResult.utcTime.day, timeResult.utcTime.hour, timeResult.utcTime.minute, timeResult.utcTime.second).replace(tzinfo=pytz.utc)
+			tzAwareDate = dateResult.utcTime.astimezone(user.getTimezone())
+			tzAwareTime = timeResult.utcTime.astimezone(user.getTimezone())
+			combinedDt = tzAwareDate
+
+			combinedDt = combinedDt.replace(hour=tzAwareTime.hour, minute=tzAwareTime.minute, second=tzAwareTime.second)
+			combinedDtUtc = combinedDt.astimezone(pytz.utc)
+
 			combinedQuery = replace(timeResult.queryWithoutTiming, dateResult.textUsed, "")
 			combinedUsedText = dateResult.textUsed + " " + timeResult.textUsed
 
-			combinedNattyResult = NattyResult(combinedDt, combinedQuery, combinedUsedText, True, True)
+			combinedNattyResult = NattyResult(combinedDtUtc, combinedQuery, combinedUsedText, True, True)
+
+			userNow = date_util.now(user.getTimezone())
+			# Cover edgecase where someone is referring to the same day (but natty originally picked)
+			# up the next week as the day. Like "monday remind me to poop at 7pm" said on a monday morning
+			if (combinedNattyResult.utcTime.astimezone(user.getTimezone()).date() - userNow.date() == datetime.timedelta(days=7) and
+							userNow < combinedNattyResult.utcTime.astimezone(user.getTimezone()) and not dateResult.explicitDate):
+				combinedNattyResult.utcTime = combinedNattyResult.utcTime - datetime.timedelta(days=7)
+
 			logger.debug("User %s: Combined two times %s %s to create %s" % (user.id, uniqueResults[0], uniqueResults[1], combinedNattyResult))
 			return combinedNattyResult
 
@@ -202,7 +216,6 @@ def fixMsgForNatty(msg, user):
 
 	# Deal with "an hour"
 	newMsg = replace(newMsg, r"\ban hour\b", "1 hour")
-
 
 	# Take anything like 7 - 10 and turn into 7 to 10
 	timeRange = re.search(r'(?P<match>[0-9](a|p|am|pm)? *- *[0-9])', newMsg, re.IGNORECASE)
@@ -356,8 +369,10 @@ def processQuery(query, timezone):
 			column = entry["column"]
 			newQuery = getNewQuery(query, usedText, column)
 
+			explicitDate = "EXPLICIT_DATE" in entry["syntaxTree"]
+
 			# They said a specific date but its in the past...so it needs to be bumped by a year
-			if "EXPLICIT_DATE" in entry["syntaxTree"] and startDate < now:
+			if explicitDate and startDate < now:
 				startDate = startDate + relativedelta.relativedelta(years=1)  # Must use relativedelta due to leapyears
 
 			# RELATIVE_DATE  shows up for in 2 days, or Wed
@@ -367,7 +382,7 @@ def processQuery(query, timezone):
 			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"] or "tonight" in usedText.lower()
 
 			hasTime = "EXPLICIT_TIME" in entry["syntaxTree"] or not isNattyDefaultTime(startDate)
-			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime))
+			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime, explicitDate))
 
 			"""
 
