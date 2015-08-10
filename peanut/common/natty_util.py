@@ -75,6 +75,37 @@ def getNattyResult(msg, user):
 	if len(nattyResults) == 0:
 		return None
 
+	# Filter down our results to be unique based on timestamp
+	uniqueDates = set()
+	uniqueResults = list()
+	for n in nattyResults:
+		if n.utcTime not in uniqueDates:
+			uniqueResults.append(n)
+			uniqueDates.add(n.utcTime)
+
+	# Handle scenarios where someone types a date and time in seperate parts of the message
+	# We look for results where one has a date, and one has a time...then combine them
+	if len(uniqueResults) == 2:
+		timeResult = None
+		dateResult = None
+		if (uniqueResults[0].hadTime and not uniqueResults[0].hadDate and
+						uniqueResults[1].hadDate and not uniqueResults[1].hadTime):
+			timeResult = uniqueResults[0]
+			dateResult = uniqueResults[1]
+		elif (uniqueResults[1].hadTime and not uniqueResults[1].hadDate and
+								uniqueResults[0].hadDate and not uniqueResults[0].hadTime):
+			timeResult = uniqueResults[1]
+			dateResult = uniqueResults[0]
+
+		if timeResult and dateResult:
+			combinedDt = datetime.datetime(dateResult.utcTime.year, dateResult.utcTime.month, dateResult.utcTime.day, timeResult.utcTime.hour, timeResult.utcTime.minute, timeResult.utcTime.second).replace(tzinfo=pytz.utc)
+			combinedQuery = replace(timeResult.queryWithoutTiming, dateResult.textUsed, "")
+			combinedUsedText = dateResult.textUsed + " " + timeResult.textUsed
+
+			combinedNattyResult = NattyResult(combinedDt, combinedQuery, combinedUsedText, True, True)
+			logger.debug("User %s: Combined two times %s %s to create %s" % (user.id, uniqueResults[0], uniqueResults[1], combinedNattyResult))
+			return combinedNattyResult
+
 	return nattyResults[0]
 
 

@@ -1351,14 +1351,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.MON_8AM)
 
-		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am every monday")
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am every tuesday")
 
 		entry = Entry.objects.get(label="#reminders")
 
 		entry.remind_recur = keeper_constants.RECUR_WEEKLY
 		entry.save()
 
-		self.setNow(dateMock, self.MON_10AM)
+		self.setNow(dateMock, self.TUE_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
 			self.assertIn("Wake up", self.getOutput(mock))
@@ -1375,15 +1375,21 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		"""
 
 		# Go forward a week...and now it should work
-		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(weeks=1))
+		self.setNow(dateMock, self.TUE_9AM + datetime.timedelta(weeks=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("Wake up", self.getOutput(mock))
 
-		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(weeks=1))
+		self.setNow(dateMock, self.TUE_10AM + datetime.timedelta(weeks=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processAllReminders()
 			self.assertIn("Wake up", self.getOutput(mock))
+
+		# But not on Wednesdays
+		self.setNow(dateMock, self.WED_9AM + datetime.timedelta(weeks=1))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Wake up", self.getOutput(mock))
 
 	def test_daily_reminder(self, dateMock):
 		self.setupUser(dateMock)
