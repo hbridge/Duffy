@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pywapi
 import logging
 
@@ -63,7 +65,7 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		data = weatherDataCache[wxcode]
 	else:
 		try:
-			data = getWeatherForWxCode(wxcode)
+			data = getWeatherForWxCode(wxcode, user.temp_format)
 			weatherDataCache[wxcode] = data
 		except:
 			data = None
@@ -85,7 +87,11 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 				logger.error("User %s: DayIndex %s is to large for data %s" % (user.id, dayIndex, data["forecasts"]))
 				return "Sorry, I don't know the weather for that day"
 
-			return "%s's forecast: %s %s | High %s and low %s" % (dayTerm, data["forecasts"][dayIndex]["text"], weatherCodes[data["forecasts"][dayIndex]["code"]], data["forecasts"][dayIndex]["high"], data["forecasts"][dayIndex]["low"])
+			tempFormatStr = ""
+			if user.temp_format == "metric":
+				tempFormatStr = u"°C"
+
+			return "%s's forecast: %s %s | High %s%s and low %s%s" % (dayTerm, data["forecasts"][dayIndex]["text"], weatherCodes[data["forecasts"][dayIndex]["code"]], data["forecasts"][dayIndex]["high"], tempFormatStr, data["forecasts"][dayIndex]["low"], tempFormatStr)
 		else:
 			logger.error("User %s: Didn't find forecast for zip %s" % (user.id, wxcode))
 			return None
@@ -93,5 +99,5 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		return None
 
 
-def getWeatherForWxCode(wxcode):
-	return pywapi.get_weather_from_yahoo(wxcode, 'imperial')
+def getWeatherForWxCode(wxcode, tempFormat='imperial'):
+	return pywapi.get_weather_from_yahoo(wxcode, tempFormat)

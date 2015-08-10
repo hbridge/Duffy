@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 import pytz
 from mock import patch
 import logging
-import sys
 
 from smskeeper import cliMsg, async, keeper_constants
 from smskeeper.models import Entry, Message
@@ -1518,6 +1519,11 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 						{'code': u'30', 'text': u'Partly Cloudy', 'high': u'84', 'low': u'73', 'date': u'18 Jul 2015', 'day': u'Sat'}],
 					'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_f.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'mi', 'speed': u'mph', 'temperature': u'F', 'pressure': u'in'}, 'astronomy': {'sunset': u'8:25 pm', 'sunrise': u'5:33 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'3', 'chill': u'78'}}
 
+	weatherDataMetric = {'html_description': u'\n<img src="http://l.yimg.com/a/i/us/we/52/26.gif"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 25 C<BR />\n<BR /><b>Forecast:</b><BR />\nMon - Rain Late. High: 27 Low: 22<br />\nTue - Thunderstorms. High: 28 Low: 22<br />\nWed - Mostly Sunny. High: 29 Low: 19<br />\nThu - Mostly Sunny. High: 29 Low: 21<br />\nFri - Sunny. High: 31 Low: 22<br />\n<br />\n<a href="http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_c.html">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href="http://www.weather.com" >The Weather Channel</a>)<br/>\n', 'atmosphere': {'pressure': u'1015.9', 'rising': u'2', 'visibility': u'16.09', 'humidity': u'54'}, 'title': u'Yahoo! Weather - New York, NY', 'condition': {'date': u'Mon, 10 Aug 2015 4:50 pm EDT', 'text': u'Cloudy', 'code': u'26', 'temp': u'25', 'title': u'Conditions for New York, NY at 4:50 pm EDT'},
+					'forecasts': [
+						{'code': u'12', 'text': u'Rain Late', 'high': u'27', 'low': u'22', 'date': u'10 Aug 2015', 'day': u'Mon'},
+						 {'code': u'4', 'text': u'Thunderstorms', 'high': u'28', 'low': u'22', 'date': u'11 Aug 2015', 'day': u'Tue'}, {'code': u'34', 'text': u'Mostly Sunny', 'high': u'29', 'low': u'19', 'date': u'12 Aug 2015', 'day': u'Wed'}, {'code': u'34', 'text': u'Mostly Sunny', 'high': u'29', 'low': u'21', 'date': u'13 Aug 2015', 'day': u'Thu'}, {'code': u'32', 'text': u'Sunny', 'high': u'31', 'low': u'22', 'date': u'14 Aug 2015', 'day': u'Fri'}], 'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_c.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'km', 'speed': u'km/h', 'temperature': u'C', 'pressure': u'mb'}, 'astronomy': {'sunset': u'8:00 pm', 'sunrise': u'5:59 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'12.87', 'chill': u'25'}}
+
 	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_in_digest(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
@@ -1560,6 +1566,21 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "what is the weather?")
 			self.assertIn("forecast: Scattered Thunderstorms", self.getOutput(mock))
+
+	@patch('common.weather_util.getWeatherForWxCode')
+	def test_weather_metric(self, weatherMock, dateMock):
+		self.setupUser(dateMock)
+		user = self.getTestUser()
+		user.wxcode = "10012"
+		user.temp_format = "metric"
+		user.save()
+
+		weatherMock.return_value = self.weatherDataMetric
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "what is the weather?")
+			self.assertIn(u"High 27°C", self.getOutput(mock))
 
 	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_on_request_tomorrow(self, weatherMock, dateMock):

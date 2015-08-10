@@ -70,6 +70,9 @@ class User(models.Model):
 	last_share_upsell = models.DateTimeField(null=True, blank=True)
 	last_feedback_prompt = models.DateTimeField(null=True, blank=True)
 
+	TEMP_FORMAT_CHOICES = [(x, x) for x in ["imperial", "metric"]]
+	temp_format = models.CharField(max_length=10, default="imperial")
+
 	overrideKeeperNumber = None
 
 	def history(self):
