@@ -71,7 +71,7 @@ class User(models.Model):
 	last_feedback_prompt = models.DateTimeField(null=True, blank=True)
 
 	TEMP_FORMAT_CHOICES = [(x, x) for x in ["imperial", "metric"]]
-	temp_format = models.CharField(max_length=10, default="imperial")
+	temp_format = models.CharField(max_length=10, default="imperial", choices=TEMP_FORMAT_CHOICES)
 
 	overrideKeeperNumber = None
 
