@@ -155,14 +155,11 @@ var KeeperApp = React.createClass({
       );
     }
 
-    // then the create list field
-    listNodes.push(
-      <CreateListField key="createList" />
-    );
-
     // then add the rest of the lists
-    for (var i = 0; i < this.state.lists.count; i++) {
-      key = this.state.lists[i];
+    keys = Object.keys(this.state.lists);
+    console.log(keys);
+    for (var i = 0; i < keys.length; i++) {
+      key = keys[i];
       listNodes.push(
         <EntryListView label={ key }
           entries={ this.state.lists[key] }
