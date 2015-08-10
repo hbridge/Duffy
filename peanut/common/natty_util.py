@@ -85,6 +85,8 @@ def getNattyResult(msg, user):
 
 	# Handle scenarios where someone types a date and time in seperate parts of the message
 	# We look for results where one has a date, and one has a time...then combine them
+	# NOTE: This doesn't handle things like "remind me to poop at 7am every monday" said on a Monday
+	# Because natty returns the "next" monday.
 	if len(uniqueResults) == 2:
 		timeResult = None
 		dateResult = None
