@@ -44,6 +44,7 @@ VCARD_TIP_ID = "vcard"
 DONE_ALL_TIP_ID = "done-all"
 PILLS_TIP_ID = "pills"
 WEATHER_TIP_ID = "weather"
+BIRTHDAY_TIP_ID = "birthday"
 
 SNOOZE_TIP_ID = "mini-snooze"
 
@@ -57,19 +58,24 @@ DIGEST_QUESTION_TIP_ID = "mini-digest-question"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
-	KeeperTip(  # mediaurl will be put in at render time
+	KeeperTip(
 		VCARD_TIP_ID,
 		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
 		type=FULL_TIP_TYPE
 	),
-	KeeperTip(  # mediaurl will be put in at render time
+	KeeperTip(
 		PILLS_TIP_ID,
 		"Pro tip: I can help remind you to take your medicine and other frequent tasks. :pill: Just say 'Remind me to take my medicine every day' etc",
 		type=FULL_TIP_TYPE
 	),
-	KeeperTip(  # mediaurl will be put in at render time
+	KeeperTip(
 		WEATHER_TIP_ID,
 		"Handy tip for you :NAME:, I can give you weather forecasts for tomorrow and this weekend. :sunny: :cloud: :umbrella: Try saying 'what's the weather tomorrow?'",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		BIRTHDAY_TIP_ID,
+		"Hey :NAME:, if you've got a friend's birthday :birthday: coming up and don't want to forget, just let me know with 'Julie's birthday is next Sunday'",
 		type=FULL_TIP_TYPE
 	),
 
