@@ -1524,6 +1524,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 						{'code': u'12', 'text': u'Rain Late', 'high': u'27', 'low': u'22', 'date': u'10 Aug 2015', 'day': u'Mon'},
 						 {'code': u'4', 'text': u'Thunderstorms', 'high': u'28', 'low': u'22', 'date': u'11 Aug 2015', 'day': u'Tue'}, {'code': u'34', 'text': u'Mostly Sunny', 'high': u'29', 'low': u'19', 'date': u'12 Aug 2015', 'day': u'Wed'}, {'code': u'34', 'text': u'Mostly Sunny', 'high': u'29', 'low': u'21', 'date': u'13 Aug 2015', 'day': u'Thu'}, {'code': u'32', 'text': u'Sunny', 'high': u'31', 'low': u'22', 'date': u'14 Aug 2015', 'day': u'Fri'}], 'link': u'http://us.rd.yahoo.com/dailynews/rss/weather/New_York__NY/*http://weather.yahoo.com/forecast/USNY0996_c.html', 'location': {'city': u'New York', 'region': u'NY', 'country': u'US'}, 'units': {'distance': u'km', 'speed': u'km/h', 'temperature': u'C', 'pressure': u'mb'}, 'astronomy': {'sunset': u'8:00 pm', 'sunrise': u'5:59 am'}, 'geo': {'lat': u'40.67', 'long': u'-73.94'}, 'wind': {'direction': u'150', 'speed': u'12.87', 'chill': u'25'}}
 
+	weatherReturnData = {"imperial": weatherData, "metric": weatherDataMetric}
 	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_in_digest(self, weatherMock, dateMock):
 		self.setupUser(dateMock)
@@ -1531,7 +1532,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.wxcode = "10012"
 		user.save()
 
-		weatherMock.return_value = self.weatherData
+		weatherMock.return_value = self.weatherReturnData
 
 		self.setNow(dateMock, self.MON_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1545,7 +1546,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.wxcode = "10012"
 		user.save()
 
-		weatherMock.return_value = self.weatherData
+		weatherMock.return_value = self.weatherReturnData
 
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1560,7 +1561,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.wxcode = "10012"
 		user.save()
 
-		weatherMock.return_value = self.weatherData
+		weatherMock.return_value = self.weatherReturnData
 
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1575,7 +1576,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.temp_format = "metric"
 		user.save()
 
-		weatherMock.return_value = self.weatherDataMetric
+		weatherMock.return_value = self.weatherReturnData
 
 		self.setNow(dateMock, self.MON_10AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1589,7 +1590,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.wxcode = "10012"
 		user.save()
 
-		weatherMock.return_value = self.weatherData
+		weatherMock.return_value = self.weatherReturnData
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:

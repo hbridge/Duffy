@@ -71,7 +71,8 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 			data = None
 
 	if data:
-		if "forecasts" in data:
+		dataForUser = data[user.temp_format]
+		if "forecasts" in dataForUser:
 			now = date_util.now(user.getTimezone())
 			tzAwareDate = utcDate.astimezone(user.getTimezone())
 
@@ -83,15 +84,15 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 				dayDiff = tzAwareDate.date() - now.date()
 				dayIndex = dayDiff.days
 
-			if dayIndex >= len(data["forecasts"]):
-				logger.error("User %s: DayIndex %s is to large for data %s" % (user.id, dayIndex, data["forecasts"]))
+			if dayIndex >= len(dataForUser["forecasts"]):
+				logger.error("User %s: DayIndex %s is to large for data %s" % (user.id, dayIndex, dataForUser["forecasts"]))
 				return "Sorry, I don't know the weather for that day"
 
 			tempFormatStr = ""
 			if user.temp_format == "metric":
 				tempFormatStr = u"°C"
 
-			return "%s's forecast: %s %s | High %s%s and low %s%s" % (dayTerm, data["forecasts"][dayIndex]["text"], weatherCodes[data["forecasts"][dayIndex]["code"]], data["forecasts"][dayIndex]["high"], tempFormatStr, data["forecasts"][dayIndex]["low"], tempFormatStr)
+			return "%s's forecast: %s %s | High %s%s and low %s%s" % (dayTerm, dataForUser["forecasts"][dayIndex]["text"], weatherCodes[dataForUser["forecasts"][dayIndex]["code"]], dataForUser["forecasts"][dayIndex]["high"], tempFormatStr, dataForUser["forecasts"][dayIndex]["low"], tempFormatStr)
 		else:
 			logger.error("User %s: Didn't find forecast for zip %s" % (user.id, wxcode))
 			return None
@@ -99,5 +100,5 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		return None
 
 
-def getWeatherForWxCode(wxcode, tempFormat='imperial'):
-	return pywapi.get_weather_from_yahoo(wxcode, tempFormat)
+def getWeatherForWxCode(wxcode):
+	return {"imperial": pywapi.get_weather_from_yahoo(wxcode, "imperial"), "metric": pywapi.get_weather_from_yahoo(wxcode, "metric")}
