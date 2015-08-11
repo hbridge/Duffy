@@ -531,6 +531,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "UnitTests\nThis Is My Sig")
 			self.assertNotIn("Sig", self.getOutput(mock))
 		self.assertEqual("UnitTests", self.getTestUser().name)
+		self.assertEqual(1, self.getTestUser().signature_num_lines)
 
 	# check for identical messages
 	def test_identical_messages(self, dateMock):

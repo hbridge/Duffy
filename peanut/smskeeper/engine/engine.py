@@ -36,11 +36,17 @@ class Engine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def process(self, user, msg):
+	def process(self, user, msgs):
 		# if the user
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None
+
+		if not isinstance(msgs, list):
+			msgs = [msgs]
+
+		# HACK: remove this and add in support for multiple lines
+		msg = msgs[0]
 
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, msg))
 

@@ -51,6 +51,7 @@ class User(models.Model):
 	timezone = models.CharField(max_length=100, null=True, blank=True)
 	postal_code = models.CharField(max_length=10, null=True, blank=True)
 	wxcode = models.CharField(max_length=10, null=True, blank=True)
+	signature_num_lines = models.IntegerField(null=True)
 
 	stripe_data_json = models.TextField(null=True, blank=True)
 

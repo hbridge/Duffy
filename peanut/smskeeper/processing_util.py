@@ -30,6 +30,31 @@ def getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber):
 	return user, created
 
 
+# This processes the message where it removes the sig if it exists and splits up lines
+# If this is the first msg in, then we look at anything after the first line and assume thats the sig
+def processSigAndSplitLines(user, msg):
+	msg = msg.strip()
+
+	if user.signature_num_lines is None:
+		# Get the first msg and see how many lines it is. Do this to support legacy users
+		# This assumes a sig always shows up and will be on seperate lines and will be at the first msg
+		firstMessage = Message.objects.filter(user=user, incoming=True).first()
+		body = json.loads(firstMessage.msg_json)["Body"]
+		user.signature_num_lines = len(body.split('\n')) - 1
+		user.save()
+		logger.info("User %s: Setting signature_num_lines to %s" % (user.id, user.signature_num_lines))
+
+	# Grab just the first line, so we ignore signatures
+	lines = msg.split('\n')
+
+	if user.signature_num_lines == 0:
+		return lines
+	elif user.signature_num_lines == len(lines) - 1:
+		return [lines[0]]
+	else:
+		return lines[:len(lines) - user.signature_num_lines]
+
+
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	user, created = getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber)
 
@@ -54,9 +79,11 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	# convert message to unicode
 	if type(msg) == str:
 		msg = msg.decode('utf-8')
-	msg = msg.strip()
-	# Grab just the first line, so we ignore signatures
-	msg = msg.split('\n')[0]
+
+	msgs = processSigAndSplitLines(user, msg)
+
+	if len(msgs) > 1:
+		logger.info("User %s:  Got %s lines in a single message" % (user.id, len(msgs)))
 
 	logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
 
@@ -68,7 +95,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		while not processed and continueProcessing and count < 10:
 			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
 				keeperEngine = Engine(Engine.DEFAULT, 0.0)
-				processed, classification, actionScores = keeperEngine.process(user, msg)
+				processed, classification, actionScores = keeperEngine.process(user, msgs)
 
 				messageObject.auto_classification = classification
 				messageObject.classification_scores_json = json.dumps(actionScores)
@@ -84,6 +111,9 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 				continueProcessing = False
 			else:
+				# For now, assume all state stuff uses one line
+				# HACKY Should remove later
+				msg = msgs[0]
 				stateModule = stateCallbacks[user.state]
 				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
 				processed, classification, actionScores = stateModule.process(user, msg, requestDict, keeperNumber)
