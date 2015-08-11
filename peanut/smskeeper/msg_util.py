@@ -571,7 +571,7 @@ def naturalize(now, futureTime, includeTime=True):
 		if includeTime:
 			result += " %s %s" % (bindingWord, time)
 	# Tomorrow
-	elif (futureTime - datetime.timedelta(days=1)).day == now.day:
+	elif (futureTime - datetime.timedelta(days=1)).date() == now.date():
 		result = "tomorrow"
 		if includeTime:
 			result += " %s %s" % (bindingWord, time)

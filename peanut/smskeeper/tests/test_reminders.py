@@ -1269,6 +1269,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Every Monday text me at 7pm reminding me to take out the trash")
 			self.assertIn("later today by 7pm", self.getOutput(mock))
 
+	# Had a bug where if someone picked something for the next day of the month in the future
+	# it'd say "tomorrow"
+	def test_same_day_in_future(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "July 2nd remind me to go poop")
+			self.assertIn("July 2nd", self.getOutput(mock))
+
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
 	def test_tomorrow_afternoon(self, dateMock):
