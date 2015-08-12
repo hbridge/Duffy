@@ -58,6 +58,7 @@ class SMSKeeperBaseCase(TestCase):
 		if productId:
 			self.user.product_id = productId
 		self.user.state = state
+		self.user.signature_num_lines = 0
 		self.user.save()
 
 		return self.user

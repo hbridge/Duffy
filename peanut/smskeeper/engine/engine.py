@@ -45,12 +45,15 @@ class Engine:
 		if not isinstance(msgs, list):
 			msgs = [msgs]
 
-		# HACK: remove this and add in support for multiple lines
-		msg = msgs[0]
-
-		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, msg))
+		if len(msgs) == 1:
+			msg = msgs[0]
+		else:
+			msg = '\n'.join(msgs)
 
 		chunk = Chunk(msg)
+
+		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
+
 		actionsByScore = dict()
 
 		for action in self.actionList:

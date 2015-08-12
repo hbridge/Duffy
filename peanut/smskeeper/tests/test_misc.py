@@ -525,6 +525,9 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 	# Emulate a user who has a signature at the end of their messages
 	def test_signatures(self, dateMock):
 		self.setupUser(True, False, keeper_constants.STATE_TUTORIAL_TODO, dateMock=dateMock)
+		user = self.getTestUser()
+		user.signature_num_lines = None
+		user.save()
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name
