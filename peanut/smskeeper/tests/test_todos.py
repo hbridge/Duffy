@@ -315,6 +315,28 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "haha, nice!")
 			self.assertEqual(u'\U0001f60e', self.getOutput(mock))
 
+	def test_joke_with_laugh_and_followup(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tell me a joke")
+			self.assertEqual("What do you call a boomerang that doesn't come back?", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "I dunno, what")
+			self.assertEqual("A stick", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "haha, nice!")
+			self.assertEqual(u'\U0001f60e', self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "blah blah blah")
+			self.assertEqual('', self.getOutput(mock))
+
+		self.assertTrue(self.getTestUser().paused)
+
 	def test_joke_runs_out(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -367,15 +389,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
 			self.assertIn("ask me again", self.getOutput(mock))
 
-		# And we should ignore other things
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "my head hurts")
-			self.assertEqual("", self.getOutput(mock))
-
 		# later that night...
 		self.setNow(dateMock, self.MON_10PM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
+			cliMsg.msg(self.testPhoneNumber, "tell me another joke please")
 			self.assertNotEqual("", self.getOutput(mock))
 			self.assertNotIn("ask me again", self.getOutput(mock))
 

@@ -1280,6 +1280,16 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("July 2nd", self.getOutput(mock))
 
 	"""
+	def test_two_times_but_one_is_after_remind_me(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me at 3 PM on Friday that I have a landscape appointment at 4:30 PM")
+			self.assertIn("Fri by 3pm", self.getOutput(mock))
+	"""
+
+	"""
 	def test_multi_line_both_with_times(self, dateMock):
 		self.setupUser(dateMock)
 		self.setNow(dateMock, self.MON_9AM)

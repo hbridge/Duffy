@@ -69,18 +69,18 @@ class Engine:
 			logger.info("User %s: Action %s got score %s" % (user.id, action, score))
 
 		for score, actions in sortedActionsByScore.iteritems():
-
 			if score > self.minScore:
 				if len(actions) > 1:
 					actions = self.tieBreakActions(actions)
 
 				# Pick the first one after sorting
 				# Later on we might want to look at the 'processed' return code
-				action = actions[0]
-				logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
-				processed = action.execute(chunk, user)
+				for action in actions:
+					logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
+					processed = action.execute(chunk, user)
 
-				return processed, action.ACTION_CLASS, actionScores
+					if processed:
+						return processed, action.ACTION_CLASS, actionScores
 
 		return False, keeper_constants.CLASS_UNKNOWN, actionScores
 

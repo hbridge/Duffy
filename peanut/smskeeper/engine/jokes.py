@@ -67,18 +67,10 @@ class JokeAction(Action):
 
 		regexHit = (requestHit or followupHit)
 
+		# Which joke we're currently on
 		jokeNum = 0
 		if user.getStateData(self.JOKE_NUM_KEY):
 			jokeNum = int(user.getStateData(self.JOKE_NUM_KEY))
-
-		recentJokeCount = self.getRecentJokeCount(user)
-
-		# Figure out the step, but only use it if it was a recent joke
-		# Otherwise we'd skip ahead in other jokes
-		step = self.JOKE_START
-		jokeLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 3)
-		if user.getStateData(self.JOKE_STEP_KEY) and jokeLastMsg and not regexHit:
-			step = int(user.getStateData(self.JOKE_STEP_KEY))
 
 		joke = joke_list.getJoke(jokeNum)
 		if not joke:
@@ -86,41 +78,58 @@ class JokeAction(Action):
 			sms_util.sendMsg(user, "Shoot, all out of jokes! I'll go work on some new ones, ask me again tomorrow")
 			return True
 
+		# How many jokes we've told in the last 6 hours
+		recentJokeCount = self.getRecentJokeCount(user)
+
+		recent = False
+		if self.secondsSinceLastJoke(user) < 120:
+			recent = True
+
+		# If we've told too many, then see if they're asking for another
+		# If so, give them a response, if not, kick out for re-processing
 		if recentJokeCount >= 2:
 			if regexHit:
 				logger.debug("User %s: Hit recentJokeCount for the day and this message matches my regex" % (user.id))
 				sms_util.sendMsg(user, "Let me go write another, ask me again tomorrow")
 				return True
 			else:
-				logger.debug("User %s: Ignoring msg '%s' because we hit recentJokeCount limit but this wasn't a new request" % (user.id, chunk.originalText))
-				return True
+				logger.debug("User %s: Kicking out from jokes with msg '%s' because we hit recentJokeCount limit but this wasn't a new request" % (user.id, chunk.originalText))
+				return False
 
-		# See if they sent something after our joke is done
-		# If its not a request for another joke, then do a simple reponse or ignore
-		# Captures things like "haha"
-		if jokeLastMsg and step == self.JOKE_DONE and not regexHit:
-			# Probably a laugh
-			if step < self.SUNGLASSES_SENT:
+		if user.getStateData(self.JOKE_STEP_KEY):
+			step = int(user.getStateData(self.JOKE_STEP_KEY))
+		else:
+			step = self.JOKE_START
+
+		if step == self.JOKE_START:
+			self.sendJokePart1(user, joke)
+		elif step == self.JOKE_PART1_SENT:
+			# eval guess
+			joke.send(user, step, chunk.normalizedText())
+			self.jokeIsDone(user, jokeNum, recentJokeCount)
+		elif step == self.JOKE_DONE:
+			# if regex hit, then send another
+			if regexHit:
+				self.sendJokePart1(user, joke)
+			elif recent:
 				sms_util.sendMsg(user, ":sunglasses:")
 				user.setStateData(self.JOKE_STEP_KEY, self.SUNGLASSES_SENT)
-				return True
 			else:
-				logger.debug("User %s: Ignoring msg '%s' because I already sent back sunglasses" % (user.id, chunk.originalText))
-				return True
-
-		if not joke.takesResponse():
-			joke.send(user)
-			self.jokeIsDone(user, jokeNum, recentJokeCount)
-		else:
-			jokeDone = joke.send(user, step, chunk.normalizedText())
-			user.setStateData(self.LAST_JOKE_SENT_KEY, date_util.unixTime(date_util.now(pytz.utc)))
-
-			if jokeDone:
-				self.jokeIsDone(user, jokeNum, recentJokeCount)
+				logger.debug("User %s: Kicking out from jokes with msg '%s' because joke was done" % (user.id, chunk.originalText))
+				return False
+		elif step == self.SUNGLASSES_SENT:
+			if regexHit:
+				self.sendJokePart1(user, joke)
 			else:
-				user.setStateData(self.JOKE_STEP_KEY, self.JOKE_PART1_SENT)
+				logger.debug("User %s: Kicking out from jokes with msg '%s' because joke was done with sunglasses" % (user.id, chunk.originalText))
+				return False
 
 		return True
+
+	def sendJokePart1(self, user, joke):
+		joke.send(user, self.JOKE_START)
+		user.setStateData(self.JOKE_STEP_KEY, self.JOKE_PART1_SENT)
+		user.setStateData(self.LAST_JOKE_SENT_KEY, date_util.unixTime(date_util.now(pytz.utc)))
 
 	def jokeIsDone(self, user, jokeNum, recentJokeCount):
 		user.setStateData(self.JOKE_NUM_KEY, jokeNum + 1)
