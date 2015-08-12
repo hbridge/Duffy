@@ -65,9 +65,10 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		data = weatherDataCache[wxcode]
 	else:
 		try:
-			data = getWeatherForWxCode(wxcode, user.temp_format)
+			data = getWeatherForWxCode(wxcode)
 			weatherDataCache[wxcode] = data
-		except:
+		except Exception, e:
+			logger.error("User %s: Got exception %s when fetching weather for %s" % (user.id, e, wxcode))
 			data = None
 
 	if data:
@@ -97,6 +98,7 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 			logger.error("User %s: Didn't find forecast for zip %s" % (user.id, wxcode))
 			return None
 	else:
+		logger.error("User %s: Didn't find forecast for zip %s" % (user.id, wxcode))
 		return None
 
 
