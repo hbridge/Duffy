@@ -45,6 +45,7 @@ DONE_ALL_TIP_ID = "done-all"
 PILLS_TIP_ID = "pills"
 WEATHER_TIP_ID = "weather"
 BIRTHDAY_TIP_ID = "birthday"
+JOKE_TIP_ID = "joke"
 
 SNOOZE_TIP_ID = "mini-snooze"
 
@@ -76,6 +77,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		BIRTHDAY_TIP_ID,
 		"Hey :NAME:, if you've got a friend's birthday :birthday: coming up and don't want to forget, just let me know with 'Julie's birthday is next Sunday'",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		JOKE_TIP_ID,
+		"Hey :NAME:, I'm the funniest digital assistant around! Just ask me to tell you a joke - guarenteed laughs or you get a pony :sunglasses:",
 		type=FULL_TIP_TYPE
 	),
 
