@@ -83,13 +83,12 @@ def getNattyResult(msg, user):
 			uniqueResults.append(n)
 			uniqueDates.add(n.utcTime)
 
-	# Handle scenarios where someone types a date and time in seperate parts of the message
-	# We look for results where one has a date, and one has a time...then combine them
-	# NOTE: This doesn't handle things like "remind me to poop at 7am every monday" said on a Monday
-	# Because natty returns the "next" monday.
 	if len(uniqueResults) == 2:
+		# Handle scenarios where someone types a date and time in seperate parts of the message
+		# We look for results where one has a date, and one has a time...then combine them
 		timeResult = None
 		dateResult = None
+
 		if (uniqueResults[0].hadTime and not uniqueResults[0].hadDate and
 						uniqueResults[1].hadDate and not uniqueResults[1].hadTime):
 			timeResult = uniqueResults[0]
@@ -121,6 +120,12 @@ def getNattyResult(msg, user):
 
 			logger.debug("User %s: Combined two times %s %s to create %s" % (user.id, uniqueResults[0], uniqueResults[1], combinedNattyResult))
 			return combinedNattyResult
+
+	if len(uniqueResults) >= 2:
+		# Handle scenarios where there are multiple times, but one is the absolute first in the line
+		for result in uniqueResults:
+			if msg.startswith(result.textUsed):
+				return result
 
 	return nattyResults[0]
 
@@ -232,7 +237,7 @@ def fixMsgForNatty(msg, user):
 # time phrase like "last week" then also gives us the words used, which are then
 # removed from the query.
 #
-# Returns: [Tuple of (startDate, usedText)]  (list of tuples)
+# Returns: [Tuple of (startDate, textUsed)]  (list of tuples)
 def getNattyInfo(query, timezone):
 	myResults = list()
 	results = processQuery(query, timezone)
@@ -241,7 +246,7 @@ def getNattyInfo(query, timezone):
 	myResults.extend(results)
 
 	# Now loop through all results and find all sub results.  Then return these
-	# with the usedText taken out of the original query
+	# with the textUsed taken out of the original query
 	# query:  book meeting with Andrew for tues morning in two hours
 	# newQuery: book meeting with Andrew for in two hours
 	# Return: book meeting with Andrew for tues morning  (two hours from now)
@@ -264,8 +269,8 @@ def isNattyDefaultTime(utcTime):
 	return utcTime.hour == now.hour and utcTime.minute == now.minute
 
 
-def updatedTimeBasedOnUsedText(utcTime, usedText, timezone):
-	if usedText.lower() == "next week":
+def updatedTimeBasedOnUsedText(utcTime, textUsed, timezone):
+	if textUsed.lower() == "next week":
 		tzAwareDate = date_util.now(pytz.utc).astimezone(timezone)
 		# This finds us the next Monday
 		tzAwareDate = tzAwareDate + datetime.timedelta(days=-tzAwareDate.weekday(), weeks=1)
@@ -283,11 +288,11 @@ def unixTime(dt):
 amPmRegex = re.compile(r'(\d) ?(p|a|pm|am)\b|morning|evening|afternoon|night', re.IGNORECASE)
 
 
-def isTomorrowInText(usedText):
+def isTomorrowInText(textUsed):
 	tmrPhrases = ["tomorrow", "tmr", "tommarow"]
 
 	for phrase in tmrPhrases:
-		if phrase in usedText.split(' '):
+		if phrase in textUsed.split(' '):
 			return True
 	return False
 
@@ -332,26 +337,26 @@ def processQuery(query, timezone):
 	if (nattyResult):
 		nattyJson = json.loads(nattyResult)
 		for entry in nattyJson:
-			usedText = entry["matchingValue"]
+			textUsed = entry["matchingValue"]
 
 			startDate = getBestTimeFromChoices(entry["timestamps"])
 
 			# Correct for a few edgecases
-			startDate = updatedTimeBasedOnUsedText(startDate, usedText, timezone)
+			startDate = updatedTimeBasedOnUsedText(startDate, textUsed, timezone)
 
 			now = date_util.now(pytz.utc)
 			tzAwareNow = date_util.now(timezone)
 
 			# If its between midnight and 4 am local time and there's tomorrow in the phrase
 			# Then move it back a day and do regular processing
-			if tzAwareNow.hour >= 0 and tzAwareNow.hour < 4 and isTomorrowInText(usedText) and startDate > now:
+			if tzAwareNow.hour >= 0 and tzAwareNow.hour < 4 and isTomorrowInText(textUsed) and startDate > now:
 				startDate = startDate - datetime.timedelta(days=1)
 
 			# If we pulled out just an int less than 12, then pick the next time that time number happens.
 			# So if its currently 14, and they say 8... then add
 			if startDate < (now - datetime.timedelta(seconds=10)) and startDate > now - datetime.timedelta(hours=24):
 				# If it has am or pm in the used text, then assume tomorrow
-				if amPmRegex.search(usedText.lower()) is not None:
+				if amPmRegex.search(textUsed.lower()) is not None:
 					startDate = startDate + datetime.timedelta(days=1)
 				elif startDate > now - datetime.timedelta(hours=24) and startDate < now - datetime.timedelta(hours=12):
 					# This is between 12 and 24 hours in the past, so:
@@ -363,11 +368,11 @@ def processQuery(query, timezone):
 
 			tzAwareStartDate = startDate.astimezone(timezone)
 			# If we think tho that its super early in the morning and there's no am, we're probably wrong, so set it later
-			if tzAwareStartDate.hour >= 0 and tzAwareStartDate.hour < 6 and "am" not in usedText.lower():
+			if tzAwareStartDate.hour >= 0 and tzAwareStartDate.hour < 6 and "am" not in textUsed.lower():
 				startDate = startDate + datetime.timedelta(hours=12)
 
 			column = entry["column"]
-			newQuery = getNewQuery(query, usedText, column)
+			newQuery = getNewQuery(query, textUsed, column)
 
 			explicitDate = "EXPLICIT_DATE" in entry["syntaxTree"]
 
@@ -379,10 +384,10 @@ def processQuery(query, timezone):
 			# EXPLICIT_DATE  shows up for July 1
 			# RELATIVE_TIME  shows up for "in an hour" so hasDate should be true (since its today)
 			# tonight        is a hack
-			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"] or "tonight" in usedText.lower()
+			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"] or "tonight" in textUsed.lower()
 
 			hasTime = "EXPLICIT_TIME" in entry["syntaxTree"] or not isNattyDefaultTime(startDate)
-			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime, explicitDate))
+			result.append(NattyResult(startDate, newQuery, textUsed, hasDate, hasTime, explicitDate))
 
 			"""
 
@@ -390,7 +395,7 @@ def processQuery(query, timezone):
 			hasDate = "RELATIVE_DATE" in entry["syntaxTree"] or "EXPLICIT_DATE" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"]
 
 			hasTime = "EXPLICIT_TIME" in entry["syntaxTree"] or "RELATIVE_TIME" in entry["syntaxTree"]
-			result.append(NattyResult(startDate, newQuery, usedText, hasDate, hasTime))
+			result.append(NattyResult(startDate, newQuery, textUsed, hasDate, hasTime))
 
 			"""
 	return result
@@ -404,13 +409,13 @@ def representsInt(s):
 		return False
 
 
-# This method takes the query and usedText and returns back the query without the usedText in it
+# This method takes the query and textUsed and returns back the query without the textUsed in it
 # The column is where the phrase starts if its defined
-def getNewQuery(query, usedText, column=None):
+def getNewQuery(query, textUsed, column=None):
 	if column:
-		newQuery = query[:column - 1] + query[column - 1 + len(usedText):]
+		newQuery = query[:column - 1] + query[column - 1 + len(textUsed):]
 	else:
-		newQuery = query.replace(usedText, '')
+		newQuery = query.replace(textUsed, '')
 	newQuery = newQuery.replace('  ', ' ').strip()
 
 	return newQuery

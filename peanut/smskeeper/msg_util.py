@@ -282,15 +282,8 @@ def getReminderHandle(msg):
 	return None
 
 
-# Returns a string which doesn't have the "remind me" phrase in it
-def cleanedReminder(msg, recurrence=None):
+def cleanMsg(msg, regexesToRemove):
 	cleaned = msg
-	regexesToRemove = [reminder_re]
-	if recurrence:
-		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
-
-	regexesToRemove.append(reminder_cleanup_re)
-
 	for regex in regexesToRemove:
 		match = regex.search(cleaned)
 		if match:
@@ -305,6 +298,29 @@ def cleanedReminder(msg, recurrence=None):
 			cleaned = cleaned.rsplit(' ', 1)[0]
 
 	return cleaned
+
+
+# Returns a string which doesn't have the "everyday" phrase in it
+def cleanedRecurrence(msg, recurrence):
+	regexesToRemove = list()
+
+	if recurrence:
+		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
+
+	regexesToRemove.append(reminder_cleanup_re)
+
+	return cleanMsg(msg, regexesToRemove)
+
+
+# Returns a string which doesn't have the "remind me" phrase in it
+def cleanedReminder(msg, recurrence=None):
+	regexesToRemove = [reminder_re]
+	if recurrence:
+		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
+
+	regexesToRemove.append(reminder_cleanup_re)
+
+	return cleanMsg(msg, regexesToRemove)
 
 
 # Returns a string which doesn't have the "done with" phrase in it

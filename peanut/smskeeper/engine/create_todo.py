@@ -1,7 +1,7 @@
 import logging
 import pytz
 
-from common import date_util
+from common import date_util, natty_util
 
 from smskeeper import reminder_util, sms_util, msg_util
 from smskeeper import keeper_constants
@@ -67,11 +67,14 @@ class CreateTodoAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		nattyResult = chunk.getNattyResult(user)
+		# We clean the text here to handle some edge cases which proritize timing info at the begining of the sentence
+		cleanedText = msg_util.cleanedReminder(chunk.originalText)
+		nattyResult = natty_util.getNattyResult(cleanedText, user)
+
 		keeperNumber = user.getKeeperNumber()
 
 		if nattyResult is None:
-			nattyResult = reminder_util.getDefaultNattyResult(chunk.originalText, user)
+			nattyResult = reminder_util.getDefaultNattyResult(cleanedText, user)
 		elif not nattyResult.hadTime:
 			nattyResult = reminder_util.fillInWithDefaultTime(user, nattyResult)
 

@@ -408,7 +408,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "I dunno, what")
 			self.assertEqual("A stick", self.getOutput(mock))
 
-		# make sure we get 2 jokes a day, this should work
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "hehe, nice")
+			self.assertEqual(u'\U0001f60e', self.getOutput(mock))
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "haha, ok, please wake me up tomorrow at 8:30")
 			self.assertIn("by 8:30am", self.getOutput(mock))
