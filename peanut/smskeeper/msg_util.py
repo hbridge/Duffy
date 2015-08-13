@@ -24,7 +24,7 @@ freeform_fetch_res = [
 	re.compile("#?(?P<label>[\S]+) list", re.I)
 ]
 reminder_re = re.compile(
-	"(can you )?#?remind(er|ers)? (?P<handle>[a-zA-Z]+)( to | on | at | in | by | about |)?"
+	"(can you )?#?remind(er|ers)? (me)?( to | on | at | in | by | about |)?"
 	+ "|^i (need|want|have) to "
 	+ "|^dont (let me )?forget (to )?"
 	+ "|^do my ",
@@ -272,18 +272,15 @@ def startsWithNo(msg):
 	return False
 
 
-def getReminderHandle(msg):
-	text = msg.lower()
-	match = reminder_re.search(text)
-	if match:
-		handle = match.group("handle")
-		if handle not in REMINDER_FRINGE_TERMS:
-			return handle
-	return None
-
-
-def cleanMsg(msg, regexesToRemove):
+# Returns a string which doesn't have the "remind me" phrase in it
+def cleanedReminder(msg, recurrence=None):
 	cleaned = msg
+	regexesToRemove = [reminder_re]
+	if recurrence:
+		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
+
+	regexesToRemove.append(reminder_cleanup_re)
+
 	for regex in regexesToRemove:
 		match = regex.search(cleaned)
 		if match:
@@ -298,29 +295,6 @@ def cleanMsg(msg, regexesToRemove):
 			cleaned = cleaned.rsplit(' ', 1)[0]
 
 	return cleaned
-
-
-# Returns a string which doesn't have the "everyday" phrase in it
-def cleanedRecurrence(msg, recurrence):
-	regexesToRemove = list()
-
-	if recurrence:
-		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
-
-	regexesToRemove.append(reminder_cleanup_re)
-
-	return cleanMsg(msg, regexesToRemove)
-
-
-# Returns a string which doesn't have the "remind me" phrase in it
-def cleanedReminder(msg, recurrence=None):
-	regexesToRemove = [reminder_re]
-	if recurrence:
-		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
-
-	regexesToRemove.append(reminder_cleanup_re)
-
-	return cleanMsg(msg, regexesToRemove)
 
 
 # Returns a string which doesn't have the "done with" phrase in it

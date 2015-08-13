@@ -1287,6 +1287,34 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me at 3 PM on Friday that I have a landscape appointment at 4:30 PM")
 			self.assertIn("Fri by 3pm", self.getOutput(mock))
 
+	def test_two_times_but_tonight_is_after_remind_me(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me tonight that I have a landscape appointment tomorrow at 4:30 PM")
+			self.assertIn("by 8pm", self.getOutput(mock))
+
+	def test_time_at_start(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "At 8, remind me to get toothpaste, a cd case, and my external hard drive")
+			self.assertIn("by 8pm", self.getOutput(mock))
+
+	def test_two_times_confusing(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "At 2, remind me to check in with Allison and find out what day they return and whether I need to sleep there the night of the 11th")
+			self.assertIn("by 2pm", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "5-guys job Thursday at 8:00")
+			self.assertIn("Thu by 8am", self.getOutput(mock))
+
 
 	"""
 	def test_multi_line_both_with_times(self, dateMock):

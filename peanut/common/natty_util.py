@@ -121,11 +121,26 @@ def getNattyResult(msg, user):
 			logger.debug("User %s: Combined two times %s %s to create %s" % (user.id, uniqueResults[0], uniqueResults[1], combinedNattyResult))
 			return combinedNattyResult
 
-	if len(uniqueResults) >= 2:
-		# Handle scenarios where there are multiple times, but one is the absolute first in the line
-		for result in uniqueResults:
-			if msg.startswith(result.textUsed):
-				return result
+		# Handle scenarios which have a date+time and just a time
+		# like "remind me tomorrow at 8 that I have something at 4"
+		# Want to return the result that shows up first in the sentence
+		# But, ignore situations where the 'time only' entry doesn't have an at. Its prob just a number
+		if ((uniqueResults[0].hadTime and uniqueResults[0].hadDate and
+						not uniqueResults[1].hadDate and uniqueResults[1].hadTime and "at " in uniqueResults[1].textUsed) or
+					(uniqueResults[0].hadTime and not uniqueResults[0].hadDate and "at " in uniqueResults[0].textUsed and
+					uniqueResults[1].hadDate and uniqueResults[1].hadTime)):
+
+			if (msg.find(uniqueResults[0].textUsed) < msg.find(uniqueResults[1].textUsed)):
+				return uniqueResults[0]
+			else:
+				return uniqueResults[1]
+
+		# Handle case where we have two well formed times, then sort by time
+		# this counters the preference of " at " above
+		if ((uniqueResults[0].hadTime and uniqueResults[0].hadDate and
+						uniqueResults[1].hadDate and uniqueResults[1].hadTime)):
+			uniqueResults = sorted(uniqueResults, key=lambda x: x.utcTime)
+			return uniqueResults[0]
 
 	return nattyResults[0]
 

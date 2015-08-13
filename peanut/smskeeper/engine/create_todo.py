@@ -67,14 +67,12 @@ class CreateTodoAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		# We clean the text here to handle some edge cases which proritize timing info at the begining of the sentence
-		cleanedText = msg_util.cleanedReminder(chunk.originalText)
-		nattyResult = natty_util.getNattyResult(cleanedText, user)
+		nattyResult = chunk.getNattyResult(user)
 
 		keeperNumber = user.getKeeperNumber()
 
 		if nattyResult is None:
-			nattyResult = reminder_util.getDefaultNattyResult(cleanedText, user)
+			nattyResult = reminder_util.getDefaultNattyResult(chunk.originalText, user)
 		elif not nattyResult.hadTime:
 			nattyResult = reminder_util.fillInWithDefaultTime(user, nattyResult)
 
