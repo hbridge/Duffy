@@ -180,6 +180,10 @@ SMSKEEPER_NICETIES = [
 		"how much .* cost|is .+ free",
 		["My help is free! :person_raising_both_hands_in_celebration: Msg and data rates may apply."]
 	),
+	Nicety(
+		"that was(nt| not) funny|that(s| was) a (terrible|bad|awful) joke|i did(nt| not) laugh|wheres my pony",
+		["Fine. Here's you pony :horse:"]
+	),
 ]
 
 
