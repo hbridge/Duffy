@@ -333,7 +333,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn(u'\U0001F434', self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "i didn't laugh")
+			cliMsg.msg(self.testPhoneNumber, "i didn't laugh. Where's my pony?")
 			self.assertIn(u'\U0001F434', self.getOutput(mock))
 
 	def test_joke_with_laugh_and_followup(self, dateMock):
