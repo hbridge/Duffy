@@ -8,7 +8,7 @@ from .action import Action
 class HelpAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_HELP
 
-	help_re = re.compile(r'[?]$|huh$|help$|how do.* work|what.* (can|do) you do|tell me more', re.I)
+	help_re = re.compile(r'help$|how do .* work|what .*(can|do) you do|tell me more', re.I)
 
 	def getScore(self, chunk, user):
 		score = 0.0
