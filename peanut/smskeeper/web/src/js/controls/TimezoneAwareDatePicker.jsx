@@ -17,6 +17,8 @@ module.exports = React.createClass({
 				ref="date"
 				dateTime={this.state.localMoment.format('x')}
 				onChange={this.pickedTimeChanged}
+				showToday={true}
+				minDate={moment.tz(this.props.timezone)}
 			/>
 		);
 	},
