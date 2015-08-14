@@ -80,6 +80,7 @@ var CreateEntryInput = React.createClass({
       <Button
         onClick={this.createEntry}
         bsStyle="primary"
+        bsSize='large'
         disabled={this.state.sendDisabled}>
           Create
       </Button>;
@@ -87,7 +88,7 @@ var CreateEntryInput = React.createClass({
     return (
       <form className='inputElement' onSubmit={this.createEntry}>
         <Input
-          type='text'
+          type='textarea'
           ref='text'
           buttonAfter={createButton}
           placeholder="poop tomorrow..."
