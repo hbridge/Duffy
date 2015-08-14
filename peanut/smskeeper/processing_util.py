@@ -6,8 +6,9 @@ from datetime import timedelta
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import not_activated, unknown_command, stopped, tutorial_todo, tutorial_medical, suspended
-from smskeeper import actions, user_util
+from smskeeper.states import stopped, tutorial_todo, tutorial_medical, suspended
+from smskeeper import actions, user_util, sms_util
+from smskeeper.chunk import Chunk
 
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
@@ -51,8 +52,94 @@ def processSigAndSplitLines(user, msg):
 		return lines
 	elif user.signature_num_lines == len(lines) - 1:
 		return [lines[0]]
+	elif user.signature_num_lines >= len(lines):
+		# Edgecase if for some reason the sig isn't there
+		return lines
 	else:
 		return lines[:len(lines) - user.signature_num_lines]
+
+
+def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber):
+	# Stop, and tutorial states
+	count = 0
+	processed = False
+	while not processed and count < 10:
+		# For now, assume all state stuff uses one line
+		# HACKY Should remove later
+		msg = msgs[0]
+
+		if user.state not in stateCallbacks:
+			return False
+
+		stateModule = stateCallbacks[user.state]
+
+		logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
+		processed, classification, actionScores = stateModule.process(user, msg, requestDict, keeperNumber)
+
+		if processed is None:
+			raise TypeError("modules must return True or False for processed")
+
+		if processed:
+			user.last_state = user.state
+			user.save()
+			messageObject.auto_classification = classification
+			messageObject.classification_scores_json = json.dumps(actionScores)
+			messageObject.save()
+			logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
+
+		if not processed:
+			actions.unknown(user, msg, user.getKeeperNumber())
+
+		count += 1
+		if count == 10:
+			logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
+	return True
+
+
+def processWithEngine(user, msgs, messageObject):
+	keeperEngine = Engine(Engine.DEFAULT, 0.0)
+	multichunk = len(msgs) > 1
+
+	if multichunk:
+		logger.info("User %s:  Got %s lines in a single message" % (user.id, len(msgs)))
+
+		timingCount = 0
+		for msg in msgs:
+			chunk = Chunk(msg)
+			if chunk.getNattyResult(user):
+				timingCount += 1
+
+		# This makes sure we don't send anything to the user
+		user.overrideKeeperNumber = "null"
+
+		processedCount = 0
+		for msg in msgs:
+			chunk = Chunk(msg)
+			processed, classification, actionScores = keeperEngine.process(user, chunk)
+
+			if processed:
+				processedCount += 1
+
+		# Make sure we can send messages again
+		user.overrideKeeperNumber = None
+
+		# Hack for now, deal with printing out responses to multi-line messages
+		if processedCount == 1:
+			sms_util.sendMsg(user, "Great, processed that")
+		elif processedCount > 1:
+			sms_util.sendMsg(user, "Great, processed those %s things" % processedCount)
+
+		# We don't record the classification on the message since it was multi-line
+	else:
+		chunk = Chunk(msgs[0])
+		processed, classification, actionScores = keeperEngine.process(user, chunk)
+
+		messageObject.auto_classification = classification
+		messageObject.classification_scores_json = json.dumps(actionScores)
+		messageObject.save()
+
+		if not processed:
+			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber())
 
 
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
@@ -60,81 +147,44 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 	# This is true if this is from a manual entry off the history page
 	manual = "Manual" in requestDict
+
+	# Deal with Dup messages (same thing sent in short amount of time)
 	if not manual and isDuplicateMsg(user, msg):
 		logger.info("User %s: Ignoring duplicate message: %s" % (user.id, msg))
 		# TODO figure out better logic so we aren't repeating this statement
 		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
 		return False
 
-	messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
-	slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
-
+	# Deal with keeper number stuff...if its cli or test, we set overrideKeeperNumber
+	# which is looked at in sms_util
 	if user.getKeeperNumber() != keeperNumber and keeper_constants.isRealKeeperNumber(keeperNumber):
 		logger.error("User %s: Recieved message '%s' to number %s but user should be sending to %s" % (user.id, msg, keeperNumber, user.getKeeperNumber()))
 		keeperNumber = user.getKeeperNumber()
 	elif not keeper_constants.isRealKeeperNumber(keeperNumber):
 		user.overrideKeeperNumber = keeperNumber
 
-	processed = False
 	# convert message to unicode
 	if type(msg) == str:
 		msg = msg.decode('utf-8')
 
-	msgs = processSigAndSplitLines(user, msg)
-
-	if len(msgs) > 1:
-		logger.info("User %s:  Got %s lines in a single message" % (user.id, len(msgs)))
-
-	logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
-
+	# Create Message object and post to slack
+	messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
+	slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
 	classification = None
+
 	if not user.paused and not created:
-		count = 0
+		logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))
+
+		# Look at multiline messages, split up and deal with signatures
+		msgs = processSigAndSplitLines(user, msg)
+
 		processed = False
-		continueProcessing = True
-		while not processed and continueProcessing and count < 10:
-			if user.state == keeper_constants.STATE_NORMAL or user.state == keeper_constants.STATE_REMINDER_SENT:
-				keeperEngine = Engine(Engine.DEFAULT, 0.0)
-				processed, classification, actionScores = keeperEngine.process(user, msgs)
+		if user.state in stateCallbacks:
+			processed = processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber)
 
-				messageObject.auto_classification = classification
-				messageObject.classification_scores_json = json.dumps(actionScores)
-				messageObject.save()
-
-				# Reset the state so we know something happened since the reminder was sent
-				# Hacky since we need to know all the states we could be in
-				# Can't simply say !STATE_NORMAL because of TUTORIAL
-
-				# TODO(Derek): Remove this in a while once reminders have been processed...this state is now obsolete
-				if user.state == keeper_constants.STATE_REMINDER_SENT:
-					user.setState(keeper_constants.STATE_NORMAL)
-
-				continueProcessing = False
-			else:
-				# For now, assume all state stuff uses one line
-				# HACKY Should remove later
-				msg = msgs[0]
-				stateModule = stateCallbacks[user.state]
-				logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
-				processed, classification, actionScores = stateModule.process(user, msg, requestDict, keeperNumber)
-				if processed is None:
-					raise TypeError("modules must return True or False for processed")
-
-				if processed:
-					user.last_state = user.state
-					user.save()
-					messageObject.auto_classification = classification
-					messageObject.classification_scores_json = json.dumps(actionScores)
-					messageObject.save()
-					logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
-
-			count += 1
-			if count == 10:
-				logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
-
+		# We might have changed state to NORMAL and it didn't process...so now use engine
 		if not processed:
-			actions.unknown(user, msg, user.getKeeperNumber())
-
+			processWithEngine(user, msgs, messageObject)
 	else:
 		if user.paused:
 			logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))
@@ -149,8 +199,6 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 
 stateCallbacks = {
-	keeper_constants.STATE_NOT_ACTIVATED: not_activated,
-	keeper_constants.STATE_UNKNOWN_COMMAND: unknown_command,
 	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,
 	keeper_constants.STATE_TUTORIAL_MEDICAL: tutorial_medical,
 	keeper_constants.STATE_STOPPED: stopped,

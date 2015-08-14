@@ -3,7 +3,6 @@ import collections
 import operator
 
 from smskeeper import keeper_constants
-from smskeeper.chunk import Chunk
 from smskeeper.engine.stop import StopAction
 from smskeeper.engine.fetch_weather import FetchWeatherAction
 from smskeeper.engine.question import QuestionAction
@@ -36,21 +35,10 @@ class Engine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def process(self, user, msgs):
-		# if the user
+	def process(self, user, chunk):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None
-
-		if not isinstance(msgs, list):
-			msgs = [msgs]
-
-		if len(msgs) == 1:
-			msg = msgs[0]
-		else:
-			msg = '\n'.join(msgs)
-
-		chunk = Chunk(msg)
 
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
 
@@ -76,11 +64,11 @@ class Engine:
 				# Pick the first one after sorting
 				# Later on we might want to look at the 'processed' return code
 				for action in actions:
-					logger.info("User %s: I think '%s' is a %s command" % (user.id, msg, action.ACTION_CLASS))
+					logger.info("User %s: I think '%s' is a %s command" % (user.id, chunk.originalText, action.ACTION_CLASS))
 					processed = action.execute(chunk, user)
 
 					if processed:
-						return processed, action.ACTION_CLASS, actionScores
+						return True, action.ACTION_CLASS, actionScores
 
 		return False, keeper_constants.CLASS_UNKNOWN, actionScores
 

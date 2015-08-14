@@ -9,6 +9,7 @@ from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper import analytics
 from smskeeper.models import Message
+from smskeeper.chunk import Chunk
 
 from smskeeper.engine import Engine
 
@@ -36,7 +37,8 @@ def process(user, msg, requestDict, keeperNumber):
 	)
 
 	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
-	processed, classification, actionScores = keeperEngine.process(user, msg)
+	chunk = Chunk(msg)
+	processed, classification, actionScores = keeperEngine.process(user, chunk)
 
 	if processed:
 		return True, classification, actionScores
@@ -114,7 +116,8 @@ def process(user, msg, requestDict, keeperNumber):
 			return True, keeper_constants.CLASS_NONE, actionScores
 
 		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
-		finishedWithCreate, classification, actionScores = keeperEngine.process(user, msg)
+		chunk = Chunk(msg)
+		finishedWithCreate, classification, actionScores = keeperEngine.process(user, chunk)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text

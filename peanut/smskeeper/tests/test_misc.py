@@ -2,7 +2,7 @@ import datetime
 from mock import patch
 
 from peanut.settings import constants
-from smskeeper.models import User, Entry, Message
+from smskeeper.models import User
 from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
 from django.conf import settings
 

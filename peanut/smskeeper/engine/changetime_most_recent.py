@@ -1,5 +1,4 @@
 import logging
-import re
 import pytz
 import datetime
 
@@ -16,7 +15,7 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGETIME_MOST_RECENT
 
 	basicRegex = r"\b(snooze|again|change)\b"
-	beginsWithRegex = r'^(change|snooze|update) '
+	beginsWithRegex = r'^(change|snooze|update|remind (me )?again) '
 
 	def getScore(self, chunk, user):
 		score = 0.0

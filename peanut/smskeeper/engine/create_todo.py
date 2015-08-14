@@ -1,7 +1,7 @@
 import logging
 import pytz
 
-from common import date_util, natty_util
+from common import date_util
 
 from smskeeper import reminder_util, sms_util, msg_util
 from smskeeper import keeper_constants
@@ -19,8 +19,9 @@ class CreateTodoAction(Action):
 
 	# things that match this RE will get a boost for create
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
-	beginsWithRe = r'^(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
-	anyMatchRegex = r'(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack) '
+	words = "(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call)"
+	beginsWithRe = r'^%s ' % words
+	anyMatchRegex = r'%s ' % words
 
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial

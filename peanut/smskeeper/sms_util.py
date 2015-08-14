@@ -53,6 +53,9 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 	if keeperNumber is None or keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_WEB_NUM] or "test" in keeperNumber:
 		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
+	elif keeperNumber is "null":
+		# Don't save the message, wasn't sent
+		pass
 	elif whatsapp_util.isWhatsappNumber(keeperNumber):
 		logger.info("User %s: sending whatsapp message: %s" % (userId, msgText))
 		whatsapp_util.sendMessage(user.phone_number, msgText, mediaUrl, keeperNumber)

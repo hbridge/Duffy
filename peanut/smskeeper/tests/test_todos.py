@@ -490,6 +490,36 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
+	"""
+	def test_remind_me_again(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+		cliMsg.msg(self.testPhoneNumber, "text dan tomorrow at 10am")
+
+		self.setNow(dateMock, self.TUE_10AM)
+		# Now make sure if we type done, we get a nice response and it gets hidden
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Text dan", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me again")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me today")
+			self.assertIn("9pm", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me in an hour")
+			self.assertIn("by 11am", self.getOutput(mock))
+
+		# Now make it process the record, like the reminder fired
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(1, len(entries))
+	"""
+
 	# Checks to make sure we can mark things as done even if they're not in the regex
 	# This assumes "blah" is a real verb but not in the regex
 	def test_fuzzy_match_done_specific_non_regex(self, dateMock):
