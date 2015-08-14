@@ -74,6 +74,7 @@ module.exports = React.createClass({
 
   refreshEntries: function(e) {
     console.log("refreshing entries");
+    e.preventDefault();
     e.stopPropagation(); // prevent propagation to the header click handler
     this.getCollection().fetch();
   },
