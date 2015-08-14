@@ -20,7 +20,7 @@ class JokeAction(Action):
 	followupRegex = re.compile(r"\b(another)\b", re.I)
 
 	LAST_JOKE_SENT_KEY = "last-joke-sent"
-	JOKE_STEP_KEY = "step"
+	JOKE_STEP_KEY = "step"  # This should be changed to joke-step at some point
 	JOKE_NUM_KEY = "joke-num"
 	JOKE_COUNT_KEY = "joke-recent-count"  # Jokes sent that day
 
@@ -87,7 +87,7 @@ class JokeAction(Action):
 
 		# If we've told too many, then see if they're asking for another
 		# If so, give them a response, if not, kick out for re-processing
-		if recentJokeCount >= 2:
+		if recentJokeCount >= 4:
 			if regexHit:
 				logger.debug("User %s: Hit recentJokeCount for the day and this message matches my regex" % (user.id))
 				sms_util.sendMsg(user, "Let me go write another, ask me again tomorrow")

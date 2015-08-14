@@ -64,6 +64,8 @@ EQUAL_PAUSE = 3
 JOKES = [
 	Joke(RESPONSE, ["What do you call a boomerang that doesn't come back?", "A stick"]),
 	Joke(RESPONSE, ["What do you call two banana peels?", "A pair of slippers"]),
+	Joke(RESPONSE, ["How do you make a tissue dance?", "Put a little boogie in it"]),
+	Joke(RESPONSE, ["What do you call cheese that’s not yours?", "Nacho cheese"]),
 	Joke(RESPONSE, ["Why did the belt get locked up?", "It held up a pair of pants"]),
 	Joke(RESPONSE, ["Where do animals go when their tails fall off?", "The retail store"]),
 	Joke(RESPONSE, ["Why can't you hear a pterodactyl going to the bathroom?", "Because the \"P\" is silent"]),
@@ -80,4 +82,8 @@ JOKES = [
 	Joke(RESPONSE, ["Why did the tomato blush?", "It saw the salad dressing"]),
 	Joke(RESPONSE, ["What did Jay-Z call his girlfriend before they got married?", u"Feyoncé"]),
 	Joke(RESPONSE, ["How many kids with ADHD does it take to change a light bulb?", "Let's go play on our bikes"]),
+	Joke(RESPONSE, ["How do you communicate with a fish?", "Drop it a line"]),
+	Joke(RESPONSE, ["What goes ha ha bonk?", "A man laughing his head off"]),
+	Joke(RESPONSE, ["What did the egg say to the frying pan?", "You crack me up"]),
+	Joke(RESPONSE, ["What is smarter than a talking bird?", "A spelling bee"]),
 ]
