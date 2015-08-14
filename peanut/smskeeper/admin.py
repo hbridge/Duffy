@@ -129,9 +129,15 @@ class ToCheck(ReminderAdmin):
 	approve_button.short_description = 'Approve'
 	approve_button.allow_tags = True
 
+	def creator_with_link(self, obj):
+		# This uses javascript from admin.js
+		return safestring.mark_safe('<a href=\'/smskeeper/history?user_id=%s\'/>%s&nbsp;-&nbsp;%s</a>' % (obj.creator.id, obj.creator.id, obj.creator.name))
+	creator_with_link.short_description = 'Id'
+	creator_with_link.allow_tags = True
+
 	actions = [mark_as_approved, mark_as_hidden]
 
-	list_display = ('id', 'approve_button', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_recur', 'reminder_sent', 'updated')
+	list_display = ('id', 'approve_button', 'creator_with_link', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_recur', 'reminder_sent', 'updated')
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
