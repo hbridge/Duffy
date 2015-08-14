@@ -107,7 +107,7 @@ var KeeperApp = React.createClass({
   			   { messageRows }
         </div>
         <UserInfo />
-        <SendControl onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused}/>
+        <SendControl onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused} user={USER}/>
         <AdminEntriesView collection={entryList} />
       </div>
 		);

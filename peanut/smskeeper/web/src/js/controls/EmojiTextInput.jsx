@@ -92,6 +92,10 @@ module.exports = React.createClass({
 	    if (originalText != emojifiedText) {
 	      this.refs.text.getInputDOMNode().value = emojifiedText;
 	    }
+
+	    if (this.props.onTextChange) {
+	    	this.props.onTextChange(emojifiedText);
+	    }
   	},
 
   	handleEmojiClicked: function(emojiKey) {

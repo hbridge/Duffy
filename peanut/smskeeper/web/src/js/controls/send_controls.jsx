@@ -18,7 +18,15 @@ module.exports = React.createClass({
   },
 
   getInitialState: function() {
-    return {loading: false, simulateOn: false};
+    return {loading: false, simulateOn: false, sendDisabled: true};
+  },
+
+  handleTextChanged: function(text){
+    if (text.length > 0 && this.props.user.state != "stopped") {
+      this.setState({"sendDisabled" : false});
+    } else {
+      this.setState({"sendDisabled" : true});
+    }
   },
 
   handlePostMsgSubmit: function(e) {
@@ -70,7 +78,17 @@ module.exports = React.createClass({
     if (this.state.simulateOn) {
       sendText = this.state.paused ? "Unpause & Simulate" : "Simulate";
     }
-    var userPausedText = this.state.paused ? "Paused" : "Normal";
+    var userStateText = "Normal";
+    if (this.props.user.state == "stopped") {
+      userStateText = "STOPPED"
+    } else if (this.state.paused) {
+      userStateText = "Paused";
+    }
+
+    if (this.props.user.state != "normal") {
+      userStateText = userStateText + " (" + this.props.user.state + ")";
+    }
+
     var pauseButtonText = this.state.paused ? "Unpause" : "Pause";
 
     if (this.state.loading) {
@@ -101,7 +119,7 @@ module.exports = React.createClass({
 
 
     var header = <div>
-      <span className="panelTitle">{userPausedText}</span>
+      <span className="panelTitle">{userStateText}</span>
       {pauseElement}
     </div>
 
@@ -109,11 +127,11 @@ module.exports = React.createClass({
 
       <Panel
         header={header}
-        bsStyle={this.state.paused ? 'danger' : 'primary'}
+        bsStyle={(this.state.paused || this.props.user.state == "stopped") ? 'danger' : 'primary'}
         className="controlPanel"
       >
         <form className='inputElement' onSubmit={this.createEntry}>
-          <EmojiTextInput ref='text' addonBefore={crMenu}/>
+          <EmojiTextInput ref='text' addonBefore={crMenu} onTextChange={this.handleTextChanged}/>
           <Input
             type='checkbox'
             ref='simulateUserToggle'
