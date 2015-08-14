@@ -4,7 +4,7 @@ from mock import patch
 
 from smskeeper.models import Entry
 from smskeeper import cliMsg
-from smskeeper import async
+from smskeeper import async, keeper_constants
 
 import test_base
 
@@ -1321,7 +1321,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Call Va, and registration at 9am tomorrow\nPay electric and water bill at 8 am tomorrow.")
-			self.assertIn("processed those 2 things", self.getOutput(mock))
+			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.assertNotIn("tomorrow", self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")
@@ -1335,7 +1335,22 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Call Va, and registration\nPay electric and water bill")
-			self.assertIn("processed those 2 things", self.getOutput(mock))
+			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEquals(2, len(entries))
+		self.assertEqual(self.TUE_9AM, entries[0].remind_timestamp)
+		self.assertIn("Call Va", entries[0].text)
+		self.assertEqual(self.TUE_9AM, entries[1].remind_timestamp)
+		self.assertIn("Pay", entries[1].text)
+
+	def test_multi_line_todo_list(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "todo list:\nCall Va, and registration\nPay electric and water bill")
+			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEquals(2, len(entries))

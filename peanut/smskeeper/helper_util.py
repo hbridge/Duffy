@@ -1,9 +1,10 @@
-import time
+
 from smskeeper import sms_util
 import random
 import keeper_constants
 import phonenumbers
 from phonenumbers import geocoder
+
 
 def sendNotFoundMessage(user, label, keeperNumber):
 	if label == keeper_constants.REMIND_LABEL:
@@ -11,8 +12,10 @@ def sendNotFoundMessage(user, label, keeperNumber):
 	label = label.replace("#", "")
 	sms_util.sendMsg(user, "You don't have anything in your %s list. Say 'add ITEM to %s' to add something to it." % (label, label), None, keeperNumber)
 
+
 def randomAcknowledgement():
 	return random.choice(keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+
 
 def isUSRegionCode(phoneNumber):
 	number = phonenumbers.parse(phoneNumber, None)

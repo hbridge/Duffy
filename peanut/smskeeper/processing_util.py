@@ -7,7 +7,7 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import stopped, tutorial_todo, tutorial_medical, suspended
-from smskeeper import actions, user_util, sms_util
+from smskeeper import actions, user_util, sms_util, helper_util
 from smskeeper.chunk import Chunk
 
 from smskeeper.models import User, Message
@@ -112,22 +112,22 @@ def processWithEngine(user, msgs, messageObject):
 		# This makes sure we don't send anything to the user
 		user.overrideKeeperNumber = "null"
 
-		processedCount = 0
+		allProcessed = True
 		for msg in msgs:
 			chunk = Chunk(msg)
-			processed, classification, actionScores = keeperEngine.process(user, chunk)
+			chunkProcessed, classification, actionScores = keeperEngine.process(user, chunk)
 
-			if processed:
-				processedCount += 1
+			if not chunkProcessed:
+				allProcessed = False
 
 		# Make sure we can send messages again
 		user.overrideKeeperNumber = None
 
 		# Hack for now, deal with printing out responses to multi-line messages
-		if processedCount == 1:
-			sms_util.sendMsg(user, "Great, processed that")
-		elif processedCount > 1:
-			sms_util.sendMsg(user, "Great, processed those %s things" % processedCount)
+		if allProcessed:
+			sms_util.sendMsg(user, "%s" % helper_util.randomAcknowledgement())
+		else:
+			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber())
 
 		# We don't record the classification on the message since it was multi-line
 	else:
