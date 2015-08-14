@@ -10,9 +10,15 @@ class Chunk:
 	originalText = None
 	commandWords = []
 	nattyResult = None
+	isPartOfMultiChunk = False
+	lineNum = 0
 
-	def __init__(self, originalText):
+	def __init__(self, originalText, isPartOfMultiChunk=False, lineNum=0):
 		self.originalText = originalText
+
+		if isPartOfMultiChunk:
+			self.isPartOfMultiChunk = isPartOfMultiChunk
+			self.lineNum = lineNum
 
 	def contractedText(self):
 		return ""

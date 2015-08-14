@@ -113,12 +113,14 @@ def processWithEngine(user, msgs, messageObject):
 		user.overrideKeeperNumber = "null"
 
 		allProcessed = True
+		lineCount = 0
 		for msg in msgs:
-			chunk = Chunk(msg)
+			chunk = Chunk(msg, True, lineCount)
 			chunkProcessed, classification, actionScores = keeperEngine.process(user, chunk)
 
 			if not chunkProcessed:
 				allProcessed = False
+			lineCount += 1
 
 		# Make sure we can send messages again
 		user.overrideKeeperNumber = None

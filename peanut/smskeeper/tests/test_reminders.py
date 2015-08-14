@@ -1359,6 +1359,26 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(self.TUE_9AM, entries[1].remind_timestamp)
 		self.assertIn("Pay", entries[1].text)
 
+		self.assertFalse(self.getTestUser().paused)
+
+	def test_multi_line_unknown_for_one(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "wub wub\nCall Va, and registration\nPay electric and water bill")
+			# We should be pausing, so no output
+			self.assertEqual("", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEquals(2, len(entries))
+		self.assertEqual(self.TUE_9AM, entries[0].remind_timestamp)
+		self.assertIn("Call Va", entries[0].text)
+		self.assertEqual(self.TUE_9AM, entries[1].remind_timestamp)
+		self.assertIn("Pay", entries[1].text)
+
+		self.assertTrue(self.getTestUser().paused)
+
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
 	def test_tomorrow_afternoon(self, dateMock):
