@@ -93,7 +93,7 @@ var EntryList = Backbone.Collection.extend({
     var sorted = notHidden.sort(function(a, b){
       var dateA = new Date(a.get("remind_timestamp"));
       var dateB = new Date(b.get("remind_timestamp"));
-      return dateB - dateA;
+      return dateA - dateB; // soonest reminder first
     });
     return(sorted);
   },
@@ -101,9 +101,9 @@ var EntryList = Backbone.Collection.extend({
   hiddenReminders: function() {
     var hidden = this.where({label: "#reminders", hidden: true})
     var sorted = hidden.sort(function(a, b){
-      var dateA = new Date(a.get("udpated"));
+      var dateA = new Date(a.get("updated"));
       var dateB = new Date(b.get("updated"));
-      return dateB - dateA;
+      return dateB - dateA; // most recently updated decending
     });
     return(sorted);
   }
