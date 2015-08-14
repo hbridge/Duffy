@@ -405,7 +405,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "you tell me")
 			self.assertEqual("A pair of slippers", self.getOutput(mock))
 
-		# Now we should be out
+		# ask two more jokes, should have answers
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
+			cliMsg.msg(self.testPhoneNumber, "I dunno")
+			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
+			cliMsg.msg(self.testPhoneNumber, "I dunno")
+			self.assertNotIn("ask me again", self.getOutput(mock))
+
+		# Now should be out
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tell me another joke")
 			self.assertIn("ask me again", self.getOutput(mock))

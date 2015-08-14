@@ -19,17 +19,17 @@ class ChangetimeSpecificAction(ChangetimeAction):
 		bestEntries = self.getEntriesToExecuteOn(chunk, user)
 		okEntries = self.getEntriesToExecuteOn(chunk, user, 65)
 		regexHit = chunk.matches(self.snoozeRegex)
-		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST) or (user.state == keeper_constants.STATE_REMINDER_SENT)
+		justNotifiedEntries = user.getLastEntries()
 
 		if regexHit and len(bestEntries) > 0:
-			if justNotified:
+			if len(set(bestEntries).intersection(set(justNotifiedEntries))) > 0:
 				score = 0.6
 			else:
 				score = 0.3
 
 		if nattyResult and len(bestEntries) > 0:
-			if justNotified:
-				score = 0.9
+			if len(set(bestEntries).intersection(set(justNotifiedEntries))) > 0:
+				score = 0.8
 			else:
 				score = 0.7
 

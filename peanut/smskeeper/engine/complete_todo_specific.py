@@ -32,7 +32,7 @@ class CompleteTodoSpecificAction(Action):
 			score = 0.9
 
 		if hasTimingInfo:
-			score -= .2
+			score -= .15
 
 		if CompleteTodoSpecificAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
