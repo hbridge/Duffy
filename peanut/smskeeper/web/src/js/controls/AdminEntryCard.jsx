@@ -50,7 +50,7 @@ module.exports = React.createClass({
       						<option value='weekly'>Weekly Reccurring</option>
       						<option value='monthly'>Monthly Reccurring</option>
     					</Input>
-    					<Input ref="hidden" type='checkbox' label="Hidden" />
+    					<Input ref="hidden" type='checkbox' label="Hidden" defaultChecked={this.state.model.hidden}/>
     					<Button
 	    					onClick={this.onSave}
 	    					bsStyle="primary"

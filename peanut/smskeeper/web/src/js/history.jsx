@@ -107,15 +107,18 @@ var KeeperApp = React.createClass({
   			   { messageRows }
         </div>
         <UserInfo />
-        <SendControl onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused} user={USER}/>
-        <AdminEntriesView collection={entryList} />
+        <div id="adminControls">
+          <SendControl onCommentSubmit={this.handleCommentSubmit} paused={this.state.paused} user={USER}/>
+          <AdminEntriesView type="active" collection={entryList} defaultExpanded={true}/>
+          <AdminEntriesView type="hidden" collection={entryList} defaultExpanded={false}/>
+        </div>
       </div>
 		);
 	},
 
   componentDidUpdate: function() {
     if (!firstLoadComplete) {
-      $("html,body").scrollTop($(document).height());
+      $("html,body").scrollTop($("#adminControls").offset().top);
       firstLoadComplete = true;
     }
   },

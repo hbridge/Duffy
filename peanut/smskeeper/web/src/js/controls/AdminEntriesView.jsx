@@ -17,6 +17,10 @@ AdminEntryCard = require('./AdminEntryCard.jsx');
 
 module.exports = React.createClass({
   mixins: [BackboneReactComponent],
+  getInitialState() {
+    return {expanded: this.props.defaultExpanded};
+  },
+
   render: function() {
     var createEntry = function(entry, index) {
       return (
@@ -24,8 +28,8 @@ module.exports = React.createClass({
       );
     }.bind(this);
 
-    var header = <div>
-      <span className="panelTitle">Active Reminders</span>
+    var header = <div onClick={this.handleHeaderClicked}>
+      <span className="panelTitle">{this.props.type == "hidden" ? "Recently Hidden" : "Active"} Reminders</span>
       <Button
         ref='refreshButton'
         onClick={this.refreshEntries}
@@ -34,22 +38,43 @@ module.exports = React.createClass({
       </Button>
     </div>
 
+    var reminders = null;
+    if (this.props.type == "hidden") {
+      reminders = this.props.collection.hiddenReminders();
+      var recentPast = moment().subtract(2, 'days');
+      reminders = reminders.filter(function(reminder){
+        var updated = moment(reminder.get('updated'));
+        return updated.isAfter(recentPast);
+      });
+    } else {
+      reminders = this.props.collection.reminders();
+    }
+
     return (
     	<Panel
         header={header}
-        bsStyle={this.state.paused ? 'danger' : 'primary'}
+        bsStyle={this.props.type == "hidden" ? "default" : "primary"}
         className="controlPanel"
+        collapsible
+        expanded={this.state.expanded}
       >
         <ListGroup>
-      		{ this.props.collection.reminders().map(createEntry) }
+      		{ reminders.map(createEntry) }
         </ListGroup>
           <CreateEntryInput />
       </Panel>
     );
   },
 
-  refreshEntries: function() {
+  handleHeaderClicked(e) {
+    e.preventDefault();
+    console.log("handleHeaderClicked");
+    this.setState({expanded: !this.state.expanded});
+  },
+
+  refreshEntries: function(e) {
     console.log("refreshing entries");
+    e.stopPropagation(); // prevent propagation to the header click handler
     this.getCollection().fetch();
   },
 

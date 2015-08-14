@@ -96,6 +96,16 @@ var EntryList = Backbone.Collection.extend({
       return dateB - dateA;
     });
     return(sorted);
+  },
+
+  hiddenReminders: function() {
+    var hidden = this.where({label: "#reminders", hidden: true})
+    var sorted = hidden.sort(function(a, b){
+      var dateA = new Date(a.get("udpated"));
+      var dateB = new Date(b.get("updated"));
+      return dateB - dateA;
+    });
+    return(sorted);
   }
 });
 
