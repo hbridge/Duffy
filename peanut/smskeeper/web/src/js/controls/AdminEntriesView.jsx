@@ -50,6 +50,11 @@ module.exports = React.createClass({
       reminders = this.props.collection.reminders();
     }
 
+    var createEntryInput = null;
+    if (this.props.type != "hidden") {
+      createEntryInput = <CreateEntryInput />
+    }
+
     return (
     	<Panel
         header={header}
@@ -61,7 +66,7 @@ module.exports = React.createClass({
         <ListGroup>
       		{ reminders.map(createEntry) }
         </ListGroup>
-          <CreateEntryInput />
+        { createEntryInput }
       </Panel>
     );
   },
