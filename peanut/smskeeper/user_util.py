@@ -67,7 +67,9 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 
 	logger.debug("User %s: Just created user from keeperNumber %s to tutorial %s" % (user.id, keeperNumber, tutorialState))
 
-	sms_util.sendMsgs(user, msgsToSend)
+	# Here we need to pass in the keeperNumber in the case of cli
+	# Normally the overrideKeeper number is set in processing_util, but this code is run before that
+	sms_util.sendMsgs(user, msgsToSend, keeperNumber=keeperNumber)
 
 	analytics.logUserEvent(
 		user,

@@ -136,7 +136,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 			actions.unknown(user, msg, user.getKeeperNumber())
 
 	else:
-		logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))
+		if user.paused:
+			logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))
+		elif created:
+			logger.debug("User %s: not processing '%s' because they were just created...so msgs should have been sent" % (user.id, msg))
 
 	analytics.logUserEvent(
 		user,
