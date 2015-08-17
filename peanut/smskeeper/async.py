@@ -76,6 +76,7 @@ def updateEntryAfterProcessing(entry):
 			newRemindTimestamp = entry.remind_timestamp + relativedelta(months=1)
 		elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_DAYS:
 			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=2)
+		#  TODO(Derek) add in weekday reminder
 
 		# If we don't have a remind end or if the new remind stamp is before the end, create a new entry
 		if ((entry.remind_recur_end and newRemindTimestamp and newRemindTimestamp < entry.remind_recur_end or not entry.remind_recur_end)):
