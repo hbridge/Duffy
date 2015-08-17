@@ -74,6 +74,9 @@ class User(models.Model):
 	TEMP_FORMAT_CHOICES = [(x, x) for x in ["imperial", "metric"]]
 	temp_format = models.CharField(max_length=10, default="imperial", choices=TEMP_FORMAT_CHOICES)
 
+	done_count = models.IntegerField(default=0)
+	create_todo_count = models.IntegerField(default=0)
+
 	overrideKeeperNumber = None
 
 	def history(self):
