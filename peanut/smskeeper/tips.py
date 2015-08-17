@@ -59,7 +59,8 @@ DONE_TIP1_ID = "mini-done1"
 DONE_TIP2_ID = "mini-done2"
 DONE_TIP3_ID = "mini-done3"
 
-DIGEST_TIP_ID = "mini-digest"
+DIGEST_DONE_TIP_ID = "mini-digest-done"
+DIGEST_SNOOZE_TIP_ID = "mini-digest-snooze"
 DIGEST_QUESTION_TIP_ID = "mini-digest-question"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
@@ -128,8 +129,13 @@ SMSKEEPER_TIPS = [
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
-		DIGEST_TIP_ID,
-		keeper_constants.REMINDER_DIGEST_INSTRUCTIONS,
+		DIGEST_DONE_TIP_ID,
+		keeper_constants.REMINDER_DIGEST_DONE_INSTRUCTIONS,
+		type=MINI_TIP_TYPE
+	),
+	KeeperTip(
+		DIGEST_SNOOZE_TIP_ID,
+		keeper_constants.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(

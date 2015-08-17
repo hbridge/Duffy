@@ -216,10 +216,10 @@ REMINDER_DIGEST_HEADERS = [
 	u"Sunday funday! \U0001F366"
 ]
 
-REMINDER_DIGEST_INSTRUCTIONS = (
-	":white_check_mark: To check a task off, tell me what you're done with, like 'Done with calling Mom'"
-	+ "\n:sleeping_symbol: To snooze a task, just tell me when I should remind you, like 'Snooze buy flip flops to Saturday'"
-)
+REMINDER_DIGEST_DONE_INSTRUCTIONS = ":white_check_mark: To check a task off, tell me what you're done with, like 'Done with calling Mom'"
+
+
+REMINDER_DIGEST_SNOOZE_INSTRUCTIONS = ":sleeping_symbol: To snooze a task, just tell me when I should remind you, like 'Snooze buy flip flops to Saturday'"
 
 REMINDER_DIGEST_EMPTY = [
 	u"No tasks for today. Let's start the week off right by tracking all you have to do! \U0001F60E",
@@ -235,7 +235,8 @@ HELP_MESSAGES = [
 	u":raising_hand: Hi! I'm an automated digital assistant here to help you get things done.",
 	u"Send me what you need to get done (and when) and I'll txt you back at the right time.",
 	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
-	REMINDER_DIGEST_INSTRUCTIONS
+	REMINDER_DIGEST_DONE_INSTRUCTIONS,
+	REMINDER_DIGEST_SNOOZE_INSTRUCTIONS
 ]
 
 HELP_MESSAGES_OLD = [

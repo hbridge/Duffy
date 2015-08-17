@@ -859,22 +859,22 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	"""
 
 	# Make sure we send instructions
-	def test_instructions_after_first_daily_digest(self, dateMock):
+	def test_instructions_after_daily_digest(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad this afternoon")
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_INSTRUCTIONS), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_DONE_INSTRUCTIONS), self.getOutput(mock))
 
-		# make sure it only goes out once
-		self.setNow(dateMock, self.WED_9AM)
+		# make sure after 3 days, we now do the snooze
+		self.setNow(dateMock, self.FRI_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertNotIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_INSTRUCTIONS), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS), self.getOutput(mock))
 
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_week(self, dateMock):

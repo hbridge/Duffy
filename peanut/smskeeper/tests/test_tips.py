@@ -95,8 +95,8 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn(tips.SMSKEEPER_TIPS[1].render(self.user), self.getOutput(mock))
 
 	def testTipSameDaySignupAllMiniTipsGoFirst(self, dateMock):
-		self.setNow(dateMock, self.MON_11AM)
-		self.setupUser(True, True, "UTC", dateMock)
+		self.setupUser(True, True, "EST", dateMock)
+		self.setNow(dateMock, self.MON_3PM)
 
 		# Set product_id = 1, so daily digests are enabled.
 		user = self.getTestUser()
@@ -105,7 +105,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		user.save()
 
 		# Now set the time to first tip delivery time later that day
-		self.setNow(dateMock, self.MON_2PM)
+		self.setNow(dateMock, self.MON_6PM)
 
 		# Try to send a tip on first day's 6pm timeslot
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -116,14 +116,14 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "remind me to poop tmrw")
 
 		# Now send out digest and its minitip
-		self.setNow(dateMock, self.TUE_5AM) # set clock ahead by 15 hours to 9am
+		self.setNow(dateMock, self.TUE_9AM)  # set clock ahead by 15 hours to 9am
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn('To snooze a task', self.getOutput(mock))		
+			self.assertIn('done', self.getOutput(mock))
 
-		# Now send out the vcard later that day
-		self.setNow(dateMock, self.TUE_2PM)
-		
+		# Now send out the first time later that day (medicine)
+		self.setNow(dateMock, self.TUE_6PM)
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
 			self.assertIn("medicine", self.getOutput(mock))
