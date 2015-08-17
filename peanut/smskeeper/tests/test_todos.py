@@ -5,7 +5,7 @@ import pytz
 from mock import patch
 import logging
 
-from smskeeper import cliMsg, async, keeper_constants
+from smskeeper import cliMsg, async, keeper_constants, tips
 from smskeeper.models import Entry, Message
 
 import test_base
@@ -124,7 +124,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			# Should be 9 am next day, so in 11 hours
 			self.assertIn("today by 11pm", self.getOutput(mock))
 
-	# Make sure first reminder we send snooze tip, then second we don't
 	def test_done_hides(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -133,10 +132,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.get(label="#reminders")
 
-		# Make sure the snooze tip came through
+		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("let me know when you're done", self.getOutput(mock))
+
+			foundMiniTip = False
+			for tip in tips.DONE_MINI_TIPS_LIST:
+				if tip.message in self.getOutput(mock):
+					foundMiniTip = True
+			self.assertTrue(foundMiniTip, self.getOutput(mock))
 
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -562,10 +566,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make it process the record, like the reminder fired
 		firstEntry = Entry.objects.filter(label="#reminders").last()
 
-		# Make sure the snooze tip came through
+		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(firstEntry)
-			self.assertIn("let me know when you're done", self.getOutput(mock))
+			foundMiniTip = False
+			for tip in tips.DONE_MINI_TIPS_LIST:
+				if tip.message in self.getOutput(mock):
+					foundMiniTip = True
+			self.assertTrue(foundMiniTip, self.getOutput(mock))
 
 		# Make sure we create a new entry and don't treat as a followup
 		with patch('smskeeper.sms_util.recordOutput') as mock:

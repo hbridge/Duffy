@@ -3,7 +3,7 @@ import pytz
 from mock import patch
 
 from smskeeper.models import Entry
-from smskeeper import cliMsg
+from smskeeper import cliMsg, tips
 from smskeeper import async, keeper_constants
 
 import test_base
@@ -615,8 +615,8 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure two seperate entries were create
 		self.assertEquals(3, len(Entry.objects.filter(label="#reminders")))
 
-	# Make sure first 3 tips are "done", and 4th is snooze
-	def test_mini_tips(self, dateMock):
+	# Make sure first tips are done until we say "done" 3 times
+	def test_done_mini_tips(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
@@ -625,7 +625,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Just let me know when you're done", self.getOutput(mock))
+			foundMiniTip = False
+			for tip in tips.DONE_MINI_TIPS_LIST:
+				if tip.message in self.getOutput(mock):
+					foundMiniTip = True
+			self.assertTrue(foundMiniTip, self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "done")
 
 		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me take medicine in 1 minute")
@@ -633,7 +638,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Let me know when you're done", self.getOutput(mock))
+			foundMiniTip = False
+			for tip in tips.DONE_MINI_TIPS_LIST:
+				if tip.message in self.getOutput(mock):
+					foundMiniTip = True
+			self.assertTrue(foundMiniTip, self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "done")
 
 		self.setNow(dateMock, self.MON_10AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me go poop in 1 minute")
@@ -641,7 +651,12 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure the done tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Btw, let me know when you're done", self.getOutput(mock))
+			foundMiniTip = False
+			for tip in tips.DONE_MINI_TIPS_LIST:
+				if tip.message in self.getOutput(mock):
+					foundMiniTip = True
+			self.assertTrue(foundMiniTip, self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "done")
 
 		self.setNow(dateMock, self.TUE_8AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me something different in 1 minute")

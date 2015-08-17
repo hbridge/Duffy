@@ -30,6 +30,10 @@ class KeeperTip():
 	def renderMini(self):
 		return self.message
 
+	def __str__(self):
+		return self.message
+
+
 FULL_TIP_TYPE = "full"
 MINI_TIP_TYPE = "mini"
 
@@ -135,8 +139,22 @@ SMSKEEPER_TIPS = [
 	),
 ]
 
+
+def tipWithId(tipId):
+	for tip in SMSKEEPER_TIPS:
+		if tip.id == tipId:
+			return tip
+	return None
+
+
 SMSKEEPER_TIP_FOOTER = "Want fewer tips? Type 'send me tips weekly/monthly/never'"
 SMSKEEPER_TIP_HOUR = 18
+
+DONE_MINI_TIPS_LIST = [
+	tipWithId(DONE_TIP1_ID),
+	tipWithId(DONE_TIP2_ID),
+	tipWithId(DONE_TIP3_ID)
+]
 
 
 def isEligibleForTip(user):
@@ -200,13 +218,6 @@ def selectNextFullTip(user):
 			return tipWithId(tipId)
 
 
-def tipWithId(tipId):
-	for tip in SMSKEEPER_TIPS:
-		if tip.id == tipId:
-			return tip
-	return None
-
-
 # isMini means that its a mini message so we don't record the last time it was sent, just that it was
 def markTipSent(user, tip, customSentDate=None, isMini=False):
 	date = customSentDate if customSentDate is not None else date_util.now(pytz.utc)
@@ -257,12 +268,5 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 			"Local Hour of Day": localHour
 		},
 	)
-
-
-def getTipFromId(tipId):
-	for tip in SMSKEEPER_TIPS:
-		if tip.id == tipId:
-			return tip
-	return None
 
 
