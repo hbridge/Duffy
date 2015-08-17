@@ -106,17 +106,6 @@ var CreateEntryInput = React.createClass({
   getInitialState: function(){
     return {sendDisabled: true}
   },
-
-  componentDidMount: function() {
-    $(this.refs.text.getInputDOMNode()).keydown(function (e) {
-        if (e.ctrlKey && (e.keyCode == 13 || e.keyCode == 10)) {
-          if (!this.state.sendDisabled) {
-            this.createEntry(e);
-          }
-      }
-    }.bind(this));
-  },
-
   render: function() {
     var createButton =
       <Button
