@@ -72,7 +72,8 @@ class CompleteTodoMostRecentAction(Action):
 			"Completed Todo",
 			{
 				"Done Type": "Contextual",
-				"Todo Count": len(entries)
+				"Todo Count": len(entries),
+				"Done Count": user.done_count
 			}
 		)
 
