@@ -46,6 +46,10 @@ PILLS_TIP_ID = "pills"
 WEATHER_TIP_ID = "weather"
 BIRTHDAY_TIP_ID = "birthday"
 JOKE_TIP_ID = "joke"
+PAY_BILLS_TIP_ID = "bills"
+GROCERY_LIST_TIP_ID = "grocery-list"
+TRASH_DAY_TIP_ID = "trash-day"
+
 
 SNOOZE_TIP_ID = "mini-snooze"
 
