@@ -58,6 +58,8 @@ class CompleteTodoSpecificAction(Action):
 
 		if msgBack:
 			sms_util.sendMsg(user, msgBack)
+			user.done_count += 1
+			user.save()
 		else:
 			logger.info("User %s: I thought '%s' was a completetodo specific command but couldn't find an entry to match on, pausing" % (user.id, chunk.originalText))
 			paused = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False)

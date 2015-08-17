@@ -1896,6 +1896,18 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "done with court August 5")
 			self.assertIn("Nice!", self.getOutput(mock))
 
+	# Make sure we can say "done" to a weekly task and the task still shows up next time
+	def test_create_and_done_counts(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Go poop tomorrow")
+		self.assertEqual(1, self.getTestUser().create_todo_count)
+
+		cliMsg.msg(self.testPhoneNumber, "done")
+		self.assertEqual(1, self.getTestUser().done_count)
+
 	def test_question_and_remidners(self, dateMock):
 		self.setupUser(dateMock)
 

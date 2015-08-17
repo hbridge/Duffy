@@ -64,6 +64,8 @@ class CompleteTodoMostRecentAction(Action):
 
 		if msgBack:
 			sms_util.sendMsg(user, msgBack)
+			user.done_count += 1
+			user.save()
 
 		analytics.logUserEvent(
 			user,

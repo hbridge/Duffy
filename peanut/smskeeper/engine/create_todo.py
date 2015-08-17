@@ -109,6 +109,8 @@ class CreateTodoAction(Action):
 			return False
 		else:
 			reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+			user.create_todo_count += 1
+			user.save()
 
 			# This is used by remind_util to see if something is a followup
 			user.setStateData(keeper_constants.LAST_ACTION_KEY, date_util.unixTime(date_util.now(pytz.utc)))
