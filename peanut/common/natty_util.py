@@ -45,6 +45,9 @@ def getNattyResult(msg, user):
 	if len(nattyResults) == 0:
 		return None
 
+	for n in nattyResults:
+		logger.debug("User %s: Starting natty result %s" % (user.id, n))
+
 	now = date_util.now(pytz.utc)
 
 	startlen = len(nattyResults)
@@ -212,7 +215,7 @@ def fixMsgForNatty(msg, user):
 		newMsg = replace(newMsg, oldtime, newtime)
 
 	# Change '4th' to 'June 4th'
-	dayOfMonth = re.search(r'\bthe (?P<time>(1st|2nd|3rd|[0-9]+th))', newMsg, re.IGNORECASE)
+	dayOfMonth = re.search(r'\bthe (?P<time>([0-9]{1,2}th|[0-9]{1,2}st|[0-9]{1,2}rd))', newMsg, re.IGNORECASE)
 	if dayOfMonth:
 		localtime = date_util.now(user.getTimezone())
 
@@ -244,6 +247,7 @@ def fixMsgForNatty(msg, user):
 		newStr = replace(match, "-", " to ")
 		newMsg = replace(newMsg, match, newStr)
 
+	logger.debug("User %s: Sending to natty '%s'" % (user.id, newMsg))
 	return newMsg
 
 
