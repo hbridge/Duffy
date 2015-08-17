@@ -134,7 +134,11 @@ def process(user, msg, requestDict, keeperNumber):
 			keeperNumber)
 
 		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
-		sms_util.sendMsg(user, u"Oh and I'll also send your daily tasks in the morning \U0001F304 with weather forecast for that day \U0001F31E.", None, keeperNumber, eta=delayedTime)
+		if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
+			sms_util.sendMsg(user, u"Oh and here's my card. Tap it to save me to your address book. That way you'll know it's me when you get reminders :sunglasses:", keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
+			sms_util.sendMsg(user, u"ps: I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E", None)
+		else:
+			sms_util.sendMsg(user, u"Oh and I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks.", None, eta=delayedTime)
 		user.setTutorialComplete()
 		classification = keeper_constants.CLASS_CREATE_TODO
 

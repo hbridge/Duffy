@@ -50,7 +50,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		self.setMockDatetimeDaysAhead(dateMock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS + 1, customHour, self.user.getTimezone())
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
+			self.assertIn("medicine", self.getOutput(mock))
 
 	def testSendTips(self, dateMock):
 		self.setupUser(True, True, "UTC", dateMock)
@@ -59,7 +59,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		self.setMockDatetimeToSendTip(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
+			self.assertIn("medicine", self.getOutput(mock))
 
 		# ensure tip 2 gets sent out
 		self.setMockDatetimeDaysAhead(dateMock, keeper_constants.DEFAULT_TIP_FREQUENCY_DAYS * 2, tips.SMSKEEPER_TIP_HOUR)
@@ -126,7 +126,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
+			self.assertIn("medicine", self.getOutput(mock))
 
 
 
@@ -152,7 +152,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 		# make sure we send them soon after activation
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.sendTips(constants.SMSKEEPER_TEST_NUM)
-			self.assertIn(tips.SMSKEEPER_TIPS[0].render(self.user), self.getOutput(mock))
+			self.assertIn("medicine", self.getOutput(mock))
 
 		self.setMockDatetimeDaysAhead(dateMock, 7, tips.SMSKEEPER_TIP_HOUR)
 

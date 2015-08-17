@@ -35,7 +35,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind me to call jesus tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("daily tasks", self.getOutput(mock))
+			self.assertIn("address book", self.getOutput(mock))
 
 	# Make sure that we ignore all messages without zip codes for 20 seconds during tutorial
 	def test_tutorial_only_barfs_after_2_minutes(self, dateMock):

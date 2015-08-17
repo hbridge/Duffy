@@ -17,10 +17,8 @@ class KeeperTip():
 		self.mediaUrl = mediaUrl
 		self.type = type
 
-	# Render a tip for a full tip, like vcard
+	# Render a tip for a full tip
 	def render(self, user):
-		if self.id == VCARD_TIP_ID:
-			self.mediaUrl = getKeeperVCard(user)
 		result = self.message
 		result = result.replace(":NAME:", user.name)
 		result = result.replace(":APP_URL:", user.getWebAppURL())
@@ -40,7 +38,6 @@ WEB_APP_TIP_ID = "webapp"
 PHOTOS_TIP_ID = "photos"
 SHARING_TIP_ID = "sharing"
 VOICE_TIP_ID = "voice"
-VCARD_TIP_ID = "vcard"
 DONE_ALL_TIP_ID = "done-all"
 PILLS_TIP_ID = "pills"
 WEATHER_TIP_ID = "weather"
@@ -63,11 +60,6 @@ DIGEST_QUESTION_TIP_ID = "mini-digest-question"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
-	KeeperTip(
-		VCARD_TIP_ID,
-		"Hey :NAME:, here's my card.  Tap it and save me to your address book so it's easier to txt me!",
-		type=FULL_TIP_TYPE
-	),
 	KeeperTip(
 		PILLS_TIP_ID,
 		"Pro tip: I can help remind you to take your medicine and other frequent tasks. :pill: Just say 'Remind me to take my medicine every day' etc",
@@ -204,9 +196,6 @@ def selectNextFullTip(user):
 					break
 			if not hasShared:
 				return tipWithId(tipId)
-		elif tipId == "vcard":
-			if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
-				return tipWithId(tipId)
 		else:
 			return tipWithId(tipId)
 
@@ -268,13 +257,6 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 			"Local Hour of Day": localHour
 		},
 	)
-
-
-def getKeeperVCard(user):
-	if user.product_id == keeper_constants.TODO_PRODUCT_ID:
-		return keeper_constants.KEEPER_TODO_VCARD_URL
-	else:
-		return keeper_constants.KEEPER_VCARD_URL
 
 
 def getTipFromId(tipId):
