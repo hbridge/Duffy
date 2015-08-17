@@ -84,6 +84,21 @@ SMSKEEPER_TIPS = [
 		"Hey :NAME:, I'm the funniest digital assistant around! Just ask me to tell you a joke - guarenteed laughs or you get a pony :sunglasses:",
 		type=FULL_TIP_TYPE
 	),
+	KeeperTip(
+		PAY_BILLS_TIP_ID,
+		"Hey :NAME:, I can also track bills for you. :page_with_curl: Just let me know when you need to pay them. Like 'Pay credit card on the 15th of every month' :postbox:",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		GROCERY_LIST_TIP_ID,
+		"Hey :NAME:, Want any help remembering grocery list? You can say 'Buy pasta, cheese and sauce later today' :spaghetti:",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		TRASH_DAY_TIP_ID,
+		"Hey :NAME:, do you have trouble remembering trash day? Just say 'Trash day every Tuesday' and I'll make sure you never forget. :pushpin:",
+		type=FULL_TIP_TYPE
+	),
 
 	# MINI TIPS
 
