@@ -43,6 +43,9 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 	if keeperNumber == "web":  # don't record responses to web messages in history
 		return
 
+	if user.overrideKeeperNumber:
+		keeperNumber = user.overrideKeeperNumber
+
 	msgJson = {"Body": msgText, "To": user.phone_number, "From": keeperNumber, "MediaUrls": mediaUrl}
 	# Create the message now, but only save it if we know we successfully sent the message
 	message = Message(user=user, incoming=False, msg_json=json.dumps(msgJson), manual=manual, classification=classification)
@@ -53,7 +56,8 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 	if keeperNumber is None or keeperNumber in [keeper_constants.SMSKEEPER_CLI_NUM, keeper_constants.SMSKEEPER_WEB_NUM] or "test" in keeperNumber:
 		recordOutput(msgText, (keeperNumber == keeper_constants.SMSKEEPER_CLI_NUM))
 		message.save()
-	elif keeperNumber is "null":
+	elif keeperNumber == "ignore":
+		logger.debug("User %s: Not sending msg '%s' because keeper number was null")
 		# Don't save the message, wasn't sent
 		pass
 	elif whatsapp_util.isWhatsappNumber(keeperNumber):

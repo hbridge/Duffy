@@ -110,7 +110,7 @@ def processWithEngine(user, msgs, messageObject):
 				timingCount += 1
 
 		# This makes sure we don't send anything to the user
-		user.overrideKeeperNumber = "null"
+		user.overrideKeeperNumber = "ignore"
 
 		allProcessed = True
 		lineCount = 0
