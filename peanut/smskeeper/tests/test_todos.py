@@ -2022,15 +2022,17 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
-		cliMsg.msg(self.testPhoneNumber, "remind me to go poop")
-		cliMsg.msg(self.testPhoneNumber, "remind me to buy some sox for fred")
+		cliMsg.msg(self.testPhoneNumber, "remind me Call granny")
+		cliMsg.msg(self.testPhoneNumber, "remind me Call regions401k")
+		cliMsg.msg(self.testPhoneNumber, "remind me Chi bday")
 
 		self.setNow(dateMock, self.MON_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			cliMsg.msg(self.testPhoneNumber, "done w/going poop")
+			cliMsg.msg(self.testPhoneNumber, "Done w/Chi")
 			self.assertIn("that off", self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")
-		self.assertTrue(entries[0].hidden)
+		self.assertFalse(entries[0].hidden)
 		self.assertFalse(entries[1].hidden)
+		self.assertTrue(entries[2].hidden)
