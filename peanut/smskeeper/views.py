@@ -1,9 +1,10 @@
 import json
-from datetime import date, timedelta
+import datetime
 import os
 import sys
 import phonenumbers
 import logging
+import pytz
 import string
 import re
 from time import time
@@ -15,7 +16,7 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from common import api_util, slack_logger
+from common import api_util
 from common.models import ContactEntry
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -356,7 +357,7 @@ def dashboard_feed(request):
 	users = list()
 	daily_stats = {}
 	for days_ago in [1, 3, 7, 30]:
-		date_filter = date.today() - timedelta(days=days_ago)
+		date_filter = datetime.now(pytz.utc) - datetime.timedelta(days=days_ago)
 		daily_stats[days_ago] = {}
 		for direction in ["incoming", "outgoing"]:
 			incoming = (direction == "incoming")
