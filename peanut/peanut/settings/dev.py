@@ -61,16 +61,6 @@ STATICFILES_DIRS = (
 	'/home/ubuntu/dev/Duffy/peanut/static',
 )
 
-DEFAULT_FROM_EMAIL = 'swap-stats@duffytech.co'
-
-EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'AKIAJHHJPIGXPBWBGSKQ'
-EMAIL_HOST_PASSWORD = 'AiAvYbMDxI7DbOlS9wWrsvbyVuykMNwIMnPkefsFH++O'
-EMAIL_USE_TLS = True
-
-SERVER_EMAIL = 'dev@duffyapp.com'
-
 ADMINS = None
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "dev.duffyapp.com"]
@@ -83,19 +73,15 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
-	CELERY_SEND_TASK_ERROR_EMAILS = True
-	ADMINS = [
-		('Admins', 'derek@duffytech.co'),
-	]
 	BROKER_URL = "amqp://duffy:du44y@dev.duffyapp.com:5672/swap"
 
-	EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
-	EMAIL_PORT = 587
-	EMAIL_HOST_USER = 'AKIAJHHJPIGXPBWBGSKQ'
-	EMAIL_HOST_PASSWORD = 'AiAvYbMDxI7DbOlS9wWrsvbyVuykMNwIMnPkefsFH++O'
-	EMAIL_USE_TLS = True
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'AKIAJHHJPIGXPBWBGSKQ'
+EMAIL_HOST_PASSWORD = 'AiAvYbMDxI7DbOlS9wWrsvbyVuykMNwIMnPkefsFH++O'
+EMAIL_USE_TLS = True
 
-	SERVER_EMAIL = 'dev@duffyapp.com'
+SERVER_EMAIL = 'dev@duffyapp.com'
 
 KEEPER_NUMBER = "+18452088586"
 
