@@ -151,9 +151,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertTrue(entry.hidden)
 
-	# Make sure the quetion tip goes out after 4 days of inactivity
+	# Make sure the quetion tip goes out after 7
 	def test_digest_survey_tip(self, dateMock):
 		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
 
 		self.setNow(dateMock, self.MON_8AM)
 
@@ -169,10 +173,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("how useful", self.getOutput(mock))
 			self.assertIn("Monday", self.getOutput(mock))
 
-		# 4 days later
-		self.setNow(dateMock, self.FRI_9AM)
+		# 5 days later to ckick off the first tip
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
+		async.processDailyDigest()
 
-		# Make sure the snooze tip came through
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
+
+		# Make sure the survey tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("how useful", self.getOutput(mock))
@@ -183,8 +190,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Great to hear!", self.getOutput(mock))
 
 	# Make sure the digest survey question changes state if its a low answer
-	def test_digest_survey_answer_changes_digest(self, dateMock):
+	def test_digest_survey_answer_changes_digest_state(self, dateMock):
 		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
 
 		self.setNow(dateMock, self.MON_8AM)
 
@@ -200,10 +211,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("how useful", self.getOutput(mock))
 			self.assertIn("Monday", self.getOutput(mock))
 
-		# 4 days later
-		self.setNow(dateMock, self.FRI_9AM)
+		# 5 days later
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
 
-		# Make sure the snooze tip came through
+		# Make sure the change time tip comes through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("a good time for this?", self.getOutput(mock))
+
+		# 7 days later from original
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("how useful", self.getOutput(mock))
@@ -219,6 +236,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 	# Had bug where we weren't catching survey numbers when there were no tasks
 	def test_digest_survey_tip_no_tasks(self, dateMock):
 		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
 
 		self.setNow(dateMock, self.MON_8AM)
 
@@ -238,8 +259,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("how useful", self.getOutput(mock))
 			self.assertIn("Monday", self.getOutput(mock))
 
-		# 4 days later
-		self.setNow(dateMock, self.FRI_9AM)
+		# 5 days later
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
+		async.processDailyDigest()
+
+		# 7 days later
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
 
 		# Make sure the snooze tip came through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -250,6 +275,60 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "4")
 			self.assertIn("Great to hear!", self.getOutput(mock))
+
+	# Make sure the change digest time goes out after 5 days, and it changes the time
+	def test_digest_tips_change_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
+
+		# Set for 4 days in future
+		self.setNow(dateMock, self.FRI_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("is 9am a good time for this", self.getOutput(mock))
+
+		# Set for 5 days in future
+		self.setNow(dateMock, self.SAT_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("is 9am a good time for this", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "6")
+			self.assertIn("6am", self.getOutput(mock))
+
+		self.assertEqual(6, self.getTestUser().digest_hour)
+		self.assertEqual(0, self.getTestUser().digest_minute)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "actually, 2:30pm please")
+			self.assertIn("2:30pm", self.getOutput(mock))
+
+		self.assertEqual(14, self.getTestUser().digest_hour)
+		self.assertEqual(30, self.getTestUser().digest_minute)
+
+	# Make sure we support things like "stop sending me these" and "never"
+	def test_digest_tips_change_time_supports_never(self, dateMock):
+		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
+
+		# Set for 5 days in future
+		self.setNow(dateMock, self.SAT_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("is 9am a good time for this", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "never")
+			self.assertIn("I won't", self.getOutput(mock))
+
+		self.assertEqual(self.getTestUser().digest_state, keeper_constants.DIGEST_STATE_LIMITED)
 
 	# Had a bug where just 'remind me' would create an entry
 	def test_just_remind_me(self, dateMock):
@@ -1926,4 +2005,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual("", self.getOutput(mock))
 
 		self.assertTrue(self.getTestUser().paused)
+
+	def test_change_morning_summary_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Give me my morning summary at 7:30am")
+			self.assertIn("7:30am", self.getOutput(mock))
+
+		self.assertEquals(7, self.getTestUser().digest_hour)
+		self.assertEquals(30, self.getTestUser().digest_minute)
 

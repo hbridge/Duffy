@@ -1,7 +1,7 @@
 import re
 import string
 
-from smskeeper import sms_util, msg_util, helper_util
+from smskeeper import sms_util, msg_util, helper_util, actions
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from .action import Action
@@ -13,6 +13,8 @@ class ChangeSettingAction(Action):
 	tipRegex = re.compile(r'.*send me tips', re.I)
 
 	zipRegex = re.compile(r"my zip ?code is (\d{5}(\-\d{4})?)", re.I)
+
+	summaryRegex = re.compile(r"(daily|morning) summary", re.I)
 
 	def getScore(self, chunk, user):
 		score = 0.0
@@ -27,6 +29,10 @@ class ChangeSettingAction(Action):
 		if msg_util.nameInSetName(normalizedText, tutorial=False):
 			score = .9
 
+		if chunk.contains(self.summaryRegex):
+			if "never" in chunk.normalizedText() or chunk.getNattyResult(user):
+				score = .95
+
 		if not user.isTutorialComplete():
 			score = 0
 
@@ -38,12 +44,15 @@ class ChangeSettingAction(Action):
 		if self.tipRegex.match(normalizedText) is not None:
 			self.setTipFrequency(user, chunk.originalText)
 
-		if self.zipRegex.match(normalizedText) is not None:
+		elif self.zipRegex.match(normalizedText) is not None:
 			self.setPostalCode(user, chunk.originalText)
 
-		if msg_util.nameInSetName(chunk.originalText, tutorial=False):
+		elif msg_util.nameInSetName(chunk.originalText, tutorial=False):
 			name = msg_util.nameInSetName(chunk.originalText, tutorial=False)
 			self.setName(user, name)
+
+		elif chunk.contains(self.summaryRegex):
+			return actions.updateDigestTime(user, chunk)
 
 		return True
 

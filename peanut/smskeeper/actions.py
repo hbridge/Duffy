@@ -1,16 +1,16 @@
 import random
 import pytz
 import logging
+import datetime
 
-from smskeeper import sms_util, msg_util, helper_util, image_util, user_util, entry_util, reminder_util
+from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
 import django
 
 from smskeeper.models import Entry, Contact, User
 from smskeeper import analytics
 
-from common import slack_logger, date_util, weather_util
-from django.conf import settings
+from common import slack_logger, date_util
 
 logger = logging.getLogger(__name__)
 
@@ -321,6 +321,38 @@ def clearAll(entries):
 		entry.hidden = True
 		entry.save()
 	return msgBack
+
+
+def updateDigestTime(user, chunk):
+	if "never" in chunk.normalizedText() or "stop" in chunk.normalizedText():
+		user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
+		user.save()
+
+		logger.debug("User %s: Updated digest state to limited due to user request" % (user.id))
+
+		sms_util.sendMsg(user, "Got it, I won't send you a morning txt when there are no tasks")
+	else:
+		nattyResult = chunk.getNattyResult(user)
+
+		if not nattyResult:
+			logger.error("User %s: Just tried to set new digest time but msg '%s' didn't have any time info in it" % (user.id, chunk.originalText))
+			return False
+
+		tzAwareTime = nattyResult.utcTime.astimezone(user.getTimezone())
+
+		# Make sure we're doing an am hour...since natty result will probably be pm
+		if "pm" not in chunk.originalText and tzAwareTime.hour > 12:
+			tzAwareTime = tzAwareTime + datetime.timedelta(hours=12)
+
+		user.digest_hour = tzAwareTime.hour
+		user.digest_minute = tzAwareTime.minute
+
+		user.save()
+
+		logger.debug("User %s: Updated digest time to %s %s due to user request" % (user.id, user.digest_hour, user.digest_minute))
+
+		sms_util.sendMsg(user, "Great, I'll send you a daily summary at %s for now on" % (msg_util.getNaturalTime(tzAwareTime)))
+	return True
 
 
 def unknown(user, msg, keeperNumber, sendMsg=True):

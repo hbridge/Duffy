@@ -62,6 +62,7 @@ DONE_TIP3_ID = "mini-done3"
 DIGEST_DONE_TIP_ID = "mini-digest-done"
 DIGEST_SNOOZE_TIP_ID = "mini-digest-snooze"
 DIGEST_QUESTION_TIP_ID = "mini-digest-question"
+DIGEST_CHANGE_TIME_TIP_ID = "mini-digest-change-time"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
@@ -141,6 +142,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		DIGEST_QUESTION_TIP_ID,
 		"btw, how useful do you find these morning txts? 1 (not useful) - 5 (very useful)",
+		type=MINI_TIP_TYPE
+	),
+	KeeperTip(
+		DIGEST_CHANGE_TIME_TIP_ID,
+		"btw, is 9am a good time for this? I can send them at any time you want, just let me know if another time is better",
 		type=MINI_TIP_TYPE
 	),
 ]

@@ -86,4 +86,5 @@ JOKES = [
 	Joke(RESPONSE, ["What goes ha ha bonk?", "A man laughing his head off"]),
 	Joke(RESPONSE, ["What did the egg say to the frying pan?", "You crack me up"]),
 	Joke(RESPONSE, ["What is smarter than a talking bird?", "A spelling bee"]),
+	Joke(RESPONSE, ["Why did Jon Snow wait in line for 6 hours at the Apple store?", "For the watch"]),
 ]

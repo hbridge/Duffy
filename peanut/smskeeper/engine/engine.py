@@ -17,7 +17,7 @@ from smskeeper.engine.changetime_specific import ChangetimeSpecificAction
 from smskeeper.engine.create_todo import CreateTodoAction
 from smskeeper.engine.complete_todo_most_recent import CompleteTodoMostRecentAction
 from smskeeper.engine.complete_todo_specific import CompleteTodoSpecificAction
-from smskeeper.engine.survey_response import SurveyResponseAction
+from smskeeper.engine.tip_question_response import TipQuestionResponseAction
 from smskeeper.engine.jokes import JokeAction
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class Engine:
 	actionList = None
 	minScore = 0.0
 
-	DEFAULT = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction(), FetchDigestAction(), ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(), CompleteTodoMostRecentAction(), CompleteTodoSpecificAction(), SurveyResponseAction(), JokeAction()]
+	DEFAULT = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction(), FetchDigestAction(), ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(), CompleteTodoMostRecentAction(), CompleteTodoSpecificAction(), TipQuestionResponseAction(), JokeAction()]
 	TUTORIAL_BASIC = [StopAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), FrustrationAction()]
 	TUTORIAL_STEP_2 = [ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(tutorial=True)]
 
@@ -74,7 +74,7 @@ class Engine:
 
 	def tieBreakActions(self, actions):
 		sortedActions = list()
-		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, FetchDigestAction, JokeAction, ChangeSettingAction, SurveyResponseAction, ChangetimeSpecificAction, ChangetimeMostRecentAction, CompleteTodoSpecificAction, CompleteTodoMostRecentAction, CreateTodoAction, QuestionAction, FrustrationAction]
+		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, FetchDigestAction, JokeAction, ChangeSettingAction, TipQuestionResponseAction, ChangetimeSpecificAction, ChangetimeMostRecentAction, CompleteTodoSpecificAction, CompleteTodoMostRecentAction, CreateTodoAction, QuestionAction, FrustrationAction]
 		for cls in actionOrder:
 			for action in actions:
 				if action.__class__ == cls:

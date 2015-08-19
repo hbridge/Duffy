@@ -5,7 +5,7 @@ import random
 import time
 import os
 import sys
-import pywapi
+
 from dateutil.relativedelta import relativedelta
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
@@ -235,35 +235,42 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
 	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_DIGEST)
 
-	if tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID):
-		cutoff = date_util.now(pytz.utc) - datetime.timedelta(days=4)
-		lastMessageIn = Message.objects.filter(user=user, incoming=True).order_by("added").last()
+	now = date_util.now(user.getTimezone())
+	daysActive = (now - user.added).days
+	tipSent = False
 
-		if lastMessageIn and lastMessageIn.added <= cutoff:
-			digestQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_TIP_ID)
-			sms_util.sendMsg(user, digestQuestionTip.renderMini(), classification=keeper_constants.OUTGOING_SURVEY)
-			tips.markTipSent(user, digestQuestionTip, isMini=True)
+	if daysActive >= 5 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_CHANGE_TIME_TIP_ID):
+		digestChangeTimeTip = tips.tipWithId(tips.DIGEST_CHANGE_TIME_TIP_ID)
+		sms_util.sendMsg(user, digestChangeTimeTip.renderMini(), classification=keeper_constants.OUTGOING_CHANGE_DIGEST_TIME)
+		tips.markTipSent(user, digestChangeTimeTip, isMini=True)
+		tipSent = True
+	elif daysActive >= 7 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID):
+		digestQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_TIP_ID)
+		sms_util.sendMsg(user, digestQuestionTip.renderMini(), classification=keeper_constants.OUTGOING_SURVEY)
+		tips.markTipSent(user, digestQuestionTip, isMini=True)
+		tipSent = True
 
 	# Do post-message processing with pending reminders
 	if len(pendingEntries) > 0:
 		# Now set to reminder sent, incase they send back done message
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [x.id for x in pendingEntries])
 
-		has3dayOldEntry = False
-		now = date_util.now(user.getTimezone())
-		for entry in pendingEntries:
-			if entry.remind_timestamp < now - datetime.timedelta(days=3):
-				has3dayOldEntry = True
+		if not tipSent:
+			has3dayOldEntry = False
 
-		# Do mini tips for digest.
-		# If they have a 3 day old entry, tell them to snooze
-		# If they don't, but they havn't hit their "done" goal then show done
-		if has3dayOldEntry:
-			digestTip = tips.tipWithId(tips.DIGEST_SNOOZE_TIP_ID)
-			sms_util.sendMsg(user, digestTip.renderMini())
-		elif user.done_count < keeper_constants.GOAL_DONE_COUNT:
-			digestTip = tips.tipWithId(tips.DIGEST_DONE_TIP_ID)
-			sms_util.sendMsg(user, digestTip.renderMini())
+			for entry in pendingEntries:
+				if entry.remind_timestamp < now - datetime.timedelta(days=3):
+					has3dayOldEntry = True
+
+			# Do mini tips for digest.
+			# If they have a 3 day old entry, tell them to snooze
+			# If they don't, but they havn't hit their "done" goal then show done
+			if has3dayOldEntry:
+				digestTip = tips.tipWithId(tips.DIGEST_SNOOZE_TIP_ID)
+				sms_util.sendMsg(user, digestTip.renderMini())
+			elif user.done_count < keeper_constants.GOAL_DONE_COUNT:
+				digestTip = tips.tipWithId(tips.DIGEST_DONE_TIP_ID)
+				sms_util.sendMsg(user, digestTip.renderMini())
 
 
 @app.task
