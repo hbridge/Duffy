@@ -463,64 +463,6 @@ class Message(models.Model):
 		recipient = msgInfo.get("To", None)
 		return sender, recipient
 
-	@classmethod
-	def Classifications(cls):
-		return ([
-			{
-				"text": "Create Todo",
-				"value": keeper_constants.CLASS_CREATE_TODO
-			},
-			{
-				"text": "Done (most recent)",
-				"value": keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT
-			},
-			{
-				"text": "Done (specific)",
-				"value": keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
-			},
-			{
-				"text": "Delete/Cancel",
-				"value": keeper_constants.CLASS_DELETE
-			},
-			{
-				"text": "Fetch Digest",
-				"value": keeper_constants.CLASS_FETCH_DIGEST
-			},
-			{
-				"text": "Nicety",
-				"value": keeper_constants.CLASS_NICETY
-			},
-			{
-				"text": "Nicety (Silent)",
-				"value": keeper_constants.CLASS_SILENT_NICETY
-			},
-			{
-				"text": "Change time (most recent)",
-				"value": keeper_constants.CLASS_CHANGETIME_MOST_RECENT
-			},
-			{
-				"text": "Change time (specific)",
-				"value": keeper_constants.CLASS_CHANGETIME_SPECIFIC
-			},
-			{
-				"text": "Help",
-				"value": keeper_constants.CLASS_HELP
-			},
-			{
-				"text": "Stop",
-				"value": keeper_constants.CLASS_STOP
-			},
-			{
-				"text": "Get weather",
-				"value": keeper_constants.CLASS_FETCH_WEATHER
-			},
-			{
-				"text": "NoCategory",
-				"value": keeper_constants.CLASS_NONE
-			},
-
-		])
-
 
 class MessageMedia:
 	url = None

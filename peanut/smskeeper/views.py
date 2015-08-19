@@ -115,7 +115,12 @@ def mykeeper(request, key):
 
 @login_required(login_url='/admin/login/')
 def history(request):
-	return renderReact(request, 'history', 'history.html', context={"classifications": Message.Classifications()})
+	return renderReact(
+		request,
+		'history',
+		'history.html',
+		context={"classifications": keeper_constants.CLASS_MENU_OPTIONS}
+	)
 
 
 def renderReact(request, appName, templateFile="react_app.html", user=None, context=dict()):

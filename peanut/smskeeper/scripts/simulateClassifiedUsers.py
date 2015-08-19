@@ -216,7 +216,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		falseNegativesByClass = {}
 		falsePositivesByClass = {}
 
-		allClasses = map(lambda x: x["value"], Message.Classifications())
+		allClasses = map(lambda x: x["value"], keeper_constants.CLASS_MENU_OPTIONS)
 
 		logger.info("All messages count %d" % Message.objects.all().count())
 		unclassified_count = 0

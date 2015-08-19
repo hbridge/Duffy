@@ -272,8 +272,66 @@ CLASS_QUESTION = "question"
 CLASS_FRUSTRATION = "frustration"
 CLASS_SURVEY_RESPONSE = "survey-response"
 CLASS_JOKE = "joke"
-
 CLASS_UNKNOWN = "unknown"
+
+CLASS_MENU_OPTIONS = ([
+	{
+		"text": "Create Todo",
+		"value": CLASS_CREATE_TODO
+	},
+	{
+		"text": "Done (most recent)",
+		"value": CLASS_COMPLETE_TODO_MOST_RECENT
+	},
+	{
+		"text": "Done (specific)",
+		"value": CLASS_COMPLETE_TODO_SPECIFIC
+	},
+	{
+		"text": "Delete/Cancel",
+		"value": CLASS_DELETE
+	},
+	{
+		"text": "Fetch Digest",
+		"value": CLASS_FETCH_DIGEST
+	},
+	{
+		"text": "Nicety",
+		"value": CLASS_NICETY
+	},
+	{
+		"text": "Nicety (Silent)",
+		"value": CLASS_SILENT_NICETY
+	},
+	{
+		"text": "Change time (most recent)",
+		"value": CLASS_CHANGETIME_MOST_RECENT
+	},
+	{
+		"text": "Change time (specific)",
+		"value": CLASS_CHANGETIME_SPECIFIC
+	},
+	{
+		"text": "Help",
+		"value": CLASS_HELP
+	},
+	{
+		"text": "Stop",
+		"value": CLASS_STOP
+	},
+	{
+		"text": "Get weather",
+		"value": CLASS_FETCH_WEATHER
+	},
+	{
+		"text": "Joke request",
+		"value": CLASS_JOKE
+	},
+	{
+		"text": "NoCategory",
+		"value": CLASS_NONE
+	},
+])
 
 OUTGOING_DIGEST = "digest"
 OUTGOING_SURVEY = "survey"
