@@ -27,8 +27,14 @@ class Chunk:
 		return self.normalizeText(self.originalText)
 
 	def normalizeText(self, text, charsToStrip=string.punctuation):
-		newMsg = ''.join(ch for ch in text if ch.isalnum() or ch == ' ' or ch in punctuationWhitelist)
-		newMsg = newMsg.strip().lower()
+		newMsg = text.strip().lower()
+
+		# Terrible HACK - this should be somewhere else
+		# problem is, next line we clear out punctuation so need to do a replace before then
+		newMsg = newMsg.replace("w/", "with ")
+
+		newMsg = ''.join(ch for ch in newMsg if ch.isalnum() or ch == ' ' or ch in punctuationWhitelist)
+		newMsg = newMsg.strip()
 		return newMsg
 
 	def normalizedTextWithoutTiming(self, user):

@@ -2018,3 +2018,19 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertEquals(7, self.getTestUser().digest_hour)
 		self.assertEquals(30, self.getTestUser().digest_minute)
 
+	def test_done_slash_w(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+		cliMsg.msg(self.testPhoneNumber, "remind me to go poop")
+		cliMsg.msg(self.testPhoneNumber, "remind me to buy some sox for fred")
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			cliMsg.msg(self.testPhoneNumber, "done w/going poop")
+			self.assertIn("that off", self.getOutput(mock))
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertTrue(entries[0].hidden)
+		self.assertFalse(entries[1].hidden)

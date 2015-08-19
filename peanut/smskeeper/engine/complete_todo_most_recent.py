@@ -43,9 +43,6 @@ class CompleteTodoMostRecentAction(Action):
 		if CompleteTodoMostRecentAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.9 and chunk.matches(self.beginsWithRe):
-			score += 0.1
-
 		return score
 
 	def execute(self, chunk, user):
