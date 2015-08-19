@@ -28,7 +28,7 @@ class CompleteTodoMostRecentAction(Action):
 		regexHit = msg_util.done_re.search(chunk.normalizedText()) is not None
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(interestingWords), 60)
 
-		if regexHit and len(interestingWords) < 2 and len(entries) == 0:
+		if regexHit and len(interestingWords) == 0 and len(entries) == 0:
 			if justNotified:
 				score = 0.9
 			else:
