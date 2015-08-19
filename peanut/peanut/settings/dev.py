@@ -83,6 +83,10 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 
 class CELERY_CONFIG(BASE_CELERY_CONFIG):
+	CELERY_SEND_TASK_ERROR_EMAILS = True
+	ADMINS = [
+		('Admins', 'derek@duffytech.co'),
+	]
 	BROKER_URL = "amqp://duffy:du44y@dev.duffyapp.com:5672/swap"
 
 KEEPER_NUMBER = "+18452088586"
@@ -94,3 +98,4 @@ WHATSAPP_SMS_URL = "http://dev.duffyapp.com/smskeeper/incoming_sms"
 WHATSAPP_PRESENCE_NAME = u"\U0001F64B DevKeeper"
 
 MIXPANEL_TOKEN = "d309a366da36d3f897ad2772390d1679"
+
