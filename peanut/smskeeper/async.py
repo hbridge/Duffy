@@ -20,6 +20,8 @@ from peanut.celery import app
 from smskeeper import tips, sms_util, user_util, msg_util
 from smskeeper.models import Entry, Message, User
 from smskeeper import keeper_constants
+from smskeeper import analytics
+from smskeeper import time_utils
 
 from common import date_util, weather_util
 
@@ -114,6 +116,18 @@ def processReminder(entry):
 				msg = "Hi! Friendly reminder: %s" % entry.text
 
 			sms_util.sendMsg(user, msg, classification=keeper_constants.OUTGOING_REMINDER)
+			analytics.logUserEvent(
+				user,
+				"Reminder Received",
+				parametersDict={
+					"Num Users": len(users),
+					"Reminder type": entry.remind_recur,
+					"Manually updated": entry.manually_updated,
+					"Manually checked": entry.manually_check,
+					"Hours since created": time_utils.totalHoursAgo(entry.added),
+					"Is default time": entry.is_default_time_and_date
+				}
+			)
 
 			updateEntryAfterProcessing(entry)
 
