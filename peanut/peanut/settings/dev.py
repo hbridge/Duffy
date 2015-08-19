@@ -89,6 +89,14 @@ class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	]
 	BROKER_URL = "amqp://duffy:du44y@dev.duffyapp.com:5672/swap"
 
+	EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+	EMAIL_PORT = 587
+	EMAIL_HOST_USER = 'AKIAJHHJPIGXPBWBGSKQ'
+	EMAIL_HOST_PASSWORD = 'AiAvYbMDxI7DbOlS9wWrsvbyVuykMNwIMnPkefsFH++O'
+	EMAIL_USE_TLS = True
+
+	SERVER_EMAIL = 'dev@duffyapp.com'
+
 KEEPER_NUMBER = "+18452088586"
 
 # Keeper number by product id
