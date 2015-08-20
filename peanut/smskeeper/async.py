@@ -240,11 +240,15 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 	tipSent = False
 
 	if daysActive >= 5 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_CHANGE_TIME_TIP_ID) and not userRequested:
+		if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
+			time.sleep(5)
 		digestChangeTimeTip = tips.tipWithId(tips.DIGEST_CHANGE_TIME_TIP_ID)
 		sms_util.sendMsg(user, digestChangeTimeTip.renderMini(), classification=keeper_constants.OUTGOING_CHANGE_DIGEST_TIME)
 		tips.markTipSent(user, digestChangeTimeTip, isMini=True)
 		tipSent = True
 	elif daysActive >= 7 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID) and not userRequested:
+		if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
+			time.sleep(5)
 		digestQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_TIP_ID)
 		sms_util.sendMsg(user, digestQuestionTip.renderMini(), classification=keeper_constants.OUTGOING_SURVEY)
 		tips.markTipSent(user, digestQuestionTip, isMini=True)
@@ -266,9 +270,13 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 			# If they have a 3 day old entry, tell them to snooze
 			# If they don't, but they havn't hit their "done" goal then show done
 			if has3dayOldEntry:
+				if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
+					time.sleep(5)
 				digestTip = tips.tipWithId(tips.DIGEST_SNOOZE_TIP_ID)
 				sms_util.sendMsg(user, digestTip.renderMini())
 			elif user.done_count < keeper_constants.GOAL_DONE_COUNT:
+				if keeper_constants.isRealKeeperNumber(user.getKeeperNumber()):
+					time.sleep(5)
 				digestTip = tips.tipWithId(tips.DIGEST_DONE_TIP_ID)
 				sms_util.sendMsg(user, digestTip.renderMini())
 
