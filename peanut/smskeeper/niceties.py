@@ -219,7 +219,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
 		user.last_share_upsell = date_util.now(pytz.utc)
 		user.save()
-		return "%s %s %s!" % (base, keeper_constants.SHARE_UPSELL_PHRASE, user.getInviteUrl())
+		return "%s %s %s!" % (base, random.choice(keeper_constants.SHARE_UPSELL_PHRASES), user.getInviteUrl())
 	else:
 		return base
 

@@ -173,9 +173,13 @@ PHOTOS_TIP_URL = "https://s3.amazonaws.com/smskeeper/PhotosTip.png"
 KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
-SHARE_UPSELL_PHRASE = "If you know anyone else who could use my help, send them to"
+SHARE_UPSELL_PHRASES = [
+	u"Btw, I'm great for anyone who forgets things \U0001F433. Know anyone who could use my help? Send them to",
+	u"Think any of your friends would want to try me? I like making new friends \U0001F38E. Send them to",
+	u"Is there anyone you know who can use a little more sanity \U0001F0CF in their life? Just send them to \U00002615",
+]
 
-FEEDBACK_FREQUENCY_DAYS = 30
+FEEDBACK_FREQUENCY_DAYS = 45
 FEEDBACK_PHRASE = u"Btw, Would you be ok if one of my minions \U0001F638 contacted you to get more info on your experience with me?"
 FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS = 3
 
