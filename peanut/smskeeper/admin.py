@@ -56,7 +56,11 @@ class ReminderAdmin(admin.ModelAdmin):
 		return obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
 
 	def remind_timestamp_tz_aware(self, obj):
-		return obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+		dt = obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
+		if obj.use_digest_time:
+			return "%s, digest" % dt.strftime('%b %d, %Y')
+		else:
+			return dt
 
 	def product_id(self, obj):
 		return obj.creator.product_id
