@@ -336,7 +336,7 @@ def updateDigestTime(user, chunk):
 
 		if not nattyResult:
 			logger.error("User %s: Just tried to set new digest time but msg '%s' didn't have any time info in it" % (user.id, chunk.originalText))
-			return False
+			return unknown(user, chunk.originalText, user.getKeeperNumber(), False)
 
 		tzAwareTime = nattyResult.utcTime.astimezone(user.getTimezone())
 
