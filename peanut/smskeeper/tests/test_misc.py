@@ -235,13 +235,21 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
-			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+			found = False
+			for phrase in keeper_constants.SHARE_UPSELL_PHRASES:
+				if phrase in output:
+					found = True			
+			self.assertEqual(found, True)
 
 		# make sure we don't send it immediately after
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
-			self.assertNotIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+			found = False
+			for phrase in keeper_constants.SHARE_UPSELL_PHRASES:
+				if phrase in output:
+					found = True			
+			self.assertEqual(found, False)
 
 		# make sure we do send if the last share date was more than SHARE_UPSELL_FREQ prior
 		self.user.last_share_upsell = self.TUE_8AM - datetime.timedelta(
@@ -251,7 +259,11 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
-			self.assertIn(keeper_constants.SHARE_UPSELL_PHRASE, output)
+			found = False
+			for phrase in keeper_constants.SHARE_UPSELL_PHRASES:
+				if phrase in output:
+					found = True			
+			self.assertEqual(found, True)
 
 	def test_feedback_upsell(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
