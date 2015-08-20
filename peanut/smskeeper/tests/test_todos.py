@@ -286,6 +286,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Set for 4 days in future
 		self.setNow(dateMock, self.FRI_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Go poop at 3pm today")
+
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("is 9am a good time for this", self.getOutput(mock))
@@ -329,6 +332,28 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("I won't", self.getOutput(mock))
 
 		self.assertEqual(self.getTestUser().digest_state, keeper_constants.DIGEST_STATE_LIMITED)
+
+	# Make sure we support things like "stop sending me these" and "never"
+	def test_digest_tips_change_time_doesnt_superceed_create(self, dateMock):
+		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
+
+		# Set for 5 days in future
+		self.setNow(dateMock, self.SAT_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("is 9am a good time for this", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me to go poop at 3pm")
+			self.assertIn("by 3pm", self.getOutput(mock))
+			self.assertNotIn("summary", self.getOutput(mock))
+
+		self.assertEqual(self.getTestUser().digest_hour, 9)
+
 
 	# Had a bug where just 'remind me' would create an entry
 	def test_just_remind_me(self, dateMock):

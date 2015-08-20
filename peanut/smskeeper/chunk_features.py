@@ -9,9 +9,14 @@ class ChunkFeatures:
 		self.chunk = chunk
 		self.user = user
 
-	# things that match this RE will get a boost for create
-	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
+	# things that match this RE will get a boost for done
 	beginsWithDoneWordRegex = r'^(done|check off) '
+
+	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
+	# things that match this RE will get a boost for create
+	createWordRegex = "(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call)"
+	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
+	containsCreateWordhRegex = r'%s ' % createWordRegex
 
 	# Features
 	def hasTimingInfo(self):
@@ -33,3 +38,9 @@ class ChunkFeatures:
 		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 		return len(entry_util.fuzzyMatchEntries(self.user, ' '.join(interestingWords), 80))
+
+	def hasCreateWord(self):
+		return self.chunk.contains(self.containsCreateWordhRegex)
+
+	def beginsWithCreateWord(self):
+		return self.chunk.matches(self.beginsWithCreateWordRegex)

@@ -24,7 +24,8 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 		basicRegexHit = chunk.matches(self.basicRegex)
 		beginsWithRegexHit = chunk.matches(self.beginsWithRegex)
 
-		justNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST) or (user.state == keeper_constants.STATE_REMINDER_SENT)
+		justNotifiedReminder = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or (user.state == keeper_constants.STATE_REMINDER_SENT)
+		justNotifiedDigest = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
 
 		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 		interestingWords = msg_util.getInterestingWords(cleanedText)
@@ -38,8 +39,10 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 
 		if len(entries) == 0:
 			if nattyResult and basicRegexHit:
-				if justNotified:
+				if justNotifiedReminder:
 					score = 0.9
+				elif justNotifiedDigest:
+					score = 0.75
 				else:
 					score = 0.7
 

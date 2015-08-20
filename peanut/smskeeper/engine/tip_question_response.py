@@ -2,7 +2,7 @@ import logging
 
 from smskeeper import keeper_constants
 from .action import Action
-from smskeeper import sms_util, actions
+from smskeeper import sms_util, actions, chunk_features
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,12 @@ class TipQuestionResponseAction(Action):
 
 	def getScore(self, chunk, user):
 		score = 0.0
+
+		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+
+		# things that match this RE will get a minus
+		containsReminderWord = chunkFeatures.hasCreateWord()
+		beginsWithReminderWord = chunkFeatures.beginsWithCreateWord()
 
 		# Check for survey
 		surveyJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY)
@@ -57,6 +63,12 @@ class TipQuestionResponseAction(Action):
 					score = .4
 			else:
 				score = .5
+
+			if containsReminderWord and score > .5:
+				score -= .2
+
+			if beginsWithReminderWord and score > .5:
+				score -= .4
 
 		return score
 

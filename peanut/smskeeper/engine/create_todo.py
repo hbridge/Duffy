@@ -4,7 +4,7 @@ import pytz
 from common import date_util
 
 from smskeeper import reminder_util, sms_util, msg_util
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, chunk_features
 from .action import Action
 import collections
 
@@ -17,22 +17,20 @@ class CreateTodoAction(Action):
 
 	tutorial = False
 
-	# things that match this RE will get a boost for create
-	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
-	words = "(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call)"
-	beginsWithRe = r'^%s ' % words
-	anyMatchRegex = r'%s ' % words
-
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial
 
 	def getScore(self, chunk, user):
 		score = 0.0
 
+		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+
 		nattyResult = chunk.getNattyResult(user)
 		regexHit = msg_util.reminder_re.search(chunk.normalizedText()) is not None
-		containsReminderWord = chunk.contains(self.anyMatchRegex)
-		beginsWithReminderWord = chunk.matches(self.beginsWithRe)
+
+		# things that match this RE will get a boost for create
+		containsReminderWord = chunkFeatures.hasCreateWord()
+		beginsWithReminderWord = chunkFeatures.beginsWithCreateWord()
 
 		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
 
