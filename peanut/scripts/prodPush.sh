@@ -20,3 +20,8 @@ ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo stop
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo start duffy-celery-beat"
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo stop duffy-whatsapp"
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo start duffy-whatsapp"
+
+echo "Checking Celery status..."
+INITCTL=$(ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "initctl list")
+echo "$INITCTL" | grep  -q  "duffy-celery start/running"  && echo "duffy-celery running" || echo "***** ERROR: duffy-celery NOT RUNNING *****"
+echo "$INITCTL" | grep  -q  "duffy-celery-beat start/running"  && echo "duffy-celery-beat running" || echo "***** ERROR: duffy-celery-beat NOT RUNNING *****"
