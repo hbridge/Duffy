@@ -301,14 +301,14 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "6")
-			self.assertIn("6am", self.getOutput(mock))
+			self.assertIn("daily summary at 6am", self.getOutput(mock))
 
 		self.assertEqual(6, self.getTestUser().digest_hour)
 		self.assertEqual(0, self.getTestUser().digest_minute)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "actually, 2:30pm please")
-			self.assertIn("2:30pm", self.getOutput(mock))
+			self.assertIn("daily summary at 2:30pm", self.getOutput(mock))
 
 		self.assertEqual(14, self.getTestUser().digest_hour)
 		self.assertEqual(30, self.getTestUser().digest_minute)
@@ -2020,7 +2020,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "done")
 		self.assertEqual(1, self.getTestUser().done_count)
 
-	def test_question_and_remidners(self, dateMock):
+	def test_question_and_reminders(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
@@ -2042,6 +2042,30 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEquals(7, self.getTestUser().digest_hour)
 		self.assertEquals(30, self.getTestUser().digest_minute)
+
+	def test_default_entry_with_different_digest_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "buy sox tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "send my daily summary at 8am")
+
+		self.setNow(dateMock, self.TUE_8AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Buy sox", self.getOutput(mock))
+
+			# Make sure 9am doesn't show up (like it was a timed reminder)
+			self.assertNotIn("9", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertEqual("", self.getOutput(mock))
 
 	def test_done_slash_w(self, dateMock):
 		self.setupUser(dateMock)

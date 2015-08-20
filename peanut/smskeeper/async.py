@@ -47,7 +47,11 @@ def shouldRemindNow(entry):
 	if entry.remind_timestamp < now - datetime.timedelta(minutes=5):
 		return False
 
-	# Ddon't send a reminder if this is during the digest time, since it'll be
+	# Don't remind if this has use_digest_time set (just shows up on digest)
+	if entry.use_digest_time:
+		return False
+
+	# Don't send a reminder if this is during the digest time, since it'll be
 	# included in that
 	if entry.creator.isDigestTime(entry.remind_timestamp) and not entry.creator.product_id == keeper_constants.MEDICAL_PRODUCT_ID:
 		return False
@@ -125,7 +129,7 @@ def processReminder(entry):
 					"Manually updated": entry.manually_updated,
 					"Manually checked": entry.manually_check,
 					"Hours since created": time_utils.totalHoursAgo(entry.added),
-					"Is default time": entry.is_default_time_and_date
+					"Is default time": entry.use_digest_time
 				}
 			)
 
@@ -206,7 +210,8 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 				updateEntryAfterProcessing(entry)
 			msg += u"\U0001F538 " + entry.text
 
-			if entry.remind_timestamp > now + datetime.timedelta(minutes=1):  # Need an extra minute since some 9am reminders are really 9:00:30
+			if (entry.remind_timestamp > now + datetime.timedelta(minutes=1) and  # Need an extra minute since some 9am reminders are really 9:00:30
+						not entry.use_digest_time):  # Don't show the time if it was a default time
 				msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
 			msg += "\n"
 

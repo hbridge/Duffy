@@ -107,10 +107,14 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recu
 		entry.manually_check = True
 
 	# If the entry had no time or date information, mark it as default
-	if not nattyResult.hadTime and not nattyResult.hadDate:
-		entry.is_default_time_and_date = True
+	if not nattyResult.hadTime:
+		entry.use_digest_time = True
 
-	entry.remind_timestamp = nattyResult.utcTime
+		tzAwareDate = nattyResult.utcTime.astimezone(user.getTimezone())
+		tzAwareDate.replace(hour=user.digest_hour, minute=user.digest_minute)
+		entry.remind_timestamp = tzAwareDate.astimezone(pytz.utc)
+	else:
+		entry.remind_timestamp = nattyResult.utcTime
 
 	entry.orig_text = json.dumps([msg])
 	if recurrence is not None:
@@ -157,8 +161,8 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 
 	# Edgecase: If the original entry had no time or date info and the nattyresult
 	# does have a time, then assume the date will be correct as well (should be today)
-	if entry.is_default_time_and_date and nattyResult.hadTime and not nattyResult.hadDate:
-		entry.is_default_time_and_date = False
+	if entry.use_digest_time and nattyResult.hadTime and not nattyResult.hadDate:
+		entry.use_digest_time = False
 		newDate = newDate.replace(year=nattyTzTime.year)
 		newDate = newDate.replace(month=nattyTzTime.month)
 		newDate = newDate.replace(day=nattyTzTime.day)
