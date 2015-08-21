@@ -441,58 +441,6 @@ def removeNoOpWords(msg):
 	return removeWordsFromMsg(msg, noOpWords)
 
 
-# Returns back (textWithoutLabel, label, listOfHandles)
-def getMessagePieces(msg):
-	textWithoutLabel, label, listOfHandles, listOfUrls, dictOfUrlTypes = getMessagePiecesWithMedia(msg, {})
-	return (textWithoutLabel, label, listOfHandles)
-
-
-# Returns back (textWithoutLabel, label, listOfHandles, listOfUrls, dictOfURLsToTypes)
-# Text could have comma's in it, that is dealt with later
-def getMessagePiecesWithMedia(msg, requestDict):
-	# process text
-	nonLabels = list()
-	handleList = list()
-	label = None
-
-	# first check whether it maches our freeform add
-	match = freeform_add_re.match(msg)
-	if match:
-		label = "#" + match.group('label')
-		if label.endswith(" list"):
-			label = label[:-len(" list")]
-		if match.group("item"):
-			nonLabels = match.group('item').split(" ")
-	else:
-		# otherwise pick out pieces
-		for word in msg.split(' '):
-			if isLabel(word):
-				label = word
-			elif isHandle(word):
-				handleList.append(word)
-			else:
-				nonLabels.append(word)
-
-	# process media
-	mediaUrlList = list()
-	mediaUrlTypes = dict()
-
-	if 'NumMedia' in requestDict:
-		numMedia = int(requestDict['NumMedia'])
-	else:
-		numMedia = 0
-
-	for n in range(numMedia):
-		urlParam = 'MediaUrl' + str(n)
-		typeParam = 'MediaContentType' + str(n)
-		url = requestDict[urlParam]
-		urlType = requestDict[typeParam]
-		mediaUrlList.append(url)
-		mediaUrlTypes[url] = urlType
-
-	return (' '.join(nonLabels), label, handleList, mediaUrlList, mediaUrlTypes)
-
-
 # Returns the label that should be deleted from, and the item indices (as written) of
 # the items to delete
 def parseDeleteCommand(msg):

@@ -60,34 +60,6 @@ def dealWithCreateHandle(user, msg, keeperNumber):
 		sms_util.sendMsg(user, "%s is now set to %s" % (handle, phoneNumber), None, keeperNumber)
 
 
-def dealWithAdd(user, msg, requestDict, keeperNumber):
-	# if this is the first time they have added a label other than reminders, tell them about fetching it
-	if (Entry.objects.filter(creator=user).exclude(label=keeper_constants.REMIND_LABEL).count() == 0):
-		firstListItem = True
-	else:
-		firstListItem = False
-	entries, unresolvedHandles = actions.add(user, msg, requestDict, keeperNumber, True, True)
-
-	label = entries[0].label
-	if firstListItem:
-		sms_util.sendMsg(user, "Just type '%s' to get these back" % (label.replace("#", "")), None, keeperNumber)
-	else:
-		if keeper_constants.isRealKeeperNumber(keeperNumber):
-			time.sleep(1)
-		actions.fetch(user, label, keeperNumber)
-		user.setState(keeper_constants.STATE_IMPLICIT_LABEL)
-		user.setStateData(keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY, label)
-
-	if len(unresolvedHandles) > 0:
-		user.setState(keeper_constants.STATE_UNRESOLVED_HANDLES)
-		user.setStateData(keeper_constants.ENTRY_IDS_DATA_KEY, map(lambda entry: entry.id, entries))
-		user.setStateData(keeper_constants.UNRESOLVED_HANDLES_DATA_KEY, unresolvedHandles)
-		user.save()
-		return False, None
-
-	return True, None
-
-
 def dealWithTodoProductMsg(user, msg, requestDict, keeperNumber):
 	if len(msg.split(' ')) <= 1:
 		logger.info("User %s: I think '%s' is a single word, skipping" % (user.id, msg))
@@ -147,9 +119,6 @@ def process(user, msg, requestDict, keeperNumber):
 			actions.deleteIndicesFromLabel(user, label, indices, keeperNumber)
 			user.setState(keeper_constants.STATE_IMPLICIT_LABEL)
 			user.setStateData(keeper_constants.IMPLICIT_LABEL_STATE_DATA_KEY, label)
-		elif msg_util.isAddTextCommand(msg) or numMedia > 0:
-			logger.info("User %s: I think '%s' is a add text command" % (user.id, msg))
-			return dealWithAdd(user, msg, requestDict, keeperNumber)
 		else:  # catch all, we're not sure
 			return dealWithTodoProductMsg(user, msg, requestDict, keeperNumber)
 
