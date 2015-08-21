@@ -34,7 +34,7 @@ class JokeAction(Action):
 
 		features = chunk_features.ChunkFeatures(chunk, user)
 
-		jokeLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 1)
+		jokeLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 2)
 		jokeFewLastMsg = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE, 3)
 		regexHit = self.jokeRequestRegex.search(chunk.normalizedText()) is not None
 
