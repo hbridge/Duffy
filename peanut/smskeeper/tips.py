@@ -50,6 +50,7 @@ JOKE_TIP_ID = "joke"
 PAY_BILLS_TIP_ID = "bills"
 GROCERY_LIST_TIP_ID = "grocery-list"
 TRASH_DAY_TIP_ID = "trash-day"
+APPOINTMENT_TIP_ID = "appointments"
 
 
 SNOOZE_TIP_ID = "mini-snooze"
@@ -99,6 +100,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		TRASH_DAY_TIP_ID,
 		"Hey :NAME:, do you have trouble remembering trash day? Just say 'Trash day every Tuesday' and I'll make sure you never forget. :pushpin:",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		APPOINTMENT_TIP_ID,
+		"Btw, I'm great at reminding you about random appointments. Just txt me when you need to go to the doctor, dentist, hair salon, DMV, etc. :syringe:",
 		type=FULL_TIP_TYPE
 	),
 
