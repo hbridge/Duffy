@@ -26,7 +26,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
-from smskeeper.forms import UserIdForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
+from smskeeper.forms import UserIdForm, SendMediaForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
 from smskeeper.models import User, Entry, Message
 
 from smskeeper import analytics, helper_util
@@ -303,6 +303,25 @@ def resend_msg(request):
 
 		response["result"] = True
 		return HttpResponse(json.dumps(response), content_type="text/json", status=200)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+
+@csrf_exempt
+def send_media(request):
+	form = SendMediaForm(api_util.getRequestData(request))
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		media = form.cleaned_data['url']
+		msg = form.cleaned_data['msg']
+
+		if not msg:
+			msg = ""
+
+		keeperNumber = user.getKeeperNumber()
+
+		sms_util.sendMsg(user, msg, media, keeperNumber, manual=True)
+		return HttpResponse(json.dumps({"result": "success"}), content_type="text/json", status=200)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 

@@ -9,6 +9,7 @@ urlpatterns = patterns(
 	url(r'^keeper_app', 'smskeeper.views.keeper_app'),
 	url(r'^history', 'smskeeper.views.history'),
 	url(r'^send_sms', 'smskeeper.views.send_sms'),
+	url(r'^send_media', 'smskeeper.views.send_media'),
 	url(r'^message_feed', 'smskeeper.views.message_feed'),
 	url(r'^entry_feed', 'smskeeper.views.entry_feed'),
 	url(r'^toggle_paused', 'smskeeper.views.toggle_paused'),

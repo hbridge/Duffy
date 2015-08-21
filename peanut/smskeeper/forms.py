@@ -43,6 +43,12 @@ class SendSMSForm(UserMixin):
 	direction = forms.CharField(required=False)
 
 
+class SendMediaForm(UserMixin):
+	user_id = forms.IntegerField(required=True)
+	msg = forms.CharField(required=False)
+	url = forms.CharField(required=True)
+
+
 class StripeForm(UserIdForm):
 	stripe_data = forms.CharField(required=True)
 
