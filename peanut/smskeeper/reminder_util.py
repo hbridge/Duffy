@@ -175,9 +175,17 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 		newDate = newDate.replace(day=nattyTzTime.day)
 
 	if nattyResult.hadTime or isSnooze:
-		newDate = newDate.replace(hour=nattyTzTime.hour)
-		newDate = newDate.replace(minute=nattyTzTime.minute)
-		newDate = newDate.replace(second=nattyTzTime.second)
+		# Make sure we set the correct digest time if there's no time defined
+		if not nattyResult.hadTime:
+			entry.use_digest_time = True
+			newDate = newDate.replace(hour=user.digest_hour)
+			newDate = newDate.replace(minute=user.digest_minute)
+			newDate = newDate.replace(second=0)
+		else:
+			entry.use_digest_time = False
+			newDate = newDate.replace(hour=nattyTzTime.hour)
+			newDate = newDate.replace(minute=nattyTzTime.minute)
+			newDate = newDate.replace(second=nattyTzTime.second)
 
 	# Edgecase: Original reminder was for 5pm, user says 'remind me 7am', but we have no date so replace in
 	# When this happens, use natty's date as it'll be the default (probably tomorrow)

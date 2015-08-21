@@ -2067,6 +2067,34 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertEqual("", self.getOutput(mock))
 
+	def test_default_entry_then_snooze(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "buy sox tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertTrue(entry.use_digest_time)
+
+		self.setNow(dateMock, self.TUE_9AM)
+		async.processAllReminders()
+		# Do a time in the future, so we shouldn't doing digest time
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze 2 hours")
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertFalse(entry.use_digest_time)
+
+		# now we should be using digest time since its a day without a time
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "snooze tomorrow")
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertTrue(entry.use_digest_time)
+
 	def test_done_slash_w(self, dateMock):
 		self.setupUser(dateMock)
 
