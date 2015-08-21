@@ -98,7 +98,7 @@ class JokeAction(Action):
 			step = self.JOKE_START
 
 		if step == self.JOKE_START:
-			self.sendJokePart1(user, joke)
+			self.sendJokePart1(user, joke, recentJokeCount)
 		elif step == self.JOKE_PART1_SENT:
 			# eval guess
 			joke.send(user, step, chunk.normalizedText())
@@ -106,7 +106,7 @@ class JokeAction(Action):
 		elif step == self.JOKE_DONE:
 			# if regex hit, then send another
 			if regexHit:
-				self.sendJokePart1(user, joke)
+				self.sendJokePart1(user, joke, recentJokeCount)
 			elif recent:
 				sms_util.sendMsg(user, ":sunglasses:")
 				user.setStateData(self.JOKE_STEP_KEY, self.SUNGLASSES_SENT)
@@ -115,17 +115,18 @@ class JokeAction(Action):
 				return False
 		elif step == self.SUNGLASSES_SENT:
 			if regexHit:
-				self.sendJokePart1(user, joke)
+				self.sendJokePart1(user, joke, recentJokeCount)
 			else:
 				logger.debug("User %s: Kicking out from jokes with msg '%s' because joke was done with sunglasses" % (user.id, chunk.originalText))
 				return False
 
 		return True
 
-	def sendJokePart1(self, user, joke):
+	def sendJokePart1(self, user, joke, recentJokeCount):
 		joke.send(user, self.JOKE_START)
 		user.setStateData(self.JOKE_STEP_KEY, self.JOKE_PART1_SENT)
 		user.setStateData(self.LAST_JOKE_SENT_KEY, date_util.unixTime(date_util.now(pytz.utc)))
+		user.setStateData(self.JOKE_COUNT_KEY, recentJokeCount)
 
 	def jokeIsDone(self, user, jokeNum, recentJokeCount):
 		user.setStateData(self.JOKE_NUM_KEY, jokeNum + 1)
