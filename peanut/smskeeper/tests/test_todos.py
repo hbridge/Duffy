@@ -1909,6 +1909,25 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		self.assertTrue(entry.use_digest_time)
 
+	def test_default_entry_then_followup(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "buy sox tomorrow")
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertTrue(entry.use_digest_time)
+
+		# Do a time in the future, so we shouldn't doing digest time
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "in 60 minutes")
+
+		entry = Entry.objects.get(label="#reminders")
+		self.assertFalse(entry.use_digest_time)
+
 	def test_done_slash_w(self, dateMock):
 		self.setupUser(dateMock)
 
