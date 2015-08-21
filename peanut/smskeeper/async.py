@@ -83,7 +83,13 @@ def updateEntryAfterProcessing(entry):
 			newRemindTimestamp = entry.remind_timestamp + relativedelta(months=1)
 		elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_DAYS:
 			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=2)
-		#  TODO(Derek) add in weekday reminder
+		elif entry.remind_recur == keeper_constants.RECUR_WEEKDAYS:
+			tzAwareNow = date_util.now(entry.creator.getTimezone())
+
+			if tzAwareNow.weekday() >= 4:  # Friday, Sat or Sun
+				newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=6 - tzAwareNow.weekday() + 1)
+			else:
+				newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=1)
 
 		# If we don't have a remind end or if the new remind stamp is before the end, create a new entry
 		if ((entry.remind_recur_end and newRemindTimestamp and newRemindTimestamp < entry.remind_recur_end or not entry.remind_recur_end)):
