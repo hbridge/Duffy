@@ -2,9 +2,10 @@ import datetime
 import pytz
 from mock import patch
 
-from smskeeper.models import Entry
+from smskeeper.models import Entry, User
 from smskeeper import cliMsg, tips
 from smskeeper import async, keeper_constants
+from smskeeper.chunk import Chunk
 
 import test_base
 
@@ -15,32 +16,48 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_8AM)
 		return super(SMSKeeperSharedReminderCase, self).setupUser(True, True)
 
-	"""
-	def test_shared_reminder_regex(self, dateMock):
-		handle = msg_util.getReminderHandle("remind mom to take her pill tomorrow morning")
-		self.assertEquals(handle, "mom")
+	def test_handle_extraction(self, dateMock):
+		positiveSubjects = ["mom", "Bill", "Aseem", "dad", "my mom", "my boyfriend", "my wife"]
+		negativeSubjects = ["to", "her", "him", "tomorrow", "Wednesday", "every", "of"]
+		positiveStructures = [
+			"Remind :SUBJECT: to foo bar baz tomorrow",
+			"Remind :SUBJECT: about the dentist",
+			"Remind :SUBJECT: this weekend to pack goggles",
+			"Remind :SUBJECT: by tomorrow pack goggles",
+			"Remind :SUBJECT: at 5pm pack goggles",
+			"Remind :SUBJECT: in an hour pack goggles",
+		]
+		negativeStructures = [
+			"Remind me to call :SUBJECT: this weekend",
+			"Remind me to email :SUBJECT: to send his presentation to Susan",
+			"Remind me in 10 mintues to remind :SUBJECT: to eat"
+		]
 
-		handle = msg_util.getReminderHandle("remind mom: take your pill tomorrow morning")
-		self.assertEquals(handle, "mom")
+		for structure in positiveStructures:
+			for subject in positiveSubjects:
+				chunk = Chunk(structure.replace(":SUBJECT:", subject))
+				self.assertIn(subject.replace("my ", ""), chunk.handles(), "Handles not found in %s" % (chunk.originalText))
 
-		handle = msg_util.getReminderHandle("remind mom about the tv show")
-		self.assertEquals(handle, "mom")
+			for subject in negativeSubjects:
+				chunk = Chunk(structure.replace(":SUBJECT:", subject))
+				self.assertNotIn(subject, chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
 
-		handle = msg_util.getReminderHandle("at 2pm tomorrow remind mom about the tv show")
-		self.assertEquals(handle, "mom")
+		for structure in negativeStructures:
+			for subject in positiveSubjects:
+				chunk = Chunk(structure.replace(":SUBJECT:", subject))
+				self.assertEqual([], chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
 
+			for subject in negativeSubjects:
+				chunk = Chunk(structure.replace(":SUBJECT:", subject))
+				self.assertEqual([], chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
 
+	'''
 	def test_shared_reminder_normal(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
 
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
-			self.assertIn("What's mom's phone number?", self.getOutput(mock))
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, phoneNumber)
-			self.assertIn("I'll remind mom tomorrow by 8am", self.getOutput(mock))
+		cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, "+16505555555")
 
 		# Make sure other user was created successfully
 		otherUser = User.objects.get(phone_number=phoneNumber)
@@ -48,43 +65,24 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 		entry = Entry.objects.filter(label="#reminders").last()
 		# Make sure entries were created correctly
-		self.assertEquals("take her pill", entry.text)
 		self.assertEquals(2, len(entry.users.all()))
 
-	def test_shared_reminder_when_already_created(self, dateMock):
+	def test_shared_reminder_for_existing_user(self, dateMock):
 		self.setupUser(dateMock)
 
 		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
 		cliMsg.msg(self.testPhoneNumber, "+16505555555")
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "remind mom to go poop Sunday at 10 am")
-			self.assertIn("10am", self.getOutput(mock))
+		cliMsg.msg(self.testPhoneNumber, "remind mom to go poop Sunday at 10 am")
 
 		entries = Entry.objects.filter(label="#reminders")
 
 		# Make sure entries were created correctly
 		self.assertEquals(2, len(entries))
-		self.assertEquals("go poop", entries[1].text)
-
-	def test_shared_reminder_correct_for_me(self, dateMock):
-		self.setupUser(dateMock)
-
-		cliMsg.msg(self.testPhoneNumber, "remind myself to take pill tomorrow morning")
-
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "no, remind me")
-			self.assertIn("I'll remind you tomorrow by 8am", self.getOutput(mock))
-
-		entries = Entry.objects.filter(label="#reminders")
-
-		# Make sure entries were created correctly
-		self.assertEquals(1, len(entries))
-		self.assertEquals("take pill", entries[0].text)
+		# Make sure entries were both shared
+		self.assertEquals(2, len(entries[0].users.all()))
+		self.assertEquals(2, len(entries[1].users.all()))
 
 
-	Derek commenting out for now.
-	This is an exception case where a state should handle a nicety
 	def test_shared_reminder_nicety(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
@@ -93,9 +91,9 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, phoneNumber)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(phoneNumber, "thanks")
+			cliMsg.msg(phoneNumber, "hi")
 			# Make sure
-			self.assertIn("No problem", self.getOutput(mock))
+			self.assertIn("Hi there.", self.getOutput(mock))
 
 
 	def test_shared_reminder_other_person_tell_me_more(self, dateMock):
@@ -108,7 +106,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "tell me more")
 			# See if it goes into tutorial
-			self.assertIn("what's your name?", self.getOutput(mock))
+			self.assertIn(self.getOutput(mock), keeper_constants.HELP_MESSAGES)
 
 	def test_shared_reminder_other_person_paused(self, dateMock):
 		phoneNumber = "+16505555555"
@@ -117,7 +115,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
 		cliMsg.msg(self.testPhoneNumber, phoneNumber)
 
-		cliMsg.msg(phoneNumber, "wtf")
+		cliMsg.msg(phoneNumber, "who is this?")
 		otherUser = User.objects.get(phone_number=phoneNumber)
 		self.assertTrue(otherUser.paused)
 
@@ -136,8 +134,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Bob wanted me", self.getOutput(mock))
-			self.assertIn("take her pill", self.getOutput(mock))
+			self.assertIn("Bob", self.getOutput(mock))
+			self.assertIn("pill", self.getOutput(mock))
 
 	def test_shared_reminder_snooze(self, dateMock):
 		phoneNumber = "+16505555555"
@@ -156,6 +154,6 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.get(label="#reminders")
 		async.processReminder(entry)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(phoneNumber, "snooze 1 hour")
+			cliMsg.msg(phoneNumber, "remind me again in 1 hour")
 			self.assertIn("later", self.getOutput(mock))
-	"""
+	'''
