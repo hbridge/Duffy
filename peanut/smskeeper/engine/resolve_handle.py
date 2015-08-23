@@ -37,7 +37,7 @@ class ResolveHandleAction(Action):
 	def execute(self, chunk, user):
 		# figure out which handle to resolve
 		unresolvedHandles = user.getUnresolvedHandles()
-		if len(unresolvedHandles) == 0:
+		if not unresolvedHandles or len(unresolvedHandles) == 0:
 			logger.error(
 				"User %d: asked to execture handler resolution,"
 				" but no unresolved handles", user.id
