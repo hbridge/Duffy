@@ -82,7 +82,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
 			self.assertNotIn("phoneNumber", self.getOutput(mock))
-	'''
+
 	def test_shared_reminder_for_existing_user(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -97,7 +97,6 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure entries were both shared
 		self.assertEquals(2, len(entries[0].users.all()))
 		self.assertEquals(2, len(entries[1].users.all()))
-
 
 	def test_shared_reminder_nicety(self, dateMock):
 		phoneNumber = "+16505555555"
@@ -122,18 +121,20 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "tell me more")
 			# See if it goes into tutorial
-			self.assertIn(self.getOutput(mock), keeper_constants.HELP_MESSAGES)
+			self.assertIn("Hi", self.getOutput(mock))
 
 	def test_shared_reminder_other_person_paused(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM) # have to set time to pause
 
 		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
 		cliMsg.msg(self.testPhoneNumber, phoneNumber)
 
-		cliMsg.msg(phoneNumber, "who is this?")
-		otherUser = User.objects.get(phone_number=phoneNumber)
-		self.assertTrue(otherUser.paused)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "who is this?")
+			otherUser = User.objects.get(phone_number=phoneNumber)
+			self.assertTrue(otherUser.paused, "Didn't pause user: " + self.getOutput(mock))
 
 	def test_shared_reminder_processed(self, dateMock):
 		phoneNumber = "+16505555555"
@@ -172,4 +173,3 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "remind me again in 1 hour")
 			self.assertIn("later", self.getOutput(mock))
-	'''
