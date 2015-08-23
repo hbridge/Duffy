@@ -1,5 +1,4 @@
 import re
-import phonenumbers
 import logging
 import unicodedata
 import sys
@@ -378,45 +377,6 @@ def isAddTextCommand(msg):
 
 def isHandle(msg):
 	return handle_re.match(msg) is not None
-
-
-def hasPhoneNumber(msg):
-	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
-	return matches.has_next()
-	# foundMatch = True
-	# obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
-
-
-def isPhoneNumber(msg):
-	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
-	if not matches.has_next():
-		return False
-	match = matches.next()
-	return match.start == 0 and match.end == len(msg)
-
-	return matches.has_next()
-
-
-def extractPhoneNumbers(msg):
-	matches = phonenumbers.PhoneNumberMatcher(msg, 'US')
-	remaining_str = unicode(msg)
-	phone_numbers = []
-	for match in matches:
-		formatted = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
-		if formatted:
-			phone_numbers.append(formatted)
-			logger.debug("removing %s in %s" % (match.raw_string, remaining_str))
-			remaining_str = remaining_str.replace(match.raw_string, "")
-
-	return phone_numbers, remaining_str
-
-def isCreateHandleCommand(msg):
-	phoneNumbers, remaining_str = extractPhoneNumbers(msg)
-	return (
-		isHandle(remaining_str.strip())
-		and phoneNumbers is not None
-		and len(phoneNumbers) > 0
-	)
 
 
 def isFetchHandleCommand(msg):

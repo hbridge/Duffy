@@ -55,6 +55,7 @@ class SMSKeeperBaseCase(TestCase):
 		if activated:
 			dt = date_util.now(pytz.utc)
 			self.user.activated = datetime.datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
+			self.user.name = "Test User"
 		if productId:
 			self.user.product_id = productId
 		self.user.state = state

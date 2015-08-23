@@ -298,6 +298,13 @@ class User(models.Model):
 		entries = Entry.objects.filter(id__in=entryIds)
 		return entries
 
+	def setUnresolvedHandles(self, handles):
+		self.setStateData("unresolvedHandles", handles)
+		self.save()
+
+	def getUnresolvedHandles(self):
+		return self.getStateData("unresolvedHandles")
+
 	def __unicode__(self):
 		if self.name:
 			return str(self.id) + " - " + self.name

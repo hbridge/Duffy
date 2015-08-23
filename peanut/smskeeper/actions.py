@@ -2,47 +2,16 @@ import random
 import pytz
 import logging
 import datetime
+import json
 
 from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants
-import django
-
 from smskeeper.models import Entry, Contact, User
 from smskeeper import analytics
 
 from common import slack_logger, date_util
 
 logger = logging.getLogger(__name__)
-
-
-def shareEntries(user, entries, handles, keeperNumber):
-	sharedHandles = list()
-	notFoundHandles = list()
-	if not isinstance(entries, django.db.models.query.QuerySet) and not isinstance(entries, list):
-		raise TypeError("entries must be list or django.db.models.query.QuerySet, actual type: %s" % (type(entries)))
-	if not isinstance(handles, list):
-		raise TypeError("handles must be a list, actual type: %s" % (type(handles)))
-	for handle in handles:
-		contact = Contact.fetchByHandle(user, handle)
-		if contact is None:
-			notFoundHandles.append(handle)
-		else:
-			# add the target user to the entry and send them a message
-			sharedHandles.append(handle)
-			for entry in entries:
-				entry.users.add(contact.target)
-
-			shareText = None
-			if len(entries) == 1:
-				shareText = "%s shared \"%s %s\" with you." % (user.nameOrPhone(), entry.text, entry.label)
-			else:
-				shareText = "%s shared %d items tagged %s with you." % (user.nameOrPhone(), len(entries), entry.label)
-
-			if len(contact.target.getMessages(incoming=False)) == 0:  # this is a new user, send them special text.
-				user_util.activate(contact.target, "Hi there. %s" % (shareText), None, keeperNumber)
-			else:
-				sms_util.sendMsg(contact.target, "Ding ding! %s" % (shareText), None, keeperNumber)
-	return sharedHandles, notFoundHandles
 
 
 def fetch(user, label, keeperNumber):
@@ -153,10 +122,17 @@ def createHandle(user, handle, targetNumber, initialState=None):
 	try:
 		target_user = User.objects.get(phone_number=targetNumber)
 	except User.DoesNotExist:
-		target_user = User.objects.create(phone_number=targetNumber)
-		if initialState:
-			target_user.setState(initialState)
-		target_user.save()
+		target_user = user_util.createUser(
+			targetNumber,
+			json.dumps({
+				"source": "sharedReminder",
+				"referer": user.id
+			}),
+			user.getKeeperNumber(),
+			user.product_id,
+			None,
+			isShare=True
+		)
 		createdUser = True
 
 	if contact is not None:

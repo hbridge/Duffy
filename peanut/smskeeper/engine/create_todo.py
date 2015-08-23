@@ -8,7 +8,6 @@ from smskeeper import keeper_constants, chunk_features
 from .action import Action
 import collections
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -67,7 +66,7 @@ class CreateTodoAction(Action):
 
 	def execute(self, chunk, user):
 		nattyResult = chunk.getNattyResult(user)
-
+		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
 		keeperNumber = user.getKeeperNumber()
 
 		if nattyResult is None:
@@ -101,8 +100,16 @@ class CreateTodoAction(Action):
 		# We set this so it knows what entry was created
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
+		# if the reminder has other handles that are the object of a remind commmand
+		# we share with them and then resolve as necessary
+		if len(chunk.handles()) > 0 and chunkFeatures.primaryActionIsRemind():
+			sharedHandles, unresolvedHandles = reminder_util.shareReminders(user, [entry], chunk.handles(), keeperNumber)
+			if len(unresolvedHandles) > 0:
+				user.setUnresolvedHandles(unresolvedHandles)
+				reminder_util.sendUnresolvedHandlesPrompt(user, keeperNumber)
+
 		# If we're in the tutorial and they didn't give a time, then give a different follow up
-		if not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT and not user.isTutorialComplete():
+		elif not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT and not user.isTutorialComplete():
 			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
 			return False
 		else:

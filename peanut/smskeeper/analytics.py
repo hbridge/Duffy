@@ -24,11 +24,12 @@ def logUserEvent(user, eventName, parametersDict=None):
 
 
 def setUserInfo(user):
-	mp.people_set(user.id, {
-		'$first_name': user.name,
-		'$phone': user.phone_number,
-		'product_id': user.product_id,
-		'source': user.getSignupData('source'),
-		'exp': user.getSignupData('exp'),
-		'paid': user.getSignupData('paid')
-	})
+	if settings.MIXPANEL_TOKEN is not None and user.id > 3:
+		mp.people_set(user.id, {
+			'$first_name': user.name,
+			'$phone': user.phone_number,
+			'product_id': user.product_id,
+			'source': user.getSignupData('source'),
+			'exp': user.getSignupData('exp'),
+			'paid': user.getSignupData('paid')
+		})

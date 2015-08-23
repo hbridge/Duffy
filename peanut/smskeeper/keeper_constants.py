@@ -276,6 +276,7 @@ CLASS_QUESTION = "question"
 CLASS_FRUSTRATION = "frustration"
 CLASS_TIP_QUESTION_RESPONSE = "tip-question-response"
 CLASS_JOKE = "joke"
+CLASS_RESOLVE_HANDLE = "resolve-handle"
 CLASS_UNKNOWN = "unknown"
 
 CLASS_MENU_OPTIONS = ([
@@ -332,6 +333,10 @@ CLASS_MENU_OPTIONS = ([
 		"value": CLASS_JOKE
 	},
 	{
+		"text": "Resolve Handle",
+		"value": CLASS_RESOLVE_HANDLE
+	},
+	{
 		"text": "NoCategory",
 		"value": CLASS_NONE
 	},
@@ -342,6 +347,7 @@ OUTGOING_SURVEY = "survey"
 OUTGOING_REMINDER = "reminder"
 OUTGOING_JOKE = "joke"
 OUTGOING_CHANGE_DIGEST_TIME = "change-digest-time"
+OUTGOING_RESOLVE_HANDLE = "outgoing-resolve-handle"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"
@@ -371,3 +377,5 @@ RECURRENCE_CHOICES = [
 WHATSAPP_STATUS = u"\U0001F64B Hi, I'm here to help!"
 
 GOAL_DONE_COUNT = 3
+
+SHARED_REMINDER_RECIPIENT_UPSELL = "Btw, txt back any time for info on my free personal assistant services. :raising_hand:"

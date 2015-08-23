@@ -21,7 +21,7 @@ from common import slack_logger
 logger = logging.getLogger(__name__)
 
 
-def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase):
+def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase, isShare=False):
 	if keeperNumber and productId is None:
 		productId = keeper_constants.TODO_PRODUCT_ID
 		for pId, number in settings.KEEPER_NUMBER_DICT.iteritems():
@@ -69,7 +69,12 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 
 	# Here we need to pass in the keeperNumber in the case of cli
 	# Normally the overrideKeeper number is set in processing_util, but this code is run before that
-	sms_util.sendMsgs(user, msgsToSend, keeperNumber=keeperNumber)
+	if not isShare:
+		sms_util.sendMsgs(user, msgsToSend, keeperNumber=keeperNumber)
+	else:
+		user.setActivated(False)
+		user.setState(keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER)
+		user.save()
 
 	analytics.logUserEvent(
 		user,
@@ -77,7 +82,8 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 		{
 			"Days Waiting": time_utils.daysAndHoursAgo(user.added)[0],
 			"Tutorial": tutorialState,
-			"Source": user.getSignupData('source')
+			"Source": user.getSignupData('source'),
+			"Is Share": isShare
 		}
 	)
 

@@ -10,6 +10,8 @@ from smskeeper import msg_util
 from common import natty_util
 from smskeeper.models import Entry, Contact
 from smskeeper import helper_util, sms_util, entry_util
+import django
+from smskeeper import user_util
 
 import logging
 logger = logging.getLogger(__name__)
@@ -336,6 +338,56 @@ def getNattyResult(user, msg):
 
 	return nattyResult
 
+
+def shareReminders(user, entries, handles, keeperNumber):
+	sharedHandles = list()
+	notFoundHandles = list()
+	if not isinstance(entries, django.db.models.query.QuerySet) and not isinstance(entries, list):
+		raise TypeError("entries must be list or django.db.models.query.QuerySet, actual type: %s" % (type(entries)))
+	if not isinstance(handles, list):
+		raise TypeError("handles must be a list, actual type: %s" % (type(handles)))
+	for handle in handles:
+		contact = Contact.fetchByHandle(user, handle)
+		if contact is None:
+			notFoundHandles.append(handle)
+		else:
+			# add the target user to the entry and send them a message
+			sharedHandles.append(handle)
+			for entry in entries:
+				entry.users.add(contact.target)
+
+			shareText = None
+			if len(entries) == 1:
+				tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
+				shareText = "Hi there! %s set a reminder %s for you: %s" % (
+					user.nameOrPhone(),
+					msg_util.naturalize(date_util.now(user.getTimezone()), tzAwareDate, includeTime=True),
+					entry.text
+				)
+			else:
+				shareText = "Hi there! %s set %d reminders for you." % (user.nameOrPhone(), len(entries))
+			sms_util.sendMsg(contact.target, shareText, None, keeperNumber)
+			if len(contact.target.getMessages(incoming=False)) == 0:
+				# this is a new user, send them special text.
+				sms_util.sendDelayedMsg(
+					contact.target,
+					keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL,
+					10,
+					keeperNumber
+				)
+
+	return sharedHandles, notFoundHandles
+
+
+def sendUnresolvedHandlesPrompt(user, keeperNumber):
+	unresolvedHandles = user.getUnresolvedHandles()
+	sms_util.sendMsg(
+		user,
+		"What's %s's phone number?" % (unresolvedHandles[0]),
+		None,
+		keeperNumber,
+		classification=keeper_constants.OUTGOING_RESOLVE_HANDLE
+	)
 
 
 """

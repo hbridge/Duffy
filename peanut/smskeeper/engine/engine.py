@@ -18,6 +18,7 @@ from smskeeper.engine.create_todo import CreateTodoAction
 from smskeeper.engine.complete_todo_most_recent import CompleteTodoMostRecentAction
 from smskeeper.engine.complete_todo_specific import CompleteTodoSpecificAction
 from smskeeper.engine.tip_question_response import TipQuestionResponseAction
+from smskeeper.engine.resolve_handle import ResolveHandleAction
 from smskeeper.engine.jokes import JokeAction
 
 logger = logging.getLogger(__name__)
@@ -27,9 +28,38 @@ class Engine:
 	actionList = None
 	minScore = 0.0
 
-	DEFAULT = [StopAction(), FetchWeatherAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), ChangeSettingAction(), FrustrationAction(), FetchDigestAction(), ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(), CompleteTodoMostRecentAction(), CompleteTodoSpecificAction(), TipQuestionResponseAction(), JokeAction()]
-	TUTORIAL_BASIC = [StopAction(), QuestionAction(), NicetyAction(), SilentNicetyAction(), HelpAction(), FrustrationAction()]
-	TUTORIAL_STEP_2 = [ChangetimeMostRecentAction(), ChangetimeSpecificAction(), CreateTodoAction(tutorial=True)]
+	DEFAULT = ([
+		StopAction(),
+		FetchWeatherAction(),
+		QuestionAction(),
+		NicetyAction(),
+		SilentNicetyAction(),
+		HelpAction(),
+		ChangeSettingAction(),
+		FrustrationAction(),
+		FetchDigestAction(),
+		ChangetimeMostRecentAction(),
+		ChangetimeSpecificAction(),
+		CreateTodoAction(),
+		CompleteTodoMostRecentAction(),
+		CompleteTodoSpecificAction(),
+		TipQuestionResponseAction(),
+		JokeAction(),
+		ResolveHandleAction()
+	])
+	TUTORIAL_BASIC = ([
+		StopAction(),
+		QuestionAction(),
+		NicetyAction(),
+		SilentNicetyAction(),
+		HelpAction(),
+		FrustrationAction()
+	])
+	TUTORIAL_STEP_2 = ([
+		ChangetimeMostRecentAction(),
+		ChangetimeSpecificAction(),
+		CreateTodoAction(tutorial=True)
+	])
 
 	def __init__(self, actionList, minScore):
 		self.actionList = actionList

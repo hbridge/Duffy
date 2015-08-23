@@ -51,13 +51,17 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))
 				self.assertEqual([], chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
 
-	'''
 	def test_shared_reminder_normal(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
-		cliMsg.msg(self.testPhoneNumber, "+16505555555")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
+			self.assertIn("mom's", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, phoneNumber)
+			self.assertIn(self.user.name, self.getOutput(mock))
 
 		# Make sure other user was created successfully
 		otherUser = User.objects.get(phone_number=phoneNumber)
@@ -67,6 +71,18 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure entries were created correctly
 		self.assertEquals(2, len(entry.users.all()))
 
+	def test_bad_capitalization(self, dateMock):
+		self.setupUser(dateMock)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Can You Remind Me Around 8 To Put Medicine, Pillow, Minion In Suitcase")
+			self.assertNotIn("phone number", self.getOutput(mock))
+
+	def test_other_action_for_object(self, dateMock):
+		self.setupUser(dateMock)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
+			self.assertNotIn("phoneNumber", self.getOutput(mock))
+	'''
 	def test_shared_reminder_for_existing_user(self, dateMock):
 		self.setupUser(dateMock)
 

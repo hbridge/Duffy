@@ -43,7 +43,7 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.MON_8AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "#reminder book meeting with Andrew for tuesday morning in two hours")
+			cliMsg.msg(self.testPhoneNumber, "Remind me to book meeting with Andrew for tuesday morning in two hours")
 			self.assertIn("by 10am", self.getOutput(mock))
 
 	"""
