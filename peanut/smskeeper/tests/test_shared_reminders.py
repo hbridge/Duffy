@@ -100,7 +100,10 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
 		cliMsg.msg(self.testPhoneNumber, "+16505555555")
-		cliMsg.msg(self.testPhoneNumber, "remind mom to go poop Sunday at 10 am")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind mom to go poop Sunday at 10 am")
+			# make sure the creator gets a confirmation
+			self.assertIn("mom", self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")
 
