@@ -265,6 +265,19 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 					found = True
 			self.assertEqual(found, True)
 
+	def test_thanks_upsell_before_tutorial_completed(self, dateMock):
+		self.setupUser(True, False, dateMock=dateMock)
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thanks")
+			output = self.getOutput(mock)
+			found = False
+			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+				if phrase in output:
+					found = True
+			self.assertEqual(found, False)
+
 	def test_feedback_upsell(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
 

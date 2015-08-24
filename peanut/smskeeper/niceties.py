@@ -217,7 +217,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		logger.info("Asked to talk to user: %s" % (user.id))
 
 		return "%s %s" % (base, keeper_constants.FEEDBACK_PHRASE)
-	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
+	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS) and user.completed_tutorial == True:
 		user.last_share_upsell = date_util.now(pytz.utc)
 		user.save()
 		phrase, link = random.choice(keeper_constants.SHARE_UPSELL_PHRASES)
