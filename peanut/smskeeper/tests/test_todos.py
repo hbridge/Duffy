@@ -1377,7 +1377,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.MON_9AM)
 
-		cliMsg.msg(self.testPhoneNumber, "Tell Brandon you didn't get his email tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "Remind me to tell Brandon you didn't get his email tomorrow")
 		cliMsg.msg(self.testPhoneNumber, "write check for guymon heat and air today")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
