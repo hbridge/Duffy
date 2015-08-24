@@ -104,7 +104,7 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		APPOINTMENT_TIP_ID,
-		"Btw, I'm great at reminding you about random appointments. Just txt me when you need to go to the doctor, dentist, hair salon, DMV, etc. :syringe:",
+		"Btw, I'm great at reminding you about random appointments. Just txt me when you need to go to the doctor, dentist, hair salon, DMV, etc. :mask:",
 		type=FULL_TIP_TYPE
 	),
 
