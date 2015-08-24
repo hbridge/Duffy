@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import entry_util, sms_util, actions, chunk_features
+from smskeeper import entry_util, sms_util, actions, chunk_features, msg_util
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from .action import Action
@@ -43,7 +43,9 @@ class CompleteTodoSpecificAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		entries = entry_util.fuzzyMatchEntries(user, chunk.originalText)
+		cleanedCommand = msg_util.getInterestingWords(chunk.originalText, removeDones=True)
+
+		entries = entry_util.fuzzyMatchEntries(user, ' '.join(cleanedCommand))
 
 		for entry in entries:
 			entry.hidden = True

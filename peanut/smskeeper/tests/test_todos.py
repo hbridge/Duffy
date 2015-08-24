@@ -1946,3 +1946,15 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[0].hidden)
 		self.assertFalse(entries[1].hidden)
 		self.assertTrue(entries[2].hidden)
+
+	# Had a bug where "check" was being removed so squashes were over aggressive
+	def test_squash_over_aggressive(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Leave work tonight at 11:20")
+		cliMsg.msg(self.testPhoneNumber, "Cash check tomorrow morning")
+
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(2, len(entries))
