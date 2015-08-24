@@ -119,7 +119,6 @@ def processReminder(entry):
 				if user.id == entry.creator.id:
 					otherUsers = set(users)
 					otherUsers.remove(entry.creator)
-					print "users: %s otherUsers %s" % (users, otherUsers)
 					otherUserNames = map(lambda target: Contact.fetchByTarget(entry.creator, target).handle, list(otherUsers))
 
 					msg = "Hi there :wave: Just letting you know that I just sent %s a reminder for you." % (", ".join(otherUserNames))
