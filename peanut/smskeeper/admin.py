@@ -8,24 +8,11 @@ from django.utils import safestring
 
 from smskeeper.models import User, Entry
 from smskeeper import keeper_constants
-from smskeeper import user_util
 
-
-def activate_to_remind(modeladmin, request, users):
-	for user in users:
-		user_util.activate(user, keeper_constants.FIRST_INTRO_MESSAGE_NO_MAGIC, keeper_constants.STATE_TUTORIAL_REMIND, user.getKeeperNumber())
-activate_to_remind.short_description = "Activate to Remind Tutorial"
-
-
-def activate_to_list(modeladmin, request, users):
-	for user in users:
-		user_util.activate(user, keeper_constants.FIRST_INTRO_MESSAGE_NO_MAGIC, False, keeper_constants.STATE_TUTORIAL_LIST, user.getKeeperNumber())
-activate_to_list.short_description = "Activate to List Tutorial"
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
 	list_display = ('id', 'activated', 'phone_number', 'name', 'state', 'completed_tutorial', 'state_data', 'print_last_message_date', 'total_msgs_from', 'history')
-	actions = [activate_to_remind, activate_to_list]
 
 
 @admin.register(Entry)
@@ -48,19 +35,29 @@ mark_as_hidden.short_description = "Mark as hidden"
 @admin.register(Reminder)
 class ReminderAdmin(admin.ModelAdmin):
 
+	def getNiceDate(self, obj, dt):
+		if dt.year != 2015:
+			dtBase = dt.strftime('%a, %b %d, %Y')
+		else:
+			dtBase = dt.strftime('%a, %b %d')
+		dtTime = dt.strftime('%I:%M %p').lstrip("0").replace(" 0", " ")
+		if obj.use_digest_time:
+			return "%s, digest" % dtBase
+		else:
+			return "%s, %s" % (dtBase, dtTime)
+
 	def queryset(self, request):
 		qs = super(ReminderAdmin, self).queryset(request)
 		return qs.filter(remind_timestamp__isnull=False).exclude(Q(creator__state=keeper_constants.STATE_STOPPED) | Q(creator__state=keeper_constants.STATE_SUSPENDED)).order_by("hidden", "remind_timestamp")
 
-	def added_tz_aware(self, obj):
-		return obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
+	def time_added_tz_aware(self, obj):
+		dt = obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
+		return self.getNiceDate(obj, dt)
 
 	def remind_timestamp_tz_aware(self, obj):
 		dt = obj.remind_timestamp.astimezone(obj.creator.getTimezone()).replace(tzinfo=pytz.utc)
-		if obj.use_digest_time:
-			return "%s, digest" % dt.strftime('%b %d, %Y')
-		else:
-			return dt
+
+		return self.getNiceDate(obj, dt)
 
 	def product_id(self, obj):
 		return obj.creator.product_id
@@ -98,8 +95,8 @@ class ReminderAdmin(admin.ModelAdmin):
 		obj.manually_updated_timestamp = datetime.datetime.now(pytz.utc)
 		obj.save()
 
-	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_recur', 'reminder_sent', 'hidden', 'updated')
-	readonly_fields = ['added_tz_aware']
+	list_display = ('id', 'creator', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'time_added_tz_aware', 'remind_recur', 'reminder_sent', 'hidden', 'updated')
+	readonly_fields = ['time_added_tz_aware']
 	search_fields = ['creator__id']
 
 	actions = [mark_as_hidden]
@@ -141,7 +138,7 @@ class ToCheck(ReminderAdmin):
 
 	actions = [mark_as_approved, mark_as_hidden]
 
-	list_display = ('id', 'approve_button', 'creator_with_link', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'added_tz_aware', 'remind_recur', 'reminder_sent', 'updated')
+	list_display = ('id', 'approve_button', 'creator_with_link', 'text', 'orig_text', 'remind_timestamp_tz_aware', 'time_added_tz_aware', 'remind_recur', 'reminder_sent', 'updated')
 
 	def queryset(self, request):
 		qs = super(ToCheck, self).queryset(request)
