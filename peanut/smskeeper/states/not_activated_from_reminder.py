@@ -1,4 +1,3 @@
-import datetime
 import pytz
 import logging
 import json
@@ -14,12 +13,12 @@ logger = logging.getLogger(__name__)
 def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
-		msgFollowup = "No problem. If there is anything I can help you with, just say 'tell me more' or visit http://getkeeper.com"
+		msgFollowup = ":thumbsup: If there is anything I can help you with, just say 'tell me more' or visit http://getkeeper.com"
 		sms_util.sendMsg(user, msgFollowup, None, keeperNumber)
 	elif "tell me more" in msg.lower():
 		user.signup_data_json = json.dumps({"source": "reminder"})
+		user_util.activateUser(user, None, keeperNumber)
 		user.save()
-		user_util.activate(user, "", None, keeperNumber)
 	elif not settings.DEBUG:
 		user.paused = True
 		user.save()
@@ -30,4 +29,4 @@ def process(user, msg, requestDict, keeperNumber):
 			postMsg = "User %s paused after: %s" % (user.id, msg)
 			slack_logger.postManualAlert(user, postMsg, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 
-	return True, None
+	return True, keeper_constants.CLASS_NONE, dict()

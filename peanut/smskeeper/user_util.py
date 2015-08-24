@@ -48,7 +48,33 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 
 	user.save()
 
+	if not isShare:
+		tutorialState = activateUser(user, introPhrase, keeperNumber)
+	else:
+		user.setActivated(False)
+		user.setState(keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER)
+		user.save()
+		tutorialState = None
+
+	analytics.logUserEvent(
+		user,
+		"User Activated",
+		{
+			"Days Waiting": time_utils.daysAndHoursAgo(user.added)[0],
+			"Tutorial": tutorialState,
+			"Source": user.getSignupData('source'),
+			"Is Share": isShare
+		}
+	)
+
+	return user
+
+
+# Activates user into tuorial state and sends the initial messages
+def activateUser(user, introPhrase, keeperNumber):
 	msgsToSend = list()
+
+	productId = user.product_id
 
 	if introPhrase:
 		msgsToSend.append(introPhrase)
@@ -72,25 +98,7 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 
 	# Here we need to pass in the keeperNumber in the case of cli
 	# Normally the overrideKeeper number is set in processing_util, but this code is run before that
-	if not isShare:
-		sms_util.sendMsgs(user, msgsToSend, keeperNumber=keeperNumber)
-	else:
-		user.setActivated(False)
-		user.setState(keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER)
-		user.save()
-
-	analytics.logUserEvent(
-		user,
-		"User Activated",
-		{
-			"Days Waiting": time_utils.daysAndHoursAgo(user.added)[0],
-			"Tutorial": tutorialState,
-			"Source": user.getSignupData('source'),
-			"Is Share": isShare
-		}
-	)
-
-	return user
+	sms_util.sendMsgs(user, msgsToSend, keeperNumber=keeperNumber)
 
 
 def shouldIncludeEntry(entry, includeAll):

@@ -6,7 +6,7 @@ from datetime import timedelta
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import stopped, tutorial_todo, tutorial_medical, tutorial_student, suspended
+from smskeeper.states import stopped, tutorial_todo, tutorial_medical, tutorial_student, suspended, not_activated_from_reminder
 from smskeeper import actions, user_util, sms_util, helper_util
 from smskeeper.chunk import Chunk
 
@@ -206,6 +206,7 @@ stateCallbacks = {
 	keeper_constants.STATE_TUTORIAL_STUDENT: tutorial_student,
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_SUSPENDED: suspended,
+	keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER: not_activated_from_reminder,
 }
 
 # Checks for duplicate message

@@ -123,8 +123,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "hi")
 			# Make sure
-			self.assertIn("Hi there.", self.getOutput(mock))
-
+			self.assertIn("just say 'tell me more'", self.getOutput(mock))
 
 	def test_shared_reminder_other_person_tell_me_more(self, dateMock):
 		phoneNumber = "+16505555555"
@@ -136,12 +135,12 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "tell me more")
 			# See if it goes into tutorial
-			self.assertIn("Hi", self.getOutput(mock))
+			self.assertIn("what's your name?", self.getOutput(mock))
 
 	def test_shared_reminder_other_person_paused(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
-		self.setNow(dateMock, self.MON_9AM) # have to set time to pause
+		self.setNow(dateMock, self.MON_9AM)  # have to set time to pause
 
 		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
 		cliMsg.msg(self.testPhoneNumber, phoneNumber)
