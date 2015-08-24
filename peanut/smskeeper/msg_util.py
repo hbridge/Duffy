@@ -272,8 +272,16 @@ def startsWithNo(msg):
 
 
 # Returns a string which doesn't have the "remind me" phrase in it
-def cleanedReminder(msg, recurrence=None):
+def cleanedReminder(msg, recurrence=None, shareHandles=None):
 	cleaned = msg
+
+	# remove shared handles
+	if shareHandles:
+		for handle in shareHandles:
+			cleaned = cleaned.replace(handle, "")
+			cleaned = cleaned.strip()
+
+	# remove timing info etc
 	regexesToRemove = [reminder_re]
 	if recurrence:
 		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))

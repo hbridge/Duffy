@@ -71,6 +71,18 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure entries were created correctly
 		self.assertEquals(2, len(entry.users.all()))
 
+	def test_shared_reminder_text(self, dateMock):
+		phoneNumber = "+16505555555"
+		self.setupUser(dateMock)
+
+		cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		entry = Entry.objects.filter(label="#reminders").last()
+		# Make sure entries were created correctly
+		self.assertNotIn("mom", entry.text.lower())
+		self.assertNotIn("to", entry.text.lower())
+
 	def test_bad_capitalization(self, dateMock):
 		self.setupUser(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -153,6 +165,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			async.processReminder(entry)
 			self.assertIn("Bob", self.getOutput(mock))
 			self.assertIn("pill", self.getOutput(mock))
+			self.assertIn("mom", self.getOutput(mock))
 
 	def test_shared_reminder_snooze(self, dateMock):
 		phoneNumber = "+16505555555"

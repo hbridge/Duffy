@@ -95,8 +95,8 @@ def isFollowup(user, entry, msg, nattyResult):
 	return False
 
 
-def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recurrence=None):
-	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming, recurrence)  # no "Remind me", or recurrence text
+def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recurrence=None, shareHandles=None):
+	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming, recurrence, shareHandles)  # no "Remind me", or recurrence text
 	cleanedText = msg_util.warpReminderText(cleanedText)  # I to your
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 

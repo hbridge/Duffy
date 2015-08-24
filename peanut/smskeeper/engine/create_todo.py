@@ -89,21 +89,29 @@ class CreateTodoAction(Action):
 				recurFrequency = frequency
 				break
 
+		# Figure out if this is a shared reminder: if the reminder has other handles and the reminder
+		# starts with remind, tell, text etc.
+		shareHandles = None
+		if len(chunk.handles()) > 0 and chunkFeatures.primaryActionIsRemind():
+			shareHandles = chunk.handles()
+
 		entry = reminder_util.createReminderEntry(
 			user,
 			nattyResult,
 			chunk.originalText,
 			sendFollowup,
 			keeperNumber,
-			recurrence=recurFrequency
+			recurrence=recurFrequency,
+			shareHandles=shareHandles
 		)
 		# We set this so it knows what entry was created
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
 		# if the reminder has other handles that are the object of a remind commmand
 		# we share with them and then resolve as necessary
-		if len(chunk.handles()) > 0 and chunkFeatures.primaryActionIsRemind():
-			sharedHandles, unresolvedHandles = reminder_util.shareReminders(user, [entry], chunk.handles(), keeperNumber)
+
+		if shareHandles:
+			sharedHandles, unresolvedHandles = reminder_util.shareReminders(user, [entry], shareHandles, keeperNumber)
 			if len(unresolvedHandles) > 0:
 				user.setUnresolvedHandles(unresolvedHandles)
 				reminder_util.sendUnresolvedHandlesPrompt(user, keeperNumber)

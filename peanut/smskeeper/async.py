@@ -22,6 +22,7 @@ from smskeeper.models import Entry, Message, User
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from smskeeper import time_utils
+from smskeeper.models import Contact
 
 from common import date_util, weather_util
 
@@ -112,14 +113,18 @@ def processReminder(entry):
 	for user in users:
 		if user.state == keeper_constants.STATE_STOPPED:
 			pass
-		elif isSharedReminder and user.id == entry.creator.id:
-			# Only process reminders for the non-creator
-			pass
 		else:
 			if isSharedReminder:
 				# If they've never used the system before
-				if user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
-					msg = "Hi, I'm Keeper. I'm a digital assistant. %s wanted me to remind you: %s" % (entry.creator.name, entry.text)
+				if user.id == entry.creator.id:
+					otherUsers = set(users)
+					otherUsers.remove(entry.creator)
+					print "users: %s otherUsers %s" % (users, otherUsers)
+					otherUserNames = map(lambda target: Contact.fetchByTarget(entry.creator, target).handle, list(otherUsers))
+
+					msg = "Hi there :wave: Just letting you know that I just sent %s a reminder for you." % (", ".join(otherUserNames))
+				elif user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
+					msg = "Hi :wave: I'm %s's digital assistant. %s wanted me to remind you: %s" % (entry.creator.name, entry.creator.name, entry.text)
 				else:
 					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
 			else:
