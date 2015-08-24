@@ -134,7 +134,7 @@ SMSKEEPER_NICETIES = [
 		["Thanks, you too! :smile:"]
 	),
 	Nicety(
-		"(can you |please )?call me|can i call you",
+		"(can you |please )?call me\b|can i call you",
 		["Sorry, I can only txt at the moment."]
 	),
 	Nicety(
