@@ -104,7 +104,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# else ignore
 				return True, keeper_constants.CLASS_NONE, actionScores
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
+		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Submit club dues on Friday' or 'Meet with advisor on Monday at 4pm'."], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
@@ -129,7 +129,7 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(
 			user,
 			[
-				u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do?",
+				u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do this week?",
 			],
 			keeperNumber)
 
