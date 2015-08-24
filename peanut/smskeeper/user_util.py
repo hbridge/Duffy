@@ -44,7 +44,7 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 		user.invite_code = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
 	if not user.key:
-		user.key = "K" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		user.key = "P" + str(productId) + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
 	user.save()
 
@@ -59,6 +59,9 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 	elif productId == keeper_constants.MEDICAL_PRODUCT_ID:
 		tutorialState = keeper_constants.STATE_TUTORIAL_MEDICAL
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES_MEDICAL)
+	elif productId == keeper_constants.STUDENT_PRODUCT_ID:
+		tutorialState = keeper_constants.STATE_TUTORIAL_STUDENT
+		msgsToSend.extend(keeper_constants.INTRO_MESSAGES)
 	else:
 		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
 		msgsToSend.extend(keeper_constants.INTRO_MESSAGES)

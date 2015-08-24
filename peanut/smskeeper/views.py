@@ -496,6 +496,8 @@ def signup_from_website(request):
 					productId = keeper_constants.WHATSAPP_TODO_PRODUCT_ID
 				elif "medical" in exp:
 					productId = keeper_constants.MEDICAL_PRODUCT_ID
+				elif "student" in exp:
+					productId = keeper_constants.STUDENT_PRODUCT_ID
 				else:
 					productId = keeper_constants.TODO_PRODUCT_ID
 

@@ -6,7 +6,7 @@ from datetime import timedelta
 from smskeeper import keeper_constants
 from smskeeper import analytics
 
-from smskeeper.states import stopped, tutorial_todo, tutorial_medical, suspended
+from smskeeper.states import stopped, tutorial_todo, tutorial_medical, tutorial_student, suspended
 from smskeeper import actions, user_util, sms_util, helper_util
 from smskeeper.chunk import Chunk
 
@@ -203,6 +203,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 stateCallbacks = {
 	keeper_constants.STATE_TUTORIAL_TODO: tutorial_todo,
 	keeper_constants.STATE_TUTORIAL_MEDICAL: tutorial_medical,
+	keeper_constants.STATE_TUTORIAL_STUDENT: tutorial_student,
 	keeper_constants.STATE_STOPPED: stopped,
 	keeper_constants.STATE_SUSPENDED: suspended,
 }

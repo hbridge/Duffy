@@ -86,7 +86,7 @@ SERVER_EMAIL = 'dev@duffyapp.com'
 KEEPER_NUMBER = "+18452088586"
 
 # Keeper number by product id
-KEEPER_NUMBER_DICT = {0: "+18452088586", 1: "+18452088586", 2: "3584573970584@s.whatsapp.net", 3: "+13144037026"}
+KEEPER_NUMBER_DICT = {0: "+18452088586", 1: "+18452088586", 2: "3584573970584@s.whatsapp.net", 3: "+13144037026", 4: "+16463626819"}
 WHATSAPP_CREDENTIALS = ("3584573970584", "2Vqf6AGTedRERwMVm3WdnU0DCbs=")
 WHATSAPP_SMS_URL = "http://dev.duffyapp.com/smskeeper/incoming_sms"
 WHATSAPP_PRESENCE_NAME = u"\U0001F64B DevKeeper"
