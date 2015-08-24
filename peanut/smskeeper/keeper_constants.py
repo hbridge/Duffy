@@ -81,8 +81,8 @@ ENTRY_IDS_DATA_KEY = "entryIDs"
 # FROM_TUTORIAL_KEY = "fromtutorial"
 TUTORIAL_STEP_KEY = "todo-tutorial-step"
 
-#LAST_SENT_ENTRIES_IDS_KEY = "lastSentEntryIds"
-#LAST_EDITED_ENTRY_ID_KEY = "lastEditedEntryId"
+# LAST_SENT_ENTRIES_IDS_KEY = "lastSentEntryIds"
+# LAST_EDITED_ENTRY_ID_KEY = "lastEditedEntryId"
 LAST_ENTRIES_IDS_KEY = "lastEntriesIds"
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
@@ -175,8 +175,8 @@ PHOTOS_TIP_URL = "https://s3.amazonaws.com/smskeeper/PhotosTip.png"
 KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
-SHARE_UPSELL_WEBLINK = 'weblink' # send weblink
-SHARE_UPSELL_PHONE = 'phone' # send phone number
+SHARE_UPSELL_WEBLINK = 'weblink'  # send weblink
+SHARE_UPSELL_PHONE = 'phone'  # send phone number
 
 # second parameter is whether to send out a website link or phone number
 SHARE_UPSELL_PHRASES = [
