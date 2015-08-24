@@ -5,6 +5,7 @@ import random
 import re
 import pytz
 import logging
+import phonenumbers
 
 from smskeeper import keeper_constants
 from smskeeper import msg_util
@@ -219,7 +220,14 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 	elif time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS):
 		user.last_share_upsell = date_util.now(pytz.utc)
 		user.save()
-		return "%s %s %s!" % (base, random.choice(keeper_constants.SHARE_UPSELL_PHRASES), user.getInviteUrl())
+		phrase, link = random.choice(keeper_constants.SHARE_UPSELL_PHRASES)
+		if link == keeper_constants.SHARE_UPSELL_WEBLINK:
+			link = user.getInviteUrl()
+		else:
+			link = user.getKeeperNumber()
+			if len(link) > 5:  # dealing with 'test' phone numbers
+				link = phonenumbers.format_number(phonenumbers.parse(user.getKeeperNumber(), 'US'), phonenumbers.PhoneNumberFormat.NATIONAL)
+		return "%s %s %s!" % (base, phrase, link)
 	else:
 		return base
 
@@ -251,6 +259,7 @@ def renderShareRequest(user, requestDict, keeperNumber):
 @custom_nicety_for(r'what(s| is) my name|keeper$')
 def renderNameQuery(user, requestDict, keeperNumber):
 	return "%s!" % (user.name.title())
+
 
 @custom_nicety_for(r'(my name isnt|my names not|im not) roger')
 def renderRogerConfusion(user, requestDict, keeperNumber):

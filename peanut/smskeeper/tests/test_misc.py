@@ -236,9 +236,9 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			found = False
-			for phrase in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
 				if phrase in output:
-					found = True			
+					found = True
 			self.assertEqual(found, True)
 
 		# make sure we don't send it immediately after
@@ -246,9 +246,9 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
 			found = False
-			for phrase in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
 				if phrase in output:
-					found = True			
+					found = True
 			self.assertEqual(found, False)
 
 		# make sure we do send if the last share date was more than SHARE_UPSELL_FREQ prior
@@ -260,9 +260,9 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			found = False
-			for phrase in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
 				if phrase in output:
-					found = True			
+					found = True
 			self.assertEqual(found, True)
 
 	def test_feedback_upsell(self, dateMock):
