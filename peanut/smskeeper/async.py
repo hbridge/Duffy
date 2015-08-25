@@ -133,6 +133,7 @@ def processReminder(entry):
 				"Reminder Received",
 				parametersDict={
 					"Num Users": len(users),
+					"Is Reminder Creator": user.id == entry.creator.id,
 					"Reminder type": entry.remind_recur,
 					"Manually updated": entry.manually_updated,
 					"Manually checked": entry.manually_check,

@@ -128,6 +128,9 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recu
 
 	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
 
+	NumUsers = 1
+	if (shareHandles):
+		NumUsers += len(shareHandles)
 	analytics.logUserEvent(
 		user,
 		"Created Reminder",
@@ -135,7 +138,8 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recu
 			"Needed Followup": sendFollowup,
 			"Was Suspicious Hour": suspiciousHour,
 			"In tutorial": not user.isTutorialComplete(),
-			"Is shared": (shareHandles and len(shareHandles) > 1),
+			"Is shared": (NumUsers > 1),
+			"Num Users": NumUsers,
 			"interface": keeperNumber,
 		}
 	)
