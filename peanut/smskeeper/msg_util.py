@@ -290,7 +290,8 @@ def cleanedReminder(msg, recurrence=None, shareHandles=None):
 
 	# remove timing info etc
 	regexesToRemove = [reminder_re]
-	if recurrence:
+	if recurrence and recurrence is not keeper_constants.RECUR_ONE_TIME:
+		# recur one-time doesn't have timing text that triggers it
 		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
 
 	regexesToRemove.append(reminder_cleanup_re)

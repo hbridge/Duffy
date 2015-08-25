@@ -94,6 +94,8 @@ class CreateTodoAction(Action):
 		shareHandles = None
 		if len(chunk.handles()) > 0 and chunkFeatures.primaryActionIsRemind():
 			shareHandles = chunk.handles()
+			# make all shared reminders one-time for nw
+			recurFrequency = keeper_constants.RECUR_ONE_TIME
 
 		entry = reminder_util.createReminderEntry(
 			user,

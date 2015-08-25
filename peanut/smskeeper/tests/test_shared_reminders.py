@@ -18,8 +18,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_8AM)
 		return super(SMSKeeperSharedReminderCase, self).setupUser(True, True)
 
-	def createMomSharedReminder(self):
-		cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
+	def createSharedReminder(self, createText="Remind mom to take her pill tomorrow morning"):
+		cliMsg.msg(self.testPhoneNumber, createText)
 		cliMsg.msg(self.testPhoneNumber, self.recipientPhoneNumber)
 
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -165,7 +165,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 	def test_shared_reminder_digest(self, dateMock):
 		user = self.setupUser(dateMock)
 		self.setNow(dateMock, self.MON_8AM)
-		entry = self.createMomSharedReminder()
+		entry = self.createSharedReminder("Remind mom to take her medicine at 11 am tomorrow")
 		recipient = User.objects.get(phone_number=self.recipientPhoneNumber)
 
 		# move clock to tuesday make sure there's no digest for unactivated recipient
@@ -174,13 +174,14 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest(startAtId=(recipient.id - 1))
 			self.assertNotIn(entry.text, self.getOutput(mock))
 
-		# activate the recipient and make sure the item appears in the recipients digest
+		# activate the recipient, add another todo and make sure the item appears in the recipients digest
 		recipient.setActivated(True, tutorialState=keeper_constants.STATE_NORMAL)
 		recipient.completed_tutorial = True
 		recipient.name = "Mom"
 		recipient.signature_num_lines = 0
 		recipient.save()
 
+		entry = self.createSharedReminder("Remind mom to take her medicine at 11 am Wednesday")
 		self.setNow(dateMock, self.WED_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest(startAtId=(recipient.id - 1))
@@ -229,3 +230,9 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "remind me again in 1 hour")
 			self.assertIn("later", self.getOutput(mock))
+
+	def test_shared_reminder_onetime(self, dateMock):
+		# all shared reminders should be one-time for now
+		self.setupUser(dateMock)
+		entry = self.createSharedReminder()
+		self.assertEqual(entry.remind_recur, keeper_constants.RECUR_ONE_TIME)
