@@ -402,4 +402,7 @@ WHATSAPP_STATUS = u"\U0001F64B Hi, I'm here to help!"
 
 GOAL_DONE_COUNT = 3
 
-SHARED_REMINDER_RECIPIENT_UPSELL = "Btw, txt back any time for info on my free personal assistant services. :raising_hand:"
+SHARED_REMINDER_RECIPIENT_UPSELL = (
+	"Btw, I can help you stay organized as well. "
+	"Say 'tell me more' for more info on my free personal assistant services. :raising_hand:"
+)

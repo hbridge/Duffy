@@ -13,8 +13,9 @@ logger = logging.getLogger(__name__)
 def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
-		msgFollowup = ":thumbsup: If there is anything I can help you with, just say 'tell me more' or visit http://getkeeper.com"
-		sms_util.sendMsg(user, msgFollowup, None, keeperNumber)
+		response = nicety.getResponse(user, requestDict, user.getKeeperNumber())
+		response = "%s %s" % (response, keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL)
+		sms_util.sendMsg(user, response, None, keeperNumber)
 	elif "tell me more" in msg.lower():
 		user.signup_data_json = json.dumps({"source": "reminder"})
 		user_util.activateUser(user, None, keeperNumber)

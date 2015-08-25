@@ -123,7 +123,10 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(phoneNumber, "hi")
 			# Make sure
-			self.assertIn("just say 'tell me more'", self.getOutput(mock))
+			self.assertIn(
+				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
+				self.getOutput(mock)
+			)
 
 	def test_shared_reminder_other_person_tell_me_more(self, dateMock):
 		phoneNumber = "+16505555555"
