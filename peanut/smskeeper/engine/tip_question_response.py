@@ -3,7 +3,7 @@ import logging
 from smskeeper import keeper_constants
 from .action import Action
 from smskeeper import sms_util, actions, chunk_features
-from smskeeper import analytics
+from smskeeper import analytics, tips
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,35 @@ class TipQuestionResponseAction(Action):
 		except ValueError:
 			return False
 
+	def getFirstInt(self, chunk):
+		words = chunk.normalizedText().split(' ')
+		for word in words:
+			if self.isInt(word):
+				firstInt = int(word)
+				return firstInt
+		return None
+
+	def getIntResponseScore(self, justNotified, chunk):
+		score = 0.0
+		hasInt = False
+		words = chunk.normalizedText().split(' ')
+
+		hasIntFirst = self.isInt(words[0])
+
+		for word in words:
+			if self.isInt(word):
+				hasInt = True
+
+		if justNotified:
+			if hasInt:
+				if len(words) == 1:
+					score = 1.0
+				elif hasIntFirst:
+					score = .7
+			else:
+				score = 0.1
+		return score
+
 	def getScore(self, chunk, user):
 		score = 0.0
 
@@ -29,28 +58,7 @@ class TipQuestionResponseAction(Action):
 
 		# Check for survey
 		surveyJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY)
-
-		try:
-			hasInt = False
-			words = chunk.normalizedText().split(' ')
-
-			hasIntFirst = self.isInt(words[0])
-
-			for word in words:
-				if self.isInt(word):
-					hasInt = True
-
-			if surveyJustNotified:
-				if hasInt:
-					if len(words) == 1:
-						score = 1.0
-					elif hasIntFirst:
-						score = .7
-				else:
-					score = 0.1
-
-		except ValueError:
-			pass
+		score = self.getIntResponseScore(surveyJustNotified, chunk)
 
 		# Check for digest change time
 		digestChangeTimeJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_CHANGE_DIGEST_TIME, 2)
@@ -74,21 +82,15 @@ class TipQuestionResponseAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		words = chunk.normalizedText().split(' ')
-
 		# Note: Should we pass in the thing we matched on above down here?
 		# Only applies to rules that have multiple small things
 		surveyJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY)
 		digestChangeTimeJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_CHANGE_DIGEST_TIME, 2)
+		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID)
+		firstInt = self.getFirstInt(chunk)
 
 		if surveyJustNotified:
-			firstInt = None
-			for word in words:
-				if self.isInt(word):
-					firstInt = int(word)
-					break
-
-			if firstInt:
+			if firstInt is not None:
 				if firstInt < 3:
 					sms_util.sendMsg(user, "Got it, I won't send you a morning txt when there are no tasks")
 					user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
@@ -100,7 +102,21 @@ class TipQuestionResponseAction(Action):
 
 				analytics.logUserEvent(
 					user,
-					"Digest survey",
+					"Digest survey response",
+					{"Score": firstInt}
+				)
+			else:
+				return False
+		elif npsJustNotified:
+			if firstInt is not None:
+				if firstInt < 8:
+					sms_util.sendMsg(user, "Got it, thanks.")
+				else:
+					sms_util.sendMsg(user, "Great to hear!")
+
+				analytics.logUserEvent(
+					user,
+					"Digest nps response",
 					{"Score": firstInt}
 				)
 			else:
