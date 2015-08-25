@@ -51,6 +51,7 @@ PAY_BILLS_TIP_ID = "bills"
 GROCERY_LIST_TIP_ID = "grocery-list"
 TRASH_DAY_TIP_ID = "trash-day"
 APPOINTMENT_TIP_ID = "appointments"
+TICKETS_TIP_ID = "tickets"
 
 
 SNOOZE_TIP_ID = "mini-snooze"
@@ -104,7 +105,12 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		APPOINTMENT_TIP_ID,
-		"Btw, I'm great at reminding you about random appointments. Just txt me when you need to go to the doctor, dentist, hair salon, DMV, etc. :mask:",
+		"Btw, I'm great at reminding you about appointments. Just txt me when you need to go to the doctor, dentist, hair salon, DMV, etc. :mask:",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		TICKETS_TIP_ID,
+		"Want to remember to buy that show's tickets as soon as they go on sale? I can remind you at the exact time. Just txt me :ticket:",
 		type=FULL_TIP_TYPE
 	),
 
