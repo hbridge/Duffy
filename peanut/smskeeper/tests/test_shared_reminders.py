@@ -6,6 +6,7 @@ from smskeeper.models import Entry, User
 from smskeeper import cliMsg, tips
 from smskeeper import async, keeper_constants
 from smskeeper.chunk import Chunk
+from smskeeper import user_util
 import re
 
 import test_base
@@ -125,21 +126,19 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 	def test_shared_reminder_for_existing_user(self, dateMock):
 		self.setupUser(dateMock)
+		recipient = self.setupAnotherUser(self.recipientPhoneNumber, True, True, dateMock=dateMock)
 
-		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
-		cliMsg.msg(self.testPhoneNumber, "+16505555555")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "remind mom to go poop Sunday at 10 am")
-			# make sure the creator gets a confirmation
-			self.assertIn("mom", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+			cliMsg.msg(self.testPhoneNumber, self.recipientPhoneNumber)
+			self.assertNotIn(self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL), self.getOutput(mock))
 
+		# make sure we don't change the recipient's state
+		self.assertEqual(recipient.state, keeper_constants.STATE_NORMAL)
+
+		# Make sure entry was created correctly
 		entries = Entry.objects.filter(label="#reminders")
-
-		# Make sure entries were created correctly
-		self.assertEquals(2, len(entries))
-		# Make sure entries were both shared
 		self.assertEquals(2, len(entries[0].users.all()))
-		self.assertEquals(2, len(entries[1].users.all()))
 
 	def test_shared_reminder_nicety(self, dateMock):
 		phoneNumber = "+16505555555"

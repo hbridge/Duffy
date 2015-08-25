@@ -61,12 +61,13 @@ class ResolveHandleAction(Action):
 			user,
 			handleToResolve,
 			phoneNumbers[0],
-			initialState=keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER
 		)
 		analytics.logUserEvent(
 			user,
 			"Resolved Handle",
-			{}
+			{
+				"Did create user": didCreateUser,
+			}
 		)
 
 		# share the reminder with the user

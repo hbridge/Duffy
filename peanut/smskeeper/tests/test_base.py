@@ -47,22 +47,27 @@ class SMSKeeperBaseCase(TestCase):
 
 	# TODO(Derek): Eventually activated and tutorialComplete should go away
 	def setupUser(self, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL, productId=None, dateMock=None):
+		self.user = self.setupAnotherUser(self.testPhoneNumber, activated, tutorialComplete, state, productId, dateMock)
+
+		return self.user
+
+	def setupAnotherUser(self, phoneNumber, activated, tutorialComplete, state=keeper_constants.STATE_NORMAL, productId=None, dateMock=None):
 		if dateMock:
 			self.setNow(dateMock, self.TUE_8AM)
 
-		self.user, created = User.objects.get_or_create(phone_number=self.testPhoneNumber)
-		self.user.completed_tutorial = tutorialComplete
+		user, created = User.objects.get_or_create(phone_number=phoneNumber)
+		user.completed_tutorial = tutorialComplete
 		if activated:
 			dt = date_util.now(pytz.utc)
-			self.user.activated = datetime.datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
-			self.user.name = "Test User"
+			user.activated = datetime.datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
+			user.name = "Test User%s" % phoneNumber[7:]
 		if productId:
-			self.user.product_id = productId
-		self.user.state = state
-		self.user.signature_num_lines = 0
-		self.user.save()
+			user.product_id = productId
+		user.state = state
+		user.signature_num_lines = 0
+		user.save()
 
-		return self.user
+		return user
 
 	def getTestUser(self):
 		return User.objects.get(id=self.user.id)

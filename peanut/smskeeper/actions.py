@@ -106,7 +106,7 @@ def clear(user, label, keeperNumber):
 	)
 
 
-def createHandle(user, handle, targetNumber, initialState=None):
+def createHandle(user, handle, targetNumber):
 	# see if there's an existing contact for that handle
 	oldUser = None
 	createdUser = False
