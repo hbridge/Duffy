@@ -403,6 +403,19 @@ class Entry(models.Model):
 		entry.users.add(user)
 		return entry
 
+	def getOtherUserNames(self, user):
+		otherUsers = set(self.users.all())
+		otherUsers.remove(user)
+		otherUserNames = []
+		for otherUser in otherUsers:
+			contact = Contact.fetchByTarget(user, otherUser)
+			if contact:
+				otherUserNames.append(contact.handle)
+			elif otherUser.name:
+				otherUserNames.append(otherUser.name)
+
+		return otherUserNames
+
 
 class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)

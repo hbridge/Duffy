@@ -117,9 +117,7 @@ def processReminder(entry):
 			if isSharedReminder:
 				# If they've never used the system before
 				if user.id == entry.creator.id:
-					otherUsers = set(users)
-					otherUsers.remove(entry.creator)
-					otherUserNames = map(lambda target: Contact.fetchByTarget(entry.creator, target).handle, list(otherUsers))
+					otherUserNames = entry.getOtherUserNames(entry.creator)
 
 					msg = "Hi there :wave: Just letting you know that I just sent %s a reminder for you." % (", ".join(otherUserNames))
 				elif user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
@@ -219,6 +217,8 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			if not userRequested and user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 				updateEntryAfterProcessing(entry)
 			msg += u"\U0001F538 " + entry.text
+			if len(entry.users.all()) > 1:
+				msg += " (%s)" % (", ".join(entry.getOtherUserNames(user)))
 
 			if (entry.remind_timestamp > now + datetime.timedelta(minutes=1) and  # Need an extra minute since some 9am reminders are really 9:00:30
 						not entry.use_digest_time):  # Don't show the time if it was a default time

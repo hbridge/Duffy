@@ -184,7 +184,12 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.WED_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest(startAtId=(recipient.id - 1))
+			# make sure that the shared reminder is in the digest
 			self.assertIn(entry.text, self.getOutput(mock))
+
+			# make sure the name of the creator is listed with the todo
+			self.assertIn(" (%s)" % self.getTestUser().name, self.getOutput(mock))
+
 
 	def test_shared_reminder_processed(self, dateMock):
 		phoneNumber = "+16505555555"
