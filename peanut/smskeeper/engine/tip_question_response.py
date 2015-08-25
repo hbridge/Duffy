@@ -3,6 +3,7 @@ import logging
 from smskeeper import keeper_constants
 from .action import Action
 from smskeeper import sms_util, actions, chunk_features
+from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,6 @@ class TipQuestionResponseAction(Action):
 		digestChangeTimeJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_CHANGE_DIGEST_TIME, 2)
 
 		if surveyJustNotified:
-
 			firstInt = None
 			for word in words:
 				if self.isInt(word):
@@ -95,8 +95,14 @@ class TipQuestionResponseAction(Action):
 					user.save()
 				elif firstInt == 3:
 					sms_util.sendMsg(user, "Got it, thanks.")
-				elif firstInt > 3:
+				else:
 					sms_util.sendMsg(user, "Great to hear!")
+
+				analytics.logUserEvent(
+					user,
+					"Digest survey",
+					{"Score": firstInt}
+				)
 			else:
 				return False
 		elif digestChangeTimeJustNotified:
