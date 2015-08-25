@@ -358,15 +358,26 @@ def shareReminders(user, entries, handles, keeperNumber):
 				entry.users.add(contact.target)
 
 			shareText = None
+
+			# if the user isn't activated send them special text
+			introText = ""
+			if not contact.target.activated:
+				introText = keeper_constants.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
+
 			if len(entries) == 1:
 				tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
-				shareText = "Hi there! %s set a reminder %s for you: %s" % (
+				shareText = "Hi there! %s %s set a reminder for you: %s. I'll remind you %s." % (
+					introText,
 					user.nameOrPhone(),
+					entry.text,
 					msg_util.naturalize(date_util.now(user.getTimezone()), tzAwareDate, includeTime=True),
-					entry.text
 				)
 			else:
-				shareText = "Hi there! %s set %d reminders for you." % (user.nameOrPhone(), len(entries))
+				shareText = "Hi there! %s %s set %d reminders for you." % (
+					introText,
+					user.nameOrPhone(),
+					len(entries)
+				)
 			sms_util.sendMsg(contact.target, shareText, None, keeperNumber)
 			if len(contact.target.getMessages(incoming=False)) == 0:
 				# this is a new user, send them special text.

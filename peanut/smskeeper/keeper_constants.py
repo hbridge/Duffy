@@ -406,3 +406,4 @@ SHARED_REMINDER_RECIPIENT_UPSELL = (
 	"Btw, I can help you stay organized as well. "
 	"Say 'tell me more' for more info on my free personal assistant services. :raising_hand:"
 )
+SHARED_REMINDER_RECIPIENT_INTRO = "I'm :NAME:'s personal assistant."

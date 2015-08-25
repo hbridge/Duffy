@@ -72,6 +72,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, phoneNumber)
 			self.assertIn(self.user.name, self.getOutput(mock))
+			# make sure we intro oursevles the first time
+			self.assertIn("assistant", self.getOutput(mock))
 
 		# Make sure other user was created successfully
 		otherUser = User.objects.get(phone_number=phoneNumber)
