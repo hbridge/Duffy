@@ -12,9 +12,18 @@ import test_base
 
 @patch('common.date_util.utcnow')
 class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
+	recipientPhoneNumber = "+16505555555"
+
 	def setupUser(self, dateMock):
 		self.setNow(dateMock, self.MON_8AM)
 		return super(SMSKeeperSharedReminderCase, self).setupUser(True, True)
+
+	def createMomSharedReminder(self):
+		cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, self.recipientPhoneNumber)
+
+		entry = Entry.objects.filter(label="#reminders").last()
+		return entry
 
 	def test_handle_extraction(self, dateMock):
 		positiveSubjects = ["mom", "Bill", "Aseem", "dad", "my mom", "my boyfriend", "my wife"]
@@ -152,6 +161,30 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(phoneNumber, "who is this?")
 			otherUser = User.objects.get(phone_number=phoneNumber)
 			self.assertTrue(otherUser.paused, "Didn't pause user: " + self.getOutput(mock))
+
+	def test_shared_reminder_digest(self, dateMock):
+		user = self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_8AM)
+		entry = self.createMomSharedReminder()
+		recipient = User.objects.get(phone_number=self.recipientPhoneNumber)
+
+		# move clock to tuesday make sure there's no digest for unactivated recipient
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest(startAtId=(recipient.id - 1))
+			self.assertNotIn(entry.text, self.getOutput(mock))
+
+		# activate the recipient and make sure the item appears in the recipients digest
+		recipient.setActivated(True, tutorialState=keeper_constants.STATE_NORMAL)
+		recipient.completed_tutorial = True
+		recipient.name = "Mom"
+		recipient.signature_num_lines = 0
+		recipient.save()
+
+		self.setNow(dateMock, self.WED_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest(startAtId=(recipient.id - 1))
+			self.assertIn(entry.text, self.getOutput(mock))
 
 	def test_shared_reminder_processed(self, dateMock):
 		phoneNumber = "+16505555555"
