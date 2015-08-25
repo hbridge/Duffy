@@ -31,6 +31,11 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		user = User.objects.get(phone_number=self.testPhoneNumber)
 		self.assertEqual(keeper_constants.TODO_PRODUCT_ID, user.product_id)
 
+	def test_send_delayed(self, dateMock):
+		self.setupUser(True, True)
+		sms_util.sendDelayedMsg(self.getTestUser(), "hi", 1, None, classification="testclass")
+		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass("testclass"))
+
 	"""
 	Commented out by Derek while we experiement with no not-activated state
 	def test_unactivated_connect(self, dateMock):

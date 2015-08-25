@@ -93,7 +93,7 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification)
 
 
-def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None):
+def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None, classification=None):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
@@ -101,12 +101,13 @@ def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None):
 		keeperNumber = user.getKeeperNumber()
 
 	msg = msg_util.renderMsg(msg)
+	args = (user.id, msg, None, keeperNumber, False, False, classification)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
 		eta = date_util.now(pytz.utc) + timedelta(seconds=delaySeconds)
-		asyncSendMsg.apply_async((user.id, msg, None, keeperNumber, False, None), eta=eta)
+		asyncSendMsg.apply_async(*args, eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
-		asyncSendMsg(user.id, msg, None, keeperNumber, False, False, None)
+		asyncSendMsg(*args)
 
 
 def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False, classification=None):
