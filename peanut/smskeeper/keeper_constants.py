@@ -337,6 +337,22 @@ CLASS_MENU_OPTIONS = ([
 		"value": CLASS_FETCH_WEATHER
 	},
 	{
+		"text": "Change Setting",
+		"value": CLASS_CHANGE_SETTING
+	},
+	{
+		"text": "Question",
+		"value": CLASS_QUESTION
+	},
+	{
+		"text": "Frustration",
+		"value": CLASS_FRUSTRATION
+	},
+	{
+		"text": "Tip question response",
+		"value": CLASS_TIP_QUESTION_RESPONSE
+	},
+	{
 		"text": "Joke request",
 		"value": CLASS_JOKE
 	},
