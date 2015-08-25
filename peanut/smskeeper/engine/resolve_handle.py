@@ -5,6 +5,7 @@ from .action import Action
 from smskeeper import actions, chunk_features
 from smskeeper import reminder_util
 from smskeeper.models import Entry
+from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,11 @@ class ResolveHandleAction(Action):
 			handleToResolve,
 			phoneNumbers[0],
 			initialState=keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER
+		)
+		analytics.logUserEvent(
+			user,
+			"Resolved Handle",
+			{}
 		)
 
 		# share the reminder with the user
