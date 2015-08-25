@@ -119,7 +119,7 @@ def processReminder(entry):
 				if user.id == entry.creator.id:
 					otherUserNames = entry.getOtherUserNames(entry.creator)
 
-					msg = "Hi there :wave: Just letting you know that I just sent %s a reminder for you." % (", ".join(otherUserNames))
+					msg = "Hi there :wave: Just letting you know that I sent %s a reminder for you." % (", ".join(otherUserNames))
 				elif user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
 					msg = "Hi :wave: I'm %s's digital assistant. %s wanted me to remind you: %s" % (entry.creator.name, entry.creator.name, entry.text)
 				else:
