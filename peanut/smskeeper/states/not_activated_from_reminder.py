@@ -16,8 +16,11 @@ def process(user, msg, requestDict, keeperNumber):
 		response = nicety.getResponse(user, requestDict, user.getKeeperNumber())
 		if not response:
 			response = ":thumbs_up_sign:"
-		response = "%s %s" % (response, keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL)
-		sms_util.sendMsg(user, response, None, keeperNumber)
+		if not user.wasRecentlySentMsgOfClass(keeper_constants.CLASS_SHARED_REMINDER_RECIPIENT_UPSELL):
+			response = "%s %s" % (response, keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL)
+			sms_util.sendMsg(user, response, None, keeperNumber, classification=keeper_constants.CLASS_SHARED_REMINDER_RECIPIENT_UPSELL)
+		else:
+			sms_util.sendMsg(user, response, None, keeperNumber)
 	elif "tell me more" in msg.lower():
 		user.signup_data_json = json.dumps({"source": "reminder"})
 		user_util.activateUser(user, None, keeperNumber)

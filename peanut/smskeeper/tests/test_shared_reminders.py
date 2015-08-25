@@ -261,3 +261,26 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 		entry = self.createSharedReminder()
 		self.assertEqual(entry.remind_recur, keeper_constants.RECUR_ONE_TIME)
+
+	def test_shared_reminder_upsell(self, dateMock):
+		phoneNumber = "+16505555555"
+		self.setupUser(dateMock)
+
+		cliMsg.msg(self.testPhoneNumber, "remind mom to take her pill tomorrow morning")
+		cliMsg.msg(self.testPhoneNumber, phoneNumber)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "hi")
+			# Make sure upsell is shown
+			self.assertIn(
+				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
+				self.getOutput(mock)
+			)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "hi")
+			# Make sure upsell is not shown
+			self.assertNotIn(
+				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
+				self.getOutput(mock)
+			)

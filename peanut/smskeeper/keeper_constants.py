@@ -284,8 +284,10 @@ CLASS_QUESTION = "question"
 CLASS_FRUSTRATION = "frustration"
 CLASS_TIP_QUESTION_RESPONSE = "tip-question-response"
 CLASS_JOKE = "joke"
+CLASS_SHARED_REMINDER_RECIPIENT_UPSELL = 'shared-reminder-recipient-upsell'
 CLASS_RESOLVE_HANDLE = "resolve-handle"
 CLASS_UNKNOWN = "unknown"
+
 
 CLASS_MENU_OPTIONS = ([
 	{
@@ -355,6 +357,10 @@ CLASS_MENU_OPTIONS = ([
 	{
 		"text": "Joke request",
 		"value": CLASS_JOKE
+	},
+	{
+		"text": "Shared reminder recipient upsell",
+		"value": CLASS_SHARED_REMINDER_RECIPIENT_UPSELL
 	},
 	{
 		"text": "Resolve Handle",
