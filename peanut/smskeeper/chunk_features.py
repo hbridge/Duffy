@@ -1,5 +1,6 @@
 from smskeeper import msg_util, entry_util
 import phonenumbers
+from smskeeper import keeper_constants
 
 
 class ChunkFeatures:
@@ -16,7 +17,6 @@ class ChunkFeatures:
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	# things that match this RE will get a boost for create
 	createWordRegex = "(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call)"
-	remindVerbRegex = r'remind|text|txt|tell'
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'%s ' % createWordRegex
 
@@ -68,7 +68,7 @@ class ChunkFeatures:
 	# is the primary verb of the chunk "remind" as in "remind me to poop"
 	# as opposed to "call fred tonight"
 	def primaryActionIsRemind(self):
-		return self.chunk.matches(self.remindVerbRegex)
+		return self.chunk.matches(keeper_constants.SHARED_REMINDER_VERB_WHITELIST_REGEX)
 
 	def hasWeatherWord(self):
 		return self.chunk.contains(self.weatherRegex)

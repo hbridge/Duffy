@@ -92,8 +92,8 @@ class CreateTodoAction(Action):
 		# Figure out if this is a shared reminder: if the reminder has other handles and the reminder
 		# starts with remind, tell, text etc.
 		shareHandles = None
-		if len(chunk.handles()) > 0 and chunkFeatures.primaryActionIsRemind():
-			shareHandles = chunk.handles()
+		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
+			shareHandles = chunk.sharedReminderHandles()
 			# make all shared reminders one-time for nw
 			recurFrequency = keeper_constants.RECUR_ONE_TIME
 

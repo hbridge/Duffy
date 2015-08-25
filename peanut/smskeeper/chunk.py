@@ -3,6 +3,7 @@ import re
 import phonenumbers
 
 from common import natty_util
+from smskeeper import keeper_constants
 
 punctuationWhitelist = '-'
 
@@ -66,7 +67,7 @@ class Chunk:
 		normalizedText = self.normalizeText(self.originalText)
 		return re.search(regex, normalizedText) is not None
 
-	def handles(self):
+	def handles(self, verbWhitelistRegex=None):
 		handles = []
 		words = self.normalizeText(self.originalText, lowercase=False).split(' ')
 		subjectDelimiterIndices = []
@@ -90,6 +91,16 @@ class Chunk:
 					continue  # don't support putting a handle first
 				if HANDLE_BLACKLIST.match(word):
 					continue
+				if verbWhitelistRegex:
+					# if we were given a whitelist of verbs to find objects for, see if it was the word before or 2 before
+					verbFound = False
+					if re.match(verbWhitelistRegex, words[idx - 1].lower()):
+						verbFound = True
+					if idx >= 2:
+						if re.match(verbWhitelistRegex, words[idx - 2].lower()):
+							verbFound = True
+					if not verbFound:
+						continue
 				if len(words) > idx + 1:
 					if len(subjectDelimiterIndices) > 0:
 						# require that there is some kind of subject delimeter, and that the handle
@@ -98,6 +109,9 @@ class Chunk:
 						if subjectDelimiterIndices[0] > idx:
 							handles.append(word)
 		return handles
+
+	def sharedReminderHandles(self):
+		return self.handles(keeper_constants.SHARED_REMINDER_VERB_WHITELIST_REGEX)
 
 	def extractPhoneNumbers(self):
 		matches = phonenumbers.PhoneNumberMatcher(self.originalText, 'US')

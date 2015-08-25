@@ -40,26 +40,35 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		negativeStructures = [
 			"Remind me to call :SUBJECT: this weekend",
 			"Remind me to email :SUBJECT: to send his presentation to Susan",
-			"Remind me in 10 mintues to remind :SUBJECT: to eat"
+			"Remind me in 10 mintues to remind :SUBJECT: to eat",
+			"Remind me I have and appointment :SUBJECT: September 17 at 1:00"
 		]
 
 		for structure in positiveStructures:
 			for subject in positiveSubjects:
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))
-				self.assertIn(subject.replace("my ", ""), chunk.handles(), "Handles not found in %s" % (chunk.originalText))
+				self.assertIn(subject.replace("my ", ""), chunk.sharedReminderHandles(), "Handles not found in %s" % (chunk.originalText))
 
 			for subject in negativeSubjects:
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))
-				self.assertNotIn(subject, chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
+				self.assertNotIn(subject, chunk.sharedReminderHandles(), "Bad handles %s found in %s" % (chunk.sharedReminderHandles(), chunk.originalText))
 
 		for structure in negativeStructures:
 			for subject in positiveSubjects:
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))
-				self.assertEqual([], chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
+				self.assertEqual(
+					[],
+					chunk.sharedReminderHandles(),
+					"Bad handles %s found in %s" % (chunk.sharedReminderHandles(), chunk.originalText)
+				)
 
 			for subject in negativeSubjects:
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))
-				self.assertEqual([], chunk.handles(), "Bad handles %s found in %s" % (chunk.handles(), chunk.originalText))
+				self.assertEqual(
+					[],
+					chunk.sharedReminderHandles(),
+					"Bad handles %s found in %s" % (chunk.sharedReminderHandles(), chunk.originalText)
+				)
 
 	def test_shared_reminder_normal(self, dateMock):
 		phoneNumber = "+16505555555"

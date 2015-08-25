@@ -413,3 +413,4 @@ SHARED_REMINDER_RECIPIENT_UPSELL = (
 	"Say 'tell me more' for more info on my free personal assistant services. :raising_hand:"
 )
 SHARED_REMINDER_RECIPIENT_INTRO = "I'm :NAME:'s personal assistant."
+SHARED_REMINDER_VERB_WHITELIST_REGEX = r'remind|text|txt|tell'
