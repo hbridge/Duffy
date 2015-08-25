@@ -516,7 +516,7 @@ class Contact(models.Model):
 			contacts = Contact.objects.filter(user=user, target=target)
 			contact = None if len(contacts) == 0 else contacts[0]
 			if len(contacts) > 1:
-				logger.error("User %d: fetchByTarget %d returned multiple contacts", user.id, target.id)
+				logger.debug("User %d: fetchByTarget %d returned multiple contacts", user.id, target.id)
 			return contact
 		except Contact.DoesNotExist:
 			return None
