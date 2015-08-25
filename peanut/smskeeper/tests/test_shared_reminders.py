@@ -6,6 +6,7 @@ from smskeeper.models import Entry, User
 from smskeeper import cliMsg, tips
 from smskeeper import async, keeper_constants
 from smskeeper.chunk import Chunk
+import re
 
 import test_base
 
@@ -187,6 +188,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest(startAtId=(recipient.id - 1))
 			# make sure that the shared reminder is in the digest
 			self.assertIn(entry.text, self.getOutput(mock))
+			# but only once
+			self.assertEqual(len(re.findall(entry.text, self.getOutput(mock))), 1)
 
 			# make sure the name of the creator is listed with the todo
 			self.assertIn(" (%s)" % self.getTestUser().name, self.getOutput(mock))
