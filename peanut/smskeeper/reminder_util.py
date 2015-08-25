@@ -12,6 +12,7 @@ from smskeeper.models import Entry, Contact
 from smskeeper import helper_util, sms_util, entry_util
 import django
 from smskeeper import user_util
+from smskeeper import tips
 
 import logging
 logger = logging.getLogger(__name__)
@@ -381,9 +382,16 @@ def shareReminders(user, entries, handles, keeperNumber):
 
 def sendUnresolvedHandlesPrompt(user, keeperNumber):
 	unresolvedHandles = user.getUnresolvedHandles()
+	msg = "What's %s's phone number?" % (unresolvedHandles[0])
+
+	# if this is the first time the user has sent a shared reminder, give them the minitip
+	if tips.isUserEligibleForMiniTip(user, tips.SHARED_REMINDER_MINI_TIP_ID):
+		tip = tips.tipWithId(tips.SHARED_REMINDER_MINI_TIP_ID)
+		msg = "%s %s" % (tip.render(user), msg)
+		tips.markTipSent(user, tip)
 	sms_util.sendMsg(
 		user,
-		"What's %s's phone number?" % (unresolvedHandles[0]),
+		msg,
 		None,
 		keeperNumber,
 		classification=keeper_constants.OUTGOING_RESOLVE_HANDLE

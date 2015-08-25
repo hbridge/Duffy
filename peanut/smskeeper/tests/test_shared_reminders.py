@@ -81,6 +81,13 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure entries were created correctly
 		self.assertEquals(2, len(entry.users.all()))
 
+	def test_shared_minitip(self, dateMock):
+		self.setupUser(dateMock)
+		self.assertTrue(tips.isUserEligibleForMiniTip(self.getTestUser(), tips.SHARED_REMINDER_MINI_TIP_ID))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.createSharedReminder()
+			self.assertIn(tips.tipWithId(tips.SHARED_REMINDER_MINI_TIP_ID).render(self.getTestUser()), self.getOutput(mock))
+
 	def test_shared_reminder_text(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
