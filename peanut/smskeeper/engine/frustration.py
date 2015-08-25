@@ -1,4 +1,4 @@
-from smskeeper import actions, msg_util
+from smskeeper import actions, chunk_features
 from smskeeper import keeper_constants
 from .action import Action
 
@@ -9,8 +9,10 @@ class FrustrationAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		if msg_util.startsWithNo(chunk.normalizedText()):
-			score = 0.4
+		features = chunk_features.ChunkFeatures(chunk, user)
+
+		if features.beginsWithNo():
+			score = 0.6
 
 		if FrustrationAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0

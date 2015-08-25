@@ -1,9 +1,8 @@
 import pytz
-import re
 
 from common import date_util, weather_util
 
-from smskeeper import sms_util
+from smskeeper import sms_util, chunk_features
 from smskeeper import keeper_constants
 from .action import Action
 
@@ -11,12 +10,12 @@ from .action import Action
 class FetchWeatherAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_FETCH_WEATHER
 
-	weatherRegex = re.compile(r"\b(weather|forecast)\b", re.I)
-
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		if self.weatherRegex.search(chunk.normalizedText()) is not None:
+		features = chunk_features.ChunkFeatures(chunk, user)
+
+		if features.hasWeatherWord():
 			score = .9
 
 		if FetchWeatherAction.HasHistoricalMatchForChunk(chunk):

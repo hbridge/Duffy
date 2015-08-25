@@ -20,6 +20,8 @@ class ChunkFeatures:
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'%s ' % createWordRegex
 
+	weatherRegex = r"\b(weather|forecast)\b"
+
 	# Features
 	def hasTimingInfo(self):
 		if self.chunk.getNattyResult(self.user):
@@ -35,6 +37,9 @@ class ChunkFeatures:
 
 	def beginsWithDoneWord(self):
 		return self.chunk.matches(self.beginsWithDoneWordRegex)
+
+	def beginsWithNo(self):
+		return msg_util.startsWithNo(self.chunk.normalizedText())
 
 	def numMatchingEntriesStrict(self):
 		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
@@ -64,3 +69,6 @@ class ChunkFeatures:
 	# as opposed to "call fred tonight"
 	def primaryActionIsRemind(self):
 		return self.chunk.matches(self.remindVerbRegex)
+
+	def hasWeatherWord(self):
+		return self.chunk.contains(self.weatherRegex)

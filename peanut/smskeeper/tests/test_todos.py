@@ -1229,6 +1229,22 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Makae sure we're now paused
 		self.assertTrue(self.getTestUser().paused)
 
+		# Make sure we pause after an unknown phrase during daytime hours
+	def test_frustration_with_reminder_text(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "take medicine tomorrow")
+
+		# Some unkown phrase, we shouldn't get anything back
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "no longer need reminder to take medicine")
+			self.assertEquals("", self.getOutput(mock))
+
+		# Makae sure we're now paused
+		self.assertTrue(self.getTestUser().paused)
+
 	# Make sure we do correction even when frustrated if there's a time in there
 	def test_corrects_even_when_frustrated(self, dateMock):
 		self.setupUser(dateMock)

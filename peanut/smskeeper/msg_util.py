@@ -274,7 +274,7 @@ def startsWithNo(msg):
 	words = msg.split(' ')
 	if len(words) > 1:
 		firstWord = words[0].strip(string.punctuation).strip().lower()
-		return firstWord in ["no", "not", "cancel", "dont", "don't", "stop", "quit", "fuck"]
+		return firstWord in ["no", "not", "dont", "don't", "stop", "quit", "fuck"]
 	return False
 
 
