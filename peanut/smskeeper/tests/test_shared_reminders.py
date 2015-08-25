@@ -180,6 +180,14 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest(startAtId=(recipient.id - 1))
 			self.assertNotIn(entry.text, self.getOutput(mock))
 
+		# make sure it is in the creators digest, and only once
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "todo")
+			# make sure that the shared reminder is in the digest
+			self.assertIn(entry.text, self.getOutput(mock))
+			# but only once
+			self.assertEqual(len(re.findall(entry.text, self.getOutput(mock))), 1)
+
 		# activate the recipient, add another todo and make sure the item appears in the recipients digest
 		recipient.setActivated(True, tutorialState=keeper_constants.STATE_NORMAL)
 		recipient.completed_tutorial = True

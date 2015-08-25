@@ -390,7 +390,7 @@ class Entry(models.Model):
 
 	@classmethod
 	def fetchEntries(cls, user, label=None, hidden=False, orderByString="added"):
-		entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user)).order_by(orderByString)
+		entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user)).order_by(orderByString).distinct()
 		if hidden is not None:
 			entries = entries.filter(hidden=hidden)
 		if label:
