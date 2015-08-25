@@ -138,6 +138,11 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 				self.getOutput(mock)
 			)
 
+		# make sure silent nicities work
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(phoneNumber, "cool")
+			self.assertNotIn("None", self.getOutput(mock))
+
 	def test_shared_reminder_other_person_tell_me_more(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)

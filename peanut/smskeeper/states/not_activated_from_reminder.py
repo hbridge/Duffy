@@ -14,6 +14,8 @@ def process(user, msg, requestDict, keeperNumber):
 	nicety = niceties.getNicety(msg)
 	if nicety:
 		response = nicety.getResponse(user, requestDict, user.getKeeperNumber())
+		if not response:
+			response = ":thumbs_up_sign:"
 		response = "%s %s" % (response, keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL)
 		sms_util.sendMsg(user, response, None, keeperNumber)
 	elif "tell me more" in msg.lower():
