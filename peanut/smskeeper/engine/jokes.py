@@ -7,7 +7,7 @@ from smskeeper import keeper_constants
 from .action import Action
 from smskeeper import sms_util
 from common import date_util
-from smskeeper import joke_list, chunk_features
+from smskeeper import joke_list, chunk_features, analytics
 
 
 logger = logging.getLogger(__name__)
@@ -99,6 +99,13 @@ class JokeAction(Action):
 
 		if step == self.JOKE_START:
 			self.sendJokePart1(user, joke, recentJokeCount)
+
+			analytics.logUserEvent(
+				user,
+				"Joke sent",
+				{
+				}
+			)
 		elif step == self.JOKE_PART1_SENT:
 			# eval guess
 			joke.send(user, step, chunk.normalizedText())

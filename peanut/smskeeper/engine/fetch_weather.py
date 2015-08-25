@@ -2,8 +2,9 @@ import pytz
 
 from common import date_util, weather_util
 
+
 from smskeeper import sms_util, chunk_features
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, analytics
 from .action import Action
 
 
@@ -36,5 +37,12 @@ class FetchWeatherAction(Action):
 			sms_util.sendMsg(user, weatherPhrase)
 		else:
 			sms_util.sendMsg(user, "I'm sorry, I don't know the weather right now")
+
+		analytics.logUserEvent(
+			user,
+			"Fetch Weather",
+			{
+			}
+		)
 
 		return True
