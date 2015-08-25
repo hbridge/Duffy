@@ -102,7 +102,7 @@ class JokeAction(Action):
 
 			analytics.logUserEvent(
 				user,
-				"Joke sent",
+				"Joke request",
 				{
 				}
 			)

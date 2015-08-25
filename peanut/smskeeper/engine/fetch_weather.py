@@ -40,7 +40,7 @@ class FetchWeatherAction(Action):
 
 		analytics.logUserEvent(
 			user,
-			"Fetch Weather",
+			"Weather request",
 			{
 			}
 		)
