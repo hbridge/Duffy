@@ -501,7 +501,11 @@ class Contact(models.Model):
 	@classmethod
 	def fetchByHandle(cls, user, handle):
 		try:
-			contact = Contact.objects.get(user=user, handle=handle)
+			contacts = Contact.objects.filter(user=user, handle=handle)
+			contact = None if len(contacts) == 0 else contacts[0]
+			if len(contacts) > 1:
+				logger.error("User %d: fetchByHandle %s returned multiple contacts", user.id, handle)
+
 			return contact
 		except Contact.DoesNotExist:
 			return None
@@ -509,7 +513,10 @@ class Contact(models.Model):
 	@classmethod
 	def fetchByTarget(cls, user, target):
 		try:
-			contact = Contact.objects.get(user=user, target=target)
+			contacts = Contact.objects.filter(user=user, target=target)
+			contact = None if len(contacts) == 0 else contacts[0]
+			if len(contacts) > 1:
+				logger.error("User %d: fetchByTarget %d returned multiple contacts", user.id, target.id)
 			return contact
 		except Contact.DoesNotExist:
 			return None
