@@ -111,6 +111,7 @@ module.exports = React.createClass({
 			console.log("date changed");
 			entryChanged = true;
 			changes.remind_timestamp = newMoment.toISOString();
+			changes.remind_to_be_sent = true;
 		}
 
 		// se if recur has changed
@@ -134,6 +135,12 @@ module.exports = React.createClass({
 		console.log("new values: ", newText, newMoment, newRecurValue, newHiddenVal);
 
 		if (entryChanged) {
+			if (this.state.model.manually_check) {
+				// the entry was marked as needing review, mark it off as approved since we're manually updating
+				changes.manually_check = false;
+				changes.manually_approved_timestamp = moment().toISOString();
+			}
+
 			changes.manually_updated = true;
 			changes.manually_updated_timestamp = moment().toISOString();
 			var result = this.props.model.save(changes);

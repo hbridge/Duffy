@@ -362,6 +362,7 @@ class Entry(models.Model):
 	manually_updated = models.BooleanField(default=False)
 	manually_updated_timestamp = models.DateTimeField(null=True, blank=True)
 
+	# manually = True means that it needs to be reviewed
 	manually_check = models.BooleanField(default=False)
 	manually_approved_timestamp = models.DateTimeField(null=True, blank=True)
 
