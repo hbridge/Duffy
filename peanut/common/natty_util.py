@@ -282,10 +282,17 @@ def getNattyInfo(query, timezone):
 
 
 # Looks to see if the given time is the same hour and minute as now. Natty returns this if it doesn't
-# know what else to do, like for queries of "today"
+# know what else to do, like for queries of "today" or "tomorrow"
 def isNattyDefaultTime(utcTime):
 	now = date_util.now(pytz.utc)
 	return utcTime.hour == now.hour and utcTime.minute == now.minute
+
+
+def isNow(utcTime):
+	now = date_util.now(pytz.utc)
+	if abs((now - utcTime).total_seconds()) < 5:
+		return True
+	return False
 
 
 def updatedTimeBasedOnUsedText(utcTime, textUsed, timezone):
@@ -322,9 +329,11 @@ def isTomorrowInText(textUsed):
 def getBestTimeFromChoices(choices):
 	if len(choices) > 1:
 		for choice in choices:
-			dt = datetime.datetime.fromtimestamp(choice)
+			dt = datetime.datetime.fromtimestamp(choice).replace(tzinfo=pytz.utc)
 			if not isNattyDefaultTime(dt):
-				return datetime.datetime.fromtimestamp(choice).replace(tzinfo=pytz.utc)
+				return dt
+			if not isNow(dt):
+				return dt
 		return datetime.datetime.fromtimestamp(choices[0]).replace(tzinfo=pytz.utc)
 	else:
 		return datetime.datetime.fromtimestamp(choices[0]).replace(tzinfo=pytz.utc)

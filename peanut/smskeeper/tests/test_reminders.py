@@ -1250,6 +1250,17 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		self.assertTrue(self.getTestUser().paused)
 
+	# Hit bug where "next two weeks" returns 2 times, one now and one in two weeks
+	# We were looking at the now
+	def test_next_two_weeks(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Email Mark on June 9th to desk with timing of calls for the next two weeks")
+			# We should be pausing, so no output
+			self.assertIn("Tue", self.getOutput(mock))
+
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)
 	def test_tomorrow_afternoon(self, dateMock):
