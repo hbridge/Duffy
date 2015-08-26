@@ -1,11 +1,10 @@
-import string
 import re
 import phonenumbers
 
 from common import natty_util
 from smskeeper import keeper_constants
 
-punctuationWhitelist = '-'
+defaultPunctuationWhitelist = '-'
 
 RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)
 RELATIONSHIP_SUBJECT_DELIMETERS = re.compile(r'to|on|at|in|by|about', re.I)
@@ -34,7 +33,7 @@ class Chunk:
 	def normalizedText(self):
 		return self.normalizeText(self.originalText)
 
-	def normalizeText(self, text, charsToStrip=string.punctuation, lowercase=True):
+	def normalizeText(self, text, punctuationWhitelist=defaultPunctuationWhitelist, lowercase=True):
 		newMsg = text.strip()
 		if lowercase:
 			newMsg = newMsg.lower()
@@ -59,13 +58,17 @@ class Chunk:
 			self.nattyResult = natty_util.getNattyResult(self.originalText, user)
 		return self.nattyResult
 
-	def matches(self, regex):
-		normalizedText = self.normalizeText(self.originalText)
+	def matches(self, regex, punctuationWhitelist=defaultPunctuationWhitelist):
+		normalizedText = self.normalizeText(self.originalText, punctuationWhitelist=punctuationWhitelist)
 		return re.match(regex, normalizedText) is not None
 
-	def contains(self, regex):
-		normalizedText = self.normalizeText(self.originalText)
+	def contains(self, regex, punctuationWhitelist=defaultPunctuationWhitelist):
+		normalizedText = self.normalizeText(self.originalText, punctuationWhitelist=punctuationWhitelist)
 		return re.search(regex, normalizedText) is not None
+
+	def endsWith(self, regex, punctuationWhitelist=defaultPunctuationWhitelist):
+		normalizedText = self.normalizeText(self.originalText, punctuationWhitelist=punctuationWhitelist)
+		return re.search(regex + '$', normalizedText) is not None
 
 	def handles(self, verbWhitelistRegex=None):
 		handles = []

@@ -1,8 +1,9 @@
 import logging
 
-from smskeeper import async, msg_util
+from smskeeper import async
 from smskeeper import keeper_constants
 from .action import Action
+from smskeeper.chunk_features import ChunkFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -10,22 +11,20 @@ logger = logging.getLogger(__name__)
 class FetchDigestAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_FETCH_DIGEST
 
-	digestRegex = r"(what('s| is) on my )?(todo(s)?|task(s)?)( list)?$|what do i have to do today|tasks for today"
-	beginsWithRegex = r"^(tasks)\b"
-
 	def getScore(self, chunk, user):
 		score = 0.0
+		chunkFeatures = ChunkFeatures(chunk, user)
 
-		couldBeDone = msg_util.done_re.search(chunk.normalizedText()) is not None
+		scoreVector = []
+		scoreVector.append(0.8 if chunkFeatures.hasFetchDigestWords() else 0)
+		scoreVector.append(0.1 if chunkFeatures.isQuestion() else 0)
+		scoreVector.append(-0.5 if chunkFeatures.isBroadQuestion() else 0)
+		scoreVector.append(0.1 if chunkFeatures.containsToday() else 0)
+		scoreVector.append(-0.5 if chunkFeatures.hasTimeOfDay() else 0)
+		scoreVector.append(-0.1 if chunkFeatures.couldBeDone() else 0)
 
-		if chunk.matches(self.digestRegex):
-			score = 0.8
-
-		if chunk.matches(self.beginsWithRegex):
-			score = 0.9
-
-		if couldBeDone:
-			score -= 0.1
+		logger.debug("User %d: fetch digest score vector: %s", user.id, scoreVector)
+		score = sum(scoreVector)
 
 		if FetchDigestAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0

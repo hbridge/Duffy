@@ -1,6 +1,7 @@
 from smskeeper import msg_util, entry_util
 import phonenumbers
 from smskeeper import keeper_constants
+from smskeeper import msg_util
 
 
 class ChunkFeatures:
@@ -25,6 +26,12 @@ class ChunkFeatures:
 	# Features
 	def hasTimingInfo(self):
 		if self.chunk.getNattyResult(self.user):
+			return True
+		return False
+
+	def hasTimeOfDay(self):
+		nattyResult = self.chunk.getNattyResult(self.user)
+		if nattyResult and nattyResult.hadTime:
 			return True
 		return False
 
@@ -72,3 +79,27 @@ class ChunkFeatures:
 
 	def hasWeatherWord(self):
 		return self.chunk.contains(self.weatherRegex)
+
+	def isQuestion(self):
+		isQuestion = False
+		if self.chunk.endsWith("\?", punctuationWhitelist="?"):
+			isQuestion = True
+
+		if self.chunk.matches(r'what|where|when|how|why|who|which'):
+			isQuestion = True
+
+		return isQuestion
+
+	def isBroadQuestion(self):
+		return self.chunk.matches(r'where\b|how\b|why\b|who\b')
+
+	def hasFetchDigestWords(self):
+		if self.chunk.contains(r'tasks|to ?do|reminders|list'):
+			return True
+		return False
+
+	def couldBeDone(self):
+		return msg_util.done_re.search(self.chunk.normalizedText()) is not None
+
+	def containsToday(self):
+		return self.chunk.contains('today')

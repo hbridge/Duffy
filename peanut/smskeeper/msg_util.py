@@ -39,7 +39,9 @@ tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+
 set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
 
-done_re = re.compile(r"\b(done|check .*off|check off|told|mark off|mark .*off|sent|cross .*off|checked|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed|cashed)\b", re.I)
+done_re = re.compile(
+	r"\b(done|clear|check .*off|check off|told|mark off|mark .*off|sent|cross .*off|checked|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed|cashed)\b",
+	re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
 freeform_add_re = re.compile("add ((?P<item>.+) )?to( my)? #?(?P<label>[^.!@#$%^&*()-=]+)( list)?", re.I)
@@ -49,7 +51,12 @@ noOpWords = ["the", "hi", "nothing", "ok", "okay", "awesome", "great", "that's",
 
 REMINDER_FRINGE_TERMS = ["to", "on", "at", "in", "by", "please", "but"]
 
-nonInterestingWords = ["sometime", "for", "please", "morning", "evening", "tonight", "today", "to", "this", "but", "i", "before", "after", "instead", "those", "things", "thing", "tonight", "today", "works", "better", "are", "my", "till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze", "again", "all", "everything", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive", "already", "tasks", "keeper", "list", "that", "task", "all"]
+nonInterestingWords = [
+	"sometime", "for", "please", "morning", "evening", "tonight", "today", "to", "this", "but", "i",
+	"before", "after", "instead", "those", "things", "thing", "tonight", "today", "works", "better",
+	"are", "my", "till", "until", "til", "actually", "do", "remind", "me", "please", "done", "snooze",
+	"again", "all", "everything", "the", "every thing", "both", "im", "finally", "it", "i", "with", "ive",
+	"already", "tasks", "keeper", "list", "that", "task", "all", "reminder", "reminders"]
 nonInterestingWords.extend(noOpWords)
 nonInterestingWords.extend(REMINDER_FRINGE_TERMS)
 
