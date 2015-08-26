@@ -46,6 +46,15 @@ class SMSKeeperNattyCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me to book meeting with Andrew for tuesday morning in two hours")
 			self.assertIn("by 10am", self.getOutput(mock))
 
+	@patch('common.date_util.utcnow')
+	def test_natty_two_times_by_words(self, dateMock):
+		self.setupUser(True, True)
+
+		self.setNow(dateMock, self.MON_8AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me to test in a half hour")
+			self.assertIn("8:30", self.getOutput(mock))
+
 	"""
 	Commenting out these tests for now because we're explictly not supporting these cases right now.
 	If two times are picked out of a string, we're choosing the sooner one. These tests create a situation

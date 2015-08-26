@@ -180,6 +180,9 @@ def fixMsgForNatty(msg, user):
 	newMsg = replace(newMsg, "o'clock", "")
 	newMsg = replace(newMsg, "oclock", "")
 
+	# support in a half hour
+	newMsg = replace(newMsg, "half hour", "30 mins")
+
 	# This might cause issues if there's an email address or other things using @
 	# Need trailing space incase they do @230
 	newMsg = replace(newMsg, "@", "at ")
