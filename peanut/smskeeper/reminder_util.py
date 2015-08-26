@@ -383,14 +383,14 @@ def shareReminders(user, entries, handles, keeperNumber):
 					user.nameOrPhone(),
 					len(entries)
 				)
-			sms_util.sendMsg(contact.target, shareText, None, keeperNumber)
+			sms_util.sendMsg(contact.target, shareText, None, contact.target.getKeeperNumber())
 			if len(contact.target.getMessages(incoming=False)) == 0:
 				# this is a new user, send them special text.
 				sms_util.sendDelayedMsg(
 					contact.target,
 					keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL,
 					10,
-					keeperNumber
+					contact.target.getKeeperNumber()
 				)
 
 	return sharedHandles, notFoundHandles
