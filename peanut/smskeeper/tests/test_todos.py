@@ -277,6 +277,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Great to hear!", self.getOutput(mock))
 
 
+	"""
+	Commenting out since we removed this for now
 	# Make sure the quetion tip goes out after 7
 	def test_digest_nps(self, dateMock):
 		self.setupUser(dateMock)
@@ -304,8 +306,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# Make sure a response doesn't kick off anything
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "9")
-			self.assertIn("Great to hear!", self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "5")
+			self.assertIn("Got it.", self.getOutput(mock))
+	"""
 
 
 	# Make sure the change digest time goes out after 5 days, and it changes the time

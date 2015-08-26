@@ -58,7 +58,12 @@ class TipQuestionResponseAction(Action):
 
 		# Check for survey
 		surveyJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY)
-		score = self.getIntResponseScore(surveyJustNotified, chunk)
+		if surveyJustNotified:
+			score = self.getIntResponseScore(surveyJustNotified, chunk)
+
+		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID)
+		if npsJustNotified:
+			score = self.getIntResponseScore(npsJustNotified, chunk)
 
 		# Check for digest change time
 		digestChangeTimeJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_CHANGE_DIGEST_TIME, 2)
@@ -89,7 +94,22 @@ class TipQuestionResponseAction(Action):
 		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID)
 		firstInt = self.getFirstInt(chunk)
 
-		if surveyJustNotified:
+		
+		if npsJustNotified:
+			if firstInt is not None:
+				if firstInt < 8:
+					sms_util.sendMsg(user, "Got it, thanks.")
+				else:
+					sms_util.sendMsg(user, "Great to hear!")
+
+				analytics.logUserEvent(
+					user,
+					"Digest nps response",
+					{"Score": firstInt}
+				)
+			else:
+				return False
+		elif surveyJustNotified:
 			if firstInt is not None:
 				if firstInt < 3:
 					sms_util.sendMsg(user, "Got it, I won't send you a morning txt when there are no tasks")
@@ -103,20 +123,6 @@ class TipQuestionResponseAction(Action):
 				analytics.logUserEvent(
 					user,
 					"Digest survey response",
-					{"Score": firstInt}
-				)
-			else:
-				return False
-		elif npsJustNotified:
-			if firstInt is not None:
-				if firstInt < 8:
-					sms_util.sendMsg(user, "Got it, thanks.")
-				else:
-					sms_util.sendMsg(user, "Great to hear!")
-
-				analytics.logUserEvent(
-					user,
-					"Digest nps response",
 					{"Score": firstInt}
 				)
 			else:
