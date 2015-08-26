@@ -417,6 +417,31 @@ class Entry(models.Model):
 
 		return otherUserNames
 
+	def setRemindTime(self, newDateTime, useDigestTime=False):
+		datetimeToSave = newDateTime
+		if useDigestTime:
+			localRemindTime = datetimeToSave.astimezone(self.creator.getTimezone())
+			localRemindTime.replace(hour=self.creator.digest_hour, minute=self.creator.digest_hour)
+			datetimeToSave = localRemindTime.astimezone(pytz.utc)
+			self.use_digest_time = True
+		self.remind_timestamp = datetimeToSave
+
+	# override save and clear use_digest_time if the remind timestamp has changed
+	# from http://stackoverflow.com/questions/1355150/django-when-saving-how-can-you-check-if-a-field-has-changed
+	def save(self, *args, **kw):
+		if self.pk is not None:
+			orig = Entry.objects.get(pk=self.pk)
+			if orig.remind_timestamp and (orig.remind_timestamp != self.remind_timestamp):
+				# the time_stamp has changed, see if we should clear use_digest_time
+				localRemindTime = self.remind_timestamp.astimezone(self.creator.getTimezone())
+				# if the new time is not your digest time, clear the use_digest_time bit
+				if localRemindTime.hour != self.creator.digest_hour or localRemindTime.minute != self.creator.digest_minute:
+					self.use_digest_time = False
+		super(Entry, self).save(*args, **kw)
+
+	def __str__(self):
+		return "Entry %d: %s" % (self.id, str(self.__dict__))
+
 
 class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)

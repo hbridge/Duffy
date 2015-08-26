@@ -207,7 +207,8 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 			logger.error("User %s: Setting entry %s to an incorrect time in the past.  old %s  and new  %s   nattyResult: %s" % (user.id, entry.id, entry.remind_timestamp, newDate, nattyResult))
 
 	logger.info("User %s: Updating entry %s with and msg '%s' with timestamp %s from using nattyResult %s.  Old timestamp was %s" % (user.id, entry.id, msg, newDate, nattyResult, entry.remind_timestamp))
-	entry.remind_timestamp = newDate.astimezone(pytz.utc)
+	# since we may be using useDigestTime=True, need to call the custom setter
+	entry.setRemindTime(newDate.astimezone(pytz.utc), useDigestTime=entry.use_digest_time)
 	entry.remind_to_be_sent = True
 
 	entry.manually_check = True

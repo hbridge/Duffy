@@ -2009,3 +2009,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(2, len(entries))
+
+	def test_digest_time_cleared(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Remind me to test")
+
+		entry = Entry.objects.get(id=1)
+		self.assertTrue(entry.use_digest_time, "Digest time not initially set")
+		entry.remind_timestamp = self.TUE_10AM
+		entry.save()
+		self.assertFalse(entry.use_digest_time, "Digest time not cleared on manual remind_timestamp change")
