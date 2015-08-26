@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import pytz
 from mock import patch
 import logging
 
@@ -171,7 +170,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertIn("Monday", self.getOutput(mock))
+			self.assertIn("sunshine", self.getOutput(mock))
 
 		# 5 days later to ckick off the first tip
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
@@ -209,7 +208,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertIn("Monday", self.getOutput(mock))
+			self.assertIn("sunshine", self.getOutput(mock))
 
 		# 5 days later
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
@@ -257,7 +256,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertIn("Monday", self.getOutput(mock))
+			self.assertIn("sunshine", self.getOutput(mock))
 
 		# 5 days later
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))

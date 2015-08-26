@@ -219,13 +219,13 @@ DIGEST_STATE_DEFAULT = "default"
 DIGEST_STATE_LIMITED = "limited"
 
 REMINDER_DIGEST_HEADERS = [
-	u":sunrise: Happy Monday!",
-	u"Hello, Tuesday! \U000026F2",
-	u"Wednesday is here!",
-	u"Ohai Thursday! :cat:",
-	u"TGIF! :party_popper:",
-	u"It's Saturday! \U0001F344",
-	u"Sunday funday! \U0001F366"
+	u":sunrise: G'morning sunshine",
+	u"Tuesday, it is \U000026F2",
+	u"Wednesday is here already!",
+	u"How did Thursday sneak up on us? :cat:",
+	u"Friday funday! :party_popper:",
+	u"It's sit-around-day \U0001F344",
+	u"Sunday Sunday Sunday! \U0001F366"
 ]
 
 REMINDER_DIGEST_DONE_INSTRUCTIONS = ":white_check_mark: To check a task off, tell me what you're done with, like 'Done with calling Mom'"
@@ -234,13 +234,13 @@ REMINDER_DIGEST_DONE_INSTRUCTIONS = ":white_check_mark: To check a task off, tel
 REMINDER_DIGEST_SNOOZE_INSTRUCTIONS = ":sleeping_symbol: To snooze a task, just tell me when I should remind you, like 'Snooze buy flip flops to Saturday'"
 
 REMINDER_DIGEST_EMPTY = [
-	u"No tasks for today. Let's start the week off right by tracking all you have to do! \U0001F60E",
-	u"Tasks for today: 0. You must be really efficient! \U0001F4AD",
-	u"I got no tasks for ya. Need me to track anything today? \U0001F60E",
-	u"A weekday without tasks? Surely, there is something you need me to track? \U0001F62E",
-	u"No tasks for today. Then, again Fridays really shouldn't even be a work day. \U0001F61B",
-	u"Your task for today: Do nothing! PS: if you really need to do something, I'm here \U0001F60E",
-	u"No tasks on a Sunday? I won't tell anyone \U0001F636"
+	u"Start the week off right. Tell me what you need to get done this week! \U0001F60E",
+	u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",
+	u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",
+	u"Empty day. Surely, there is something you need me to track? \U0001F62E",
+	u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",
+	u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",
+	u"Last day of the week to get stuff done! \U0001F636"
 ]
 
 HELP_MESSAGES = [
