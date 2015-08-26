@@ -84,6 +84,10 @@ class TipQuestionResponseAction(Action):
 			if beginsWithReminderWord and score > .5:
 				score -= .4
 
+		# none of our questions ask for a phone number at the moment, and this could conflict with resolve handle
+		if chunkFeatures.hasPhoneNumber():
+			score -= 0.5
+
 		return score
 
 	def execute(self, chunk, user):
@@ -94,7 +98,7 @@ class TipQuestionResponseAction(Action):
 		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID)
 		firstInt = self.getFirstInt(chunk)
 
-		
+
 		if npsJustNotified:
 			if firstInt is not None:
 				if firstInt < 8:
