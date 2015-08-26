@@ -49,7 +49,7 @@ class FetchWeatherAction(Action):
 			user,
 			"Weather request",
 			{
-				"Date Specific": nattyResult.hadDate
+				"Date Specific": (nattyResult and nattyResult.hadDate),
 			}
 		)
 
