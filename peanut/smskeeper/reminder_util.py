@@ -365,19 +365,19 @@ def shareReminders(user, entries, handles, keeperNumber):
 			shareText = None
 
 			# if the user isn't activated send them special text
-			introText = ""
+			introText = "Hi there :wave:"
 			if not contact.target.activated:
-				introText = keeper_constants.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
+				introText += "%s " % keeper_constants.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
 
 			if len(entries) == 1:
 				tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
-				shareText = "Hi there! %s Just a heads up that %s set a reminder for you %s, so I'll follow up with you then." % (
+				shareText = "%sJust a heads up that %s set a reminder for you %s, so I'll follow up with you then." % (
 					introText,
 					user.nameOrPhone(),
 					msg_util.naturalize(date_util.now(user.getTimezone()), tzAwareDate, includeTime=True),
 				)
 			else:
-				shareText = "Hi there! %s %s set %d reminders for you." % (
+				shareText = "%s%s set %d reminders for you." % (
 					introText,
 					user.nameOrPhone(),
 					len(entries)
