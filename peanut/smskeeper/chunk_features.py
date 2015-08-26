@@ -21,7 +21,7 @@ class ChunkFeatures:
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'%s ' % createWordRegex
 
-	weatherRegex = r"\b(weather|forecast)\b"
+	weatherRegex = r"\b(weather|forecast|rain|temp|temperature|how hot)\b"
 
 	# Features
 	def hasTimingInfo(self):

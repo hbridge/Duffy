@@ -2,10 +2,12 @@ import pytz
 
 from common import date_util, weather_util
 
-
 from smskeeper import sms_util, chunk_features
 from smskeeper import keeper_constants, analytics
 from .action import Action
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class FetchWeatherAction(Action):
@@ -15,9 +17,14 @@ class FetchWeatherAction(Action):
 		score = 0.0
 
 		features = chunk_features.ChunkFeatures(chunk, user)
+		scoreVector = []
+		scoreVector.append(0.8 if features.hasWeatherWord() else 0)
+		scoreVector.append(0.1 if features.isQuestion() else 0)
+		scoreVector.append(-0.5 if features.isBroadQuestion() else 0)
+		scoreVector.append(0.1 if features.containsToday() else 0)
 
-		if features.hasWeatherWord():
-			score = .9
+		logger.debug("User %d: fetch weather score vector: %s", user.id, scoreVector)
+		score = sum(scoreVector)
 
 		if FetchWeatherAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
@@ -42,6 +49,7 @@ class FetchWeatherAction(Action):
 			user,
 			"Weather request",
 			{
+				"Date Specific": nattyResult.hadDate
 			}
 		)
 
