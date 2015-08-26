@@ -23,7 +23,8 @@ module.exports = React.createClass({
 	    			<br/>
 	    			<Well>
 	    				Original Messages: {this.state.model.orig_text} <br />
-	    				Added: {moment.tz(this.state.model.added, USER.timezone).format('llll')}
+	    				Added: {moment.tz(this.state.model.added, USER.timezone).format('llll')} <br />
+	    				User IDs: {this.state.model.users.join(", ")}
 	    			</Well>
 	    			<form className='inputElement' onSubmit={this.createEntry}>
 		    			<Input
@@ -68,9 +69,17 @@ module.exports = React.createClass({
 	    }
 
 	    var subtitle = moment.tz(this.state.model.remind_timestamp, USER.timezone).format('llll');
+	    var qualifiers = [];
 	    if (this.state.model.remind_recur && this.state.model.remind_recur != "default") {
-	    	subtitle = subtitle + " (recurs " + this.state.model.remind_recur + ")";
+	    	qualifiers.push("recurs " + this.state.model.remind_recur);
 	    }
+	    if (this.state.model.users.length > 1) {
+	    	qualifiers.push(" shared");
+	    }
+	    if (qualifiers.length > 0) {
+	    	subtitle = subtitle + " (" + qualifiers.join(", ") + ")"
+	    }
+
 
     	return(
     		<ListGroupItem
