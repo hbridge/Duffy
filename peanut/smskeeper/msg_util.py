@@ -316,6 +316,12 @@ def cleanedReminder(msg, recurrence=None, shareHandles=None):
 		if words[-1].lower() in REMINDER_FRINGE_TERMS:
 			cleaned = cleaned.rsplit(' ', 1)[0]
 
+	# remove punctuation again after removing any fringe terms
+	cleaned = cleaned.strip(string.punctuation).strip()
+
+	# remove too many spaces
+	cleaned = re.sub(r' {2,}', ' ', cleaned)
+
 	return cleaned
 
 
