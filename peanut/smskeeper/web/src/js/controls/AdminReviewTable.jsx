@@ -17,16 +17,18 @@ var EntryRow = React.createClass({
 	render() {
 		console.log(this.state);
 		console.log(this.props);
+		var timezone = this.state.model.creator.timezone;
+
 		return (
 			<tr>
 		        <td> { this.state.model.id } </td>
 		        <td> { this.state.model.text } </td>
 		        <td> { this.state.model.orig_text } </td>
-		        <td> { moment.tz(this.state.model.remind_timestamp).format('llll') } </td>
-		        <td> { moment.tz(this.state.model.added).format('llll') } </td>
+		        <td> { moment.tz(this.state.model.remind_timestamp, timezone).format('llll') } </td>
+		        <td> { moment.tz(this.state.model.added, timezone).format('llll') } </td>
 		        <td> { this.state.model.remind_recur } </td>
 		        <td> { this.state.model.remind_last_notified } </td>
-		        <td> { moment.tz(this.state.model.updated).format('llll') } </td>
+		        <td> { moment.tz(this.state.model.updated, timezone).format('llll') } </td>
       		</tr>
       	);
 	}
