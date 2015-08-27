@@ -28,7 +28,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		return entry
 
 	def test_handle_extraction(self, dateMock):
-		positiveSubjects = ["mom", "Bill", "Aseem", "dad", "my mom", "my boyfriend", "my wife"]
+		positiveSubjects = ["mom", "Bill", "Aseem", "dad", "my mom", "my boyfriend", "my wife", "steve"]
 		negativeSubjects = ["to", "her", "him", "tomorrow", "Wednesday", "every", "of"]
 		positiveStructures = [
 			"Remind :SUBJECT: to foo bar baz tomorrow",
@@ -114,15 +114,13 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 	def test_bad_capitalization(self, dateMock):
 		self.setupUser(dateMock)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Can You Remind Me Around 8 To Put Medicine, Pillow, Minion In Suitcase")
-			self.assertNotIn("phone number", self.getOutput(mock))
+		cliMsg.msg(self.testPhoneNumber, "Can You Remind Me Around 8 To Put Medicine, Pillow, Minion In Suitcase")
+		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_RESOLVE_HANDLE))
 
 	def test_other_action_for_object(self, dateMock):
 		self.setupUser(dateMock)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
-			self.assertNotIn("phoneNumber", self.getOutput(mock))
+		cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
+		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_RESOLVE_HANDLE))
 
 	def test_shared_reminder_for_existing_user(self, dateMock):
 		self.setupUser(dateMock)
@@ -292,3 +290,9 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
 				self.getOutput(mock)
 			)
+
+	def test_short_shared_reminder(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Remind Steve to test")
+		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_RESOLVE_HANDLE))
+

@@ -2,6 +2,7 @@ import re
 import phonenumbers
 
 from common import natty_util
+from common import name_util
 from smskeeper import keeper_constants
 
 defaultPunctuationWhitelist = '-'
@@ -75,21 +76,26 @@ class Chunk:
 		words = self.normalizeText(self.originalText, lowercase=False).split(' ')
 		subjectDelimiterIndices = []
 		numWordsStartUpper = 0
+		numWordsStartAlpha = 0
 
 		for idx, word in enumerate(words):
 			if RELATIONSHIP_SUBJECT_DELIMETERS.match(word):
 				subjectDelimiterIndices.append(idx)
 				continue
-			if len(word) > 0 and word[0].isupper():
-				numWordsStartUpper += 1
+			if len(word) > 0 and word[0].isalpha:
+				numWordsStartAlpha += 1
+				if word[0].isupper():
+					numWordsStartUpper += 1
 
 		# we get some messages from people where very word is capped
-		useCapitalizationSignal = (numWordsStartUpper < len(words) / 2.0)
+		useCapitalizationSignal = (numWordsStartAlpha is not numWordsStartUpper)
 
 		for idx, word in enumerate(words):
 			if len(word) == 0:
 				continue
-			if RELATIONSHIP_RE.match(word) or (word[0].isupper() and useCapitalizationSignal):
+			if (RELATIONSHIP_RE.match(word)
+						or (word[0].isupper() and useCapitalizationSignal)
+						or name_util.isCommonName(word)):
 				if idx == 0:
 					continue  # don't support putting a handle first
 				if HANDLE_BLACKLIST.match(word):
