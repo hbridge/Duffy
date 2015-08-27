@@ -1,7 +1,7 @@
 var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
-var moment = require('moment');
+var moment = require('moment-timezone');
 var BackboneReactComponent = require('backbone-react-component');
 var Utils = require('../utils.js')
 var Bootstrap = require('react-bootstrap');
@@ -19,8 +19,14 @@ var EntryRow = React.createClass({
 		console.log(this.props);
 		return (
 			<tr>
-		        <td> {this.state.model.id} </td>
-		        <td> {this.state.model.text} </td>
+		        <td> { this.state.model.id } </td>
+		        <td> { this.state.model.text } </td>
+		        <td> { this.state.model.orig_text } </td>
+		        <td> { moment.tz(this.state.model.remind_timestamp).format('llll') } </td>
+		        <td> { moment.tz(this.state.model.added).format('llll') } </td>
+		        <td> { this.state.model.remind_recur } </td>
+		        <td> { this.state.model.remind_last_notified } </td>
+		        <td> { moment.tz(this.state.model.updated).format('llll') } </td>
       		</tr>
       	);
 	}
@@ -39,14 +45,22 @@ module.exports = React.createClass({
     }.bind(this);
 
   	return (
-  		<Table>
+  		<Table striped bordered condensed hover>
 			<thead>
 				<tr>
-					<th>#</th>
+					<th>id</th>
 					<th>Text</th>
+					<th>Orig text</th>
+					<th>Remind timestamp (tz aware)</th>
+					<th>Time added (tz aware)</th>
+					<th>Recur</th>
+					<th>Sent</th>
+					<th>Updated</th>
 				</tr>
 			</thead>
+			<tbody>
   			{ this.props.collection.map(createRow) }
+  			</tbody>
   		</Table>
   	);
   },
