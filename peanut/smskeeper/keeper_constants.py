@@ -238,8 +238,8 @@ REMINDER_DIGEST_EMPTY = [
 	u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",
 	u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",
 	# TODO replace this after digests go out tomorrow
-	#u"I can text other people reminders for you, just say something like:\nRemind Eric to pick up pizza at 6pm :pizza:",
-	u"Empty day. Surely, there is something you need me to track? \U0001F62E",
+	u"I can text other people reminders for you, just say something like:\nRemind Eric to pick up pizza at 6pm :pizza:",
+	# u"Empty day. Surely, there is something you need me to track? \U0001F62E",
 	u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",
 	u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",
 	u"Last day of the week to get stuff done! \U0001F636"
