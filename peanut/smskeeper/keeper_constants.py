@@ -110,9 +110,9 @@ INTRO_MESSAGES_MEDICAL = [
 
 
 UNKNOWN_COMMAND_PHRASES = [
-	u"ZZZZ \U0001F62A....so tired. Talk more in the morning! \U0001F60C",
-	u"So sleepy. Let's play the silent game... with eyes closed \U0001F606",
-	u"\U0001F4A4 I'll be much more responsive in the morning",
+	u"Zzz \U0001F62A... so tired. Talk more in the morning! \U0001F60C",
+	u"\U0001F4A4 I'll get back to you in the morning.",
+	u"Hmmm, I need my minions for that that and they're sleeping. I'll get back to you in the morning :sunrise:"
 ]
 
 REPORT_ISSUE_KEYWORD = "report"
