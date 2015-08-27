@@ -15,13 +15,19 @@ AdminEntryCard = require('./AdminEntryCard.jsx');
 var EntryRow = React.createClass({
 	mixins: [BackboneReactComponent],
 	render() {
-		console.log(this.state);
-		console.log(this.props);
-		var timezone = this.state.model.creator.timezone;
+		var timezone = this.state.model.creatorTimezone;
+		var approveButton = <Button
+			bsStyle={this.state.model.manually_check ? 'success' : 'danger'}
+			ref="approveButton"
+			bsSize="xsmall"
+			onClick={this.handleApproveToggled}
+		>
+			{this.state.model.manually_check ? "Approve" : "Unapprove"}
+		</Button>
 
 		return (
 			<tr>
-		        <td> { this.state.model.id } </td>
+		        <td> { approveButton } </td>
 		        <td> { this.state.model.text } </td>
 		        <td> { this.state.model.orig_text } </td>
 		        <td> { moment.tz(this.state.model.remind_timestamp, timezone).format('llll') } </td>
@@ -31,6 +37,14 @@ var EntryRow = React.createClass({
 		        <td> { moment.tz(this.state.model.updated, timezone).format('llll') } </td>
       		</tr>
       	);
+	},
+
+	handleApproveToggled(e) {
+		var newVal = !(this.state.model.manually_check);
+		console.log("setting manually_check for %d to %s", this.state.model.id, newVal);
+		var changes = {'manually_check': newVal};
+		var result = this.props.model.save(changes, {patch: true});
+		console.log("save result:", result)
 	}
 });
 
@@ -40,7 +54,6 @@ module.exports = React.createClass({
 
   render() {
   	var createRow = function(entry, index) {
-  		console.log("map create row", entry, index);
       return (
         <EntryRow model={ entry } key={ entry.id } />
       );
@@ -50,7 +63,7 @@ module.exports = React.createClass({
   		<Table striped bordered condensed hover>
 			<thead>
 				<tr>
-					<th>id</th>
+					<th>Approval</th>
 					<th>Text</th>
 					<th>Orig text</th>
 					<th>Remind timestamp (tz aware)</th>

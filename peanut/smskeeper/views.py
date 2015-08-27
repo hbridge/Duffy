@@ -32,7 +32,6 @@ from smskeeper.models import User, Entry, Message
 from smskeeper import analytics, helper_util
 
 from smskeeper.serializers import EntrySerializer
-from smskeeper.serializers import ReviewEntrySerializer
 from smskeeper.serializers import MessageSerializer
 from rest_framework import generics
 from rest_framework import permissions
@@ -223,7 +222,7 @@ class ReviewFeed(generics.ListCreateAPIView):
 	authentication_classes = (authentication.BasicAuthentication,)
 	permission_classes = (permissions.AllowAny,)
 	queryset = Entry.objects.filter(manually_check=True, hidden=False)
-	serializer_class = ReviewEntrySerializer
+	serializer_class = EntrySerializer
 
 class EntryList(generics.ListCreateAPIView):
 	# set authentication to basic and allow any to disable CSRF protection
