@@ -102,9 +102,10 @@ def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None, classification=No
 
 	msg = msg_util.renderMsg(msg)
 	args = (user.id, msg, None, keeperNumber, False, False, classification)
+	logger.info("User %d: sendDelayedMsg args %s", user.id, str(args))
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
 		eta = date_util.now(pytz.utc) + timedelta(seconds=delaySeconds)
-		asyncSendMsg.apply_async(*args, eta=eta)
+		asyncSendMsg.apply_async(args, eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
 		asyncSendMsg(*args)
