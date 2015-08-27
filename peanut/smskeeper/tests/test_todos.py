@@ -2034,3 +2034,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 			self.assertNotIn("foo bar", self.getOutput(mock))
 			self.assertNotIn("poop", self.getOutput(mock))
+
+	def test_silent_stop(self, dateMock):
+		self.setupUser(dateMock)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Silent stop")
+			self.assertEqual("", self.getOutput(mock))
+			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_STOPPED)

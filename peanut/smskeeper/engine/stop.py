@@ -9,7 +9,7 @@ from smskeeper import analytics
 class StopAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_STOP
 
-	stopRegex = re.compile(r"stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
+	stopRegex = re.compile(r"stop$|silent stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
 
 	def getScore(self, chunk, user):
 		score = 0.0
@@ -25,16 +25,21 @@ class StopAction(Action):
 	def execute(self, chunk, user):
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 
-		sms_util.sendMsg(
-			user,
-			u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'"
-			+ u"\n\nI hate to see you go. Is there something I can do better? \U0001F423",
-			stopOverride=True
-		)
+		isSilent = chunk.matches('silent')
+		if not isSilent:
+			sms_util.sendMsg(
+				user,
+				u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'"
+				+ u"\n\nI hate to see you go. Is there something I can do better? \U0001F423",
+				stopOverride=True
+			)
 
 		analytics.logUserEvent(
 			user,
 			"Stop/Start",
-			{"Action": "Stop"}
+			{
+				"Action": "Stop",
+				"Is Silent": isSilent,
+			}
 		)
 		return True

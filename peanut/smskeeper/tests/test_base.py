@@ -94,6 +94,8 @@ class SMSKeeperBaseCase(TestCase):
 		return events
 
 	def renderTextConstant(self, constant):
+		if isinstance(constant, list):
+			return map(lambda txt: self.renderTextConstant(txt), constant)
 		return emoji.emojize(constant, True)
 
 	# Day, hasDate, hasTime
