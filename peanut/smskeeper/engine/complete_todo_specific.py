@@ -54,7 +54,6 @@ class CompleteTodoSpecificAction(Action):
 			entry.save()
 
 		features = ChunkFeatures(chunk, user)
-
 		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord())
 
 		if msgBack:
