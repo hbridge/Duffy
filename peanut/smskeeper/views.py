@@ -124,15 +124,26 @@ def history(request):
 	)
 
 
-def renderReact(request, appName, templateFile="react_app.html", user=None, context=dict()):
+@login_required(login_url='/admin/login/')
+def review(request):
+	return renderReact(
+		request,
+		'review',
+		requiresUser=False,
+	)
+
+
+def renderReact(request, appName, templateFile="react_app.html", user=None, context=dict(), requiresUser=True):
 	form = UserIdForm(api_util.getRequestData(request))
 	if (form.is_valid()):
-		if not user:
-			user = form.cleaned_data['user']
+		if requiresUser:
+			if not user:
+				user = form.cleaned_data['user']
+			phoneNumToContactDict = getNameFromContactsDB([user.phone_number])
+			context["user_data"] = json.dumps(getUserDataDict(user, phoneNumToContactDict), cls=DjangoJSONEncoder)
+		else:
+			context["user_data"] = json.dumps({})
 
-		phoneNumToContactDict = getNameFromContactsDB([user.phone_number])
-
-		context["user_data"] = json.dumps(getUserDataDict(user, phoneNumToContactDict), cls=DjangoJSONEncoder)
 		context["development"] = settings.DEBUG
 		if form.cleaned_data['development']:
 			context["development"] = form.cleaned_data['development']
@@ -205,6 +216,13 @@ def entry_feed(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+
+class ReviewFeed(generics.ListCreateAPIView):
+	# set authentication to basic and allow any to disable CSRF protection
+	authentication_classes = (authentication.BasicAuthentication,)
+	permission_classes = (permissions.AllowAny,)
+	queryset = Entry.objects.filter(manually_check=True, hidden=False)
+	serializer_class = EntrySerializer
 
 class EntryList(generics.ListCreateAPIView):
 	# set authentication to basic and allow any to disable CSRF protection

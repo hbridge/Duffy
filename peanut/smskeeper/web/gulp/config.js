@@ -62,6 +62,12 @@ module.exports = {
       outputName: 'keeper_app_bundle.js',
       // list of externally available modules to exclude from the bundle
       // external: ['jquery', 'underscore']
+    }, {
+      entries: srcjs + '/review.jsx',
+      dest: dest,
+      outputName: 'review_bundle.js',
+      // list of externally available modules to exclude from the bundle
+      // external: ['jquery', 'underscore']
     }]
   },
   production: {

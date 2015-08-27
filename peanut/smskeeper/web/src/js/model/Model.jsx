@@ -109,8 +109,19 @@ var EntryList = Backbone.Collection.extend({
   }
 });
 
+var ReviewList = Backbone.Collection.extend({
+  model: Entry,
+  url: "/smskeeper/review_feed",
+  comparator: function(entry) {
+    var date = new Date(entry.get("remind_timestamp"));
+    var dval = (date - 0) * -1;
+    return dval;
+  },
+});
+
 exports.HistoryStore = HistoryStore;
 exports.Message = Message;
 exports.MessageList = MessageList;
 exports.EntryList = EntryList;
 exports.Entry = Entry;
+exports.ReviewList = ReviewList;
