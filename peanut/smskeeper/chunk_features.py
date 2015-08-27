@@ -103,3 +103,6 @@ class ChunkFeatures:
 
 	def containsToday(self):
 		return self.chunk.contains('today')
+
+	def containsDeleteWord(self):
+		return self.chunk.contains(r'delete|clear|remove')

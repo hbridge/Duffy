@@ -144,7 +144,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done!")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -604,7 +604,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done!")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -626,7 +626,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -675,7 +675,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "I blahed tonya")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").first()
@@ -916,7 +916,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done with all")
 
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 			# We don't send back individals
 			self.assertNotIn("Poop", self.getOutput(mock))
@@ -943,7 +943,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			with patch('smskeeper.sms_util.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, donePhrase)
 
-				self.assertIn("Nice!", self.getOutput(mock), donePhrase)
+				self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock), donePhrase)
 
 			# Make sure first and third were cleared
 			entry = Entry.objects.last()
@@ -963,7 +963,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Check off run!")
 
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Make sure first and third were cleared
 		entries = Entry.objects.all()
@@ -1146,7 +1146,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done with charu")
-			self.assertIn("Nice", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Make sure right one is removed and not all
 		entries = Entry.objects.filter(label="#reminders")
@@ -1172,7 +1172,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done with charu and poop")
-			self.assertIn("Nice", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Make sure right ones are removed and not all
 		entries = Entry.objects.filter(label="#reminders")
@@ -1193,7 +1193,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Done with message Amina and dazie")
-			self.assertIn("Nice", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 			self.assertNotIn("I'm not sure which entry you mean", self.getOutput(mock))
 
 		# Make sure we hid the entry
@@ -1405,7 +1405,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "done writing imaging doc")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertTrue(entries[0].hidden)
@@ -1521,7 +1521,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, phrase2)
-			self.assertIn("Nice", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertTrue(entries[0].hidden)
@@ -1700,7 +1700,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Now make sure if we type done, we get a nice response and it gets hidden
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Thank you done")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()
@@ -1848,7 +1848,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "done go poop")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1870,7 +1870,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "Court on the 5th of aug tomorrow")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "done with court August 5")
-			self.assertIn("Nice!", self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
 
 	# Make sure we can say "done" to a weekly task and the task still shows up next time
 	def test_create_and_done_counts(self, dateMock):
@@ -2018,3 +2018,19 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entry.remind_timestamp = self.TUE_10AM
 		entry.save()
 		self.assertFalse(entry.use_digest_time, "Digest time not cleared on manual remind_timestamp change")
+
+	def test_delete_all(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Remind me to test foo bar")
+		cliMsg.msg(self.testPhoneNumber, "Remind me to go poop tonight")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remove poop")
+			self.assertNotIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "tasks")
+			self.assertNotIn("poop", self.getOutput(mock))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "delete all tasks")
+			self.assertNotIn(self.renderTextConstant(":white_check_mark:"), self.getOutput(mock))
+			self.assertNotIn("foo bar", self.getOutput(mock))
+			self.assertNotIn("poop", self.getOutput(mock))

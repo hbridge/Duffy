@@ -21,7 +21,7 @@ class FetchDigestAction(Action):
 		scoreVector.append(-0.5 if chunkFeatures.isBroadQuestion() else 0)
 		scoreVector.append(0.1 if chunkFeatures.containsToday() else 0)
 		scoreVector.append(-0.5 if chunkFeatures.hasTimeOfDay() else 0)
-		scoreVector.append(-0.1 if chunkFeatures.couldBeDone() else 0)
+		scoreVector.append(-0.2 if chunkFeatures.couldBeDone() else 0)
 
 		logger.debug("User %d: fetch digest score vector: %s", user.id, scoreVector)
 		score = sum(scoreVector)

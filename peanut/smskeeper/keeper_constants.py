@@ -86,6 +86,7 @@ TUTORIAL_STEP_KEY = "todo-tutorial-step"
 LAST_ENTRIES_IDS_KEY = "lastEntriesIds"
 
 ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
+DONE_PHRASES = ["Nice!", "Sweet!", ":+1:", "Well done!", "Woohoo!"]
 
 FIRST_INTRO_MESSAGE_NO_MAGIC = "Oh hello. I'm ready for you."
 FIRST_INTRO_MESSAGE_MAGIC = "Ah. You used the magic phrase. Smooth."

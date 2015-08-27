@@ -5,6 +5,7 @@ from smskeeper import keeper_constants
 from .action import Action
 from smskeeper import niceties
 from smskeeper import analytics
+from smskeeper.chunk_features import ChunkFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -53,11 +54,8 @@ class CompleteTodoMostRecentAction(Action):
 			logger.info("User %s: Marking off entry %s as hidden" % (user.id, entry.id))
 			entry.save()
 
-		msgBack = None
-		if len(entries) == 1:
-			msgBack = "Nice! Checked that off :white_check_mark:"
-		elif len(entries) > 1:
-			msgBack = "Nice! Checked those off :white_check_mark:"
+		features = ChunkFeatures(chunk, user)
+		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord())
 
 		if msgBack:
 			sms_util.sendMsg(user, msgBack)

@@ -13,7 +13,7 @@ from models import Entry, Message
 from smskeeper import keeper_constants
 from models import ZipData
 from smskeeper.chunk import Chunk
-
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
 
 done_re = re.compile(
-	r"\b(done|clear|check .*off|check off|told|mark off|mark .*off|sent|cross .*off|checked|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed|cashed)\b",
+	r"\b(done|clear|delete|remove|check .*off|check off|told|mark off|mark .*off|sent|cross .*off|checked|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed|cashed)\b",
 	re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo
@@ -517,3 +517,19 @@ def naturalize(now, futureTime, includeTime=True):
 # returns the message text
 def renderMsg(msg):
 	return emoji.emojize(msg, use_aliases=True)
+
+
+def renderDoneResponse(entries, isDelete):
+	if len(entries) == 0:
+		return None
+
+	if len(entries) == 1:
+		article = "that"
+	elif len(entries) > 1:
+		article = "those"
+
+	if isDelete:
+		msgBack = "Ok. Removed :ARTICLE: :cross_mark:"
+	else:
+		msgBack = "%s Checked :ARTICLE: off :white_check_mark:" % random.choice(keeper_constants.DONE_PHRASES)
+	return msgBack.replace(':ARTICLE:', article)
