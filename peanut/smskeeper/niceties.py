@@ -239,11 +239,11 @@ def renderBirthdayInquiry(user, requestDict, keeperNumber):
 	return u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423" % (deltaText)
 
 
-EMOJI_NICETY_RE = u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])'
+EMOJI_NICETY_RE = u'(([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF]))$'
 try:
 	re.compile(EMOJI_NICETY_RE)
 except:
-	EMOJI_NICETY_RE = (u'([\u2600-\u27BF])|([\uD83C][\uDF00-\uDFFF])|([\uD83D][\uDC00-\uDE4F])|([\uD83D][\uDE80-\uDEFF])')
+	EMOJI_NICETY_RE = (u'(([\u2600-\u27BF])|([\uD83C][\uDF00-\uDFFF])|([\uD83D][\uDC00-\uDE4F])|([\uD83D][\uDE80-\uDEFF]))$')
 
 
 @custom_nicety_for(EMOJI_NICETY_RE)
