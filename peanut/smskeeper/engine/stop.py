@@ -25,10 +25,12 @@ class StopAction(Action):
 	def execute(self, chunk, user):
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 
-		sms_util.sendMsgs(
+		sms_util.sendMsg(
 			user,
-			[u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'",
-			u"I hate to see you go. Is there something I can do better? \U0001F423"], stopOverride=True)
+			u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'"
+			+ u"\n\nI hate to see you go. Is there something I can do better? \U0001F423",
+			stopOverride=True
+		)
 
 		analytics.logUserEvent(
 			user,
