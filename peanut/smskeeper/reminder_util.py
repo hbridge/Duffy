@@ -365,7 +365,7 @@ def shareReminders(user, entries, handles, keeperNumber):
 			shareText = None
 
 			# if the user isn't activated send them special text
-			introText = "Hi there :wave:"
+			introText = "Hi there :wave: "
 			if not contact.target.activated:
 				introText += "%s " % keeper_constants.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
 
