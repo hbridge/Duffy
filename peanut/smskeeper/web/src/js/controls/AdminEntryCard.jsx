@@ -15,6 +15,13 @@ TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
 
 module.exports = React.createClass({
 	mixins: [BackboneReactComponent],
+
+	componentDidMount(){
+		if (this.props.expanded) {
+			this.setState({expanded: true});
+		}
+	},
+
 	render: function() {
 	    var expandedElems = null;
 	    if (this.state.expanded) {
