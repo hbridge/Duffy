@@ -28,6 +28,7 @@ from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SendMediaForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
 from smskeeper.models import User, Entry, Message
+from smskeeper import admin
 
 from smskeeper import analytics, helper_util
 
@@ -222,6 +223,7 @@ class ReviewFeed(generics.ListCreateAPIView):
 	authentication_classes = (authentication.BasicAuthentication,)
 	permission_classes = (permissions.AllowAny,)
 	queryset = Entry.objects.filter(manually_check=True, hidden=False)
+	queryset = admin.filterReminderQueryset(queryset)
 	serializer_class = EntrySerializer
 
 class EntryList(generics.ListCreateAPIView):

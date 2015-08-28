@@ -32,6 +32,9 @@ def mark_as_hidden(modeladmin, request, entries):
 mark_as_hidden.short_description = "Mark as hidden"
 
 
+def filterReminderQueryset(qs):
+	return qs.filter(remind_timestamp__isnull=False).exclude(Q(creator__state=keeper_constants.STATE_STOPPED) | Q(creator__state=keeper_constants.STATE_SUSPENDED)).order_by("hidden", "remind_timestamp")
+
 @admin.register(Reminder)
 class ReminderAdmin(admin.ModelAdmin):
 
@@ -48,7 +51,7 @@ class ReminderAdmin(admin.ModelAdmin):
 
 	def queryset(self, request):
 		qs = super(ReminderAdmin, self).queryset(request)
-		return qs.filter(remind_timestamp__isnull=False).exclude(Q(creator__state=keeper_constants.STATE_STOPPED) | Q(creator__state=keeper_constants.STATE_SUSPENDED)).order_by("hidden", "remind_timestamp")
+		return filterReminderQueryset(qs)
 
 	def time_added_tz_aware(self, obj):
 		dt = obj.added.astimezone(obj.creator.getTimezone()).replace(tzinfo=None)
