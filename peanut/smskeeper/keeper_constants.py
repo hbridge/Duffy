@@ -172,6 +172,7 @@ COMMON_LIST_RES = [
 
 KEEPER_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper.vcf"
 KEEPER_TODO_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper_todo.vcf"
+KEEPER_STUDENT_VCARD_URL = "https://s3.amazonaws.com/smskeeper/Keeper_student.vcf"
 PHOTOS_TIP_URL = "https://s3.amazonaws.com/smskeeper/PhotosTip.png"
 KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
