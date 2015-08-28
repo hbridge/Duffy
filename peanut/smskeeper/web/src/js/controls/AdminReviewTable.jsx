@@ -18,12 +18,12 @@ var EntryRow = React.createClass({
 	render() {
 		var timezone = this.state.model.creatorTimezone;
 		var approveButton = <Button
-			bsStyle={this.state.model.manually_check ? 'success' : 'danger'}
+			bsStyle={this.state.model.manually_check ? 'danger' : 'success'}
 			ref="approveButton"
 			bsSize="xsmall"
 			onClick={this.handleApproveToggled}
 		>
-			{this.state.model.manually_check ? "Approve" : "Unapprove"}
+			{this.state.model.manually_check ? "Unreviewed" : "Approved"}
 		</Button>
 
 		return (
@@ -34,7 +34,7 @@ var EntryRow = React.createClass({
 		        <td> { moment.tz(this.state.model.remind_timestamp, timezone).format('llll') } </td>
 		        <td> { moment.tz(this.state.model.added, timezone).format('llll') } </td>
 		        <td> { this.state.model.remind_recur } </td>
-		        <td> { this.state.model.remind_last_notified } </td>
+		        <td> { this.state.model.remind_last_notified ? "√" : ""} </td>
 		        <td> { moment.tz(this.state.model.updated, timezone).format('llll') } </td>
       		</tr>
       	);
@@ -45,7 +45,10 @@ var EntryRow = React.createClass({
 		e.stopPropagation();
 		var newVal = !(this.state.model.manually_check);
 		console.log("setting manually_check for %d to %s", this.state.model.id, newVal);
-		var changes = {'manually_check': newVal};
+		var changes = {
+			'manually_check': newVal,
+			'manually_approved_timestamp': newVal ? null : moment().toISOString(),
+		};
 		var result = this.props.model.save(changes, {patch: true});
 		console.log("save result:", result)
 	},
@@ -92,6 +95,7 @@ module.exports = React.createClass({
   			</tbody>
   		</Table>
   		{ modal }
+  		<p>Entries to review: <b>{ this.state.collection.length }</b></p>
   		</div>
   	);
   },

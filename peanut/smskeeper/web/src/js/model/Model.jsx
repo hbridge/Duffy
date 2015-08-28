@@ -114,7 +114,7 @@ var ReviewList = Backbone.Collection.extend({
   url: "/smskeeper/review_feed",
   comparator: function(entry) {
     var date = new Date(entry.get("remind_timestamp"));
-    var dval = (date - 0) * -1;
+    var dval = (date - 0);
     return dval;
   },
 });
