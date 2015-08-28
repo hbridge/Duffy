@@ -77,7 +77,7 @@ var EntryRow = React.createClass({
 		return (
 			<tr>
 		        <td> { approveButton } </td>
-		        <td> <a href={'../history?user_id=' + this.state.model.creator }> {this.state.model.creatorName} </a></td>
+		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creatorName} </a></td>
 		        <td onClick={this.handleRowClicked}> { this.state.model.text } </td>
 		        <td onClick={this.handleRowClicked}> { this.state.model.orig_text } </td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>

@@ -29,6 +29,7 @@ module.exports = React.createClass({
 	    		<div>
 	    			<br/>
 	    			<Well>
+	    				Entry ID: <a href={'/admin/smskeeper/entry/' + this.state.model.id} target="_blank">{this.state.model.id}</a><br/>
 	    				Original Messages: {this.state.model.orig_text} <br />
 	    				Added: {moment.tz(this.state.model.added, this.props.userTimezone).format('llll')} <br />
 	    				User IDs: {this.state.model.users.join(", ")}
