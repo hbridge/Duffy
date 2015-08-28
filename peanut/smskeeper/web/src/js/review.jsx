@@ -23,7 +23,7 @@ var ReviewApp = React.createClass({
   componentDidMount: function() {
     this.lastSeenMessageId = 0;
     if (!DevelopmentMode) {
-      setInterval(function () {this.getModel().fetch()}.bind(this), 2000);
+      // setInterval(function () {this.getCollection().fetch()}.bind(this), 2000);
     }
   },
 

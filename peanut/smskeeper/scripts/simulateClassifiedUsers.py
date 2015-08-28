@@ -64,6 +64,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			response = {"users": []}
 
 		classified_users = json.loads(response)["users"]
+		# don't do users with UID < 1000, they have hash tags etc in their transcripts
+		classified_users = filter(lambda uid: uid >= 1000, classified_users)
 		logger.info("Replaying messages for %d users..." % min(len(classified_users), MAX_USERS_TO_SIMULATE))
 
 		message_count = 0
