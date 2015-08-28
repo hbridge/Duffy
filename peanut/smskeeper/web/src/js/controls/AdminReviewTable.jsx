@@ -29,13 +29,14 @@ var EntryRow = React.createClass({
 		var dateFormat = "h:mm A ddd, MMM D";
 
 		return (
-			<tr onClick={this.handleRowClicked}>
+			<tr>
 		        <td> { approveButton } </td>
-		        <td> { this.state.model.text } </td>
-		        <td> { this.state.model.orig_text } </td>
-		        <td> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
-		        <td> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
-		        <td> { this.state.model.remind_recur } </td>
+		        <td> <a href={'../history?user_id=' + this.state.model.creator }> {this.state.model.creatorName} </a></td>
+		        <td onClick={this.handleRowClicked}> { this.state.model.text } </td>
+		        <td onClick={this.handleRowClicked}> { this.state.model.orig_text } </td>
+		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
+		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
+		        <td onClick={this.handleRowClicked}> { this.state.model.remind_recur } </td>
 		        <td> { this.state.model.remind_last_notified ? "√" : ""} </td>
       		</tr>
       	);
@@ -82,6 +83,7 @@ module.exports = React.createClass({
 			<thead>
 				<tr>
 					<th>Approval</th>
+					<th>User</th>
 					<th>Text</th>
 					<th>Orig text</th>
 					<th>Remind timestamp (tz aware)</th>
