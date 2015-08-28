@@ -26,16 +26,17 @@ var EntryRow = React.createClass({
 			{this.state.model.manually_check ? "Unreviewed" : "Approved"}
 		</Button>
 
+		var dateFormat = "h:mm A ddd, MMM D";
+
 		return (
 			<tr onClick={this.handleRowClicked}>
 		        <td> { approveButton } </td>
 		        <td> { this.state.model.text } </td>
 		        <td> { this.state.model.orig_text } </td>
-		        <td> { moment.tz(this.state.model.remind_timestamp, timezone).format('llll') } </td>
-		        <td> { moment.tz(this.state.model.added, timezone).format('llll') } </td>
+		        <td> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
+		        <td> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
 		        <td> { this.state.model.remind_recur } </td>
 		        <td> { this.state.model.remind_last_notified ? "√" : ""} </td>
-		        <td> { moment.tz(this.state.model.updated, timezone).format('llll') } </td>
       		</tr>
       	);
 	},
@@ -87,7 +88,6 @@ module.exports = React.createClass({
 					<th>Time added (tz aware)</th>
 					<th>Recur</th>
 					<th>Sent</th>
-					<th>Updated</th>
 				</tr>
 			</thead>
 			<tbody>
