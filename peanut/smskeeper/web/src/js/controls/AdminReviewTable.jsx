@@ -101,14 +101,19 @@ module.exports = React.createClass({
   },
 
   handleRowClicked(entry){
-  	this.setState({showDetails: entry});
+  	this.setState({expandedEntry: entry});
   },
 
   getModal() {
+  		creatorTimezone = null;
+  		if (this.state.expandedEntry) {
+  			creatorTimezone = this.state.expandedEntry.get('creatorTimezone');
+  		}
 		return (
-			<Modal show={this.state.showDetails != null} onHide={this.close}>
+			<Modal show={this.state.expandedEntry != null} onHide={this.close}>
 	          <Modal.Body>
-	           	<AdminEntryCard model={this.state.showDetails} expanded
+	           	<AdminEntryCard model={this.state.expandedEntry} expanded
+	           		userTimezone={creatorTimezone}
 	           		onSave={this.close}
 	           		onCancel={this.close}
 	           	/>
@@ -118,7 +123,7 @@ module.exports = React.createClass({
 	},
 
 	close(e) {
-		this.setState({showDetails: null})
+		this.setState({expandedEntry: null})
 	}
 
  });

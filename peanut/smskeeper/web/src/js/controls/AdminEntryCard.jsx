@@ -30,7 +30,7 @@ module.exports = React.createClass({
 	    			<br/>
 	    			<Well>
 	    				Original Messages: {this.state.model.orig_text} <br />
-	    				Added: {moment.tz(this.state.model.added, USER.timezone).format('llll')} <br />
+	    				Added: {moment.tz(this.state.model.added, this.props.userTimezone).format('llll')} <br />
 	    				User IDs: {this.state.model.users.join(", ")}
 	    			</Well>
 	    			<form className='inputElement' onSubmit={this.createEntry}>
@@ -42,8 +42,8 @@ module.exports = React.createClass({
 		    			/>
 		    			<TZDateTimePicker
 		    				ref="date"
-		    				initialMoment={moment.tz(this.state.model.remind_timestamp, USER.timezone)}
-		    				timezone={USER.timezone}
+		    				initialMoment={moment.tz(this.state.model.remind_timestamp, this.props.userTimezone)}
+		    				timezone={this.props.userTimezone}
 		    			/>
 		    			<Input ref="recur"
 		    				type='select'
@@ -75,7 +75,7 @@ module.exports = React.createClass({
 	    	);
 	    }
 
-	    var subtitle = moment.tz(this.state.model.remind_timestamp, USER.timezone).format('llll');
+	    var subtitle = moment.tz(this.state.model.remind_timestamp, this.props.userTimezone).format('llll');
 	    var qualifiers = [];
 	    if (this.state.model.remind_recur && this.state.model.remind_recur != "default") {
 	    	qualifiers.push("recurs " + this.state.model.remind_recur);

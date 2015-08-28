@@ -24,7 +24,7 @@ module.exports = React.createClass({
   render: function() {
     var createEntry = function(entry, index) {
       return (
-        <AdminEntryCard model={ entry } key={ entry.id } />
+        <AdminEntryCard model={ entry } key={ entry.id } userTimezone={USER.timezone}/>
       );
     }.bind(this);
 
