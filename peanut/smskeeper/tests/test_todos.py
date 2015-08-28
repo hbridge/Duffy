@@ -1301,7 +1301,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Some unkown phrase, we shouldn't get anything back
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "this is a random phrase")
-			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_constants.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
 
 		# Make sure we didn't create anything
 		entries = Entry.objects.filter(label="#reminders")

@@ -588,8 +588,8 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Are you my daddy?")
-			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_constants.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Who is the bestests")
-			self.assertIn(self.getOutput(mock), keeper_constants.UNKNOWN_COMMAND_PHRASES)
+			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_constants.UNKNOWN_COMMAND_PHRASES), use_aliases=True))

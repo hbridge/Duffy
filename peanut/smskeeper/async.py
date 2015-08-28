@@ -255,6 +255,14 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 	daysActive = (now - user.added).days
 	tipSent = False
 
+	analytics.logUserEvent(
+		user,
+		"Digest sent",
+		parametersDict={
+			"Num Entries": len(pendingEntries),
+		}
+	)
+
 	if daysActive >= 5 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_CHANGE_TIME_TIP_ID) and not userRequested:
 		digestChangeTimeTip = tips.tipWithId(tips.DIGEST_CHANGE_TIME_TIP_ID)
 		sms_util.sendMsg(user, digestChangeTimeTip.renderMini(), classification=keeper_constants.OUTGOING_CHANGE_DIGEST_TIME)
