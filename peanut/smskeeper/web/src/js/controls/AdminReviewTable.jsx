@@ -80,6 +80,7 @@ var EntryRow = React.createClass({
 		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creatorName} </a></td>
 		        <td onClick={this.handleRowClicked}> { this.state.model.text } </td>
 		        <td onClick={this.handleRowClicked}> { this.state.model.orig_text } </td>
+		        <td> {this.getCreateRemindDeltaText()} </td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
 		        <td> <RecurButton model={this.props.model} /> </td>
@@ -106,6 +107,12 @@ var EntryRow = React.createClass({
 		this.props.onRowClicked(this.props.model);
 	},
 
+	getCreateRemindDeltaText(){
+		var millis = moment(this.state.model.remind_timestamp).diff(this.state.model.added);
+		var duration = moment.duration(millis);
+		return duration.days() + "d " + duration.hours() + "h";
+	},
+
 });
 
 
@@ -123,14 +130,15 @@ module.exports = React.createClass({
 
   	return (
   		<div>
-  		<Table striped bordered condensed hover>
+  		<Table striped bordered condensed hover responsive>
 			<thead>
 				<tr>
 					<th>Approval</th>
 					<th>User</th>
 					<th>Text</th>
 					<th>Orig text</th>
-					<th>Remind timestamp (tz aware)</th>
+					<th>∆</th>
+					<th>Remind time (tz aware)</th>
 					<th>Time added (tz aware)</th>
 					<th>Recur</th>
 					<th>Sent</th>
