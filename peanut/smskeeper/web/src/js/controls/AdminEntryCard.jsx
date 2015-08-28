@@ -50,13 +50,9 @@ module.exports = React.createClass({
 		    				label="Type"
 		    				defaultValue={this.state.model.remind_recur}
 		    			>
-      						<option value='default'>Default Reminder</option>
-      						<option value='one-time'>One-time Reminder</option>
-      						<option value='daily'>Daily Reccurring</option>
-      						<option value='every-2-days'>Every 2 days Reccurring</option>
-      						<option value='weekdays'>Weekdays Reccurring</option>
-      						<option value='weekly'>Weekly Reccurring</option>
-      						<option value='monthly'>Monthly Reccurring</option>
+		    				{this.props.model.recurOptions().map(function(option){
+		    					return (<option value={option.value}>{option.longText}</option>);
+		    				})};
     					</Input>
     					<Input ref="hidden" type='checkbox' label="Hidden" defaultChecked={this.state.model.hidden}/>
     					<Button

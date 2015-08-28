@@ -56,6 +56,18 @@ var Entry = Backbone.Model.extend({
     urlRoot: function() {
       return "/smskeeper/entry/";
     },
+
+    recurOptions: function() {
+      return ([
+        {value: "default", shortText: "Default", longText: "Default Reminder"},
+        {value: "one-time", shortText: "One-time", longText: "One-time Reminder"},
+        {value: "daily", shortText: "Daily", longText: "Daily Recurring"},
+        {value: "every-2-days", shortText: "Every other", longText: "Every Other Day"},
+        {value: "weekdays", shortText: "Weekdays", longText: "Weekday Recurring"},
+        {value: "weekly", shortText: "Weekly", longText: "Weekly Recurring"},
+        {value: "monthly", shortText: "Monthly", longText: "Monthly Recurring"},
+      ]);
+    }
 });
 
 var EntryList = Backbone.Collection.extend({

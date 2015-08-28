@@ -10,7 +10,53 @@ var Bootstrap = require('react-bootstrap');
   ListGroup = Bootstrap.ListGroup;
   Table = Bootstrap.Table;
   Modal = Bootstrap.Modal;
+  SplitButton = Bootstrap.SplitButton;
+  MenuItem = Bootstrap.MenuItem;
 AdminEntryCard = require('./AdminEntryCard.jsx');
+
+var RecurButton = React.createClass({
+	mixins: [BackboneReactComponent],
+	render() {
+		var style = 'default';
+		var title = "Default";
+		var recurOptions = this.props.model.recurOptions();
+
+		if (this.state.model) {
+			var option = recurOptions.find(function(option){return option.value == this.state.model.remind_recur}.bind(this));
+			title = option.shortText;
+			if (this.state.model.remind_recur == 'default') {
+				style = 'default';
+			} else if (this.state.model.remind_recur == 'one-time') {
+				style = 'info';
+			} else {
+				style = 'primary';
+			}
+		}
+
+		return (
+			<SplitButton bsStyle={style} title={title} key={title} bsSize='xsmall' pullRight onClick={this.handleMainButtonClicked}>
+				{recurOptions.map(function(option){
+					var handlerFunc = function(e){this.handleMenuItemClicked(option.value)}.bind(this);
+			    	return (<MenuItem eventKey={option.value} onClick={handlerFunc}>{option.longText}</MenuItem>);
+			   	}.bind(this))};
+	    	</SplitButton>
+    	);
+	},
+
+	handleMainButtonClicked(e){
+		console.log("main button clicked");
+		var newVal = 'default';
+		if (this.state.model.remind_recur == 'default') {
+			newVal = 'one-time';
+		}
+
+		this.props.model.save({remind_recur: newVal}, {patch: true});
+	},
+
+	handleMenuItemClicked(recurValue) {
+		this.props.model.save({remind_recur: recurValue}, {patch: true});
+	},
+});
 
 
 var EntryRow = React.createClass({
@@ -36,7 +82,7 @@ var EntryRow = React.createClass({
 		        <td onClick={this.handleRowClicked}> { this.state.model.orig_text } </td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
-		        <td onClick={this.handleRowClicked}> { this.state.model.remind_recur } </td>
+		        <td> <RecurButton model={this.props.model} /> </td>
 		        <td> { this.state.model.remind_last_notified ? "√" : ""} </td>
       		</tr>
       	);
@@ -59,8 +105,6 @@ var EntryRow = React.createClass({
 		e.preventDefault();
 		this.props.onRowClicked(this.props.model);
 	},
-
-
 
 });
 
