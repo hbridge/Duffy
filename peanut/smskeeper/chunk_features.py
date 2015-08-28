@@ -94,9 +94,10 @@ class ChunkFeatures:
 		return self.chunk.matches(r'where\b|how\b|why\b|who\b')
 
 	def hasFetchDigestWords(self):
-		if self.chunk.contains(r'tasks|to ?do|reminders|list'):
-			return True
-		return False
+		return self.chunk.contains(r'tasks|todo|reminders|list')
+
+	def isFetchDigestPhrase(self):
+		return self.chunk.matches(r'tasks|todo')
 
 	def couldBeDone(self):
 		return msg_util.done_re.search(self.chunk.normalizedText()) is not None

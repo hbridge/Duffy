@@ -16,8 +16,9 @@ class FetchDigestAction(Action):
 		chunkFeatures = ChunkFeatures(chunk, user)
 
 		scoreVector = []
-		scoreVector.append(0.8 if chunkFeatures.hasFetchDigestWords() else 0)
-		scoreVector.append(0.1 if chunkFeatures.isQuestion() else 0)
+		scoreVector.append(0.2 if chunkFeatures.hasFetchDigestWords() else 0)
+		scoreVector.append(0.6 if chunkFeatures.isFetchDigestPhrase() else 0)
+		scoreVector.append(0.2 if chunkFeatures.isQuestion() else 0)
 		scoreVector.append(-0.5 if chunkFeatures.isBroadQuestion() else 0)
 		scoreVector.append(0.1 if chunkFeatures.containsToday() else 0)
 		scoreVector.append(-0.5 if chunkFeatures.hasTimeOfDay() else 0)

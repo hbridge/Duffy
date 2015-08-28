@@ -1440,6 +1440,21 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("Brandon", self.getOutput(mock))
 			self.assertIn("guymon", self.getOutput(mock))
 
+	def test_digest_fetch_overagressive(self, dateMock):
+		self.setupUser(dateMock)
+		msgs = [
+			"need to do laundry",
+			"cancel all cough syrup reminders"
+		]
+		for msg in msgs:
+			cliMsg.msg(self.testPhoneNumber, msg)
+			self.assertFalse(
+				self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST),
+				"Msg: '%s' triggered digest fetch" % msg
+			)
+			self.getTestUser().paused = False
+			self.getTestUser().save()
+
 	def test_done_only_affects_last_created(self, dateMock):
 		self.setupUser(dateMock)
 
