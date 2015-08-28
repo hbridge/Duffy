@@ -130,6 +130,7 @@ def review(request):
 	return renderReact(
 		request,
 		'review',
+		'review.html',
 		requiresUser=False,
 	)
 
