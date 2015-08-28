@@ -23,7 +23,8 @@
     "react-tap-event-plugin": "^0.1.7",
     "react-time": "^2.5.0",
     "string-format": "^0.5.0",
-    "timeago": "^0.2.0"
+    "timeago": "^0.2.0",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "browser-sync": "~2.2.2",
@@ -63,7 +64,12 @@
   },
   "browserify": {
     "transform": [
-      ["reactify", {"es6": true}]
+      [
+        "reactify",
+        {
+          "es6": true
+        }
+      ]
     ],
     "reactify": "^1.1.1"
   },

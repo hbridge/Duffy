@@ -3,7 +3,8 @@ var $ = require('jquery');
 var classNames = require('classnames');
 var moment = require('moment-timezone');
 var BackboneReactComponent = require('backbone-react-component');
-var Utils = require('../utils.js')
+var Utils = require('../utils.js');
+var _ = require('underscore');
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
@@ -22,7 +23,7 @@ var RecurButton = React.createClass({
 		var recurOptions = this.props.model.recurOptions();
 
 		if (this.state.model) {
-			var option = recurOptions.find(function(option){return option.value == this.state.model.remind_recur}.bind(this));
+			var option = _.find(recurOptions, function(option){return option.value == this.state.model.remind_recur}.bind(this));
 			title = option.shortText;
 			if (this.state.model.remind_recur == 'default') {
 				style = 'default';
@@ -80,10 +81,10 @@ var EntryRow = React.createClass({
 		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creatorName} </a></td>
 		        <td onClick={this.handleRowClicked}> { this.state.model.text } </td>
 		        <td onClick={this.handleRowClicked}> { this.state.model.orig_text } </td>
-		        <td> {this.getCreateRemindDeltaText()} </td>
+		        <td> <div style={{minWidth: "52px"}}>{this.getCreateRemindDeltaText()} </div></td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
 		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
-		        <td> <RecurButton model={this.props.model} /> </td>
+		        <td> <div style={{minWidth: "80px"}}><RecurButton model={this.props.model} /> </div></td>
 		        <td> { this.state.model.remind_last_notified ? "√" : ""} </td>
       		</tr>
       	);
@@ -130,7 +131,7 @@ module.exports = React.createClass({
 
   	return (
   		<div>
-  		<Table striped bordered condensed hover responsive>
+  		<Table striped bordered condensed hover>
 			<thead>
 				<tr>
 					<th>Approval</th>
