@@ -52,6 +52,7 @@ GROCERY_LIST_TIP_ID = "grocery-list"
 TRASH_DAY_TIP_ID = "trash-day"
 APPOINTMENT_TIP_ID = "appointments"
 TICKETS_TIP_ID = "tickets"
+TVSHOW_TIP_ID = "tv-show"
 
 
 SNOOZE_TIP_ID = "mini-snooze"
@@ -113,6 +114,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		TICKETS_TIP_ID,
 		"Want to remember to buy that show's tickets as soon as they go on sale? I can remind you at the exact time. Just txt me :ticket:",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		TVSHOW_TIP_ID,
+		"Want me to remind you when your favorite shows are on TV. Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'",
 		type=FULL_TIP_TYPE
 	),
 
