@@ -582,17 +582,13 @@ def cleanBodyText(text):
 
 
 def classified_users(request):
-	user_list = []
-	for i in range(1000, 1150):
-		user_list.append(i)
+	classified_messages = Message.objects.filter(incoming=True).exclude(classification__isnull=True).exclude(classification=keeper_constants.CLASS_NONE)
+	users_with_classification = User.objects.filter(product_id=keeper_constants.TODO_PRODUCT_ID, message__in=classified_messages).distinct()
 
-	users = User.objects.filter(id__in=user_list)
 	classifiedUserIds = list()
 
-	# We filter by product 1 users since we want to correctly emulate them in the tutorial
-	for user in users:
-		if user.product_id == keeper_constants.TODO_PRODUCT_ID:
-			classifiedUserIds.append(user.id)
+	for user in users_with_classification:
+		classifiedUserIds.append(user.id)
 
 	return HttpResponse(json.dumps({"users": classifiedUserIds}), content_type="text/text", status=200)
 
