@@ -118,7 +118,7 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		TVSHOW_TIP_ID,
-		"Want me to remind you when your favorite shows are on TV. Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'",
+		"Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'",
 		type=FULL_TIP_TYPE
 	),
 
