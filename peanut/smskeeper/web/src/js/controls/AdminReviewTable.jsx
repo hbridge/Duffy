@@ -108,7 +108,10 @@ module.exports = React.createClass({
 		return (
 			<Modal show={this.state.showDetails != null} onHide={this.close}>
 	          <Modal.Body>
-	           	<AdminEntryCard model={this.state.showDetails} expanded/>
+	           	<AdminEntryCard model={this.state.showDetails} expanded
+	           		onSave={this.close}
+	           		onCancel={this.close}
+	           	/>
 	          </Modal.Body>
 	        </Modal>
         );

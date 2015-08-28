@@ -66,7 +66,7 @@ module.exports = React.createClass({
 	    					Save
     					</Button>
     					<Button
-	    					onClick={function(e){this.setState({expanded: false})}.bind(this)}
+	    					onClick={this.handleCancel}
 	    				>
 	    					Cancel
     					</Button>
@@ -102,6 +102,15 @@ module.exports = React.createClass({
 
 	onTapCardTitle: function(e) {
 		this.setState({expanded: !this.state.expanded});
+	},
+
+	handleCancel(e){
+		e.preventDefault();
+		if (this.props.onCancel) {
+			this.props.onCancel();
+		} else {
+			this.setState({expanded: false});
+		}
 	},
 
 	onSave: function(e) {
@@ -161,7 +170,11 @@ module.exports = React.createClass({
 			changes.manually_updated_timestamp = moment().toISOString();
 			var result = this.props.model.save(changes);
 			console.log("save result:", result)
-			this.setState({expanded: false});
+			if (this.props.onSave) {
+				this.props.onSave();
+			} else {
+				this.setState({expanded: false});
+			}
 		}
 	},
 });
