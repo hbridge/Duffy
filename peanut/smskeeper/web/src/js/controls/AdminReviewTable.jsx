@@ -14,6 +14,7 @@ var Bootstrap = require('react-bootstrap');
   SplitButton = Bootstrap.SplitButton;
   MenuItem = Bootstrap.MenuItem;
 AdminEntryCard = require('./AdminEntryCard.jsx');
+var emoji = require('node-emoji');
 
 var RecurButton = React.createClass({
 	mixins: [BackboneReactComponent],
@@ -79,13 +80,21 @@ var EntryRow = React.createClass({
 			<tr>
 		        <td> { approveButton } </td>
 		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creatorName} </a></td>
-		        <td onClick={this.handleRowClicked}> { this.state.model.text } </td>
-		        <td onClick={this.handleRowClicked}> { this.state.model.orig_text } </td>
+		        <td onClick={this.handleRowClicked}>
+		        	{ this.state.model.text } <br />
+		        	{ this.state.model.orig_text }
+		        </td>
 		        <td> <div style={{minWidth: "52px"}}>{this.getCreateRemindDeltaText()} </div></td>
-		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) } </td>
-		        <td onClick={this.handleRowClicked}> { moment.tz(this.state.model.added, timezone).format(dateFormat) } </td>
-		        <td> <div style={{minWidth: "80px"}}><RecurButton model={this.props.model} /> </div></td>
-		        <td> { this.state.model.remind_last_notified ? "√" : ""} </td>
+		        <td onClick={this.handleRowClicked}>
+		        	<div style={{minWidth: "110px"}}>
+		        		{ moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) }
+		        		&nbsp;{ this.state.model.remind_last_notified ? emoji.get("white_check_mark") : ""}
+		        	</div>
+		        </td>
+		        <td onClick={this.handleRowClicked}>
+		        	<div style={{minWidth: "110px"}}> { moment.tz(this.state.model.added, timezone).format(dateFormat) }</div>
+		        </td>
+		        <td> <div style={{minWidth: "90px"}}><RecurButton model={this.props.model} /> </div></td>
       		</tr>
       	);
 	},
@@ -137,12 +146,10 @@ module.exports = React.createClass({
 					<th>Approval</th>
 					<th>User</th>
 					<th>Text</th>
-					<th>Orig text</th>
 					<th>∆</th>
 					<th>Remind time (tz aware)</th>
 					<th>Time added (tz aware)</th>
 					<th>Recur</th>
-					<th>Sent</th>
 				</tr>
 			</thead>
 			<tbody>
