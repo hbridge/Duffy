@@ -243,7 +243,7 @@ REMINDER_DIGEST_EMPTY = [
 	u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",
 	u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",
 	# TODO replace this after digests go out tomorrow
-	#u"I can text other people reminders for you, just say something like:\nRemind Eric to pick up pizza at 6pm :pizza:",
+	# u"I can text other people reminders for you, just say something like:\nRemind Eric to pick up pizza at 6pm :pizza:",
 	u"Empty day. Surely, there is something you need me to track? \U0001F62E",
 	u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",
 	u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",
@@ -251,11 +251,10 @@ REMINDER_DIGEST_EMPTY = [
 ]
 
 HELP_MESSAGES = [
-	u":raising_hand: Hi! I'm an automated digital assistant here to help you get things done.",
-	u"Send me what you need to get done (and when) and I'll txt you back at the right time.",
+	u":raising_hand: Hi! I'm an automated digital assistant to help you remember things.",
+	u"Just say what you need to get done and I'll remind you at the right time.",
 	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
 	REMINDER_DIGEST_DONE_INSTRUCTIONS,
-	REMINDER_DIGEST_SNOOZE_INSTRUCTIONS
 ]
 
 HELP_MESSAGES_OLD = [
