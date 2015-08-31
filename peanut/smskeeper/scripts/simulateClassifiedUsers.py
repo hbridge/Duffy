@@ -34,7 +34,10 @@ class MyLogger:
 		self.fileHandle = open(filePath, 'w')
 
 	def info(self, formatStr, *args):
-		formatted = formatStr % args
+		try:
+			formatted = formatStr % args
+		except:
+			formatted = "Error in formatstr: %s" % formatStr
 		if type(formatted) == unicode:
 			formatted = formatted.encode('utf-8')
 		self.fileHandle.write("%s\n" % formatted)
@@ -66,7 +69,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		classified_users = json.loads(response)["users"]
 		# don't do users with UID < 1000, they have hash tags etc in their transcripts
-		classified_users = filter(lambda uid: uid >= 1197, classified_users)
+		classified_users = filter(lambda uid: uid >= 1584, classified_users)
 		logger.info("Replaying messages for %d users..." % min(len(classified_users), MAX_USERS_TO_SIMULATE))
 
 		message_count = 0
@@ -150,7 +153,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					printStr = "%s (%s, %s): %s" % (
 						self.testPhoneNumber,
 						self.mockedDate.astimezone(self.user.getTimezone()).strftime("%m/%d %H:%M"),
-						self.user.state, message["Body"]
+						self.user.state,
+						message["Body"]
 					)
 					cliMsg.msg(self.testPhoneNumber, message["Body"])
 
