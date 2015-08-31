@@ -307,12 +307,8 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 @app.task
 def sendDigestForUserId(userId, overrideKeeperNumber=None):
 
-	# cutoff hides tasks older than 3 days
-	now = date_util.now(pytz.utc)
-	cutoff = now - datetime.timedelta(days=keeper_constants.DIGEST_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS)
-
 	user = User.objects.get(id=userId)
-	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False, after=cutoff)
+	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 	sendDigestForUser(user, pendingEntries, dict(), True, overrideKeeperNumber=overrideKeeperNumber)
 
@@ -348,11 +344,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		if not user.completed_tutorial:
 			continue
 
-		# cutoff hides tasks older than 3 days
-		now = date_util.now(pytz.utc)
-		cutoff = now - datetime.timedelta(days=keeper_constants.DIGEST_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS)
-
-		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False, after=cutoff)
+		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 		if len(pendingEntries) > 0:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
