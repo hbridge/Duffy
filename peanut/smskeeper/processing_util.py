@@ -134,7 +134,11 @@ def processWithEngine(user, msgs, messageObject):
 		# We don't record the classification on the message since it was multi-line
 	else:
 		chunk = Chunk(msgs[0])
-		processed, classification, actionScores = keeperEngine.process(user, chunk)
+		processed, classification, actionScores = keeperEngine.process(
+			user,
+			chunk,
+			overrideClassification=messageObject.classification
+		)
 
 		messageObject.auto_classification = classification
 		messageObject.classification_scores_json = json.dumps(actionScores)
@@ -170,9 +174,16 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 		msg = msg.decode('utf-8')
 
 	# Create Message object and post to slack
-	messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
+	# there may be an override message classification, if so create the message with it
+	classification = requestDict.get("OverrideClass", None)
+	messageObject = Message.objects.create(
+		user=user,
+		msg_json=json.dumps(requestDict),
+		incoming=True,
+		manual=manual,
+		classification=classification
+	)
 	slack_logger.postMessage(messageObject, keeper_constants.SLACK_CHANNEL_FEED)
-	classification = None
 
 	if not user.paused and not created:
 		logger.info("User %s: START with '%s'. State %s with state_data %s" % (user.id, msg, user.state, user.state_data))

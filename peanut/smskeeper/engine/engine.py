@@ -65,20 +65,25 @@ class Engine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def process(self, user, chunk):
+	def process(self, user, chunk, overrideClassification=None):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None, {}
 
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
-
 		actionsByScore = dict()
-
-		for action in self.actionList:
-			score = action.getScore(chunk, user)
-			if score not in actionsByScore:
-				actionsByScore[score] = list()
-			actionsByScore[score].append(action)
+		if not overrideClassification:
+			for action in self.actionList:
+				score = action.getScore(chunk, user)
+				if score not in actionsByScore:
+					actionsByScore[score] = list()
+				actionsByScore[score].append(action)
+		else:
+			logger.info("User %s: Action class overridden to %s" % (user.id, overrideClassification))
+			for action in self.actionList:
+				if action.ACTION_CLASS == overrideClassification:
+					actionsByScore[1.0] = [action]
+					break
 
 		sortedActionsByScore = collections.OrderedDict(sorted(actionsByScore.items(), reverse=True))
 		actionScores = self.getActionScores(sortedActionsByScore)

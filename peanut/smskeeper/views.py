@@ -257,6 +257,7 @@ def send_sms(request):
 		msg = form.cleaned_data['msg']
 		keeperNumber = form.cleaned_data['from_num']
 		direction = form.cleaned_data['direction']
+		override_class = form.cleaned_data['override_class']
 		media = None  # add a link here to send to users
 
 		if not keeperNumber:
@@ -272,6 +273,7 @@ def send_sms(request):
 			requestDict["To"] = keeperNumber
 			requestDict["From"] = user.phone_number
 			requestDict["Manual"] = True
+			requestDict["OverrideClass"] = override_class
 			processing_util.processMessage(user.phone_number, msg, requestDict, keeperNumber)
 		return HttpResponse(json.dumps({"result": "success"}), content_type="text/json", status=200)
 	else:

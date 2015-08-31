@@ -152,8 +152,9 @@ var CreateEntryInput = React.createClass({
     e.preventDefault();
     var text = this.refs.text.getValue();
     console.log("create entry with text: " + text);
-    Utils.SubmitCommandToServer(
+    Utils.SubmitCommandWithClassToServer(
       "Remind me to " + text,
+      'createtodo',
       function(entryData){
         this.getCollection().fetch();
         this.refs.text.getInputDOMNode().value = "";

@@ -41,12 +41,24 @@ var PostToSlack = function(username, text, channel){
   });
 }
 
-var SubmitCommandToServer = function(msg, onSuccess, onFailure) {
+var SubmitCommandWithClassToServer = function(msg, override_class, onSuccess, onFailure) {
+  var data = {
+    msg: msg,
+    user_id: USER.id,
+    direction: "ToKeeper",
+    response_data: "entries",
+    from_num: "web"
+  };
+
+  if (override_class) {
+    data.override_class = override_class;
+  }
+
   $.ajax({
         url: "/smskeeper/send_sms",
         dataType: 'json',
         type: 'POST',
-        data: {msg: msg, user_id: USER.id, direction: "ToKeeper", response_data: "entries", from_num: "web"},
+        data: data,
         success: function(entryData) {
           onSuccess(entryData);
         },
@@ -57,6 +69,10 @@ var SubmitCommandToServer = function(msg, onSuccess, onFailure) {
       });
 }
 
+
+var SubmitCommandToServer = function(msg, onSuccess, onFailure) {
+  SubmitCommandWithClassToServer(msg, null, onSuccess, onFailure);
+}
 
 var Emojize = function(str) {
   newstr = str;
@@ -117,6 +133,7 @@ var IsClientMobile = function() {
 module.exports.PostToSlack = PostToSlack;
 module.exports.getUrlParameter = getUrlParameter;
 module.exports.SubmitCommandToServer = SubmitCommandToServer;
+module.exports.SubmitCommandWithClassToServer = SubmitCommandWithClassToServer;
 module.exports.Emojize = Emojize;
 module.exports.EmojiKeysMatchingSubstr = EmojiKeysMatchingSubstr;
 module.exports.IsClientMobile = IsClientMobile;
