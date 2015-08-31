@@ -31,7 +31,7 @@ class MyLogger:
 	filePath = None
 	fileHandle = None
 
-	def __init__(self, filePath):
+	def __init__(self, filePath, mode='a'):
 		self.filePath = filePath
 		self.fileHandle = open(filePath, 'w')
 
@@ -47,9 +47,15 @@ class MyLogger:
 	def finalize(self):
 		self.fileHandle.close()
 
-logger = MyLogger("/mnt/log/keeperSimulation.log")
+logger = MyLogger("/mnt/log/sim.log", mode='w')
+summaryLogger = MyLogger("/mnt/log/sim_summary.log")
 
 MAX_USERS_TO_SIMULATE = 10000
+
+
+def summaryText(text):
+	logger.info(text)
+	summaryLogger.info(text)
 
 
 @patch('common.date_util.utcnow')
@@ -201,7 +207,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					else:
 						logger.info("Keeper: IGNORED")
 
-		logger.info(
+		summaryText(
 			"\n\n *** Unknown Rate ***\n"
 			+ "%d messages" % message_count
 			+ "\n%d unknown" % unknown_count
@@ -220,9 +226,10 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		# close the file for writing
 		logger.finalize()
+		summaryLogger.finalize()
 
 	def printMisclassifictions(self):
-		logger.info("\n\n******* Accuracy *******")
+		summaryText("\n\n******* Accuracy *******")
 		truePositivesByClass = {}
 		trueNegativesByClass = {}
 		falseNegativesByClass = {}
@@ -230,7 +237,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		allClasses = map(lambda x: x["value"], keeper_constants.CLASS_MENU_OPTIONS)
 
-		logger.info("All messages count %d" % Message.objects.all().count())
+		summaryText("All messages count %d" % Message.objects.all().count())
 		unclassified_count = 0
 		classified_count = 0
 		manual_count = 0
@@ -275,9 +282,9 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			falsePositivesByClass[message.auto_classification] = falsePositivesForClass
 			falseNegativesByClass[message.classification] = falseNegativesForClass
 
-		logger.info("Unclassified, Unknown, and NoCategory count: %d" % unclassified_count)
-		logger.info("Manual messages ignored: %d" % manual_count)
-		logger.info("Classified messages tested for accuracy: %d" % classified_count)
+		summaryText("Unclassified, Unknown, and NoCategory count: %d" % unclassified_count)
+		summaryText("Manual messages ignored: %d" % manual_count)
+		summaryText("Classified messages tested for accuracy: %d" % classified_count)
 
 		allTp = sum(map(lambda arr: len(arr), truePositivesByClass.values()))
 		allTn = sum(map(lambda arr: len(arr), trueNegativesByClass.values()))
@@ -292,7 +299,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			fp = len(falsePositivesByClass.get(classification, []))
 
 			if (tp + fn) == 0:
-				logger.info("\nNo examples found for %s.  Skipping." % (classification))
+				summaryText("\nNo examples found for %s.  Skipping." % (classification))
 				continue
 			self.printCategorySummary(classification, tp, tn, fn, fp)
 
@@ -318,21 +325,21 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		else:
 			recall = 0.0
 
-		logger.info("\n%s results:" % (classification))
-		logger.info(
+		summaryText("\n%s results:" % (classification))
+		summaryText(
 			"Accuracy %.02f (%d of %d classification decisions are correct)",
 			float(tp + tn) / float(tp + tn + fp + fn),
 			tp + tn,
 			tp + tn + fp + fn
 		)
-		logger.info(
+		summaryText(
 			"Precision %.02f (%d of %d messages classified as %s were correct)",
 			precision,
 			tp,
 			tp + fp,
 			classification
 		)
-		logger.info(
+		summaryText(
 			"Recall %.02f (%d of %d messages that actually are %s were found)",
 			recall,
 			tp,
@@ -345,7 +352,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		else:
 			f1 = 0.0
 
-		logger.info("F1 score: %.02f", f1)
+		summaryText("F1 score: %.02f", f1)
 
 	def printMisclassifiedMessagesForClass(self, classification, falseNegativesByClass, falsePositivesByClass):
 		falseNegatives = falseNegativesByClass.get(classification, [])
