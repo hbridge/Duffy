@@ -33,6 +33,7 @@ reminder_re = re.compile(
 
 # this is junk that sometimes get left in reminders and should be removed
 reminder_cleanup_re = re.compile(r'every ?$|of ?$', re.I)
+reminder_prefix_cleanup_re = re.compile(r'^(to|and|also)', re.I)
 
 # We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
@@ -302,6 +303,7 @@ def cleanedReminder(msg, recurrence=None, shareHandles=None):
 		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))
 
 	regexesToRemove.append(reminder_cleanup_re)
+	regexesToRemove.append(reminder_prefix_cleanup_re)
 
 	for regex in regexesToRemove:
 		match = regex.search(cleaned)

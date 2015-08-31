@@ -48,6 +48,9 @@ class CreateTodoAction(Action):
 		if nattyResult and regexHit:
 			score = 0.9
 
+		if score < 0.3 and chunkFeatures.beginsWithAndWord():
+			score += 0.3  # for "and socks" lists of stuff
+
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
 		recurScores = collections.OrderedDict(
 			sorted(self.getRecurScores(chunk).items(), key=lambda t: t[1], reverse=True)

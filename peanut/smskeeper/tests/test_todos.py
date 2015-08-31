@@ -2056,3 +2056,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Silent stop")
 			self.assertEqual("", self.getOutput(mock))
 			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_STOPPED)
+
+	def test_multisend_list(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Buy socks")
+		cliMsg.msg(self.testPhoneNumber, "And shoes")
+		cliMsg.msg(self.testPhoneNumber, "Also pants")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "todo")
+			self.assertIn("socks", self.getOutput(mock))
+			self.assertIn("Shoes", self.getOutput(mock))
+			self.assertIn("Pants", self.getOutput(mock))
+			self.assertNotIn("And", self.getOutput(mock))
+			self.assertNotIn("Also", self.getOutput(mock))

@@ -59,6 +59,9 @@ class ChunkFeatures:
 	def beginsWithCreateWord(self):
 		return self.chunk.matches(self.beginsWithCreateWordRegex)
 
+	def beginsWithAndWord(self):
+		return self.chunk.matches(r'and|also')
+
 	def hasPhoneNumber(self):
 		matches = phonenumbers.PhoneNumberMatcher(self.chunk.originalText, 'US')
 		return matches.has_next()
