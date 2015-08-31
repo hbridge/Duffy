@@ -43,7 +43,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			"Remind me to email :SUBJECT: to send his presentation to Susan",
 			"Remind me in 10 mintues to remind :SUBJECT: to eat",
 			"Remind me I have and appointment :SUBJECT: September 17 at 1:00",
-			"Remind me NOT to :SUBJECT: in an hour"
+			"Remind me NOT to :SUBJECT: in an hour",
+			"Remind September 1st to test :SUBJECT:"
 		]
 
 		for structure in positiveStructures:

@@ -9,7 +9,7 @@ defaultPunctuationWhitelist = '-'
 
 RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)
 RELATIONSHIP_SUBJECT_DELIMETERS = re.compile(r'to|on|at|in|by|about', re.I)
-HANDLE_BLACKLIST = re.compile(r'you|remind|me|I|im|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday', re.I)
+HANDLE_BLACKLIST = re.compile(r'you|remind|me|I|im|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|May|June|July|August|September|October|November|December', re.I)
 
 class Chunk:
 	originalText = None
