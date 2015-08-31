@@ -53,6 +53,7 @@ TRASH_DAY_TIP_ID = "trash-day"
 APPOINTMENT_TIP_ID = "appointments"
 TICKETS_TIP_ID = "tickets"
 TVSHOW_TIP_ID = "tv-show"
+SHARED_REMINDER_ID = "shared-reminder-pizza"
 
 
 SNOOZE_TIP_ID = "mini-snooze"
@@ -119,6 +120,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		TVSHOW_TIP_ID,
 		"Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		SHARED_REMINDER_ID,
+		"I can now remind other people on your behalf. Just say 'Remind Erika to pickup pizza at 7pm tonight'",
 		type=FULL_TIP_TYPE
 	),
 
