@@ -1,4 +1,5 @@
 @import "_common";
+@import "_calendar-picker";
 
 .classifier {
 	font-size: 75%;
@@ -39,18 +40,4 @@
 
 .messageActionsButton {
 	margin-left: 2px;
-}
-
-td.day {
-	&.today {
-		font-weight: bold;
-	}
-
-	&.disabled {
-		color: lightgray;
-	}
-
-	&.active {
-		background-color: #94D0FF;
-	}
 }
