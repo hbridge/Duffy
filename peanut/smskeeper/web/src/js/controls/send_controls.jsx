@@ -110,6 +110,7 @@ module.exports = React.createClass({
         >
             <MenuItem eventKey="/admin/smskeeper/reminder/?q=" onSelect={this.handleMoreAction}>Reminders</MenuItem>
             <MenuItem eventKey={'/' + USER.key + '?internal=1'} onSelect={this.handleMoreAction}>KeeperApp</MenuItem>
+            <MenuItem eventKey={'/admin/smskeeper/user/' + USER.id} onSelect={this.handleMoreAction}>Edit User</MenuItem>
         </DropdownButton>
       </ButtonGroup>
     }
