@@ -100,6 +100,8 @@ class Chunk:
 					continue  # don't support putting a handle first
 				if HANDLE_BLACKLIST.match(word):
 					continue
+				if len(word) > 1 and word.upper() == word:
+					continue  # all caps words are not handles
 				if verbWhitelistRegex:
 					# if we were given a whitelist of verbs to find objects for, see if it was the word before or 2 before
 					verbFound = False
