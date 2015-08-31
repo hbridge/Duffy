@@ -170,16 +170,13 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 	# does have a time, then assume the date will be correct as well (should be today)
 	if entry.use_digest_time and nattyResult.hadTime and not nattyResult.hadDate:
 		entry.use_digest_time = False
-		newDate = newDate.replace(year=nattyTzTime.year)
-		newDate = newDate.replace(month=nattyTzTime.month)
-		newDate = newDate.replace(day=nattyTzTime.day)
+		newDate.replace(year=nattyTzTime.year)
+		newDate = newDate.replace(year=nattyTzTime.year, month=nattyTzTime.month, day=nattyTzTime.day)
 
 	# Only update with a date or time if Natty found one
 	# Or if its a snooze. Snoozes are relative to user's now so its ok to swap everything out
 	if nattyResult.hadDate or isSnooze:
-		newDate = newDate.replace(year=nattyTzTime.year)
-		newDate = newDate.replace(month=nattyTzTime.month)
-		newDate = newDate.replace(day=nattyTzTime.day)
+		newDate = newDate.replace(year=nattyTzTime.year, month=nattyTzTime.month, day=nattyTzTime.day)
 
 	if nattyResult.hadTime or isSnooze:
 		# Make sure we set the correct digest time if there's no time defined
@@ -199,9 +196,7 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 	# Normally, isSnooze should be True, but we can't rely upon that.
 	if newDate < userNow:
 		if not nattyResult.hadDate:
-			newDate = newDate.replace(year=nattyTzTime.year)
-			newDate = newDate.replace(month=nattyTzTime.month)
-			newDate = newDate.replace(day=nattyTzTime.day)
+			newDate = newDate.replace(year=nattyTzTime.year, month=nattyTzTime.month, day=nattyTzTime.day)
 		else:
 			# Something really went wrong
 			logger.error("User %s: Setting entry %s to an incorrect time in the past.  old %s  and new  %s   nattyResult: %s" % (user.id, entry.id, entry.remind_timestamp, newDate, nattyResult))
