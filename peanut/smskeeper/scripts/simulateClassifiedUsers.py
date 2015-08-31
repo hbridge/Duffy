@@ -22,7 +22,9 @@ from smskeeper import user_util
 from smskeeper.scripts import importZipdata
 
 from datetime import datetime
-import pytz
+
+# don't do users with UID < 1000, they have hash tags etc in their transcripts
+MIN_USER_ID = 1000
 
 
 class MyLogger:
@@ -68,8 +70,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			response = {"users": []}
 
 		classified_users = json.loads(response)["users"]
-		# don't do users with UID < 1000, they have hash tags etc in their transcripts
-		classified_users = filter(lambda uid: uid >= 1584, classified_users)
+		classified_users = filter(lambda uid: uid >= MIN_USER_ID, classified_users)
 		logger.info("Replaying messages for %d users..." % min(len(classified_users), MAX_USERS_TO_SIMULATE))
 
 		message_count = 0
