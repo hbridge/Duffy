@@ -68,7 +68,7 @@ class Engine:
 	def process(self, user, chunk):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
-			return False, None
+			return False, None, {}
 
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
 
