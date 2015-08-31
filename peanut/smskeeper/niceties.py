@@ -226,7 +226,11 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		else:
 			link = user.getKeeperNumber()
 			if len(link) > 5:  # dealing with 'test' phone numbers
-				link = phonenumbers.format_number(phonenumbers.parse(user.getKeeperNumber(), 'US'), phonenumbers.PhoneNumberFormat.NATIONAL)
+				try:
+					link = phonenumbers.format_number(phonenumbers.parse(user.getKeeperNumber(), 'US'), phonenumbers.PhoneNumberFormat.NATIONAL)
+				except:
+					logger.error("Error trying to parse %s", user.getKeeperNumber())
+
 		return "%s %s %s!" % (base, phrase, link)
 	else:
 		return base
