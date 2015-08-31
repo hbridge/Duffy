@@ -192,6 +192,9 @@ FEEDBACK_FREQUENCY_DAYS = 45
 FEEDBACK_PHRASE = u"Btw, Would you be ok if one of my minions \U0001F638 contacted you to get more info on your experience with me?"
 FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS = 3
 
+# Once a task is this old and still on the list, remove it from daily digest and task list
+DIGEST_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS = 4
+
 SMSKEEPER_TEST_NUM = "test"
 SMSKEEPER_CLI_NUM = "cli"
 SMSKEEPER_WEB_NUM = "web"

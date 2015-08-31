@@ -1014,6 +1014,23 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS), self.getOutput(mock))
 
+	# Make sure we expire tasks after N days
+	def test_old_tasks_fall_off_the_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad this afternoon")
+
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run with your dad", self.getOutput(mock))
+
+		self.setNow(dateMock, self.SAT_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Run with your dad", self.getOutput(mock))
+
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_week(self, dateMock):
 		self.setupUser(dateMock)

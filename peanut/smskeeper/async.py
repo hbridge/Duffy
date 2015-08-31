@@ -22,7 +22,6 @@ from smskeeper.models import Entry, Message, User
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from smskeeper import time_utils
-from smskeeper.models import Contact
 
 from common import date_util, weather_util
 
@@ -307,8 +306,13 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 @app.task
 def sendDigestForUserId(userId, overrideKeeperNumber=None):
+
+	# cutoff hides tasks older than 3 days
+	now = date_util.now(pytz.utc)
+	cutoff = now - datetime.timedelta(days=keeper_constants.DIGEST_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS)
+
 	user = User.objects.get(id=userId)
-	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
+	pendingEntries = user_util.pendingTodoEntries(user, includeAll=False, after=cutoff)
 
 	sendDigestForUser(user, pendingEntries, dict(), True, overrideKeeperNumber=overrideKeeperNumber)
 
@@ -344,7 +348,11 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		if not user.completed_tutorial:
 			continue
 
-		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
+		# cutoff hides tasks older than 3 days
+		now = date_util.now(pytz.utc)
+		cutoff = now - datetime.timedelta(days=keeper_constants.DIGEST_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS)
+
+		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False, after=cutoff)
 
 		if len(pendingEntries) > 0:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
@@ -399,4 +407,3 @@ def suspendInactiveUsers(doit=False):
 			if doit:
 				user.setState(keeper_constants.STATE_SUSPENDED, override=True)
 				user.save()
-
