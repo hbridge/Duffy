@@ -22,6 +22,7 @@ from smskeeper import user_util
 from smskeeper.scripts import importZipdata
 
 from datetime import datetime
+import pytz
 
 
 class MyLogger:
@@ -65,7 +66,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 
 		classified_users = json.loads(response)["users"]
 		# don't do users with UID < 1000, they have hash tags etc in their transcripts
-		classified_users = filter(lambda uid: uid >= 1000, classified_users)
+		classified_users = filter(lambda uid: uid >= 1197, classified_users)
 		logger.info("Replaying messages for %d users..." % min(len(classified_users), MAX_USERS_TO_SIMULATE))
 
 		message_count = 0
@@ -86,7 +87,8 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			# break
 
 			if testPhoneNumInt >= 16505560000:
-				raise NameError('too many test users')
+				print 'too many test users, skipping'
+				continue
 			self.testPhoneNumber = "+%d" % testPhoneNumInt
 			testPhoneNumInt += 1
 			self.setupUser(activated=True, tutorialComplete=False, productId=1, state=keeper_constants.STATE_TUTORIAL_TODO)
@@ -114,17 +116,20 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 					self.setNow(dateMock, message_date)
 				elif self.mockedDate < message_date:
 					while self.mockedDate < message_date:
-						nextEventDate = self.getNextEventDate()
+						nextEventDate, eventType = self.getNextEventDate(self.mockedDate)
 						# logger.info("dateMock %s message_date %s newTime %s" % (self.mockedDate, message_date, newTime))
 						if nextEventDate <= message_date:
 							self.setNow(dateMock, nextEventDate)
+							print "\n*****TICK %s, %s" % (nextEventDate, eventType)
 							# run async jobs
 							with patch('smskeeper.sms_util.recordOutput') as mock:
-								with patch('common.weather_util.getWeatherPhraseForZip') as weatherMock:
-									weatherMock.return_value = "mock forecast"
-									async.processDailyDigest()
-								async.sendTips()
-								async.processAllReminders()
+								if eventType == 'digest':
+									with patch('common.weather_util.getWeatherPhraseForZip') as weatherMock:
+										weatherMock.return_value = "mock forecast"
+										async.processDailyDigest()
+									# async.sendTips()
+								elif eventType == 'reminder':
+									async.processAllReminders()
 								output = self.getOutput(mock)
 								if output != "":
 									logger.info(
@@ -365,15 +370,15 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 		self.browser['password'] = 'duffy'
 		self.browser.submit()
 
-	def getNextEventDate(self):
+	def getNextEventDate(self, mockedDate):
 		# figure out when to adjust the clock to, the next todo, next digest, or next tips
 		pendingTodos = user_util.pendingTodoEntries(self.user, includeAll=True, after=self.mockedDate)
+		nextReminderDate = self.mockedDate + timedelta(days=30)
 		if len(pendingTodos) > 0:
-			nextReminderDate = pendingTodos[0].remind_timestamp
-		else:
-			nextReminderDate = self.mockedDate + timedelta(days=30)
+			if not pendingTodos[0].use_digest_time:
+				nextReminderDate = pendingTodos[0].remind_timestamp.astimezone(self.user.getTimezone())
 
-		localMockedDate = self.mockedDate.astimezone(self.user.getTimezone())
+		localMockedDate = mockedDate.astimezone(self.user.getTimezone())
 		nextDigestDate = copy.copy(localMockedDate)
 		nextDigestDate = nextDigestDate.replace(
 			hour=self.user.getDigestHour(),
@@ -384,5 +389,7 @@ class SMSKeeperParsingCase(test_base.SMSKeeperBaseCase):
 			nextDigestDate += timedelta(days=1)
 
 		# we have the next time events, set the time to the first and simulate events
-		times = sorted([nextReminderDate, nextDigestDate])
-		return times[0]
+		if nextReminderDate < nextDigestDate:
+			return nextReminderDate, 'reminder'
+		else:
+			return nextDigestDate, 'digest'
