@@ -258,7 +258,7 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 	# Not great at this low level but want to make sure it always gets called
 	# This removes all
 	pendingEntries = cleanUpRecurringReminders(user, pendingEntries)
-	if not userRequested and date_util.now(user.getTimezone()).isoweekday() == 2:  # only do this on Tuesdays (for testing)
+	if not userRequested and date_util.now(user.getTimezone()).isoweekday() == keeper_constants.SWEEP_CLEANUP_WEEKDAY:
 		pendingEntries, sweptEntries = sweepTasksForUser(user, pendingEntries)
 	else:
 		sweptEntries = []
@@ -327,7 +327,7 @@ def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TI
 	now = date_util.now(pytz.utc)
 	sweptEntries = []
 	for entry in pendingEntries:
-		if entry.updated < now - datetime.timedelta(days=age):
+		if entry.remind_recur == keeper_constants.RECUR_DEFAULT and entry.remind_last_notified and entry.remind_last_notified < now - datetime.timedelta(days=age):
 			entry.state = keeper_constants.REMINDER_STATE_SWEPT
 			entry.last_state_change = now
 			entry.save()

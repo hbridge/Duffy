@@ -1019,7 +1019,11 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
-		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad this afternoon")
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad at 2pm today")
+
+		# trigger the reminder; this is important, otherwise remind_last_notified won't be updated
+		self.setNow(dateMock, self.MON_2PM)
+		async.processAllReminders()
 
 		# task should show up
 		self.setNow(dateMock, self.TUE_9AM)
@@ -1033,16 +1037,20 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertIn("Run with your dad", self.getOutput(mock))
 
+		cliMsg.msg(self.testPhoneNumber, "I need to call Mom on Monday")
+
 		# task should show up
 		self.setNow(dateMock, self.THU_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("Run with your dad", self.getOutput(mock))
 
-		# task should show up with link
+		# task should show up under old tasks
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
+			self.assertIn("Call Mom", self.getOutput(mock))
+			self.assertIn("Old tasks", self.getOutput(mock))
 			self.assertIn("Run with your dad", self.getOutput(mock))
 			self.assertIn("my.getkeeper.com/", self.getOutput(mock))
 
@@ -1050,6 +1058,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM + datetime.timedelta(days=7))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
+			self.assertIn("Call Mom", self.getOutput(mock))
 			self.assertNotIn("Run with your dad", self.getOutput(mock))
 			self.assertNotIn("my.getkeeper.com/", self.getOutput(mock))
 
