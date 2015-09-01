@@ -35,7 +35,7 @@ class ShareReminderAction(Action):
 			score += 0.3
 		if len(resolvedHandles) and chunk.contains(resolvedHandlesRe):
 			score += 0.4
-		if user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT):
+		if user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT, num=1):
 			score += 0.3
 
 		if unresolvedHandles and len(unresolvedHandles) > 0:

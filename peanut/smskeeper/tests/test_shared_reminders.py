@@ -77,7 +77,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
 			self.assertIn("remind you", self.getOutput(mock))  # make sure we tell them we'll remind them
-			self.assertIn(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))  # make sure we upsell them to remind mom
+			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT), self.getOutput(mock))  # make sure we upsell them to remind mom
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, phoneNumber)
@@ -115,7 +115,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to call me in a week")
 			self.assertNotIn(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))
-			self.assertIn(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT, self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
 			cliMsg.msg(self.testPhoneNumber, "Text mom")
 
 		# Make sure both entries were shared
@@ -280,3 +280,17 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 		cliMsg.msg(self.testPhoneNumber, "Remind Steve to test")
 		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT))
+
+	def test_overagressive_share(self, dateMock):
+		self.setupUser(dateMock)
+		sharedEntry = self.createSharedReminder()
+		cliMsg.msg(self.testPhoneNumber, "Remind mom to test")
+		cliMsg.msg(self.testPhoneNumber, "Remind me to jump out a window this evening")
+		cliMsg.msg(self.testPhoneNumber, "Remind me to eat grass")
+
+		entries = Entry.objects.filter(label="#reminders")
+		for entry in entries:
+			if entry == sharedEntry:
+				continue
+
+			self.assertEqual(entry.users.count(), 1, "Entry erroneously shared: %s" % entry)
