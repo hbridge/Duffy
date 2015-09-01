@@ -691,7 +691,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "print shit out")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("If that time doesn't work", self.getOutput(mock))
+			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 	# Make sure we create a new entry instead of a followup
 	def test_create_new_after_reminder(self, dateMock):
@@ -1814,7 +1814,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "snooze go poop")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("If that time doesn't work", self.getOutput(mock))
+			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 		self.setNow(dateMock, self.TUE_9AM)
 		async.processDailyDigest()
@@ -1824,7 +1824,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "snooze go poop ")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("If that time doesn't work", self.getOutput(mock))
+			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 	# If they type something starting with snooze, always make sure it snoozes (even if tasks is in there)
 	def test_snooze_starts_with_snooze(self, dateMock):
@@ -1839,7 +1839,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "snooze All Tasks")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn("If that time doesn't work", self.getOutput(mock))
+			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()

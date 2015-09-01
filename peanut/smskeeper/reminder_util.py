@@ -252,25 +252,21 @@ def sendCompletionResponse(user, entry, followups, keeperNumber):
 
 	toSend = "%s I'll remind %s %s." % (helper_util.randomAcknowledgement(), handle, userMsg)
 
-	# add new lines for followups
-	if user.isTutorialComplete() and len(followups) > 0:
-		toSend = toSend + "\n\n"
-
 	responseClassification = None
 	# time followups
 	if keeper_constants.FOLLOWUP_TIME in followups:
 		if not user.isTutorialComplete():
 			toSend = toSend + " (If that time doesn't work, just tell me what time is better.)"
 		else:
-			toSend = toSend + "If that time doesn't work, tell me what time is better."
+			toSend = toSend + " " + keeper_constants.FOLLOWUP_TIME_TEXT
 
 	# sharing followups
 	if user.isTutorialComplete():
 		if keeper_constants.FOLLOWUP_SHARE_UNRESOLVED in followups:
-			toSend = toSend + " " + keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT
+			toSend = toSend + "\n" + keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT
 			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
 		elif keeper_constants.FOLLOWUP_SHARE_RESOLVED in followups:
-			toSend = toSend + " " + keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT
+			toSend = toSend + "\n" + keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT
 			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
 
 	sms_util.sendMsg(user, toSend, None, keeperNumber, classification=responseClassification)

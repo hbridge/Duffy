@@ -240,7 +240,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tomorrow")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertNotIn("If that time doesn't work", self.getOutput(mock))
+			self.assertNotIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 			self.assertIn("It's that easy. ", self.getOutput(mock))
 
 	# Hit bug where a done command in the tutorial was bouncing out
