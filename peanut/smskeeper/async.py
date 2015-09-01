@@ -219,9 +219,11 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			msg += generateTaskStringForDigest(user, entry)
 
 	if not userRequested and len(sweptEntries) > 0:
-		msg += "\n" + "Old tasks (available at " + user.getWebAppURL() + "):"
+		msg += "\n\n" + "Old tasks\n:"
 		for entry in sweptEntries:
 			msg += generateTaskStringForDigest(user, entry)
+
+		msg += "(Moved to " + user.getWebAppURL() + " to keep your list fresh)"
 
 	return msg
 
