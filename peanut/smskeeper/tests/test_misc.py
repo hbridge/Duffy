@@ -283,6 +283,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 					found = True
 			self.assertEqual(found, False)
 
+	'''
 	def test_feedback_upsell(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
 
@@ -313,7 +314,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
 			self.assertIn(keeper_constants.FEEDBACK_PHRASE, output)
-
+	'''
 
 	def testBirthdayNicety(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
