@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 COMMAND_PICK = 0
@@ -303,7 +304,7 @@ CLASS_FRUSTRATION = "frustration"
 CLASS_TIP_QUESTION_RESPONSE = "tip-question-response"
 CLASS_JOKE = "joke"
 CLASS_SHARED_REMINDER_RECIPIENT_UPSELL = 'shared-reminder-recipient-upsell'
-CLASS_RESOLVE_HANDLE = "resolve-handle"
+CLASS_SHARE_REMINDER = "share-reminder"
 CLASS_UNKNOWN = "unknown"
 
 
@@ -381,8 +382,8 @@ CLASS_MENU_OPTIONS = ([
 		"value": CLASS_SHARED_REMINDER_RECIPIENT_UPSELL
 	},
 	{
-		"text": "Resolve Handle",
-		"value": CLASS_RESOLVE_HANDLE
+		"text": "Share Reminder",
+		"value": CLASS_SHARE_REMINDER
 	},
 	{
 		"text": "NoCategory",
@@ -395,7 +396,7 @@ OUTGOING_SURVEY = "survey"
 OUTGOING_REMINDER = "reminder"
 OUTGOING_JOKE = "joke"
 OUTGOING_CHANGE_DIGEST_TIME = "change-digest-time"
-OUTGOING_RESOLVE_HANDLE = "outgoing-resolve-handle"
+OUTGOING_SHARE_PROMPT = "outgoing-share-prompt"
 
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"
@@ -432,3 +433,11 @@ SHARED_REMINDER_RECIPIENT_UPSELL = (
 )
 SHARED_REMINDER_RECIPIENT_INTRO = "I'm :NAME:'s personal assistant."
 SHARED_REMINDER_VERB_WHITELIST_REGEX = r'remind|text|txt|tell'
+
+
+FOLLOWUP_TIME = "time"
+FOLLOWUP_SHARE_RESOLVED = "share-resolved"
+FOLLOWUP_SHARE_UNRESOLVED = "share-unresolved"
+
+FOLLOWUP_SHARE_RESOLVED_TEXT = "Lmk if you want me to txt them directly!"
+FOLLOWUP_SHARE_UNRESOLVED_TEXT = u"I can also txt them for you -- just send me their phone number."

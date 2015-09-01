@@ -7,6 +7,7 @@ from smskeeper import reminder_util, sms_util, msg_util
 from smskeeper import keeper_constants, chunk_features
 from .action import Action
 import collections
+from smskeeper.models import Contact
 
 logger = logging.getLogger(__name__)
 
@@ -77,9 +78,9 @@ class CreateTodoAction(Action):
 		elif not nattyResult.hadTime:
 			nattyResult = reminder_util.fillInWithDefaultTime(user, nattyResult)
 
-		sendFollowup = False
+		followups = []
 		if not nattyResult.validTime() or not user.isTutorialComplete():
-			sendFollowup = True
+			followups.append(keeper_constants.FOLLOWUP_TIME)
 
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
 		recurScores = collections.OrderedDict(
@@ -92,41 +93,35 @@ class CreateTodoAction(Action):
 				recurFrequency = frequency
 				break
 
-		# Figure out if this is a shared reminder: if the reminder has other handles and the reminder
-		# starts with remind, tell, text etc.
+		# Figure out if we should offer to should offer to share the reminder
 		shareHandles = None
+		unresolvedHandles = None
 		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
 			shareHandles = chunk.sharedReminderHandles()
-			# make all shared reminders one-time for nw
-			recurFrequency = keeper_constants.RECUR_ONE_TIME
+			contacts, unresolvedHandles = Contact.resolveHandles(user, shareHandles)
+			logger.info("User %d: handles in create_todo %d resolved %d unresolved", user.id, len(contacts), len(unresolvedHandles))
+			if len(unresolvedHandles) > 0:
+				followups.append(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED)
+			else:
+				followups.append(keeper_constants.FOLLOWUP_SHARE_RESOLVED)
+			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, contacts))
 
 		entry = reminder_util.createReminderEntry(
 			user,
 			nattyResult,
 			chunk.originalText,
-			sendFollowup,
+			followups,
 			keeperNumber,
-			recurrence=recurFrequency,
-			shareHandles=shareHandles
+			recurrence=recurFrequency
 		)
 		# We set this so it knows what entry was created
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
-		# if the reminder has other handles that are the object of a remind commmand, share it
-		unresolvedHandles = []
-		if shareHandles:
-			sharedHandles, unresolvedHandles = reminder_util.shareReminders(user, [entry], shareHandles, keeperNumber)
-			user.setUnresolvedHandles(unresolvedHandles)
-
-		# If the share had unresolved handles, don't send other followups
-		if len(unresolvedHandles) > 0:
-			reminder_util.sendUnresolvedHandlesPrompt(user, keeperNumber)
-		# If we're in the tutorial and they didn't give a time, then give a different follow up
-		elif not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT and not user.isTutorialComplete():
+		if not user.isTutorialComplete() and not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT:
 			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
 			return False
 		else:
-			reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+			reminder_util.sendCompletionResponse(user, entry, followups, keeperNumber)
 			user.create_todo_count += 1
 			user.save()
 

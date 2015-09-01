@@ -1,12 +1,9 @@
-import datetime
-import pytz
 from mock import patch
 
 from smskeeper.models import Entry, User
 from smskeeper import cliMsg, tips
 from smskeeper import async, keeper_constants
 from smskeeper.chunk import Chunk
-from smskeeper import user_util
 import re
 
 import test_base
@@ -73,16 +70,18 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 					"Bad handles %s found in %s" % (chunk.sharedReminderHandles(), chunk.originalText)
 				)
 
-	def test_shared_reminder_normal(self, dateMock):
+	def test_shared_reminder_recipient_nonuser(self, dateMock):
 		phoneNumber = "+16505555555"
 		self.setupUser(dateMock)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
-			self.assertIn("mom's", self.getOutput(mock))  # make sure we upsell them to remind mom
+			self.assertIn("remind you", self.getOutput(mock))  # make sure we tell them we'll remind them
+			self.assertIn(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))  # make sure we upsell them to remind mom
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, phoneNumber)
+			self.assertIn("mom tomorrow", self.getOutput(mock))
 			self.assertIn(self.user.name, self.getOutput(mock))
 			# make sure we intro oursevles the first time
 			self.assertIn("assistant", self.getOutput(mock))
@@ -95,32 +94,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		entry = Entry.objects.filter(label="#reminders").last()
 		self.assertEquals(2, len(entry.users.all()))
 
-	def test_shared_minitip(self, dateMock):
-		self.setupUser(dateMock)
-		self.assertTrue(tips.isUserEligibleForMiniTip(self.getTestUser(), tips.SHARED_REMINDER_MINI_TIP_ID))
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			self.createSharedReminder()
-			self.assertIn(tips.tipWithId(tips.SHARED_REMINDER_MINI_TIP_ID).render(self.getTestUser()), self.getOutput(mock))
-
-	def test_shared_reminder_text(self, dateMock):
-		self.setupUser(dateMock)
-
-		entry = self.createSharedReminder()
-		# Make sure entries were created correctly
-		self.assertNotIn("mom", entry.text.lower())
-		self.assertNotIn("to", entry.text.lower())
-
-	def test_bad_capitalization(self, dateMock):
-		self.setupUser(dateMock)
-		cliMsg.msg(self.testPhoneNumber, "Can You Remind Me Around 8 To Put Medicine, Pillow, Minion In Suitcase")
-		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_RESOLVE_HANDLE))
-
-	def test_other_action_for_object(self, dateMock):
-		self.setupUser(dateMock)
-		cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
-		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_RESOLVE_HANDLE))
-
-	def test_shared_reminder_for_existing_user(self, dateMock):
+	def test_shared_reminder_recipient_user(self, dateMock):
 		self.setupUser(dateMock)
 		recipient = self.setupAnotherUser(self.recipientPhoneNumber, True, True, dateMock=dateMock)
 
@@ -134,6 +108,38 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		# Make sure entry was created correctly
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEquals(2, len(entries[0].users.all()))
+
+	def test_shared_reminder_2nd_time(self, dateMock):
+		self.setupUser(dateMock)
+		self.createSharedReminder()
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind mom to call me in a week")
+			self.assertNotIn(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT, self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "Text mom")
+
+		# Make sure both entries were shared
+		entries = Entry.objects.filter(label="#reminders")
+		for entry in entries:
+			self.assertEquals(2, len(entry.users.all()))
+
+	def test_shared_reminder_text(self, dateMock):
+		self.setupUser(dateMock)
+
+		entry = self.createSharedReminder()
+		# Make sure entries were created correctly
+		self.assertNotIn("mom", entry.text.lower())
+		self.assertNotIn("to", entry.text.lower())
+
+	def test_bad_capitalization(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Can You Remind Me Around 8 To Put Medicine, Pillow, Minion In Suitcase")
+		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT))
+
+	def test_other_action_for_object(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Call Dr at 11:30 in the morning")
+		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT))
 
 	def test_shared_reminder_nicety(self, dateMock):
 		self.setupUser(dateMock)
@@ -273,4 +279,4 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 	def test_short_shared_reminder(self, dateMock):
 		self.setupUser(dateMock)
 		cliMsg.msg(self.testPhoneNumber, "Remind Steve to test")
-		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_RESOLVE_HANDLE))
+		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT))

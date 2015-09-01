@@ -293,7 +293,7 @@ def cleanedReminder(msg, recurrence=None, shareHandles=None):
 	# remove shared handles
 	if shareHandles:
 		for handle in shareHandles:
-			cleaned = cleaned.replace(handle, "")
+			cleaned = re.sub(handle, "", cleaned, flags=re.I)
 			cleaned = cleaned.strip()
 
 	# remove timing info etc

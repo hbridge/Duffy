@@ -18,7 +18,7 @@ from smskeeper.engine.create_todo import CreateTodoAction
 from smskeeper.engine.complete_todo_most_recent import CompleteTodoMostRecentAction
 from smskeeper.engine.complete_todo_specific import CompleteTodoSpecificAction
 from smskeeper.engine.tip_question_response import TipQuestionResponseAction
-from smskeeper.engine.resolve_handle import ResolveHandleAction
+from smskeeper.engine.share_reminder import ShareReminderAction
 from smskeeper.engine.jokes import JokeAction
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class Engine:
 		CompleteTodoSpecificAction(),
 		TipQuestionResponseAction(),
 		JokeAction(),
-		ResolveHandleAction()
+		ShareReminderAction()
 	])
 	TUTORIAL_BASIC = ([
 		StopAction(),

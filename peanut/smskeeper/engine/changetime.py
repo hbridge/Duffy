@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import reminder_util, actions, sms_util
+from smskeeper import reminder_util, actions, sms_util, keeper_constants
 from .action import Action
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,10 @@ class ChangetimeAction(Action):
 				isSnooze = (snoozeRegexHit or justNotified)
 				reminder_util.updateReminderEntry(user, nattyResult, chunk.originalText, entry, user.getKeeperNumber(), isSnooze=isSnooze)
 
-			needFollowup = not nattyResult.validTime()
-			reminder_util.sendCompletionResponse(user, entries[0], needFollowup, user.getKeeperNumber())
+			followups = []
+			if not nattyResult.validTime():
+				followups = [keeper_constants.FOLLOWUP_TIME]
+
+			reminder_util.sendCompletionResponse(user, entries[0], followups, user.getKeeperNumber())
 
 		return True

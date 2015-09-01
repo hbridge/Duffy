@@ -12,6 +12,8 @@ def isDateOlderThan(dt, days=0, hours=0):
 
 
 def daysAndHoursAgo(dt):
+	if dt is None:
+		return None
 	delta = date_util.now(pytz.utc) - dt
 	return delta.days, (delta.seconds / 60 / 60)
 

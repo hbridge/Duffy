@@ -298,12 +298,18 @@ class User(models.Model):
 		entries = Entry.objects.filter(id__in=entryIds)
 		return entries
 
-	def setUnresolvedHandles(self, handles):
-		self.setStateData("unresolvedHandles", handles)
+	def setSharePromptHandles(self, unresolvedHandles, resolvedHandles):
+		self.setStateData("unresolvedHandles", unresolvedHandles)
+		self.setStateData("sharePromptHandles", resolvedHandles)
 		self.save()
 
-	def getUnresolvedHandles(self):
-		return self.getStateData("unresolvedHandles")
+	def getSharePromptHandles(self):
+		unresolvedHandles = self.getStateData("unresolvedHandles")
+		resolvedHandles = self.getStateData("sharePromptHandles")
+		return (
+			unresolvedHandles if unresolvedHandles is not None else [],
+			resolvedHandles if resolvedHandles is not None else []
+		)
 
 	def __unicode__(self):
 		if self.name:
@@ -531,6 +537,24 @@ class Contact(models.Model):
 	handle = models.CharField(max_length=30, db_index=True)
 
 	@classmethod
+	def resolveHandles(cls, user, handles):
+		if type(handles) is not list:
+			raise NameError("Fetch by handles takes a list of handles")
+		contacts = Contact.objects.filter(user=user, handle__in=handles)
+
+		# dedupe by targets and figure out which were
+		seenTargetIds = set()
+		resolvedContacts = list()
+		unresolvedHandles = set(handles)
+		for contact in contacts:
+			if contact.target.id not in seenTargetIds:
+				seenTargetIds.add(contact.target.id)
+				resolvedContacts.append(contact)
+			unresolvedHandles.remove(contact.handle)
+
+		return resolvedContacts, list(unresolvedHandles)
+
+	@classmethod
 	def fetchByHandle(cls, user, handle):
 		try:
 			contacts = Contact.objects.filter(user=user, handle=handle)
@@ -552,7 +576,6 @@ class Contact(models.Model):
 			return contact
 		except Contact.DoesNotExist:
 			return None
-
 
 class ZipData(models.Model):
 	city = models.CharField(max_length=100)

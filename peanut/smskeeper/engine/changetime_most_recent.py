@@ -5,6 +5,7 @@ import datetime
 from smskeeper import entry_util, msg_util
 from smskeeper import keeper_constants
 from .changetime import ChangetimeAction
+from smskeeper.chunk_features import ChunkFeatures
 
 from common import date_util
 
@@ -23,6 +24,7 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 		nattyResult = chunk.getNattyResult(user)
 		basicRegexHit = chunk.matches(self.basicRegex)
 		beginsWithRegexHit = chunk.matches(self.beginsWithRegex)
+		features = ChunkFeatures(chunk, user)
 
 		justNotifiedReminder = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER) or (user.state == keeper_constants.STATE_REMINDER_SENT)
 		justNotifiedDigest = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
@@ -54,6 +56,9 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 
 		if ChangetimeMostRecentAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
+
+		if features.hasPhoneNumber():
+			score = 0.0
 
 		return score
 

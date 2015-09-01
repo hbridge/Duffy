@@ -11,7 +11,6 @@ from common import natty_util
 from smskeeper.models import Entry, Contact
 from smskeeper import helper_util, sms_util, entry_util
 import django
-from smskeeper import user_util
 from smskeeper import tips
 
 import logging
@@ -96,8 +95,8 @@ def isFollowup(user, entry, msg, nattyResult):
 	return False
 
 
-def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recurrence=None, shareHandles=None):
-	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming, recurrence, shareHandles)  # no "Remind me", or recurrence text
+def createReminderEntry(user, nattyResult, msg, followups, keeperNumber, recurrence=None):
+	cleanedText = msg_util.cleanedReminder(nattyResult.queryWithoutTiming, recurrence)  # no "Remind me", or recurrence text
 	cleanedText = msg_util.warpReminderText(cleanedText)  # I to your
 	entry = Entry.createEntry(user, keeperNumber, keeper_constants.REMIND_LABEL, cleanedText)
 
@@ -129,17 +128,14 @@ def createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber, recu
 	suspiciousHour = dealWithSuspiciousHour(user, entry, keeperNumber)
 
 	NumUsers = 1
-	if (shareHandles):
-		NumUsers += len(shareHandles)
 	analytics.logUserEvent(
 		user,
 		"Created Reminder",
 		{
-			"Needed Followup": sendFollowup,
+			"Needed Followup": (len(followups) > 0),
 			"Was Suspicious Hour": suspiciousHour,
 			"In tutorial": not user.isTutorialComplete(),
 			"Is shared": (NumUsers > 1),
-			"Num Users": NumUsers,
 			"interface": keeperNumber,
 		}
 	)
@@ -235,7 +231,8 @@ def updateReminderEntry(user, nattyResult, msg, entry, keeperNumber, isSnooze=Fa
 
 
 #  Send off a response like "I'll remind you Sunday at 9am" or "I'll remind mom Sunday at 9am"
-def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
+def sendCompletionResponse(user, entry, followups, keeperNumber):
+	logger.info("Send completion response with followups %s", followups)
 	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
 
 	# Include time if old product or if its not a default time
@@ -255,15 +252,28 @@ def sendCompletionResponse(user, entry, sendFollowup, keeperNumber):
 
 	toSend = "%s I'll remind %s %s." % (helper_util.randomAcknowledgement(), handle, userMsg)
 
-	# Tutorial gets a special followup message
-	if sendFollowup:
-		if not user.isTutorialComplete():
-			toSend = toSend + " (If that time doesn't work, just tell me what time is better)"
-		else:
-			toSend = toSend + "\n\n"
-			toSend = toSend + "If that time doesn't work, tell me what time is better"
+	# add new lines for followups
+	if user.isTutorialComplete() and len(followups) > 0:
+		toSend = toSend + "\n\n"
 
-	sms_util.sendMsg(user, toSend, None, keeperNumber)
+	responseClassification = None
+	# time followups
+	if keeper_constants.FOLLOWUP_TIME in followups:
+		if not user.isTutorialComplete():
+			toSend = toSend + " (If that time doesn't work, just tell me what time is better.)"
+		else:
+			toSend = toSend + "If that time doesn't work, tell me what time is better."
+
+	# sharing followups
+	if user.isTutorialComplete():
+		if keeper_constants.FOLLOWUP_SHARE_UNRESOLVED in followups:
+			toSend = toSend + " " + keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT
+			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
+		elif keeper_constants.FOLLOWUP_SHARE_RESOLVED in followups:
+			toSend = toSend + " " + keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT
+			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
+
+	sms_util.sendMsg(user, toSend, None, keeperNumber, classification=responseClassification)
 
 
 def getDefaultTime(user, isToday=False):
@@ -343,6 +353,7 @@ def getNattyResult(user, msg):
 def shareReminders(user, entries, handles, keeperNumber):
 	sharedHandles = list()
 	notFoundHandles = list()
+	nonActivatedRecipients = False
 	if not isinstance(entries, django.db.models.query.QuerySet) and not isinstance(entries, list):
 		raise TypeError("entries must be list or django.db.models.query.QuerySet, actual type: %s" % (type(entries)))
 	if not isinstance(handles, list):
@@ -356,6 +367,9 @@ def shareReminders(user, entries, handles, keeperNumber):
 			sharedHandles.append(handle)
 			for entry in entries:
 				entry.users.add(contact.target)
+				entry.remind_recur = keeper_constants.RECUR_ONE_TIME
+				entry.text = msg_util.cleanedReminder(entry.text, shareHandles=handles)
+				entry.save()
 
 			shareText = None
 
@@ -363,6 +377,7 @@ def shareReminders(user, entries, handles, keeperNumber):
 			introText = "Hi there :wave: "
 			if not contact.target.activated:
 				introText += "%s " % keeper_constants.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
+				nonActivatedRecipients = True
 
 			if len(entries) == 1:
 				tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())
@@ -387,6 +402,16 @@ def shareReminders(user, entries, handles, keeperNumber):
 					contact.target.getKeeperNumber()
 				)
 
+	analytics.logUserEvent(
+		user,
+		"Shared Reminder",
+		{
+			"Num Users": len(handles),
+			"Num Entries:": len(entries),
+			"Targets Unactivated": nonActivatedRecipients,
+		}
+	)
+
 	return sharedHandles, notFoundHandles
 
 
@@ -404,7 +429,7 @@ def sendUnresolvedHandlesPrompt(user, keeperNumber):
 		msg,
 		None,
 		keeperNumber,
-		classification=keeper_constants.OUTGOING_RESOLVE_HANDLE
+		classification=keeper_constants.OUTGOING_SHARE_PROMPT
 	)
 
 

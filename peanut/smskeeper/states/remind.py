@@ -73,11 +73,11 @@ def process(user, msg, requestDict, keeperNumber):
 			return False, None
 
 	if doCreate:
-		sendFollowup = False
+		followups = []
 		if not nattyResult.validTime() or not user.isTutorialComplete():
-			sendFollowup = True
+			followups.append(keeper_constants.FOLLOWUP_TIME)
 
-		entry = reminder_util.createReminderEntry(user, nattyResult, msg, sendFollowup, keeperNumber)
+		entry = reminder_util.createReminderEntry(user, nattyResult, msg, followups, keeperNumber)
 		# We set this so it knows what entry was created
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
 
@@ -88,7 +88,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# Return here and we should come back
 			return True, keeper_constants.CLASS_CREATE_TODO
 		else:
-			reminder_util.sendCompletionResponse(user, entry, sendFollowup, keeperNumber)
+			reminder_util.sendCompletionResponse(user, entry, followups, keeperNumber)
 
 		# If we came from the tutorial, then set state and return False so we go back for reprocessing
 		if not user.isTutorialComplete():
