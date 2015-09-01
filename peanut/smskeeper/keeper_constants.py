@@ -189,6 +189,7 @@ PHOTOS_TIP_URL = "https://s3.amazonaws.com/smskeeper/PhotosTip.png"
 KEEPER_BIRTHDAY = datetime.date(2015, 4, 29)
 
 SHARE_UPSELL_FREQUENCY_DAYS = 3
+SHARE_UPSELL_MIN_ACTIVATED_DAYS = 1
 SHARE_UPSELL_WEBLINK = 'weblink'  # send weblink
 SHARE_UPSELL_PHONE = 'phone'  # send phone number
 

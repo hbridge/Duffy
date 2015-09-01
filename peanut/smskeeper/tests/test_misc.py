@@ -4,8 +4,10 @@ from mock import patch
 from peanut.settings import constants
 from smskeeper.models import User
 from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
+from common import date_util
 from django.conf import settings
 
+import pytz
 import test_base
 import emoji
 
@@ -190,7 +192,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual("", self.getOutput(mock))
 			self.assertFalse(self.getTestUser().isPaused())
 
-
 	# See if we get into the paused state when we enter an invalid command during daytime hours
 	def test_sets_paused_when_daytime(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
@@ -234,11 +235,24 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
 
 	def test_thanks_upsell(self, dateMock):
+		# this will setup user's activated time to be TUE_8AM
 		self.setupUser(True, True, dateMock=dateMock)
 
+		# it shouldn't do the upsell an hour later
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
+			output = self.getOutput(mock)
+			found = False
+			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+				if phrase in output:
+					found = True
+			self.assertEqual(found, False)
+
+		# a day later it should do the upsell
+		self.setNow(dateMock, self.WED_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
 			found = False
 			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
@@ -248,7 +262,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		# make sure we don't send it immediately after
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "thank you")
+			cliMsg.msg(self.testPhoneNumber, "thanks Keeper")
 			output = self.getOutput(mock)
 			found = False
 			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:

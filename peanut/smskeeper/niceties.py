@@ -219,7 +219,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 
 		return "%s %s" % (base, keeper_constants.FEEDBACK_PHRASE)
 	'''
-	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS) and user.completed_tutorial == True:
+	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS) and time_utils.isDateOlderThan(user.activated, keeper_constants.SHARE_UPSELL_MIN_ACTIVATED_DAYS) and user.completed_tutorial is True:
 		user.last_share_upsell = date_util.now(pytz.utc)
 		user.save()
 		phrase, link = random.choice(keeper_constants.SHARE_UPSELL_PHRASES)
