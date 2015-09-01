@@ -311,9 +311,10 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 			# Do mini tips for digest.
 			# If they have a 3 day old entry, tell them to snooze
 			# If they don't, but they havn't hit their "done" goal then show done
-			if has3dayOldEntry:
+			if has3dayOldEntry and tips.DIGEST_SNOOZE_TIP_ID not in tips.getSentTipIds(user):
 				digestTip = tips.tipWithId(tips.DIGEST_SNOOZE_TIP_ID)
 				sms_util.sendMsg(user, digestTip.renderMini())
+				tips.markTipSent(user, digestTip, isMini=True)
 			elif user.done_count < keeper_constants.GOAL_DONE_COUNT:
 				digestTip = tips.tipWithId(tips.DIGEST_DONE_TIP_ID)
 				sms_util.sendMsg(user, digestTip.renderMini())
