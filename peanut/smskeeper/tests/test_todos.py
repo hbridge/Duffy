@@ -1050,7 +1050,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("Call Mom", self.getOutput(mock))
-			self.assertIn("Old tasks", self.getOutput(mock))
+			self.assertIn("old tasks", self.getOutput(mock))
 			self.assertIn("Run with your dad", self.getOutput(mock))
 			self.assertIn("my.getkeeper.com/", self.getOutput(mock))
 
@@ -1070,12 +1070,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
 		user.save()
-		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow at 2pm")
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("Run with your dad", self.getOutput(mock))
+
+		# trigger the reminder; this is important, otherwise remind_last_notified won't be updated
+		self.setNow(dateMock, self.TUE_2PM)
+		async.processAllReminders()
 
 		# digest should go out with this task under "old tasks"
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))

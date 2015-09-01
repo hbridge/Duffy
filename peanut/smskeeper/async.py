@@ -205,7 +205,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 				msg += u"\n%s\n\n" % (weatherPhrase)
 
 	if len(pendingEntries) == 0:
-		msg += keeper_constants.REMINDER_DIGEST_EMPTY[now.weekday()]
+		msg += keeper_constants.REMINDER_DIGEST_EMPTY[now.weekday()] + '\n'
 	else:
 		if userRequested:  # This shows all tasks so we don't mention today
 			msg += u"Your current tasks: \U0001F4DD\n"
@@ -219,7 +219,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			msg += generateTaskStringForDigest(user, entry)
 
 	if not userRequested and len(sweptEntries) > 0:
-		msg += "\n\n" + "Btw, I moved your old tasks to " + user.getWebAppURL() + " to keep your list fresh:\n"
+		msg += "\n" + "Btw, I moved these old tasks to " + user.getWebAppURL() + " to keep your list fresh:\n"
 		for entry in sweptEntries:
 			msg += generateTaskStringForDigest(user, entry)
 
@@ -321,19 +321,20 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 # For this user, sweep all the tasks older than age given and return them
 def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS):
-
-	now = date_util.now(pytz.utc)
 	sweptEntries = []
-	for entry in pendingEntries:
-		if entry.remind_recur == keeper_constants.RECUR_DEFAULT and entry.remind_last_notified and entry.remind_last_notified < now - datetime.timedelta(days=age):
-			entry.state = keeper_constants.REMINDER_STATE_SWEPT
-			entry.last_state_change = now
-			entry.save()
-			logger.info("Sweeping task %s for user %s" % (entry.id, user.id))
-			sweptEntries.append(entry)
+	if user.id in [18, 1515, 1607, 1809, 1994] or '16505555550' in user.phone_number:  # TODO: Remove to release this to more users
+		now = date_util.now(pytz.utc)
 
-	for entry in sweptEntries:
-		pendingEntries.remove(entry)
+		for entry in pendingEntries:
+			if entry.remind_recur == keeper_constants.RECUR_DEFAULT and entry.remind_last_notified and entry.remind_last_notified < now - datetime.timedelta(days=age):
+				entry.state = keeper_constants.REMINDER_STATE_SWEPT
+				entry.last_state_change = now
+				entry.save()
+				logger.info("Sweeping task %s for user %s" % (entry.id, user.id))
+				sweptEntries.append(entry)
+
+		for entry in sweptEntries:
+			pendingEntries.remove(entry)
 
 	return pendingEntries, sweptEntries
 
