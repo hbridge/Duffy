@@ -223,7 +223,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 		for entry in sweptEntries:
 			msg += generateTaskStringForDigest(user, entry)
 
-		msg += "(Moved to " + user.getWebAppURL() + " to keep your list fresh)"
+		msg += "\n(Moved to " + user.getWebAppURL() + " to keep your list fresh)"
 
 	return msg
 
@@ -327,10 +327,11 @@ def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TI
 	now = date_util.now(pytz.utc)
 	sweptEntries = []
 	for entry in pendingEntries:
-		entry.state = keeper_constants.REMINDER_STATE_SWEPT
-		entry.last_state_change = now
-		entry.save()
-		sweptEntries.append(entry)
+		if entry.updated < now - datetime.timedelta(days=age):
+			entry.state = keeper_constants.REMINDER_STATE_SWEPT
+			entry.last_state_change = now
+			entry.save()
+			sweptEntries.append(entry)
 
 	for entry in sweptEntries:
 		pendingEntries.remove(entry)
