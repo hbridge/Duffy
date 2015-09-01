@@ -362,6 +362,10 @@ class Entry(models.Model):
 	manually_updated = models.BooleanField(default=False)
 	manually_updated_timestamp = models.DateTimeField(null=True, blank=True)
 
+	STATE_CHOICES = [(x, x) for x in keeper_constants.ALL_REMINDER_STATES]
+	state = models.CharField(max_length=100, choices=STATE_CHOICES, default=keeper_constants.REMINDER_STATE_NORMAL)
+	last_state_change = models.DateTimeField(null=True, blank=True)
+
 	# manually = True means that it needs to be reviewed
 	manually_check = models.BooleanField(default=False)
 	manually_approved_timestamp = models.DateTimeField(null=True, blank=True)
@@ -390,12 +394,14 @@ class Entry(models.Model):
 			return None
 
 	@classmethod
-	def fetchEntries(cls, user, label=None, hidden=False, orderByString="added"):
+	def fetchEntries(cls, user, label=None, hidden=False, orderByString="added", state=None):
 		entries = Entry.objects.filter(Q(users__in=[user]) | Q(creator=user)).order_by(orderByString).distinct()
 		if hidden is not None:
 			entries = entries.filter(hidden=hidden)
 		if label:
 			entries = entries.filter(label__iexact=label)
+		if state:
+			entries = entries.filter(state=keeper_constants.REMINDER_STATE_NORMAL)
 		return entries
 
 	@classmethod

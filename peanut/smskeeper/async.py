@@ -191,7 +191,7 @@ def shouldIncludeEntry(entry):
 	return False
 
 
-def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested):
+def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested, sweptEntries):
 	now = date_util.now(pytz.utc)
 	msg = ""
 
@@ -216,15 +216,26 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			# If this is the digest and this reminder was timed to this day and time...then process it (mark it as sent)
 			if not userRequested and user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 				updateEntryAfterProcessing(entry)
-			msg += u"\U0001F538 " + entry.text
-			if len(entry.users.all()) > 1:
-				msg += " (%s)" % (", ".join(entry.getOtherUserNames(user)))
+			msg += generateTaskStringForDigest(user, entry)
 
-			if (entry.remind_timestamp > now + datetime.timedelta(minutes=1) and  # Need an extra minute since some 9am reminders are really 9:00:30
-						not entry.use_digest_time):  # Don't show the time if it was a default time
-				msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
-			msg += "\n"
+	if not userRequested and len(sweptEntries) > 0:
+		msg += "\n" + "Old tasks (available at " + user.getWebAppURL() + "):"
+		for entry in sweptEntries:
+			msg += generateTaskStringForDigest(user, entry)
 
+	return msg
+
+
+def generateTaskStringForDigest(user, entry):
+	now = date_util.now(pytz.utc)
+	msg = u"\U0001F538 " + entry.text
+	if len(entry.users.all()) > 1:
+		msg += " (%s)" % (", ".join(entry.getOtherUserNames(user)))
+
+	if (entry.remind_timestamp > now + datetime.timedelta(minutes=1) and  # Need an extra minute since some 9am reminders are really 9:00:30
+				not entry.use_digest_time):  # Don't show the time if it was a default time
+		msg += " (%s)" % msg_util.naturalize(now, entry.remind_timestamp.astimezone(user.getTimezone()), True)
+	msg += "\n"
 	return msg
 
 
@@ -245,9 +256,13 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 	# Not great at this low level but want to make sure it always gets called
 	# This removes all
 	pendingEntries = cleanUpRecurringReminders(user, pendingEntries)
+	if not userRequested and date_util.now(user.getTimezone()).isoweekday() == 1:  # only do this on Mondays
+		pendingEntries, sweptEntries = sweepTasksForUser(user, pendingEntries)
+	else:
+		sweptEntries = []
 
 	# We send the message here
-	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested)
+	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested, sweptEntries)
 	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_DIGEST)
 
 	now = date_util.now(user.getTimezone())
@@ -302,6 +317,23 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 			elif user.done_count < keeper_constants.GOAL_DONE_COUNT:
 				digestTip = tips.tipWithId(tips.DIGEST_DONE_TIP_ID)
 				sms_util.sendMsg(user, digestTip.renderMini())
+
+
+# For this user, sweep all the tasks older than age given and return them
+def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS):
+
+	now = date_util.now(pytz.utc)
+	sweptEntries = []
+	for entry in pendingEntries:
+		entry.state = keeper_constants.REMINDER_STATE_SWEPT
+		entry.last_state_change = now
+		entry.save()
+		sweptEntries.append(entry)
+
+	for entry in sweptEntries:
+		pendingEntries.remove(entry)
+
+	return pendingEntries, sweptEntries
 
 
 @app.task

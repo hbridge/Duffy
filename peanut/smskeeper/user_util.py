@@ -118,7 +118,7 @@ def shouldIncludeEntry(entry, includeAll):
 
 
 def pendingTodoEntries(user, includeAll=False, before=None, after=None):
-	entries = Entry.fetchEntries(user, label="#reminders", hidden=False, orderByString="remind_timestamp")
+	entries = Entry.fetchEntries(user, label="#reminders", hidden=False, orderByString="remind_timestamp", state=keeper_constants.REMINDER_STATE_NORMAL)
 
 	results = list()
 	for entry in entries:

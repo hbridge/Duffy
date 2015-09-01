@@ -1013,24 +1013,73 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS), self.getOutput(mock))
-	'''
+
 	# Make sure we expire tasks after N days
-	def test_old_tasks_fall_off_the_digest(self, dateMock):
+	def test_old_tasks_fall_off_the_digest_on_Monday(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_8AM)
 		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad this afternoon")
+
+		# task should show up
+		self.setNow(dateMock, self.TUE_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run with your dad", self.getOutput(mock))
+
+		# task should show up
+		self.setNow(dateMock, self.WED_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run with your dad", self.getOutput(mock))
+
+		# task should show up
+		self.setNow(dateMock, self.THU_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run with your dad", self.getOutput(mock))
+
+		# task should show up with link
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run with your dad", self.getOutput(mock))
+			self.assertIn("my.getkeeper.com/", self.getOutput(mock))
+
+		# task shouldn't show up anymore
+		self.setNow(dateMock, self.TUE_9AM + datetime.timedelta(days=7))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Run with your dad", self.getOutput(mock))
+			self.assertNotIn("my.getkeeper.com/", self.getOutput(mock))
+
+	# Make sure we expire tasks after N days
+	def test_old_tasks_fall_off_the_digest_for_limited_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		user = self.getTestUser()
+		user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
+		user.save()
+		cliMsg.msg(self.testPhoneNumber, "I need to run with my dad tomorrow")
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertIn("Run with your dad", self.getOutput(mock))
 
-		self.setNow(dateMock, self.SAT_9AM)
+		# digest should go out with this task under "old tasks"
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Run with your dad", self.getOutput(mock))
+			self.assertIn("my.getkeeper.com/", self.getOutput(mock))
+
+		# digest shouldn't go out at all
+		self.setNow(dateMock, self.TUE_9AM + datetime.timedelta(days=7))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("Run with your dad", self.getOutput(mock))
-	'''
 
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_week(self, dateMock):
