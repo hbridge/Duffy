@@ -219,11 +219,9 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			msg += generateTaskStringForDigest(user, entry)
 
 	if not userRequested and len(sweptEntries) > 0:
-		msg += "\n\n" + "Old tasks\n:"
+		msg += "\n\n" + "Btw, I moved your old tasks to " + user.getWebAppURL() + " to keep your list fresh:\n"
 		for entry in sweptEntries:
 			msg += generateTaskStringForDigest(user, entry)
-
-		msg += "\n(Moved to " + user.getWebAppURL() + " to keep your list fresh)"
 
 	return msg
 
@@ -331,6 +329,7 @@ def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TI
 			entry.state = keeper_constants.REMINDER_STATE_SWEPT
 			entry.last_state_change = now
 			entry.save()
+			logger.info("Sweeping task %s for user %s" % (entry.id, user.id))
 			sweptEntries.append(entry)
 
 	for entry in sweptEntries:
