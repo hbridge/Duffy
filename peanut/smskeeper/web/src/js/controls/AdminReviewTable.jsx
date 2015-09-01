@@ -13,6 +13,8 @@ var Bootstrap = require('react-bootstrap');
   Modal = Bootstrap.Modal;
   SplitButton = Bootstrap.SplitButton;
   MenuItem = Bootstrap.MenuItem;
+  Popover = Bootstrap.Popover;
+  OverlayTrigger = Bootstrap.OverlayTrigger;
 AdminEntryCard = require('./AdminEntryCard.jsx');
 var emoji = require('node-emoji');
 
@@ -80,9 +82,9 @@ var EntryRow = React.createClass({
 			<tr>
 		        <td> { approveButton } </td>
 		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creatorName} </a></td>
-		        <td onClick={this.handleRowClicked}>
-		        	{ this.state.model.text } <br />
-		        	{ this.state.model.orig_text }
+		        <td>
+		        	<a onClick={this.handleRowClicked} href="#" className="userText">{ this.state.model.text } </a><br />
+		        	[{ _.map(JSON.parse(this.state.model.orig_text), this.getUnsquashLink) }]
 		        </td>
 		        <td> <div style={{minWidth: "52px"}}>{this.getCreateRemindDeltaText()} </div></td>
 		        <td onClick={this.handleRowClicked}>
@@ -123,6 +125,33 @@ var EntryRow = React.createClass({
 		return duration.days() + "d " + duration.hours() + "h";
 	},
 
+	getUnsquashLink(text) {
+		var popover = <Popover title='Unsquash'>
+			Copy entry with text &ldquo;{text}&rdquo;?
+			<br /><br />
+			<Button onClick={function(e){
+				this.handleUnsquashLinkClicked(text);
+			}.bind(this)} bsSize="small">
+				Create
+			</Button>
+		</Popover>;
+		return (
+			<OverlayTrigger ref="unsquashTrigger" trigger='click' placement='bottom' overlay={popover} rootClose={true}>
+	      		<span>&ldquo;<a href="#" className="userText">{text}</a>&rdquo;</span>
+    		</OverlayTrigger>
+		);
+	},
+
+	handleUnsquashLinkClicked(text) {
+		console.log("Unsquashing %s", text);
+		var newModel = this.props.model.clone();
+		newModel.set("text", text);
+		newModel.set("id", null);
+		this.getCollection().add(newModel);
+		var saveResult = newModel.save();
+		console.log("Save copy result: ", saveResult)
+		this.refs.unsquashTrigger.dismiss();
+	},
 });
 
 

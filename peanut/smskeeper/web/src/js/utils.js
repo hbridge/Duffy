@@ -41,10 +41,10 @@ var PostToSlack = function(username, text, channel){
   });
 }
 
-var SubmitCommandWithClassToServer = function(msg, override_class, onSuccess, onFailure) {
+var SubmitCommandWithClassToServer = function(user, msg, override_class, onSuccess, onFailure) {
   var data = {
     msg: msg,
-    user_id: USER.id,
+    user_id: user,
     direction: "ToKeeper",
     response_data: "entries",
     from_num: "web"
@@ -69,9 +69,8 @@ var SubmitCommandWithClassToServer = function(msg, override_class, onSuccess, on
       });
 }
 
-
 var SubmitCommandToServer = function(msg, onSuccess, onFailure) {
-  SubmitCommandWithClassToServer(msg, null, onSuccess, onFailure);
+  SubmitCommandWithClassToServer(USER.id, msg, null, onSuccess, onFailure);
 }
 
 var Emojize = function(str) {

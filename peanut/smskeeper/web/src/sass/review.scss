@@ -1,2 +1,10 @@
 @import "_common";
 @import "_calendar-picker";
+
+a {
+	cursor: auto;
+
+	&.userText {
+		color: black;
+	}
+}
