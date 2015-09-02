@@ -22,9 +22,11 @@ from icalendar import Event
 from icalendar import vCalAddress
 from icalendar import vText
 
+
 def icsFeed(request, key):
+	key = ["K" + key, "P" + key]
 	try:
-		user = User.objects.get(key="K" + key)
+		user = User.objects.get(key__in=key)
 		icsText = icsFeedForUser(user)
 		return HttpResponse(icsText, content_type="text/calendar", status=200)
 	except User.DoesNotExist:
