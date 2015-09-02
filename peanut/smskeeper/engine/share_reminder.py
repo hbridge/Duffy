@@ -92,6 +92,7 @@ class ShareReminderAction(Action):
 			reminder_util.shareReminders(user, entries, [handleToResolve], user.getKeeperNumber())
 			# remove the unresolved handle and see if we need to keep going
 			unresolvedHandles.remove(handleToResolve)
+			resolvedHandles.append(handleToResolve)
 			user.setSharePromptHandles(unresolvedHandles, [])
 
 			analytics.logUserEvent(
@@ -106,6 +107,6 @@ class ShareReminderAction(Action):
 			# TODO henry: this only works for single entry share case
 			reminder_util.sendCompletionResponse(user, entries[0], [], user.getKeeperNumber())
 		else:
-			reminder_util.sendUnresolvedHandlesPrompt(user, user.getKeeperNumber())
+			logger.error("User %d: I think I'm being asked to resolve multiple handles %s in a share command", user.id, unresolvedHandles)
 
 		return True

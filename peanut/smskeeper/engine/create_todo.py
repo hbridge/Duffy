@@ -8,6 +8,7 @@ from smskeeper import keeper_constants, chunk_features
 from .action import Action
 import collections
 from smskeeper.models import Contact
+from smskeeper import user_util
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +99,9 @@ class CreateTodoAction(Action):
 		unresolvedHandles = None
 		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
 			shareHandles = chunk.sharedReminderHandles()
+			if len(shareHandles) > 1:
+				user_util.setPaused(user, True, user.getKeeperNumber(), "Multiple handles in share command")
+				return True
 			contacts, unresolvedHandles = Contact.resolveHandles(user, shareHandles)
 			logger.info("User %d: handles in create_todo %d resolved %d unresolved", user.id, len(contacts), len(unresolvedHandles))
 			if len(unresolvedHandles) > 0:

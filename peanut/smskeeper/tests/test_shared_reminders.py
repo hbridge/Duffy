@@ -297,14 +297,19 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 	def test_handle_cap_difference(self, dateMock):
 		self.setupUser(dateMock)
-		sharedEntry = self.createSharedReminder()
+		self.createSharedReminder()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind Mom to test")
 			self.assertNotIn(
-					self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT),
-					self.getOutput(mock)
-				)
+				self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT),
+				self.getOutput(mock)
+			)
 			self.assertIn(
-					self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT),
-					self.getOutput(mock)
-				)
+				self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT),
+				self.getOutput(mock)
+			)
+
+	def test_multiple_handles_pause(self, dateMock):
+		self.setupUser(dateMock)
+		self.createSharedReminder("Remind Mon Petit Garcon about Medieval Times Sunday at 11am")
+		self.assertTrue(self.getTestUser().paused)

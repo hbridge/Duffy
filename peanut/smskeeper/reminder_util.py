@@ -411,24 +411,6 @@ def shareReminders(user, entries, handles, keeperNumber):
 	return sharedHandles, notFoundHandles
 
 
-def sendUnresolvedHandlesPrompt(user, keeperNumber):
-	unresolvedHandles = user.getUnresolvedHandles()
-	msg = "What's %s's phone number?" % (unresolvedHandles[0])
-
-	# if this is the first time the user has sent a shared reminder, give them the minitip
-	if tips.isUserEligibleForMiniTip(user, tips.SHARED_REMINDER_MINI_TIP_ID):
-		tip = tips.tipWithId(tips.SHARED_REMINDER_MINI_TIP_ID)
-		msg = "%s %s" % (tip.render(user), msg)
-		tips.markTipSent(user, tip)
-	sms_util.sendMsg(
-		user,
-		msg,
-		None,
-		keeperNumber,
-		classification=keeper_constants.OUTGOING_SHARE_PROMPT
-	)
-
-
 """
 Temp remove due to pausing shared reminders
 # Don't do any of this logic in the tutorial state, shouldn't be correct
