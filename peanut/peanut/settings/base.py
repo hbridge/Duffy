@@ -268,12 +268,12 @@ LOGGING = {
             'propagate': True,
         },
         'smskeeper.async': {
-            'handlers': ['celery', 'duffyfile', 'djangoerror', 'mail_admins'],
+            'handlers': ['celery', 'duffyfile', 'djangoerror', 'mail_admins', 'slackerror'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'smskeeper.sms_util': {
-            'handlers': ['celery', 'duffyfile', 'djangoerror', 'mail_admins'],
+            'handlers': ['celery', 'duffyfile', 'djangoerror', 'mail_admins', 'slackerror'],
             'propagate': True,
             'level': 'DEBUG',
         },
