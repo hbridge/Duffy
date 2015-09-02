@@ -4,8 +4,8 @@ from smskeeper import models
 
 class EntrySerializer(serializers.ModelSerializer):
 	# need this for the custom review page to show entries in the right timezone
-	creatorName = serializers.CharField(source='creator.name')
-	creatorTimezone = serializers.CharField(source='creator.getTimezone')
+	creatorName = serializers.CharField(source='creator.name', read_only=True)
+	creatorTimezone = serializers.CharField(source='creator.getTimezone', read_only=True)
 
 	class Meta:
 		model = models.Entry
