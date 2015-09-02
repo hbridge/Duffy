@@ -341,6 +341,7 @@ def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TI
 
 
 # Used to send daily digest to specific list of people. Written for when Twilio failed.
+# IMPORTANT: THIS FUNCTION DOESN'T CHECK FOR DIGEST TIME (since it's meant to resend missed digests at a later time)
 def processDailyDigestFromList(userIdList):
 	weatherDataCache = dict()
 
