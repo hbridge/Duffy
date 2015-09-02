@@ -10,6 +10,6 @@ urlpatterns = patterns('',
     url(r'^smskeeper/', include('smskeeper.urls')),
 
     url(r'^K(?P<key>[A-Za-z0-9]+)', 'smskeeper.views.mykeeper'),
-
+    url(r'^(?P<key>[A-Za-z0-9]+)', 'smskeeper.views.mykeeper'),
     url(r'^ios-notifications/', include('ios_notifications.urls')),
 )
