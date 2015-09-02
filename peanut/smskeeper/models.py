@@ -540,6 +540,8 @@ class Contact(models.Model):
 	def resolveHandles(cls, user, handles):
 		if type(handles) is not list:
 			raise NameError("Fetch by handles takes a list of handles")
+		# convert all handles to lowercase
+		handles = map(lambda handle: handle.lower(), handles)
 		contacts = Contact.objects.filter(user=user, handle__in=handles)
 
 		# dedupe by targets and figure out which were
@@ -557,6 +559,7 @@ class Contact(models.Model):
 	@classmethod
 	def fetchByHandle(cls, user, handle):
 		try:
+			handle = handle.lower()
 			contacts = Contact.objects.filter(user=user, handle=handle)
 			contact = None if len(contacts) == 0 else contacts[0]
 			if len(contacts) > 1:
@@ -576,6 +579,10 @@ class Contact(models.Model):
 			return contact
 		except Contact.DoesNotExist:
 			return None
+
+	def save(self, *args, **kw):
+		self.handle = self.handle.lower()  # ensure all handles are lowercase
+		super(Contact, self).save(*args, **kw)
 
 class ZipData(models.Model):
 	city = models.CharField(max_length=100)
