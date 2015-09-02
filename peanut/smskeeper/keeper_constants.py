@@ -207,7 +207,7 @@ FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS = 3
 
 # Once a task is this old and still on the list, remove it from daily digest and task list
 SWEEP_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS = 4
-SWEEP_CLEANUP_WEEKDAY = 3  # 1 is Monday, 2 is Tuesday, etc.
+SWEEP_CLEANUP_WEEKDAY = 4  # 1 is Monday, 2 is Tuesday, etc.
 
 SMSKEEPER_TEST_NUM = "test"
 SMSKEEPER_CLI_NUM = "cli"

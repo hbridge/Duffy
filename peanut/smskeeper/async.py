@@ -323,7 +323,7 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 # For this user, sweep all the tasks older than age given and return them
 def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS):
 	sweptEntries = []
-	if user.id in [18, 1515, 1607, 1809, 1994] or '16505555550' in user.phone_number:  # TODO: Remove to release this to more users
+	if user.id in [219, 712, 1453, 1502, 1698, 1871, 2050] or '16505555550' in user.phone_number:  # TODO: Remove to release this to more users
 		now = date_util.now(pytz.utc)
 
 		for entry in pendingEntries:
