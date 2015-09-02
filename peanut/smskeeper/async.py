@@ -340,6 +340,30 @@ def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TI
 	return pendingEntries, sweptEntries
 
 
+# Used to send daily digest to specific list of people. Written for when Twilio failed.
+def processDailyDigest(userList):
+	weatherDataCache = dict()
+
+	for user in userList:
+		if user.state == keeper_constants.STATE_STOPPED or user.state == keeper_constants.STATE_SUSPENDED:
+			continue
+
+		if user.product_id == keeper_constants.MEDICAL_PRODUCT_ID:
+			continue
+
+		if not user.completed_tutorial:
+			continue
+
+		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
+
+		if len(pendingEntries) > 0:
+			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
+
+		# No pending entries, make sure they have digest state to default and product id 1
+		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID and user.digest_state == keeper_constants.DIGEST_STATE_DEFAULT:
+			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
+
+
 @app.task
 def sendDigestForUserId(userId, overrideKeeperNumber=None):
 
@@ -388,7 +412,6 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		# No pending entries, make sure they have digest state to default and product id 1
 		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID and user.digest_state == keeper_constants.DIGEST_STATE_DEFAULT:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
-
 
 @app.task
 def sendTips(overrideKeeperNumber=None):
