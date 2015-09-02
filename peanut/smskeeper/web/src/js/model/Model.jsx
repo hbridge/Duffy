@@ -123,7 +123,7 @@ var EntryList = Backbone.Collection.extend({
 
 var ReviewList = Backbone.Collection.extend({
   model: Entry,
-  url: "/smskeeper/review_feed",
+  url: "/smskeeper/review_feed/",
   comparator: function(entry) {
     var date = new Date(entry.get("remind_timestamp"));
     var dval = (date - 0);
