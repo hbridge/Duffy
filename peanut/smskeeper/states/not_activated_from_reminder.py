@@ -22,7 +22,6 @@ def process(user, msg, requestDict, keeperNumber):
 		else:
 			sms_util.sendMsg(user, response, None, keeperNumber)
 	elif "tell me more" in msg.lower():
-		user.signup_data_json = json.dumps({"source": "reminder"})
 		user_util.activateUser(user, None, keeperNumber)
 		user.save()
 	elif not settings.DEBUG:
