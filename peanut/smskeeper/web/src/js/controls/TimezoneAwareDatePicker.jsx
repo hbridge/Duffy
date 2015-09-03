@@ -1,6 +1,11 @@
 React = require('react');
 DateTimePicker = require('react-bootstrap-datetimepicker');
 moment = require('moment');
+var Bootstrap = require('react-bootstrap');
+  Button = Bootstrap.Button;
+  Input = Bootstrap.Input;
+  Row = Bootstrap.Row;
+  Col = Bootstrap.Col;
 
 module.exports = React.createClass({
 	getInitialState: function() {
@@ -8,24 +13,64 @@ module.exports = React.createClass({
 		// get a the moment in the admin's TZ by parsing the date without TZ info
 		var localMoment = moment(this.props.initialMoment.format('YYYY-MM-DD HH:mm'));
 		console.log("Local moment: " + JSON.stringify(localMoment));
-		return {localMoment: localMoment};
+		return {localMoment: localMoment, isDigestTime: this.props.isDigestTime};
 	},
 
 	render: function() {
+		console.log("rendering with localMomentFormat: %s", this.state.localMoment.format('x'));
 		return(
-			<DateTimePicker
-				ref="date"
-				dateTime={this.state.localMoment.format('x')}
-				onChange={this.pickedTimeChanged}
-				showToday={true}
-				minDate={moment.tz(this.props.timezone)}
-			/>
+			<Input label='Time' wrapperClassName='wrapper'>
+				<Row>
+				<Col xs={12} sm={4} smOffset={0}>
+					<DateTimePicker
+						ref="date"
+						dateTime={this.state.localMoment.format('x')}
+						onChange={this.pickedTimeChanged}
+						showToday={true}
+						minDate={moment.tz(this.props.timezone)}
+						mode='date'
+						inputFormat="MM/DD/YY"
+					/>
+				</Col>
+				<Col xs={12} sm={4} smOffset={0}>
+					<DateTimePicker
+						ref="time"
+						dateTime={this.state.localMoment.format('x')}
+						onChange={this.pickedTimeChanged}
+						showToday={true}
+						minDate={moment.tz(this.props.timezone)}
+						mode='time'
+						inputFormat="h:mm A"
+					/>
+				</Col>
+				<Col xs={12} md={4}>
+					{
+						this.state.isDigestTime ?
+							<Input
+							ref="digestTime"
+							type='checkbox'
+							label="Digest Time"
+							onChange={this.toggleDigestTime}
+							checked/> :
+							<Input
+							ref="digestTime"
+							type='checkbox'
+							label="Digest Time"
+							onChange={this.toggleDigestTime}/>
+					}
+				</Col>
+				</Row>
+			</Input>
 		);
 	},
 
 	pickedTimeChanged: function(timeString) {
 		var localMoment = moment(timeString, "x");
 		this.setState({localMoment: localMoment})
+		if (localMoment.hour() != this.props.digestHour || localMoment.minute() != this.props.digestMinute){
+			// this.refs.digestTime.getInputDOMNode().checked = false;
+			this.setState({isDigestTime: false})
+		}
 		console.log("pickedTimeChanged, local " + localMoment.format());
 	},
 
@@ -42,14 +87,18 @@ module.exports = React.createClass({
 		return timezoneMoment;
 	},
 
-	shouldComponentUpdate: function(nextProps, nextState) {
-		if (!this.props.initialMoment.isSame(nextProps.initialMoment)
-			|| this.props.timezone != nextProps.timezone) {
-			console.log("component updating");
-			return true;
-		}
+	isDigestTime() {
+		return this.state.isDigestTime;
+	},
 
-		return false;
+	toggleDigestTime(e){
+		console.log("toggle digestTime");
+		if (e.target.value) {
+			localMoment = this.state.localMoment;
+			localMoment.set('hour', this.props.digestHour);
+			localMoment.set('minute', this.props.digestMinute);
+			this.setState({localMoment: localMoment, isDigestTime: true});
+		}
 	}
 
 });

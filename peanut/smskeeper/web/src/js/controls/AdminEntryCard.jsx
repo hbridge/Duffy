@@ -10,7 +10,7 @@ var Bootstrap = require('react-bootstrap');
   Input = Bootstrap.Input;
   ListGroupItem = Bootstrap.ListGroupItem;
   Well = Bootstrap.Well;
-TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
+var TZDateTimePicker = require('./TimezoneAwareDatePicker.jsx');
 
 
 module.exports = React.createClass({
@@ -45,6 +45,9 @@ module.exports = React.createClass({
 		    				ref="date"
 		    				initialMoment={moment.tz(this.state.model.remind_timestamp, this.props.userTimezone)}
 		    				timezone={this.props.userTimezone}
+		    				isDigestTime={this.state.model.use_digest_time}
+		    				digestHour={this.state.model.creatorDigestHour}
+		    				digestMinute={this.state.model.creatorDigestMinute}
 		    			/>
 		    			<Input ref="recur"
 		    				type='select'
@@ -134,6 +137,11 @@ module.exports = React.createClass({
 			entryChanged = true;
 			changes.remind_timestamp = newMoment.toISOString();
 			changes.remind_to_be_sent = true;
+		}
+
+		if (this.state.model.use_digest_time != this.refs.date.isDigestTime()) {
+			changes.use_digest_time = this.refs.date.isDigestTime();
+			entryChanged = true;
 		}
 
 		// se if recur has changed
