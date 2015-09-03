@@ -2149,3 +2149,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Pants", self.getOutput(mock))
 			self.assertNotIn("And", self.getOutput(mock))
 			self.assertNotIn("Also", self.getOutput(mock))
+
+	def test_add_phrasing(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "Add buy Apple battery")
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEqual(entries.count(), 1)
+		self.assertEqual(entries.last().text, "Buy Apple battery")

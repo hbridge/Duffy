@@ -27,7 +27,8 @@ reminder_re = re.compile(
 	"(can you )?#?remind(er|ers)? (me)?( to | on | at | in | by | about |)?"
 	+ "|^i (need|want|have) to "
 	+ "|^dont (let me )?forget (to )?"
-	+ "|^do my ",
+	+ "|^do my "
+	+ "|^add[: ]",
 	re.I
 )
 
