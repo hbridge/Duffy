@@ -1,6 +1,5 @@
 import json
 import datetime
-import pytz
 import os
 import sys
 import logging
@@ -18,45 +17,53 @@ from common import date_util
 
 logger = logging.getLogger(__name__)
 
-from icalendar import Calendar
-from icalendar import Event
-from icalendar import vCalAddress
-from icalendar import vText
+from django_ical.views import ICalFeed
 from icalendar import vDatetime
 
+from django.shortcuts import get_object_or_404
 
 
 def icsFeed(request, key):
 	keys = ["K" + key, "P" + key]
 	try:
 		user = User.objects.get(key__in=keys)
-		icsText = icsFeedForUser(user)
-		return HttpResponse(icsText, content_type="text/calendar", status=200)
+		return EventFeed(request, user)
 	except User.DoesNotExist:
 		return HttpResponse(json.dumps({"Errors": "User not found"}), content_type="text/json", status=400)
 
 
-def icsFeedForUser(user):
-	cal = Calendar()
-	cal.add('prodid', "-//%s's Keeper Calendar//getkeeper.com//" % user.name)
-	cal.add('version', '2.0')
+class EventFeed(ICalFeed):
+	product_id = "-//Keeper Calendar//getkeeper.com//"
 
-	weekAgo = date_util.now() - datetime.timedelta(days=7)
-	entries = Entry.fetchEntries(user, label="#reminders", hidden=False, orderByString="remind_timestamp")
-	entries = entries.exclude(remind_timestamp__lt=weekAgo)
+	def get_object(self, request, key):
+		keys = ["K" + key, "P" + key]
+		return get_object_or_404(User, key__in=keys)
 
-	entryEvents = []
-	for entry in entries:
-		# if the date is the same, add the entry to the current entry event
-		if len(entryEvents) > 0 and entryEvents[-1].equalToDateTime(entry.remind_timestamp):
-			entryEvents[-1].addEntry(entry)
-		else:
-			entryEvents.append(EntryEvent(entry, user))
+	def items(self, user):
+		weekAgo = date_util.now() - datetime.timedelta(days=7)
+		entries = Entry.fetchEntries(user, label="#reminders", hidden=False, orderByString="remind_timestamp")
+		entries = entries.exclude(remind_timestamp__lt=weekAgo)
 
-	for entryEvent in entryEvents:
-		cal.add_component(entryEvent.asIcsEvent())
+		entryEvents = []
+		for entry in entries:
+			# if the date is the same, add the entry to the current entry event
+			if len(entryEvents) > 0 and entryEvents[-1].equalToDateTime(entry.remind_timestamp):
+				entryEvents[-1].addEntry(entry)
+			else:
+				entryEvents.append(EntryEvent(entry, user))
+		return entryEvents
 
-	return cal.to_ical()
+	def item_title(self, item):
+		return item.title()
+
+	def item_description(self, item):
+		return item.description()
+
+	def item_start_datetime(self, item):
+		return item.start_datetime()
+
+	def item_end_datetime(self, item):
+		return item.end_datetime()
 
 
 class EntryEvent:
@@ -66,6 +73,22 @@ class EntryEvent:
 	def __init__(self, entry, user):
 		self.entries = [entry]
 		self.user = user
+
+	# feed properties
+	def title(self):
+		return ", ".join(map(lambda entry: entry.text, self.entries))
+
+	def description(self):
+		return ""
+
+	def start_datetime(self):
+		return self.entries[0].remind_timestamp.replace(second=0)
+
+	def end_datetime(self):
+		return self.entries[0].remind_timestamp.replace(second=0) + datetime.timedelta(hours=1)
+
+	def get_absolute_url(self):
+		return "/" + self.user.key + "/" + "d".join(map(lambda entry: str(entry.id), self.entries))
 
 	def addEntry(self, entry):
 		if len(self.entries) > 0 and not self.equalToDateTime(entry.remind_timestamp):
@@ -83,26 +106,3 @@ class EntryEvent:
 		otherVDateTime = vDatetime(dt.replace(second=0)).to_ical()
 		print "myVDatetime: %s otherVDateTime: %s" % (myVDatetime, otherVDateTime)
 		return myVDatetime == otherVDateTime
-
-	def asIcsEvent(self):
-		event = Event()
-
-		event.add('summary', ", ".join(map(lambda entry: entry.text, self.entries)))
-
-		event.add('dtstart', self.entries[0].remind_timestamp.replace(second=0))
-		event.add('dtend', self.entries[0].remind_timestamp.replace(second=0) + datetime.timedelta(hours=1))
-		event.add('dtstamp', self.entries[0].added)  # this is not accurate, but shouldn't matter
-
-		# people
-		organizer = vCalAddress('MAILTO:support@getkeeper.com')
-		organizer.params['cn'] = vText('Keeper')
-		organizer.params['role'] = vText('CHAIR')
-		event['organizer'] = organizer
-		event['uid'] = "d".join(map(lambda entry: str(entry.id), self.entries))
-		event.add('priority', 5)
-
-		attendee = vCalAddress('SMS:' + self.user.phone_number)
-		attendee.params['cn'] = vText(self.user.name)
-		attendee.params['ROLE'] = vText('REQ-PARTICIPANT')
-		event.add('attendee', attendee, encode=0)
-		return event
