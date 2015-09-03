@@ -117,7 +117,7 @@ class Chunk:
 						# is before the first one, meaning its the direct object of the sentence, not
 						# the indirect object
 						if subjectDelimiterIndices[0] > idx:
-							handles.append(word)
+							handles.append(word.lower())
 		return handles
 
 	def sharedReminderHandles(self):

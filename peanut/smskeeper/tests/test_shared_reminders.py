@@ -47,7 +47,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		for structure in positiveStructures:
 			for subject in positiveSubjects:
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))
-				self.assertIn(subject.replace("my ", ""), chunk.sharedReminderHandles(), "Handles not found in %s" % (chunk.originalText))
+				self.assertIn(subject.replace("my ", "").lower(), chunk.sharedReminderHandles(), "Handles not found in %s" % (chunk.originalText))
 
 			for subject in negativeSubjects:
 				chunk = Chunk(structure.replace(":SUBJECT:", subject))

@@ -109,6 +109,9 @@ class CreateTodoAction(Action):
 			else:
 				followups.append(keeper_constants.FOLLOWUP_SHARE_RESOLVED)
 			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, contacts))
+		else:
+			# clear out share prompt handles if there are no handles in this one
+			user.setSharePromptHandles(None, None)
 
 		entry = reminder_util.createReminderEntry(
 			user,
