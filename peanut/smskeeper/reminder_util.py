@@ -246,7 +246,7 @@ def sendCompletionResponse(user, entry, followups, keeperNumber):
 		for target in entry.users.all():
 			if target.id != user.id:
 				contact = Contact.fetchByTarget(user, target)
-				handle = contact.handle
+				handle = contact.displayName()
 	else:
 		handle = "you"
 

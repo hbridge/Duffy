@@ -7,7 +7,6 @@ from smskeeper import keeper_constants
 
 defaultPunctuationWhitelist = '-'
 
-RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)
 RELATIONSHIP_SUBJECT_DELIMETERS = re.compile(r'to|on|at|in|by|about', re.I)
 HANDLE_BLACKLIST = re.compile(r'you|remind|me|I|im|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|May|June|July|August|September|October|November|December', re.I)
 
@@ -93,7 +92,7 @@ class Chunk:
 		for idx, word in enumerate(words):
 			if len(word) == 0:
 				continue
-			if (RELATIONSHIP_RE.match(word)
+			if (keeper_constants.RELATIONSHIP_RE.match(word)
 						or (word[0].isupper() and useCapitalizationSignal)
 						or name_util.isCommonName(word)):
 				if idx == 0:

@@ -536,6 +536,12 @@ class Contact(models.Model):
 	target = models.ForeignKey(User, db_index=True, related_name="contact_target")
 	handle = models.CharField(max_length=30, db_index=True)
 
+	def displayName(self):
+		if keeper_constants.RELATIONSHIP_RE.match(self.handle):
+			return "your %s" % self.handle
+		else:
+			return self.handle.title()
+
 	@classmethod
 	def resolveHandles(cls, user, handles):
 		if type(handles) is not list:

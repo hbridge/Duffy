@@ -313,3 +313,14 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 		self.createSharedReminder("Remind Mon Petit Garcon about Medieval Times Sunday at 11am")
 		self.assertTrue(self.getTestUser().paused)
+
+	def test_handle_display(self, dateMock):
+		self.setupUser(dateMock)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.createSharedReminder("Remind mom to test tomorrow")
+			self.assertIn("your mom", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.recipientPhoneNumber = "+16505552222"
+			self.createSharedReminder("Remind susan to test tomorrow")
+			self.assertIn("Susan", self.getOutput(mock))

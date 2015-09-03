@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import re
 
 COMMAND_PICK = 0
 COMMAND_CLEAR = 1
@@ -443,3 +444,5 @@ FOLLOWUP_SHARE_UNRESOLVED = "share-unresolved"
 
 FOLLOWUP_SHARE_RESOLVED_TEXT = ":information_desk_person: Lmk if you want me to txt them directly!"
 FOLLOWUP_SHARE_UNRESOLVED_TEXT = u":information_desk_person: I can also txt them for you -- just send me their phone number."
+
+RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)
