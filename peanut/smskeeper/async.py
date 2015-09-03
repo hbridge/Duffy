@@ -323,19 +323,18 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 # For this user, sweep all the tasks older than age given and return them
 def sweepTasksForUser(user, pendingEntries, age=keeper_constants.SWEEP_CUTOFF_TIME_FOR_OLD_TASKS_IN_DAYS):
 	sweptEntries = []
-	if user.id in [219, 712, 1453, 1502, 1698, 1871, 2050] or '16505555550' in user.phone_number:  # TODO: Remove to release this to more users
-		now = date_util.now(pytz.utc)
+	now = date_util.now(pytz.utc)
 
-		for entry in pendingEntries:
-			if entry.remind_recur == keeper_constants.RECUR_DEFAULT and entry.remind_last_notified and entry.remind_last_notified < now - datetime.timedelta(days=age):
-				entry.state = keeper_constants.REMINDER_STATE_SWEPT
-				entry.last_state_change = now
-				entry.save()
-				logger.info("Sweeping task %s for user %s" % (entry.id, user.id))
-				sweptEntries.append(entry)
+	for entry in pendingEntries:
+		if entry.remind_recur == keeper_constants.RECUR_DEFAULT and entry.remind_last_notified and entry.remind_last_notified < now - datetime.timedelta(days=age):
+			entry.state = keeper_constants.REMINDER_STATE_SWEPT
+			entry.last_state_change = now
+			entry.save()
+			logger.info("Sweeping task %s for user %s" % (entry.id, user.id))
+			sweptEntries.append(entry)
 
-		for entry in sweptEntries:
-			pendingEntries.remove(entry)
+	for entry in sweptEntries:
+		pendingEntries.remove(entry)
 
 	return pendingEntries, sweptEntries
 
