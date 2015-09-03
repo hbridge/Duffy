@@ -21,6 +21,7 @@ from django_ical.views import ICalFeed
 from icalendar import vDatetime
 
 from django.shortcuts import get_object_or_404
+import emoji
 
 
 def icsFeed(request, key):
@@ -34,6 +35,7 @@ def icsFeed(request, key):
 
 class EventFeed(ICalFeed):
 	product_id = "-//Keeper Calendar//getkeeper.com//"
+	title = emoji.emojize("Keeper :raising_hand:", use_aliases=True)
 
 	def get_object(self, request, key):
 		keys = ["K" + key, "P" + key]
