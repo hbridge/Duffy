@@ -101,4 +101,26 @@ for entry, count in sortedList:
     print entry + " " + str(count)
 
 
+# Print out messages that users sent that paused them.
+
+from smskeeper.models import Message
+from smskeeper import keeper_constants
+import json
+
+msgs = Message.objects.filter(auto_classification=keeper_constants.CLASS_UNKNOWN)
+
+for msg in msgs:
+    nextMsgs = Message.objects.filter(user=msg.user).filter(id__gt=msg.id)
+    body = json.loads(msg.msg_json)['Body']
+    print "%s: %s, %s"%(msg.id, msg.added, body)
+    for n in nextMsgs:
+        if n.manual == True or n.incoming == False:
+            break
+        nbody = json.loads(n.msg_json)['Body']
+        print "%s: %s, %s"%(n.id, n.added, nbody)
+    print '\n\n'
+
+
+
+
 
