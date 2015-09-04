@@ -521,6 +521,28 @@ class Message(models.Model):
 		recipient = msgInfo.get("To", None)
 		return sender, recipient
 
+	def activeEntriesSnapshot(self):
+		historicalEntries = Entry.history.filter(history_date__lt=self.added, creator=self.user).order_by('id', '-history_id')
+		lastSeenId = 0
+		result = []
+
+		for historicalEntry in historicalEntries:
+			if historicalEntry.id == lastSeenId:
+				continue
+			else:
+				lastSeenId = historicalEntry.id
+
+			if not historicalEntry.hidden:
+				# we reverse sorted by history_id, so this should be the most recent historical entry before
+				# the message was sent
+				result.append(historicalEntry)
+
+		return result
+
+	def userSnapshot(self):
+		userSnapshot = User.history.filter(history_date__lt=self.added, id=self.user.id).order_by('history_id').last()
+		return userSnapshot
+
 
 class MessageMedia:
 	url = None

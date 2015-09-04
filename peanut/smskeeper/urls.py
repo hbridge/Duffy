@@ -12,6 +12,7 @@ urlpatterns = patterns(
 	url(r'^send_sms', 'smskeeper.views.send_sms'),
 	url(r'^send_media', 'smskeeper.views.send_media'),
 	url(r'^message_feed', 'smskeeper.views.message_feed'),
+	url(r'^classified_messages_feed', 'smskeeper.views.classified_messages_feed'),
 	url(r'^entry_feed', 'smskeeper.views.entry_feed'),
 	url(r'^toggle_paused', 'smskeeper.views.toggle_paused'),
 	url(r'^dashboard_feed', 'smskeeper.views.dashboard_feed'),

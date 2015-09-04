@@ -34,6 +34,7 @@ from smskeeper import analytics, helper_util
 
 from smskeeper.serializers import EntrySerializer
 from smskeeper.serializers import MessageSerializer
+from smskeeper.serializers import ClassifiedMessageSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
@@ -594,6 +595,15 @@ def classified_users(request):
 		classifiedUserIds.append(user.id)
 
 	return HttpResponse(json.dumps({"users": classifiedUserIds}), content_type="text/text", status=200)
+
+
+def classified_messages_feed(request):
+	classified_messages = Message.objects.filter(incoming=True)
+	classified_messages = classified_messages.exclude(classification__isnull=True)
+	classified_messages = classified_messages.exclude(classification__exact='')
+	classified_messages = classified_messages.exclude(classification=keeper_constants.CLASS_NONE)
+	serializer = ClassifiedMessageSerializer(classified_messages, many=True)
+	return HttpResponse(json.dumps(serializer.data, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 
 
 @login_required(login_url='/admin/login/')

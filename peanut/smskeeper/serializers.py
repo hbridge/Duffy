@@ -13,9 +13,37 @@ class EntrySerializer(serializers.ModelSerializer):
 		model = models.Entry
 
 
+class HistoricalEntrySerializer(serializers.ModelSerializer):
+	class Meta:
+		model = models.Entry
+		fields = (
+			'id',
+			'text',
+			'remind_timestamp',
+		)
+
+
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = models.User
+
+
+class HistoricalUserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = models.User
+		fields = (
+			'completed_tutorial',
+			'product_id',
+			'activated',
+			'paused',
+			'state',
+			'last_state',
+			'state_data',
+			'timezone',
+			'postal_code',
+			'signature_num_lines',
+			'added',
+		)
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -31,3 +59,11 @@ class MessageSerializer(serializers.ModelSerializer):
 			'added',
 			'updated'
 		)
+
+
+class ClassifiedMessageSerializer(serializers.ModelSerializer):
+	activeEntriesSnapshot = HistoricalEntrySerializer(many=True)
+	userSnapshot = HistoricalUserSerializer()
+
+	class Meta:
+		model = models.Message
