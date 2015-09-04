@@ -598,7 +598,7 @@ def classified_users(request):
 
 
 def classified_messages_feed(request):
-	classified_messages = Message.objects.filter(incoming=True)
+	classified_messages = Message.objects.filter(incoming=True).order_by('user')
 	classified_messages = classified_messages.exclude(classification__isnull=True)
 	classified_messages = classified_messages.exclude(classification__exact='')
 	classified_messages = classified_messages.exclude(classification=keeper_constants.CLASS_NONE)
