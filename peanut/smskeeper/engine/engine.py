@@ -65,7 +65,7 @@ class Engine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def process(self, user, chunk, overrideClassification=None):
+	def process(self, user, chunk, overrideClassification=None, simulate=False):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None, {}
@@ -100,7 +100,10 @@ class Engine:
 				# Later on we might want to look at the 'processed' return code
 				for action in actions:
 					logger.info("User %s: I think '%s' is a %s command" % (user.id, chunk.originalText, action.ACTION_CLASS))
-					processed = action.execute(chunk, user)
+					if not simulate:
+						processed = action.execute(chunk, user)
+					else:
+						processed = True
 
 					if processed:
 						return True, action.ACTION_CLASS, actionScores
