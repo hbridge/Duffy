@@ -47,7 +47,8 @@ INSTALLED_APPS = (
     'storages',
     'djcelery',
     'async',
-    'django_inbound_email'
+    'django_inbound_email',
+    'simple_history'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -60,6 +61,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
     # 'snippetscream.ProfileMiddleware', # not compatible with Django 1.7
 )
 

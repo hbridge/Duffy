@@ -13,9 +13,11 @@ from smskeeper import keeper_constants
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+from simple_history.models import HistoricalRecords
 
 
 class User(models.Model):
+	history = HistoricalRecords()
 	phone_number = models.CharField(max_length=100, unique=True)
 	name = models.CharField(max_length=100, blank=True)
 	completed_tutorial = models.BooleanField(default=False)
@@ -78,9 +80,6 @@ class User(models.Model):
 	create_todo_count = models.IntegerField(default=0)
 
 	overrideKeeperNumber = None
-
-	def history(self):
-		return format_html("<a href='/smskeeper/history?user_id=%s'>History</a>" % self.id)
 
 	def print_last_message_date(self, incoming=True):
 		lastMsg = Message.objects.filter(user=self, incoming=incoming).order_by("-added")[:1]
@@ -341,6 +340,7 @@ class NoteEntry(models.Model):
 
 
 class Entry(models.Model):
+	history = HistoricalRecords()
 	creator = models.ForeignKey(User, related_name="creator")
 
 	# creator will be in this list
