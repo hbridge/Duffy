@@ -217,7 +217,9 @@ def isEligibleForTip(user):
 	localHour = localdt.hour
 	# print "now: %s usernow: %s usertz: %s sendhour: %d" % (now, localdt, user.getTimezone(), SMSKEEPER_TIP_HOUR)
 	if localHour != SMSKEEPER_TIP_HOUR:
-		return
+		return False
+	if localdt.isoweekday() > 4:
+		return False
 
 	# only send tips if the user has been active or last tip was sent > their preference for days
 	tip_frequency_seconds = (user.tip_frequency_days * 24 * 60 * 60) - (60 * 60)  # - is a fudge factor of an hour

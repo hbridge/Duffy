@@ -133,6 +133,7 @@ class SMSKeeperTipsCase(test_base.SMSKeeperBaseCase):
 	def testTipsSkipIneligibleUsers(self, dateMock):
 		# unactivated users don't get tips
 		self.setupUser(True, False, "UTC", dateMock)
+		self.setNow(dateMock, self.MON_9AM)
 		# send a tip
 		self.setMockDatetimeToSendTip(dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
