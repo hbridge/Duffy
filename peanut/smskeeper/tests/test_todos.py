@@ -232,6 +232,45 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.digest_state, keeper_constants.DIGEST_STATE_LIMITED)
 
+	def test_digest_state_never_stops_all_digests(self, dateMock):
+		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.digest_state = keeper_constants.DIGEST_STATE_NEVER
+		user.save()
+
+		self.setNow(dateMock, self.MON_8AM)
+
+		# Add a message and make it look like it was sent at the right time
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop")
+		message = Message.objects.get(id=1)
+		message.added = self.MON_8AM
+		message.save()
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIs(0, len(self.getOutput(mock)))
+
+		# 5 days later
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
+
+		# Make sure the change time tip comes through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIs(0, len(self.getOutput(mock)))
+
+		# 7 days later from original
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIs(0, len(self.getOutput(mock)))
+
+		# Make sure a response doesn't kick off anything
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			self.assertIs(0, len(self.getOutput(mock)))
+
 	# Had bug where we weren't catching survey numbers when there were no tasks
 	def test_digest_survey_tip_no_tasks(self, dateMock):
 		self.setupUser(dateMock)

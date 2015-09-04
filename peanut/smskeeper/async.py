@@ -406,6 +406,9 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		if not user.completed_tutorial:
 			continue
 
+		if user.digest_state == keeper_constants.DIGEST_STATE_NEVER:
+			continue
+
 		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
 		if len(pendingEntries) > 0:

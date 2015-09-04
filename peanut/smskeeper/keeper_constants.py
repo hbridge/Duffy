@@ -237,6 +237,7 @@ def isTestKeeperNumber(keeperNumber):
 
 DIGEST_STATE_DEFAULT = "default"
 DIGEST_STATE_LIMITED = "limited"
+DIGEST_STATE_NEVER = "never"
 
 REMINDER_DIGEST_HEADERS = [
 	u":sunrise: G'morning sunshine",
