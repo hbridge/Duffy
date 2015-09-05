@@ -522,8 +522,11 @@ class Message(models.Model):
 		return sender, recipient
 
 	def activeEntriesSnapshot(self):
+		dateFilter = self.added
+		if not dateFilter:
+			dateFilter = self.updated
 		try:
-			historicalEntries = Entry.history.filter(history_date__lt=self.added, creator=self.user).order_by('id', '-history_id')
+			historicalEntries = Entry.history.filter(history_date__lt=dateFilter, creator=self.user).order_by('id', '-history_id')
 		except:
 			logger.error("Historical entries filter for message %d raised error", self.id)
 			historicalEntries = []
@@ -544,7 +547,14 @@ class Message(models.Model):
 		return result
 
 	def userSnapshot(self):
-		userSnapshot = User.history.filter(history_date__lt=self.added, id=self.user.id).order_by('history_id').last()
+		dateFilter = self.added
+		if not dateFilter:
+			dateFilter = self.updated
+		try:
+			userSnapshot = User.history.filter(history_date__lt=dateFilter, id=self.user.id).order_by('history_id').last()
+		except:
+			logger.error("Historical user filter for message %d raised error", self.id)
+			return None
 		return userSnapshot
 
 
