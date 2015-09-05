@@ -131,9 +131,76 @@ var ReviewList = Backbone.Collection.extend({
   },
 });
 
+var SimResult = Backbone.Model.extend({
+  urlRoot: function() {
+    return "/smskeeper/simulation_result/";
+  },
+});
+
+function SimulationRun (simResults) {
+    this.simResults = simResults;
+}
+
+SimulationRun.prototype.sim_id = function() {
+  return this.simResults[0].get('sim_id');
+};
+
+var SimResultList = Backbone.Collection.extend({
+  model: SimResult,
+  url: "/smskeeper/simulation_result/",
+
+  simulationRuns(){
+    var resultsById = {};
+    this.forEach(function(simResult){
+      simId = simResult.get("sim_id");
+      resultsForId = resultsById[simId];
+      if (!resultsForId) {
+        resultsForId = []
+      }
+      resultsForId.push(simResult);
+      resultsById[simId] = resultsForId;
+    });
+
+    var simRuns = [];
+    for (key of Object.keys(resultsById)) {
+      console.log("Creating sim run for %s with %d objs", key, resultsById[key].length);
+      simRun = new SimulationRun(resultsById[key]);
+      simRuns.push(simRun);
+    }
+    return simRuns;
+  },
+
+  uniqueSimIds() {
+    var results = {}
+    this.forEach(function(simResult){
+      simId = simResult.get("sim_id");
+      results[simId] = true;
+    });
+    console.log("uniqueSimIds", results)
+    console.log("uniqueSimIds keys", Object.keys(results))
+    return Object.keys(results);
+  },
+
+  accurateClassifications(simId) {
+    return this.filter(function(simResult){
+      if (simResult.get('sim_id') != simId) return false;
+      return (simResult.get('sim_classification') == simResult.get('correctClassification'));
+    });
+  },
+
+  inaccurateClassifications(simId) {
+    return this.filter(function(simResult){
+      return (simResult.get('sim_classification') != simResult.get('correctClassification'));
+    });
+  },
+
+});
+
 exports.HistoryStore = HistoryStore;
 exports.Message = Message;
 exports.MessageList = MessageList;
 exports.EntryList = EntryList;
 exports.Entry = Entry;
 exports.ReviewList = ReviewList;
+exports.SimResult = SimResult;
+exports.SimResultList = SimResultList;

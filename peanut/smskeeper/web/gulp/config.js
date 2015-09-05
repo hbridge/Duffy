@@ -68,6 +68,12 @@ module.exports = {
       outputName: 'review_bundle.js',
       // list of externally available modules to exclude from the bundle
       // external: ['jquery', 'underscore']
+    }, {
+      entries: srcjs + '/simulation_dash.jsx',
+      dest: dest,
+      outputName: 'simulation_dash_bundle.js',
+      // list of externally available modules to exclude from the bundle
+      // external: ['jquery', 'underscore']
     }]
   },
   production: {

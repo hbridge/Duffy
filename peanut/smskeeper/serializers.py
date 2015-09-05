@@ -75,6 +75,10 @@ class ClassifiedMessageSerializer(serializers.ModelSerializer):
 
 
 class SimulationResultSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+	correctClassification = serializers.CharField(source='message.classification', read_only=True)
+	autoClassification = serializers.CharField(source='message.auto_classification', read_only=True)
+	body = serializers.CharField(source='message.getBody', read_only=True)
+
 	class Meta:
 		model = models.SimulationResult
 		list_serializer_class = BulkListSerializer

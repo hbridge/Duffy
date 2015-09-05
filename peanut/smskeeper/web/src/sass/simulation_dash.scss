@@ -1,0 +1,9 @@
+@import "_common";
+
+a {
+	cursor: auto;
+
+	&.userText {
+		color: black;
+	}
+}

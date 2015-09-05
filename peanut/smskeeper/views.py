@@ -624,6 +624,14 @@ class SimulationResultList(ListBulkCreateUpdateDestroyAPIView):
 			pass
 		serializer.save(sim_id=maxSimId + 1)
 
+@login_required(login_url='/admin/login/')
+def simulation_dash(request):
+	return renderReact(
+		request,
+		'simulation_dash',
+		'simulation_dash.html',
+		requiresUser=False,
+	)
 
 @login_required(login_url='/admin/login/')
 def approved_todos(request):
