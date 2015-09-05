@@ -85,13 +85,15 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 			logger.info("Processing message: %s", message)
 			self.message_count += 1
 			userId = message["user"]
+			userPhone = self.phoneNumberForUserId(userId)
 			try:
-				user = User.objects.get(id=userId)
+				user = User.objects.get(phone_number=userPhone)
 			except:
-				phone_number = self.phoneNumberForUserId(userId)
-				logger.info("Creating user %d with phone_number %s", userId, phone_number)
-				user = User.objects.create(phone_number=phone_number)
+				logger.info("Creating user %d with phone_number %s", userId, userPhone)
+				user = User.objects.create(phone_number=userPhone)
+				user.save()
 			self.setUserProps(user, message.get("userSnapshot"))
+			self.setNow(dateMock, date_util.fromIsoString(message["added"]))
 			# TODO set entries
 			# TODO set recent outgoing message classes
 			self.scoreMessage(user, message)

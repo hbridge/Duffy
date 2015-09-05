@@ -1,5 +1,6 @@
 import pytz
 import datetime
+import dateutil.parser
 
 
 # Returns seconds since epoch
@@ -15,3 +16,6 @@ def now(tz=pytz.utc):
 
 def utcnow():
 	return datetime.datetime.now(pytz.utc)
+
+def fromIsoString(string):
+	return dateutil.parser.parse(string)
