@@ -626,6 +626,7 @@ class Contact(models.Model):
 		self.handle = self.handle.lower()  # ensure all handles are lowercase
 		super(Contact, self).save(*args, **kw)
 
+
 class ZipData(models.Model):
 	city = models.CharField(max_length=100)
 	state = models.CharField(max_length=100)
@@ -642,3 +643,12 @@ class VerbData(models.Model):
 	past_participle = models.CharField(max_length=40, db_index=True)
 	s_es_ies = models.CharField(max_length=40)
 	ing = models.CharField(max_length=40)
+
+
+class SimulationResult(models.Model):
+	message = models.ForeignKey(Message, db_index=True)
+	sim_id = models.IntegerField(null=True, blank=True)
+	git_revision = models.CharField(max_length=7, db_index=True)
+	sim_classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
+	sim_classification_scores_json = models.CharField(max_length=1000, null=True, blank=True)
+	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)

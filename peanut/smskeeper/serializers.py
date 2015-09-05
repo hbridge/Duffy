@@ -1,5 +1,9 @@
 from rest_framework import serializers
 from smskeeper import models
+from rest_framework_bulk import (
+    BulkListSerializer,
+    BulkSerializerMixin,
+)
 
 
 class EntrySerializer(serializers.ModelSerializer):
@@ -68,3 +72,9 @@ class ClassifiedMessageSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = models.Message
+
+
+class SimulationResultSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+	class Meta:
+		model = models.SimulationResult
+		list_serializer_class = BulkListSerializer

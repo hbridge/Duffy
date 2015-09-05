@@ -23,11 +23,19 @@ from smskeeper.chunk import Chunk
 
 from django.conf import settings
 
+from smskeeper.serializers import SimulationResultSerializer
+from django.core.serializers.json import DjangoJSONEncoder
+
+import subprocess
+GIT_REVISION = subprocess.check_output(["git", "describe", "--always"]).replace("\n", "")
+
 
 # don't do users with UID < 1000, they have hash tags etc in their transcripts
 MIN_USER_ID = 1000
 
-CLASSIFIED_MESSAGES_URL = "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed"
+#CLASSIFIED_MESSAGES_URL = "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed"
+CLASSIFIED_MESSAGES_URL = "http://localhost:7500/smskeeper/classified_messages_feed/"
+POST_RESULTS_URL = "http://localhost:7500/smskeeper/simulation_result/"
 
 class MyLogger:
 	filePath = None
@@ -98,7 +106,8 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 			# TODO set recent outgoing message classes
 			self.scoreMessage(user, message)
 
-		self.printMisclassifictions()
+		self.uploadClassificationResults()
+		# self.printMisclassifictions()
 
 		summaryLogger.finalize()
 		logger.finalize()
@@ -125,6 +134,7 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 
 		# set the correct classification for the message objct
 		message["simulated_classification"] = classification
+		message["simulated_scores"] = actionScores
 		logger.info("Scored message %s", message)
 		self.classified_messages.append(message)
 
@@ -146,6 +156,23 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 			logger.info("\n%s: %d messages missed:\n" % (key, len(message_list)))
 			for message in message_list:
 				logger.info("- %s (%s)" % (message["Body"], message["uid"]))
+
+	def uploadClassificationResults(self):
+		# create the dicts
+		result = []
+		for message in self.classified_messages:
+			simResult = {}
+			simResult["message"] = message["id"]
+			simResult["git_revision"] = GIT_REVISION
+			simResult["sim_classification"] = message["simulated_classification"]
+			simResult["sim_classification_scores_json"] = json.dumps(message["simulated_scores"])
+			result.append(simResult)
+
+		logger.info("Uploading results: %s", json.dumps(result, cls=DjangoJSONEncoder))
+		req = urllib2.Request(POST_RESULTS_URL)
+		req.add_header('Content-Type', 'application/json')
+		response = urllib2.urlopen(req, json.dumps(result, cls=DjangoJSONEncoder))
+		logger.info("Upload response: %s", response)
 
 	def printMisclassifictions(self):
 		summaryText("\n\n******* Accuracy *******")

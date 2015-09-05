@@ -23,6 +23,7 @@ urlpatterns = patterns(
 	url(r'^entry/(?P<pk>[0-9]+)/$', views.EntryDetail.as_view()),
 	url(r'^review_feed/$', views.ReviewFeed.as_view()),
 	url(r'^message/(?P<pk>[0-9]+)/$', views.MessageDetail.as_view()),
+	url(r'^simulation_result/$', views.SimulationResultList.as_view()),
 	url(r'^message_classification[.]csv$', 'smskeeper.views.message_classification_csv'),
 	url(r'^classified_users$', 'smskeeper.views.classified_users'),
 	url(r'^approved_todos$', 'smskeeper.views.approved_todos'),

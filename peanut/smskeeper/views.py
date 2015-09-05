@@ -27,7 +27,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SendMediaForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
-from smskeeper.models import User, Entry, Message
+from smskeeper.models import User, Entry, Message, SimulationResult
 from smskeeper import admin
 
 from smskeeper import analytics, helper_util
@@ -35,11 +35,14 @@ from smskeeper import analytics, helper_util
 from smskeeper.serializers import EntrySerializer
 from smskeeper.serializers import MessageSerializer
 from smskeeper.serializers import ClassifiedMessageSerializer
+from smskeeper.serializers import SimulationResultSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
 
 from common.api_util import DuffyJsonEncoder
+
+from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
 logger = logging.getLogger(__name__)
 
@@ -604,6 +607,22 @@ def classified_messages_feed(request):
 	classified_messages = classified_messages.exclude(classification=keeper_constants.CLASS_NONE)
 	serializer = ClassifiedMessageSerializer(classified_messages, many=True)
 	return HttpResponse(json.dumps(serializer.data, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+
+
+class SimulationResultList(ListBulkCreateUpdateDestroyAPIView):
+	# set authentication to basic and allow any to disable CSRF protection
+	authentication_classes = (authentication.BasicAuthentication,)
+	permission_classes = (permissions.AllowAny,)
+	queryset = SimulationResult.objects.all()
+	serializer_class = SimulationResultSerializer
+
+	def perform_create(self, serializer):
+		maxSimId = 0
+		try:
+			maxSimId = SimulationResult.objects.all().order_by('sim_id').last().sim_id
+		except:
+			pass
+		serializer.save(sim_id=maxSimId + 1)
 
 
 @login_required(login_url='/admin/login/')
