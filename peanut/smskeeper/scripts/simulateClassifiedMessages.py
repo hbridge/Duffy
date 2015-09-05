@@ -74,7 +74,7 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 
 		logger.info("Getting classified messages...")
 		try:
-			response = urllib2.urlopen(CLASSIFIED_MESSAGES_URL.read()
+			response = urllib2.urlopen(CLASSIFIED_MESSAGES_URL).read()
 		except URLError as e:
 			logger.info("Could not connect to prod server: %@" % (e))
 			response = {"users": []}
