@@ -522,7 +522,11 @@ class Message(models.Model):
 		return sender, recipient
 
 	def activeEntriesSnapshot(self):
-		historicalEntries = Entry.history.filter(history_date__lt=self.added, creator=self.user).order_by('id', '-history_id')
+		try:
+			historicalEntries = Entry.history.filter(history_date__lt=self.added, creator=self.user).order_by('id', '-history_id')
+		except:
+			logger.error("Historical entries filter for message %d raised error", self.id)
+			historicalEntries = []
 		lastSeenId = 0
 		result = []
 

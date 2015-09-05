@@ -27,10 +27,7 @@ from django.conf import settings
 # don't do users with UID < 1000, they have hash tags etc in their transcripts
 MIN_USER_ID = 1000
 
-LOCAL_WEB_PORT = "80"
-if settings.LOCAL:
-	LOCAL_WEB_PORT = "7500"
-
+CLASSIFIED_MESSAGES_URL = "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed"
 
 class MyLogger:
 	filePath = None
@@ -77,7 +74,7 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 
 		logger.info("Getting classified messages...")
 		try:
-			response = urllib2.urlopen("http://localhost:%s/smskeeper/classified_messages_feed" % LOCAL_WEB_PORT).read()
+			response = urllib2.urlopen(CLASSIFIED_MESSAGES_URL.read()
 		except URLError as e:
 			logger.info("Could not connect to prod server: %@" % (e))
 			response = {"users": []}
