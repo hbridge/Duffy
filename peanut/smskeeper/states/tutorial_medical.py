@@ -81,7 +81,7 @@ def process(user, msg, requestDict, keeperNumber):
 		postalCode = msg_util.getPostalCode(msg)
 
 		if postalCode:
-			timezone, wxcode = msg_util.dataForPostalCode(postalCode)
+			timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
@@ -90,6 +90,7 @@ def process(user, msg, requestDict, keeperNumber):
 				user.postal_code = postalCode
 				user.timezone = timezone
 				user.wxcode = wxcode
+				user.temp_format = tempFormat
 		else:
 			logger.debug("postalCodes were none for: %s" % msg)
 			lastMessageOut = Message.objects.filter(user=user, incoming=False).order_by("added").last()

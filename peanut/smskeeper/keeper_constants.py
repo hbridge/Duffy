@@ -401,6 +401,9 @@ OUTGOING_JOKE = "joke"
 OUTGOING_CHANGE_DIGEST_TIME = "change-digest-time"
 OUTGOING_SHARE_PROMPT = "outgoing-share-prompt"
 
+TEMP_FORMAT_METRIC = 'metric'
+TEMP_FORMAT_IMPERIAL = 'imperial'
+
 RECUR_DEFAULT = "default"
 RECUR_ONE_TIME = "one-time"
 RECUR_WEEKLY = "weekly"

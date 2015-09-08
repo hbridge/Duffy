@@ -5,6 +5,8 @@ import logging
 
 from common import date_util
 
+from smskeeper import keeper_constants
+
 logger = logging.getLogger(__name__)
 
 weatherCodes = {
@@ -61,11 +63,11 @@ weatherCodes = {
 
 
 def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
-	if wxcode in weatherDataCache:
+	if wxcode in weatherDataCache and user.temp_format in weatherDataCache[wxcode]:
 		data = weatherDataCache[wxcode]
 	else:
 		try:
-			data = getWeatherForWxCode(wxcode)
+			data = getWeatherForWxCode(wxcode, user.temp_format)
 			weatherDataCache[wxcode] = data
 		except Exception, e:
 			logger.error("User %s: Got exception %s when fetching weather for %s" % (user.id, e, wxcode))
@@ -90,7 +92,7 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 				return "Sorry, I don't know the weather for that day"
 
 			tempFormatStr = ""
-			if user.temp_format == "metric":
+			if user.temp_format == keeper_constants.TEMP_FORMAT_METRIC:
 				tempFormatStr = u"°C"
 
 			return "%s's forecast: %s %s | High %s%s and low %s%s" % (dayTerm, dataForUser["forecasts"][dayIndex]["text"], weatherCodes[dataForUser["forecasts"][dayIndex]["code"]], dataForUser["forecasts"][dayIndex]["high"], tempFormatStr, dataForUser["forecasts"][dayIndex]["low"], tempFormatStr)
@@ -102,5 +104,5 @@ def getWeatherPhraseForZip(user, wxcode, utcDate, weatherDataCache):
 		return None
 
 
-def getWeatherForWxCode(wxcode):
-	return {"imperial": pywapi.get_weather_from_yahoo(wxcode, "imperial"), "metric": pywapi.get_weather_from_yahoo(wxcode, "metric")}
+def getWeatherForWxCode(wxcode, tempFormat):
+	return {tempFormat: pywapi.get_weather_from_yahoo(wxcode, tempFormat)}

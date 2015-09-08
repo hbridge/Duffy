@@ -108,9 +108,10 @@ class ChangeSettingAction(Action):
 			return True
 
 		user.postal_code = postalCode
-		timezone, wxcode = msg_util.dataForPostalCode(postalCode)
+		timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
 		user.timezone = timezone
 		user.wxcode = wxcode
+		user.temp_format = tempFormat
 		user.save()
 		sms_util.sendMsg(user, helper_util.randomAcknowledgement())
 

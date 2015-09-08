@@ -73,8 +73,8 @@ class User(models.Model):
 	last_share_upsell = models.DateTimeField(null=True, blank=True)
 	last_feedback_prompt = models.DateTimeField(null=True, blank=True)
 
-	TEMP_FORMAT_CHOICES = [(x, x) for x in ["imperial", "metric"]]
-	temp_format = models.CharField(max_length=10, default="imperial", choices=TEMP_FORMAT_CHOICES)
+	TEMP_FORMAT_CHOICES = [(x, x) for x in [keeper_constants.TEMP_FORMAT_IMPERIAL, keeper_constants.TEMP_FORMAT_METRIC]]
+	temp_format = models.CharField(max_length=10, default=keeper_constants.TEMP_FORMAT_IMPERIAL, choices=TEMP_FORMAT_CHOICES)
 
 	done_count = models.IntegerField(default=0)
 	create_todo_count = models.IntegerField(default=0)
@@ -635,8 +635,8 @@ class ZipData(models.Model):
 	area_code = models.CharField(max_length=10, db_index=True)
 	timezone = models.CharField(max_length=30)
 	wxcode = models.CharField(max_length=10, null=True)
-	TEMP_FORMAT_CHOICES = [(x, x) for x in ["imperial", "metric"]]
-	temp_format = models.CharField(max_length=10, default="metric", choices=TEMP_FORMAT_CHOICES)
+	TEMP_FORMAT_CHOICES = [(x, x) for x in [keeper_constants.TEMP_FORMAT_IMPERIAL, keeper_constants.TEMP_FORMAT_METRIC]]
+	temp_format = models.CharField(max_length=10, default=keeper_constants.TEMP_FORMAT_METRIC, choices=TEMP_FORMAT_CHOICES)
 
 
 class VerbData(models.Model):
