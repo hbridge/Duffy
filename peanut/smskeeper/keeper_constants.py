@@ -443,7 +443,7 @@ FOLLOWUP_TIME_TEXT = "If there's a better time, just tell me."
 FOLLOWUP_SHARE_RESOLVED = "share-resolved"
 FOLLOWUP_SHARE_UNRESOLVED = "share-unresolved"
 
-FOLLOWUP_SHARE_RESOLVED_TEXT = ":information_desk_person: Lmk if you want me to txt them directly!"
+FOLLOWUP_SHARE_RESOLVED_TEXT = ":information_desk_person: I'll also remind them directly!"
 FOLLOWUP_SHARE_UNRESOLVED_TEXT = u":information_desk_person: I can also txt them for you -- just send me their phone number."
 
 RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)

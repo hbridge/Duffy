@@ -267,7 +267,6 @@ def sendCompletionResponse(user, entry, followups, keeperNumber):
 			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
 		elif keeper_constants.FOLLOWUP_SHARE_RESOLVED in followups:
 			toSend = toSend + "\n" + keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT
-			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
 
 	sms_util.sendMsg(user, toSend, None, keeperNumber, classification=responseClassification)
 

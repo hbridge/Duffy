@@ -116,7 +116,6 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to call me in a week")
 			self.assertNotIn(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))
 			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
-			cliMsg.msg(self.testPhoneNumber, "Text mom")
 
 		# Make sure both entries were shared
 		entries = Entry.objects.filter(label="#reminders")
@@ -280,20 +279,6 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 		cliMsg.msg(self.testPhoneNumber, "Remind Steve to test")
 		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT))
-
-	def test_overagressive_share(self, dateMock):
-		self.setupUser(dateMock)
-		sharedEntry = self.createSharedReminder()
-		cliMsg.msg(self.testPhoneNumber, "Remind mom to test")
-		cliMsg.msg(self.testPhoneNumber, "Remind me to jump out a window this evening")
-		cliMsg.msg(self.testPhoneNumber, "Remind me to eat grass")
-
-		entries = Entry.objects.filter(label="#reminders")
-		for entry in entries:
-			if entry == sharedEntry:
-				continue
-
-			self.assertEqual(entry.users.count(), 1, "Entry erroneously shared: %s" % entry)
 
 	def test_handle_cap_difference(self, dateMock):
 		self.setupUser(dateMock)

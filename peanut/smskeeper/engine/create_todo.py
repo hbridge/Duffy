@@ -94,21 +94,23 @@ class CreateTodoAction(Action):
 				recurFrequency = frequency
 				break
 
-		# Figure out if we should offer to should offer to share the reminder
+		# Figure out if there are resolved/unresolved handles
 		shareHandles = None
 		unresolvedHandles = None
+		shareContacts = None
 		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
 			shareHandles = chunk.sharedReminderHandles()
 			if len(shareHandles) > 1:
 				user_util.setPaused(user, True, user.getKeeperNumber(), "Multiple handles in share command")
 				return True
-			contacts, unresolvedHandles = Contact.resolveHandles(user, shareHandles)
-			logger.info("User %d: handles in create_todo %d resolved %d unresolved", user.id, len(contacts), len(unresolvedHandles))
+			shareContacts, unresolvedHandles = Contact.resolveHandles(user, shareHandles)
+			logger.info("User %d: handles in create_todo %d resolved %d unresolved", user.id, len(shareContacts), len(unresolvedHandles))
 			if len(unresolvedHandles) > 0:
+				# we have unresolved handles, set the followup
 				followups.append(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED)
 			else:
 				followups.append(keeper_constants.FOLLOWUP_SHARE_RESOLVED)
-			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, contacts))
+			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, shareContacts))
 		else:
 			# clear out share prompt handles if there are no handles in this one
 			user.setSharePromptHandles(None, None)
@@ -123,6 +125,10 @@ class CreateTodoAction(Action):
 		)
 		# We set this so it knows what entry was created
 		user.setStateData(keeper_constants.LAST_ENTRIES_IDS_KEY, [entry.id])
+
+		# if there were resolved handles, we share directly with the user
+		if shareContacts and len(shareContacts) > 0:
+			reminder_util.shareReminders(user, [entry], [shareContacts[0].handle], keeperNumber)
 
 		if not user.isTutorialComplete() and not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT:
 			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
