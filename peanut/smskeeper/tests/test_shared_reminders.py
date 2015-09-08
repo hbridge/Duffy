@@ -139,9 +139,16 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		entry = self.createSharedReminder()
-		# Make sure entries were created correctly
 		self.assertNotIn("mom", entry.text.lower())
 		self.assertNotIn("to", entry.text.lower())
+
+		# make sure we don't warp my -> your
+		entry = self.createSharedReminder("Remind mom to bring my phone tomorrow")
+		self.assertEqual("bring my phone", entry.text.lower())
+
+		# make sure we don't warp my -> your
+		entry = self.createSharedReminder("Text mom I love you in 5 minutes")
+		self.assertEqual("i love you", entry.text.lower())
 
 	def test_bad_capitalization(self, dateMock):
 		self.setupUser(dateMock)

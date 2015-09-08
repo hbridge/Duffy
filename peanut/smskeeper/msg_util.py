@@ -35,6 +35,7 @@ reminder_re = re.compile(
 # this is junk that sometimes get left in reminders and should be removed
 reminder_cleanup_re = re.compile(r'every ?$|of ?$', re.I)
 reminder_prefix_cleanup_re = re.compile(r'^(to|and|also)', re.I)
+shared_reminder_cleanup_re = re.compile(r'^(text)', re.I)
 
 # We have 2 name phrases, because in tutorial we want to support "I'm bob" but not normally...due to "I'm lonely"
 tutorial_name_re = re.compile("(my name('s| is|s)|i('| a)m) (?P<name>[a-zA-Z\s]+)", re.I)
@@ -289,16 +290,18 @@ def startsWithNo(msg):
 
 # Returns a string which doesn't have the "remind me" phrase in it
 def cleanedReminder(msg, recurrence=None, shareHandles=None):
+	logger.info("cleaning %s", msg)
 	cleaned = msg
+	regexesToRemove = [reminder_re]
 
 	# remove shared handles
+	regexesToRemove.append(shared_reminder_cleanup_re)
 	if shareHandles:
 		for handle in shareHandles:
 			cleaned = re.sub(handle, "", cleaned, flags=re.I)
 			cleaned = cleaned.strip()
 
 	# remove timing info etc
-	regexesToRemove = [reminder_re]
 	if recurrence and recurrence is not keeper_constants.RECUR_ONE_TIME:
 		# recur one-time doesn't have timing text that triggers it
 		regexesToRemove.append(re.compile(keeper_constants.RECUR_REGEXES[recurrence], re.I))

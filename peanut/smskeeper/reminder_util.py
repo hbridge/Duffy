@@ -361,9 +361,10 @@ def shareReminders(user, entries, handles, keeperNumber):
 			# add the target user to the entry and send them a message
 			sharedHandles.append(handle)
 			for entry in entries:
+				logger.info("sharing entry with text: %s orig_text: %s", entry.text, entry.orig_text)
 				entry.users.add(contact.target)
 				entry.remind_recur = keeper_constants.RECUR_ONE_TIME
-				entry.text = msg_util.cleanedReminder(entry.text, shareHandles=handles)
+				entry.text = getSharedEntryText(entry, user, handles)
 				entry.save()
 
 			shareText = None
@@ -409,6 +410,12 @@ def shareReminders(user, entries, handles, keeperNumber):
 
 	return sharedHandles, notFoundHandles
 
+
+def getSharedEntryText(entry, user, handles):
+	originalText = json.loads(entry.orig_text)[-1]
+	nattyResult = natty_util.getNattyResult(originalText, user)
+	text = nattyResult.queryWithoutTiming if nattyResult else originalText
+	return msg_util.cleanedReminder(text, recurrence=None, shareHandles=handles)
 
 """
 Temp remove due to pausing shared reminders
