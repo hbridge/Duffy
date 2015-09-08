@@ -423,7 +423,7 @@ class Entry(models.Model):
 		for otherUser in otherUsers:
 			contact = Contact.fetchByTarget(user, otherUser)
 			if contact:
-				otherUserNames.append(contact.handle)
+				otherUserNames.append(contact.displayName())
 			elif otherUser.name:
 				otherUserNames.append(otherUser.name)
 
