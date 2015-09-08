@@ -413,7 +413,7 @@ RECUR_EVERY_2_DAYS = "every-2-days"
 RECUR_MONTHLY = "monthly"
 
 RECUR_REGEXES = {
-	RECUR_DAILY: r'(every|each) (day|morning|evening|afternoon)|everyday',
+	RECUR_DAILY: r'(every|each) (day|morning|evening|afternoon)|everyday|daily',
 	RECUR_WEEKDAYS: r'(every|each) weekday|m[-]f|monday[-]friday|mon[-]fri',
 	RECUR_WEEKLY: r'(every|each) (week|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|weekly',
 	RECUR_MONTHLY: r'(every|each) month|once a month|monthly'

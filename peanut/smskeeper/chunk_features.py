@@ -1,7 +1,8 @@
-from smskeeper import msg_util, entry_util
+from smskeeper import entry_util
 import phonenumbers
 from smskeeper import keeper_constants
 from smskeeper import msg_util
+import collections
 
 
 class ChunkFeatures:
@@ -88,13 +89,13 @@ class ChunkFeatures:
 		if self.chunk.endsWith("\?", punctuationWhitelist="?"):
 			isQuestion = True
 
-		if self.chunk.matches(r'what|where|when|how|why|who|which'):
+		if self.chunk.matches(r'(what(s)?|where|when|how|why|who(s)?|whose|which|should|would|is|are)\b'):
 			isQuestion = True
 
 		return isQuestion
 
 	def isBroadQuestion(self):
-		return self.chunk.matches(r'where\b|how\b|why\b|who\b')
+		return self.chunk.matches(r'(where|how|why|who|should|would)\b')
 
 	def hasFetchDigestWords(self):
 		return self.chunk.contains(r'tasks|todo|reminders|list')
@@ -110,3 +111,25 @@ class ChunkFeatures:
 
 	def containsDeleteWord(self):
 		return self.chunk.contains(r'delete|clear|remove')
+
+	def recurScores(self):
+		results = {}
+		for frequency in keeper_constants.RECUR_REGEXES.keys():
+			if self.chunk.contains(keeper_constants.RECUR_REGEXES[frequency]):
+				if frequency == keeper_constants.RECUR_WEEKDAYS:
+					# we want weekday to win out over weekly, and weekly's RE is more general
+					results[frequency] = 0.9
+				else:
+					results[frequency] = 0.8
+			else:
+				results[frequency] = 0.0
+
+		return collections.OrderedDict(
+			sorted(results.items(), key=lambda t: t[1], reverse=True)
+		)
+
+	def containsTipWord(self):
+		return self.chunk.contains(r'tip')
+
+	def containsNegativeWord(self):
+		return self.chunk.contains(r'(no|dont|not|never|stop)')

@@ -6,7 +6,6 @@ from common import date_util
 from smskeeper import reminder_util, sms_util, msg_util
 from smskeeper import keeper_constants, chunk_features
 from .action import Action
-import collections
 from smskeeper.models import Contact
 from smskeeper import user_util
 from smskeeper import actions
@@ -55,10 +54,8 @@ class CreateTodoAction(Action):
 			score += 0.3  # for "and socks" lists of stuff
 
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
-		recurScores = collections.OrderedDict(
-			sorted(self.getRecurScores(chunk).items(), key=lambda t: t[1], reverse=True)
-		)
-		for frequency in recurScores.keys():
+		recurScores = chunkFeatures.recurScores()
+		for frequency in recurScores:
 			if recurScores[frequency] >= 0.5:
 				score = recurScores[frequency]
 
@@ -68,9 +65,13 @@ class CreateTodoAction(Action):
 		if score < 0.9 and beginsWithReminderWord:
 			score += 0.1
 
+		if chunkFeatures.isBroadQuestion():
+			score -= 0.3
+
 		return score
 
 	def execute(self, chunk, user):
+		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
 		nattyResult = chunk.getNattyResult(user)
 		keeperNumber = user.getKeeperNumber()
 
@@ -84,9 +85,7 @@ class CreateTodoAction(Action):
 			followups.append(keeper_constants.FOLLOWUP_TIME)
 
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
-		recurScores = collections.OrderedDict(
-			sorted(self.getRecurScores(chunk).items(), key=lambda t: t[1], reverse=True)
-		)
+		recurScores = chunkFeatures.recurScores()
 		logger.info("User %s: create recurrence scores %s", user.id, recurScores)
 		recurFrequency = None
 		for frequency in recurScores.keys():
@@ -126,20 +125,6 @@ class CreateTodoAction(Action):
 			# This is used by remind_util to see if something is a followup
 			user.setStateData(keeper_constants.LAST_ACTION_KEY, date_util.unixTime(date_util.now(pytz.utc)))
 		return True
-
-	def getRecurScores(self, chunk):
-		results = {}
-		for frequency in keeper_constants.RECUR_REGEXES.keys():
-			if chunk.contains(keeper_constants.RECUR_REGEXES[frequency]):
-				if frequency == keeper_constants.RECUR_WEEKDAYS:
-					# we want weekday to win out over weekly, and weekly's RE is more general
-					results[frequency] = 0.9
-				else:
-					results[frequency] = 0.8
-			else:
-				results[frequency] = 0.0
-
-		return results
 
 	def evaluateSharing(self, chunk, user):
 		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)

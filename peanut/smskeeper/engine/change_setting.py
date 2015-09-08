@@ -5,12 +5,11 @@ from smskeeper import sms_util, msg_util, helper_util, actions
 from smskeeper import keeper_constants
 from smskeeper import analytics
 from .action import Action
+from smskeeper.chunk_features import ChunkFeatures
 
 
 class ChangeSettingAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGE_SETTING
-
-	tipRegex = re.compile(r'.*send me tips', re.I)
 
 	zipRegex = re.compile(r"my zip ?code is (\d{5}(\-\d{4})?)", re.I)
 
@@ -18,9 +17,10 @@ class ChangeSettingAction(Action):
 
 	def getScore(self, chunk, user):
 		score = 0.0
+		features = ChunkFeatures(chunk, user)
 
 		normalizedText = chunk.normalizedText()
-		if self.tipRegex.match(normalizedText) is not None:
+		if self.looksLikeTip(features, user):
 			score = .9
 
 		if self.zipRegex.match(normalizedText) is not None:
@@ -40,9 +40,10 @@ class ChangeSettingAction(Action):
 
 	def execute(self, chunk, user):
 		normalizedText = chunk.normalizedText()
+		features = ChunkFeatures(chunk, user)
 
-		if self.tipRegex.match(normalizedText) is not None:
-			self.setTipFrequency(user, chunk.originalText)
+		if self.looksLikeTip(features, user):
+			self.setTipFrequency(user, features)
 
 		elif self.zipRegex.match(normalizedText) is not None:
 			self.setPostalCode(user, chunk.originalText)
@@ -56,26 +57,34 @@ class ChangeSettingAction(Action):
 
 		return True
 
-	def setTipFrequency(self, user, msg):
+	def looksLikeTip(self, features, user):
+		if features.containsTipWord():
+			if features.containsNegativeWord() or max(features.recurScores().values()) > 0.5:
+				return True
+		return False
+
+	def setTipFrequency(self, user, features):
 		old_tip_frequency = user.tip_frequency_days
-		if "weekly" in msg:
-			user.tip_frequency_days = 7
-			user.save()
-			sms_util.sendMsg(user, "Ok, I'll send you tips weekly.")
-		elif "monthly" in msg:
-			user.tip_frequency_days = 30
-			user.save()
-			sms_util.sendMsg(user, "Ok, I'll send you tips monthly.")
-		elif "daily" in msg:
-			user.tip_frequency_days = 1
-			user.save()
-			sms_util.sendMsg(user, "Ok, I'll send you tips daily.")
-		elif "never" in msg or "stop" in msg or "don't" in msg:
+		if features.containsNegativeWord():
 			user.tip_frequency_days = 0
 			user.save()
 			sms_util.sendMsg(user, "Ok, I'll stop sending you tips.")
 		else:
-			sms_util.sendMsg(user, "Sorry, I didn't get that. You can type 'send me tips weekly/monthly/never' to change how often I send you tips.")
+			recurType, bestScore = features.recurScores().items()[0]
+			if recurType == keeper_constants.RECUR_WEEKLY:
+				user.tip_frequency_days = 7
+				user.save()
+				sms_util.sendMsg(user, "Ok, I'll send you tips weekly.")
+			elif recurType == keeper_constants.RECUR_MONTHLY:
+				user.tip_frequency_days = 30
+				user.save()
+				sms_util.sendMsg(user, "Ok, I'll send you tips monthly.")
+			elif recurType == keeper_constants.RECUR_DAILY:
+				user.tip_frequency_days = 1
+				user.save()
+				sms_util.sendMsg(user, "Ok, I'll send you tips daily.")
+			else:
+				sms_util.sendMsg(user, "Sorry, I didn't get that. You can type 'send me tips weekly/monthly/never' to change how often I send you tips.")
 
 		analytics.logUserEvent(
 			user,
