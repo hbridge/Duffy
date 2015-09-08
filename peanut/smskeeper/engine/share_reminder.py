@@ -95,14 +95,6 @@ class ShareReminderAction(Action):
 			resolvedHandles.append(handleToResolve)
 			user.setSharePromptHandles(unresolvedHandles, [])
 
-			analytics.logUserEvent(
-				user,
-				"Resolved Handle",
-				{
-					"Did create user": didCreateUser,
-				}
-			)
-
 		if len(unresolvedHandles) == 0:  # we're done resolving handles
 			# TODO henry: this only works for single entry share case
 			reminder_util.sendCompletionResponse(user, entries[0], [], user.getKeeperNumber())

@@ -141,6 +141,14 @@ def createHandle(user, handle, targetNumber):
 		contact = Contact.objects.create(user=user, handle=handle, target=target_user)
 	contact.save()
 
+	analytics.logUserEvent(
+		user,
+		"Resolved Handle",
+		{
+			"Did create user": createdUser,
+		}
+	)
+
 	return contact, createdUser, oldUser
 
 

@@ -9,6 +9,7 @@ from .action import Action
 import collections
 from smskeeper.models import Contact
 from smskeeper import user_util
+from smskeeper import actions
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +72,6 @@ class CreateTodoAction(Action):
 
 	def execute(self, chunk, user):
 		nattyResult = chunk.getNattyResult(user)
-		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
 		keeperNumber = user.getKeeperNumber()
 
 		if nattyResult is None:
@@ -94,26 +94,11 @@ class CreateTodoAction(Action):
 				recurFrequency = frequency
 				break
 
-		# Figure out if there are resolved/unresolved handles
-		shareHandles = None
-		unresolvedHandles = None
-		shareContacts = None
-		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
-			shareHandles = chunk.sharedReminderHandles()
-			if len(shareHandles) > 1:
-				user_util.setPaused(user, True, user.getKeeperNumber(), "Multiple handles in share command")
-				return True
-			shareContacts, unresolvedHandles = Contact.resolveHandles(user, shareHandles)
-			logger.info("User %d: handles in create_todo %d resolved %d unresolved", user.id, len(shareContacts), len(unresolvedHandles))
-			if len(unresolvedHandles) > 0:
-				# we have unresolved handles, set the followup
-				followups.append(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED)
-			else:
-				followups.append(keeper_constants.FOLLOWUP_SHARE_RESOLVED)
-			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, shareContacts))
-		else:
-			# clear out share prompt handles if there are no handles in this one
-			user.setSharePromptHandles(None, None)
+		# eval sharing
+		shareContacts, shareFollowups, paused = self.evaluateSharing(chunk, user)
+		if paused:
+			return True
+		followups += shareFollowups
 
 		entry = reminder_util.createReminderEntry(
 			user,
@@ -155,3 +140,44 @@ class CreateTodoAction(Action):
 				results[frequency] = 0.0
 
 		return results
+
+	def evaluateSharing(self, chunk, user):
+		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+
+		shareHandles = None
+		unresolvedHandles = None
+		shareContacts = []
+		followups = []
+
+		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
+			shareHandles = chunk.sharedReminderHandles()
+			if len(shareHandles) > 1:
+				# we don't handle more than one share handle at the moment
+				user_util.setPaused(user, True, user.getKeeperNumber(), "Multiple handles in share command")
+				return None, None, True
+
+			# resolve contacts so we can see what to do within the create flow
+			shareContacts, unresolvedHandles = Contact.resolveHandles(user, shareHandles)
+			logger.info("User %d: handles in create_todo %d resolved %d unresolved", user.id, len(shareContacts), len(unresolvedHandles))
+			if len(unresolvedHandles) > 0:
+				# we have unresolved handles, if there's a phone number resolve it immediately, otherwise, set a followup
+				phoneNumbers, remainingStr = chunk.extractPhoneNumbers()
+				if len(phoneNumbers) == 0:
+					followups.append(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED)
+				else:
+					contact, didCreateUser, oldUser = actions.createHandle(
+						user,
+						unresolvedHandles[0],
+						phoneNumbers[0],
+					)
+					shareContacts = [contact]
+
+			# we have one or more resolved contacts to share with, set that as a followup
+			if len(shareContacts) > 0:
+				followups.append(keeper_constants.FOLLOWUP_SHARE_RESOLVED)
+			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, shareContacts))
+		else:
+			# clear out share prompt handles if there are no handles in this one
+			user.setSharePromptHandles(None, None)
+
+		return shareContacts, followups, False

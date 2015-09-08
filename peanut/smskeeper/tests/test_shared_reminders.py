@@ -109,6 +109,18 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEquals(2, len(entries[0].users.all()))
 
+	def test_create_with_handle_resolution(self, dateMock):
+		self.setupUser(dateMock)
+		self.setupAnotherUser(self.recipientPhoneNumber, True, True, dateMock=dateMock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind mom to call me %s" % (self.recipientPhoneNumber))
+			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
+
+		# Make sure entry was created correctly
+		entries = Entry.objects.filter(label="#reminders")
+		self.assertEquals(2, len(entries[0].users.all()))
+
 	def test_shared_reminder_2nd_time(self, dateMock):
 		self.setupUser(dateMock)
 		self.createSharedReminder()
