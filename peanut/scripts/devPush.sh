@@ -10,6 +10,7 @@ cd smskeeper/web
 npm install
 node_modules/.bin/gulp
 sudo apachectl -k restart
+DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py syncdb
 EOF
 
 echo "Restarting scripts..."
