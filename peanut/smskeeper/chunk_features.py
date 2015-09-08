@@ -133,3 +133,9 @@ class ChunkFeatures:
 
 	def containsNegativeWord(self):
 		return self.chunk.contains(r'(no|dont|not|never|stop)')
+
+	def containsPostalCode(self):
+		return msg_util.getPostalCode(self.chunk.normalizedText())
+
+	def containsZipCodeWord(self):
+		return self.chunk.contains(r'(^|\b)zip( )?(code)?')

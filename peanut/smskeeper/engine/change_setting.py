@@ -10,9 +10,6 @@ from smskeeper.chunk_features import ChunkFeatures
 
 class ChangeSettingAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGE_SETTING
-
-	zipRegex = re.compile(r"my zip ?code is (\d{5}(\-\d{4})?)", re.I)
-
 	summaryRegex = re.compile(r"(daily|morning) summary", re.I)
 
 	def getScore(self, chunk, user):
@@ -23,7 +20,7 @@ class ChangeSettingAction(Action):
 		if self.looksLikeTip(features, user):
 			score = .9
 
-		if self.zipRegex.match(normalizedText) is not None:
+		if features.containsZipCodeWord() and features.containsPostalCode():
 			score = .9
 
 		if msg_util.nameInSetName(normalizedText, tutorial=False):
@@ -39,13 +36,12 @@ class ChangeSettingAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		normalizedText = chunk.normalizedText()
 		features = ChunkFeatures(chunk, user)
 
 		if self.looksLikeTip(features, user):
 			self.setTipFrequency(user, features)
 
-		elif self.zipRegex.match(normalizedText) is not None:
+		elif features.containsZipCodeWord() and features.containsPostalCode():
 			self.setPostalCode(user, chunk.originalText)
 
 		elif msg_util.nameInSetName(chunk.originalText, tutorial=False):
@@ -129,6 +125,3 @@ class ChangeSettingAction(Action):
 			"Changed PostalCode",
 			None
 		)
-
-
-

@@ -533,6 +533,20 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "US/Eastern")
 
+	def testSetZipcodeHarder(self, dateMock):
+		self.setupUser(True, True, dateMock=dateMock)
+		self.assertNotEqual(self.user.timezone, "PST")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "My new zip code is 94117")
+			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.user = User.objects.get(id=self.user.id)
+			self.assertEqual(self.user.timezone, "US/Pacific")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Change my zip code to 10012")
+			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.user = User.objects.get(id=self.user.id)
+			self.assertEqual(self.user.timezone, "US/Eastern")
+
 	def testStopped(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:

@@ -10,6 +10,7 @@ defaultPunctuationWhitelist = '-'
 RELATIONSHIP_SUBJECT_DELIMETERS = re.compile(r'to|on|at|in|by|about', re.I)
 HANDLE_BLACKLIST = re.compile(r'you|remind|me|I|im|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|May|June|July|August|September|October|November|December|no|at|by|so|if', re.I)
 
+
 class Chunk:
 	originalText = None
 	commandWords = []
