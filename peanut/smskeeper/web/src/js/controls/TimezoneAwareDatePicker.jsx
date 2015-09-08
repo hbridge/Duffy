@@ -18,6 +18,12 @@ module.exports = React.createClass({
 
 	render: function() {
 		console.log("rendering with localMomentFormat: %s", this.state.localMoment.format('x'));
+		var timeChangeFunction = function(timeString) {
+			this.pickedTimeChanged(timeString, 'time');
+		}.bind(this);
+		var dateChangeFunction = function(timeString) {
+			this.pickedTimeChanged(timeString, 'date');
+		}.bind(this);
 		return(
 			<Input label='Time' wrapperClassName='wrapper'>
 				<Row>
@@ -25,7 +31,7 @@ module.exports = React.createClass({
 					<DateTimePicker
 						ref="date"
 						dateTime={this.state.localMoment.format('x')}
-						onChange={this.pickedTimeChanged}
+						onChange={dateChangeFunction}
 						showToday={true}
 						minDate={moment.tz(this.props.timezone)}
 						mode='date'
@@ -36,7 +42,7 @@ module.exports = React.createClass({
 					<DateTimePicker
 						ref="time"
 						dateTime={this.state.localMoment.format('x')}
-						onChange={this.pickedTimeChanged}
+						onChange={timeChangeFunction}
 						showToday={true}
 						minDate={moment.tz(this.props.timezone)}
 						mode='time'
@@ -64,8 +70,23 @@ module.exports = React.createClass({
 		);
 	},
 
-	pickedTimeChanged: function(timeString) {
-		var localMoment = moment(timeString, "x");
+	pickedTimeChanged: function(timeString, fieldType) {
+		var changedMoment = moment(timeString, "x");
+		if (!changedMoment.isValid()) {
+			console.log("changed moment invalid");
+			return;
+		}
+
+		var localMoment = this.state.localMoment;
+		if (fieldType == 'date') {
+			localMoment.year(changedMoment.year());
+			localMoment.month(changedMoment.month());
+			localMoment.date(changedMoment.date());
+		} else if (fieldType == 'time') {
+			localMoment.hour(changedMoment.hour());
+			localMoment.minute(changedMoment.minute());
+		}
+
 		this.setState({localMoment: localMoment})
 		if (localMoment.hour() != this.props.digestHour || localMoment.minute() != this.props.digestMinute){
 			// this.refs.digestTime.getInputDOMNode().checked = false;
