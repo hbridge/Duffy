@@ -25,7 +25,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		return entry
 
 	def test_handle_extraction(self, dateMock):
-		positiveSubjects = ["mom", "Bill", "Aseem", "dad", "my mom", "my boyfriend", "my wife", "steve"]
+		positiveSubjects = ["mom", "Bill", "Aseem", "dad", "my mom", "my boyfriend", "my wife", "steve", "RC"]
 		negativeSubjects = ["to", "her", "him", "tomorrow", "Wednesday", "every", "of"]
 		positiveStructures = [
 			"Remind :SUBJECT: to foo bar baz tomorrow",
@@ -41,7 +41,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			"Remind me in 10 mintues to remind :SUBJECT: to eat",
 			"Remind me I have and appointment :SUBJECT: September 17 at 1:00",
 			"Remind me NOT to :SUBJECT: in an hour",
-			"Remind September 1st to test :SUBJECT:"
+			"Remind me NO soccer practice with :SUBJECT: in an hour",
+			"Remind September 1st to test :SUBJECT:",
 		]
 
 		for structure in positiveStructures:

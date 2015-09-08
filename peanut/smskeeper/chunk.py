@@ -8,7 +8,7 @@ from smskeeper import keeper_constants
 defaultPunctuationWhitelist = '-'
 
 RELATIONSHIP_SUBJECT_DELIMETERS = re.compile(r'to|on|at|in|by|about', re.I)
-HANDLE_BLACKLIST = re.compile(r'you|remind|me|I|im|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|May|June|July|August|September|October|November|December', re.I)
+HANDLE_BLACKLIST = re.compile(r'you|remind|me|I|im|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|May|June|July|August|September|October|November|December|no|at|by|so|if', re.I)
 
 class Chunk:
 	originalText = None
@@ -99,7 +99,7 @@ class Chunk:
 					continue  # don't support putting a handle first
 				if HANDLE_BLACKLIST.match(word):
 					continue
-				if len(word) > 1 and word.upper() == word:
+				if len(word) > 2 and word.upper() == word:
 					continue  # all caps words are not handles
 				if verbWhitelistRegex:
 					# if we were given a whitelist of verbs to find objects for, see if it was the word before or 2 before
