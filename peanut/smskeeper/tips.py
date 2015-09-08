@@ -89,7 +89,7 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		JOKE_TIP_ID,
-		"Hey :NAME:, I'm the funniest digital assistant around! Just ask me to tell you a joke - guarenteed laughs or you get a pony :sunglasses:",
+		"Hey :NAME:, I'm the funniest digital assistant around! Just ask me to tell you a joke - guaranteed laughs or you get a pony :sunglasses:",
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
@@ -318,5 +318,3 @@ def logTipSent(user, tip, customSentDate, isMini, sentTips):
 			"Local Hour of Day": localHour
 		},
 	)
-
-
