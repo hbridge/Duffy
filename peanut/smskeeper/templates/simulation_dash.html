@@ -6,4 +6,16 @@
 <!-- Bootstrap -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
+<script type='text/javascript'>
+CLASSIFICATION_OPTIONS = [
+{% for classification in classifications %}
+	{
+		text: "{{classification.text}}",
+		value: "{{classification.value}}"
+	},
+{% endfor %}
+];
+</script>
+
+
 {% endblock %}

@@ -631,6 +631,7 @@ def simulation_dash(request):
 		'simulation_dash',
 		'simulation_dash.html',
 		requiresUser=False,
+		context={"classifications": keeper_constants.CLASS_MENU_OPTIONS}
 	)
 
 @login_required(login_url='/admin/login/')

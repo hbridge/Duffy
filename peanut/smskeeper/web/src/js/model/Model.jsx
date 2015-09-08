@@ -176,9 +176,7 @@ var SimResultList = Backbone.Collection.extend({
       simId = simResult.get("sim_id");
       results[simId] = true;
     });
-    console.log("uniqueSimIds", results)
-    console.log("uniqueSimIds keys", Object.keys(results))
-    return Object.keys(results);
+    return Object.keys(results).map(function(intStr){return parseInt(intStr)});
   },
 
   accurateClassifications(simId) {
@@ -194,6 +192,88 @@ var SimResultList = Backbone.Collection.extend({
     });
   },
 
+  totalSummary(simId, categories) {
+    var totalTps = [], totalTns = [], totalFps = [], totalFns = [];
+    for (category of categories) {
+      var categorySummary = this.categorySummary(simId, category);
+      totalTps = totalTps.concat(categorySummary['tps']);
+      totalTns = totalTns.concat(categorySummary['tns']);
+      totalFps = totalFps.concat(categorySummary['fps']);
+      totalFns = totalFns.concat(categorySummary['fns']);
+    }
+    return {
+      tps: totalTps,
+      tns: totalTns,
+      fps: totalFps,
+      fns: totalFns,
+    }
+  },
+
+  categorySummary(simId, category) {
+    var tps = [], tns = [], fps = [], fns = [];
+    this.forEach(function(simResult){
+      if (simResult.get('sim_id') != simId) return;
+      if (simResult.get('sim_classification')
+          == simResult.get('correctClassification')
+        && simResult.get('sim_classification')
+          == category){
+        tps.push(simResult)
+      } else if (simResult.get('sim_classification')
+          != category
+        && simResult.get('correctClassification')
+          != category
+      ) {
+        tns.push(simResult);
+      } else if (simResult.get('sim_classification')
+          == category
+        && simResult.get('correctClassification')
+          != category
+      ) {
+        fps.push(simResult);
+      } else if (simResult.get('sim_classification')
+          != category
+        && simResult.get('correctClassification')
+          == category
+      ) {
+        fns.push(simResult);
+      }
+    });
+
+    var summary = {
+      tps: tps,
+      tns: tns,
+      fps: fps,
+      fns: fns
+    }
+
+    console.log("summary for %s ", category, summary);
+
+    return summary;
+  },
+
+  metricsForSummary(summary) {
+    /*
+      Metric      Formula
+      Accuracy    (TP + TN) / (TP + TN + FP + FN)
+      Precision TP / (TP + FP)
+      Recall      TP / (TP + FN)
+      F1-score  2 x P x R / (P + R)
+    */
+    var tp = summary.tps.length;
+    var tn = summary.tns.length;
+    var fp = summary.fps.length;
+    var fn = summary.fns.length;
+    var precision = tp / (tp + fp);
+    var recall = tp / (tp + fn);
+    var f1 = (2 * precision * recall) / (precision + recall);
+    return {
+      simpleAccuracy: (tp / (tp + fn)).toFixed(2),
+      accuracy: ((tp + tn) / (tp+tn+fp+fn)).toFixed(2),
+      precision: isFinite(precision) ? precision.toFixed(2) : 'NA',
+      recall: isFinite(recall) ? recall.toFixed(2) : 'NA',
+      f1: isFinite(f1) ? f1.toFixed(2) : 'NA'
+    }
+  }
 });
 
 exports.HistoryStore = HistoryStore;
