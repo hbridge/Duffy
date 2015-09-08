@@ -109,6 +109,24 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "US/Pacific")
 
+	def test_tutorial_zip_code_india(self, dateMock):
+		self.setupUser(dateMock)
+
+		# Activation message asks for their name
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "UnitTests")
+			self.assertIn("code", self.getOutput(mock))
+
+		user = self.getTestUser()
+		self.assertEqual(user.temp_format, 'imperial')
+
+		cliMsg.msg(self.testPhoneNumber, "55555")
+
+		user = self.getTestUser()
+		self.assertEqual(user.timezone, "Asia/Kolkata")
+		self.assertEqual(user.wxcode, 'INXX0342')
+		self.assertEqual(user.temp_format, 'metric')
+
 	def test_tutorial_uk_postal_code(self, dateMock):
 		self.setupUser(dateMock, productId=2)
 
@@ -123,6 +141,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "Europe/London")
 		self.assertEqual(user.wxcode, "UKXX0333")
+		self.assertEqual(user.temp_format, 'metric')
 
 	def test_tutorial_uk_postal_code_space(self, dateMock):
 		self.setupUser(dateMock, productId=2)
@@ -138,6 +157,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		user = self.getTestUser()
 		self.assertEqual(user.timezone, "Europe/London")
 		self.assertEqual(user.wxcode, "UKXX0333")
+		self.assertEqual(user.temp_format, 'metric')
 
 	# Had a bug where 'work' matched the UK postal codes so broke the tutorial
 	def test_does_not_match_work(self, dateMock):

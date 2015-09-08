@@ -40,6 +40,7 @@ class SMSKeeperBaseCase(TestCase):
 		ZipData.objects.create(city="New York", state="NY", country_code="US", wxcode="10012", postal_code="10012", timezone="EST", area_code="212")
 		ZipData.objects.create(city="Milltimber", state="Aberdeenshire", country_code="UK", wxcode="UKXX0333", postal_code="AB13", timezone="Europe/London")
 		ZipData.objects.create(city="Milltimber", state="Aberdeenshire", country_code="UK", wxcode="UKXX0333", postal_code="N2H", timezone="Europe/London")
+		ZipData.objects.create(city="Gurgaon", state="HR", country_code="IN", wxcode="INXX0342", postal_code="55555", timezone="Asia/Kolkata")
 
 	def setupVerbData(self):
 		VerbData.objects.create(past="done")

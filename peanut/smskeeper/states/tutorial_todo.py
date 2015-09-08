@@ -82,6 +82,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		if postalCode:
 			timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
+			print "timezone, wxcode, tempFormat"%(timezone, wxcode, tempFormat)
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
