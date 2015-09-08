@@ -129,6 +129,7 @@ class SMSKeeperBaseCase(TestCase):
 	WED_9AM = datetime.datetime(2015, 6, 3, 13, 0, 0, tzinfo=pytz.utc)
 	THU_9AM = datetime.datetime(2015, 6, 4, 13, 0, 0, tzinfo=pytz.utc)
 	THU_10AM = datetime.datetime(2015, 6, 4, 14, 0, 0, tzinfo=pytz.utc)
+	THU_6PM = datetime.datetime(2015, 6, 4, 22, 0, 0, tzinfo=pytz.utc)
 	FRI_9AM = datetime.datetime(2015, 6, 5, 13, 0, 0, tzinfo=pytz.utc)
 	SAT_9AM = datetime.datetime(2015, 6, 6, 13, 0, 0, tzinfo=pytz.utc)
 	SUNDAY_7PM = datetime.datetime(2015, 6, 7, 23, 0, 0, tzinfo=pytz.utc)
