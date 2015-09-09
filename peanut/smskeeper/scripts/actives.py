@@ -122,5 +122,75 @@ for msg in msgs:
 
 
 
+# Figure out organic growth on monthly basis
+
+from smskeeper.models import User
+import datetime, pytz, json
+
+def countReferredUsers(userList):
+    count = 0
+    for user in userList:
+        if user.signup_data_json:
+            data = json.loads(user.signup_data_json)
+            if 'referrer' in data:
+                referrer = data['referrer']
+                if len(referrer) > 2:
+                    count += 1
+    return count
+
+def countUsers(userList):
+    refCount = 0
+    defaultCount = 0
+    fbCount = 0
+    nojsCount = 0
+    txtedUsCount = 0
+    noSourceCount = 0
+    reminderCount = 0
+    otherCount = 0
+    for user in userList:
+        if user.signup_data_json:
+            data = json.loads(user.signup_data_json)
+            if 'referrer' in data:
+                referrer = data['referrer']
+                if len(referrer) > 2:
+                    refCount += 1
+                    continue
+            if 'source' in data:
+                source = data['source']
+                if 'fb' in source:
+                    fbCount +=1
+                    continue
+                if 'no-js' in source:
+                    nojsCount += 1
+                    continue
+                if 'reminder' in source:
+                    reminderCount +=1
+                    continue
+                if len(source) == 0 or 'default' in source:
+                    defaultCount += 1
+                    continue
+            else:
+                txtedUsCount += 1
+                continue
+        else:
+            noSourceCount +=1
+            continue
+        otherCount +=1
+    print "%d\t Total users added"%(len(userList))
+    print "%d\t From facebook [PAID]"%(fbCount)
+    print "%d\t Source 'no-js [PAID - mostly]'"%(nojsCount)
+    print "%d\t Source 'default'"%(defaultCount)
+    print "%d\t Phone #"%(txtedUsCount)
+    print "%d\t Confirmed referrals"%(refCount)
+    print "%d\t Shared reminders"%(reminderCount)
 
 
+
+def getDataForMonth(month):
+    if (month < 1 or month > 12):
+        print "month must be between 1 and 12"
+        return 0
+    begin = datetime.datetime(2015, month, 1, 0, 0, 0, tzinfo=pytz.utc)
+    end = datetime.datetime(2015, month + 1 % 12, 1, 0, 0, 0, tzinfo=pytz.utc)
+    allUsers = User.objects.filter(activated__gt=begin, activated__lt=end)
+    countUsers(allUsers)
