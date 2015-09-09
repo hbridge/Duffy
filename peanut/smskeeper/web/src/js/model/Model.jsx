@@ -145,40 +145,23 @@ var SimResult = Backbone.Model.extend({
   urlRoot: function() {
     return "/smskeeper/simulation_result/";
   },
+
+  simType: function() {
+    var shortType = this.get('sim_type');
+    if (shortType == 't') {
+      return "test";
+    } else if (shortType == 'dp') {
+      return "Dev Push";
+    } else if (shortType == 'pp') {
+      return "Prod Push";
+    }
+    return "Unknown";
+  }
 });
-
-function SimulationRun (simResults) {
-    this.simResults = simResults;
-}
-
-SimulationRun.prototype.sim_id = function() {
-  return this.simResults[0].get('sim_id');
-};
 
 var SimResultList = Backbone.Collection.extend({
   model: SimResult,
   url: "/smskeeper/simulation_result/",
-
-  simulationRuns(){
-    var resultsById = {};
-    this.forEach(function(simResult){
-      simId = simResult.get("sim_id");
-      resultsForId = resultsById[simId];
-      if (!resultsForId) {
-        resultsForId = []
-      }
-      resultsForId.push(simResult);
-      resultsById[simId] = resultsForId;
-    });
-
-    var simRuns = [];
-    for (key of Object.keys(resultsById)) {
-      console.log("Creating sim run for %s with %d objs", key, resultsById[key].length);
-      simRun = new SimulationRun(resultsById[key]);
-      simRuns.push(simRun);
-    }
-    return simRuns;
-  },
 
   uniqueSimIds() {
     var results = {}

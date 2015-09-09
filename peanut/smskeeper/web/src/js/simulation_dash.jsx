@@ -24,6 +24,7 @@ var SimulationRow = React.createClass({
   mixins: [BackboneReactComponent],
   render() {
     var simId = this.getSimId();
+    var simRun = this.getCollection().findWhere({sim_id: simId});
     var classNames = CLASSIFICATION_OPTIONS.map(function(dict){
       return dict.value;
     });
@@ -32,7 +33,7 @@ var SimulationRow = React.createClass({
     return (
 
       <tr onClick={this.handleClicked}>
-        <td> { simId } </td>
+        <td> { simId } ({simRun.simType()} @ {simRun.get('git_revision')})</td>
         <td> {totalMetrics.simpleAccuracy}</td>
         <td> {totalMetrics.precision}</td>
         <td> {totalMetrics.recall}</td>
