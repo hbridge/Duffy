@@ -6,12 +6,11 @@ git rebase origin/master
 cd peanut
 DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test
 DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py test smskeeper.tests.regress.reminders
+DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py syncdb
 cd smskeeper/web
 npm install
 node_modules/.bin/gulp
 sudo apachectl -k restart
-cd /home/ubuntu/dev/Duffy
-DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py syncdb
 EOF
 
 echo "Restarting scripts..."
