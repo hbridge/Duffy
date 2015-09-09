@@ -91,7 +91,7 @@ var EntryRow = React.createClass({
 		        	<div style={{minWidth: "110px"}}>
 		        		{ this.state.model.use_digest_time ? "\u00a0" + emoji.get("memo") : ""}
 		        		{ moment.tz(this.state.model.remind_timestamp, timezone).format(dateFormat) }
-		        		{ this.state.model.remind_last_notified ? "\u00a0" + emoji.get("white_check_mark") : ""}
+		        		{ this.state.model.remind_to_be_sent ? "" : "\u00a0" + emoji.get("white_check_mark")}
 		        	</div>
 		        </td>
 		        <td onClick={this.handleRowClicked}>
