@@ -1,7 +1,6 @@
-from smskeeper import actions
+from smskeeper import actions, msg_util
 from smskeeper import keeper_constants
 from .action import Action
-from smskeeper.chunk_features import ChunkFeatures
 
 
 class QuestionAction(Action):
@@ -9,12 +8,12 @@ class QuestionAction(Action):
 
 	def getScore(self, chunk, user):
 		score = 0.0
-		features = ChunkFeatures(chunk, user)
 
-		if features.isQuestion():
+		firstWord = msg_util.getFirstWord(chunk.originalText)
+		question_re = ("?" in chunk.originalText) or firstWord in ["who", "what", "where", "when", "why", "how", "what's", "whats", "is", "are"]
+
+		if question_re:
 			score = .6
-		if features.isBroadQuestion():
-			score = 0.8
 
 		if QuestionAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
@@ -25,5 +24,5 @@ class QuestionAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		actions.unknown(user, chunk.originalText, user.getKeeperNumber())
+		actions.unknown(user, chunk.originalText, user.getKeeperNumber(), doAlert=True)
 		return True

@@ -2,7 +2,7 @@ import datetime
 import pytz
 from mock import patch
 
-from smskeeper.models import Entry
+from smskeeper.models import Entry, Message
 from smskeeper import cliMsg, tips
 from smskeeper import async, keeper_constants
 
@@ -1248,7 +1248,9 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(self.TUE_9AM, entries[1].remind_timestamp)
 		self.assertIn("Pay", entries[1].text)
 
-		self.assertTrue(self.getTestUser().paused)
+		# We don't pause, but we want to mark that message as needing checking
+		lastMessage = Message.objects.filter(incoming=True).last()
+		self.assertTrue(lastMessage.manually_check)
 
 	# Hit bug where "next two weeks" returns 2 times, one now and one in two weeks
 	# We were looking at the now

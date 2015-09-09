@@ -2,7 +2,7 @@ import datetime
 from mock import patch
 
 from peanut.settings import constants
-from smskeeper.models import User
+from smskeeper.models import User, Message
 from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
 from common import date_util
 from django.conf import settings
@@ -202,8 +202,10 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_NORMAL)
 			cliMsg.msg(self.testPhoneNumber, "what is blah blah")
-			# ensure we got paused
-			self.assertTrue(self.getTestUser().isPaused())
+
+			# We don't pause, but we want to mark that message as needing checking
+			lastMessage = Message.objects.filter(incoming=True).last()
+			self.assertTrue(lastMessage.manually_check)
 
 			# And that we got no response
 			self.assertEqual("", self.getOutput(mock))
@@ -222,7 +224,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertNotEqual("", self.getOutput(mock))
 
 			# ensure we didn't get paused
-			self.assertEqual(self.getTestUser().state, keeper_constants.STATE_UNKNOWN_COMMAND)
+			self.assertFalse(self.getTestUser().paused)
 
 	def test_common_niceties(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
@@ -529,20 +531,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual(self.user.timezone, "US/Pacific")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "My zip code is 10012")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
-			self.user = User.objects.get(id=self.user.id)
-			self.assertEqual(self.user.timezone, "US/Eastern")
-
-	def testSetZipcodeHarder(self, dateMock):
-		self.setupUser(True, True, dateMock=dateMock)
-		self.assertNotEqual(self.user.timezone, "PST")
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "My new zip code is 94117")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
-			self.user = User.objects.get(id=self.user.id)
-			self.assertEqual(self.user.timezone, "US/Pacific")
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "Change my zip code to 10012")
 			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "US/Eastern")

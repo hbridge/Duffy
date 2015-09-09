@@ -7,9 +7,11 @@ var Backbone = require('backbone');
 var BackboneReactComponent = require('backbone-react-component');
 var Model = require('./model/Model.jsx');
 var ReviewList = Model.ReviewList;
+var UnknownMsgList = Model.UnknownMsgList;
 
 // Our UI components
 var AdminReviewTable = require('./controls/AdminReviewTable.jsx');
+var UnknownMsgTable = require('./controls/UnknownMsgTable.jsx');
 var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 var firstLoadComplete = false;
 
@@ -30,7 +32,7 @@ var ReviewApp = React.createClass({
 	render: function() {
     var loading = null;
     var showAll = null;
-    if (this.state.collection.size == 0) {
+    if (this.props.reviewList.size == 0) {
       loading =
       <div>
         <p>
@@ -42,7 +44,11 @@ var ReviewApp = React.createClass({
 		return (
       <div>
         { loading }
-        <AdminReviewTable collection={this.props.collection} />
+        <AdminReviewTable collection={this.props.reviewList} />
+        <div>
+          <h2>Unknown messages</h2>
+        </div>
+        <UnknownMsgTable collection={this.props.unknownMsgList} />
       </div>
 		);
 	},
@@ -54,4 +60,8 @@ var ReviewApp = React.createClass({
 
 var reviewList = new ReviewList();
 reviewList.fetch();
-React.render(<ReviewApp collection={ reviewList }/>, document.getElementById("keeper_app"));
+
+var unknownMsgList = new UnknownMsgList();
+unknownMsgList.fetch();
+
+React.render(<ReviewApp reviewList={ reviewList } unknownMsgList={ unknownMsgList }/>, document.getElementById("keeper_app"));

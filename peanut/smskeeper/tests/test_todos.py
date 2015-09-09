@@ -534,10 +534,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertEqual(u'\U0001f60e', self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "blah blah blah")
-			self.assertEqual('', self.getOutput(mock))
-
-		self.assertTrue(self.getTestUser().paused)
+			cliMsg.msg(self.testPhoneNumber, "remind me about stuff tomorrow")
+			self.assertIn('tomorrow', self.getOutput(mock))
 
 	def test_joke_runs_out(self, dateMock):
 		self.setupUser(dateMock)
@@ -1346,11 +1344,12 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertFalse(entries[1].hidden)
 		self.assertFalse(entries[2].hidden)
 
-		# Makae sure we're now paused
-		self.assertTrue(self.getTestUser().paused)
+		# We don't pause, but we want to mark that message as needing checking
+		lastMessage = Message.objects.filter(incoming=True).last()
+		self.assertTrue(lastMessage.manually_check)
 
 	# Make sure we pause after an unknown phrase during daytime hours
-	def test_create_unknown_pauses(self, dateMock):
+	def test_create_unknown_empty_response(self, dateMock):
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.MON_10AM)
@@ -1363,8 +1362,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Make sure nothing was hidden
 		self.assertEqual(0, len(Entry.objects.filter(label="#reminders")))
 
-		# Makae sure we're now paused
-		self.assertTrue(self.getTestUser().paused)
+		# We don't pause, but we want to mark that message as needing checking
+		lastMessage = Message.objects.filter(incoming=True).last()
+		self.assertTrue(lastMessage.manually_check)
 
 	# Make sure we pause after an unknown phrase during daytime hours
 	def test_pauses_when_user_frustrated(self, dateMock):
@@ -1604,16 +1604,11 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, phrase1)
 			self.assertEqual("", self.getOutput(mock))
 
-		# Make sure we barfed
-		user = self.getTestUser()
-		self.assertTrue(user.paused)
+		# We don't pause anymore
 
 		message = Message.objects.get(msg_json__contains=phrase1)
 		message.classification = "stop"
 		message.save()
-
-		user.paused = False
-		user.save()
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, phrase2)
@@ -1632,7 +1627,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_10AM)
 		cliMsg.msg(self.testPhoneNumber, "I want to pick up my sox tomorrow")
 
-		self.setNow(dateMock, self.TUE_9AM)
+		self.setNow(dateMock, self.TUE_10AM)
 		async.processDailyDigest()
 
 		# Come up with new "done" phrase
@@ -1644,7 +1639,10 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertFalse(entries[0].hidden)
 		user = self.getTestUser()
-		self.assertTrue(user.paused)
+
+		# We don't pause, but we want to mark that message as needing checking
+		lastMessage = Message.objects.filter(incoming=True).last()
+		self.assertTrue(lastMessage.manually_check)
 
 		message = Message.objects.get(msg_json__contains=phrase1)
 		message.classification = keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT
@@ -2027,7 +2025,9 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Why didn't I get my daily reminders yet?")
 			self.assertEqual("", self.getOutput(mock))
 
-		self.assertTrue(self.getTestUser().paused)
+		# We don't pause, but we want to mark that message as needing checking
+		lastMessage = Message.objects.filter(incoming=True).last()
+		self.assertTrue(lastMessage.manually_check)
 
 	def test_change_morning_summary_time(self, dateMock):
 		self.setupUser(dateMock)

@@ -223,7 +223,7 @@ def entry_feed(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
-
+# These are used from urls.py and turned into JSON feeds
 class ReviewFeed(generics.ListCreateAPIView):
 	# set authentication to basic and allow any to disable CSRF protection
 	authentication_classes = (authentication.BasicAuthentication,)
@@ -246,6 +246,37 @@ class EntryDetail(generics.RetrieveUpdateAPIView):
 	permission_classes = (permissions.AllowAny,)
 	queryset = Entry.objects.all()
 	serializer_class = EntrySerializer
+
+
+def unknown_messages_feed(request):
+	response = dict()
+	messages = Message.objects.filter(manually_check=True)
+
+	messages_dicts = []
+
+	for message in messages:
+		message_dict = dict()
+		message_dict["id"] = message.id
+		message_dict["user"] = message.user_id
+		msgJson = json.loads(message.msg_json)
+		message_dict["body"] = msgJson["Body"]
+		message_dict["manually_check"] = message.manually_check
+		message_dict["user_name"] = message.user.name
+
+		followupBodies = list()
+		followups = Message.objects.filter(user=message.user, added__gt=message.added, incoming=True)
+		for followup in followups:
+			msgJson = json.loads(followup.msg_json)
+			followupBodies.append(msgJson["Body"])
+
+		message_dict["followups"] = ', '.join(followupBodies)
+
+		messages_dicts.append(message_dict)
+
+	response["messages"] = messages_dicts
+
+	return HttpResponse(json.dumps(response, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+
 
 #
 # Send a sms message to a user from a certain number

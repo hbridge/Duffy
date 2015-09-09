@@ -62,9 +62,10 @@ class CompleteTodoSpecificAction(Action):
 			user.save()
 		else:
 			logger.info("User %s: I thought '%s' was a completetodo specific command but couldn't find an entry to match on, pausing" % (user.id, chunk.originalText))
-			paused = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False)
-			if not paused:
-				msgBack = "Sorry, I'm not sure what entry you mean."
+			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False, doAlert=True)
+
+			if not daytime:
+				msgBack = "Sorry, I'm not sure what entry you mean. Could you rephrase?"
 				sms_util.sendMsg(user, msgBack, None, user.getKeeperNumber())
 
 		analytics.logUserEvent(

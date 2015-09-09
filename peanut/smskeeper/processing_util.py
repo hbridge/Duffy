@@ -147,6 +147,12 @@ def processWithEngine(user, msgs, messageObject):
 		if not processed:
 			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber())
 
+	# This gets set in actions.unknown. Means that the engine didn't know something and we should
+	# mark the message object as needing review
+	if hasattr(user, 'messageWasUnknown') and user.messageWasUnknown:
+		messageObject.manually_check = True
+		messageObject.save()
+
 
 def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 	user, created = getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber)

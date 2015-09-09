@@ -41,6 +41,16 @@ var MessageList = Backbone.Collection.extend({
   },
 });
 
+var UnknownMsgList = Backbone.Collection.extend({
+  model: Message,
+  url: function() {
+  return ("/smskeeper/unknown_messages_feed");
+  },
+  parse: function(data) {
+    return data.messages;
+  },
+});
+
 var Entry = Backbone.Model.extend({
   defaults: function() {
       var dateString = (new Date()).toISOString();
@@ -284,3 +294,4 @@ exports.Entry = Entry;
 exports.ReviewList = ReviewList;
 exports.SimResult = SimResult;
 exports.SimResultList = SimResultList;
+exports.UnknownMsgList = UnknownMsgList;
