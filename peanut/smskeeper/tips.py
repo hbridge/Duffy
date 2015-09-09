@@ -212,8 +212,7 @@ def isEligibleForTip(user):
 		return False
 
 	# figure out if it's the right local time for tips
-	now = date_util.now(pytz.utc)
-	localdt = now.astimezone(user.getTimezone())  # we do this to get around mocking, as tests mock datetime.now()
+	localdt = date_util.now(user.getTimezone())  # we do this to get around mocking, as tests mock datetime.now()
 	localHour = localdt.hour
 	# print "now: %s usernow: %s usertz: %s sendhour: %d" % (now, localdt, user.getTimezone(), SMSKEEPER_TIP_HOUR)
 	if localHour != SMSKEEPER_TIP_HOUR:
