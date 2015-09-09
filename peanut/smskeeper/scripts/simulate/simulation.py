@@ -32,8 +32,6 @@ GIT_REVISION = subprocess.check_output(["git", "describe", "--always"]).replace(
 # don't do users with UID < 1000, they have hash tags etc in their transcripts
 MIN_USER_ID = 1000
 
-#CLASSIFIED_MESSAGES_URL = "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed"
-
 
 class MyLogger:
 	filePath = None
@@ -99,27 +97,40 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 		classified_messages = json.loads(response)
 
 		for message in classified_messages:
-			logger.info("Processing message: %s", message)
-			self.message_count += 1
-			userId = message["user"]
-			userPhone = self.phoneNumberForUserId(userId)
 			try:
-				user = User.objects.get(phone_number=userPhone)
-			except:
-				logger.info("Creating user %d with phone_number %s", userId, userPhone)
-				user = User.objects.create(phone_number=userPhone)
-				user.save()
-			self.setUserProps(user, message.get("userSnapshot"))
-			self.setNow(dateMock, date_util.fromIsoString(message["added"]))
-			# TODO set entries
-			# TODO set recent outgoing message classes
-			self.scoreMessage(user, message)
+				logger.info("\n Processing message: %s", message)
+				self.message_count += 1
+
+				# get the user
+				user = self.getOrCreateUser(message["user"])
+
+				# for each message setup and simulate
+				self.setUserProps(user, message.get("userSnapshot"))
+				self.setNow(dateMock, date_util.fromIsoString(message["added"]))
+				# TODO set entries
+				# TODO set recent outgoing message classes
+				self.scoreMessage(user, message)
+			except Exception as e:
+				logger.info("Error processing message: %s, exception %s", message, e)
+				if message in self.classified_messages:
+					self.classified_messages.remove(message)
 
 		self.uploadClassificationResults()
-		# self.printMisclassifictions()
+		self.printMisclassifictions()
 
 		summaryLogger.finalize()
 		logger.finalize()
+
+	def getOrCreateUser(self, userId):
+		userPhone = self.phoneNumberForUserId(userId)
+		try:
+			user = User.objects.get(phone_number=userPhone)
+		except:
+			logger.info("Creating user %d with phone_number %s", userId, userPhone)
+			user = User.objects.create(phone_number=userPhone)
+			user.save()
+
+		return user
 
 	def setUserProps(self, user, userSnapshot):
 		logger.info("setting props from userSnapshot: %s", userSnapshot)
