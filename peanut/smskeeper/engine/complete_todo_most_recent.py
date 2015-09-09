@@ -50,9 +50,12 @@ class CompleteTodoMostRecentAction(Action):
 		entries = user.getLastEntries()
 
 		for entry in entries:
-			entry.hidden = True
-			logger.info("User %s: Marking off entry %s as hidden" % (user.id, entry.id))
-			entry.save()
+			if entry.remind_recur == keeper_constants.RECUR_DEFAULT:
+				entry.hidden = True
+				logger.info("User %s: Marking off entry %s as hidden" % (user.id, entry.id))
+				entry.save()
+			else:
+				logger.debug("User %s: Didn't mark off entry %s as hidden since its not recur_default" % (user.id, entry.id))
 
 		features = ChunkFeatures(chunk, user)
 		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord())

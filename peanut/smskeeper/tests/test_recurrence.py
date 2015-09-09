@@ -265,6 +265,26 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 			async.processDailyDigest()
 			self.assertIn("Pay bills", self.getOutput(mock))
 
+	def test_done_recur_before_sent(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am everyday")
+		cliMsg.msg(self.testPhoneNumber, "remind me to go skiing at 3pm")
+
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("Wake up", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "done with all")
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		# Make sure we only mark the non-recur one done
+		self.assertFalse(entries[0].hidden)
+		self.assertTrue(entries[1].hidden)
+
 	def test_weekday_reminder(self, dateMock):
 		self.setupUser(dateMock)
 
