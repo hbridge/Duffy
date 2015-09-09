@@ -652,15 +652,22 @@ class VerbData(models.Model):
 	ing = models.CharField(max_length=40)
 
 
+class SimulationRun(models.Model):
+	git_revision = models.CharField(max_length=7)
+	source = models.CharField(max_length=1, choices=[('p', 'prod'), ('d', 'dev'), ('l', 'local')])
+	sim_type = models.CharField(max_length=2, choices=[('pp', 'prodpush'), ('dp', 'devpush'), ('t', 'test')], db_index=True)
+	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
+
+	def simResults(self):
+		return SimulationResult.objects.filter(run=self)
+
+
 class SimulationResult(models.Model):
-	git_revision = models.CharField(max_length=7, db_index=True)
 	message_classification = models.CharField(max_length=100, null=True, blank=True)
 	message_auto_classification = models.CharField(max_length=100, null=True, blank=True)
 	message_id = models.IntegerField()
-	message_source = models.CharField(max_length=1, choices=[('p', 'prod'), ('d', 'dev'), ('l', 'local')])
 	message_body = models.TextField(null=True, blank=True)
-	sim_id = models.IntegerField(null=True, blank=True, db_index=True)
-	sim_type = models.CharField(max_length=2, choices=[('pp', 'prodpush'), ('dp', 'devpush'), ('t', 'test')], db_index=True)
+	run = models.ForeignKey(SimulationRun, null=True)
 	sim_classification = models.CharField(max_length=100, null=True, blank=True)
 	sim_classification_scores_json = models.CharField(max_length=1000, null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
