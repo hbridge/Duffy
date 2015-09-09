@@ -34,12 +34,6 @@ MIN_USER_ID = 1000
 
 #CLASSIFIED_MESSAGES_URL = "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed"
 
-LOCAL_TEST = {
-	'message_source': 'l',  # messages are local
-	'sim_type': 't',  # test
-	'classified_messages_url': "http://localhost:7500/smskeeper/classified_messages_feed/",
-	'post_results_url': "http://localhost:7500/smskeeper/simulation_result/"
-}
 
 class MyLogger:
 	filePath = None
@@ -73,23 +67,33 @@ def summaryText(text, *args):
 
 
 @patch('common.date_util.utcnow')
-class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
+class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 	message_count = 0
 	classified_messages = []
-	SIMULATION_CONFIGURATION = LOCAL_TEST
+	SIMULATION_CONFIGURATION = None
+	'''
+	SIMULATION_CONFIGURATION shoudl include
+	'message_source'
+	'sim_type'
+	'classified_messages_url'
+	'post_results_url'
+	'''
 
 	def test_parse_accuracy(self, dateMock):
+		if not self.SIMULATION_CONFIGURATION:
+			raise NameError("This is the base simulation class, use a speicific configuration.")
+
 		logger.info("Starting simulation on %s", datetime.now())
 		# self.setupAuthenticatedBrowser()
 
 		logger.info("Importing zip data...")
 		importZipdata.loadZipDataFromTGZ("./smskeeper/data/zipdata.tgz")
 
-		logger.info("Getting classified messages...")
+		logger.info("Getting classified messages from %s...", self.SIMULATION_CONFIGURATION['classified_messages_url'])
 		try:
 			response = urllib2.urlopen(self.SIMULATION_CONFIGURATION['classified_messages_url']).read()
 		except URLError as e:
-			logger.info("Could not connect to prod server: %@" % (e))
+			logger.info("Could not connect to server for messages: %s" % (e))
 			response = {"users": []}
 
 		classified_messages = json.loads(response)
