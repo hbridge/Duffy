@@ -23,7 +23,6 @@ from smskeeper.chunk import Chunk
 
 from django.conf import settings
 
-from smskeeper.serializers import SimulationResultSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
 import subprocess
@@ -34,8 +33,13 @@ GIT_REVISION = subprocess.check_output(["git", "describe", "--always"]).replace(
 MIN_USER_ID = 1000
 
 #CLASSIFIED_MESSAGES_URL = "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed"
-CLASSIFIED_MESSAGES_URL = "http://localhost:7500/smskeeper/classified_messages_feed/"
-POST_RESULTS_URL = "http://localhost:7500/smskeeper/simulation_result/"
+
+LOCAL_TEST = {
+	'message_source': 'l',  # messages are local
+	'sim_type': 't',  # test
+	'classified_messages_url': "http://localhost:7500/smskeeper/classified_messages_feed/",
+	'post_results_url': "http://localhost:7500/smskeeper/simulation_result/"
+}
 
 class MyLogger:
 	filePath = None
@@ -72,6 +76,7 @@ def summaryText(text, *args):
 class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 	message_count = 0
 	classified_messages = []
+	SIMULATION_CONFIGURATION = LOCAL_TEST
 
 	def test_parse_accuracy(self, dateMock):
 		logger.info("Starting simulation on %s", datetime.now())
@@ -82,7 +87,7 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 
 		logger.info("Getting classified messages...")
 		try:
-			response = urllib2.urlopen(CLASSIFIED_MESSAGES_URL).read()
+			response = urllib2.urlopen(self.SIMULATION_CONFIGURATION['classified_messages_url']).read()
 		except URLError as e:
 			logger.info("Could not connect to prod server: %@" % (e))
 			response = {"users": []}
@@ -162,14 +167,20 @@ class SMSKeeperClassifyMessagesCase(test_base.SMSKeeperBaseCase):
 		result = []
 		for message in self.classified_messages:
 			simResult = {}
-			simResult["message"] = message["id"]
 			simResult["git_revision"] = GIT_REVISION
+			simResult["message_classification"] = message["classification"]
+			simResult["message_auto_classification"] = message["auto_classification"]
+			simResult["message_id"] = message["id"]
+			simResult["message_source"] = self.SIMULATION_CONFIGURATION['message_source']
+			simResult["message_body"] = message["body"]
+			# sim_id populated by server
+			simResult["sim_type"] = self.SIMULATION_CONFIGURATION['sim_type']
 			simResult["sim_classification"] = message["simulated_classification"]
 			simResult["sim_classification_scores_json"] = json.dumps(message["simulated_scores"])
 			result.append(simResult)
 
 		logger.info("Uploading results: %s", json.dumps(result, cls=DjangoJSONEncoder))
-		req = urllib2.Request(POST_RESULTS_URL)
+		req = urllib2.Request(self.SIMULATION_CONFIGURATION['post_results_url'])
 		req.add_header('Content-Type', 'application/json')
 		response = urllib2.urlopen(req, json.dumps(result, cls=DjangoJSONEncoder))
 		logger.info("Upload response: %s", response)

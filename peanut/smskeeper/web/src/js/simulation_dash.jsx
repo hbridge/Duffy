@@ -171,7 +171,7 @@ var SimulationDashboard = React.createClass({
   getModal() {
     var createListItem = function(model) {
       return (
-        <li>{model.get('body')}</li>
+        <li>{model.get('message_body')} (sim: {model.get('sim_classification')} actual: {model.get('message_classification')})</li>
       );
     };
     var sum = this.state.expandedSummary;
