@@ -55,10 +55,12 @@ var SimulationRow = React.createClass({
 var SimDetailsRow = React.createClass({
   mixins: [BackboneReactComponent],
   render() {
+    var numTps = this.props.summary.tps.length;
+    var numFns = this.props.summary.fns.length;
     return (
       <tr onClick={this.handleClicked}>
         <td style={{textAlign: "right"}}> { this.props.classification } </td>
-        <td> {this.props.stats.simpleAccuracy}</td>
+        <td> {this.props.stats.simpleAccuracy} ({numTps}/{numTps+numFns})</td>
         <td> {this.props.stats.precision}</td>
         <td> {this.props.stats.recall}</td>
         <td> {this.props.stats.f1}</td>
@@ -186,7 +188,7 @@ var SimulationDashboard = React.createClass({
           <strong>False Positives</strong>
           <ul>{sum ? sum.fps.map(createListItem) : null}</ul>
           <strong>False Negatives</strong>
-          <ul>{sum ? sum.fps.map(createListItem) : null}</ul>
+          <ul>{sum ? sum.fns.map(createListItem) : null}</ul>
         </Modal.Body>
       </Modal>
       );

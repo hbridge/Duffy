@@ -223,29 +223,18 @@ var SimResultList = Backbone.Collection.extend({
     var tps = [], tns = [], fps = [], fns = [];
     this.forEach(function(simResult){
       if (simResult.get('sim_id') != simId) return;
-      if (simResult.get('sim_classification')
-          == simResult.get('message_classification')
-        && simResult.get('sim_classification')
-          == category){
-        tps.push(simResult)
-      } else if (simResult.get('sim_classification')
-          != category
-        && simResult.get('message_classification')
-          != category
-      ) {
-        tns.push(simResult);
-      } else if (simResult.get('sim_classification')
-          == category
-        && simResult.get('message_classification')
-          != category
-      ) {
-        fps.push(simResult);
-      } else if (simResult.get('sim_classification')
-          != category
-        && simResult.get('message_classification')
-          == category
-      ) {
-        fns.push(simResult);
+      if (simResult.get('sim_classification') == simResult.get('message_classification')
+        && simResult.get('sim_classification') == category){
+          tps.push(simResult)
+      } else if (simResult.get('sim_classification') != category
+        && simResult.get('message_classification') != category) {
+          tns.push(simResult);
+      } else if (simResult.get('sim_classification') == category
+        && simResult.get('message_classification') != category) {
+          fps.push(simResult);
+      } else if (simResult.get('sim_classification') != category
+        && simResult.get('message_classification') == category) {
+          fns.push(simResult);
       }
     });
 
