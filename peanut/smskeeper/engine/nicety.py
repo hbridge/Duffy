@@ -21,7 +21,7 @@ class NicetyAction(Action):
 		# we're a real one if there's no responses
 		# Kinda hacky
 		if nicety and not nicety.isSilent():
-			score = 1.0
+			score = .6
 
 		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
 

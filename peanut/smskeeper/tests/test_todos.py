@@ -510,8 +510,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		# make sure they get their pony
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "that was a terrible joke")
-			self.assertIn(u'\U0001F434', self.getOutput(mock))
+			cliMsg.msg(self.testPhoneNumber, "that was terrible")
+			self.assertIn(u'\U0001f60e', self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "i didn't laugh. Where's my pony?")
@@ -2195,3 +2195,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEqual(entries.count(), 1)
 		self.assertEqual(entries.last().text, "Buy Apple battery")
+
+	def test_reminder_with_nicety(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me next Wednesday to start taking birth control again. 7 in the morning. Thank you keeper")
+			self.assertIn("Wed", self.getOutput(mock))
+
