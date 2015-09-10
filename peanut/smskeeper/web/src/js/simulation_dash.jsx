@@ -50,7 +50,17 @@ var SimulationDashboard = React.createClass({
     var rows = [];
     _.forEach(this.state.simRuns, function(simRun){
       var simId = simRun.id;
-      rows.push(<SimulationRow simRun={ simRun } key={ simId } onRowClicked={this.handleRowClicked}/>);
+      if (simRun.recentComparableRuns.length > 0){
+        var comparable = _.findWhere(this.state.simRuns, {id: simRun.recentComparableRuns[0]});
+      }
+
+      rows.push(<SimulationRow
+        simRun={ simRun }
+        compareTo={comparable}
+        key={ simId }
+        onRowClicked={this.handleRowClicked}
+        onRowDeleted={this.handleRowDeleted}
+      />);
       console.log("simId, expandedRows", simId, this.state.expandedRows);
       if (_.contains(this.state.expandedRows, simId)) {
         console.log("simId %s expanded, adding details rows", simId);
@@ -121,6 +131,13 @@ var SimulationDashboard = React.createClass({
     }
     console.log("row with simId clicked %s", simId, newExpanded);
     this.setState({expandedRows: newExpanded});
+  },
+
+  handleRowDeleted(simId){
+    var newSimRuns = _.reject(this.state.simRuns, function(simRun){
+      return simRun.id == simId
+    });
+    this.setState({simRuns: newSimRuns});
   },
 
   getSimRunClassData(simId) {

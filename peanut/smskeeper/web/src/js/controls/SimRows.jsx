@@ -9,6 +9,8 @@ var Bootstrap = require('react-bootstrap');
   Modal = Bootstrap.Modal;
   Accordion = Bootstrap.Accordion;
   Panel = Bootstrap.Panel;
+  DropdownButton = Bootstrap.DropdownButton;
+  MenuItem = Bootstrap.MenuItem;
 
 var SimulationRow = React.createClass({
   render() {
@@ -16,13 +18,19 @@ var SimulationRow = React.createClass({
     var numCorrect = this.props.simRun.numCorrect;
     var numWrong = this.props.simRun.numIncorrect;
     var simpleAccuracy = numCorrect / (numCorrect + numWrong);
+    console.log("compare to", this.props.compareTo);
+    if (this.props.compareTo) {
+	    var compareCorrect = this.props.compareTo.numCorrect;
+	    var compareWrong = this.props.compareTo.numIncorrect;
+	    var compareAccuracy = compareCorrect / (compareCorrect + compareWrong);
+	}
     return (
-      <tr onClick={this.handleClicked}>
-        <td> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
-        <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({numCorrect}/{numCorrect+numWrong})</td>
+      <tr>
+        <td onClick={this.handleClicked}> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
+        <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({numCorrect}/{numCorrect+numWrong}) ∆ {simpleAccuracy - compareAccuracy}</td>
         <td> </td>
         <td> </td>
-        <td> </td>
+        <td> {this.getMoreActions()}</td>
       </tr>
     );
   },
@@ -47,6 +55,25 @@ var SimulationRow = React.createClass({
   	}
 
   	return "Unknown";
+  },
+
+  handleDelete(e){
+  	Model.deleteSimRun(this.props.simRun.id, function(simRunId){
+  		this.props.onRowDeleted(simRunId);
+  	}.bind(this));
+  },
+
+  getMoreActions(){
+  	return (
+	  	<DropdownButton
+	          title='•••'
+	          ref='crselect'
+	          bsSize='xsmall'
+	          pullRight
+	        >
+	        	<MenuItem eventKey="delete" onSelect={this.handleDelete}>Delete</MenuItem>
+	    </DropdownButton>
+    );
   }
 });
 

@@ -23,3 +23,14 @@ module.exports.bindSimulationClassDetails = function(simRunId, className, reactO
   }
   $.getJSON("/smskeeper/simulation_class_details/" + simRunId + "/" + className, dataCallback);
 }
+
+module.exports.deleteSimRun=function(simRunId, callback){
+  $.ajax({
+    url: '/smskeeper/simulation_run/' + simRunId,
+    type: 'DELETE',
+    success: function(result) {
+        console.log("Deleted sim run %d", simRunId);
+        callback(simRunId);
+    }
+});
+}
