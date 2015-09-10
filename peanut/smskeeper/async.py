@@ -125,7 +125,7 @@ def processReminder(entry):
 				else:
 					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
 			else:
-				msg = "Hi! Friendly reminder: %s" % entry.text
+				msg = random.choice(keeper_constants.REMINDER_PHRASES) + " %s" % entry.text
 
 			sms_util.sendMsg(user, msg, classification=keeper_constants.OUTGOING_REMINDER)
 			analytics.logUserEvent(

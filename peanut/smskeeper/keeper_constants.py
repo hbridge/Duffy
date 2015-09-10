@@ -128,6 +128,15 @@ UNKNOWN_COMMAND_PHRASES = [
 	u"Err... Not sure what you mean. Don't worry, my minions :smile_cat::smile_cat: will straighten things out in the morning",
 ]
 
+REMINDER_PHRASES = [
+	u"Reminder for you:",
+	u"Reminder:",
+	u"Hi there! Wanted to remind you: ",
+	u"Hello. Friendly reminder: ",
+	u"Hi! You wanted me to remind you:",
+	u"Hi! Don't forget:",
+]
+
 REPORT_ISSUE_KEYWORD = "report"
 REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
@@ -393,8 +402,6 @@ CLASS_MENU_OPTIONS = ([
 		"value": CLASS_NONE
 	},
 ])
-
-ALL_CLASS_OPTIONS = map(lambda option: option["value"], CLASS_MENU_OPTIONS)
 
 OUTGOING_DIGEST = "digest"
 OUTGOING_SURVEY = "survey"
