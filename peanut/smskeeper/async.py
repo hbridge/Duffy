@@ -84,6 +84,8 @@ def updateEntryAfterProcessing(entry):
 			newRemindTimestamp = entry.remind_timestamp + relativedelta(months=1)
 		elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_DAYS:
 			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=2)
+		elif entry.remind_recur == keeper_constants.RECUR_EVERY_2_WEEKS:
+			newRemindTimestamp = entry.remind_timestamp + datetime.timedelta(days=14)
 		elif entry.remind_recur == keeper_constants.RECUR_WEEKDAYS:
 			tzAwareNow = date_util.now(entry.creator.getTimezone())
 
