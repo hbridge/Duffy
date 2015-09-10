@@ -23,7 +23,7 @@ var WrongResultsGroup = React.createClass({
 					eventKey={messageClass}>
 				  <ul>
 			      	{messages.map(function(message){
-			      		return <li> {message.body} </li>
+			      		return <li><a target="_blank" href={"/smskeeper/simulation_result/" + message.sim_result_id}> {message.body} </a></li>
 			      	})}
 			      </ul>
 			    </Panel>

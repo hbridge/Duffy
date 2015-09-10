@@ -26,6 +26,7 @@ urlpatterns = patterns(
 	url(r'^review_feed/$', views.ReviewFeed.as_view()),
 	url(r'^message/(?P<pk>[0-9]+)/$', views.MessageDetail.as_view()),
 	url(r'^simulation_result/$', sim_views.SimulationResultList.as_view()),
+	url(r'^simulation_result/(?P<pk>[0-9]+)/$', sim_views.SimulationResultDetail.as_view()),
 	url(r'^simulation_run/$', sim_views.SimulationRunCreate.as_view()),
 	url(r'^simulation_run/list$', sim_views.SimulationRunList.as_view()),
 	url(r'^simulation_run/(?P<pk>[0-9]+)/$', sim_views.SimulationRunDetail.as_view()),

@@ -812,13 +812,15 @@ class SimulationClassDetails:
 		result['fnMessages'] = []
 		for simResult in self.fp:
 			result['fpMessages'].append({
-				"id": simResult.message_id,
+				"sim_result_id": simResult.id,
+				"message_id": simResult.message_id,
 				"body": simResult.message_body,
 				"class": simResult.message_classification,
 			})
 		for simResult in self.fn:
 			result['fnMessages'].append({
-				"id": simResult.message_id,
+				"sim_result_id": simResult.id,
+				"message_id": simResult.message_id,
 				"body": simResult.message_body,
 				"sim_class": simResult.sim_classification
 			})

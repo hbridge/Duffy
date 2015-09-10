@@ -67,14 +67,12 @@ class SimulationResultList(ListBulkCreateUpdateDestroyAPIView):
 	queryset = SimulationResult.objects.all()
 	serializer_class = SimulationResultSerializer
 
-	def perform_create(self, serializer):
-		maxSimId = 0
-		try:
-			maxSimId = SimulationResult.objects.all().order_by('sim_id').last().sim_id
-		except:
-			pass
-		serializer.save(sim_id=maxSimId + 1)
-
+class SimulationResultDetail(generics.RetrieveUpdateDestroyAPIView):
+	# set authentication to basic and allow any to disable CSRF protection
+	authentication_classes = (authentication.BasicAuthentication,)
+	permission_classes = (permissions.AllowAny,)
+	queryset = SimulationResult.objects.all()
+	serializer_class = SimulationResultSerializer
 
 class SimulationRunDetail(generics.RetrieveUpdateDestroyAPIView):
 	# set authentication to basic and allow any to disable CSRF protection
@@ -82,7 +80,6 @@ class SimulationRunDetail(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (permissions.AllowAny,)
 	queryset = SimulationRun.objects.all()
 	serializer_class = DetailedSimulationRunSerializer
-
 
 class SimulationRunList(generics.ListAPIView):
 	# set authentication to basic and allow any to disable CSRF protection
