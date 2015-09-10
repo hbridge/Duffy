@@ -141,6 +141,32 @@ var ReviewList = Backbone.Collection.extend({
   },
 });
 
+var SimRun = Backbone.Model.extend({
+  urlRoot: function() {
+    return "/smskeeper/simulation_run/";
+  },
+});
+
+var SimRunList = Backbone.Collection.extend({
+  model: SimRun,
+  url: "/smskeeper/simulation_run/",
+
+  uniqueSimIds() {
+    var results = {}
+    this.forEach(function(simRun){
+      simId = simResult.get("id");
+      results[simId] = true;
+    });
+    return Object.keys(results).map(function(intStr){return parseInt(intStr)});
+  },
+});
+
+var SimClassSummary = Backbone.Model.extend({
+  urlRoot: function() {
+    return "/smskeeper/simulation_classes_summary/";
+  },
+});
+
 var SimResult = Backbone.Model.extend({
   urlRoot: function() {
     return "/smskeeper/simulation_result/";
@@ -162,15 +188,6 @@ var SimResult = Backbone.Model.extend({
 var SimResultList = Backbone.Collection.extend({
   model: SimResult,
   url: "/smskeeper/simulation_result/",
-
-  uniqueSimIds() {
-    var results = {}
-    this.forEach(function(simResult){
-      simId = simResult.get("sim_id");
-      results[simId] = true;
-    });
-    return Object.keys(results).map(function(intStr){return parseInt(intStr)});
-  },
 
   accurateClassifications(simId) {
     return this.filter(function(simResult){
@@ -264,6 +281,8 @@ exports.MessageList = MessageList;
 exports.EntryList = EntryList;
 exports.Entry = Entry;
 exports.ReviewList = ReviewList;
+exports.SimRun = SimRun;
+exports.SimRunList = SimRunList;
 exports.SimResult = SimResult;
 exports.SimResultList = SimResultList;
 exports.UnknownMsgList = UnknownMsgList;

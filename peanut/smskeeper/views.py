@@ -27,22 +27,19 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
 from smskeeper.forms import UserIdForm, SendMediaForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
-from smskeeper.models import User, Entry, Message, SimulationResult
+from smskeeper.models import User, Entry, Message
 from smskeeper import admin
 
 from smskeeper import analytics, helper_util
 
 from smskeeper.serializers import EntrySerializer
 from smskeeper.serializers import MessageSerializer
-from smskeeper.serializers import ClassifiedMessageSerializer
-from smskeeper.serializers import SimulationResultSerializer
+
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
 
 from common.api_util import DuffyJsonEncoder
-
-from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
 logger = logging.getLogger(__name__)
 
@@ -584,23 +581,6 @@ def signup_from_website(request):
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 
-@login_required(login_url='/admin/login/')
-def message_classification_csv(request):
-	classified_messages = Message.objects.filter(
-		classification__isnull=False).exclude(classification__in='nocategory').order_by("id")
-
-	# column headers
-	response = 'text, classification\n'
-
-	# message rows
-	for message in classified_messages:
-		if message.classification == "nocategory" or not message.getBody():
-			continue
-		response += '"%s",%s\n' % (cleanBodyText(message.getBody()), message.classification)
-
-	return HttpResponse(response, content_type="text/text", status=200)
-
-
 @jsonp
 def update_stripe_info(request):
 	response = dict({'result': True})
@@ -619,57 +599,6 @@ def update_stripe_info(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
-
-def cleanBodyText(text):
-	result = re.sub(ur'[\n"\u201d]', '', text)
-	return result
-
-
-def classified_users(request):
-	classified_messages = Message.objects.filter(incoming=True).exclude(classification__isnull=True).exclude(classification=keeper_constants.CLASS_NONE)
-	users_with_classification = User.objects.filter(product_id=keeper_constants.TODO_PRODUCT_ID, message__in=classified_messages).distinct()
-
-	classifiedUserIds = list()
-
-	for user in users_with_classification:
-		classifiedUserIds.append(user.id)
-
-	return HttpResponse(json.dumps({"users": classifiedUserIds}), content_type="text/text", status=200)
-
-
-def classified_messages_feed(request):
-	classified_messages = Message.objects.filter(incoming=True).order_by('user')
-	classified_messages = classified_messages.exclude(classification__isnull=True)
-	classified_messages = classified_messages.exclude(classification__exact='')
-	classified_messages = classified_messages.exclude(classification=keeper_constants.CLASS_NONE)
-	serializer = ClassifiedMessageSerializer(classified_messages, many=True)
-	return HttpResponse(json.dumps(serializer.data, cls=DjangoJSONEncoder), content_type="text/json", status=200)
-
-
-class SimulationResultList(ListBulkCreateUpdateDestroyAPIView):
-	# set authentication to basic and allow any to disable CSRF protection
-	authentication_classes = (authentication.BasicAuthentication,)
-	permission_classes = (permissions.AllowAny,)
-	queryset = SimulationResult.objects.all()
-	serializer_class = SimulationResultSerializer
-
-	def perform_create(self, serializer):
-		maxSimId = 0
-		try:
-			maxSimId = SimulationResult.objects.all().order_by('sim_id').last().sim_id
-		except:
-			pass
-		serializer.save(sim_id=maxSimId + 1)
-
-@login_required(login_url='/admin/login/')
-def simulation_dash(request):
-	return renderReact(
-		request,
-		'simulation_dash',
-		'simulation_dash.html',
-		requiresUser=False,
-		context={"classifications": keeper_constants.CLASS_MENU_OPTIONS}
-	)
 
 @login_required(login_url='/admin/login/')
 def approved_todos(request):

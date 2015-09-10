@@ -14,6 +14,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 from simple_history.models import HistoricalRecords
+from django.db.models import F
 
 
 class User(models.Model):
@@ -661,6 +662,18 @@ class SimulationRun(models.Model):
 	def simResults(self):
 		return SimulationResult.objects.filter(run=self)
 
+	def numCorrect(self):
+		return self.correctResults().count()
+
+	def correctResults(self):
+		return self.simResults().filter(message_classification=F('sim_classification'))
+
+	def numIncorrect(self):
+		return self.incorrectResults().count()
+
+	def incorrectResults(self):
+		return self.simResults().exclude(message_classification=F('sim_classification'))
+
 
 class SimulationResult(models.Model):
 	message_classification = models.CharField(max_length=100, null=True, blank=True)
@@ -671,3 +684,151 @@ class SimulationResult(models.Model):
 	sim_classification = models.CharField(max_length=100, null=True, blank=True)
 	sim_classification_scores_json = models.CharField(max_length=1000, null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
+
+	def isCorrect(self):
+		return self.message_classification == self.sim_classification
+
+	@classmethod
+	def resultsByClass(cls, queryset):
+		results = {}
+		for simResult in queryset:
+			simClass = simResult.message_classification
+			resultsForClass = results.get(simClass, [])
+			resultsForClass.append(simResult)
+			results[simClass] = resultsForClass
+
+		return results
+
+	@classmethod
+	def simulationClassDetails(cls, qs):
+		classSummaries = {}
+		for messageClass in keeper_constants.ALL_CLASS_OPTIONS:
+			classSummaries[messageClass] = SimulationClassDetails(messageClass)
+
+		for simResult in qs:
+			if simResult.isCorrect():
+				details = classSummaries.get(
+					simResult.message_classification,
+					SimulationClassDetails(simResult.message_classification)
+				)
+				details.tp.append(simResult)
+				classSummaries[details.messageClass] = details
+				SimulationClassDetails.addTrueNegativeToSummaries(
+					simResult,
+					classSummaries,
+					exclude=[simResult.message_classification]
+				)
+			else:
+				messageClassDetails = classSummaries.get(
+					simResult.message_classification,
+					SimulationClassDetails(simResult.message_classification)
+				)
+				simClassDetails = classSummaries.get(
+					simResult.sim_classification,
+					SimulationClassDetails(simResult.sim_classification)
+				)
+				messageClassDetails.fn.append(simResult)
+				simClassDetails.fp.append(simResult)
+				classSummaries[messageClassDetails.messageClass] = messageClassDetails
+				classSummaries[simClassDetails.messageClass] = simClassDetails
+
+				SimulationClassDetails.addTrueNegativeToSummaries(
+					simResult,
+					classSummaries,
+					exclude=[simResult.message_classification, simResult.sim_classification]
+				)
+
+		return classSummaries
+
+
+class SimulationClassDetails:
+	messageClass = ""
+
+	def __init__(self, messageClass):
+		self.messageClass = messageClass
+		self.tp = []
+		self.tn = []
+		self.fp = []
+		self.fn = []
+
+	@classmethod
+	def addTrueNegativeToSummaries(cls, trueNegative, summariesByClass, exclude=[]):
+		for otherClass in summariesByClass.keys():
+			if otherClass in exclude:
+				continue
+			else:
+				summariesByClass[otherClass].tn.append(trueNegative)
+
+	@classmethod
+	def dictRepsForSummaries(cls, summariesByClass):
+		result = {}
+		for key in summariesByClass.keys():
+			result[key] = summariesByClass[key].summaryJsonDict()
+
+		return result
+
+	def countOf(self, field):
+		return float(len(getattr(self, field)))
+
+	def simpleAccuracy(self):
+		if self.countOf('tp') + self.countOf('fn') > 0:
+			val = self.countOf('tp') / (self.countOf('tp') + self.countOf('fn'))
+			return val
+		else:
+			return None
+
+	def precision(self):
+		if (self.countOf('tp') + self.countOf('fp')) > 0:
+			return self.countOf('tp') / (self.countOf('tp') + self.countOf('fp'))
+		return None
+
+	def recall(self):
+		if (self.countOf('tp') + self.countOf('fn')):
+			return self.countOf('tp') / (self.countOf('tp') + self.countOf('fn'))
+		return None
+
+	def f1(self):
+		p = self.precision()
+		r = self.recall()
+		if (p and r):
+			return (2 * p * r) / (p + r)
+		return None
+
+	def summaryJsonDict(self):
+		return {
+			"messageClass": self.messageClass,
+			"tp": len(self.tp),
+			"fp": len(self.fp),
+			"fn": len(self.fn),
+			"simpleAccuracy": self.simpleAccuracy(),
+			"precision": self.precision(),
+			"recall": self.recall(),
+			"f1": self.f1()
+		}
+
+	def fullJsonDict(self):
+		result = self.summaryJsonDict()
+		result['fpMessages'] = []
+		result['fnMessages'] = []
+		for simResult in self.fp:
+			result['fpMessages'].append({
+				"id": simResult.message_id,
+				"body": simResult.message_body,
+				"class": simResult.message_classification,
+			})
+		for simResult in self.fn:
+			result['fnMessages'].append({
+				"id": simResult.message_id,
+				"body": simResult.message_body,
+				"sim_class": simResult.sim_classification
+			})
+		return result
+
+	def __str__(self):
+		return "SimulationClassSummary for %s: tp:%d tn:%d fp:%d fn:%d" % (
+			self.messageClass,
+			len(self.tp),
+			len(self.tn),
+			len(self.fp),
+			len(self.fn),
+		)

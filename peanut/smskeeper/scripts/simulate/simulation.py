@@ -20,6 +20,7 @@ import pytz
 
 from smskeeper.engine import Engine
 from smskeeper.chunk import Chunk
+from smskeeper import processing_util
 
 from django.conf import settings
 
@@ -98,6 +99,8 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 		for message in classified_messages:
 			try:
+				if self.SIMULATION_CONFIGURATION['sim_type'] == 'p' and int(message["user"]) < MIN_USER_ID:
+					continue
 				logger.info("\n Processing message: %s", message)
 				self.message_count += 1
 
@@ -148,7 +151,8 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 		user.save()
 
 	def scoreMessage(self, user, message):
-		chunk = Chunk(message["body"])
+		lines = processing_util.processSigAndSplitLines(user, message["body"])
+		chunk = Chunk(lines[0])  # only process first line for now
 		engine = Engine(Engine.DEFAULT, 0.0)
 		processed, classification, actionScores = engine.process(user, chunk, simulate=True)
 
@@ -179,25 +183,30 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 	def uploadClassificationResults(self):
 		# create the dicts
-		result = []
+		simRun = {
+			"git_revision": GIT_REVISION,
+			"source": self.SIMULATION_CONFIGURATION['message_source'],
+			"sim_type": self.SIMULATION_CONFIGURATION['sim_type'],
+			"simResults": [],
+		}
 		for message in self.classified_messages:
 			simResult = {}
-			simResult["git_revision"] = GIT_REVISION
 			simResult["message_classification"] = message["classification"]
 			simResult["message_auto_classification"] = message["auto_classification"]
 			simResult["message_id"] = message["id"]
-			simResult["message_source"] = self.SIMULATION_CONFIGURATION['message_source']
 			simResult["message_body"] = message["body"]
-			# sim_id populated by server
-			simResult["sim_type"] = self.SIMULATION_CONFIGURATION['sim_type']
 			simResult["sim_classification"] = message["simulated_classification"]
 			simResult["sim_classification_scores_json"] = json.dumps(message["simulated_scores"])
-			result.append(simResult)
+			simRun["simResults"].append(simResult)
 
-		logger.info("Uploading results: %s", json.dumps(result, cls=DjangoJSONEncoder))
+		logger.info("\n\n****Uploading results: %s", json.dumps(simRun, cls=DjangoJSONEncoder))
 		req = urllib2.Request(self.SIMULATION_CONFIGURATION['post_results_url'])
 		req.add_header('Content-Type', 'application/json')
-		response = urllib2.urlopen(req, json.dumps(result, cls=DjangoJSONEncoder))
+		try:
+			response = urllib2.urlopen(req, json.dumps(simRun, cls=DjangoJSONEncoder))
+		except urllib2.HTTPError, error:
+			contents = error.read()
+			print "Couldn't upload results %s:\n%s" % (error, contents)
 		logger.info("Upload response: %s", response)
 
 	def printMisclassifictions(self):

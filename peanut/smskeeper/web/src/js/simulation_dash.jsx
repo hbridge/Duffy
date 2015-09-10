@@ -3,10 +3,7 @@ var React = require('react')
 React.initializeTouchEvents(true);
 
 // Model
-var Backbone = require('backbone');
-var BackboneReactComponent = require('backbone-react-component');
-var Model = require('./model/Model.jsx');
-var SimResultList = Model.SimResultList;
+var Model = require('./model/SimulationModel.jsx');
 var _ = require('underscore');
 
 // Bootstrap
@@ -21,23 +18,18 @@ var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 var firstLoadComplete = false;
 
 var SimulationRow = React.createClass({
-  mixins: [BackboneReactComponent],
   render() {
-    var simId = this.getSimId();
-    var simRun = this.getCollection().findWhere({sim_id: simId});
-    var classNames = CLASSIFICATION_OPTIONS.map(function(dict){
-      return dict.value;
-    });
-    var totalSummary = this.getCollection().totalSummary(simId, classNames);
-    var totalMetrics = this.getCollection().metricsForSummary(totalSummary);
+    var simId = this.props.simRun.id;
+    var numCorrect = this.props.simRun.numCorrect;
+    var numWrong = this.props.simRun.numIncorrect;
+    var simpleAccuracy = numCorrect / (numCorrect + numWrong);
     return (
-
       <tr onClick={this.handleClicked}>
-        <td> { simId } ({simRun.simType()} @ {simRun.get('git_revision')})</td>
-        <td> {totalMetrics.simpleAccuracy}</td>
-        <td> {totalMetrics.precision}</td>
-        <td> {totalMetrics.recall}</td>
-        <td> {totalMetrics.f1}</td>
+        <td> { simId } ({this.props.simRun.sim_type} @ {this.props.simRun.git_revision})</td>
+        <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} {numCorrect}/{numCorrect+numWrong}</td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
       </tr>
 
     );
@@ -45,7 +37,7 @@ var SimulationRow = React.createClass({
 
   handleClicked(e) {
     e.preventDefault();
-    this.props.onRowClicked(this.getSimId());
+    this.props.onRowClicked(this.props.simRun.id);
   },
 
   getSimId(){
@@ -54,34 +46,77 @@ var SimulationRow = React.createClass({
 });
 
 var SimDetailsRow = React.createClass({
-  mixins: [BackboneReactComponent],
   render() {
-    var numTps = this.props.summary.tps.length;
-    var numFns = this.props.summary.fns.length;
+    var tp = this.props.classSummary.tp;
+    var fn = this.props.classSummary.fn;
+    var simpleAccuracy = this.props.classSummary.simpleAccuracy;
+    var precision = this.props.classSummary.precision;
+    var recall = this.props.classSummary.recall;
+    var f1 = this.props.classSummary.f1;
     return (
       <tr onClick={this.handleClicked}>
-        <td style={{textAlign: "right"}}> { this.props.classification } </td>
-        <td> {this.props.stats.simpleAccuracy} ({numTps}/{numTps+numFns})</td>
-        <td> {this.props.stats.precision}</td>
-        <td> {this.props.stats.recall}</td>
-        <td> {this.props.stats.f1}</td>
+        <td style={{textAlign: "right"}}> { this.props.classSummary.messageClass } </td>
+        <td> {simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({tp}/{tp+fn})</td>
+        <td> {precision ? precision.toFixed(2) : ""}</td>
+        <td> {recall ? recall.toFixed(2) : ""}</td>
+        <td> {f1 ? f1.toFixed(2) : ""}</td>
       </tr>
     );
   },
 
   handleClicked(e){
-    this.props.handleClicked(this.props.summary);
+    this.props.handleClicked(this.props.simId, this.props.classSummary.messageClass);
   }
 });
 
-var SimulationDashboard = React.createClass({
-  mixins: [BackboneReactComponent],
 
+var SimClassModal = React.createClass({
+  getInitialState(){
+    return {summaryData: null}
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.simId && nextProps.messageClass) {
+      console.log("Modal receiving new props", nextProps);
+      this.setState({show: true});
+      Model.bindSimulationClassDetails(nextProps.simId, nextProps.messageClass, this, 'summaryData');
+    }
+  },
+
+  render(){
+    var createListItem = function(message) {
+      return (
+        <li>{message.body}</li>
+      );
+    };
+    var summary = this.state.summaryData;
+    return (
+      <Modal show={this.state.show} onHide={this.close}>
+        <Modal.Header closeButton>
+            <Modal.Title>Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <strong>False Positives</strong>
+          <ul>{summary ? summary.fpMessages.map(createListItem) : null}</ul>
+          <strong>False Negatives</strong>
+          <ul>{summary ? summary.fnMessages.map(createListItem) : null}</ul>
+        </Modal.Body>
+      </Modal>
+      );
+  },
+
+  close(e) {
+    this.setState({show: false})
+  }
+})
+
+var SimulationDashboard = React.createClass({
   getInitialState: function() {
-    return {results: [], expandedRows: [],};
+    return {simRuns: [], expandedRows: [], simRunClassData: {}};
   },
 
   componentDidMount: function() {
+    Model.bindSimulationRuns(this, 'simRuns');
     if (!DevelopmentMode) {
       // setInterval(function () {this.getCollection().fetch()}.bind(this), 2000);
     }
@@ -90,7 +125,7 @@ var SimulationDashboard = React.createClass({
 	render: function() {
     var loading = null;
     var showAll = null;
-    if (this.state.collection.size == 0) {
+    if (this.state.simRuns.size == 0) {
       loading =
       <div>
         <p>
@@ -99,22 +134,22 @@ var SimulationDashboard = React.createClass({
       </div>
     }
 
-    var simIds = this.props.collection.uniqueSimIds();
+    console.log("simRuns", this.state.simRuns);
     var rows = [];
-    for (var i = 0; i < simIds.length; i++) {
-      var simId = simIds[i];
-      rows.push(<SimulationRow simulationId={ simId } key={ i } onRowClicked={this.handleRowClicked}/>);
+    _.forEach(this.state.simRuns, function(simRun){
+      var simId = simRun.id;
+      rows.push(<SimulationRow simRun={ simRun } key={ simId } onRowClicked={this.handleRowClicked}/>);
       console.log("simId, expandedRows", simId, this.state.expandedRows);
       if (_.contains(this.state.expandedRows, simId)) {
         console.log("simId %s expanded, adding details rows", simId);
         rows = rows.concat(this.getDetailsRows(simId));
       }
-    }
+    }.bind(this));
 
 		return (
       <div>
         { loading }
-        { this.getModal() }
+        <SimClassModal simId={this.state.expandedSimId} messageClass={this.state.expandedMessageClass}/>
         <Table striped bordered condensed hover>
           <thead>
             <tr>
@@ -134,25 +169,28 @@ var SimulationDashboard = React.createClass({
 	},
 
   getDetailsRows(simId) {
-      var classNames = CLASSIFICATION_OPTIONS.map(function(dict){
-        return dict.value;
-      });
-      var createClassRow = function(className, index) {
-        var summary = this.getCollection().categorySummary(simId, className);
-        var stats = this.getCollection().metricsForSummary(summary);
-        // console.log("details row for %s summary", className, summary);
-        return (<SimDetailsRow
-          classification={className}
-          stats={stats}
-          summary={summary}
-          key={className + index}
-          handleClicked={this.handleDetailRowClicked}
-        />);
-      }.bind(this);
+      // see if there's data
+      if (this.state.simRunClassData && this.state.simRunClassData[simId]) {
+        var classNames = CLASSIFICATION_OPTIONS.map(function(dict){
+          return dict.value;
+        });
 
-      return (
-        classNames.map(createClassRow)
-      );
+        var createClassRow = function(className, index) {
+          return (<SimDetailsRow
+            classSummary={this.state.simRunClassData[simId][className]}
+            simId={simId}
+            key={className + index}
+            handleClicked={this.handleDetailRowClicked}
+          />);
+        }.bind(this);
+        return classNames.map(createClassRow);
+      } else {
+        return ([
+          <tr>
+            loading...
+          </tr>
+        ]);
+      }
   },
 
   handleRowClicked(simId){
@@ -161,49 +199,31 @@ var SimulationDashboard = React.createClass({
       newExpanded = _.without(this.state.expandedRows, simId);
     } else {
       newExpanded.push(simId);
+      if (!this.state.simRunClassData[simId]) {
+        this.getSimRunClassData(simId);
+      }
     }
     console.log("row with simId clicked %s", simId, newExpanded);
     this.setState({expandedRows: newExpanded});
   },
 
-  handleDetailRowClicked(summary){
-    console.log("expanding summary", summary)
-    this.setState({expandedSummary: summary});
+  getSimRunClassData(simId) {
+    Model.fetchSimulationClassSummary(simId, function(data){
+      console.log("setting simrunClass data for %d", simId, data);
+      var simRunClassData = this.state.simRunClassData;
+      simRunClassData[simId] = data;
+      this.setState({simRunClassData: simRunClassData});
+    }.bind(this));
   },
 
-  getModal() {
-    var createListItem = function(model) {
-      return (
-        <li>{model.get('message_body')} (sim: {model.get('sim_classification')} actual: {model.get('message_classification')})</li>
-      );
-    };
-    var sum = this.state.expandedSummary;
-    return (
-      <Modal show={this.state.expandedSummary != null} onHide={this.close}>
-        <Modal.Header closeButton>
-            <Modal.Title>Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <strong>True Postives</strong>
-          <ul>{sum ? sum.tps.map(createListItem) : null}</ul>
-          <strong>False Positives</strong>
-          <ul>{sum ? sum.fps.map(createListItem) : null}</ul>
-          <strong>False Negatives</strong>
-          <ul>{sum ? sum.fns.map(createListItem) : null}</ul>
-        </Modal.Body>
-      </Modal>
-      );
+  handleDetailRowClicked(simId, messageClass){
+    console.log("expanding simId: %d messageClass:%s", simId, messageClass);
+    this.setState({expandedSimId: simId, expandedMessageClass: messageClass});
   },
 
   componentWillUpdate: function(nextProps, nextState) {
     console.log("component will update");
   },
-
-  close(e) {
-    this.setState({expandedSummary: null})
-  }
 });
 
-var simResultList = new SimResultList();
-simResultList.fetch();
-React.render(<SimulationDashboard collection={ simResultList }/>, document.getElementById("keeper_app"));
+React.render(<SimulationDashboard />, document.getElementById("keeper_app"));

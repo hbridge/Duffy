@@ -8,5 +8,5 @@ class SMSKeeperLocalSimulationCase(simulation.SMSKeeperSimulationCase):
 		'message_source': 'p',  # messages are local
 		'sim_type': 't',  # test
 		'classified_messages_url': "http://prod.strand.duffyapp.com/smskeeper/classified_messages_feed",
-		'post_results_url': "http://localhost:7500/smskeeper/simulation_result/"
+		'post_results_url': "http://localhost:7500/smskeeper/simulation_run/"
 	}
