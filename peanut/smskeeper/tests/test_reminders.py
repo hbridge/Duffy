@@ -170,7 +170,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(dateMock)
 
 		dt = datetime.datetime(2020, 01, 01, 10, 0, 0, tzinfo=pytz.utc)
-		entry = Entry(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
+		entry = Entry.objects.create(creator=self.getTestUser(), text="blah", remind_timestamp=dt)
 
 		# This is an hour before, shouldn't remind now
 		dateMock.return_value = datetime.datetime(2020, 01, 01, 9, 0, 0, tzinfo=pytz.utc)
@@ -1262,6 +1262,28 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Email Mark on June 9th to desk with timing of calls for the next two weeks")
 			# We should be pausing, so no output
 			self.assertIn("Tue", self.getOutput(mock))
+
+
+	# Make sure if a reminder is set in the near future, we don't send it early.
+	def test_near_time_reminder_exact_time(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me to poop at 9:30")
+
+		# Normally at 9:20 we'd send the reminder, but since it was created recently, don't
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(minutes=21))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertEqual("", self.getOutput(mock))
+
+		# We should actually do it at 9:30
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(minutes=30))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Poop", self.getOutput(mock))
+
+
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)

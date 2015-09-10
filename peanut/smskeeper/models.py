@@ -379,7 +379,7 @@ class Entry(models.Model):
 	created_from_entry_id = models.IntegerField(null=True, blank=True)
 
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
-	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+	updated = models.DateTimeField(db_index=True, null=True)
 
 	@classmethod
 	def fetchAllLabels(cls, user, hidden=False):
@@ -449,6 +449,7 @@ class Entry(models.Model):
 				# if the new time is not your digest time, clear the use_digest_time bit
 				if localRemindTime.hour != self.creator.digest_hour or localRemindTime.minute != self.creator.digest_minute:
 					self.use_digest_time = False
+		self.updated = date_util.now(pytz.utc)
 		super(Entry, self).save(*args, **kw)
 
 	def __str__(self):

@@ -60,7 +60,8 @@ def shouldRemindNow(entry):
 	if entry.remind_recur_end and entry.remind_timestamp > entry.remind_recur_end:
 		return False
 
-	if entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30:
+	if ((entry.remind_timestamp.minute == 0 or entry.remind_timestamp.minute == 30) and
+				(entry.remind_timestamp - entry.updated).total_seconds() > 60 * 60):  # Don't do this if they set this less than an hour ago
 		# If we're within 10 minutes, so alarm goes off at 9:50 if remind is at 10
 		return (now + datetime.timedelta(minutes=10) > entry.remind_timestamp)
 	else:
