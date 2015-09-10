@@ -131,12 +131,12 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		GET_TASKS_TIP_ID,
-		"Btw, you can get a list of all your tasks anytime. Just say 'What are my tasks?",
+		"Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?",
 		type=FULL_TIP_TYPE,
 	),
 	KeeperTip(
 		SHARED_REMINDER_TIP2_ID,
-		"I can directly remind your other half for you. Just say 'Remind my boyfriend to take out trash on Thursday at 7pm'",
+		"I can directly remind your other half for you. Just say 'Remind my boyfriend to get groceries tmrw at 7pm'",
 		type=FULL_TIP_TYPE
 	),
 
