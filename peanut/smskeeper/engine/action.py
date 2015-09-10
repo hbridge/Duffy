@@ -25,6 +25,10 @@ class Action:
 		else:
 			className = cls.ACTION_CLASS
 		pastMessages = Message.getClassifiedAs(className)
+
+		if len(chunk.normalizedText()) <= 2:
+			return False
+
 		for pastMsg in pastMessages:
 			# hack confusing messages for chunks
 			pastChunk = Chunk(pastMsg.getBody())
