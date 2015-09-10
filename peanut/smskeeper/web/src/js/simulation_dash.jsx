@@ -16,6 +16,7 @@ var Bootstrap = require('react-bootstrap');
 // Our UI components
 var DevelopmentMode = (window['DEVELOPMENT'] != undefined);
 var firstLoadComplete = false;
+var SimClassModal = require('./controls/SimClassDetailsModal.jsx');
 
 var SimulationRow = React.createClass({
   render() {
@@ -70,46 +71,6 @@ var SimDetailsRow = React.createClass({
 });
 
 
-var SimClassModal = React.createClass({
-  getInitialState(){
-    return {summaryData: null}
-  },
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.simId && nextProps.messageClass) {
-      console.log("Modal receiving new props", nextProps);
-      this.setState({show: true});
-      Model.bindSimulationClassDetails(nextProps.simId, nextProps.messageClass, this, 'summaryData');
-    }
-  },
-
-  render(){
-    var createListItem = function(message) {
-      return (
-        <li>{message.body}</li>
-      );
-    };
-    var summary = this.state.summaryData;
-    return (
-      <Modal show={this.state.show} onHide={this.close}>
-        <Modal.Header closeButton>
-            <Modal.Title>Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <strong>False Positives</strong>
-          <ul>{summary ? summary.fpMessages.map(createListItem) : null}</ul>
-          <strong>False Negatives</strong>
-          <ul>{summary ? summary.fnMessages.map(createListItem) : null}</ul>
-        </Modal.Body>
-      </Modal>
-      );
-  },
-
-  close(e) {
-    this.setState({show: false})
-  }
-})
-
 var SimulationDashboard = React.createClass({
   getInitialState: function() {
     return {simRuns: [], expandedRows: [], simRunClassData: {}};
@@ -149,7 +110,11 @@ var SimulationDashboard = React.createClass({
 		return (
       <div>
         { loading }
-        <SimClassModal simId={this.state.expandedSimId} messageClass={this.state.expandedMessageClass}/>
+        <SimClassModal
+          simId={this.state.expandedSimId}
+          messageClass={this.state.expandedMessageClass}
+          onClose={this.handleModalClosed}
+        />
         <Table striped bordered condensed hover>
           <thead>
             <tr>
@@ -219,6 +184,10 @@ var SimulationDashboard = React.createClass({
   handleDetailRowClicked(simId, messageClass){
     console.log("expanding simId: %d messageClass:%s", simId, messageClass);
     this.setState({expandedSimId: simId, expandedMessageClass: messageClass});
+  },
+
+  handleModalClosed() {
+    this.setState({expandedSimId: null, expandedMessageClass: null});
   },
 
   componentWillUpdate: function(nextProps, nextState) {
