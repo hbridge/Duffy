@@ -69,6 +69,7 @@ DIGEST_QUESTION_TIP_ID = "mini-digest-question"
 DIGEST_CHANGE_TIME_TIP_ID = "mini-digest-change-time"
 SHARED_REMINDER_MINI_TIP_ID = "mini-shared-reminder"
 DIGEST_QUESTION_NPS_TIP_ID = "mini-digest-question-nps"
+REFERRAL_ASK_TIP_ID = "mini-referral-ask"
 
 # Full-tips will be evaluated for sending based on order in the array, so be sure they're in the right spot!
 SMSKEEPER_TIPS = [
@@ -183,6 +184,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		DIGEST_QUESTION_NPS_TIP_ID,
 		"btw, how likely are you to recommend me to a friend?  1 (not likely) - 10 (extremely likely)",
+		type=MINI_TIP_TYPE
+	),
+	KeeperTip(
+		REFERRAL_ASK_TIP_ID,
+		"btw, I'm curious, how did you hear about me?",
 		type=MINI_TIP_TYPE
 	),
 ]
