@@ -290,7 +290,6 @@ def startsWithNo(msg):
 
 # Returns a string which doesn't have the "remind me" phrase in it
 def cleanedReminder(msg, recurrence=None, shareHandles=None):
-	logger.info("cleaning %s", msg)
 	cleaned = msg
 	regexesToRemove = [reminder_re]
 
