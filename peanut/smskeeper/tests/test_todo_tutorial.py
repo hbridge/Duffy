@@ -1,5 +1,6 @@
 import datetime
 import pytz
+import json
 
 from mock import patch
 
@@ -12,10 +13,13 @@ import test_base
 @patch('common.date_util.utcnow')
 class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
-	def setupUser(self, dateMock, productId = 1):
+	def setupUser(self, dateMock, productId=1):
 		# All tests start at Tuesday 8am
 		self.setNow(dateMock, self.TUE_8AM)
 		super(SMSKeeperTodoTutorialCase, self).setupUser(True, False, keeper_constants.STATE_TUTORIAL_TODO, productId=productId)
+		user = self.getTestUser()
+		user.signup_data_json = "{}"
+		user.save()
 
 	def test_tutorial_remind_normal(self, dateMock):
 		self.setupUser(dateMock)
@@ -306,4 +310,56 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "5:30 P.M")
 			self.assertIn("tomorrow by 5:30pm", self.getOutput(mock))
+
+	def test_referral_ask(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10PM)
+
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Do homework at 6pm")
+			self.assertIn("about me?", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Bobby told me")
+			self.assertIn("Great, thanks", self.getOutput(mock))
+
+		user = self.getTestUser()
+		info = json.loads(user.signup_data_json)
+		self.assertIn("Bobby", info["referrer"])
+
+	def test_referral_dont_ask_if_fb(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10PM)
+
+		user = self.getTestUser()
+		user.signup_data_json = '{"source": "fb-25", "exp": "student", "paid": "0", "referrer": ""}'
+		user.save()
+
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Do homework at 6pm")
+			self.assertNotIn("about me?", self.getOutput(mock))
+
+	def test_referral_dont_ask_if_referred(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10PM)
+
+		user = self.getTestUser()
+		user.signup_data_json = '{"source": "default", "exp": "student", "paid": "0", "referrer": "KP23F3"}'
+		user.save()
+
+		cliMsg.msg(self.testPhoneNumber, "UnitTests")
+		cliMsg.msg(self.testPhoneNumber, "10012")
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Do homework at 6pm")
+			self.assertNotIn("about me?", self.getOutput(mock))
 
