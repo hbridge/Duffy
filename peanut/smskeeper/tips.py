@@ -131,7 +131,7 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		GET_TASKS_TIP_ID,
-		"Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?",
+		"Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?'",
 		type=FULL_TIP_TYPE,
 	),
 	KeeperTip(
