@@ -674,6 +674,22 @@ class SimulationRun(models.Model):
 	def incorrectResults(self):
 		return self.simResults().exclude(message_classification=F('sim_classification'))
 
+	def recentComparableRuns(self):
+		comparableTypes = self.sim_type
+		if self.sim_type == 't':
+			comparableTypes = ['pp', 'dp', 't']
+		elif self.sim_type == 'dp':
+			comparableTypes = ['pp', 'dp']
+
+		recentRuns = SimulationRun.objects.filter(
+			source=self.source,
+			sim_type__in=comparableTypes,
+			id__lt=self.id
+		)
+		recentRuns = recentRuns.order_by("-id")[:3]
+		logger.info("returning last comparable run %s", recentRuns)
+		return recentRuns
+
 
 class SimulationResult(models.Model):
 	message_classification = models.CharField(max_length=100, null=True, blank=True)

@@ -74,9 +74,9 @@ class SimulationResultSerializer(BulkSerializerMixin, serializers.ModelSerialize
 
 
 class SimulationRunSummarySerializer(serializers.ModelSerializer):
-	simResults = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 	numCorrect = serializers.IntegerField(read_only=True)
 	numIncorrect = serializers.IntegerField(read_only=True)
+	recentComparableRuns = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
 	class Meta:
 		model = models.SimulationRun

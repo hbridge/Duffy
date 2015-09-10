@@ -19,7 +19,7 @@ var SimulationRow = React.createClass({
     return (
       <tr onClick={this.handleClicked}>
         <td> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
-        <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} {numCorrect}/{numCorrect+numWrong}</td>
+        <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({numCorrect}/{numCorrect+numWrong})</td>
         <td> </td>
         <td> </td>
         <td> </td>
