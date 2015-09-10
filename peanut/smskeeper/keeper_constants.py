@@ -403,6 +403,8 @@ CLASS_MENU_OPTIONS = ([
 	},
 ])
 
+ALL_CLASS_OPTIONS = map(lambda option: option["value"], CLASS_MENU_OPTIONS)
+
 OUTGOING_DIGEST = "digest"
 OUTGOING_SURVEY = "survey"
 OUTGOING_REMINDER = "reminder"
