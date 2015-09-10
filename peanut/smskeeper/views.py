@@ -270,7 +270,10 @@ def unknown_messages_feed(request):
 			if followup.incoming:
 				followupBodies.append("Them:  %s" % msgJson["Body"])
 			else:
-				followupBodies.append("Us:      %s" % msgJson["Body"])
+				if followup.manual:
+					followupBodies.append("Us (manual): %s" % msgJson["Body"])
+				else:
+					followupBodies.append("Us:      %s" % msgJson["Body"])
 
 		message_dict["followups"] = followupBodies
 
