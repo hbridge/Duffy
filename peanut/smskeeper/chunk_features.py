@@ -14,11 +14,11 @@ class ChunkFeatures:
 		self.user = user
 
 	# things that match this RE will get a boost for done
-	beginsWithDoneWordRegex = r'^(done|check off) '
+	beginsWithDoneWordRegex = r'^(done|check off|mark off) '
 
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	# things that match this RE will get a boost for create
-	createWordRegex = "(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk)"
+	createWordRegex = "(remind|buy|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order)"
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'%s ' % createWordRegex
 
