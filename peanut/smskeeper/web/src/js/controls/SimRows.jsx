@@ -60,7 +60,7 @@ var SimDetailsRow = React.createClass({
     var f1 = this.props.classSummary.f1;
     return (
       <tr onClick={this.handleClicked}>
-        <td style={{textAlign: "right"}}> { this.props.classSummary.messageClass } </td>
+        <td style={{textAlign: "right"}}> <strong>{ this.props.classSummary.messageClass }</strong> </td>
         <td> {simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({tp}/{tp+fn})</td>
         <td> {precision ? precision.toFixed(2) : ""}</td>
         <td> {recall ? recall.toFixed(2) : ""}</td>
