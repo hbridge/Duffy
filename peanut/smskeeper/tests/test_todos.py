@@ -2189,6 +2189,31 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("And", self.getOutput(mock))
 			self.assertNotIn("Also", self.getOutput(mock))
 
+	"""
+	TODO(Derek): Make pass, need to refactor async processReminders
+	def test_multiple_reminders_at_same_time_aggregate(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "Buy socks tomorrow at 10am")
+		cliMsg.msg(self.testPhoneNumber, "do other stuff tomorrow at 10am")
+
+		self.setNow(dateMock, self.TUE_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("socks", self.getOutput(mock))
+			self.assertIn("stuff", self.getOutput(mock))
+
+			words = self.getOutput(mock).split(' ')
+			count = 0
+			for word in words:
+				if "hi" in word.lower():
+					count += 1
+
+			# Make sure we only say 'hi' once. We're assuming this is in the greeting
+			self.assertEqual(count, 1)
+	"""
+
 	def test_add_phrasing(self, dateMock):
 		self.setupUser(dateMock)
 		cliMsg.msg(self.testPhoneNumber, "Add buy Apple battery")
