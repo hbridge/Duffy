@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('underscore');
 var Model = require('../model/SimulationModel.jsx');
+var moment = require('moment');
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
@@ -17,13 +18,12 @@ var SimulationRow = React.createClass({
     var simpleAccuracy = numCorrect / (numCorrect + numWrong);
     return (
       <tr onClick={this.handleClicked}>
-        <td> { simId } ({this.props.simRun.sim_type} @ {this.props.simRun.git_revision})</td>
+        <td> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
         <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} {numCorrect}/{numCorrect+numWrong}</td>
         <td> </td>
         <td> </td>
         <td> </td>
       </tr>
-
     );
   },
 
@@ -35,6 +35,19 @@ var SimulationRow = React.createClass({
   getSimId(){
     return parseInt(this.props.simulationId);
   },
+
+  getSimType(){
+  	var type = this.props.simRun.sim_type;
+  	if (type == "t") {
+  		return "Test";
+  	} else if (type == "pp") {
+  		return "Prod Push";
+  	} else if (type == "dp") {
+  		return "Dev Push";
+  	}
+
+  	return "Unknown";
+  }
 });
 
 var SimDetailsRow = React.createClass({
