@@ -53,8 +53,9 @@ TRASH_DAY_TIP_ID = "trash-day"
 APPOINTMENT_TIP_ID = "appointments"
 TICKETS_TIP_ID = "tickets"
 TVSHOW_TIP_ID = "tv-show"
-SHARED_REMINDER_ID = "shared-reminder-1"
-
+SHARED_REMINDER_TIP1_ID = "shared-reminder-1"
+SHARED_REMINDER_TIP2_ID = "shared-reminder-2"
+GET_TASKS_TIP_ID = "get-tasks"
 
 SNOOZE_TIP_ID = "mini-snooze"
 
@@ -119,13 +120,23 @@ SMSKEEPER_TIPS = [
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
-		SHARED_REMINDER_ID,
+		SHARED_REMINDER_TIP1_ID,
 		"I can now remind other people on your behalf. Just say 'Remind Anne about lunch tomorrow at 12pm'",
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		TVSHOW_TIP_ID,
 		"Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'",
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		GET_TASKS_TIP_ID,
+		"Btw, you can get a list of all your tasks anytime. Just say 'What are my tasks?",
+		type=FULL_TIP_TYPE,
+	),
+	KeeperTip(
+		SHARED_REMINDER_TIP2_ID,
+		"I can directly remind your other half for you. Just say 'Remind my boyfriend to take out trash on Thursday at 7pm'",
 		type=FULL_TIP_TYPE
 	),
 
