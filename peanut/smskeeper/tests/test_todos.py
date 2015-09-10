@@ -2205,3 +2205,16 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me next Wednesday to start taking birth control again. 7 in the morning. Thank you keeper")
 			self.assertIn("Wed", self.getOutput(mock))
 
+	"""
+	TODO(Derek): Make pass
+	def test_paper_due_back_2_days(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Remind me I have a paper due friday")
+			self.assertIn("Wed", self.getOutput(mock))
+	"""
+
+

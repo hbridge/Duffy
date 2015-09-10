@@ -94,9 +94,18 @@ class TipQuestionResponseAction(Action):
 
 	def referralScore(self, chunk, user):
 		score = 0.0
+		if user.signup_data_json:
+			signupData = json.loads(user.signup_data_json)
+		else:
+			signupData = "{}"
+
 		referralAskJustNotified = user.wasRecentlySentMsgOfClass(tips.REFERRAL_ASK_TIP_ID, 2)
 		if referralAskJustNotified:
-			score = .6
+			# Only score if we don't have any current referrer
+			# So we don't score anything on the second message
+			if "referrer" not in signupData or len(signupData["referrer"]) == 0:
+				score = .6
+
 		return score
 
 	def digestChangeScore(self, chunk, user):

@@ -143,6 +143,18 @@ def createReminderEntry(user, nattyResult, msg, followups, keeperNumber, recurre
 	return entry
 
 
+def hasBeforePhrase(entry):
+	keywords = ["test", "report", "hw", "assignment", "assn", "homework", "essay", "paper", "exam"]
+
+	hasKeyword = False
+	for keyword in keywords:
+		if keyword in entry.text:
+			hasKeyword = True
+
+	if "due" in entry.text and hasKeyword:
+		pass
+
+
 def dealWithSuspiciousHour(user, entry, keeperNumber):
 	# If we're setting for early morning, send out a warning
 	tzAwareDate = entry.remind_timestamp.astimezone(user.getTimezone())

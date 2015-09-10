@@ -3,8 +3,9 @@ import pytz
 import logging
 import datetime
 import string
+import json
 
-from smskeeper import sms_util
+from smskeeper import sms_util, tips
 from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper import analytics
@@ -136,10 +137,17 @@ def process(user, msg, requestDict, keeperNumber):
 
 		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
 		if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
-			sms_util.sendMsg(user, u"Oh and here's my card. Tap it to save me to your address book. That way you'll know it's me when you get reminders :sunglasses:", keeper_constants.KEEPER_STUDENT_VCARD_URL, keeperNumber, eta=delayedTime)
-			sms_util.sendMsg(user, u"ps: I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E", None, keeperNumber, eta=delayedTime)
+			sms_util.sendMsg(user, u"Oh and here's my card. Tap it to save me to your address book. I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E", keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
 		else:
 			sms_util.sendMsg(user, u"Oh and I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks.", None, eta=delayedTime)
+
+		# Ask for referral if needed
+		signupData = json.loads(user.signup_data_json)
+		if "source" not in signupData or ("fb" not in signupData["source"] and len(signupData["referrer"]) == 0):
+			referralTip = tips.tipWithId(tips.REFERRAL_ASK_TIP_ID)
+			sms_util.sendMsg(user, referralTip.renderMini(), classification=tips.REFERRAL_ASK_TIP_ID, eta=delayedTime + datetime.timedelta(seconds=10))
+			tips.markTipSent(user, referralTip, isMini=True)
+
 		user.setTutorialComplete()
 		classification = keeper_constants.CLASS_CREATE_TODO
 

@@ -20,7 +20,7 @@ class KeeperTip():
 	# Render a tip for a full tip
 	def render(self, user):
 		result = self.message
-		result = result.replace(":NAME:", user.name)
+		result = result.replace(":NAME:", user.getFirstName())
 		result = result.replace(":APP_URL:", user.getWebAppURL())
 		if self.type == FULL_TIP_TYPE:
 			result += "\n\n" + SMSKEEPER_TIP_FOOTER
