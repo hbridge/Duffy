@@ -38,7 +38,7 @@ var EntryRow = React.createClass({
             <td> { approveButton } </td>
             <td> <a href={'../history?user_id=' + this.state.model.user } target="_blank"> {this.state.model.user_name} </a></td>
             <td> { this.state.model.body } </td>
-            <td> { this.state.model.followups } </td>
+            <td style={{whiteSpace: "pre"}}>{ this.state.model.followups.join('\n') }</td>
       </tr>
         );
   },
