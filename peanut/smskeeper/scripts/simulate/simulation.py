@@ -1,30 +1,26 @@
 # to run use ./manage.py test smskeeper.scripts.simulateClassifiedMessages
 
-import urllib2
-from urllib2 import URLError
-from mock import patch
-
-from smskeeper.tests import test_base
-import json
-
-from smskeeper import keeper_constants
-from smskeeper.models import User
-from smskeeper.models import Message
-import mechanize
-
-from smskeeper.scripts import importZipdata
-
 from datetime import datetime
+import json
+from urllib2 import URLError
+import urllib2
+
 from common import date_util
-import pytz
-
-from smskeeper.engine import Engine
-from smskeeper.chunk import Chunk
-from smskeeper import processing_util
-
 from django.conf import settings
-
 from django.core.serializers.json import DjangoJSONEncoder
+import mechanize
+from mock import patch
+import pytz
+from smskeeper import keeper_constants
+from smskeeper import processing_util
+from smskeeper.chunk import Chunk
+from smskeeper.engine import Engine
+from smskeeper.models import Entry
+from smskeeper.models import Message
+from smskeeper.models import User
+from smskeeper.scripts import importZipdata
+from smskeeper.tests import test_base
+
 
 import subprocess
 GIT_REVISION = subprocess.check_output(["git", "describe", "--always"]).replace("\n", "")
@@ -110,7 +106,7 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 				# for each message setup and simulate
 				self.setUserProps(user, message.get("userSnapshot"))
 				self.setNow(dateMock, date_util.fromIsoString(message["added"]))
-				# TODO set entries
+				self.setActiveEntries(user, message.get("activeEntriesSnapshot", []))
 				# TODO set recent outgoing message classes
 				self.scoreMessage(user, message)
 			except Exception as e:
@@ -149,6 +145,23 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 			user.activated = datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
 			user.signature_num_lines = 0
 		user.save()
+
+	def setActiveEntries(self, user, entriesSnapshot):
+		# hide any currently active entries
+		activeEntries = Entry.fetchReminders(user, hidden=False)
+		for entry in activeEntries:
+			entry.hidden = True
+			entry.save()
+
+		# create active entries
+		newActiveEntries = []
+		for entrySnapshot in entriesSnapshot:
+			text = entrySnapshot.get("text", "")
+			remind_timestamp = date_util.fromIsoString(entrySnapshot.get("remind_timestamp"))
+			newEntry = Entry.createReminder(user, text, remind_timestamp)
+			newEntry.save()
+			newActiveEntries.append(newEntry)
+		logger.info("Set active entries: %s", newActiveEntries)
 
 	def scoreMessage(self, user, message):
 		lines = processing_util.processSigAndSplitLines(user, message["body"])

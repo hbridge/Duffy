@@ -412,8 +412,18 @@ class Entry(models.Model):
 		return entries
 
 	@classmethod
+	def fetchReminders(cls, user, hidden=False, orderByString="added", state=None):
+		return Entry.fetchEntries(user, keeper_constants.REMIND_LABEL, hidden, orderByString, state)
+
+	@classmethod
 	def createEntry(cls, user, keeper_number, label, text, img_url=None, remind_timestamp=None):
 		entry = Entry.objects.create(creator=user, label=label, text=text, img_url=img_url, remind_timestamp=remind_timestamp)
+		entry.users.add(user)
+		return entry
+
+	@classmethod
+	def createReminder(cls, user, text, remind_timestamp):
+		entry = Entry.objects.create(creator=user, label=keeper_constants.REMIND_LABEL, text=text, remind_timestamp=remind_timestamp)
 		entry.users.add(user)
 		return entry
 
