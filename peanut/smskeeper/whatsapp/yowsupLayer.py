@@ -25,7 +25,7 @@ parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 
 import logging
 logger = logging.getLogger(__name__)
@@ -95,7 +95,7 @@ class KeeperLayer(YowInterfaceLayer, asyncore.dispatcher_with_send):
 		self.toLower(entity)
 
 		# set keeper's status
-		statusEntity = SetStatusIqProtocolEntity(text=keeper_constants.WHATSAPP_STATUS.encode('utf-8'))
+		statusEntity = SetStatusIqProtocolEntity(text=keeper_strings.WHATSAPP_STATUS.encode('utf-8'))
 		self.toLower(statusEntity)
 
 	def handle_accept(self):

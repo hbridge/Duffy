@@ -1,6 +1,6 @@
 import re
 
-from smskeeper import keeper_constants, sms_util
+from smskeeper import keeper_constants, sms_util, keeper_strings
 from smskeeper import analytics
 from .action import Action
 
@@ -19,7 +19,7 @@ class HelpAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		sms_util.sendMsgs(user, keeper_constants.HELP_MESSAGES)
+		sms_util.sendMsgs(user, keeper_strings.HELP_MESSAGES)
 		analytics.logUserEvent(
 			user,
 			"Requested Help",

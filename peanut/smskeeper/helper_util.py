@@ -1,7 +1,7 @@
 
 from smskeeper import sms_util
+from smskeeper import keeper_constants, keeper_strings
 import random
-import keeper_constants
 import phonenumbers
 from phonenumbers import geocoder
 
@@ -14,7 +14,7 @@ def sendNotFoundMessage(user, label, keeperNumber):
 
 
 def randomAcknowledgement():
-	return random.choice(keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+	return random.choice(keeper_strings.ACKNOWLEDGEMENT_PHRASES)
 
 
 def isUSRegionCode(phoneNumber):

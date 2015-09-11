@@ -10,7 +10,7 @@ import pytz
 import emoji
 
 from models import Entry, Message
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from models import ZipData
 from smskeeper.chunk import Chunk
 import random
@@ -536,5 +536,5 @@ def renderDoneResponse(entries, isDelete):
 	if isDelete:
 		msgBack = "Ok. Removed :ARTICLE: :cross_mark:"
 	else:
-		msgBack = "%s Checked :ARTICLE: off :white_check_mark:" % random.choice(keeper_constants.DONE_PHRASES)
+		msgBack = "%s Checked :ARTICLE: off :white_check_mark:" % random.choice(keeper_strings.DONE_PHRASES)
 	return msgBack.replace(':ARTICLE:', article)

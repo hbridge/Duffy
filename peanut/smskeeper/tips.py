@@ -1,6 +1,6 @@
 import pytz
 from smskeeper.models import Entry
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from smskeeper import time_utils
 
@@ -169,12 +169,12 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		DIGEST_DONE_TIP_ID,
-		keeper_constants.REMINDER_DIGEST_DONE_INSTRUCTIONS,
+		keeper_strings.REMINDER_DIGEST_DONE_INSTRUCTIONS,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DIGEST_SNOOZE_TIP_ID,
-		keeper_constants.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS,
+		keeper_strings.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(

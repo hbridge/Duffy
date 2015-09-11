@@ -3,7 +3,7 @@ import pytz
 from common import date_util, weather_util
 
 from smskeeper import sms_util, chunk_features
-from smskeeper import keeper_constants, analytics
+from smskeeper import keeper_constants, analytics, keeper_strings
 from .action import Action
 
 import logging
@@ -43,7 +43,7 @@ class FetchWeatherAction(Action):
 		if weatherPhrase:
 			sms_util.sendMsg(user, weatherPhrase)
 		else:
-			sms_util.sendMsg(user, "I'm sorry, I don't know the weather right now")
+			sms_util.sendMsg(user, keeper_strings.WEATHER_NOT_FOUND)
 
 		analytics.logUserEvent(
 			user,

@@ -4,7 +4,7 @@ import json
 
 from django.conf import settings
 
-from smskeeper import niceties, sms_util, keeper_constants, user_util
+from smskeeper import niceties, sms_util, keeper_constants, user_util, keeper_strings
 from common import slack_logger, date_util
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ def process(user, msg, requestDict, keeperNumber):
 		if not response:
 			response = ":thumbs_up_sign:"
 		if not user.wasRecentlySentMsgOfClass(keeper_constants.CLASS_SHARED_REMINDER_RECIPIENT_UPSELL):
-			response = "%s %s" % (response, keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL)
+			response = "%s %s" % (response, keeper_strings.SHARED_REMINDER_RECIPIENT_UPSELL)
 			sms_util.sendMsg(user, response, None, keeperNumber, classification=keeper_constants.CLASS_SHARED_REMINDER_RECIPIENT_UPSELL)
 		else:
 			sms_util.sendMsg(user, response, None, keeperNumber)

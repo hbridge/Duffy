@@ -5,7 +5,7 @@ from peanut.settings import constants
 import pytz
 from smskeeper import analytics
 from common import date_util
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import msg_util
 from common import natty_util
 from smskeeper.models import Entry, Contact
@@ -270,15 +270,15 @@ def sendCompletionResponse(user, entry, followups, keeperNumber):
 		if not user.isTutorialComplete():
 			toSend = toSend + " (If that time doesn't work, just tell me what time is better.)"
 		else:
-			toSend = toSend + " " + keeper_constants.FOLLOWUP_TIME_TEXT
+			toSend = toSend + " " + keeper_strings.FOLLOWUP_TIME_TEXT
 
 	# sharing followups
 	if user.isTutorialComplete():
 		if keeper_constants.FOLLOWUP_SHARE_UNRESOLVED in followups:
-			toSend = toSend + "\n" + keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT
+			toSend = toSend + "\n" + keeper_strings.FOLLOWUP_SHARE_UNRESOLVED_TEXT
 			responseClassification = keeper_constants.OUTGOING_SHARE_PROMPT
 		elif keeper_constants.FOLLOWUP_SHARE_RESOLVED in followups:
-			toSend = toSend + "\n" + keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT
+			toSend = toSend + "\n" + keeper_strings.FOLLOWUP_SHARE_RESOLVED_TEXT
 
 	sms_util.sendMsg(user, toSend, None, keeperNumber, classification=responseClassification)
 
@@ -384,7 +384,7 @@ def shareReminders(user, entries, handles, keeperNumber):
 			# if the user isn't activated send them special text
 			introText = "Hi there :wave: "
 			if not contact.target.activated:
-				introText += "%s " % keeper_constants.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
+				introText += "%s " % keeper_strings.SHARED_REMINDER_RECIPIENT_INTRO.replace(":NAME:", user.nameOrPhone())
 				nonActivatedRecipients = True
 
 			if len(entries) == 1:
@@ -405,7 +405,7 @@ def shareReminders(user, entries, handles, keeperNumber):
 				# this is a new user, send them special text.
 				sms_util.sendDelayedMsg(
 					contact.target,
-					keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL,
+					keeper_strings.SHARED_REMINDER_RECIPIENT_UPSELL,
 					10,
 					contact.target.getKeeperNumber()
 				)

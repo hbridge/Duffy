@@ -3,7 +3,7 @@ from mock import patch
 
 from peanut.settings import constants
 from smskeeper.models import User, Message
-from smskeeper import msg_util, cliMsg, keeper_constants, sms_util
+from smskeeper import msg_util, cliMsg, keeper_constants, sms_util, keeper_strings
 from common import date_util
 from django.conf import settings
 
@@ -234,7 +234,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			with patch('smskeeper.sms_util.recordOutput') as mock:
 				cliMsg.msg(self.testPhoneNumber, phrase)
 				output = self.getOutput(mock)
-				self.assertNotIn(output, keeper_constants.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
+				self.assertNotIn(output, keeper_strings.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
 
 	def test_thanks_upsell(self, dateMock):
 		# this will setup user's activated time to be TUE_8AM
@@ -246,7 +246,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			found = False
-			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
 				if phrase in output:
 					found = True
 			self.assertEqual(found, False)
@@ -257,7 +257,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thank you")
 			output = self.getOutput(mock)
 			found = False
-			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
 				if phrase in output:
 					found = True
 			self.assertEqual(found, True)
@@ -267,7 +267,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks Keeper")
 			output = self.getOutput(mock)
 			found = False
-			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
 				if phrase in output:
 					found = True
 			self.assertEqual(found, False)
@@ -281,7 +281,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			found = False
-			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
 				if phrase in output:
 					found = True
 			self.assertEqual(found, True)
@@ -294,7 +294,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "thanks")
 			output = self.getOutput(mock)
 			found = False
-			for phrase, link in keeper_constants.SHARE_UPSELL_PHRASES:
+			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
 				if phrase in output:
 					found = True
 			self.assertEqual(found, False)
@@ -445,16 +445,6 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		ret = msg_util.naturalize(now, datetime.datetime(2015, 07, 7, 15, 0, 0))
 		self.assertIn("July 7th", ret)
 
-	"""
-	def test_exception_error_message(self, dateMock):
-		self.setupUser(True, True, dateMock=dateMock)
-		with self.assertRaises(NameError):
-			cliMsg.msg(self.testPhoneNumber, 'yippee ki yay motherfucker')
-
-		# we have to dig into messages as ouput would never get returned from the mock
-		messages = Message.objects.filter(user=self.user, incoming=False).all()
-		self.assertIn(messages[0].getBody(), keeper_constants.GENERIC_ERROR_MESSAGES)
-	"""
 
 	def testSendMsgs(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
@@ -526,12 +516,12 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.assertNotEqual(self.user.timezone, "PST")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "My zipcode is 94117")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.assertIn(self.getOutput(mock), keeper_strings.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "US/Pacific")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "My zip code is 10012")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.assertIn(self.getOutput(mock), keeper_strings.ACKNOWLEDGEMENT_PHRASES)
 			self.user = User.objects.get(id=self.user.id)
 			self.assertEqual(self.user.timezone, "US/Eastern")
 
@@ -588,7 +578,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True, dateMock=dateMock)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, 'tell me more')
-			self.assertIn(self.renderTextConstant(keeper_constants.HELP_MESSAGES[0]), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_strings.HELP_MESSAGES[0]), self.getOutput(mock))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, 'tell me more')
 			self.assertEqual('', self.getOutput(mock))
@@ -605,8 +595,8 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Are you my daddy?")
-			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_constants.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
+			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_strings.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Who is the bestests")
-			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_constants.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
+			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_strings.UNKNOWN_COMMAND_PHRASES), use_aliases=True))

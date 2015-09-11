@@ -4,7 +4,7 @@ import datetime
 from mock import patch
 import logging
 
-from smskeeper import cliMsg, async, keeper_constants, tips
+from smskeeper import cliMsg, async, keeper_constants, tips, keeper_strings
 from smskeeper.models import Entry, Message
 
 import test_base
@@ -728,7 +728,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "print shit out")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_strings.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 	# Make sure we create a new entry instead of a followup
 	def test_create_new_after_reminder(self, dateMock):
@@ -1043,13 +1043,13 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_DONE_INSTRUCTIONS), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_strings.REMINDER_DIGEST_DONE_INSTRUCTIONS), self.getOutput(mock))
 
 		# make sure after 3 days, we now do the snooze
 		self.setNow(dateMock, self.FRI_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(self.renderTextConstant(keeper_constants.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_strings.REMINDER_DIGEST_SNOOZE_INSTRUCTIONS), self.getOutput(mock))
 
 	# Make sure we expire tasks after N days
 	def test_old_tasks_fall_off_the_digest_on_Monday(self, dateMock):
@@ -1139,7 +1139,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
 
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_weekend(self, dateMock):
@@ -1149,7 +1149,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY[4]), self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[4]), self.getOutput(mock))
 
 	# Make sure we don't ping for product id 0
 	def test_daily_digest_doesnt_ping_product_0(self, dateMock):
@@ -1173,7 +1173,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
 
 	"""
 	Commenting out since now we're pinging every day
@@ -1420,7 +1420,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Some unkown phrase, we shouldn't get anything back
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "this is a random phrase")
-			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_constants.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
+			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_strings.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
 
 		# Make sure we didn't create anything
 		entries = Entry.objects.filter(label="#reminders")
@@ -1495,7 +1495,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			# We shouldn't send a digest since we have an entry for tomorrow
-			self.assertIn(emoji.emojize(keeper_constants.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
+			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
 
 		self.getTestUser().setState(keeper_constants.STATE_SUSPENDED)
 
@@ -1739,7 +1739,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tasks")
 			self.assertNotIn("forecast:", self.getOutput(mock))
-			self.assertIn(keeper_constants.REMINDER_DIGEST_EMPTY[0], self.getOutput(mock))
+			self.assertIn(keeper_strings.REMINDER_DIGEST_EMPTY[0], self.getOutput(mock))
 
 	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_on_request(self, weatherMock, dateMock):
@@ -1851,7 +1851,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "snooze go poop")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_strings.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 		self.setNow(dateMock, self.TUE_9AM)
 		async.processDailyDigest()
@@ -1861,7 +1861,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "snooze go poop ")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_strings.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 	# If they type something starting with snooze, always make sure it snoozes (even if tasks is in there)
 	def test_snooze_starts_with_snooze(self, dateMock):
@@ -1876,7 +1876,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "snooze All Tasks")
 			self.assertIn("tomorrow", self.getOutput(mock))
-			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_strings.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 		# Now make it process the record, like the reminder fired
 		entry = Entry.objects.filter(label="#reminders").last()

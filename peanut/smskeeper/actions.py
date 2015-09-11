@@ -5,7 +5,7 @@ import datetime
 import json
 
 from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper.models import Entry, Contact, User
 from smskeeper import analytics
 
@@ -286,8 +286,8 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 		ret = True
 	else:
 		if sendMsg:
-			sms_util.sendMsg(user, random.choice(keeper_constants.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
-			logger.info("User %s: (At night) I couldn't figure out '%s'. unknown type %s" % (user.id, msg, unknownType))
+			sms_util.sendMsg(user, random.choice(keeper_strings.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
+			logger.info("User %s: (At night) I couldn't figure out '%s'" % (user.id, msg))
 		slack_logger.postManualAlert(
 			user,
 			"User %s: sent unknown %s" % (user.id, msg),

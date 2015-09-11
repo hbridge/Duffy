@@ -75,10 +75,6 @@ PHOTO_LABEL = '#photo'
 SCREENSHOT_LABEL = '#screenshot'
 ATTACHMENTS_LABEL = '#attachment'
 REMIND_LABEL = "#reminders"
-GENERIC_ERROR_MESSAGES = [
-	u'\U0001F635 something went wrong.  My minions have been notified.',
-	u"Well \U0001F4A9 something happened.  Someone'll be along to clean up shortly.",
-]
 
 UNRESOLVED_HANDLES_DATA_KEY = "unresolvedHandles"
 RESOLVED_HANDLES_DATA_KEY = "resolvedHandles"
@@ -98,47 +94,8 @@ TUTORIAL_STEP_KEY = "todo-tutorial-step"
 # LAST_EDITED_ENTRY_ID_KEY = "lastEditedEntryId"
 LAST_ENTRIES_IDS_KEY = "lastEntriesIds"
 
-ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing.", u"\U0001F44D", "Noted.", u"\U0001F44C"]
-DONE_PHRASES = ["Nice!", "Sweet!", ":+1:", "Well done!", "Woohoo!"]
-
-FIRST_INTRO_MESSAGE_NO_MAGIC = "Oh hello. I'm ready for you."
-FIRST_INTRO_MESSAGE_MAGIC = "Ah. You used the magic phrase. Smooth."
-
-INTRO_MESSAGES = [
-	u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
-	"Let me show you how I can help you. First, what's your name?"
-]
-
-INTRO_MESSAGES_PAID = [
-	u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
-	"Let's start your 7-day free trial. You can send CANCEL to cancel anytime.",
-	"Let me show you how I can help you. First, what's your name?"
-]
-
-INTRO_MESSAGES_MEDICAL = [
-	u"\U0001F44B Hi, I'm Keeper! I'm here to make sure you remember to take your medicine.",
-	"Let's start your 7-day free trial. You can send CANCEL to cancel anytime.",
-	"Let me show you how I can help you. First, what's your name?"
-]
-
-
-UNKNOWN_COMMAND_PHRASES = [
-	u"Hmmm, I need my minions for that that and they're sleeping. I'll get back to you in the morning :sunrise:",
-	u"I'm not sure what you mean :hatching_chick:. I'll ask my minions :smile_cat::smile_cat: to help me out when they wake up.",
-	u"Err... Not sure what you mean. Don't worry, my minions :smile_cat::smile_cat: will straighten things out in the morning",
-]
-
-REMINDER_PHRASES = [
-	u"Reminder for you:",
-	u"Reminder:",
-	u"Hi there! Wanted to remind you: ",
-	u"Hello. Friendly reminder: ",
-	u"Hi! You wanted me to remind you:",
-	u"Hi! Don't forget:",
-]
 
 REPORT_ISSUE_KEYWORD = "report"
-REPORT_ISSUE_CONFIRMATION = "My minions have been notified."
 DEFAULT_TIP_FREQUENCY_DAYS = 3
 
 LISTS_HELP_SUBJECT = "lists"
@@ -146,34 +103,6 @@ REMINDERS_HELP_SUBJECT = "reminders"
 
 GENERAL_HELP_KEY = "general"
 EXAMPLES_HELP_KEY = "examples"
-
-HELP_SUBJECTS = {
-	LISTS_HELP_SUBJECT: {
-		GENERAL_HELP_KEY: [
-			u"Lists \U0001F4DD are great for remembering things you want to keep track of.",
-			u"Just say 'add' with an item and a list. For example: 'Add pay rent to my todo list'"
-		],
-		EXAMPLES_HELP_KEY: [
-			u"Add Airplane \u2708\ufe0f to my movies list" + "\n" +
-			u"Add Tokyo \U0001f1ef\U0001f1f5, Paris \U0001f1eb\U0001f1f7 to travel" + "\n" +
-			u"Add Di Fara, Motorino to Pizza Joints \U0001F355" + "\n" +
-			u"Add invitations, party favors, seating chart to wedding \U0001F492"
-		],
-	},
-	REMINDERS_HELP_SUBJECT: {
-		GENERAL_HELP_KEY: [
-			u"Reminders \u23F0 are great for keeping track of stuff you need to do later.",
-			u"Just say 'remind me' and then what you want to be reminded of.  If you don't include a time \U0001f554, I'll ask you for one." + "\n" +
-			u"For example, you could say 'remind me to call mom \U0001f4f1 this weekend'"
-		],
-		EXAMPLES_HELP_KEY: [
-			u"Remind me to do laundry on Saturday" + "\n" +
-			u"Remind me to practice \U0001F3B8 tonight at 8pm" + "\n" +
-			u"Remind me to email the team \U0001F4E7 next week" + "\n" +
-			u"Remind me to get a gift for Dad \U0001F381"
-		]
-	},
-}
 
 SLACK_CHANNEL_FEED = "#livesmskeeperfeed"
 SLACK_CHANNEL_MANUAL_ALERTS = "#manual-alerts"
@@ -203,16 +132,7 @@ SHARE_UPSELL_MIN_ACTIVATED_DAYS = 1
 SHARE_UPSELL_WEBLINK = 'weblink'  # send weblink
 SHARE_UPSELL_PHONE = 'phone'  # send phone number
 
-# second parameter is whether to send out a website link or phone number
-SHARE_UPSELL_PHRASES = [
-	[u"Btw, I'm great for anyone who forgets things \U0001F433. Know anyone who could use my help? Send them to", SHARE_UPSELL_WEBLINK],
-	[u"Think any of your friends would want to try me? I like making new friends \U0001F38E. Send them to", SHARE_UPSELL_WEBLINK],
-	[u"Is there anyone you know who can use a little more sanity \U0001F0CF in their life? Just send them to \U00002615", SHARE_UPSELL_WEBLINK],
-	[u"And if you have anyone else who needs help, just ask them to say 'hello' to me at", SHARE_UPSELL_PHONE],
-]
-
 FEEDBACK_FREQUENCY_DAYS = 45
-FEEDBACK_PHRASE = u"Btw, Would you be ok if one of my minions \U0001F638 contacted you to get more info on your experience with me?"
 FEEDBACK_MIN_ACTIVATED_TIME_IN_DAYS = 3
 
 # Once a task is this old and still on the list, remove it from daily digest and task list
@@ -247,46 +167,6 @@ def isTestKeeperNumber(keeperNumber):
 DIGEST_STATE_DEFAULT = "default"
 DIGEST_STATE_LIMITED = "limited"
 DIGEST_STATE_NEVER = "never"
-
-REMINDER_DIGEST_HEADERS = [
-	u":sunrise: G'morning sunshine",
-	u"Tuesday, it is \U000026F2",
-	u"Wednesday is here already!",
-	u"How did Thursday sneak up on us? :cat:",
-	u"Friday funday! :party_popper:",
-	u"It's sit-around-day \U0001F344",
-	u"Sunday Sunday Sunday! \U0001F366"
-]
-
-REMINDER_DIGEST_DONE_INSTRUCTIONS = ":white_check_mark: To check a task off, tell me what you're done with, like 'Done with calling Mom'"
-
-
-REMINDER_DIGEST_SNOOZE_INSTRUCTIONS = ":sleeping_symbol: To snooze a task, just tell me when I should remind you, like 'Snooze buy flip flops to Saturday'"
-
-REMINDER_DIGEST_EMPTY = [
-	u"Start the week off right. Tell me what you need to get done this week! \U0001F60E",
-	u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",
-	u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",
-	# TODO replace this after digests go out tomorrow
-	# u"I can text other people reminders for you, just say something like:\nRemind Eric to pick up pizza at 6pm :pizza:",
-	u"Empty day. Surely, there is something you need me to track? \U0001F62E",
-	u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",
-	u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",
-	u"Last day of the week to get stuff done! \U0001F636"
-]
-
-HELP_MESSAGES = [
-	u":raising_hand: Hi! I'm an automated digital assistant to help you remember things.",
-	u"Just say what you need to get done and I'll remind you at the right time.",
-	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
-	REMINDER_DIGEST_DONE_INSTRUCTIONS,
-]
-
-HELP_MESSAGES_OLD = [
-	u'There are a few things I can help you with. \U0001F4AA' + "\n" +
-	u"I can remember lists \U0001F4DD of things for you, and I can send you reminders at a specific time \u23F0",
-	u"What would you like to learn more about? Lists or reminders?"
-]
 
 KEEPER_PROD_PHONE_NUMBERS = ["+14792026561", "+14792086270", "3584573970819@s.whatsapp.net", "+19284851665", "+16462332164"]
 
@@ -442,15 +322,9 @@ RECURRENCE_CHOICES = [
 	RECUR_EVERY_2_WEEKS
 ]
 
-WHATSAPP_STATUS = u"\U0001F64B Hi, I'm here to help!"
-
 GOAL_DONE_COUNT = 3
 
-SHARED_REMINDER_RECIPIENT_UPSELL = (
-	"Btw, I can help you stay organized as well. "
-	"Say 'tell me more' for more info on my free personal assistant services. :raising_hand:"
-)
-SHARED_REMINDER_RECIPIENT_INTRO = "I'm :NAME:'s personal assistant."
+
 SHARED_REMINDER_VERB_WHITELIST_REGEX = r'remind|text|txt|tell'
 
 UNKNOWN_TYPE_ZERO_SCORE = "zeros"
@@ -461,11 +335,7 @@ UNKNOWN_TYPE_QUESTION = "question"
 
 
 FOLLOWUP_TIME = "time"
-FOLLOWUP_TIME_TEXT = "If there's a better time, just tell me."
 FOLLOWUP_SHARE_RESOLVED = "share-resolved"
 FOLLOWUP_SHARE_UNRESOLVED = "share-unresolved"
-
-FOLLOWUP_SHARE_RESOLVED_TEXT = ":information_desk_person: I'll also remind them directly!"
-FOLLOWUP_SHARE_UNRESOLVED_TEXT = u":information_desk_person: I can also txt them for you -- just send me their phone number."
 
 RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)

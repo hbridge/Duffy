@@ -4,7 +4,7 @@ from mock import patch
 
 from smskeeper.models import Entry, Message
 from smskeeper import cliMsg, tips
-from smskeeper import async, keeper_constants
+from smskeeper import async, keeper_constants, keeper_strings
 
 import test_base
 
@@ -102,7 +102,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_8AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind poop")
-			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_strings.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 		self.setNow(dateMock, self.MON_9AM)
 		cliMsg.msg(self.testPhoneNumber, "remind me pee tomorrow")
@@ -431,7 +431,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind me poop")
-			self.assertIn(keeper_constants.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
+			self.assertIn(keeper_strings.FOLLOWUP_TIME_TEXT, self.getOutput(mock))
 
 		origEntry = Entry.objects.get(label="#reminders")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -1192,7 +1192,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Call Va, and registration at 9am tomorrow\nPay electric and water bill at 8 am tomorrow.")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.assertIn(self.getOutput(mock), keeper_strings.ACKNOWLEDGEMENT_PHRASES)
 			self.assertNotIn("tomorrow", self.getOutput(mock))
 
 		entries = Entry.objects.filter(label="#reminders")
@@ -1206,7 +1206,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Call Va, and registration\nPay electric and water bill")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.assertIn(self.getOutput(mock), keeper_strings.ACKNOWLEDGEMENT_PHRASES)
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEquals(2, len(entries))
@@ -1221,7 +1221,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "todo list:\nCall Va, and registration\nPay electric and water bill")
-			self.assertIn(self.getOutput(mock), keeper_constants.ACKNOWLEDGEMENT_PHRASES)
+			self.assertIn(self.getOutput(mock), keeper_strings.ACKNOWLEDGEMENT_PHRASES)
 
 		entries = Entry.objects.filter(label="#reminders")
 		self.assertEquals(2, len(entries))

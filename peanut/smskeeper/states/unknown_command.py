@@ -1,6 +1,6 @@
 import re
 from smskeeper import sms_util, msg_util
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from common import slack_logger
 from smskeeper.models import Message
 
@@ -12,7 +12,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 	# If the user enters report, let them know we've been notified
 	if re.match(keeper_constants.REPORT_ISSUE_KEYWORD, msg_util.cleanMsgText(msg)) is not None:
-		sms_util.sendMsg(user, keeper_constants.REPORT_ISSUE_CONFIRMATION, None, keeperNumber)
+		sms_util.sendMsg(user, keeper_strings.REPORT_ISSUE_CONFIRMATION, None, keeperNumber)
 		recentMessages = Message.objects.filter(user=user).order_by("-added")
 		recentMessages = recentMessages[:RECENT_MESSAGES_TO_POST]
 		# recentMessages.reverse()

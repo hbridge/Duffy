@@ -1,6 +1,6 @@
 from mock import patch
 
-from smskeeper import cliMsg, keeper_constants
+from smskeeper import cliMsg, keeper_constants, keeper_strings
 
 import test_base
 
@@ -11,7 +11,7 @@ class SMSKeeperHelpCase(test_base.SMSKeeperBaseCase):
 		self.setupUser(True, True)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "help")
-			self.assertIn(self.renderTextConstant(keeper_constants.HELP_MESSAGES[0]), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_strings.HELP_MESSAGES[0]), self.getOutput(mock))
 
 	# commenting all the original test cases out, since Help is now stateless and simpler
 	'''

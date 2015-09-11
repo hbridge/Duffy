@@ -1,7 +1,7 @@
 from .action import Action
 import re
 from smskeeper import sms_util
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 import time
 from smskeeper import analytics
 
@@ -29,8 +29,7 @@ class StopAction(Action):
 		if not isSilent:
 			sms_util.sendMsg(
 				user,
-				u"I won't txt you anymore \U0001F61E. If you didn't mean to do this, just type 'start'"
-				+ u"\n\nI hate to see you go. Is there something I can do better? \U0001F423",
+				keeper_strings.STOP_RESPONSE,
 				stopOverride=True
 			)
 

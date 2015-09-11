@@ -19,7 +19,7 @@ from peanut.celery import app
 
 from smskeeper import tips, sms_util, user_util, msg_util
 from smskeeper.models import Entry, Message, User
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from smskeeper import time_utils
 
@@ -127,7 +127,7 @@ def processReminder(entry):
 				else:
 					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
 			else:
-				msg = random.choice(keeper_constants.REMINDER_PHRASES) + " %s" % entry.text
+				msg = random.choice(keeper_strings.REMINDER_PHRASES) + " %s" % entry.text
 
 			sms_util.sendMsg(user, msg, classification=keeper_constants.OUTGOING_REMINDER)
 			analytics.logUserEvent(
@@ -199,7 +199,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 	msg = ""
 
 	if not userRequested:  # Include a header and weather if not user requested
-		headerPhrase = keeper_constants.REMINDER_DIGEST_HEADERS[now.weekday()]
+		headerPhrase = keeper_strings.REMINDER_DIGEST_HEADERS[now.weekday()]
 		msg += u"%s\n" % (headerPhrase)
 
 		if user.wxcode:
@@ -208,7 +208,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 				msg += u"\n%s\n\n" % (weatherPhrase)
 
 	if len(pendingEntries) == 0:
-		msg += keeper_constants.REMINDER_DIGEST_EMPTY[now.weekday()] + '\n'
+		msg += keeper_strings.REMINDER_DIGEST_EMPTY[now.weekday()] + '\n'
 	else:
 		if userRequested:  # This shows all tasks so we don't mention today
 			msg += u"Your current tasks: \U0001F4DD\n"

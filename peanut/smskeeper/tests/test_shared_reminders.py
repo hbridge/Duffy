@@ -2,7 +2,7 @@ from mock import patch
 
 from smskeeper.models import Entry, User
 from smskeeper import cliMsg, tips
-from smskeeper import async, keeper_constants
+from smskeeper import async, keeper_constants, keeper_strings
 from smskeeper.chunk import Chunk
 import re
 
@@ -78,7 +78,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to take her pill tomorrow morning")
 			self.assertIn("remind you", self.getOutput(mock))  # make sure we tell them we'll remind them
-			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT), self.getOutput(mock))  # make sure we upsell them to remind mom
+			self.assertIn(self.renderTextConstant(keeper_strings.FOLLOWUP_SHARE_UNRESOLVED_TEXT), self.getOutput(mock))  # make sure we upsell them to remind mom
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, phoneNumber)
@@ -101,7 +101,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			self.createSharedReminder()
-			self.assertNotIn(self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL), self.getOutput(mock))
+			self.assertNotIn(self.renderTextConstant(keeper_strings.SHARED_REMINDER_RECIPIENT_UPSELL), self.getOutput(mock))
 
 		# make sure we don't change the recipient's state
 		self.assertEqual(recipient.state, keeper_constants.STATE_NORMAL)
@@ -116,7 +116,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to call me %s" % (self.recipientPhoneNumber))
-			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_strings.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
 
 		# Make sure entry was created correctly
 		entries = Entry.objects.filter(label="#reminders")
@@ -127,8 +127,8 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		self.createSharedReminder()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind mom to call me in a week")
-			self.assertNotIn(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))
-			self.assertIn(self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
+			self.assertNotIn(keeper_strings.FOLLOWUP_SHARE_UNRESOLVED_TEXT, self.getOutput(mock))
+			self.assertIn(self.renderTextConstant(keeper_strings.FOLLOWUP_SHARE_RESOLVED_TEXT), self.getOutput(mock))
 
 		# Make sure both entries were shared
 		entries = Entry.objects.filter(label="#reminders")
@@ -168,7 +168,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.recipientPhoneNumber, "hi")
 			# Make sure
 			self.assertIn(
-				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
+				self.renderTextConstant(keeper_strings.SHARED_REMINDER_RECIPIENT_UPSELL),
 				self.getOutput(mock)
 			)
 
@@ -283,7 +283,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.recipientPhoneNumber, "hi")
 			# Make sure upsell is shown
 			self.assertIn(
-				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
+				self.renderTextConstant(keeper_strings.SHARED_REMINDER_RECIPIENT_UPSELL),
 				self.getOutput(mock)
 			)
 
@@ -291,7 +291,7 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.recipientPhoneNumber, "hi")
 			# Make sure upsell is not shown a second time
 			self.assertNotIn(
-				self.renderTextConstant(keeper_constants.SHARED_REMINDER_RECIPIENT_UPSELL),
+				self.renderTextConstant(keeper_strings.SHARED_REMINDER_RECIPIENT_UPSELL),
 				self.getOutput(mock)
 			)
 
@@ -306,11 +306,11 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Remind Mom to test")
 			self.assertNotIn(
-				self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_UNRESOLVED_TEXT),
+				self.renderTextConstant(keeper_strings.FOLLOWUP_SHARE_UNRESOLVED_TEXT),
 				self.getOutput(mock)
 			)
 			self.assertIn(
-				self.renderTextConstant(keeper_constants.FOLLOWUP_SHARE_RESOLVED_TEXT),
+				self.renderTextConstant(keeper_strings.FOLLOWUP_SHARE_RESOLVED_TEXT),
 				self.getOutput(mock)
 			)
 

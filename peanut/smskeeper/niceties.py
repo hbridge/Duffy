@@ -7,7 +7,7 @@ import pytz
 import logging
 import phonenumbers
 
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import msg_util
 from smskeeper import time_utils
 
@@ -217,12 +217,12 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		user.save()
 		logger.info("Asked to talk to user: %s" % (user.id))
 
-		return "%s %s" % (base, keeper_constants.FEEDBACK_PHRASE)
+		return "%s %s" % (base, keeper_strings.FEEDBACK_PHRASE)
 	'''
 	if time_utils.isDateOlderThan(user.last_share_upsell, keeper_constants.SHARE_UPSELL_FREQUENCY_DAYS) and time_utils.isDateOlderThan(user.activated, keeper_constants.SHARE_UPSELL_MIN_ACTIVATED_DAYS) and user.completed_tutorial is True:
 		user.last_share_upsell = date_util.now(pytz.utc)
 		user.save()
-		phrase, link = random.choice(keeper_constants.SHARE_UPSELL_PHRASES)
+		phrase, link = random.choice(keeper_strings.SHARE_UPSELL_PHRASES)
 		if link == keeper_constants.SHARE_UPSELL_WEBLINK:
 			link = user.getInviteUrl()
 		else:
