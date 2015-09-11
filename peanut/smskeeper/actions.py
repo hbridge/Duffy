@@ -283,6 +283,10 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 		slack_logger.postManualAlert(user, infoMessage, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 
 		logger.info("User %s: (During day) I couldn't figure out '%s'. unknown type %s" % (user.id, msg, unknownType))
+
+		if unknownType == keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_STATE or unknownType == keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_SINGLE:
+			sms_util.maybeSendConfusedMsg(user, keeperNumber)
+
 		ret = True
 	else:
 		if sendMsg:

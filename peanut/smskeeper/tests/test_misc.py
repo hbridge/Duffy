@@ -4,10 +4,10 @@ from mock import patch
 from peanut.settings import constants
 from smskeeper.models import User, Message
 from smskeeper import msg_util, cliMsg, keeper_constants, sms_util, keeper_strings
-from common import date_util
 from django.conf import settings
 
-import pytz
+from common import date_util
+
 import test_base
 import emoji
 
@@ -35,6 +35,8 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def test_send_delayed(self, dateMock):
 		self.setupUser(True, True)
+		self.setNow(dateMock, self.TUE_8AM)
+
 		sms_util.sendDelayedMsg(self.getTestUser(), "hi", 1, None, classification="testclass")
 		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass("testclass"))
 
@@ -600,3 +602,34 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Who is the bestests")
 			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_strings.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
+
+	def test_unknown_zero_message_when_no_followup(self, dateMock):
+		self.setupUser(True, True, dateMock=dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "gobbly gook")
+
+			# Pretend we're 2 minutes later
+			self.setNow(dateMock, self.MON_10AM + datetime.timedelta(minutes=2))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(self.MON_10AM))
+
+			# No followup
+			# So should get error message a few minutes later
+			self.assertTrue(self.containsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock))
+
+		self.setNow(dateMock, self.MON_11AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "gobblie gookopper")
+
+			# Pretend we're 1 minute later
+			self.setNow(dateMock, self.MON_11AM + datetime.timedelta(minutes=1))
+			cliMsg.msg(self.testPhoneNumber, "remind me gobblie gookopper")
+
+			# Pretend we're 2 minutes later
+			self.setNow(dateMock, self.MON_11AM + datetime.timedelta(minutes=2))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(self.MON_11AM))
+
+			# Had followup so shouldn't see error msg
+			self.assertFalse(self.containsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock))

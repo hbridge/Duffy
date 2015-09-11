@@ -295,6 +295,7 @@ class BASE_CELERY_CONFIG:
         'memfresh.async.evalAllUsersForFollowUp': {'queue': 'keeper', 'routing_key': 'keeper'},
         'memfresh.async.evalUserForFollowUp': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.sms_util.asyncSendMsg': {'queue': 'keeper', 'routing_key': 'keeper'},
+        'smskeeper.sms_util.asyncMaybeSendConfusedMsg': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.processReminder': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.processAllReminders': {'queue': 'keeper', 'routing_key': 'keeper'},
         'smskeeper.async.sendTips': {'queue': 'keeper', 'routing_key': 'keeper'},

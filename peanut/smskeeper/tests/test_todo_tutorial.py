@@ -321,7 +321,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Do homework at 6pm")
-			self.assertIn("about me?", self.getOutput(mock))
+			self.assertIn("about me?", self.getOutput(mock))  # How did you hear about me?
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Bobby told me")

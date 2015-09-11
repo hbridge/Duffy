@@ -4,7 +4,7 @@ from mock import patch
 
 from smskeeper.models import Entry, Message
 from smskeeper import cliMsg, tips
-from smskeeper import async, keeper_constants, keeper_strings
+from smskeeper import async, keeper_strings
 
 import test_base
 

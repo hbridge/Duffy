@@ -94,6 +94,12 @@ class SMSKeeperBaseCase(TestCase):
 
 		return events
 
+	def containsOneOf(self, output, stringList):
+		for s in stringList:
+			if emoji.emojize(s, use_aliases=True) in output:
+				return True
+		return False
+
 	def renderTextConstant(self, constant):
 		if isinstance(constant, list):
 			return map(lambda txt: self.renderTextConstant(txt), constant)

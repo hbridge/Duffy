@@ -421,6 +421,7 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID and user.digest_state == keeper_constants.DIGEST_STATE_DEFAULT:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
 
+
 @app.task
 def sendTips(overrideKeeperNumber=None):
 	# TODO add test to make sure we send tips to the right number for each user

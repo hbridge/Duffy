@@ -161,7 +161,7 @@ class User(models.Model):
 		logger.debug("User %s: Setting state data %s %s" % (self.id, key, value))
 
 	def wasRecentlySentMsgOfClass(self, outgoingMsgClass, num=3):
-		recentOutgoing = Message.objects.filter(user=self, incoming=False).order_by("-added")[:num]
+		recentOutgoing = Message.objects.filter(user=self, incoming=False).order_by("-id")[:num]
 
 		for msg in recentOutgoing:
 			if msg.classification and msg.classification == outgoingMsgClass:
@@ -480,11 +480,18 @@ class Message(models.Model):
 	manually_approved_timestamp = models.DateTimeField(null=True, blank=True)
 
 	classification_scores_json = models.CharField(max_length=1000, null=True, blank=True)
-	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
-	updated = models.DateTimeField(auto_now=True, db_index=True, null=True)
+	added = models.DateTimeField(db_index=True, null=True)
+	updated = models.DateTimeField(db_index=True, null=True)
 
 	# calculated attributes
 	messageDict = None
+
+	def save(self, *args, **kwargs):
+		# On save, update timestamps
+		if not self.id:
+			self.added = date_util.now()
+		self.updated = date_util.now()
+		return super(Message, self).save(*args, **kwargs)
 
 	def getBody(self):
 		return self.getMessageAttribute("Body")

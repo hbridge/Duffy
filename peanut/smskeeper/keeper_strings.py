@@ -155,9 +155,9 @@ HELP_MESSAGES = [
 
 # When you say something that we don't understand, we send these back
 UNKNOWN_COMMAND_PHRASES = [
-	u"Hmmm, I need my minions for that that and they're sleeping. I'll get back to you in the morning :sunrise:",
-	u"I'm not sure what you mean :hatching_chick:. I'll ask my minions :smile_cat::smile_cat: to help me out when they wake up.",
-	u"Err... Not sure what you mean. Don't worry, my minions :smile_cat::smile_cat: will straighten things out in the morning",
+	u"Mmm...say again?",
+	u"Hmmm...I'm not sure what you mean :hatching_chick:.",
+	u"Err... Not sure what you mean.",
 ]
 
 # When someone says 'report' to let us know something went wrong

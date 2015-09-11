@@ -1,13 +1,13 @@
 import pytz
 import json
-
-from datetime import timedelta
+import datetime
+import random
 
 from twilio import TwilioRestException
 
 from celery.utils.log import get_task_logger
 
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import msg_util
 from smskeeper.models import Message, User
 
@@ -94,21 +94,10 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 
 
 def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None, classification=None):
-	if isinstance(msg, list):
-		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
+	eta = date_util.now(pytz.utc) + datetime.timedelta(seconds=delaySeconds)
+	logger.info("User %d: sendDelayedMsg %s %s", user.id, delaySeconds, msg)
 
-	if keeperNumber is None:
-		keeperNumber = user.getKeeperNumber()
-
-	msg = msg_util.renderMsg(msg)
-	args = (user.id, msg, None, keeperNumber, False, False, classification)
-	logger.info("User %d: sendDelayedMsg args %s", user.id, str(args))
-	if keeper_constants.isRealKeeperNumber(keeperNumber):
-		eta = date_util.now(pytz.utc) + timedelta(seconds=delaySeconds)
-		asyncSendMsg.apply_async(args, eta=eta)
-	else:
-		# If its CLI or TEST then keep it local and not async.
-		asyncSendMsg(*args)
+	sendMsg(user, msg, eta=eta, keeperNumber=keeperNumber, classification=classification)
 
 
 def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False, classification=None):
@@ -120,7 +109,7 @@ def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOve
 
 	seconds_delay = 0
 	for i, msgTxt in enumerate(msgList):
-		scheduledTime = date_util.now(pytz.utc) + timedelta(seconds=seconds_delay)
+		scheduledTime = date_util.now(pytz.utc) + datetime.timedelta(seconds=seconds_delay)
 		logger.debug("scheduling %s at time %s" % (msgTxt, scheduledTime))
 
 		# calc the time for the next message
@@ -135,3 +124,36 @@ def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOve
 		sendMsg(user, msgTxt, None, keeperNumber, scheduledTime, stopOverride=stopOverride, classification=classification)
 
 	return seconds_delay
+
+
+# When this runs, check to see if there's been any further messages sent by the user
+# If so, then don't execute
+# If not, then send out a confused message
+def maybeSendConfusedMsg(user, keeperNumber=None):
+	if keeperNumber is None:
+		keeperNumber = user.getKeeperNumber()
+
+	now = date_util.now(pytz.utc)
+
+	if keeper_constants.isRealKeeperNumber(keeperNumber):
+		eta = now + datetime.timedelta(minutes=2)
+		asyncMaybeSendConfusedMsg.apply_async((user.id, date_util.unixTime(now)), eta=eta)
+	else:
+		pass
+		# Tests should call this manually
+		# asyncMaybeSendConfusedMsg(user.id, date_util.unixTime(now))
+
+
+@app.task
+def asyncMaybeSendConfusedMsg(userId, msgTimeSinceEpoch):
+	user = User.objects.get(id=userId)
+	dt = datetime.datetime.fromtimestamp(msgTimeSinceEpoch)
+	messagesAfter = Message.objects.filter(user=user, incoming=True, added__gt=dt)
+
+	if len(messagesAfter) == 0:
+		logger.debug("User %s: Sending out confused message because 0 messages came after my time %s", user.id, dt)
+		# Send out confused message
+		sendMsg(user, random.choice(keeper_strings.UNKNOWN_COMMAND_PHRASES))
+	else:
+		logger.debug("User %s: Didn't send out confused message because %s messages came after my time %s", user.id, len(messagesAfter), dt)
+

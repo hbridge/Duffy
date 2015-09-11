@@ -88,7 +88,7 @@ def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber
 			logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
 		if not processed:
-			actions.unknown(user, msg, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE)
+			actions.unknown(user, msg, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_STATE)
 
 		count += 1
 		if count == 10:
@@ -129,7 +129,7 @@ def processWithEngine(user, msgs, messageObject):
 		if allProcessed:
 			sms_util.sendMsg(user, "%s" % helper_util.randomAcknowledgement())
 		else:
-			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE)
+			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_MULTILINE)
 
 		# We don't record the classification on the message since it was multi-line
 	else:
@@ -145,7 +145,7 @@ def processWithEngine(user, msgs, messageObject):
 		messageObject.save()
 
 		if not processed:
-			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE)
+			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_SINGLE)
 
 	# This gets set in actions.unknown. Means that the engine didn't know something and we should
 	# mark the message object as needing review
