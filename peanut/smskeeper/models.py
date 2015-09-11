@@ -573,6 +573,14 @@ class Message(models.Model):
 			return None
 		return userSnapshot
 
+	def recentOutgoingMessageClasses(self):
+		recentOutgoing = Message.objects.filter(user=self.user, incoming=False, id__lt=self.id).order_by("-added")[:3]
+		result = []
+		for message in recentOutgoing:
+			if message.classification:
+				result.append(message.classification)
+		return result
+
 
 class MessageMedia:
 	url = None

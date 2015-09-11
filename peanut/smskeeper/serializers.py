@@ -62,6 +62,7 @@ class ClassifiedMessageSerializer(serializers.ModelSerializer):
 	activeEntriesSnapshot = HistoricalEntrySerializer(many=True)
 	userSnapshot = HistoricalUserSerializer()
 	body = serializers.CharField(source='getBody', read_only=True)
+	recentOutgoingMessageClasses = serializers.ListField(child=serializers.CharField(), read_only=True)
 
 	class Meta:
 		model = models.Message
