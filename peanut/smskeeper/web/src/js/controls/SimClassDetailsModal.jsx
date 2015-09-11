@@ -106,6 +106,7 @@ module.exports = React.createClass({
   getComparisonGroups(){
     if (this.state.compareData) {
       var classCompareData = this.state.compareData[this.props.messageClass];
+      if (!classCompareData) return;
       var fpsByCorrectClass = _.groupBy(classCompareData.fpMessages, function(fpMessage){
         return fpMessage.class;
       });
