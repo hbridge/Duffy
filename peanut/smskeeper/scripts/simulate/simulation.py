@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 from urllib2 import URLError
 import urllib2
+import traceback
 
 from common import date_util
 from django.conf import settings
@@ -20,7 +21,6 @@ from smskeeper.models import Message
 from smskeeper.models import User
 from smskeeper.scripts import importZipdata
 from smskeeper.tests import test_base
-
 
 import subprocess
 GIT_REVISION = subprocess.check_output(["git", "describe", "--always"]).replace("\n", "")
@@ -59,7 +59,6 @@ MAX_USERS_TO_SIMULATE = 10000
 def summaryText(text, *args):
 	logger.info(text, *args)
 	summaryLogger.info(text, *args)
-
 
 @patch('common.date_util.utcnow')
 class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
@@ -107,15 +106,30 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 				self.setUserProps(user, message.get("userSnapshot"))
 				self.setNow(dateMock, date_util.fromIsoString(message["added"]))
 				self.setActiveEntries(user, message.get("activeEntriesSnapshot", []))
-				# TODO set recent outgoing message classes
-				self.scoreMessage(user, message)
+				with patch('smskeeper.models.User.wasRecentlySentMsgOfClass') as mock:
+					recentClasses = message.get("recentOutgoingMessageClasses")
+					self.setRecentOutgoingMessageClasses(user, recentClasses, mock)
+					if len(recentClasses) > 0:
+						# make sure our mock is working
+						self.assertTrue(user.wasRecentlySentMsgOfClass(recentClasses[0]), True)
+
+					# actually score the message
+					self.scoreMessage(user, message)
 			except Exception as e:
-				logger.info("Error processing message: %s, exception %s", message, e)
+				logger.info("-" * 60)
+				logger.info(
+					"Error processing message: %s\n*** Exception %s",
+					message,
+					traceback.format_exc()
+				)
 				if message in self.classified_messages:
 					self.classified_messages.remove(message)
 
-		self.uploadClassificationResults()
-		self.printMisclassifictions()
+		if len(self.classified_messages) > 0:
+			self.uploadClassificationResults()
+			self.printMisclassifictions()
+		else:
+			print "No classified messages, check the /mnt/log/sim.log"
 
 		summaryLogger.finalize()
 		logger.finalize()
@@ -162,6 +176,15 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 			newEntry.save()
 			newActiveEntries.append(newEntry)
 		logger.info("Set active entries: %s", newActiveEntries)
+
+	def setRecentOutgoingMessageClasses(self, user, outgoingMessageClasses, mock):
+		self.recentOutgoingMessageClasses = outgoingMessageClasses
+		mock.side_effect = self.wasRecentlySentMsgOfClass
+
+	def wasRecentlySentMsgOfClass(self, outgoingMsgClass, num=3):
+		result = outgoingMsgClass in self.recentOutgoingMessageClasses[:num]
+		logger.info("Was recently sent %s for user %s", outgoingMsgClass, result)
+		return result
 
 	def scoreMessage(self, user, message):
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
@@ -212,7 +235,7 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 			simResult["sim_classification_scores_json"] = json.dumps(message["simulated_scores"])
 			simRun["simResults"].append(simResult)
 
-		logger.info("\n\n****Uploading results: %s", json.dumps(simRun, cls=DjangoJSONEncoder))
+		logger.info("\n\n****Uploading results to: %s", self.SIMULATION_CONFIGURATION['post_results_url'])
 		req = urllib2.Request(self.SIMULATION_CONFIGURATION['post_results_url'])
 		req.add_header('Content-Type', 'application/json')
 		try:
