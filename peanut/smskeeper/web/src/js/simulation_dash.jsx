@@ -61,7 +61,6 @@ var SimulationDashboard = React.createClass({
         onRowClicked={this.handleRowClicked}
         onRowDeleted={this.handleRowDeleted}
       />);
-      console.log("simId, expandedRows", simId, this.state.expandedRows);
       if (_.contains(this.state.expandedRows, simId)) {
         console.log("simId %s expanded, adding details rows", simId);
         rows = rows.concat(this.getDetailsRows(simId));
@@ -102,24 +101,33 @@ var SimulationDashboard = React.createClass({
         });
 
         var createClassRow = function(className, index) {
-          return (<SimDetailsRow
-            classSummary={this.state.simRunClassData[simId][className]}
-            simId={simId}
-            key={className + index}
-            handleClicked={this.handleDetailRowClicked}
-          />);
+          var simRun = this.simRunWithId(simId);
+          if (simRun && simRun.recentComparableRuns && simRun.recentComparableRuns.length > 0) {
+            var compRunId = simRun.recentComparableRuns[0];
+            var compRunClassData = this.state.simRunClassData[compRunId];
+            var compClassSummary = compRunClassData[className];
+          }
+          return (
+            <SimDetailsRow
+              classSummary={this.state.simRunClassData[simId][className]}
+              compSummary={compClassSummary}
+              simId={simId}
+              key={className + simId}
+              handleClicked={this.handleDetailRowClicked}
+            />);
         }.bind(this);
         return classNames.map(createClassRow);
       } else {
         return ([
-          <tr>
+          <tr key="loading">
             loading...
           </tr>
         ]);
       }
   },
 
-  handleRowClicked(simId){
+  handleRowClicked(simRun){
+    var simId = simRun.id;
     var newExpanded = this.state.expandedRows;
     if (_.contains(this.state.expandedRows, simId)) {
       newExpanded = _.without(this.state.expandedRows, simId);
@@ -127,6 +135,12 @@ var SimulationDashboard = React.createClass({
       newExpanded.push(simId);
       if (!this.state.simRunClassData[simId]) {
         this.getSimRunClassData(simId);
+      }
+      if (simRun.recentComparableRuns.length > 0) {
+        var compRunId = simRun.recentComparableRuns[0];
+        if (!this.state.simRunClassData[compRunId]) {
+          this.getSimRunClassData(compRunId);
+        }
       }
     }
     console.log("row with simId clicked %s", simId, newExpanded);
@@ -142,9 +156,10 @@ var SimulationDashboard = React.createClass({
 
   getSimRunClassData(simId) {
     Model.fetchSimulationClassSummary(simId, function(data){
-      console.log("setting simrunClass data for %d", simId, data);
       var simRunClassData = this.state.simRunClassData;
+      console.log("old simRunClassData", simRunClassData);
       simRunClassData[simId] = data;
+      console.log("newSimRunClassData", simRunClassData);
       this.setState({simRunClassData: simRunClassData});
     }.bind(this));
   },
@@ -161,6 +176,12 @@ var SimulationDashboard = React.createClass({
   componentWillUpdate: function(nextProps, nextState) {
     console.log("component will update");
   },
+
+
+  simRunWithId(simId) {
+    return _.findWhere(this.state.simRuns, {id: simId});
+  }
+
 });
 
 React.render(<SimulationDashboard />, document.getElementById("keeper_app"));

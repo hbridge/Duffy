@@ -18,7 +18,6 @@ var SimulationRow = React.createClass({
     var numCorrect = this.props.simRun.numCorrect;
     var numWrong = this.props.simRun.numIncorrect;
     var simpleAccuracy = numCorrect / (numCorrect + numWrong);
-    console.log("compare to", this.props.compareTo);
     if (this.props.compareTo) {
 	    var compareCorrect = this.props.compareTo.numCorrect;
 	    var compareWrong = this.props.compareTo.numIncorrect;
@@ -37,7 +36,7 @@ var SimulationRow = React.createClass({
 
   handleClicked(e) {
     e.preventDefault();
-    this.props.onRowClicked(this.props.simRun.id);
+    this.props.onRowClicked(this.props.simRun);
   },
 
   getSimId(){
@@ -85,10 +84,17 @@ var SimDetailsRow = React.createClass({
     var precision = this.props.classSummary.precision;
     var recall = this.props.classSummary.recall;
     var f1 = this.props.classSummary.f1;
+
+    if (this.props.compSummary) {
+    	var dSimpleAccuracy = (simpleAccuracy - this.props.compSummary.simpleAccuracy).toFixed(3);
+    } else {
+    	console.log("compSummary not defined");
+    }
+
     return (
       <tr onClick={this.handleClicked}>
         <td style={{textAlign: "right"}}> <strong>{ this.props.classSummary.messageClass }</strong> </td>
-        <td> {simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({tp}/{tp+fn})</td>
+        <td> {simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({tp}/{tp+fn}) {"∆ " + dSimpleAccuracy}</td>
         <td> {precision ? precision.toFixed(2) : ""}</td>
         <td> {recall ? recall.toFixed(2) : ""}</td>
         <td> {f1 ? f1.toFixed(2) : ""}</td>
