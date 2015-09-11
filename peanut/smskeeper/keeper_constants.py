@@ -206,8 +206,8 @@ SHARE_UPSELL_PHONE = 'phone'  # send phone number
 # second parameter is whether to send out a website link or phone number
 SHARE_UPSELL_PHRASES = [
 	[u"Btw, I'm great for anyone who forgets things \U0001F433. Know anyone who could use my help? Send them to", SHARE_UPSELL_WEBLINK],
-	[u"Think any of your friends would want to try me? I like making new friends \U0001F38E. Tell them say 'hi' to me at", SHARE_UPSELL_PHONE],
-	[u"Is there anyone you know who can use a little more sanity \U0001F0CF in their life? Just send them to \U00002615", SHARE_UPSELL_PHONE],
+	[u"Think any of your friends would want to try me? I like making new friends \U0001F38E. Send them to", SHARE_UPSELL_WEBLINK],
+	[u"Is there anyone you know who can use a little more sanity \U0001F0CF in their life? Just send them to \U00002615", SHARE_UPSELL_WEBLINK],
 	[u"And if you have anyone else who needs help, just ask them to say 'hello' to me at", SHARE_UPSELL_PHONE],
 ]
 
@@ -452,6 +452,12 @@ SHARED_REMINDER_RECIPIENT_UPSELL = (
 )
 SHARED_REMINDER_RECIPIENT_INTRO = "I'm :NAME:'s personal assistant."
 SHARED_REMINDER_VERB_WHITELIST_REGEX = r'remind|text|txt|tell'
+
+UNKNOWN_TYPE_ZERO_SCORE = "zeros"
+UNKNOWN_TYPE_CHANGETIME = "changetime"
+UNKNOWN_TYPE_DONE = "done"
+UNKNOWN_TYPE_FRUSTRATION = "frustration"
+UNKNOWN_TYPE_QUESTION = "question"
 
 
 FOLLOWUP_TIME = "time"

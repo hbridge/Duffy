@@ -62,7 +62,7 @@ class CompleteTodoSpecificAction(Action):
 			user.save()
 		else:
 			logger.info("User %s: I thought '%s' was a completetodo specific command but couldn't find an entry to match on, pausing" % (user.id, chunk.originalText))
-			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False, doAlert=True)
+			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_DONE, sendMsg=False, doAlert=True)
 
 			if not daytime:
 				msgBack = "Sorry, I'm not sure what entry you mean. Could you rephrase?"

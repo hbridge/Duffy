@@ -20,5 +20,5 @@ class FrustrationAction(Action):
 		return score
 
 	def execute(self, chunk, user):
-		actions.unknown(user, chunk.originalText, user.getKeeperNumber(), doPause=True)
+		actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_FRUSTRATION, doPause=True)
 		return True

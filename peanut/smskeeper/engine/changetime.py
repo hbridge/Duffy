@@ -17,7 +17,7 @@ class ChangetimeAction(Action):
 
 		if len(entries) == 0:
 			logger.info("User %s: I think this is a changetime command but couldn't find a good enough entry. kicking out" % (user.id))
-			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), sendMsg=False, doAlert=True)
+			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_CHANGETIME, sendMsg=False, doAlert=True)
 
 			if not daytime:
 				msgBack = "Sorry, I'm not sure what entry you mean. Could you rephrase?"
