@@ -11,6 +11,7 @@ var Bootstrap = require('react-bootstrap');
   Panel = Bootstrap.Panel;
   DropdownButton = Bootstrap.DropdownButton;
   MenuItem = Bootstrap.MenuItem;
+var DeltaLabel = require('./DeltaLabel.jsx');
 
 var SimulationRow = React.createClass({
   render() {
@@ -25,8 +26,8 @@ var SimulationRow = React.createClass({
 	}
     return (
       <tr>
-        <td onClick={this.handleClicked}> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
-        <td> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({numCorrect}/{numCorrect+numWrong}) ∆ {(simpleAccuracy - compareAccuracy).toFixed(3)}</td>
+        <td onClick={this.handleClicked} href='#'> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
+        <td onClick={this.handleClicked} href='#'> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({numCorrect}/{numCorrect+numWrong}) <DeltaLabel value={(simpleAccuracy - compareAccuracy)} /></td>
         <td> </td>
         <td> </td>
         <td> {this.getMoreActions()}</td>
@@ -86,7 +87,7 @@ var SimDetailsRow = React.createClass({
     var f1 = this.props.classSummary.f1;
 
     if (this.props.compSummary) {
-    	var dSimpleAccuracy = (simpleAccuracy - this.props.compSummary.simpleAccuracy).toFixed(3);
+    	var dSimpleAccuracy = (simpleAccuracy - this.props.compSummary.simpleAccuracy);
     } else {
     	console.log("compSummary not defined");
     }
@@ -94,7 +95,7 @@ var SimDetailsRow = React.createClass({
     return (
       <tr onClick={this.handleClicked}>
         <td style={{textAlign: "right"}}> <strong>{ this.props.classSummary.messageClass }</strong> </td>
-        <td> {simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({tp}/{tp+fn}) {"∆ " + dSimpleAccuracy}</td>
+        <td> {simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({tp}/{tp+fn}) <DeltaLabel value={dSimpleAccuracy} /></td>
         <td> {precision ? precision.toFixed(2) : ""}</td>
         <td> {recall ? recall.toFixed(2) : ""}</td>
         <td> {f1 ? f1.toFixed(2) : ""}</td>
