@@ -72,6 +72,7 @@ var SimulationDashboard = React.createClass({
         { loading }
         <SimClassModal
           simId={this.state.expandedSimId}
+          compareRunId={this.state.compareRunId}
           messageClass={this.state.expandedMessageClass}
           onClose={this.handleModalClosed}
         />
@@ -166,11 +167,15 @@ var SimulationDashboard = React.createClass({
 
   handleDetailRowClicked(simId, messageClass){
     console.log("expanding simId: %d messageClass:%s", simId, messageClass);
-    this.setState({expandedSimId: simId, expandedMessageClass: messageClass});
+    var simRun = this.simRunWithId(simId);
+    if (simRun.recentComparableRuns.length > 0) {
+      var compareToId = simRun.recentComparableRuns[0];
+    }
+    this.setState({expandedSimId: simId, expandedMessageClass: messageClass, compareRunId: compareToId});
   },
 
   handleModalClosed() {
-    this.setState({expandedSimId: null, expandedMessageClass: null});
+    this.setState({expandedSimId: null, expandedMessageClass: null, compareRunId: null});
   },
 
   componentWillUpdate: function(nextProps, nextState) {

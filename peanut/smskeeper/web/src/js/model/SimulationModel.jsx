@@ -25,6 +25,16 @@ module.exports.bindSimulationClassDetails = function(simRunId, className, reactO
   $.getJSON("/smskeeper/simulation_class_details/" + simRunId + "/" + className, dataCallback);
 }
 
+module.exports.bindSimulationCompareClassDetails = function(simRunId, compareRunId, reactObj, stateName) {
+  var dataCallback = function(data){
+    console.log("bindSimulationCompareClassDetails callback with data ", data);
+    var stateObj = {};
+    stateObj[stateName] = data;
+    reactObj.setState(stateObj);
+  }
+  $.getJSON("/smskeeper/simulation_run_compare/" + simRunId + "/" + compareRunId, dataCallback);
+}
+
 module.exports.deleteSimRun=function(simRunId, callback){
   $.ajax({
     url: '/smskeeper/simulation_run/' + simRunId,

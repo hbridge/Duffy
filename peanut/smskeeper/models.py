@@ -712,6 +712,27 @@ class SimulationRun(models.Model):
 		logger.info("returning last comparable run %s", recentRuns)
 		return recentRuns
 
+	def compareToRun(self, otherRun):
+		myResults = self.simResults().order_by('message_id')
+		myResultsByMessageId = {}
+		for result in myResults:
+			myResultsByMessageId[result.message_id] = result
+
+		otherResults = SimulationResult.objects.filter(run=otherRun).order_by('message_id')
+		differentResults = []
+		for otherResult in otherResults:
+			myResult = myResultsByMessageId.get(otherResult.message_id, None)
+			if not myResult:
+				continue
+
+			if myResult.sim_classification == otherResult.sim_classification:
+				continue
+
+			differentResults.append(myResult)
+
+		return SimulationResult.simulationClassDetails(differentResults)
+
+
 
 class SimulationResult(models.Model):
 	message_classification = models.CharField(max_length=100, null=True, blank=True)
@@ -844,7 +865,7 @@ class SimulationClassDetails:
 			"f1": self.f1()
 		}
 
-	def fullJsonDict(self):
+	def fullJsonDict(self, includePositives=False):
 		result = self.summaryJsonDict()
 		result['fpMessages'] = []
 		result['fnMessages'] = []
@@ -862,6 +883,15 @@ class SimulationClassDetails:
 				"body": simResult.message_body,
 				"sim_class": simResult.sim_classification
 			})
+		if includePositives:
+			result['tpMessages'] = []
+			for simResult in self.tp:
+				result['tpMessages'].append({
+					"sim_result_id": simResult.id,
+					"message_id": simResult.message_id,
+					"body": simResult.message_body
+				})
+
 		return result
 
 	def __str__(self):

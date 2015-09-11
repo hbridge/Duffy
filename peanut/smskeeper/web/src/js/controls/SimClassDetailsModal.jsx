@@ -56,6 +56,12 @@ module.exports = React.createClass({
       console.log("Modal receiving new props", nextProps);
       this.setState({show: true});
       Model.bindSimulationClassDetails(nextProps.simId, nextProps.messageClass, this, 'summaryData');
+
+      if (nextProps.compareRunId) {
+        Model.bindSimulationCompareClassDetails(nextProps.simId, nextProps.compareRunId, this, 'compareData');
+      } else {
+        console.log("no compareRunId")
+      }
     }
   },
 
@@ -71,16 +77,17 @@ module.exports = React.createClass({
 
 	    var fpCount = this.state.summaryData.fpMessages.length;
 	    var fnCount = this.state.summaryData.fnMessages.length;
-	}
+	  }
 
     var summary = this.state.summaryData;
 
     return (
-      <Modal show={this.state.show} onHide={this.close}>
+      <Modal show={this.state.show} onHide={this.close} dialogClassName='detailsModal'>
         <Modal.Header closeButton>
             <Modal.Title>Details for run #{this.props.simId}: {this.props.messageClass} </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {this.getComparisonGroups()}
         	<WrongResultsGroup
         		title="False Positives"
         		wrongByClass={fpsByCorrectClass}
@@ -94,6 +101,45 @@ module.exports = React.createClass({
         </Modal.Body>
       </Modal>
       );
+  },
+
+  getComparisonGroups(){
+    if (this.state.compareData) {
+      var classCompareData = this.state.compareData[this.props.messageClass];
+      var fpsByCorrectClass = _.groupBy(classCompareData.fpMessages, function(fpMessage){
+        return fpMessage.class;
+      });
+
+      var fnsBySimClass = _.groupBy(classCompareData.fnMessages, function(fnMessage){
+        return fnMessage.sim_class;
+      });
+
+      return (
+        <div>
+          <Panel
+            header="New Successes"
+            eventKey="newSuccesses"
+            collapsable>
+            <ul>
+              {classCompareData.tpMessages.map(function(message){
+                return <li><a target="_blank" href={"/smskeeper/simulation_result/" + message.sim_result_id}> {message.body} </a></li>
+              })}
+            </ul>
+          </Panel>
+          <WrongResultsGroup
+            title="New False Positives"
+            wrongByClass={fpsByCorrectClass}
+            totalWrong={classCompareData.fpMessages.count}
+          />
+          <WrongResultsGroup
+            title="New False Negatives"
+            wrongByClass={fnsBySimClass}
+            totalWrong={classCompareData.fnMessages.count}
+          />
+        </div>
+      );
+    }
+    return <span></span>
   },
 
   close(e) {

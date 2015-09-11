@@ -113,6 +113,17 @@ def simulation_class_details(request, simId, msgClass):
 	return HttpResponse(json.dumps(detailsDict, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 
 
+def simulation_run_compare(request, simId, compareId):
+	simRun = get_object_or_404(SimulationRun, id=simId)
+	compareRun = get_object_or_404(SimulationRun, id=compareId)
+	diffClassDetails = simRun.compareToRun(compareRun)
+	for classKey in diffClassDetails.keys():
+		diffClassDetails[classKey] = diffClassDetails[classKey].fullJsonDict(includePositives=True)
+
+	return HttpResponse(json.dumps(diffClassDetails, cls=DjangoJSONEncoder), content_type="text/json", status=200)
+
+
+
 @login_required(login_url='/admin/login/')
 def simulation_dash(request):
 	return renderReact(

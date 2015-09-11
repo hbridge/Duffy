@@ -33,6 +33,7 @@ urlpatterns = patterns(
 	url(r'^simulation_dash/$', 'smskeeper.sim_views.simulation_dash'),
 	url(r'^simulation_classes_summary/(?P<simId>[0-9]+)/$', sim_views.simulation_classes_summary),
 	url(r'^simulation_class_details/(?P<simId>[0-9]+)/(?P<msgClass>[a-z\-]+)$', sim_views.simulation_class_details),
+	url(r'^simulation_run_compare/(?P<simId>[0-9]+)/(?P<compareId>[0-9]+)$', sim_views.simulation_run_compare),
 	url(r'^approved_todos$', 'smskeeper.views.approved_todos'),
 	url(r'^update_stripe_info', 'smskeeper.views.update_stripe_info'),
 )
