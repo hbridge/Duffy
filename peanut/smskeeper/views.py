@@ -264,13 +264,15 @@ def unknown_messages_feed(request):
 		followups = Message.objects.filter(user=message.user, added__gt=message.added).order_by("added")
 		for followup in followups:
 			msgJson = json.loads(followup.msg_json)
+			manualStr = " (manual)" if followup.manual else ""
+
 			if followup.incoming:
-				followupBodies.append("Them:  %s" % msgJson["Body"])
+				followupBodies.append("Them%s:  %s" % (manualStr, msgJson["Body"]))
 			else:
 				if followup.manual:
-					followupBodies.append("Us (manual): %s" % msgJson["Body"])
+					followupBodies.append("Us%s: %s" % (manualStr, msgJson["Body"]))
 				else:
-					followupBodies.append("Us:      %s" % msgJson["Body"])
+					followupBodies.append("Us%s:      %s" % (manualStr, msgJson["Body"]))
 
 		message_dict["followups"] = followupBodies
 
