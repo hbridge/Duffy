@@ -534,7 +534,7 @@ def renderDoneResponse(entries, isDelete):
 		article = "those"
 
 	if isDelete:
-		msgBack = "Ok. Removed :ARTICLE: :cross_mark:"
+		msgBack = keeper_strings.DELETE_RESPONSE
 	else:
-		msgBack = "%s Checked :ARTICLE: off :white_check_mark:" % random.choice(keeper_strings.DONE_PHRASES)
+		msgBack = keeper_strings.DONE_RESPONSE % random.choice(keeper_strings.DONE_SHORT_PHRASES)
 	return msgBack.replace(':ARTICLE:', article)

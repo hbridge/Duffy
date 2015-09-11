@@ -1,7 +1,7 @@
 import logging
 
 from smskeeper import entry_util, sms_util, actions, chunk_features, msg_util
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from .action import Action
 from smskeeper.chunk_features import ChunkFeatures
@@ -65,8 +65,7 @@ class CompleteTodoSpecificAction(Action):
 			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_DONE, sendMsg=False, doAlert=True)
 
 			if not daytime:
-				msgBack = "Sorry, I'm not sure what entry you mean. Could you rephrase?"
-				sms_util.sendMsg(user, msgBack, None, user.getKeeperNumber())
+				sms_util.sendMsg(user, keeper_strings.ENTRY_NOT_FOUND_TEXT, None, user.getKeeperNumber())
 
 		analytics.logUserEvent(
 			user,

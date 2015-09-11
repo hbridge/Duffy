@@ -2,7 +2,7 @@ import re
 import string
 
 from smskeeper import sms_util, msg_util, helper_util, actions
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from .action import Action
 from smskeeper.chunk_features import ChunkFeatures
@@ -64,23 +64,23 @@ class ChangeSettingAction(Action):
 		if features.containsNegativeWord():
 			user.tip_frequency_days = 0
 			user.save()
-			sms_util.sendMsg(user, "Ok, I'll stop sending you tips.")
+			sms_util.sendMsg(user, keeper_strings.TIP_STOP_CONFIRMATION_TEXT)
 		else:
 			recurType, bestScore = features.recurScores().items()[0]
 			if recurType == keeper_constants.RECUR_WEEKLY:
 				user.tip_frequency_days = 7
 				user.save()
-				sms_util.sendMsg(user, "Ok, I'll send you tips weekly.")
+				sms_util.sendMsg(user, keeper_strings.TIP_WEEKLY_CONFIRMATION_TEXT)
 			elif recurType == keeper_constants.RECUR_MONTHLY:
 				user.tip_frequency_days = 30
 				user.save()
-				sms_util.sendMsg(user, "Ok, I'll send you tips monthly.")
+				sms_util.sendMsg(user, keeper_strings.TIP_MONTHLY_CONFIRMATION_TEXT)
 			elif recurType == keeper_constants.RECUR_DAILY:
 				user.tip_frequency_days = 1
 				user.save()
-				sms_util.sendMsg(user, "Ok, I'll send you tips daily.")
+				sms_util.sendMsg(user, keeper_strings.TIP_DAILY_CONFIRMATION_TEXT)
 			else:
-				sms_util.sendMsg(user, "Sorry, I didn't get that. You can type 'send me tips weekly/monthly/never' to change how often I send you tips.")
+				sms_util.sendMsg(user, keeper_strings.TIP_FREQUENCY_CHANGE_ERROR_TEXT)
 
 		analytics.logUserEvent(
 			user,
@@ -96,9 +96,9 @@ class ChangeSettingAction(Action):
 		if name and name != "":
 			user.name = name
 			user.save()
-			sms_util.sendMsg(user, "Great, I'll call you %s from now on." % name)
+			sms_util.sendMsg(user, keeper_strings.NAME_CHANGE_CONFIRMATION_TEXT % name)
 		else:
-			sms_util.sendMsg(user, "Sorry, I didn't catch that, try saying something like 'My name is Keeper'" % name)
+			sms_util.sendMsg(user, keeper_strings.NAME_CHANGE_ERROR_TEXT)
 		analytics.logUserEvent(
 			user,
 			"Changed Name",
@@ -109,7 +109,7 @@ class ChangeSettingAction(Action):
 		postalCode = msg_util.getPostalCode(msg)
 
 		if postalCode is None:
-			sms_util.sendMsg(user, "I'm sorry, I don't know that postal code")
+			sms_util.sendMsg(user, keeper_strings.ZIPCODE_CHANGE_ERROR_TEXT)
 			return True
 
 		user.postal_code = postalCode

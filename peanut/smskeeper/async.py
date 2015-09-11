@@ -121,11 +121,11 @@ def processReminder(entry):
 				if user.id == entry.creator.id:
 					otherUserNames = entry.getOtherUserNames(entry.creator)
 
-					msg = "Hi there :wave: Just letting you know that I sent %s a reminder for you." % (", ".join(otherUserNames))
+					msg = keeper_strings.SHARED_REMINDER_SENT_CONFIRMATION_TEXT % (", ".join(otherUserNames))
 				elif user.state == keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER:
-					msg = "Hi :wave: I'm %s's digital assistant. %s wanted me to remind you: %s" % (entry.creator.name, entry.creator.name, entry.text)
+					msg = keeper_strings.SHARED_REMINDER_TEXT_TO_UNACTIVATED_USER % (entry.creator.name, entry.creator.name, entry.text)
 				else:
-					msg = "Hi! Friendly reminder from %s: %s" % (entry.creator.name, entry.text)
+					msg = keeper_strings.SHARED_REMINDER_TEXT_TO_ACTIVATED_USER % (entry.creator.name, entry.text)
 			else:
 				msg = random.choice(keeper_strings.REMINDER_PHRASES) + " %s" % entry.text
 
@@ -211,9 +211,9 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 		msg += keeper_strings.REMINDER_DIGEST_EMPTY[now.weekday()] + '\n'
 	else:
 		if userRequested:  # This shows all tasks so we don't mention today
-			msg += u"Your current tasks: \U0001F4DD\n"
+			msg += keeper_strings.DIGEST_HEADER_USER_REQUESTED + "\n"
 		else:
-			msg += u"Your tasks for today: \U0001F4DD\n"
+			msg += keeper_strings.DIGEST_HEADER_TODAY + "\n"
 
 		for entry in pendingEntries:
 			# If this is the digest and this reminder was timed to this day and time...then process it (mark it as sent)
@@ -222,7 +222,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			msg += generateTaskStringForDigest(user, entry)
 
 	if not userRequested and len(sweptEntries) > 0:
-		msg += "\n" + "Btw, I moved these old tasks to " + user.getWebAppURL() + " to keep your list fresh:\n"
+		msg += "\n" + keeper_strings.SWEEP_MESSAGE_TEXT % (user.getWebAppURL())
 		for entry in sweptEntries:
 			msg += generateTaskStringForDigest(user, entry)
 

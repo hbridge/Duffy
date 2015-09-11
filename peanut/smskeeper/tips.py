@@ -23,7 +23,7 @@ class KeeperTip():
 		result = result.replace(":NAME:", user.getFirstName())
 		result = result.replace(":APP_URL:", user.getWebAppURL())
 		if self.type == FULL_TIP_TYPE:
-			result += "\n\n" + SMSKEEPER_TIP_FOOTER
+			result += "\n\n" + keeper_strings.SMSKEEPER_TIP_FOOTER
 		return result
 
 	# Mini tips are little sentences sent after first actions
@@ -76,67 +76,67 @@ REFERRAL_ASK_TIP_ID = "mini-referral-ask"
 SMSKEEPER_TIPS = [
 	KeeperTip(
 		PILLS_TIP_ID,
-		"Pro tip: I can help remind you to take your medicine and other frequent tasks. :pill: Just say 'Remind me to take my medicine every day' etc",
+		keeper_strings.PILLS_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		WEATHER_TIP_ID,
-		"Handy tip for you :NAME:, I can give you weather forecasts for tomorrow and this weekend. :sunny: :cloud: :umbrella: Try saying 'what's the weather tomorrow?'",
+		keeper_strings.WEATHER_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		BIRTHDAY_TIP_ID,
-		"Hey :NAME:, if you've got a friend's birthday :birthday: coming up and don't want to forget, just let me know with 'Julie's birthday is next Sunday'",
+		keeper_strings.BIRTHDAY_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		JOKE_TIP_ID,
-		"Hey :NAME:, I'm the funniest digital assistant around! Just ask me to tell you a joke - guaranteed laughs or you get a pony :sunglasses:",
+		keeper_strings.JOKE_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		PAY_BILLS_TIP_ID,
-		"Hey :NAME:, I can also track bills for you. :page_with_curl: Just let me know when you need to pay them. Like 'Pay credit card on the 15th of every month' :postbox:",
+		keeper_strings.PAY_BILLS_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		GROCERY_LIST_TIP_ID,
-		"Hey :NAME:, Want any help remembering grocery list? You can say 'Buy pasta, cheese and sauce later today' :spaghetti:",
+		keeper_strings.GROCERY_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		TRASH_DAY_TIP_ID,
-		"Hey :NAME:, do you have trouble remembering trash day? Just say 'Trash day every Tuesday' and I'll make sure you never forget. :pushpin:",
+		keeper_strings.TRASH_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		APPOINTMENT_TIP_ID,
-		"Btw, I'm great at reminding you about appointments. Just txt me when you need to go to the doctor, dentist, hair salon, DMV, etc. :mask:",
+		keeper_strings.APPOINTMENT_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		TICKETS_TIP_ID,
-		"Want to remember to buy that show's tickets as soon as they go on sale? I can remind you at the exact time. Just txt me :ticket:",
+		keeper_strings.TICKET_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		SHARED_REMINDER_TIP1_ID,
-		"I can now remind other people on your behalf. Just say 'Remind Anne about lunch tomorrow at 12pm'",
+		keeper_strings.SHARED_REMINDER_TIP1_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		TVSHOW_TIP_ID,
-		"Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'",
+		keeper_strings.TVSHOW_TIP_TEXT,
 		type=FULL_TIP_TYPE
 	),
 	KeeperTip(
 		GET_TASKS_TIP_ID,
-		"Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?'",
+		keeper_strings.GET_TASKS_TIP_TEXT,
 		type=FULL_TIP_TYPE,
 	),
 	KeeperTip(
 		SHARED_REMINDER_TIP2_ID,
-		"I can directly remind your other half for you. Just say 'Remind my boyfriend to get groceries tmrw at 7pm'",
+		keeper_strings.SHARED_REMINDER_TIP2_TEXT,
 		type=FULL_TIP_TYPE
 	),
 
@@ -144,27 +144,27 @@ SMSKEEPER_TIPS = [
 
 	KeeperTip(
 		DONE_ALL_TIP_ID,
-		"Pro tip: You can also say 'Done with everything' to mark all items as done.",
+		keeper_strings.DONE_ALL_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		SNOOZE_TIP_ID,
-		"Btw, you can always snooze a reminder by saying 'snooze for 5 mins' or 'snooze till 9pm'",
+		keeper_strings.SNOOZE_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP1_ID,
-		"Just let me know when you're done and I'll check it off your list",
+		keeper_strings.DONE_TIP1_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP2_ID,
-		"Let me know when you're done and I'll check it off for you",
+		keeper_strings.DONE_TIP2_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DONE_TIP3_ID,
-		"Btw, let me know when you're done",
+		keeper_strings.DONE_TIP3_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
@@ -179,27 +179,27 @@ SMSKEEPER_TIPS = [
 	),
 	KeeperTip(
 		DIGEST_QUESTION_TIP_ID,
-		"btw, how useful do you find these morning txts? 1 (not useful) - 5 (very useful)",
+		keeper_strings.DIGEST_QUESTION_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DIGEST_CHANGE_TIME_TIP_ID,
-		"btw, is 9am a good time for this? I can send them at any time you want, just let me know if another time is better",
+		keeper_strings.DIGEST_CHANGE_TIME_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		SHARED_REMINDER_MINI_TIP_ID,
-		"I can remind other people directly for you!",
+		keeper_strings.SHARED_REMINDER_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		DIGEST_QUESTION_NPS_TIP_ID,
-		"btw, how likely are you to recommend me to a friend?  1 (not likely) - 10 (extremely likely)",
+		keeper_strings.DIGEST_QUESTION_NPS_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 	KeeperTip(
 		REFERRAL_ASK_TIP_ID,
-		"btw, I'm curious, how did you hear about me?",
+		keeper_strings.REFERRAL_ASK_MINITIP_TEXT,
 		type=MINI_TIP_TYPE
 	),
 ]
@@ -212,7 +212,6 @@ def tipWithId(tipId):
 	return None
 
 
-SMSKEEPER_TIP_FOOTER = "Want fewer tips? Type 'send me tips weekly/monthly/never'"
 SMSKEEPER_TIP_HOUR = 18
 
 DONE_MINI_TIPS_LIST = [

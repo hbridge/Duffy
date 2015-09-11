@@ -6,7 +6,7 @@ import string
 import json
 
 from smskeeper import sms_util, tips
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import msg_util
 from smskeeper import analytics
 from smskeeper.models import Message
@@ -57,7 +57,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
-				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
+				sms_util.sendMsg(user, keeper_strings.ASK_AGAIN_FOR_NAME, None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				user.name = msg.strip(string.punctuation)
@@ -65,14 +65,14 @@ def process(user, msg, requestDict, keeperNumber):
 		user.save()
 
 		if user.product_id == keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
-			postalCodeMessage = u"What's your postal/zip code? It'll help me remind you of things at the right time \U0001F553"
+			postalCodeMessage = keeper_strings.ASK_FOR_POSTAL_CODE_TEXT
 		else:
-			postalCodeMessage = u"What's your zipcode? It'll help me remind you of things at the right time \U0001F553"
+			postalCodeMessage = keeper_strings.ASK_FOR_ZIPCODE_TEXT
 
 		sms_util.sendMsgs(
 			user,
 			[
-				u"Great, nice to meet you %s! \U0001F44B" % user.getFirstName(),
+				keeper_strings.GOT_NAME_RESPONSE % user.getFirstName(),
 				postalCodeMessage
 			],
 			keeperNumber
@@ -85,8 +85,7 @@ def process(user, msg, requestDict, keeperNumber):
 			timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
 			logger.debug("%s, %s, %s"%(timezone, wxcode, tempFormat))
 			if timezone is None:
-				response = "Sorry, I don't know that zipcode. Could you check that?"
-				sms_util.sendMsg(user, response, None, keeperNumber)
+				sms_util.sendMsg(user, keeper_strings.ZIPCODE_NOT_VALID_TEXT, None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				user.postal_code = postalCode
@@ -100,14 +99,13 @@ def process(user, msg, requestDict, keeperNumber):
 
 			# If we last sent a message over 2 minutes ago, then send back I'm not sure
 			if lastMessageOut.added < cutoff:
-				response = "Got it, but first thing, what's your zipcode?"
-				sms_util.sendMsg(user, response, None, keeperNumber)
+				sms_util.sendMsg(user, keeper_strings.ASK_AGAIN_FOR_ZIPCODE_TEXT, None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				# else ignore
 				return True, keeper_constants.CLASS_NONE, actionScores
 
-		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's add something you need to get done. \u2705", u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'."], keeperNumber)
+		sms_util.sendMsgs(user, [keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT, keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
@@ -131,16 +129,15 @@ def process(user, msg, requestDict, keeperNumber):
 			time.sleep(1)
 		sms_util.sendMsgs(
 			user,
-			[
-				u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do?",
+			[keeper_strings.TUTORIAL_DONE_TEXT,
 			],
 			keeperNumber)
 
 		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
 		if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
-			sms_util.sendMsg(user, u"Oh and here's my card. Tap it to save me to your address book. I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E", keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
+			sms_util.sendMsg(user, keeper_strings.TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT, keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
 		else:
-			sms_util.sendMsg(user, u"Oh and I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks.", None, eta=delayedTime)
+			sms_util.sendMsg(user, keeper_strings.TUTORIAL_MORNING_DIGEST_ONLY_TEXT, None, eta=delayedTime)
 
 		# Ask for referral if needed
 		signupData = json.loads(user.signup_data_json)

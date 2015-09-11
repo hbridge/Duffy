@@ -4,7 +4,7 @@ import pytz
 from common import date_util
 
 from smskeeper import reminder_util, sms_util, msg_util
-from smskeeper import keeper_constants, chunk_features
+from smskeeper import keeper_constants, chunk_features, keeper_strings
 from .action import Action
 from smskeeper.models import Contact
 from smskeeper import user_util
@@ -115,7 +115,7 @@ class CreateTodoAction(Action):
 			reminder_util.shareReminders(user, [entry], [shareContacts[0].handle], keeperNumber)
 
 		if not user.isTutorialComplete() and not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT:
-			sms_util.sendMsg(user, "Great, and when would you like to be reminded?", None, keeperNumber)
+			sms_util.sendMsg(user, keeper_strings.ASK_FOR_TIME_TEXT, None, keeperNumber)
 			return False
 		else:
 			reminder_util.sendCompletionResponse(user, entry, followups, keeperNumber)

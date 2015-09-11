@@ -1,7 +1,7 @@
 import logging
 import json
 
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from .action import Action
 from smskeeper import sms_util, actions, chunk_features
 from smskeeper import analytics, tips
@@ -160,9 +160,9 @@ class TipQuestionResponseAction(Action):
 			if typeId == self.NPS:
 				if firstInt is not None:
 					if firstInt < 8:
-						sms_util.sendMsg(user, "Got it, thanks.")
+						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_OK_RESPONSE_TEXT)
 					else:
-						sms_util.sendMsg(user, "Great to hear!")
+						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT)
 
 					analytics.logUserEvent(
 						user,
@@ -174,13 +174,13 @@ class TipQuestionResponseAction(Action):
 			elif typeId == self.SURVEY:
 				if firstInt is not None:
 					if firstInt < 3:
-						sms_util.sendMsg(user, "Got it, I won't send you a morning txt when there are no tasks")
+						sms_util.sendMsg(user, keeper_strings.CONFIRM_MORNING_DIGEST_LIMITED_STATE_TEXT)
 						user.digest_state = keeper_constants.DIGEST_STATE_LIMITED
 						user.save()
 					elif firstInt == 3:
-						sms_util.sendMsg(user, "Got it, thanks.")
+						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_OK_RESPONSE_TEXT)
 					else:
-						sms_util.sendMsg(user, "Great to hear!")
+						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT)
 
 					analytics.logUserEvent(
 						user,
@@ -200,7 +200,7 @@ class TipQuestionResponseAction(Action):
 					signupData["referrer"] = chunk.originalText
 					user.signup_data_json = json.dumps(signupData)
 					user.save()
-				sms_util.sendMsg(user, "Great, thanks!")
+				sms_util.sendMsg(user, keeper_strings.RESPONSE_FOR_WHO_REFERRED_YOU)
 		else:
 			return False
 

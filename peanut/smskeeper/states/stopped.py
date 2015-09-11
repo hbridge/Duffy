@@ -1,4 +1,4 @@
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from smskeeper import sms_util
 from smskeeper import analytics
 from smskeeper import time_utils
@@ -12,7 +12,7 @@ def process(user, msg, requestDict, keeperNumber):
 		user.state = keeper_constants.STATE_NORMAL
 		user.setState(keeper_constants.STATE_NORMAL)
 		user.save()
-		sms_util.sendMsg(user, u"\U0001F44B Welcome back!", None, keeperNumber)
+		sms_util.sendMsg(user, keeper_strings.START_RESPONSE, None, keeperNumber)
 		analytics.logUserEvent(
 			user,
 			"Stop/Start",

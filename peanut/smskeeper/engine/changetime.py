@@ -1,6 +1,6 @@
 import logging
 
-from smskeeper import reminder_util, actions, sms_util, keeper_constants
+from smskeeper import reminder_util, actions, sms_util, keeper_constants, keeper_strings
 from .action import Action
 
 logger = logging.getLogger(__name__)
@@ -20,8 +20,7 @@ class ChangetimeAction(Action):
 			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_CHANGETIME, sendMsg=False, doAlert=True)
 
 			if not daytime:
-				msgBack = "Sorry, I'm not sure what entry you mean. Could you rephrase?"
-				sms_util.sendMsg(user, msgBack, None, user.getKeeperNumber())
+				sms_util.sendMsg(user, keeper_strings.ENTRY_NOT_FOUND_TEXT, None, user.getKeeperNumber())
 		else:
 			nattyResult = chunk.getNattyResult(user)
 			if nattyResult is None:

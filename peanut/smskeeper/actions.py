@@ -242,7 +242,7 @@ def updateDigestTime(user, chunk):
 
 		logger.debug("User %s: Updated digest state to limited due to user request" % (user.id))
 
-		sms_util.sendMsg(user, "Got it, I won't send you a morning txt when there are no tasks")
+		sms_util.sendMsg(user, keeper_strings.CONFIRM_MORNING_DIGEST_LIMITED_STATE_TEXT)
 	else:
 		nattyResult = chunk.getNattyResult(user)
 
@@ -263,7 +263,7 @@ def updateDigestTime(user, chunk):
 
 		logger.debug("User %s: Updated digest time to %s %s due to user request" % (user.id, user.digest_hour, user.digest_minute))
 
-		sms_util.sendMsg(user, "Great, I'll send you a daily summary at %s for now on" % (msg_util.getNaturalTime(tzAwareTime)))
+		sms_util.sendMsg(user, keeper_strings.CHANGE_MORNING_DIGEST_TIME_TEXT % (msg_util.getNaturalTime(tzAwareTime)))
 	return True
 
 

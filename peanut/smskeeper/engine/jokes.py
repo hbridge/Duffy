@@ -3,7 +3,7 @@ import re
 import pytz
 import datetime
 
-from smskeeper import keeper_constants
+from smskeeper import keeper_constants, keeper_strings
 from .action import Action
 from smskeeper import sms_util
 from common import date_util
@@ -71,7 +71,7 @@ class JokeAction(Action):
 		joke = joke_list.getJoke(jokeNum)
 		if not joke:
 			logger.debug("User %s: Couldn't find joke for jokeNum %s" % (user.id, jokeNum))
-			sms_util.sendMsg(user, "Shoot, all out of jokes! I'll go work on some new ones, ask me again tomorrow")
+			sms_util.sendMsg(user, keeper_strings.JOKES_NO_MORE_TEXT)
 			return True
 
 		# How many jokes we've told in the last 6 hours
@@ -86,7 +86,7 @@ class JokeAction(Action):
 		if recentJokeCount >= 4:
 			if regexHit:
 				logger.debug("User %s: Hit recentJokeCount for the day and this message matches my regex" % (user.id))
-				sms_util.sendMsg(user, "Let me go write another, ask me again tomorrow")
+				sms_util.sendMsg(user, keeper_strings.JOKES_MAX_SENT_TODAY_TEXT)
 				return True
 			else:
 				logger.debug("User %s: Kicking out from jokes with msg '%s' because we hit recentJokeCount limit but this wasn't a new request" % (user.id, chunk.originalText))
@@ -115,7 +115,7 @@ class JokeAction(Action):
 			if regexHit:
 				self.sendJokePart1(user, joke, recentJokeCount)
 			elif recent:
-				sms_util.sendMsg(user, ":sunglasses:")
+				sms_util.sendMsg(user, keeper_strings.JOKE_LAST_STEP)
 				user.setStateData(self.JOKE_STEP_KEY, self.SUNGLASSES_SENT)
 			else:
 				logger.debug("User %s: Kicking out from jokes with msg '%s' because joke was done" % (user.id, chunk.originalText))
