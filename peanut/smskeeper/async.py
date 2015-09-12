@@ -196,19 +196,20 @@ def shouldIncludeEntry(entry):
 
 def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested, sweptEntries):
 	now = date_util.now(pytz.utc)
+	userNow = date_util.now(user.getTimezone())
 	msg = ""
 
 	if not userRequested:  # Include a header and weather if not user requested
-		headerPhrase = keeper_strings.REMINDER_DIGEST_HEADERS[now.weekday()]
+		headerPhrase = keeper_strings.REMINDER_DIGEST_HEADERS[userNow.weekday()]
 		msg += u"%s\n" % (headerPhrase)
 
 		if user.wxcode:
-			weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.wxcode, date_util.now(pytz.utc), weatherDataCache)
+			weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.wxcode, userNow, weatherDataCache)
 			if weatherPhrase:
 				msg += u"\n%s\n\n" % (weatherPhrase)
 
 	if len(pendingEntries) == 0:
-		msg += keeper_strings.REMINDER_DIGEST_EMPTY[now.weekday()] + '\n'
+		msg += keeper_strings.REMINDER_DIGEST_EMPTY[userNow.weekday()] + '\n'
 	else:
 		if userRequested:  # This shows all tasks so we don't mention today
 			msg += keeper_strings.DIGEST_HEADER_USER_REQUESTED + "\n"
