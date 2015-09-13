@@ -194,3 +194,41 @@ def getDataForMonth(month):
     end = datetime.datetime(2015, month + 1 % 12, 1, 0, 0, 0, tzinfo=pytz.utc)
     allUsers = User.objects.filter(activated__gt=begin, activated__lt=end)
     countUsers(allUsers)
+
+
+# Figure out how many users are in what state
+
+from smskeeper.models import User, ZipData, Message
+import operator
+from datetime import date, timedelta
+
+def getStatesByUsers(userList):
+    postalCodes = list()
+    for user in userList:
+        if user.postal_code:
+            postalCodes.append(user.postal_code)
+    print "Postal Codes found: %s"%len(postalCodes)
+    zips = list(ZipData.objects.filter(postal_code__in=postalCodes))
+    print "zipdata found: %s"%len(zips)
+    stateDict = {}
+    for pc in postalCodes:
+        for z in zips:
+            if pc in z.postal_code:
+                if z.state:
+                    if z.state in stateDict:
+                        stateDict[z.state] += 1
+                    else:
+                        stateDict[z.state] = 1
+    stateDict = sorted(stateDict.items(), key=operator.itemgetter(1), reverse=True)
+    return stateDict
+
+allUsers = User.objects.all()
+allUserData = getStatesByUsers(allUsers)
+dateFilter = date.today() - timedelta(days=7)
+activeUsers = Message.objects.values_list('user').filter(added__gt=dateFilter).filter(incoming=True).distinct()
+activeUsersData = getStatesByUsers(activeUsers)
+for x in allUserData:
+    print "%s: %d"%(x[0], x[1])
+for x in activeUsersData:
+    print "%s: %d"%(x[0], x[1])
+
