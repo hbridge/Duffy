@@ -141,7 +141,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		# Ask for referral if needed
 		signupData = json.loads(user.signup_data_json)
-		if "source" not in signupData or ("fb" not in signupData["source"] and len(signupData["referrer"]) == 0):
+		if "source" not in signupData or ("fb" not in signupData["source"] and 'referrer' in signupData and len(signupData["referrer"]) == 0):
 			referralTip = tips.tipWithId(tips.REFERRAL_ASK_TIP_ID)
 			sms_util.sendMsg(user, referralTip.renderMini(), classification=tips.REFERRAL_ASK_TIP_ID, eta=delayedTime + datetime.timedelta(seconds=10))
 			tips.markTipSent(user, referralTip, isMini=True)
