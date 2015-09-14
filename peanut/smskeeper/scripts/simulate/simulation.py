@@ -223,6 +223,7 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 	def uploadClassificationResults(self):
 		# create the dicts
 		simRun = {
+			"username": UNIX_NAME,
 			"git_revision": GIT_REVISION,
 			"source": self.SIMULATION_CONFIGURATION['message_source'],
 			"sim_type": self.SIMULATION_CONFIGURATION['sim_type'],
