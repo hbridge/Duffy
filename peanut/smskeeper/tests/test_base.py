@@ -100,6 +100,12 @@ class SMSKeeperBaseCase(TestCase):
 				return True
 		return False
 
+	def assertContainsOneOf(self, output, stringList):
+		self.assertTrue(self.containsOneOf(output, stringList), "String wasn't found in '%s'" % output)
+
+	def assertNotContainsOneOf(self, output, stringList):
+		self.assertFalse(self.containsOneOf(output, stringList), "String did match: %s" % output)
+
 	def renderTextConstant(self, constant):
 		if isinstance(constant, list):
 			return map(lambda txt: self.renderTextConstant(txt), constant)

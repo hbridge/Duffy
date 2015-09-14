@@ -161,7 +161,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_8AM)
 
 		# Add a message and make it look like it was sent at the right time
-		cliMsg.msg(self.testPhoneNumber, "Remind me go poop")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
 		message = Message.objects.get(id=1)
 		message.added = self.MON_8AM
 		message.save()
@@ -170,7 +170,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertIn("sunshine", self.getOutput(mock))
+			self.assertIn("poop", self.getOutput(mock))
 
 		# 5 days later to ckick off the first tip
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
@@ -199,7 +199,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_8AM)
 
 		# Add a message and make it look like it was sent at the right time
-		cliMsg.msg(self.testPhoneNumber, "Remind me go poop")
+		cliMsg.msg(self.testPhoneNumber, "Remind me go poop at 3")
 		message = Message.objects.get(id=1)
 		message.added = self.MON_8AM
 		message.save()
@@ -208,7 +208,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertIn("sunshine", self.getOutput(mock))
+			self.assertIn("poop", self.getOutput(mock))
 
 		# 5 days later
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
@@ -216,7 +216,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Make sure the change time tip comes through
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("a good time for this?", self.getOutput(mock))
+			self.assertIn(keeper_strings.DIGEST_CHANGE_TIME_MINITIP_TEXT, self.getOutput(mock))
 
 		# 7 days later from original
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
@@ -295,7 +295,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertIn("sunshine", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY)
 
 		# 5 days later
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
@@ -357,20 +357,20 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		user.added = self.MON_8AM
 		user.save()
 
-		# Set for 4 days in future
-		self.setNow(dateMock, self.FRI_9AM)
+		# Set for 1 days in future
+		self.setNow(dateMock, self.TUE_9AM)
 
 		cliMsg.msg(self.testPhoneNumber, "Go poop at 3pm today")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertNotIn("is this a good time for this", self.getOutput(mock))
+			self.assertNotIn(keeper_strings.DIGEST_CHANGE_TIME_MINITIP_TEXT, self.getOutput(mock))
 
 		# Set for 5 days in future
 		self.setNow(dateMock, self.SAT_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("is this a good time for this", self.getOutput(mock))
+			self.assertIn(keeper_strings.DIGEST_CHANGE_TIME_MINITIP_TEXT, self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "6")
@@ -398,7 +398,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.SAT_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("is this a good time for this", self.getOutput(mock))
+			self.assertIn(keeper_strings.DIGEST_CHANGE_TIME_MINITIP_TEXT, self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "never")
@@ -418,7 +418,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.SAT_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn("is this a good time for this", self.getOutput(mock))
+			self.assertIn(keeper_strings.DIGEST_CHANGE_TIME_MINITIP_TEXT, self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "remind me to go poop at 3pm")
@@ -1739,7 +1739,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "tasks")
 			self.assertNotIn("forecast:", self.getOutput(mock))
-			self.assertIn(keeper_strings.REMINDER_DIGEST_EMPTY[0], self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.USER_REQUESTED_DIGEST_EMPTY)
 
 	@patch('common.weather_util.getWeatherForWxCode')
 	def test_weather_on_request(self, weatherMock, dateMock):

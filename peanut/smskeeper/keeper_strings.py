@@ -75,6 +75,12 @@ REMINDER_DIGEST_EMPTY = [
 	u"Last day of the week to get stuff done! \U0001F636"
 ]
 
+USER_REQUESTED_DIGEST_EMPTY = [
+	u"I don't have anything on record :eyeglasses: for you",
+	u"Nothing on your list, need to add anything? :ear:",
+	u"Your todo list :scroll: is clear right now"
+]
+
 # Goes out with a digest until a user has checked off three tasks
 REMINDER_DIGEST_DONE_INSTRUCTIONS = ":white_check_mark: To check a task off, tell me what you're done with, like 'Done with calling Mom'"
 
@@ -209,7 +215,7 @@ DONE_TIP2_MINITIP_TEXT = "Let me know when you're done and I'll check it off for
 DONE_TIP3_MINITIP_TEXT = "Btw, let me know when you're done"
 SNOOZE_MINITIP_TEXT = "Btw, you can always snooze a reminder by saying 'snooze for 5 mins' or 'snooze till 9pm'"
 DIGEST_QUESTION_MINITIP_TEXT = "btw, how useful do you find these morning txts? 1 (not useful) - 5 (very useful)"
-DIGEST_CHANGE_TIME_MINITIP_TEXT = "btw, is this a good time for this? I can send them at any time you want, just let me know if another time is better"
+DIGEST_CHANGE_TIME_MINITIP_TEXT = "btw, when do you wake up? I can send this to you earlier or later in the day, just let me know what time is best"
 SHARED_REMINDER_MINITIP_TEXT = "I can remind other people directly for you!"
 DIGEST_QUESTION_NPS_MINITIP_TEXT = "btw, how likely are you to recommend me to a friend?  1 (not likely) - 10 (extremely likely)"
 REFERRAL_ASK_MINITIP_TEXT = "btw, I'm curious, how did you hear about me?"

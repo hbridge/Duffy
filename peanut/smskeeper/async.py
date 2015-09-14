@@ -200,16 +200,16 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 	msg = ""
 
 	if not userRequested:  # Include a header and weather if not user requested
-		headerPhrase = keeper_strings.REMINDER_DIGEST_HEADERS[userNow.weekday()]
-		msg += u"%s\n" % (headerPhrase)
-
 		if user.wxcode:
 			weatherPhrase = weather_util.getWeatherPhraseForZip(user, user.wxcode, userNow, weatherDataCache)
 			if weatherPhrase:
 				msg += u"\n%s\n\n" % (weatherPhrase)
 
 	if len(pendingEntries) == 0:
-		msg += keeper_strings.REMINDER_DIGEST_EMPTY[userNow.weekday()] + '\n'
+		if userRequested:
+			msg += random.choice(keeper_strings.USER_REQUESTED_DIGEST_EMPTY)
+		else:
+			msg += keeper_strings.REMINDER_DIGEST_EMPTY[userNow.weekday()] + '\n'
 	else:
 		if userRequested:  # This shows all tasks so we don't mention today
 			msg += keeper_strings.DIGEST_HEADER_USER_REQUESTED + "\n"
@@ -281,7 +281,7 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 		}
 	)
 
-	if daysActive >= 5 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_CHANGE_TIME_TIP_ID) and not userRequested:
+	if daysActive >= 2 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_CHANGE_TIME_TIP_ID) and not userRequested:
 		digestChangeTimeTip = tips.tipWithId(tips.DIGEST_CHANGE_TIME_TIP_ID)
 		sms_util.sendMsg(user, digestChangeTimeTip.renderMini(), classification=keeper_constants.OUTGOING_CHANGE_DIGEST_TIME)
 		tips.markTipSent(user, digestChangeTimeTip, isMini=True)

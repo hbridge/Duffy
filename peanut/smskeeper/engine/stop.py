@@ -2,14 +2,13 @@ from .action import Action
 import re
 from smskeeper import sms_util
 from smskeeper import keeper_constants, keeper_strings
-import time
 from smskeeper import analytics
 
 
 class StopAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_STOP
 
-	stopRegex = re.compile(r"stop$|silent stop$|cancel( keeper)?$|leave me alone|stop .+ me|.*don't text me.*", re.I)
+	stopRegex = re.compile(r"stop$|silent stop$|cancel( keeper)?$", re.I)
 
 	def getScore(self, chunk, user):
 		score = 0.0
