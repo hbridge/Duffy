@@ -679,6 +679,7 @@ class VerbData(models.Model):
 
 
 class SimulationRun(models.Model):
+	username = models.CharField(max_length=10)
 	git_revision = models.CharField(max_length=7)
 	source = models.CharField(max_length=1, choices=[('p', 'prod'), ('d', 'dev'), ('l', 'local')])
 	sim_type = models.CharField(
@@ -686,6 +687,7 @@ class SimulationRun(models.Model):
 		choices=[('pp', 'prodpush'), ('dp', 'devpush'), ('t', 'test'), ('nl', 'nightly')],
 		db_index=True
 	)
+	annotation = models.TextField(null=True, blank=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True, null=True)
 
 	def simResults(self):

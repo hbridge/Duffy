@@ -5,6 +5,8 @@ import json
 from urllib2 import URLError
 import urllib2
 import traceback
+import pwd
+import os
 
 from common import date_util
 from django.conf import settings
@@ -54,6 +56,7 @@ logger = MyLogger("/mnt/log/sim.log", mode='w')
 summaryLogger = MyLogger("/mnt/log/sim_summary.log")
 
 MAX_USERS_TO_SIMULATE = 10000
+UNIX_NAME = pwd.getpwuid(os.getuid()).pw_name
 
 
 def summaryText(text, *args):

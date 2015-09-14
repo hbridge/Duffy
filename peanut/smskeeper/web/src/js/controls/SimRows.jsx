@@ -26,7 +26,7 @@ var SimulationRow = React.createClass({
 	}
     return (
       <tr>
-        <td onClick={this.handleClicked} href='#'> { simId }, {this.getSimType()}, @{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
+        <td onClick={this.handleClicked} href='#'> { simId }.  {this.getSimType()}: {this.props.simRun.username}@{this.props.simRun.git_revision}, {moment(this.props.simRun.added).fromNow()}</td>
         <td onClick={this.handleClicked} href='#'> { simpleAccuracy ? simpleAccuracy.toFixed(2) : ""} ({numCorrect}/{numCorrect+numWrong}) <DeltaLabel value={(simpleAccuracy - compareAccuracy)} /></td>
         <td> </td>
         <td> </td>
