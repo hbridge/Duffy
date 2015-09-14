@@ -2230,6 +2230,44 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me next Wednesday to start taking birth control again. 7 in the morning. Thank you keeper")
 			self.assertIn("Wed", self.getOutput(mock))
 
+	def test_two_unknowns_in_row_pasuses(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "bobble gobble")
+		cliMsg.msg(self.testPhoneNumber, "bobble gobble2")
+
+		user = self.getTestUser()
+		self.assertTrue(user.paused)
+
+		user.paused = False
+		user.save()
+
+		self.setNow(dateMock, self.TUE_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "bobble gobble")
+		cliMsg.msg(self.testPhoneNumber, "remind me bobble gobble")
+		cliMsg.msg(self.testPhoneNumber, "something else entirly")
+
+		user = self.getTestUser()
+		self.assertTrue(user.paused)
+
+		user.paused = False
+		user.save()
+
+		self.setNow(dateMock, self.WED_9AM)
+
+		cliMsg.msg(self.testPhoneNumber, "bobble gobble")
+		cliMsg.msg(self.testPhoneNumber, "remind me bobble gobble")
+
+		self.setNow(dateMock, self.THU_9AM)
+		cliMsg.msg(self.testPhoneNumber, "something else entirly")
+
+		user = self.getTestUser()
+		self.assertFalse(user.paused)
+
+
 	"""
 	TODO(Derek): Make pass
 	def test_paper_due_back_2_days(self, dateMock):

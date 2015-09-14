@@ -6,7 +6,7 @@ import json
 
 from smskeeper import sms_util, msg_util, helper_util, image_util, user_util
 from smskeeper import keeper_constants, keeper_strings
-from smskeeper.models import Entry, Contact, User
+from smskeeper.models import Entry, Contact, User, Message
 from smskeeper import analytics
 
 from common import slack_logger, date_util
@@ -268,17 +268,26 @@ def updateDigestTime(user, chunk):
 
 
 def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, doAlert=False):
+	infoMessage = "User %s: unknown '%s'" % (user.id, msg)
 	now = date_util.now(pytz.timezone("US/Eastern"))
 
 	user.messageWasUnknown = True
 
+	unknownMsgCount = 0
+	recentIncoming = list(Message.objects.filter(user=user, incoming=True).order_by("-id")[:3])
+	for incomingMsg in recentIncoming:
+		if incomingMsg.auto_classification == keeper_constants.CLASS_UNKNOWN:
+			unknownMsgCount += 1
+
+	# If we got 2 out of 3 unknowns within 20 minutes
+	# then pause
+	timeDiffSec = abs((recentIncoming[0].added - recentIncoming[-1].added).total_seconds())
+	if unknownMsgCount >= 2 and timeDiffSec < 20 * 60:
+		doPause = True
+
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM:
-		infoMessage = "User %s: unknown '%s'" % (user.id, msg)
 		if doAlert or doPause:
 			infoMessage += "   @derek @aseem @henry"  # Add ourselves to get alerted during the day
-
-		if doPause:
-			user_util.setPaused(user, True, keeperNumber, infoMessage)
 
 		slack_logger.postManualAlert(user, infoMessage, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 
@@ -291,7 +300,7 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 	else:
 		if sendMsg:
 			sms_util.sendMsg(user, random.choice(keeper_strings.UNKNOWN_COMMAND_PHRASES), None, keeperNumber)
-			logger.info("User %s: (At night) I couldn't figure out '%s'" % (user.id, msg))
+			logger.info("User %s: (At night) I couldn't figure out '%s'. unknown type %s" % (user.id, msg, unknownType))
 		slack_logger.postManualAlert(
 			user,
 			"User %s: sent unknown %s" % (user.id, msg),
@@ -299,6 +308,9 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 			keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS
 		)
 		ret = False
+
+	if doPause:
+		user_util.setPaused(user, True, keeperNumber, infoMessage)
 
 	analytics.logUserEvent(
 		user,
