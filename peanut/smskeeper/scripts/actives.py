@@ -1,3 +1,5 @@
+# Bunch of oneoff scripts
+
 from datetime import date, timedelta
 from smskeeper.models import Message, User
 from smskeeper import keeper_constants
@@ -231,4 +233,51 @@ for x in allUserData:
     print "%s: %d"%(x[0], x[1])
 for x in activeUsersData:
     print "%s: %d"%(x[0], x[1])
+
+
+# Get a list of users from a particular cohort that aren't active n weeks later
+
+from smskeeper.models import User, Message
+from datetime import datetime, timedelta
+import pytz
+
+def getAllUsersFromCohort(startDate):
+    # assuming startDate is Monday
+    endDate = startDate + timedelta(days=7)
+    return User.objects.filter(activated__gt=startDate, activated__lt=endDate)
+
+def getUsersInWeekN(cohort, startDate, weeknumber):
+    weekStart = startDate + timedelta(days=(weeknumber - 1)*7)
+    weekEnd = weekStart + timedelta(days=7)
+    print "Week %d: from %s to %s"%(weeknumber, weekStart, weekEnd)
+    activeUsers = list()
+    nonActiveUsers = list()
+    for user in cohort:
+        msgCount = Message.objects.filter(user=user, incoming=True, added__gt=weekStart, added__lt=weekEnd).count()
+        if msgCount > 0:
+            activeUsers.append(user)
+        else:
+            nonActiveUsers.append(user)
+    return activeUsers, nonActiveUsers
+
+def getUsersForFirstNWeeks(startDate, weekNumber):
+    users = getAllUsersFromCohort(startDate)
+    print "Total users found: %d"%(len(users))
+    for x in range(weekNumber):
+        active, nonactive = getUsersInWeekN(users,startDate,x+1)
+        print "\tWeek %d -- Active: %d, Non-active: %d"%(x+1, len(active), len(nonactive))
+
+def getDiffOfUsers(cohort, startDate, fromWeek, toWeek):
+    if not cohort:
+        cohort = getAllUsersFromCohort(startDate)
+    fromWeekUsers = getUsersInWeekN(cohort, startDate, fromWeek)
+    toWeekUsers = getUsersInWeekN(cohort, startDate, toWeek)
+    fromList = [user.id for user in fromWeekUsers[0]]
+    toList = [user.id for user in toWeekUsers[0]]
+    diff = list(set(fromList) - set(toList))
+    return diff
+
+monday = datetime(2015, 7, 13, 0, 0, 0, tzinfo=pytz.timezone('US/Eastern'))
+diff = getDiffOfUsers(None, monday, 5, 9)
+print diff
 
