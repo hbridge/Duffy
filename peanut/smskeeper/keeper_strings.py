@@ -205,7 +205,7 @@ TICKET_TIP_TEXT = "Want to remember to buy that show's tickets as soon as they g
 SHARED_REMINDER_TIP1_TEXT = "I can now remind other people on your behalf. Just say 'Remind Anne about lunch tomorrow at 12pm'"
 TVSHOW_TIP_TEXT = "Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'"
 GET_TASKS_TIP_TEXT = "Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?'"
-SHARED_REMINDER_TIP2_TEXT = "I can directly remind your other half for you. Just say 'Remind my boyfriend to get groceries tmrw at 7pm'"
+SHARED_REMINDER_TIP2_TEXT = "I can directly remind your other half for you. Just say 'Remind my boyfriend (or girlfriend) to get groceries tmrw at 7pm'"
 
 # Mini tips: these go out at specific instances. Like when a user takes an action
 
