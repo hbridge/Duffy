@@ -46,8 +46,8 @@ module.exports = React.createClass({
 		    				initialMoment={moment.tz(this.state.model.remind_timestamp, this.props.userTimezone)}
 		    				timezone={this.props.userTimezone}
 		    				isDigestTime={this.state.model.use_digest_time}
-		    				digestHour={this.state.model.creatorDigestHour}
-		    				digestMinute={this.state.model.creatorDigestMinute}
+		    				digestHour={this.state.model.creator_digest_hour}
+		    				digestMinute={this.state.model.creator_digest_minute}
 		    			/>
 		    			<Input ref="recur"
 		    				type='select'

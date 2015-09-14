@@ -66,7 +66,7 @@ var RecurButton = React.createClass({
 var EntryRow = React.createClass({
 	mixins: [BackboneReactComponent],
 	render() {
-		var timezone = this.state.model.creatorTimezone;
+		var timezone = this.state.model.creator_timezone;
 		var approveButton = <Button
 			bsStyle={this.state.model.manually_check ? 'danger' : 'success'}
 			ref="approveButton"
@@ -81,7 +81,7 @@ var EntryRow = React.createClass({
 		return (
 			<tr>
 		        <td> { approveButton } </td>
-		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creatorName} </a></td>
+		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creator_name} </a></td>
 		        <td>
 		        	<a onClick={this.handleRowClicked} href="#" className="userText">{ this.state.model.text } </a><br />
 		        	[{ _.map(JSON.parse(this.state.model.orig_text), this.getUnsquashLink) }]
@@ -199,7 +199,7 @@ module.exports = React.createClass({
   getModal() {
   		creatorTimezone = null;
   		if (this.state.expandedEntry) {
-  			creatorTimezone = this.state.expandedEntry.get('creatorTimezone');
+  			creatorTimezone = this.state.expandedEntry.get('creator_timezone');
   		}
 		return (
 			<Modal show={this.state.expandedEntry != null} onHide={this.close}>

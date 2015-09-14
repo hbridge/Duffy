@@ -92,11 +92,11 @@ class SMSRemindersRegressionCase(test_base.SMSKeeperBaseCase):
 				self.clearData()
 				self.setupUser(dateMock)
 				user = self.getTestUser()
-				user.timezone = entryData["timezone"]
+				user.timezone = entryData["creator_timezone"]
 				user.save()
 
-				added = datetime.datetime.fromtimestamp(entryData['added']).replace(tzinfo=pytz.utc)
-				correctRemindTime = datetime.datetime.fromtimestamp(entryData['remind_timestamp']).replace(tzinfo=pytz.utc)
+				added = datetime.datetime.strptime(entryData['added'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc)
+				correctRemindTime = datetime.datetime.strptime(entryData['remind_timestamp'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc)
 
 				self.setNow(dateMock, added)
 
