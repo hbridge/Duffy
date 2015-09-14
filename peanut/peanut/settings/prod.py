@@ -36,7 +36,6 @@ SERVER_EMAIL = 'prod@duffyapp.com'
 
 ADMINS = (
 	('Admins', 'server-errors@duffytech.co'),
-	('Trello', 'servererrors+xl4dq5gxaohxoqfhln4q@boards.trello.com')
 )
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "my.getkeeper.com"]
@@ -49,7 +48,6 @@ class CELERY_CONFIG(BASE_CELERY_CONFIG):
 	CELERY_SEND_TASK_ERROR_EMAILS = True
 	ADMINS = [
 		('Admins', 'server-errors@duffytech.co'),
-		('Trello', 'servererrors+xl4dq5gxaohxoqfhln4q@boards.trello.com')
 	]
 	BROKER_URL = "amqp://duffy:du44y@172.31.21.173:5672/swap"
 
