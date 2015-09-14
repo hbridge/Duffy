@@ -284,6 +284,7 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 	timeDiffSec = abs((recentIncoming[0].added - recentIncoming[-1].added).total_seconds())
 	if unknownMsgCount >= 2 and timeDiffSec < 20 * 60:
 		doPause = True
+		sendMsg = False
 
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM:
 		if doAlert or doPause:
@@ -293,7 +294,7 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 
 		logger.info("User %s: (During day) I couldn't figure out '%s'. unknown type %s" % (user.id, msg, unknownType))
 
-		if unknownType == keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_STATE or unknownType == keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_SINGLE:
+		if sendMsg and unknownType == keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_STATE or unknownType == keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_SINGLE:
 			sms_util.maybeSendConfusedMsg(user, keeperNumber)
 
 		ret = True
