@@ -52,7 +52,9 @@ var SimulationRow = React.createClass({
   		return "Prod Push";
   	} else if (type == "dp") {
   		return "Dev Push";
-  	}
+  	} else if (type == "n") {
+      return "Nightly";
+    }
 
   	return "Unknown";
   },
