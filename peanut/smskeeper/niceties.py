@@ -1,3 +1,5 @@
+from __future__ import division
+
 import datetime
 import humanize
 import emoji
@@ -33,6 +35,23 @@ class Nicety():
 			return re.match(self.reStr, cleanedMsg, re.I) is not None
 		except:
 			print "RE raised exception: %s", self.reStr
+
+	def matchScore(self, msg):
+		if not msg or msg == "":
+			return False
+		cleanedMsg = msg_util.cleanMsgText(msg)
+
+		# We do this so we can look at a full match of a string.
+		reStr = "(" + self.reStr.replace(".*", "") + ")"
+		match = re.match(reStr, cleanedMsg, re.I)
+
+		longestMatch = 0
+		if match:
+			for group in match.groups():
+				if group and len(group) > longestMatch:
+					longestMatch = len(group)
+
+		return longestMatch / len(cleanedMsg)
 
 	def getResponse(self, user, requestDict, keeperNumber):
 		response = None

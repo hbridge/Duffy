@@ -23,8 +23,11 @@ class NicetyAction(Action):
 		if nicety and not nicety.isSilent():
 			score = .6
 
-		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
+			matchScore = nicety.matchScore(chunk.originalText)
+			if matchScore > .9:
+				score = .95
 
+		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
 		if msg_util.isDoneCommand(chunk.originalText):
 			score = 0.0
 

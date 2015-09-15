@@ -10,7 +10,7 @@ from smskeeper.models import Entry, Message
 import test_base
 
 import emoji
-from smskeeper import time_utils
+from smskeeper import time_utils, sms_util
 from common import date_util
 from datetime import timedelta
 
@@ -2230,39 +2230,89 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Remind me next Wednesday to start taking birth control again. 7 in the morning. Thank you keeper")
 			self.assertIn("Wed", self.getOutput(mock))
 
+	# Emulate a user sending in three unknown phrases in a row
+	# Gets a bit funky due to the maybe send confused msg stuff
 	def test_two_unknowns_in_row_pasuses(self, dateMock):
 		self.setupUser(dateMock)
 
-		self.setNow(dateMock, self.MON_10AM)
+		# First, test the basic 3 in a row
+		dt = self.MON_10AM
+		self.setNow(dateMock, dt)
 
-		cliMsg.msg(self.testPhoneNumber, "bobble gobble")
-		cliMsg.msg(self.testPhoneNumber, "bobble gobble2")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bobble gobble")
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=2))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt))
+
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bobble gobble2")
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=4))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt + datetime.timedelta(minutes=2)))
+
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bobble gobble3")
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=6))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt + datetime.timedelta(minutes=4)))
+
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
 
 		user = self.getTestUser()
 		self.assertTrue(user.paused)
 
+		# Now, test if we can still do a remind in there
 		user.paused = False
 		user.save()
 
-		self.setNow(dateMock, self.TUE_9AM)
+		dt = self.TUE_9AM
+		self.setNow(dateMock, dt)
 
-		cliMsg.msg(self.testPhoneNumber, "bobble gobble")
-		cliMsg.msg(self.testPhoneNumber, "remind me bobble gobble")
-		cliMsg.msg(self.testPhoneNumber, "something else entirly")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bobble gobble")
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=2))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt))
+
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "remind me to go poop tomorrow")
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=2))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt))
+
+			self.assertIn("tomorrow", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "what is the sun made of?")  # Make sure questions count too
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=6))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt + datetime.timedelta(minutes=4)))
+
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bobble gobble3")
+			self.setNow(dateMock, dt + datetime.timedelta(minutes=8))
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt + datetime.timedelta(minutes=6)))
+
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
 
 		user = self.getTestUser()
 		self.assertTrue(user.paused)
 
+		# Now, now sure the 20 minute thing applies. Unpause then run again an hour later
 		user.paused = False
 		user.save()
 
-		self.setNow(dateMock, self.WED_9AM)
+		dt = self.TUE_10AM
+		self.setNow(dateMock, dt)
 
-		cliMsg.msg(self.testPhoneNumber, "bobble gobble")
-		cliMsg.msg(self.testPhoneNumber, "remind me bobble gobble")
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "bobble gobble4")
+			sms_util.asyncMaybeSendConfusedMsg(self.getTestUser().id, date_util.unixTime(dt + datetime.timedelta(minutes=2)))
 
-		self.setNow(dateMock, self.THU_9AM)
-		cliMsg.msg(self.testPhoneNumber, "something else entirly")
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
 
 		user = self.getTestUser()
 		self.assertFalse(user.paused)

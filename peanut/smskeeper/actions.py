@@ -273,18 +273,20 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 
 	user.messageWasUnknown = True
 
-	unknownMsgCount = 0
-	recentIncoming = list(Message.objects.filter(user=user, incoming=True).order_by("-id")[:3])
-	for incomingMsg in recentIncoming:
-		if incomingMsg.auto_classification == keeper_constants.CLASS_UNKNOWN:
-			unknownMsgCount += 1
-
 	# If we got 2 out of 3 unknowns within 20 minutes
 	# then pause
-	timeDiffSec = abs((recentIncoming[0].added - recentIncoming[-1].added).total_seconds())
-	if unknownMsgCount >= 2 and timeDiffSec < 20 * 60:
-		doPause = True
-		sendMsg = False
+	recentOutgoing = list(Message.objects.filter(user=user, incoming=False).order_by("-id")[:3])
+
+	if len(recentOutgoing) >= 2:
+		unknownMsgCount = 0
+		for outgoingMsg in recentOutgoing:
+			if outgoingMsg.classification == keeper_constants.OUTGOING_UNKNOWN:
+				unknownMsgCount += 1
+
+		timeDiffSec = abs((date_util.now(pytz.utc) - recentOutgoing[-1].added).total_seconds())
+		if unknownMsgCount >= 2 and timeDiffSec < 20 * 60:
+			doPause = True
+			sendMsg = False
 
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM:
 		if doAlert or doPause:

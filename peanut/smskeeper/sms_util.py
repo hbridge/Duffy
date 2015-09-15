@@ -153,7 +153,7 @@ def asyncMaybeSendConfusedMsg(userId, msgTimeSinceEpoch):
 	if len(messagesAfter) == 0:
 		logger.debug("User %s: Sending out confused message because 0 messages came after my time %s", user.id, dt)
 		# Send out confused message
-		sendMsg(user, random.choice(keeper_strings.UNKNOWN_COMMAND_PHRASES))
+		sendMsg(user, random.choice(keeper_strings.UNKNOWN_COMMAND_PHRASES), classification=keeper_constants.OUTGOING_UNKNOWN)
 	else:
 		logger.debug("User %s: Didn't send out confused message because %s messages came after my time %s", user.id, len(messagesAfter), dt)
 

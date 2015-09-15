@@ -1284,6 +1284,24 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Poop", self.getOutput(mock))
 
 
+	# Had bug with good morning where it thought it was a changetime todo
+	def test_good_morning(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_10AM)
+
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up tomorrow at 8")
+
+		# Normally at 9:20 we'd send the reminder, but since it was created recently, don't
+		self.setNow(dateMock, self.TUE_8AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Wake up", self.getOutput(mock))
+
+		self.setNow(dateMock, self.TUE_8AM + datetime.timedelta(minutes=5))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Good morning")
+			self.assertNotIn("tomorrow", self.getOutput(mock))
+
 
 	"""
 	# Hit a bug where tomorrow afternoon would return in 2 days (so Wed instead of Tuesday)

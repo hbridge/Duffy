@@ -617,7 +617,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 			# No followup
 			# So should get error message a few minutes later
-			self.assertTrue(self.containsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.UNKNOWN_COMMAND_PHRASES), self.getOutput(mock)
 
 		self.setNow(dateMock, self.MON_11AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:

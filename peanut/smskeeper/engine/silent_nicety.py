@@ -21,6 +21,10 @@ class SilentNicetyAction(Action):
 		if nicety and nicety.isSilent():
 			score = 0.4
 
+			matchScore = nicety.matchScore(chunk.originalText)
+			if matchScore > .9:
+				score = .95
+
 		if SilentNicetyAction.HasHistoricalMatchForChunk(chunk):
 			score = 0.5
 

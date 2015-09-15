@@ -291,6 +291,7 @@ OUTGOING_REMINDER = "reminder"
 OUTGOING_JOKE = "joke"
 OUTGOING_CHANGE_DIGEST_TIME = "change-digest-time"
 OUTGOING_SHARE_PROMPT = "outgoing-share-prompt"
+OUTGOING_UNKNOWN = "outgoing-unknown"
 
 TEMP_FORMAT_METRIC = 'metric'
 TEMP_FORMAT_IMPERIAL = 'imperial'
