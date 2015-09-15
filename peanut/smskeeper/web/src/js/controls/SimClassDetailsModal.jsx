@@ -17,7 +17,9 @@ var WrongResultsGroup = React.createClass({
 			return <span></span>;
 		}
 		var createClassPanel = function(messageClass) {
-			var messages = this.props.wrongByClass[messageClass];
+			var messages = _.sortBy(this.props.wrongByClass[messageClass], function(message){
+        return message.body;
+      });
 			return (
 				<Panel
 					header={messageClass + " (" + messages.length + "/" + this.props.totalWrong + ")"}
