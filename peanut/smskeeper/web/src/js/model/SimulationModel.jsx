@@ -35,6 +35,10 @@ module.exports.bindSimulationCompareClassDetails = function(simRunId, compareRun
   $.getJSON("/smskeeper/simulation_run_compare/" + simRunId + "/" + compareRunId, dataCallback);
 }
 
+module.exports.fetchSimulationResult = function(simResultId, callback) {
+  $.getJSON("/smskeeper/simulation_result/" + simResultId, callback);
+}
+
 module.exports.deleteSimRun=function(simRunId, callback){
   $.ajax({
     url: '/smskeeper/simulation_run/' + simRunId,

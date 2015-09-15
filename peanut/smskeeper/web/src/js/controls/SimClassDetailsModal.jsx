@@ -8,6 +8,7 @@ var Bootstrap = require('react-bootstrap');
   Modal = Bootstrap.Modal;
   Accordion = Bootstrap.Accordion;
   Panel = Bootstrap.Panel;
+var SimResultModal = require("./SimResultModal.jsx");
 
 
 var WrongResultsGroup = React.createClass({
@@ -23,10 +24,10 @@ var WrongResultsGroup = React.createClass({
 					eventKey={messageClass}>
 				  <ul>
 			      	{messages.map(function(message){
-			      		return <li><a target="_blank" href={"/smskeeper/simulation_result/" + message.sim_result_id}> {message.body} </a></li>
-			      	})}
-			      </ul>
-			    </Panel>
+			      		return <li><a onClick={function(e){this.handleResultClicked(message.sim_result_id)}.bind(this)}> {message.body} </a></li>
+			      	}.bind(this))}
+			    </ul>
+			  </Panel>
 			);
 		}.bind(this);
 
@@ -42,7 +43,11 @@ var WrongResultsGroup = React.createClass({
 			</Accordion>
 			</div>
 		);
-	}
+	},
+
+  handleResultClicked(resultId){
+    this.props.onResultIdClicked(resultId);
+  }
 });
 
 
@@ -81,8 +86,12 @@ module.exports = React.createClass({
 
     var summary = this.state.summaryData;
 
+    if (this.state.showSimResultId) {
+      return (<SimResultModal simResultId={this.state.showSimResultId} onClose={this.handleSimResultModalClosed}/>);
+    }
+
     return (
-      <Modal show={this.state.show} onHide={this.close} dialogClassName='detailsModal'>
+      <Modal show={this.state.show} onHide={this.close} dialogClassName='detailsModal' animation={false}>
         <Modal.Header closeButton>
             <Modal.Title>Details for run #{this.props.simId}: {this.props.messageClass} </Modal.Title>
         </Modal.Header>
@@ -92,11 +101,13 @@ module.exports = React.createClass({
         		title="False Positives"
         		wrongByClass={fpsByCorrectClass}
         		totalWrong={fpCount}
+            onResultIdClicked={this.handleResultClicked}
         	/>
         	<WrongResultsGroup
         		title="False Negatives"
         		wrongByClass={fnsBySimClass}
         		totalWrong={fnCount}
+            onResultIdClicked={this.handleResultClicked}
         	/>
         </Modal.Body>
       </Modal>
@@ -126,24 +137,34 @@ module.exports = React.createClass({
             collapsable>
             <ul>
               {classCompareData.tpMessages.map(function(message){
-                return <li><a target="_blank" href={"/smskeeper/simulation_result/" + message.sim_result_id}> {message.body} </a></li>
-              })}
+                return <li><a onClick={function(e){this.handleResultClicked(message.sim_result_id)}.bind(this)}> {message.body} </a></li>
+              }.bind(this))}
             </ul>
           </Panel>
           <WrongResultsGroup
             title="New False Positives"
             wrongByClass={fpsByCorrectClass}
-            totalWrong={classCompareData.fpMessages.count}
+            totalWrong={classCompareData.fpMessages.length}
+            onResultIdClicked={this.handleResultClicked}
           />
           <WrongResultsGroup
             title="New False Negatives"
             wrongByClass={fnsBySimClass}
-            totalWrong={classCompareData.fnMessages.count}
+            totalWrong={classCompareData.fnMessages.length}
+            onResultIdClicked={this.handleResultClicked}
           />
         </div>
       );
     }
     return <span></span>
+  },
+
+  handleResultClicked(simResultId){
+    this.setState({showSimResultId: simResultId})
+  },
+
+  handleSimResultModalClosed(e) {
+    this.setState({showSimResultId: null});
   },
 
   close(e) {

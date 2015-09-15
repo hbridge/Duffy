@@ -756,6 +756,14 @@ class SimulationResult(models.Model):
 	def isCorrect(self):
 		return self.message_classification == self.sim_classification
 
+	def recentComparableResults(self):
+		recentComparable = SimulationResult.objects.filter(
+			id__lt=self.id,
+			message_id=self.message_id,
+			run__source=self.run.source
+		)
+		return recentComparable
+
 	@classmethod
 	def resultsByClass(cls, queryset):
 		results = {}

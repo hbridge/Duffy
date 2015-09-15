@@ -69,6 +69,8 @@ class ClassifiedMessageSerializer(serializers.ModelSerializer):
 
 
 class SimulationResultSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+	recentComparableResults = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
 	class Meta:
 		model = models.SimulationResult
 		list_serializer_class = BulkListSerializer
