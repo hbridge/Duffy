@@ -16,15 +16,17 @@ class FetchDigestAction(Action):
 		chunkFeatures = ChunkFeatures(chunk, user)
 
 		scoreVector = []
-		scoreVector.append(0.2 if chunkFeatures.hasFetchDigestWords() else 0)
+		scoreVector.append(0.2 * chunkFeatures.numFetchDigestWords())
+		scoreVector.append(0.1 if chunkFeatures.containsFirstPersonWord() else 0)
 		scoreVector.append(0.6 if chunkFeatures.isFetchDigestPhrase() else 0)
-		scoreVector.append(0.2 if chunkFeatures.isQuestion() else 0)
+		scoreVector.append(0.4 if chunkFeatures.isQuestion() else 0)
 		scoreVector.append(-0.5 if chunkFeatures.isBroadQuestion() else 0)
 		scoreVector.append(0.1 if chunkFeatures.containsToday() else 0)
 		scoreVector.append(-0.5 if chunkFeatures.hasTimeOfDay() else 0)
 		scoreVector.append(-0.2 if chunkFeatures.couldBeDone() else 0)
+		scoreVector.append(-0.2 if chunkFeatures.looksLikeList() else 0)
 
-		logger.debug("User %d: fetch digest score vector: %s", user.id, scoreVector)
+		logger.info("User %d: fetch digest score vector: %s", user.id, scoreVector)
 		score = sum(scoreVector)
 
 		if FetchDigestAction.HasHistoricalMatchForChunk(chunk):

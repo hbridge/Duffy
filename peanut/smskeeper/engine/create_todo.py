@@ -62,8 +62,10 @@ class CreateTodoAction(Action):
 		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.9 and beginsWithReminderWord:
-			score += 0.1
+		if score < 0.3 and beginsWithReminderWord:
+			score += 0.2  # give an extra boost if nothing else matches
+		elif score < 0.9 and beginsWithReminderWord:
+			score += 0.1  # don't make us overly certain if it's already higher match
 
 		if chunkFeatures.isBroadQuestion():
 			score -= 0.3

@@ -320,7 +320,7 @@ RESPONSE_FOR_WHO_REFERRED_YOU = 'Great, thanks!'
 #  ]
 # If more than one response, then it picks at random
 # None means we won't respond to it.
-
+PONY_RESPONSE = "Fine. Here's your pony :horse:"
 NICETIES_LIST = [
 	[
 		"hi$|hello( keeper)?$|hey( keeper)?$",
@@ -464,9 +464,10 @@ NICETIES_LIST = [
 	],
 	[
 		"that was(nt| not) funny|that(s| was) a (terrible|bad|awful) joke|i did(nt| not) laugh|.*wheres my pony|thats not funny",
-		["Fine. Here's your pony :horse:"]
+		[PONY_RESPONSE]
 	],
 ]
+
 
 THANKYOU_RESPONSES = ["You're welcome.", "Happy to help.", "No problem.", "Sure thing."]
 AGE_RESPONSE = u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423"

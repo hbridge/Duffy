@@ -18,7 +18,7 @@ class ChangeSettingAction(Action):
 
 		normalizedText = chunk.normalizedText()
 		if self.looksLikeTip(features, user):
-			score = .9
+			score = 1.0
 
 		if features.containsPostalCode():
 			if features.containsZipCodeWord():

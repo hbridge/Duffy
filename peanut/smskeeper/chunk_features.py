@@ -18,7 +18,7 @@ class ChunkFeatures:
 
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	# things that match this RE will get a boost for create
-	createWordRegex = "(remind|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop)"
+	createWordRegex = "(remind|to do|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop)"
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'\b%s ' % createWordRegex
 
@@ -95,13 +95,23 @@ class ChunkFeatures:
 		return isQuestion
 
 	def isBroadQuestion(self):
-		return self.chunk.matches(r'(where|how|why|who|should|would)\b')
+		return self.chunk.matches(r'(where|how|why|who|should|would|are)\b')
 
-	def hasFetchDigestWords(self):
-		return self.chunk.contains(r'tasks|todo|reminders|list')
+	def numFetchDigestWords(self):
+		fetchDigestWords = ["tasks", "todo", "reminders", "list", "left", "reminding", "schedule", "all"]
+		normalizedText = self.chunk.normalizedText()
+		count = 0
+		for word in fetchDigestWords:
+			if word in normalizedText.split():
+				count += 1
+
+		if self.chunk.contains(r'\bto do\b'):
+			count += 1
+
+		return count
 
 	def isFetchDigestPhrase(self):
-		return self.chunk.matches(r'tasks|todo')
+		return self.chunk.matches(r'tasks|todo|whats left|what am i doing')
 
 	def couldBeDone(self):
 		return msg_util.done_re.search(self.chunk.normalizedText()) is not None
@@ -139,3 +149,9 @@ class ChunkFeatures:
 
 	def containsZipCodeWord(self):
 		return self.chunk.contains(r'(^|\b)zip( )?(code)?')
+
+	def containsFirstPersonWord(self):
+		return self.chunk.contains(r'(\bI\b|\bmy\b)')
+
+	def looksLikeList(self):
+		return self.chunk.contains(r'[:]', punctuationWhitelist=':')

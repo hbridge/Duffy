@@ -1587,11 +1587,42 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.assertNotIn("Brandon", self.getOutput(mock))
 			self.assertIn("guymon", self.getOutput(mock))
 
-	def test_digest_fetch_overagressive(self, dateMock):
+	def test_digest_fetch_phrases(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_2AM)
+		cliMsg.msg(self.testPhoneNumber, "Remind me to tell Brandon you didn't get his email tomorrow")
+		self.setNow(dateMock, self.MON_10AM)
+
+		phrases = [
+			"What are my tasks for tomorrow",
+			"What am I doing Tuesday",
+			"Any tasks today?",
+			"What's left?",
+			"Can you show me my reminders?",
+			"What is my list",
+			"Can you send me my to do list?",
+			"What do I have to do tomorrow",
+		]
+
+		for phrase in phrases:
+			cliMsg.msg(self.testPhoneNumber, phrase)
+			lastClass = self.getTestUser().lastIncomingMessageAutoclass()
+			self.assertEqual(
+				lastClass,
+				keeper_constants.CLASS_FETCH_DIGEST,
+				"Missed fetchdigest for phrase: %s, thought it was %s" % (phrase, lastClass)
+			)
+
+	def test_digest_fetch_overaggressive(self, dateMock):
 		self.setupUser(dateMock)
 		msgs = [
-			"need to do laundry",
-			"cancel all cough syrup reminders"
+			"I need to do laundry",
+			"cancel all cough syrup reminders",
+			"Call my sister at lunch time",
+			"Get my debit card",
+			"Remind me to Do my list tonight at 950",
+			"To do: call shalom, jcab poll",
+			"Remind me to do my eyebrows tomorrow",
 		]
 		for msg in msgs:
 			cliMsg.msg(self.testPhoneNumber, msg)

@@ -123,6 +123,8 @@ class JokeAction(Action):
 		elif step == self.SUNGLASSES_SENT:
 			if regexHit:
 				self.sendJokePart1(user, joke, recentJokeCount)
+			elif chunk.contains("pony"):
+				sms_util.sendMsg(user, keeper_strings.PONY_RESPONSE)
 			else:
 				logger.debug("User %s: Kicking out from jokes with msg '%s' because joke was done with sunglasses" % (user.id, chunk.originalText))
 				return False

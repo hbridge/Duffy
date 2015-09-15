@@ -169,6 +169,10 @@ class User(models.Model):
 
 		return False
 
+	def lastIncomingMessageAutoclass(self):
+		lastIncoming = self.getMessages(True, False).first()
+		return lastIncoming.auto_classification
+
 	def getTimezone(self):
 		# These mappings came from http://code.davidjanes.com/blog/2008/12/22/working-with-dates-times-and-timezones-in-python/
 		# Note: 3 letter entries are to handle the early accounts. All new accounts use the full string
@@ -197,7 +201,7 @@ class User(models.Model):
 			return pytz.timezone('US/Eastern')
 
 	def getMessages(self, incoming, ascending=True):
-		orderByString = "added" if ascending else "-added"
+		orderByString = "id" if ascending else "-id"
 		return Message.objects.filter(user=self, incoming=incoming).order_by(orderByString)
 
 	def isActivated(self):
