@@ -80,14 +80,19 @@ class TipQuestionResponseAction(Action):
 
 	def surveyScore(self, chunk, user):
 		score = 0.0
-		surveyJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY)
-		if surveyJustNotified:
+		surveyJustNotified = user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY, 2)
+		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID, 2)
+
+		# nps comes after survey, so assume answer is most recent
+		# hacky here
+		if surveyJustNotified and not npsJustNotified:
 			score = self.getIntResponseScore(surveyJustNotified, chunk)
+
 		return score
 
 	def npsScore(self, chunk, user):
 		score = 0.0
-		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID)
+		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID, 2)
 		if npsJustNotified:
 			score = self.getIntResponseScore(npsJustNotified, chunk)
 		return score
@@ -164,6 +169,8 @@ class TipQuestionResponseAction(Action):
 					else:
 						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT)
 
+					logger.info("User %s: Logging a score of %s for nps" % (user.id, firstInt))
+					user.setStateData("nps-result", firstInt)
 					analytics.logUserEvent(
 						user,
 						"Digest nps response",
@@ -182,6 +189,8 @@ class TipQuestionResponseAction(Action):
 					else:
 						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT)
 
+					logger.info("User %s: Logging a score of %s for digest survey" % (user.id, firstInt))
+					user.setStateData("digest-survey-result", firstInt)
 					analytics.logUserEvent(
 						user,
 						"Digest survey response",
@@ -190,6 +199,8 @@ class TipQuestionResponseAction(Action):
 				else:
 					return False
 			elif typeId == self.DIGEST_CHANGE:
+				logger.info("User %s: Updating digest time %s" % (user.id, chunk.originalText))
+
 				return actions.updateDigestTime(user, chunk)
 			elif typeId == self.REFERRAL:
 				signupData = json.loads(user.signup_data_json)
@@ -200,6 +211,8 @@ class TipQuestionResponseAction(Action):
 					signupData["referrer"] = chunk.originalText
 					user.signup_data_json = json.dumps(signupData)
 					user.save()
+					logger.info("User %s: Updated referrer to %s" % (user.id, chunk.originalText))
+
 				sms_util.sendMsg(user, keeper_strings.RESPONSE_FOR_WHO_REFERRED_YOU)
 		else:
 			return False

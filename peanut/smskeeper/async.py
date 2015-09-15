@@ -294,14 +294,11 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 		sms_util.sendMsg(user, digestQuestionTip.renderMini(), classification=keeper_constants.OUTGOING_SURVEY)
 		tips.markTipSent(user, digestQuestionTip, isMini=True)
 		tipSent = True
-	"""
-	Commenting out due to needing to get this working where we tell the difference on a response to this and the other survey questions
 	elif daysActive >= 9 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_NPS_TIP_ID) and not userRequested:
 		npsQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_NPS_TIP_ID)
 		sms_util.sendMsg(user, npsQuestionTip.renderMini(), classification=tips.DIGEST_QUESTION_NPS_TIP_ID)
 		tips.markTipSent(user, npsQuestionTip, isMini=True)
 		tipSent = True
-	"""
 
 	# Do post-message processing with pending reminders
 	if len(pendingEntries) > 0:

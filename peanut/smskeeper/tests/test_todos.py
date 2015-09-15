@@ -314,10 +314,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "4")
 			self.assertIn("Great to hear!", self.getOutput(mock))
 
-
-	"""
-	Commenting out since we removed this for now
-	# Make sure the quetion tip goes out after 7
 	def test_digest_nps(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -327,7 +323,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.setNow(dateMock, self.MON_8AM)
 		# 5 days later to ckick off the first tip
-		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=2))
 		async.processDailyDigest()
 
 		# 2 more days to do next tip
@@ -345,9 +341,41 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		# Make sure a response doesn't kick off anything
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "5")
-			self.assertIn("Got it.", self.getOutput(mock))
-	"""
+			self.assertIn(keeper_strings.QUESTION_ACKNOWLEDGE_OK_RESPONSE_TEXT, self.getOutput(mock))
 
+		user = self.getTestUser()
+		self.assertEqual(5, user.getStateData("nps-result"))
+
+	def test_digest_nps_but_really_reminder(self, dateMock):
+		self.setupUser(dateMock)
+
+		user = self.getTestUser()
+		user.added = self.MON_8AM
+		user.save()
+
+		self.setNow(dateMock, self.MON_8AM)
+		# 5 days later to ckick off the first tip
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=2))
+		async.processDailyDigest()
+
+		# 2 more days to do next tip
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=7))
+		async.processDailyDigest()
+
+		# 2 more days to do next tip
+		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=9))
+
+		# Make sure the survey tip came through
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertIn("recommend me", self.getOutput(mock))
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "5pm remind me to go poop")
+			self.assertIn("5pm", self.getOutput(mock))
+
+		user = self.getTestUser()
+		self.assertTrue(user.getStateData("nps-result") is None)
 
 	# Make sure the change digest time goes out after 5 days, and it changes the time
 	def test_digest_tips_change_time(self, dateMock):
