@@ -20,8 +20,11 @@ class ChangeSettingAction(Action):
 		if self.looksLikeTip(features, user):
 			score = .9
 
-		if features.containsZipCodeWord() and features.containsPostalCode():
-			score = .9
+		if features.containsPostalCode():
+			if features.containsZipCodeWord():
+				score = .9
+			else:
+				score = .6
 
 		if msg_util.nameInSetName(normalizedText, tutorial=False):
 			score = .9
@@ -41,7 +44,7 @@ class ChangeSettingAction(Action):
 		if self.looksLikeTip(features, user):
 			self.setTipFrequency(user, features)
 
-		elif features.containsZipCodeWord() and features.containsPostalCode():
+		elif features.containsPostalCode():
 			self.setPostalCode(user, chunk.originalText)
 
 		elif msg_util.nameInSetName(chunk.originalText, tutorial=False):
