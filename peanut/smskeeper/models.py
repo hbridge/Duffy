@@ -706,7 +706,7 @@ class SimulationRun(models.Model):
 		return self.simResults().exclude(message_classification=F('sim_classification'))
 
 	def recentComparableRuns(self):
-		comparableTypes = self.sim_type
+		comparableTypes = [self.sim_type]
 		if self.sim_type == 't':
 			comparableTypes = ['pp', 'dp', 't']
 		elif self.sim_type == 'dp':
