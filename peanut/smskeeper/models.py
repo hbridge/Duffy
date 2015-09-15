@@ -765,7 +765,7 @@ class SimulationResult(models.Model):
 			id__lt=self.id,
 			message_id=self.message_id,
 			run__source=self.run.source
-		)
+		).order_by("-id")
 		return recentComparable
 
 	@classmethod

@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('underscore');
 var Model = require('../model/SimulationModel.jsx');
+var moment = require('moment');
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
   Input = Bootstrap.Input;
@@ -53,7 +54,7 @@ var ResultPanel = React.createClass({
 
     return (
     <Panel>
-      Run: {simResult.run} <br />
+      Run: {simResult.run} ({moment(simResult.added).fromNow()})<br />
       Sim classification: {simResult.sim_classification} &nbsp;
       <Label bsStyle={isCorrect ? "success" : "danger"} bsSize="large">
         {isCorrect ? "CORRECT" : "WRONG"}
@@ -81,7 +82,7 @@ module.exports = React.createClass({
         Model.fetchSimulationResult(resultId, function(comparableResult){
           var comparableResults = this.state.comparableResults;
           if (!comparableResults) comparableResults = {};
-          comparableResults[comparableResult.id] = comparableResult;
+          comparableResults[parseInt(comparableResult.id)] = comparableResult;
           this.setState({comparableResults: comparableResults});
         }.bind(this));
       }, this);
@@ -97,6 +98,12 @@ module.exports = React.createClass({
       );
     }.bind(this);
 
+    if (this.state.comparableResults){
+      var comparableResultKeys = _.sortBy(Object.keys(this.state.comparableResults), function(idStr){
+        return parseInt(idStr) * -1; // -1 to reverse sort
+      });
+    }
+
     return (
       <Modal show={this.state.show} onHide={this.close} dialogClassName='simResultModal' animation={false}>
         <Modal.Header closeButton>
@@ -106,7 +113,7 @@ module.exports = React.createClass({
           <p><strong>Message:</strong> &ldquo;{this.state.simResult.message_body}&rdquo;</p>
           <ResultPanel simResult={this.state.simResult} />
           <h5>Comparable recent results</h5>
-          {this.state.comparableResults ? Object.keys(this.state.comparableResults).map(createComparableResult) : "None"}
+          {this.state.comparableResults ? comparableResultKeys.map(createComparableResult) : "None"}
         </Modal.Body>
       </Modal>
       );
