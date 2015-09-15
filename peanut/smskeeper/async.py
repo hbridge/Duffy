@@ -286,17 +286,17 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 	if daysActive >= 2 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_CHANGE_TIME_TIP_ID) and not userRequested:
 		digestChangeTimeTip = tips.tipWithId(tips.DIGEST_CHANGE_TIME_TIP_ID)
-		sms_util.sendMsg(user, digestChangeTimeTip.renderMini(), classification=keeper_constants.OUTGOING_CHANGE_DIGEST_TIME)
+		sms_util.sendDelayedMsg(user, digestChangeTimeTip.renderMini(), 5, classification=keeper_constants.OUTGOING_CHANGE_DIGEST_TIME)
 		tips.markTipSent(user, digestChangeTimeTip, isMini=True)
 		tipSent = True
 	elif daysActive >= 7 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_TIP_ID) and not userRequested:
 		digestQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_TIP_ID)
-		sms_util.sendMsg(user, digestQuestionTip.renderMini(), classification=keeper_constants.OUTGOING_SURVEY)
+		sms_util.sendDelayedMsg(user, digestQuestionTip.renderMini(), 5, classification=keeper_constants.OUTGOING_SURVEY)
 		tips.markTipSent(user, digestQuestionTip, isMini=True)
 		tipSent = True
 	elif daysActive >= 9 and tips.isUserEligibleForMiniTip(user, tips.DIGEST_QUESTION_NPS_TIP_ID) and not userRequested:
 		npsQuestionTip = tips.tipWithId(tips.DIGEST_QUESTION_NPS_TIP_ID)
-		sms_util.sendMsg(user, npsQuestionTip.renderMini(), classification=tips.DIGEST_QUESTION_NPS_TIP_ID)
+		sms_util.sendDelayedMsg(user, npsQuestionTip.renderMini(), 5, classification=tips.DIGEST_QUESTION_NPS_TIP_ID)
 		tips.markTipSent(user, npsQuestionTip, isMini=True)
 		tipSent = True
 
@@ -317,11 +317,11 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 			# If they don't, but they havn't hit their "done" goal then show done
 			if has3dayOldEntry and tips.DIGEST_SNOOZE_TIP_ID not in tips.getSentTipIds(user):
 				digestTip = tips.tipWithId(tips.DIGEST_SNOOZE_TIP_ID)
-				sms_util.sendMsg(user, digestTip.renderMini())
+				sms_util.sendDelayedMsg(user, digestTip.renderMini(), 5)
 				tips.markTipSent(user, digestTip, isMini=True)
 			elif user.done_count < keeper_constants.GOAL_DONE_COUNT:
 				digestTip = tips.tipWithId(tips.DIGEST_DONE_TIP_ID)
-				sms_util.sendMsg(user, digestTip.renderMini())
+				sms_util.sendDelayedMsg(user, digestTip.renderMini(), 5)
 
 
 # For this user, sweep all the tasks older than age given and return them

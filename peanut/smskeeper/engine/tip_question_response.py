@@ -17,6 +17,9 @@ class TipQuestionResponseAction(Action):
 	REFERRAL = 2
 	DIGEST_CHANGE = 3
 
+	DIGEST_SURVEY_DATA_KEY = "digest-survey-result"
+	NPS_DATA_KEY = "nps-result"
+
 	# Different types of questions this class handles
 	TYPES = [SURVEY, NPS, REFERRAL, DIGEST_CHANGE]
 
@@ -85,7 +88,7 @@ class TipQuestionResponseAction(Action):
 
 		# nps comes after survey, so assume answer is most recent
 		# hacky here
-		if surveyJustNotified and not npsJustNotified:
+		if surveyJustNotified and not npsJustNotified and user.getStateData(self.DIGEST_SURVEY_DATA_KEY) is None:
 			score = self.getIntResponseScore(surveyJustNotified, chunk)
 
 		return score
@@ -93,7 +96,7 @@ class TipQuestionResponseAction(Action):
 	def npsScore(self, chunk, user):
 		score = 0.0
 		npsJustNotified = user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID, 2)
-		if npsJustNotified:
+		if npsJustNotified and user.getStateData(self.NPS_DATA_KEY) is None:
 			score = self.getIntResponseScore(npsJustNotified, chunk)
 		return score
 
@@ -170,7 +173,7 @@ class TipQuestionResponseAction(Action):
 						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT)
 
 					logger.info("User %s: Logging a score of %s for nps" % (user.id, firstInt))
-					user.setStateData("nps-result", firstInt)
+					user.setStateData(self.NPS_DATA_KEY, firstInt)
 					analytics.logUserEvent(
 						user,
 						"Digest nps response",
@@ -190,7 +193,7 @@ class TipQuestionResponseAction(Action):
 						sms_util.sendMsg(user, keeper_strings.QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT)
 
 					logger.info("User %s: Logging a score of %s for digest survey" % (user.id, firstInt))
-					user.setStateData("digest-survey-result", firstInt)
+					user.setStateData(self.DIGEST_SURVEY_DATA_KEY, firstInt)
 					analytics.logUserEvent(
 						user,
 						"Digest survey response",
