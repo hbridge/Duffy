@@ -75,6 +75,17 @@ def postManualAlert(user, msg, keeperNumber, channel):
         logger.info("User %s: non-prod interface %s. Slacklogger would have posted '%s'", user.id, keeperNumber, msg)
 
 
+def postString(msg, channel, keeperNumber):
+    if (keeper_constants.isRealKeeperNumber(keeperNumber)):
+        params = dict()
+        params['icon_emoji'] = ':rabbit:'
+        params['username'] = "Keeper"
+        params['text'] = msg
+        params['channel'] = channel
+
+        requests.post(SLACK_URL, data=json.dumps(params))
+
+
 def postMessage(message, channel):
     msgContent = json.loads(message.msg_json)
     if (isProdMessage(message)):

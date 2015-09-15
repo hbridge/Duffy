@@ -43,7 +43,7 @@ set_name_re = re.compile("my name('s| is|s) (?P<name>[a-zA-Z\s]+)", re.I)
 
 
 done_re = re.compile(
-	r"\b(done|clear|delete|remove|cancel|check .*off|check off|told|mark off|mark .*off|sent|cross .*off|checked|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed|cashed|asked|returned|grabbed|uploaded|reminded|brought)\b",
+	r"\b(done|clear|delete|remove|cancel|check .*off|check off|told|mark off|mark .*off|sent|cross .*off|checked|mailed|messaged|reviewed|took|created|turned in|put|gave|followed up|check it off|finished|talked|texted|txted|found|wrote|walked|worked|left|packed|cleaned|called|payed|paid|bought|did|picked|went|got|had|completed|cashed|asked|returned|grabbed|uploaded|reminded|brought|made)\b",
 	re.I)
 delete_re = re.compile('delete (?P<indices>[0-9, ]+) ?(from )?(my )?#?(?P<label>[\S]+)?( list)?', re.I)
 # we allow items to be blank to support "add to myphotolist" with an attached photo

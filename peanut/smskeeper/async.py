@@ -23,7 +23,7 @@ from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from smskeeper import time_utils
 
-from common import date_util, weather_util
+from common import date_util, weather_util, slack_logger
 
 logger = get_task_logger(__name__)
 
@@ -270,7 +270,9 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 	# We send the message here
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested, sweptEntries)
-	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_DIGEST)
+
+	sendToSlack = userRequested
+	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_DIGEST, sendToSlack=sendToSlack)
 
 	now = date_util.now(user.getTimezone())
 	daysActive = (now - user.added).days
@@ -391,6 +393,7 @@ def sendAllRemindersForUserId(userId, overrideKeeperNumber=None):
 @app.task
 def processDailyDigest(startAtId=None, minuteOverride=None):
 	weatherDataCache = dict()
+	usersSentTo = list()
 
 	if startAtId:
 		users = User.objects.filter(id__gt=startAtId)
@@ -415,16 +418,35 @@ def processDailyDigest(startAtId=None, minuteOverride=None):
 
 		pendingEntries = user_util.pendingTodoEntries(user, includeAll=False)
 
+		sentDigest = False
 		if len(pendingEntries) > 0:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
+			sentDigest = True
 
 		# No pending entries, make sure they have digest state to default and product id 1
 		elif user.product_id >= keeper_constants.TODO_PRODUCT_ID and user.digest_state == keeper_constants.DIGEST_STATE_DEFAULT:
 			sendDigestForUser(user, pendingEntries, weatherDataCache, False)
+			sentDigest = True
+
+		if sentDigest:
+			usersSentTo.append(user)
+
+		if len(usersSentTo) > 20:
+			keeperNumber = usersSentTo[0].getKeeperNumber()
+
+			msg = "Digest sent to users: "
+
+			for user in usersSentTo:
+				msg += "%s " % user.id
+
+			slack_logger.postString(msg, keeper_constants.SLACK_CHANNEL_FEED, keeperNumber)
+			usersSentTo = list()
 
 
 @app.task
 def sendTips(overrideKeeperNumber=None):
+	usersSentTo = list()
+
 	# TODO add test to make sure we send tips to the right number for each user
 	users = User.objects.all()
 	for user in users:
@@ -438,9 +460,24 @@ def sendTips(overrideKeeperNumber=None):
 				keeperNumber = user.getKeeperNumber()
 			sendTipToUser(tip, user, keeperNumber)
 
+			usersSentTo.append(user)
+
+		if len(usersSentTo) > 20:
+			keeperNumber = overrideKeeperNumber
+			if not keeperNumber:
+				keeperNumber = usersSentTo[0].getKeeperNumber()
+
+			msg = "Sent tip to users: "
+
+			for user in usersSentTo:
+				msg += "%s " % user.id
+
+			slack_logger.postString(msg, keeper_constants.SLACK_CHANNEL_FEED, keeperNumber)
+			usersSentTo = list()
+
 
 def sendTipToUser(tip, user, keeperNumber):
-	sms_util.sendMsg(user, tip.render(user), tip.mediaUrl, keeperNumber)
+	sms_util.sendMsg(user, tip.render(user), tip.mediaUrl, keeperNumber, sendToSlack=False)
 	tips.markTipSent(user, tip)
 
 

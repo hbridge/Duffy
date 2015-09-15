@@ -29,7 +29,7 @@ def recordOutput(msgText, doPrint=False):
 
 # Note: Adding params here will break existing entries queued up
 @app.task
-def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, classification):
+def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, classification, sendToSlack):
 	logger.info("User %s: asyncSendMsg to keeperNumber: %s", userId, keeperNumber)
 	try:
 		user = User.objects.get(id=userId)
@@ -64,7 +64,9 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 		logger.info("User %s: sending whatsapp message: %s" % (userId, msgText))
 		whatsapp_util.sendMessage(user.phone_number, msgText, mediaUrl, keeperNumber)
 		message.save()
-		slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
+
+		if sendToSlack:
+			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
 	else:
 		if user.getKeeperNumber() != keeperNumber:
 			logger.error("User %s: This user's keeperNumber %s doesn't match the keeperNumber passed into asyncSendMsg: %s... fixing" % (user.id, user.getKeeperNumber(), keeperNumber))
@@ -73,12 +75,13 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 			logger.info("User %s: Sending '%s'" % (user.id, msgText))
 			notifications_util.sendSMSThroughTwilio(user.phone_number, msgText, mediaUrl, keeperNumber)
 			message.save()
-			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
+			if sendToSlack:
+				slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
 		except TwilioRestException as e:
 			logger.error("User %s: Got TwilioRestException with message '%s' and exception %s" % (userId, msgText, e))
 
 
-def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False, stopOverride=False, classification=None):
+def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False, stopOverride=False, classification=None, sendToSlack=True):
 	if isinstance(msg, list):
 		raise TypeError("Passing a list to sendMsg.  Did you mean sendMsgs?")
 
@@ -87,10 +90,10 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 
 	msg = msg_util.renderMsg(msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
-		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification), eta=eta)
+		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification, sendToSlack), eta=eta)
 	else:
 		# If its CLI or TEST then keep it local and not async.
-		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification)
+		asyncSendMsg(user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification, sendToSlack)
 
 
 def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None, classification=None):
@@ -148,7 +151,7 @@ def maybeSendConfusedMsg(user, keeperNumber=None):
 def asyncMaybeSendConfusedMsg(userId, msgTimeSinceEpoch):
 	user = User.objects.get(id=userId)
 	dt = datetime.datetime.fromtimestamp(msgTimeSinceEpoch)
-	messagesAfter = Message.objects.filter(user=user, incoming=True, added__gt=dt)
+	messagesAfter = Message.objects.filter(user=user, added__gt=dt)
 
 	if len(messagesAfter) == 0:
 		logger.debug("User %s: Sending out confused message because 0 messages came after my time %s", user.id, dt)
