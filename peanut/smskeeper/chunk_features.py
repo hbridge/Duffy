@@ -24,6 +24,8 @@ class ChunkFeatures:
 	# things that match this RE will get a boost for done
 	beginsWithDoneWordRegex = r'^(done|check off|mark off) '
 
+	help_re = r'help$|how do .* work|what .*(can|do) you do|tell me more'
+
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	# things that match this RE will get a boost for create
 	createWordRegex = "(remind|to do|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop)"
@@ -214,6 +216,9 @@ class ChunkFeatures:
 
 	def inTutorial(self):
 		return not self.user.isTutorialComplete()
+
+	def startsWithHelpPhrase(self):
+		return self.chunk.matches(self.help_re)
 
 	# Returns True if this message has a valid time and it doesn't look like another remind command
 	# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup

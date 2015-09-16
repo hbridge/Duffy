@@ -1,19 +1,19 @@
-import re
-
 from smskeeper import keeper_constants, sms_util, keeper_strings
 from smskeeper import analytics
 from .action import Action
+
+from smskeeper.chunk_features import ChunkFeatures
 
 
 class HelpAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_HELP
 
-	help_re = re.compile(r'help$|how do .* work|what .*(can|do) you do|tell me more', re.I)
-
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		if self.help_re.match(chunk.normalizedText()) is not None:
+		features = ChunkFeatures(chunk, user)
+
+		if features.startsWithHelpPhrase():
 			score = 1.0
 
 		return score
