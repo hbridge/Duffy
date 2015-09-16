@@ -159,9 +159,6 @@ class CreateTodoAction(Action):
 					)
 					shareContacts = [contact]
 
-			# we have one or more resolved contacts to share with, set that as a followup
-			if len(shareContacts) > 0:
-				followups.append(keeper_constants.FOLLOWUP_SHARE_RESOLVED)
 			user.setSharePromptHandles(unresolvedHandles, map(lambda contact: contact.handle, shareContacts))
 		else:
 			# clear out share prompt handles if there are no handles in this one

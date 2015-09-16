@@ -74,21 +74,25 @@ class Chunk:
 	def handles(self, verbWhitelistRegex=None):
 		handles = []
 		words = self.normalizeText(self.originalText, lowercase=False).split(' ')
-		subjectDelimiterIndices = []
 		numWordsStartUpper = 0
 		numWordsStartAlpha = 0
+		whitelistedVerbLocations = []
 
 		for idx, word in enumerate(words):
-			if RELATIONSHIP_SUBJECT_DELIMETERS.match(word):
-				subjectDelimiterIndices.append(idx)
-				continue
 			if len(word) > 0 and word[0].isalpha:
 				numWordsStartAlpha += 1
 				if word[0].isupper():
 					numWordsStartUpper += 1
+				if verbWhitelistRegex:
+					if re.match(verbWhitelistRegex, word.lower()):
+						whitelistedVerbLocations.append(idx)
 
 		# we get some messages from people where very word is capped
 		useCapitalizationSignal = (numWordsStartAlpha is not numWordsStartUpper)
+
+		# if there's verb whitelist regex but no instances of the verb, return []
+		if verbWhitelistRegex and len(whitelistedVerbLocations) == 0:
+			return handles
 
 		for idx, word in enumerate(words):
 			if len(word) == 0:
@@ -101,24 +105,17 @@ class Chunk:
 				if HANDLE_BLACKLIST.match(word):
 					continue
 				if len(word) > 2 and word.upper() == word:
-					continue  # all caps words are not handles
+					continue  # all caps words like 'NOT' are not handles
 				if verbWhitelistRegex:
 					# if we were given a whitelist of verbs to find objects for, see if it was the word before or 2 before
-					verbFound = False
-					if re.match(verbWhitelistRegex, words[idx - 1].lower()):
-						verbFound = True
-					if idx >= 2:
-						if re.match(verbWhitelistRegex, words[idx - 2].lower()):
-							verbFound = True
-					if not verbFound:
+					# and make sure there isn't an earlier incidence of it
+					firstLoc = whitelistedVerbLocations[0]
+					if firstLoc < idx - 2 or firstLoc >= idx:
 						continue
-				if len(words) > idx + 1:
-					if len(subjectDelimiterIndices) > 0:
-						# require that there is some kind of subject delimeter, and that the handle
-						# is before the first one, meaning its the direct object of the sentence, not
-						# the indirect object
-						if subjectDelimiterIndices[0] > idx:
-							handles.append(word.lower())
+
+				# passed all the exception cases, we think it's a handle
+				handles.append(word.lower())
+
 		return handles
 
 	def sharedReminderHandles(self):
