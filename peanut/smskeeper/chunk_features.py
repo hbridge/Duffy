@@ -38,6 +38,10 @@ class ChunkFeatures:
 	changeTimeBasicRegex = r"\b(snooze|again|change)\b"
 	changeTimeBeginsWithRegex = r'^(change|snooze|update|again|remind (me )?again) '
 
+	# Jokes
+	jokeRequestRegex = r"\bjoke(s)?\b"
+	jokeFollowupRegex = r"\b(another)\b"
+
 	# PRIVATE
 	def getInterestingWords(self):
 		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
@@ -192,6 +196,9 @@ class ChunkFeatures:
 	def wasRecentlySentMsgOfClassDigest(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
 
+	def wasRecentlySentMsgOfClassJoke(self):
+		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE)
+
 	def getLastActionTime(self, user):
 		if user.getStateData(keeper_constants.LAST_ACTION_KEY):
 			return datetime.datetime.utcfromtimestamp(user.getStateData(keeper_constants.LAST_ACTION_KEY)).replace(tzinfo=pytz.utc)
@@ -219,6 +226,20 @@ class ChunkFeatures:
 
 	def startsWithHelpPhrase(self):
 		return self.chunk.matches(self.help_re)
+
+	def hasJokePhrase(self):
+		return self.chunk.contains(self.jokeRequestRegex)
+
+	def hasJokeFollowupPhrase(self):
+		return self.chunk.contains(self.jokeFollowupRegex)
+
+	def secondsSinceLastJoke(self):
+		if self.user.getStateData(keeper_constants.LAST_JOKE_SENT_KEY):
+			now = date_util.now(pytz.utc)
+			lastJokeTime = datetime.datetime.utcfromtimestamp(self.user.getStateData(keeper_constants.LAST_JOKE_SENT_KEY)).replace(tzinfo=pytz.utc)
+			return abs((lastJokeTime - now).total_seconds())
+		else:
+			return 10000000  # Big number to say its been a while
 
 	# Returns True if this message has a valid time and it doesn't look like another remind command
 	# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup

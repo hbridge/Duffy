@@ -342,3 +342,8 @@ FOLLOWUP_SHARE_RESOLVED = "share-resolved"
 FOLLOWUP_SHARE_UNRESOLVED = "share-unresolved"
 
 RELATIONSHIP_RE = re.compile(r'(mom|dad|wife|husband|boyfriend|girlfriend|spouse|partner|mother|father)', re.I)
+
+LAST_JOKE_SENT_KEY = "last-joke-sent"
+JOKE_STEP_KEY = "step"  # This should be changed to joke-step at some point
+JOKE_NUM_KEY = "joke-num"
+JOKE_COUNT_KEY = "joke-recent-count"  # Jokes sent that day
