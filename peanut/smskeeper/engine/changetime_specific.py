@@ -3,6 +3,7 @@ import logging
 from smskeeper import entry_util, msg_util
 from smskeeper import keeper_constants
 from .changetime import ChangetimeAction
+from smskeeper.chunk_features import ChunkFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -10,30 +11,28 @@ logger = logging.getLogger(__name__)
 class ChangetimeSpecificAction(ChangetimeAction):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGETIME_SPECIFIC
 
-	beginsWithRe = r'^(change|snooze|update) '
-
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		nattyResult = chunk.getNattyResult(user)
+		features = ChunkFeatures(chunk, user)
+
 		bestEntries = self.getEntriesToExecuteOn(chunk, user)
 		okEntries = self.getEntriesToExecuteOn(chunk, user, 65)
-		regexHit = chunk.matches(self.snoozeRegex)
 		justNotifiedEntries = user.getLastEntries()
 
-		if regexHit and len(bestEntries) > 0:
+		if features.beginsWithChangeTimeWord() and len(bestEntries) > 0:
 			if len(set(bestEntries).intersection(set(justNotifiedEntries))) > 0:
 				score = 0.6
 			else:
 				score = 0.3
 
-		if nattyResult and len(bestEntries) > 0:
+		if features.hasTimingInfo() and len(bestEntries) > 0:
 			if len(set(bestEntries).intersection(set(justNotifiedEntries))) > 0:
 				score = 0.8
 			else:
 				score = 0.7
 
-		if chunk.matches(self.beginsWithRe) and nattyResult and len(okEntries) > 0:
+		if features.beginsWithChangeTimeWord() and features.hasTimingInfo() and len(okEntries) > 0:
 			score = 0.95
 
 		if ChangetimeSpecificAction.HasHistoricalMatchForChunk(chunk):

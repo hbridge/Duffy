@@ -5,7 +5,7 @@ import pytz
 from smskeeper import entry_util
 import phonenumbers
 from smskeeper import keeper_constants
-from smskeeper import msg_util
+from smskeeper import msg_util, niceties
 import collections
 
 from common import date_util
@@ -34,7 +34,13 @@ class ChunkFeatures:
 
 	# Changetime most recent
 	changeTimeBasicRegex = r"\b(snooze|again|change)\b"
-	changeTimeBeginsWithRegex = r'^(change|snooze|update|remind (me )?again) '
+	changeTimeBeginsWithRegex = r'^(change|snooze|update|again|remind (me )?again) '
+
+	# PRIVATE
+	def getInterestingWords(self):
+		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
+		interestingWords = msg_util.getInterestingWords(cleanedText)
+		return interestingWords
 
 	# Features
 	def hasTimingInfo(self):
@@ -68,9 +74,10 @@ class ChunkFeatures:
 		return self.chunk.matches(self.changeTimeBeginsWithRegex)
 
 	def numMatchingEntriesStrict(self):
-		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
-		interestingWords = msg_util.getInterestingWords(cleanedText)
-		return len(entry_util.fuzzyMatchEntries(self.user, ' '.join(interestingWords), 80))
+		return len(entry_util.fuzzyMatchEntries(self.user, ' '.join(self.getInterestingWords()), 80))
+
+	def numMatchingEntriesBroad(self):
+		return len(entry_util.fuzzyMatchEntries(self.user, ' '.join(self.getInterestingWords()), 65))
 
 	def hasCreateWord(self):
 		return self.chunk.contains(self.containsCreateWordhRegex)
@@ -198,6 +205,9 @@ class ChunkFeatures:
 		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=5)) else False
 
 		return isRecentAction
+
+	def hasNicety(self):
+		return True if niceties.getNicety(' '.join(self.getInterestingWords())) else False
 
 	# Returns True if this message has a valid time and it doesn't look like another remind command
 	# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup
