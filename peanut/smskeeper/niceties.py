@@ -93,7 +93,7 @@ def custom_nicety_for(regexp):
 	return gethandler
 
 
-@custom_nicety_for(r'.*thanks( keeper)?|.*thank (you|u)( (very|so) much)?( keeper)?|(ok )?(ty|thx|thz|thks|thnx|thanx)( keeper)?$')
+@custom_nicety_for(r'.*thanks( keeper)?|.*thank ?(you|u)( (very|so) much)?( keeper)?|(ok )?(ty|thx|thz|thks|thnx|thanx)( keeper)?$')
 def renderThankYouResponse(user, requestDict, keeperNumber):
 	base = random.choice(keeper_strings.THANKYOU_RESPONSES)
 	'''
@@ -123,7 +123,7 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		return base
 
 
-@custom_nicety_for(r'how old are (you|u)|whats your birthday|when were you born')
+@custom_nicety_for(r'.*how old are (you|u)|whats your birthday|when were you born')
 def renderBirthdayInquiry(user, requestDict, keeperNumber):
 	delta = datetime.date.today() - keeper_constants.KEEPER_BIRTHDAY
 	deltaText = humanize.naturaldelta(delta)

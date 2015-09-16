@@ -323,7 +323,7 @@ RESPONSE_FOR_WHO_REFERRED_YOU = 'Great, thanks!'
 PONY_RESPONSE = "Fine. Here's your pony :horse:"
 NICETIES_LIST = [
 	[
-		"hi$|hello( keeper)?$|hey( keeper)?$",
+		"(hi|hello|hey|heya) ?(keeper|there)?$",
 		["Hi there."]
 	],
 	[
@@ -372,11 +372,11 @@ NICETIES_LIST = [
 	],
 	[
 		"are you( a)? real( person)?|are you human|are you an? (computer|machine)|are you an ai",
-		["Do you think I am?"]
+		["I'm an automated digital assistant, but I have human minions to help me. :smile_cat:"]
 	],
 	[
 		"(is this|are you).* (human|ai|a machine|automated|computer|person)",
-		["Do you think I am?"]
+		["I'm an automated digital assistant, but I have human minions to help me. :smile_cat:"]
 	],
 	[
 		"whats the meaning of life",
@@ -455,7 +455,7 @@ NICETIES_LIST = [
 		["Sorry, I'm already taken! :bride_with_veil: I'm here to help you remember stuff though!"]
 	],
 	[
-		"good (morning|evening|afternoon|day)",
+		"good ?(morning|evening|night|afternoon|day) ?(keeper)?$",
 		["Thanks, same to you! :smiling_face_with_smiling_eyes:"]
 	],
 	[
@@ -465,6 +465,10 @@ NICETIES_LIST = [
 	[
 		"that was(nt| not) funny|that(s| was) a (terrible|bad|awful) joke|i did(nt| not) laugh|.*wheres my pony|thats not funny",
 		[PONY_RESPONSE]
+	],
+	[
+		"(today is|its) my (birthday|bday)",
+		["Happy Birthday! :birthday:"]
 	],
 ]
 
