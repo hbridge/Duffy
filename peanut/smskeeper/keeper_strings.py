@@ -50,13 +50,13 @@ TUTORIAL_MORNING_DIGEST_ONLY_TEXT = u"Oh and I'll also send you a morning txt \U
 
 # These is the first line of the digest, one per day of the week.
 REMINDER_DIGEST_HEADERS = [
-	[u":sunrise: G'morning sunshine",],
-	[u"Tuesday, it is \U000026F2",],
-	[u"Wednesday is here already!",],
-	[u"How did Thursday sneak up on us? :cat:",],
-	[u"Friday funday! :party_popper:",],
-	[u"It's sit-around-day \U0001F344", ":wavy_dash:Saturday vibes:wavy_dash:"],
-	[u"Sunday Sunday Sunday! \U0001F366", "Sunday funday! :raised_hands:"],
+	[u":sunrise: G'morning sunshine",],  # copy for Monday
+	[u"Tuesday, it is \U000026F2",],  # copy for Tuesday
+	[u"Wednesday is here already!",],  # Wednesday
+	[u"How did Thursday sneak up on us? :cat:",],  # Thursday
+	[u"Friday funday! :party_popper:",],  # Friday
+	[u"It's sit-around-day \U0001F344", ":wavy_dash:Saturday vibes:wavy_dash:"],  # Saturday
+	[u"Sunday Sunday Sunday! \U0001F366", "Sunday funday! :raised_hands:"],  # Sunday
 ]
 
 # if there are tasks, begin with this header
@@ -66,13 +66,13 @@ DIGEST_HEADER_USER_REQUESTED = u"Your current tasks: \U0001F4DD"  # this means u
 
 # If there are no tasks, this line is shown. One per day of the week.
 REMINDER_DIGEST_EMPTY = [
-	[u"Start the week off right. Tell me what you need to get done this week! \U0001F60E",],
-	[u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",],
-	[u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",],
-	[u"Empty day. Surely, there is something you need me to track? \U0001F62E",],
-	[u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",],
-	[u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",],
-	[u"Last day of the week to get stuff done! \U0001F636",],
+	[u"Start the week off right. Tell me what you need to get done this week! \U0001F60E",], #  For Monday
+	[u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",], #  For Tuesday
+	[u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",], #  For Wednesday
+	[u"Empty day. Surely, there is something you need me to track? \U0001F62E",],  # For Thursday
+	[u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",],  # For Friday
+	[u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",],  # For Saturday
+	[u"Last day of the week to get stuff done! \U0001F636",],  # For Sunday
 ]
 
 USER_REQUESTED_DIGEST_EMPTY = [
