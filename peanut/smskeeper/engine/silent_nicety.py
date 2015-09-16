@@ -1,6 +1,5 @@
 from smskeeper import keeper_constants
-from smskeeper import niceties
-from smskeeper import analytics
+from smskeeper import analytics, chunk_features
 from .action import Action
 
 
@@ -9,19 +8,18 @@ class SilentNicetyAction(Action):
 
 	def getScore(self, chunk, user):
 		score = 0.0
+		features = chunk_features.ChunkFeatures(chunk, user)
 
-		nicety = niceties.getNicety(chunk.originalText)
-
-		if len(chunk.originalText.split(' ')) == 1:
+		if features.numWords() <= 1:
 			score = .3
 
 		# We have both nicety and silent nicety right now...so make sure we don't think
 		# we're a silent one if there's responses
 		# Kinda hacky
-		if nicety and nicety.isSilent():
+		if features.hasAnyNicety() and features.hasSilentNicety():
 			score = 0.4
 
-			matchScore = nicety.matchScore(chunk.originalText)
+			matchScore = features.nicetyMatchScore()
 			if matchScore > .9:
 				score = .95
 

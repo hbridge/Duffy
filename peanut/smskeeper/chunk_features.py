@@ -42,6 +42,9 @@ class ChunkFeatures:
 	jokeRequestRegex = r"\bjoke(s)?\b"
 	jokeFollowupRegex = r"\b(another)\b"
 
+	# Stop
+	stopRegex = r"stop$|silent stop$|cancel( keeper)?$"
+
 	# PRIVATE
 	def getInterestingWords(self):
 		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
@@ -117,6 +120,9 @@ class ChunkFeatures:
 
 	def hasWeatherWord(self):
 		return self.chunk.contains(self.weatherRegex)
+
+	def numWords(self):
+		return len(self.chunk.normalizedText().split(' '))
 
 	def isQuestion(self):
 		isQuestion = False
@@ -252,6 +258,9 @@ class ChunkFeatures:
 			return abs((lastJokeTime - now).total_seconds())
 		else:
 			return 10000000  # Big number to say its been a while
+
+	def hasStopPhrase(self):
+		return self.chunk.matches(self.stopRegex)
 
 	# Returns True if this message has a valid time and it doesn't look like another remind command
 	# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup

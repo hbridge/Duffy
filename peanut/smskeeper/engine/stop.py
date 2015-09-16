@@ -1,19 +1,17 @@
 from .action import Action
-import re
 from smskeeper import sms_util
 from smskeeper import keeper_constants, keeper_strings
-from smskeeper import analytics
+from smskeeper import analytics, chunk_features
 
 
 class StopAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_STOP
 
-	stopRegex = re.compile(r"stop$|silent stop$|cancel( keeper)?$", re.I)
-
 	def getScore(self, chunk, user):
 		score = 0.0
+		features = chunk_features.ChunkFeatures(chunk, user)
 
-		if self.stopRegex.match(chunk.normalizedText()) is not None:
+		if features.hasStopPhrase():
 			score = .9
 
 		if StopAction.HasHistoricalMatchForChunk(chunk):

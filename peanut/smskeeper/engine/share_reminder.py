@@ -23,13 +23,13 @@ class ShareReminderAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+		features = chunk_features.ChunkFeatures(chunk, user)
 		unresolvedHandles, resolvedHandles = user.getSharePromptHandles()
 		# Check for recently asked to resolve handle
 		if len(resolvedHandles) > 0:
 			resolvedHandlesRe = "|".join(resolvedHandles)
 
-		if chunkFeatures.hasPhoneNumber():
+		if features.hasPhoneNumber():
 			score += 0.5
 		if chunk.matches(r'(text|.* directly|.* for me|remind|yes)'):
 			score += 0.3
