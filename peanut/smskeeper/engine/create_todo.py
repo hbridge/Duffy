@@ -3,7 +3,7 @@ import pytz
 
 from common import date_util
 
-from smskeeper import reminder_util, sms_util, msg_util
+from smskeeper import reminder_util, sms_util
 from smskeeper import keeper_constants, chunk_features, keeper_strings
 from .action import Action
 from smskeeper.models import Contact
@@ -24,37 +24,28 @@ class CreateTodoAction(Action):
 	def getScore(self, chunk, user):
 		score = 0.0
 
-		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+		features = chunk_features.ChunkFeatures(chunk, user)
 
-		nattyResult = chunk.getNattyResult(user)
-		regexHit = msg_util.reminder_re.search(chunk.normalizedText()) is not None
-
-		# things that match this RE will get a boost for create
-		containsReminderWord = chunkFeatures.hasCreateWord()
-		beginsWithReminderWord = chunkFeatures.beginsWithCreateWord()
-
-		cleanedText = msg_util.cleanedReminder(chunk.normalizedTextWithoutTiming(user))
-
-		if nattyResult and not regexHit:
+		if features.hasTimingInfo() and not features.hasReminderPhrase():
 			score = 0.5
 
-		if not nattyResult and regexHit and len(cleanedText) > 2:
+		if not features.hasTimingInfo() and features.hasReminderPhrase() and features.numCharactersInCleanedText() > 2:
 			score = 0.5
 
-		if nattyResult and containsReminderWord:
+		if features.hasTimingInfo() and features.hasCreateWord():
 			score = 0.6
 
-		if self.tutorial:
+		if features.inTutorial():
 			score = 0.7
 
-		if nattyResult and regexHit:
+		if features.hasTimingInfo() and features.hasReminderPhrase():
 			score = 0.9
 
-		if score < 0.3 and chunkFeatures.beginsWithAndWord():
+		if score < 0.3 and features.beginsWithAndWord():
 			score += 0.3  # for "and socks" lists of stuff
 
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
-		recurScores = chunkFeatures.recurScores()
+		recurScores = features.recurScores()
 		for frequency in recurScores:
 			if recurScores[frequency] >= 0.5:
 				score = recurScores[frequency]
@@ -62,18 +53,18 @@ class CreateTodoAction(Action):
 		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.3 and beginsWithReminderWord:
+		if score < 0.3 and features.beginsWithCreateWord():
 			score += 0.2  # give an extra boost if nothing else matches
-		elif score < 0.9 and beginsWithReminderWord:
+		elif score < 0.9 and features.beginsWithCreateWord():
 			score += 0.1  # don't make us overly certain if it's already higher match
 
-		if chunkFeatures.isBroadQuestion():
+		if features.isBroadQuestion():
 			score -= 0.3
 
 		return score
 
 	def execute(self, chunk, user):
-		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+		features = chunk_features.ChunkFeatures(chunk, user)
 		nattyResult = chunk.getNattyResult(user)
 		keeperNumber = user.getKeeperNumber()
 
@@ -87,7 +78,7 @@ class CreateTodoAction(Action):
 			followups.append(keeper_constants.FOLLOWUP_TIME)
 
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
-		recurScores = chunkFeatures.recurScores()
+		recurScores = features.recurScores()
 		logger.info("User %s: create recurrence scores %s", user.id, recurScores)
 		recurFrequency = None
 		for frequency in recurScores.keys():
@@ -129,14 +120,14 @@ class CreateTodoAction(Action):
 		return True
 
 	def evaluateSharing(self, chunk, user):
-		chunkFeatures = chunk_features.ChunkFeatures(chunk, user)
+		features = chunk_features.ChunkFeatures(chunk, user)
 
 		shareHandles = None
 		unresolvedHandles = None
 		shareContacts = []
 		followups = []
 
-		if len(chunk.sharedReminderHandles()) > 0 and chunkFeatures.primaryActionIsRemind():
+		if len(chunk.sharedReminderHandles()) > 0 and features.primaryActionIsRemind():
 			shareHandles = chunk.sharedReminderHandles()
 			if len(shareHandles) > 1:
 				# we don't handle more than one share handle at the moment

@@ -82,6 +82,9 @@ class ChunkFeatures:
 	def hasCreateWord(self):
 		return self.chunk.contains(self.containsCreateWordhRegex)
 
+	def hasReminderPhrase(self):
+		return msg_util.reminder_re.search(self.chunk.normalizedText()) is not None
+
 	def beginsWithCreateWord(self):
 		return self.chunk.matches(self.beginsWithCreateWordRegex)
 
@@ -194,7 +197,7 @@ class ChunkFeatures:
 			return None
 
 	def numCharactersInCleanedText(self):
-		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
+		cleanedText = msg_util.cleanedReminder(msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user)))
 		return len(cleanedText)
 
 	# This could be a problem since it looks at now
@@ -208,6 +211,9 @@ class ChunkFeatures:
 
 	def hasNicety(self):
 		return True if niceties.getNicety(' '.join(self.getInterestingWords())) else False
+
+	def inTutorial(self):
+		return not self.user.isTutorialComplete()
 
 	# Returns True if this message has a valid time and it doesn't look like another remind command
 	# If reminderSent is true, then we look for again or snooze which if found, we'll assume is a followup

@@ -17,28 +17,22 @@ class CompleteTodoSpecificAction(Action):
 
 		features = chunk_features.ChunkFeatures(chunk, user)
 
-		numInterestingWords = features.numInterestingWords()
-		hasDoneWord = features.hasDoneWord()
-		beginsWithDoneWord = features.beginsWithDoneWord()
-		numBestEntries = features.numMatchingEntriesStrict()
-		hasTimingInfo = features.hasTimingInfo()
-
-		if numBestEntries > 0 and numInterestingWords >= 2:
+		if features.numMatchingEntriesStrict() > 0 and features.numInterestingWords() >= 2:
 			score = 0.3
 
-		if hasDoneWord and numInterestingWords >= 2:
+		if features.hasDoneWord() and features.numInterestingWords() >= 2:
 			score = 0.5
 
-		if hasDoneWord and numBestEntries > 0:
+		if features.hasDoneWord() and features.numMatchingEntriesStrict() > 0:
 			score = 0.9
 
-		if hasTimingInfo:
+		if features.hasTimingInfo():
 			score -= .15
 
 		if CompleteTodoSpecificAction.HasHistoricalMatchForChunk(chunk):
 			score = 1.0
 
-		if score < 0.9 and beginsWithDoneWord:
+		if score < 0.9 and features.beginsWithDoneWord():
 			score += 0.1
 
 		return score
