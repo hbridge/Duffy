@@ -218,8 +218,20 @@ class ChunkFeatures:
 
 		return isRecentAction
 
-	def hasNicety(self):
-		return True if niceties.getNicety(' '.join(self.getInterestingWords())) else False
+	def hasAnyNicety(self):
+		return True if niceties.getNicety(self.chunk.originalText) else False
+
+	def hasSilentNicety(self):
+		nicety = niceties.getNicety(self.chunk.originalText)
+		if nicety and nicety.isSilent():
+			return True
+		return False
+
+	def nicetyMatchScore(self):
+		nicety = niceties.getNicety(self.chunk.originalText)
+		if nicety:
+			return nicety.matchScore(self.chunk.originalText)
+		return 0
 
 	def inTutorial(self):
 		return not self.user.isTutorialComplete()

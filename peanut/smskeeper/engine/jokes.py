@@ -1,7 +1,5 @@
 import logging
-import re
 import pytz
-import datetime
 
 from smskeeper import keeper_constants, keeper_strings
 from .action import Action

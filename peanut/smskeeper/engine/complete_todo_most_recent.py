@@ -23,7 +23,7 @@ class CompleteTodoMostRecentAction(Action):
 			else:
 				score = 0.7
 
-		if features.hasDoneWord() and features.hasNicety():
+		if features.hasDoneWord() and features.hasAnyNicety():
 			score = 0.6
 
 		if features.hasTimingInfo():

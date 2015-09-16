@@ -1,9 +1,10 @@
 import logging
 
-from smskeeper import msg_util, sms_util
+from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import niceties
 from smskeeper import analytics
+from smskeeper import chunk_features
 from .action import Action
 
 logger = logging.getLogger(__name__)
@@ -14,21 +15,19 @@ class NicetyAction(Action):
 
 	def getScore(self, chunk, user):
 		score = 0.0
-
-		nicety = niceties.getNicety(chunk.originalText)
+		features = chunk_features.ChunkFeatures(chunk, user)
 
 		# We have both nicety and silent nicety right now...so make sure we don't think
 		# we're a real one if there's no responses
 		# Kinda hacky
-		if nicety and not nicety.isSilent():
+		if features.hasAnyNicety() and not features.hasSilentNicety():
 			score = .6
 
-			matchScore = nicety.matchScore(chunk.originalText)
-			if matchScore > .9:
+			if features.nicetyMatchScore() > .9:
 				score = .95
 
 		# TODO(Derek): Remove this once reminder stuff has been moved over to new processing engine
-		if msg_util.isDoneCommand(chunk.originalText):
+		if features.hasDoneWord():
 			score = 0.0
 
 		return score
