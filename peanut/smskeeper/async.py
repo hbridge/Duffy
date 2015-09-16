@@ -200,7 +200,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 	msg = ""
 
 	if not userRequested:  # Include a header and weather if not user requested
-		headerPhrase = keeper_strings.REMINDER_DIGEST_HEADERS[userNow.weekday()]
+		headerPhrase = random.choice(keeper_strings.REMINDER_DIGEST_HEADERS[userNow.weekday()])
 		msg += u"%s\n" % (headerPhrase)
 
 		if user.wxcode:
@@ -212,7 +212,7 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 		if userRequested:
 			msg += random.choice(keeper_strings.USER_REQUESTED_DIGEST_EMPTY)
 		else:
-			msg += keeper_strings.REMINDER_DIGEST_EMPTY[userNow.weekday()] + '\n'
+			msg += random.choice(keeper_strings.REMINDER_DIGEST_EMPTY[userNow.weekday()]) + '\n'
 	else:
 		if userRequested:  # This shows all tasks so we don't mention today
 			msg += keeper_strings.DIGEST_HEADER_USER_REQUESTED + "\n"

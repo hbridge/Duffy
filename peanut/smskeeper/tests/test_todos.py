@@ -295,7 +295,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			self.assertNotIn("how useful", self.getOutput(mock))
-			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY)
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY[0])
 
 		# 5 days later
 		self.setNow(dateMock, self.MON_9AM + datetime.timedelta(days=5))
@@ -1167,7 +1167,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY[0])
 
 	# Make sure we ping the user if we don't have anything for this week
 	def test_daily_digest_pings_if_nothing_set_weekend(self, dateMock):
@@ -1177,7 +1177,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[4]), self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY[4])
 
 	# Make sure we don't ping for product id 0
 	def test_daily_digest_doesnt_ping_product_0(self, dateMock):
@@ -1201,7 +1201,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
-			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY[0])
 
 	"""
 	Commenting out since now we're pinging every day
@@ -1523,7 +1523,7 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processDailyDigest()
 			# We shouldn't send a digest since we have an entry for tomorrow
-			self.assertIn(emoji.emojize(keeper_strings.REMINDER_DIGEST_EMPTY[0]), self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.REMINDER_DIGEST_EMPTY[0])
 
 		self.getTestUser().setState(keeper_constants.STATE_SUSPENDED)
 
