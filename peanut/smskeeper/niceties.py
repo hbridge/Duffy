@@ -113,10 +113,17 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		else:
 			link = user.getKeeperNumber()
 			if len(link) > 5:  # dealing with 'test' phone numbers
-				try:
-					link = phonenumbers.format_number(phonenumbers.parse(user.getKeeperNumber(), 'US'), phonenumbers.PhoneNumberFormat.NATIONAL)
-				except:
-					logger.error("Error trying to parse %s", user.getKeeperNumber())
+				if 'whatsapp' in link:  # dealing with whatsapp number
+					index = link.find('@')
+					if index > 0:
+						link = link[:index]
+						link = phonenumbers.format_number(phonenumbers.parse(link, 'US'), phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+						link += ' on whatsapp'
+				else:
+					try:
+						link = phonenumbers.format_number(phonenumbers.parse(user.getKeeperNumber(), 'US'), phonenumbers.PhoneNumberFormat.NATIONAL)
+					except:
+						logger.error("Error trying to parse %s", user.getKeeperNumber())
 
 		return "%s %s %s!" % (base, phrase, link)
 	else:
