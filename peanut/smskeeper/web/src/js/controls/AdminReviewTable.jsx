@@ -64,7 +64,20 @@ var RecurButton = React.createClass({
 
 
 var EntryRow = React.createClass({
-	mixins: [BackboneReactComponent],
+	getInitialState(){
+		return({model: this.props.model.attributes});
+	},
+	componentDidMount(){
+		this.props.model.on("change", function(eventName){
+			if (this.state.model.manually_check != this.props.model.attributes.manually_check) {
+				this.setState({model: this.props.model.attributes})
+				console.log("change", this.props.model.attributes);
+			} else {
+				console.log("no change");
+			}
+		}.bind(this));
+	},
+
 	render() {
 		var timezone = this.state.model.creator_timezone;
 		var approveButton = <Button

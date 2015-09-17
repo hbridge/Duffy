@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "backbone": "^1.2.1",
-    "backbone-react-component": "^0.8.1",
+    "backbone-react-component": "^0.9",
     "classnames": "^1.2.2",
     "fixed-data-table": "^0.3.0",
     "gulp-ignore": "^1.2.1",
