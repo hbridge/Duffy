@@ -279,7 +279,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "help bobby get his shit done")
-			self.assertIn("reminded?", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.ASK_FOR_TIME_TEXT)
 			self.assertNotIn("It's that easy. ", self.getOutput(mock))
 
 	def test_tutorial_time_not_given_same_day(self, dateMock):

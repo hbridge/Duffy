@@ -103,7 +103,7 @@ def sendDelayedMsg(user, msg, delaySeconds, keeperNumber=None, classification=No
 	sendMsg(user, msg, eta=eta, keeperNumber=keeperNumber, classification=classification)
 
 
-def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=True, stopOverride=False, classification=None):
+def sendMsgs(user, msgList, keeperNumber=None, sendMessageDividers=False, stopOverride=False, classification=None):
 	if not isinstance(msgList, list):
 		raise TypeError("Passing %s to sendMsg.  Did you mean sendMsg?", type(msgList))
 
