@@ -9,6 +9,8 @@ import pytz
 import logging
 import phonenumbers
 
+from django.conf import settings
+
 from smskeeper import keeper_constants, keeper_strings
 from smskeeper import msg_util
 from smskeeper import time_utils
@@ -120,6 +122,8 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 						link = phonenumbers.format_number(phonenumbers.parse(link, 'US'), phonenumbers.PhoneNumberFormat.INTERNATIONAL)
 						link += ' on whatsapp'
 				else:
+					if settings.KEEPER_NUMBER_DICT[0] in link:
+						link = settings.KEEPER_NUMBER_DICT[1]  # this is to stop people from signing up for phone number associated with product_id 0
 					try:
 						link = phonenumbers.format_number(phonenumbers.parse(user.getKeeperNumber(), 'US'), phonenumbers.PhoneNumberFormat.NATIONAL)
 					except:
