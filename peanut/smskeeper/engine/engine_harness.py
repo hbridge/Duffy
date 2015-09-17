@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class EngineSimHarness():
+	entriesCount = 0
+
 	@patch('common.date_util.utcnow')
 	@patch('smskeeper.models.User.wasRecentlySentMsgOfClass')
 	@patch('smskeeper.models.User.getActiveEntries')
@@ -93,7 +95,8 @@ class EngineSimHarness():
 			text = entrySnapshot.get("text", "")
 			remind_timestamp = date_util.fromIsoString(entrySnapshot.get("remind_timestamp"))
 
-			entry = Entry.objects.create(creator_id=message["user"], label=keeper_constants.REMIND_LABEL, text=text, remind_timestamp=remind_timestamp)
+			entry = Entry(id=self.entriesCount, creator_id=message["user"], label=keeper_constants.REMIND_LABEL, text=text, remind_timestamp=remind_timestamp)
+			self.entriesCount += 1
 			newActiveEntries.append(entry)
 
 		mock.return_value = newActiveEntries

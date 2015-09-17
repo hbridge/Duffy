@@ -203,83 +203,103 @@ CLASS_UNKNOWN = "unknown"
 CLASS_MENU_OPTIONS = ([
 	{
 		"text": "Create Todo",
-		"value": CLASS_CREATE_TODO
+		"value": CLASS_CREATE_TODO,
+		"code": 0
 	},
 	{
 		"text": "Done (most recent)",
-		"value": CLASS_COMPLETE_TODO_MOST_RECENT
+		"value": CLASS_COMPLETE_TODO_MOST_RECENT,
+		"code": 1
 	},
 	{
 		"text": "Done (specific)",
-		"value": CLASS_COMPLETE_TODO_SPECIFIC
+		"value": CLASS_COMPLETE_TODO_SPECIFIC,
+		"code": 2
 	},
 	{
 		"text": "Delete/Cancel",
-		"value": CLASS_DELETE
+		"value": CLASS_DELETE,
+		"code": 3
 	},
 	{
 		"text": "Fetch Digest",
-		"value": CLASS_FETCH_DIGEST
+		"value": CLASS_FETCH_DIGEST,
+		"code": 4
 	},
 	{
 		"text": "Nicety",
-		"value": CLASS_NICETY
+		"value": CLASS_NICETY,
+		"code": 5
 	},
 	{
 		"text": "Nicety (Silent)",
-		"value": CLASS_SILENT_NICETY
+		"value": CLASS_SILENT_NICETY,
+		"code": 6
 	},
 	{
 		"text": "Change time (most recent)",
-		"value": CLASS_CHANGETIME_MOST_RECENT
+		"value": CLASS_CHANGETIME_MOST_RECENT,
+		"code": 7
 	},
 	{
 		"text": "Change time (specific)",
-		"value": CLASS_CHANGETIME_SPECIFIC
+		"value": CLASS_CHANGETIME_SPECIFIC,
+		"code": 8
 	},
 	{
 		"text": "Help",
-		"value": CLASS_HELP
+		"value": CLASS_HELP,
+		"code": 9
 	},
 	{
 		"text": "Stop",
-		"value": CLASS_STOP
+		"value": CLASS_STOP,
+		"code": 10
 	},
 	{
 		"text": "Get weather",
-		"value": CLASS_FETCH_WEATHER
+		"value": CLASS_FETCH_WEATHER,
+		"code": 11
 	},
 	{
 		"text": "Change Setting",
-		"value": CLASS_CHANGE_SETTING
+		"value": CLASS_CHANGE_SETTING,
+		"code": 12
 	},
 	{
 		"text": "Question",
-		"value": CLASS_QUESTION
+		"value": CLASS_QUESTION,
+		"code": 13
 	},
 	{
 		"text": "Frustration",
-		"value": CLASS_FRUSTRATION
+		"value": CLASS_FRUSTRATION,
+		"code": 14
 	},
 	{
 		"text": "Tip question response",
-		"value": CLASS_TIP_QUESTION_RESPONSE
+		"value": CLASS_TIP_QUESTION_RESPONSE,
+		"code": 15
 	},
 	{
 		"text": "Joke request",
-		"value": CLASS_JOKE
+		"value": CLASS_JOKE,
+		"code": 16
 	},
 	{
 		"text": "Shared reminder recipient upsell",
-		"value": CLASS_SHARED_REMINDER_RECIPIENT_UPSELL
+		"value": CLASS_SHARED_REMINDER_RECIPIENT_UPSELL,
+		"code": 17
 	},
 	{
 		"text": "Share Reminder",
-		"value": CLASS_SHARE_REMINDER
+		"value": CLASS_SHARE_REMINDER,
+		"code": 18
 	},
 	{
 		"text": "NoCategory",
-		"value": CLASS_NONE
+		"value": CLASS_NONE,
+		"code": 19
 	},
 ])
 

@@ -81,6 +81,12 @@ class ChunkFeatures:
 		interestingWords = msg_util.getInterestingWords(cleanedText)
 		return interestingWords
 
+	def getLastActionTime(self):
+		if self.user.getStateData(keeper_constants.LAST_ACTION_KEY):
+			return datetime.datetime.utcfromtimestamp(self.user.getStateData(keeper_constants.LAST_ACTION_KEY)).replace(tzinfo=pytz.utc)
+		else:
+			return None
+
 	# Features
 	@feature
 	def hasTimingInfo(self):
@@ -155,7 +161,7 @@ class ChunkFeatures:
 		if not matches.has_next():
 			return False
 		match = matches.next()
-		return match.start == 0 and match.end == len(self.originalText)
+		return match.start == 0 and match.end == len(self.chunk.originalText)
 
 		return matches.has_next()
 
@@ -244,7 +250,7 @@ class ChunkFeatures:
 
 	@feature
 	def containsPostalCode(self):
-		return msg_util.getPostalCode(self.chunk.normalizedText())
+		return msg_util.getPostalCode(self.chunk.normalizedText()) is not None
 
 	@feature
 	def containsZipCodeWord(self):
@@ -271,13 +277,6 @@ class ChunkFeatures:
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE)
 
 	@feature
-	def getLastActionTime(self, user):
-		if user.getStateData(keeper_constants.LAST_ACTION_KEY):
-			return datetime.datetime.utcfromtimestamp(user.getStateData(keeper_constants.LAST_ACTION_KEY)).replace(tzinfo=pytz.utc)
-		else:
-			return None
-
-	@feature
 	def numCharactersInCleanedText(self):
 		cleanedText = msg_util.cleanedReminder(msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user)))
 		return len(cleanedText)
@@ -287,7 +286,7 @@ class ChunkFeatures:
 	def isRecentAction(self):
 		now = date_util.now(pytz.utc)
 
-		lastActionTime = self.getLastActionTime(self.user)
+		lastActionTime = self.getLastActionTime()
 		isRecentAction = True if (lastActionTime and (now - lastActionTime) < datetime.timedelta(minutes=5)) else False
 
 		return isRecentAction

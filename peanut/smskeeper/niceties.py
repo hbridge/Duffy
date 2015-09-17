@@ -167,6 +167,3 @@ def renderNameQuery(user, requestDict, keeperNumber):
 def renderRogerConfusion(user, requestDict, keeperNumber):
 	return keeper_strings.MY_NAME_IS_NOT_ROGER_RESPONSE % (user.name.title())
 
-
-# for nicety in SMSKEEPER_NICETIES:
-# 	print nicety
