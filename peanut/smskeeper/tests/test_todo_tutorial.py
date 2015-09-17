@@ -26,14 +26,15 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		# Activation message asks for their name
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
-			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
+			name = "UnitTests"
+			cliMsg.msg(self.testPhoneNumber, name)
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.GOT_NAME_RESPONSE, name)
 			self.assertEquals(self.getTestUser().name, "UnitTests")
 
 		# Activation message asks for their zip
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertIn("Let's add something you need to get done.", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT)
 			self.assertEqual(self.getTestUser().postal_code, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -50,8 +51,9 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		# Activation message asks for their name
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
-			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
+			name = "UnitTests"
+			cliMsg.msg(self.testPhoneNumber, name)
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.GOT_NAME_RESPONSE, name)
 			self.assertEquals(self.getTestUser().name, "UnitTests")
 
 		# Immediatly after, should ignore
@@ -72,14 +74,15 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		# Activation message asks for their name
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "UnitTests")
-			self.assertIn("nice to meet you UnitTests!", self.getOutput(mock))
+			name = "UnitTests"
+			cliMsg.msg(self.testPhoneNumber, name)
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.GOT_NAME_RESPONSE, name)
 			self.assertEquals(self.getTestUser().name, "UnitTests")
 
 		# Activation message asks for their zip
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertIn("Let's add something you need to get done.", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hello")
@@ -244,7 +247,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			# Activation message asks for their name, but instead respond with sentence
 			cliMsg.msg(self.testPhoneNumber, "What are you")
-			self.assertIn("but first what's your name?", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.ASK_AGAIN_FOR_NAME)
 
 		cliMsg.msg(self.testPhoneNumber, "I'm Billy")
 		user = self.getTestUser()
@@ -258,7 +261,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Need to call bobby")
-			self.assertIn("reminded?", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.ASK_FOR_TIME_TEXT)
 			self.assertNotIn("It's that easy. ", self.getOutput(mock))
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -289,7 +292,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Do homework when the cable guy leaves")
-			self.assertIn("reminded?", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.ASK_FOR_TIME_TEXT)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "5:30 P.M")
@@ -305,7 +308,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Do homework when the cable guy leaves")
-			self.assertIn("reminded?", self.getOutput(mock))
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.ASK_FOR_TIME_TEXT)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "5:30 P.M")

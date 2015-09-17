@@ -81,16 +81,16 @@ def activateUser(user, introPhrase, keeperNumber):
 
 	if productId == keeper_constants.TODO_PRODUCT_ID:
 		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
-		msgsToSend.extend(keeper_strings.INTRO_MESSAGES)
+		msgsToSend.extend([random.choice(x) for x in keeper_strings.INTRO_MESSAGES])
 	elif productId == keeper_constants.MEDICAL_PRODUCT_ID:
 		tutorialState = keeper_constants.STATE_TUTORIAL_MEDICAL
 		msgsToSend.extend(keeper_strings.INTRO_MESSAGES_MEDICAL)
 	elif productId == keeper_constants.STUDENT_PRODUCT_ID:
 		tutorialState = keeper_constants.STATE_TUTORIAL_STUDENT
-		msgsToSend.extend(keeper_strings.INTRO_MESSAGES)
+		msgsToSend.extend([random.choice(x) for x in keeper_strings.INTRO_MESSAGES])
 	else:
 		tutorialState = keeper_constants.STATE_TUTORIAL_TODO
-		msgsToSend.extend(keeper_strings.INTRO_MESSAGES)
+		msgsToSend.extend([random.choice(x) for x in keeper_strings.INTRO_MESSAGES])
 
 	user.setActivated(True, tutorialState=tutorialState)
 

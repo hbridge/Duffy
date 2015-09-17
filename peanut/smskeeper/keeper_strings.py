@@ -9,8 +9,14 @@ from smskeeper import keeper_constants
 
 # Intro messages for different types of users
 INTRO_MESSAGES = [
-	u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
-	"Let me show you how I can help you. First, what's your name?"
+	[
+		u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
+		u"Hi! I'm Keeper :wave:, I'm here to help you remember anything and everything.",
+		u"Yo! I'm Keeper, I can help you remember things any time."
+	],
+	[
+		"Let me show you how I can help you. First, what's your name?",
+	],
 ]
 
 # specifically for the medical use case that never went anywhere. Pls ignore
@@ -20,20 +26,37 @@ INTRO_MESSAGES_MEDICAL = [
 	"Let me show you how I can help you. First, what's your name?"
 ]
 
-ASK_AGAIN_FOR_NAME = u"We'll get to that, but first what's your name?"
-GOT_NAME_RESPONSE = u"Great, nice to meet you %s! \U0001F44B"
+ASK_AGAIN_FOR_NAME = [
+	u"We'll get to that, but first what's your name?",
+	u"Whoa, whoa, slow down. What's your name first?"
+]
+GOT_NAME_RESPONSE = [
+	u"Great, nice to meet you %s! \U0001F44B",
+	u"Thanks, %s!. Awesome to meet you. :wave:",
+	u"Thanks! I'm sure we'll be great friends, %s!",
+]
 
 
 ASK_FOR_ZIPCODE_TEXT = u"What's your zipcode? It'll help me remind you of things at the right time \U0001F553"
 ASK_FOR_POSTAL_CODE_TEXT = u"What's your postal/zip code? It'll help me remind you of things at the right time \U0001F553"  # used for non-US phone numbers
 
-ZIPCODE_NOT_VALID_TEXT = "Sorry, I don't know that zipcode. Could you check that?"
+ZIPCODE_NOT_VALID_TEXT = [
+	"Sorry, I don't know that zipcode. Could you check that?",
+	"Hmm, that doesn't sound familiar. Mind sending again?"
+]
 ASK_AGAIN_FOR_ZIPCODE_TEXT = "Got it, but first thing, what's your zipcode?"
 
 # When a user sets their *first* reminder and don't give us time, we ask them to clarify
-ASK_FOR_TIME_TEXT = "Great, and when would you like to be reminded?"
+ASK_FOR_TIME_TEXT = [
+	"Great, and when would you like to be reminded?",
+	"Perfect, what time would you like to be reminded?",
+	"Cool, what time should I remind you?"
+]
 
-TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT = u"\U0001F44F Thanks! Let's add something you need to get done. \u2705"
+TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT = [
+	u"\U0001F44F Thanks! Let's add something you need to get done. \u2705",
+	u"Thanks! Let's get this to do list started."
+]
 TUTORIAL_ADD_FIRST_REMINDER_TEXT = u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'."
 TUTORIAL_STUDENT_ADD_FIRST_REMINDER_TEXT = u"What's an item on your todo list right now? You can say things like 'Submit club dues on Friday' or 'Meet with advisor on Monday at 4pm'."
 

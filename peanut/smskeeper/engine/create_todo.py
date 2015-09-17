@@ -1,5 +1,6 @@
 import logging
 import pytz
+import random
 
 from common import date_util
 
@@ -108,7 +109,7 @@ class CreateTodoAction(Action):
 			reminder_util.shareReminders(user, [entry], [shareContacts[0].handle], keeperNumber)
 
 		if not user.isTutorialComplete() and not nattyResult.validTime() and entry.remind_recur == keeper_constants.RECUR_DEFAULT:
-			sms_util.sendMsg(user, keeper_strings.ASK_FOR_TIME_TEXT, None, keeperNumber)
+			sms_util.sendMsg(user, random.choice(keeper_strings.ASK_FOR_TIME_TEXT), None, keeperNumber)
 			return False
 		else:
 			reminder_util.sendCompletionResponse(user, entry, followups, keeperNumber)

@@ -94,14 +94,18 @@ class SMSKeeperBaseCase(TestCase):
 
 		return events
 
-	def containsOneOf(self, output, stringList):
+	def containsOneOf(self, output, stringList, substitute=None):
 		for s in stringList:
-			if emoji.emojize(s, use_aliases=True) in output:
-				return True
+			if substitute:
+				if emoji.emojize(s % substitute, use_aliases=True) in output:
+					return True
+			else:
+				if emoji.emojize(s, use_aliases=True) in output:
+					return True
 		return False
 
-	def assertContainsOneOf(self, output, stringList):
-		self.assertTrue(self.containsOneOf(output, stringList), "String wasn't found in '%s'" % output)
+	def assertContainsOneOf(self, output, stringList, substitute=None):
+		self.assertTrue(self.containsOneOf(output, stringList, substitute), "String wasn't found in '%s'" % output)
 
 	def assertNotContainsOneOf(self, output, stringList):
 		self.assertFalse(self.containsOneOf(output, stringList), "String did match: %s" % output)

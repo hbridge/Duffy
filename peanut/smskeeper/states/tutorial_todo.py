@@ -4,6 +4,7 @@ import logging
 import datetime
 import string
 import json
+import random
 
 from smskeeper import sms_util, tips
 from smskeeper import keeper_constants, keeper_strings
@@ -57,7 +58,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
-				sms_util.sendMsg(user, keeper_strings.ASK_AGAIN_FOR_NAME, None, keeperNumber)
+				sms_util.sendMsg(user, random.choice(keeper_strings.ASK_AGAIN_FOR_NAME), None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				user.name = msg.strip(string.punctuation)
@@ -72,7 +73,7 @@ def process(user, msg, requestDict, keeperNumber):
 		sms_util.sendMsgs(
 			user,
 			[
-				keeper_strings.GOT_NAME_RESPONSE % user.getFirstName(),
+				random.choice(keeper_strings.GOT_NAME_RESPONSE) % user.getFirstName(),
 				postalCodeMessage
 			],
 			keeperNumber
@@ -85,7 +86,7 @@ def process(user, msg, requestDict, keeperNumber):
 			timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
 			logger.debug("%s, %s, %s"%(timezone, wxcode, tempFormat))
 			if timezone is None:
-				sms_util.sendMsg(user, keeper_strings.ZIPCODE_NOT_VALID_TEXT, None, keeperNumber)
+				sms_util.sendMsg(user, random.choice(keeper_strings.ZIPCODE_NOT_VALID_TEXT), None, keeperNumber)
 				return True, keeper_constants.CLASS_NONE, actionScores
 			else:
 				user.postal_code = postalCode
@@ -105,7 +106,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# else ignore
 				return True, keeper_constants.CLASS_NONE, actionScores
 
-		sms_util.sendMsgs(user, [keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT, keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT], keeperNumber)
+		sms_util.sendMsgs(user, [random.choice(keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT), keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
