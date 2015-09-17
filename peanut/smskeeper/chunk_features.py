@@ -188,7 +188,7 @@ class ChunkFeatures:
 		return msg_util.getPostalCode(self.chunk.normalizedText())
 
 	def containsZipCodeWord(self):
-		return self.chunk.contains(r'(^|\b)zip( )?(code)?')
+		return self.chunk.contains(r'(zip|zip code|zipcode|moved)')
 
 	def containsFirstPersonWord(self):
 		return self.chunk.contains(r'(\bI\b|\bmy\b)')

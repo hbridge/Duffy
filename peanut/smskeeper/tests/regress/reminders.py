@@ -8,6 +8,7 @@ from mock import patch
 from smskeeper import cliMsg
 from smskeeper.tests import test_base
 from smskeeper.models import Entry, User
+from smskeeper.scripts import importZipdata
 
 import json
 import logging
@@ -59,6 +60,9 @@ class SMSRemindersRegressionCase(test_base.SMSKeeperBaseCase):
 
 	def test_reminder_regressions(self, dateMock):
 		print "Running Regression tests..."
+		logger.info("Importing zip data...")
+		importZipdata.loadZipDataFromTGZ("./smskeeper/data/zipdata.tgz")
+
 		logging.disable(logging.CRITICAL)
 		#  credentials = {'host': 'localhost:8000', 'username': 'tests', 'password': 'tests'}
 		credentials = {'host': 'prod.strand.duffyapp.com', 'username': 'tests', 'password': 'RegressionTestsAreSoCool'}
@@ -101,7 +105,6 @@ class SMSRemindersRegressionCase(test_base.SMSKeeperBaseCase):
 				self.setNow(dateMock, added)
 
 				origText = origTexts[0]
-
 				cliMsg.msg(self.testPhoneNumber, origText)
 				entries = Entry.objects.filter(label="#reminders")
 
