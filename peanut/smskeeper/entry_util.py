@@ -2,7 +2,6 @@ import logging
 
 from smskeeper import msg_util, niceties
 
-from smskeeper.models import Entry
 logger = logging.getLogger(__name__)
 
 from fuzzywuzzy import fuzz
@@ -50,7 +49,7 @@ def fuzzyMatchEntries(user, cleanedCommand, minScore=60):
 
 def getBestEntryMatch(user, msg, entries=None):
 	if not entries:
-		entries = Entry.objects.filter(creator=user, label="#reminders", hidden=False)
+		entries = user.getActiveEntries()
 
 	logger.debug("User %s: Going to try to find the best match to '%s'" % (user.id, msg))
 	entries = sorted(entries, key=lambda x: x.added)

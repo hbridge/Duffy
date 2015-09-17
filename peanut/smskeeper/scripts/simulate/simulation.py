@@ -8,19 +8,12 @@ import traceback
 import pwd
 import os
 
-from common import date_util
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 import mechanize
-from mock import patch
-import pytz
 from smskeeper import keeper_constants
-from smskeeper import processing_util
-from smskeeper.chunk import Chunk
-from smskeeper.engine import Engine
-from smskeeper.models import Entry
+from smskeeper.engine.engine_harness import EngineSimHarness
 from smskeeper.models import Message
-from smskeeper.models import User
 from smskeeper.scripts import importZipdata
 from smskeeper.tests import test_base
 
@@ -63,7 +56,7 @@ def summaryText(text, *args):
 	logger.info(text, *args)
 	summaryLogger.info(text, *args)
 
-@patch('common.date_util.utcnow')
+
 class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 	message_count = 0
 	classified_messages = []
@@ -76,7 +69,7 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 	'post_results_url'
 	'''
 
-	def test_parse_accuracy(self, dateMock):
+	def test_parse_accuracy(self):
 		if not self.SIMULATION_CONFIGURATION:
 			raise NameError("This is the base simulation class, use a speicific configuration.")
 
@@ -95,6 +88,8 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 		classified_messages = json.loads(response)
 
+		harness = EngineSimHarness()
+
 		for message in classified_messages:
 			try:
 				if self.SIMULATION_CONFIGURATION['sim_type'] == 'p' and int(message["user"]) < MIN_USER_ID:
@@ -102,22 +97,12 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 				logger.info("\n Processing message: %s", message)
 				self.message_count += 1
 
-				# get the user
-				user = self.getOrCreateUser(message["user"])
+				classification, actionScores = harness.scoreMessage(message)
 
-				# for each message setup and simulate
-				self.setUserProps(user, message.get("userSnapshot"))
-				self.setNow(dateMock, date_util.fromIsoString(message["added"]))
-				self.setActiveEntries(user, message.get("activeEntriesSnapshot", []))
-				with patch('smskeeper.models.User.wasRecentlySentMsgOfClass') as mock:
-					recentClasses = message.get("recentOutgoingMessageClasses")
-					self.setRecentOutgoingMessageClasses(user, recentClasses, mock)
-					if len(recentClasses) > 0:
-						# make sure our mock is working
-						self.assertTrue(user.wasRecentlySentMsgOfClass(recentClasses[0]), True)
-
-					# actually score the message
-					self.scoreMessage(user, message)
+				message["simulated_classification"] = classification
+				message["simulated_scores"] = actionScores
+				logger.info("Scored message %s", message)
+				self.classified_messages.append(message)
 			except Exception as e:
 				logger.info("-" * 60)
 				logger.info(
@@ -136,73 +121,6 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 		summaryLogger.finalize()
 		logger.finalize()
-
-	def getOrCreateUser(self, userId):
-		userPhone = self.phoneNumberForUserId(userId)
-		try:
-			user = User.objects.get(phone_number=userPhone)
-		except:
-			logger.info("Creating user %d with phone_number %s", userId, userPhone)
-			user = User.objects.create(phone_number=userPhone)
-			user.save()
-
-		return user
-
-	def setUserProps(self, user, userSnapshot):
-		logger.info("setting props from userSnapshot: %s", userSnapshot)
-		if userSnapshot:
-			for key in userSnapshot.keys():
-				setattr(user, key, userSnapshot.get(key))
-		else:
-			# default values
-			user.productId = keeper_constants.TODO_PRODUCT_ID
-			user.state = keeper_constants.STATE_NORMAL
-			user.completed_tutorial = True
-			dt = date_util.now(pytz.utc)
-			user.activated = datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
-			user.signature_num_lines = 0
-		user.save()
-
-	def setActiveEntries(self, user, entriesSnapshot):
-		# hide any currently active entries
-		activeEntries = Entry.fetchReminders(user, hidden=False)
-		for entry in activeEntries:
-			entry.hidden = True
-			entry.save()
-
-		# create active entries
-		newActiveEntries = []
-		for entrySnapshot in entriesSnapshot:
-			text = entrySnapshot.get("text", "")
-			remind_timestamp = date_util.fromIsoString(entrySnapshot.get("remind_timestamp"))
-			newEntry = Entry.createReminder(user, text, remind_timestamp)
-			newEntry.save()
-			newActiveEntries.append(newEntry)
-		logger.info("Set active entries: %s", newActiveEntries)
-
-	def setRecentOutgoingMessageClasses(self, user, outgoingMessageClasses, mock):
-		self.recentOutgoingMessageClasses = outgoingMessageClasses
-		mock.side_effect = self.wasRecentlySentMsgOfClass
-
-	def wasRecentlySentMsgOfClass(self, outgoingMsgClass, num=3):
-		result = outgoingMsgClass in self.recentOutgoingMessageClasses[:num]
-		logger.info("Was recently sent %s for user %s", outgoingMsgClass, result)
-		return result
-
-	def scoreMessage(self, user, message):
-		lines = processing_util.processSigAndSplitLines(user, message["body"])
-		chunk = Chunk(lines[0])  # only process first line for now
-		engine = Engine(Engine.DEFAULT, 0.0)
-		processed, classification, actionScores = engine.process(user, chunk, simulate=True)
-
-		# set the correct classification for the message objct
-		message["simulated_classification"] = classification
-		message["simulated_scores"] = actionScores
-		logger.info("Scored message %s", message)
-		self.classified_messages.append(message)
-
-	def phoneNumberForUserId(self, uid):
-		return "+1650555" + "%04d" % uid
 
 	def printUnknowns(self):
 		summaryText(

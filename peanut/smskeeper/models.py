@@ -302,6 +302,9 @@ class User(models.Model):
 		entries = Entry.objects.filter(id__in=entryIds)
 		return entries
 
+	def getActiveEntries(self):
+		return Entry.objects.filter(creator=self, label="#reminders", hidden=False)
+
 	def setSharePromptHandles(self, unresolvedHandles, resolvedHandles):
 		self.setStateData("unresolvedHandles", unresolvedHandles)
 		self.setStateData("sharePromptHandles", resolvedHandles)
