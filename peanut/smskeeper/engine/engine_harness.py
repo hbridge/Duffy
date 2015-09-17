@@ -4,7 +4,7 @@ import logging
 
 from common import date_util
 from mock import patch
-from smskeeper import processing_util, keeper_constants
+from smskeeper import processing_util, keeper_constants, chunk_features
 from smskeeper.chunk import Chunk
 from smskeeper.models import Entry
 from smskeeper.models import User
@@ -37,6 +37,29 @@ class EngineSimHarness():
 
 		# set the correct classification for the message object
 		return classification, actionScores
+
+	@patch('common.date_util.utcnow')
+	@patch('smskeeper.models.User.wasRecentlySentMsgOfClass')
+	@patch('smskeeper.models.User.getActiveEntries')
+	def getFeatures(self, message, activeEntriesMock, recentMsgMock, dateMock):
+		# get the user
+		userId = message["user"]
+		user = User(id=userId, phone_number=self.phoneNumberForUserId(message["user"]))
+
+		# for each message setup and simulate
+		self.setNow(dateMock, date_util.fromIsoString(message["added"]))
+		self.setUserProps(user, message.get("userSnapshot"))
+
+		self.setRecentOutgoingMessageClasses(message, recentMsgMock)
+		self.setActiveEntries(message, activeEntriesMock)
+
+		# actually score the message
+		lines = processing_util.processSigAndSplitLines(user, message["body"])
+		chunk = Chunk(lines[0])  # only process first line for now
+		features = chunk_features.ChunkFeatures(chunk, user)
+
+		featuresDict = chunk_features.getFeaturesDict(features)
+		return featuresDict
 
 	def setUserProps(self, user, userSnapshot):
 		logger.info("setting props from userSnapshot: %s", userSnapshot)
