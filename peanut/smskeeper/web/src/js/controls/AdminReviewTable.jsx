@@ -161,7 +161,7 @@ var EntryRow = React.createClass({
 		var newModel = this.props.model.clone();
 		newModel.set("text", text);
 		newModel.set("id", null);
-		this.getCollection().add(newModel);
+		this.props.collection.add(newModel);
 		var saveResult = newModel.save();
 		console.log("Save copy result: ", saveResult)
 		this.refs.unsquashTrigger.dismiss();
@@ -175,7 +175,7 @@ module.exports = React.createClass({
   render() {
   	var createRow = function(entry, index) {
       return (
-        <EntryRow model={ entry } key={ entry.id } onRowClicked={this.handleRowClicked}/>
+        <EntryRow model={ entry } collection={this.props.collection} key={ entry.id } onRowClicked={this.handleRowClicked}/>
       );
     }.bind(this);
 
