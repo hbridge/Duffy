@@ -56,6 +56,7 @@ TVSHOW_TIP_ID = "tv-show"
 SHARED_REMINDER_TIP1_ID = "shared-reminder-1"
 SHARED_REMINDER_TIP2_ID = "shared-reminder-2"
 GET_TASKS_TIP_ID = "get-tasks"
+WORKOUT_SCHEDULE_TIP_ID = 'workout-schedule'
 
 SNOOZE_TIP_ID = "mini-snooze"
 
@@ -137,6 +138,11 @@ SMSKEEPER_TIPS = [
 	KeeperTip(
 		SHARED_REMINDER_TIP2_ID,
 		keeper_strings.SHARED_REMINDER_TIP2_TEXT,
+		type=FULL_TIP_TYPE
+	),
+	KeeperTip(
+		WORKOUT_SCHEDULE_TIP_ID,
+		keeper_strings.WORKOUT_SCHEDULE_TEXT,
 		type=FULL_TIP_TYPE
 	),
 

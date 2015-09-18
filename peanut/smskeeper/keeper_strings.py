@@ -1,3 +1,4 @@
+
 # All user-visible string should go here.
 
 from smskeeper import keeper_constants
@@ -289,6 +290,7 @@ SHARED_REMINDER_TIP1_TEXT = "I can now remind other people on your behalf. Just 
 TVSHOW_TIP_TEXT = "Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'"
 GET_TASKS_TIP_TEXT = "Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?'"
 SHARED_REMINDER_TIP2_TEXT = "I can directly remind your other half for you. Just say 'Remind my boyfriend (or girlfriend) to get groceries tmrw at 7pm'"
+WORKOUT_SCHEDULE_TEXT = "Hey :NAME:, having trouble going to the gym? Just let me know when you want to go and I'll remind you."
 
 # Mini tips: these go out at specific instances. Like when a user takes an action
 
