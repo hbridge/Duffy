@@ -1,5 +1,6 @@
 import datetime
 import json
+import random
 
 from peanut.settings import constants
 import pytz
@@ -270,7 +271,7 @@ def sendCompletionResponse(user, entry, followups, keeperNumber):
 		if not user.isTutorialComplete():
 			toSend = toSend + " (If that time doesn't work, just tell me what time is better.)"
 		else:
-			toSend = toSend + " " + keeper_strings.FOLLOWUP_TIME_TEXT
+			toSend = toSend + " " + random.choice(keeper_strings.FOLLOWUP_TIME_TEXT)
 
 	# sharing followups
 	if user.isTutorialComplete():

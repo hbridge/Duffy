@@ -15,7 +15,8 @@ INTRO_MESSAGES = [
 		u"Yo! I'm Keeper, I can help you remember things any time."
 	],
 	[
-		"Let me show you how I can help you. First, what's your name?",
+		u"Let me show you how I can help you. First, what's your name?",
+		u"First thing's first, what's your name?",
 	],
 ]
 
@@ -41,28 +42,44 @@ ASK_FOR_ZIPCODE_TEXT = u"What's your zipcode? It'll help me remind you of things
 ASK_FOR_POSTAL_CODE_TEXT = u"What's your postal/zip code? It'll help me remind you of things at the right time \U0001F553"  # used for non-US phone numbers
 
 ZIPCODE_NOT_VALID_TEXT = [
-	"Sorry, I don't know that zipcode. Could you check that?",
-	"Hmm, that doesn't sound familiar. Mind sending again?"
+	u"Sorry, I don't know that zipcode. Could you check that?",
+	u"Hmm, that doesn't sound familiar. Mind sending your zip again?"
 ]
+
 ASK_AGAIN_FOR_ZIPCODE_TEXT = "Got it, but first thing, what's your zipcode?"
 
 # When a user sets their *first* reminder and don't give us time, we ask them to clarify
 ASK_FOR_TIME_TEXT = [
-	"Great, and when would you like to be reminded?",
-	"Perfect, what time would you like to be reminded?",
-	"Cool, what time should I remind you?"
+	u"Great, and when would you like to be reminded?",
+	u"Perfect, what time would you like to be reminded?",
+	u"Cool, what time should I remind you?",
+	u"Noted! What time would you like to be reminded?"
 ]
 
+# Note that this and TUTORIAL_ADD_FIRST_REMINDER_TEXT go out together at this point in the tutorial
 TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT = [
 	u"\U0001F44F Thanks! Let's add something you need to get done. \u2705",
-	u"Thanks! Let's get this to do list started."
+	u"Thanks! Let's get this to do list started.",
+	u"Name some stuff you need to get done, and I'll remind you.",
 ]
-TUTORIAL_ADD_FIRST_REMINDER_TEXT = u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'."
-TUTORIAL_STUDENT_ADD_FIRST_REMINDER_TEXT = u"What's an item on your todo list right now? You can say things like 'Submit club dues on Friday' or 'Meet with advisor on Monday at 4pm'."
+
+# Immediately follows one of the above lines
+TUTORIAL_ADD_FIRST_REMINDER_TEXT = [
+	u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'.",
+]
+
+# Student-only tutorial: Immediately follows one of the above lines in TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT
+TUTORIAL_STUDENT_ADD_FIRST_REMINDER_TEXT = [
+	u"What's an item on your todo list right now? You can say things like 'Submit club dues on Friday' or 'Meet with advisor on Monday at 4pm'.",
+	u"What's on your todo list right now? Things like 'finish homework by 4' or 'walk the dog tonight' are some examples.",
+]
 
 TUTORIAL_DONE_TEXT = u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do?"
 
-TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT = u"Oh and here's my card. Tap it to save me to your address book. I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E"
+TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT = [
+	u"Oh and here's my card. Tap it to save me to your address book. I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E",
+	u"BTW, here's my info. Tap it to save me to your address book :ok_hand:",
+]
 TUTORIAL_MORNING_DIGEST_ONLY_TEXT = u"Oh and I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks."  # used for whatsapp users
 
 
@@ -73,13 +90,36 @@ TUTORIAL_MORNING_DIGEST_ONLY_TEXT = u"Oh and I'll also send you a morning txt \U
 
 # These is the first line of the digest, one per day of the week.
 REMINDER_DIGEST_HEADERS = [
-	[u":sunrise: G'morning sunshine",],  # copy for Monday
-	[u"Tuesday, it is \U000026F2",],  # copy for Tuesday
-	[u"Wednesday is here already!",],  # Wednesday
-	[u"How did Thursday sneak up on us? :cat:",],  # Thursday
-	[u"Friday funday! :party_popper:",],  # Friday
-	[u"It's sit-around-day \U0001F344", ":wavy_dash:Saturday vibes:wavy_dash:"],  # Saturday
-	[u"Sunday Sunday Sunday! \U0001F366", "Sunday funday! :raised_hands:"],  # Sunday
+	[  # copy for Monday
+		u":sunrise: G'morning sunshine",
+		u"Rise 'n grind, Monday is here :sunny:",
+		u"Good morning, %s!",
+	],
+	[  # copy for Tuesday
+		u"Tuesday, it is \U000026F2",
+		u"Happy Tuesday, %s! :v:",
+	],
+	[  # copy for Wednesday
+		u"Wednesday is here already!",
+		u"How is it already Wednesday? :eyes:",
+	],
+	[  # copy for Thursday
+		u"How did Thursday sneak up on us? :cat:",
+		u"How is it already Wednesday? :eyes:"],
+	[  # copy for Friday
+		u"Friday funday! :party_popper:",
+		u"TGIF :tada:",
+	],
+	[  # copy for Saturday
+		u"It's sit-around-day \U0001F344",
+		u":wavy_dash:Saturday vibes:wavy_dash:",
+		u"Ahh, Saturday... The best day of the week.",
+	],
+	[  # copy for Sunday
+		u"Sunday Sunday Sunday! \U0001F366",
+		u"Sunday funday! :raised_hands:",
+		u"Good morning!",
+	],
 ]
 
 # if there are tasks, begin with this header
@@ -89,13 +129,27 @@ DIGEST_HEADER_USER_REQUESTED = u"Your current tasks: \U0001F4DD"  # this means u
 
 # If there are no tasks, this line is shown. One per day of the week.
 REMINDER_DIGEST_EMPTY = [
-	[u"Start the week off right. Tell me what you need to get done this week! \U0001F60E",], #  For Monday
-	[u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",], #  For Tuesday
-	[u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",], #  For Wednesday
-	[u"Empty day. Surely, there is something you need me to track? \U0001F62E",],  # For Thursday
-	[u"No tasks for today. Then, again Fridays should be free days. \U0001F61B",],  # For Friday
-	[u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",],  # For Saturday
-	[u"Last day of the week to get stuff done! \U0001F636",],  # For Sunday
+	[  # Monday
+		u"Start the week off right. Tell me what you need to get done! \U0001F60E",
+	],
+	[  # Tuesday
+		u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",
+	],
+	[  # Wednesday
+		u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",
+	],
+	[  # Thursday
+		u"Empty day. Surely, there's something you need me help with? \U0001F62E",
+	],
+	[  # Friday
+		u"No tasks for today. Then again, Fridays should be free days. \U0001F61B",
+	],
+	[  # Saturday
+		u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",
+	],
+	[  # Sunday
+		u"Last day of the week to get stuff done! \U0001F636",
+	],
 ]
 
 USER_REQUESTED_DIGEST_EMPTY = [
@@ -123,21 +177,27 @@ SWEEP_MESSAGE_TEXT = "Btw, I moved these old tasks to %s to keep your list fresh
 # REMINDER MESSAGES
 #########################
 
-# Prefixes when reminders go out. Ex: "Hi there: Wanted to remind you: take out trash"
+# Prefixes when a reminder goes out. Note these have to singular Ex: "Hi there: Wanted to remind you: take out trash"
 REMINDER_PHRASES = [
 	u"Reminder for you:",
 	u"Reminder:",
 	u"Hi there! Wanted to remind you: ",
 	u"Hello. Friendly reminder: ",
-	u"Hi! You wanted me to remind you:",
 	u"Hi! Don't forget:",
 ]
 
 # When you set a reminder, we ask you if you prefer another time.
-FOLLOWUP_TIME_TEXT = "If there's a better time, just tell me."
+FOLLOWUP_TIME_TEXT = [
+	u"If there's a better time, just tell me.",
+	u"Need this reminder at another time? Just let me know.",
+	u"If there's a better time to remind you, just let me know.",
+]
 
 # Used when you say "Done with mom" and we can't tell which entry you mean
-ENTRY_NOT_FOUND_TEXT = "Sorry, I'm not sure what entry you mean. Could you rephrase?"
+ENTRY_NOT_FOUND_TEXT = [
+	u"Sorry, I'm not sure what entry you mean. Could you rephrase?"
+	u"Didn't catch that, mind rephrasing?"
+]
 
 
 

@@ -1,4 +1,5 @@
 import logging
+import random
 
 from smskeeper import entry_util, sms_util, actions, chunk_features, msg_util
 from smskeeper import keeper_constants, keeper_strings
@@ -59,7 +60,7 @@ class CompleteTodoSpecificAction(Action):
 			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_DONE, sendMsg=False, doAlert=True)
 
 			if not daytime:
-				sms_util.sendMsg(user, keeper_strings.ENTRY_NOT_FOUND_TEXT, None, user.getKeeperNumber())
+				sms_util.sendMsg(user, random.choice(keeper_strings.ENTRY_NOT_FOUND_TEXT), None, user.getKeeperNumber())
 
 		analytics.logUserEvent(
 			user,

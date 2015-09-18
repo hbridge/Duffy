@@ -106,7 +106,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# else ignore
 				return True, keeper_constants.CLASS_NONE, actionScores
 
-		sms_util.sendMsgs(user, [random.choice(keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT), keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT], keeperNumber)
+		sms_util.sendMsgs(user, [random.choice(keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT), random.choice(keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT)], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
@@ -136,7 +136,7 @@ def process(user, msg, requestDict, keeperNumber):
 
 		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
 		if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
-			sms_util.sendMsg(user, keeper_strings.TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT, keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
+			sms_util.sendMsg(user, random.choice(keeper_strings.TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT), keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
 		else:
 			sms_util.sendMsg(user, keeper_strings.TUTORIAL_MORNING_DIGEST_ONLY_TEXT, None, eta=delayedTime)
 
