@@ -9,7 +9,7 @@ DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py
 DJANGO_SETTINGS_MODULE=peanut.settings.dev /home/ubuntu/env/bin/python manage.py syncdb
 cd smskeeper/web
 npm install
-node_modules/.bin/gulp
+node_modules/.bin/gulp development
 sudo apachectl -k restart
 EOF
 
