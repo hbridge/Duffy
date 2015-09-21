@@ -94,11 +94,11 @@ REMINDER_DIGEST_HEADERS = [
 	[  # copy for Monday
 		u":sunrise: G'morning sunshine",
 		u"Rise 'n grind, Monday is here :sunny:",
-		u"Good morning, %s!",
+		u"Good morning, :NAME:!",
 	],
 	[  # copy for Tuesday
 		u"Tuesday, it is \U000026F2",
-		u"Happy Tuesday, %s! :v:",
+		u"Happy Tuesday, :NAME:! :v:",
 	],
 	[  # copy for Wednesday
 		u"Wednesday is here already!",
