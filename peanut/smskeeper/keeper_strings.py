@@ -34,7 +34,7 @@ ASK_AGAIN_FOR_NAME = [
 ]
 GOT_NAME_RESPONSE = [
 	u"Great, nice to meet you %s! \U0001F44B",
-	u"Thanks, %s!. Awesome to meet you. :wave:",
+	u"Thanks, %s! Awesome to meet you. :wave:",
 	u"Thanks! I'm sure we'll be great friends, %s!",
 ]
 
