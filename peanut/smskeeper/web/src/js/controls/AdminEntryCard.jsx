@@ -2,7 +2,7 @@ var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
 var emoji = require("node-emoji");
-var moment = require("moment");
+var moment = require("moment-timezone");
 var BackboneReactComponent = require('backbone-react-component');
 
 var Bootstrap = require('react-bootstrap');
