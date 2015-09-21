@@ -33,6 +33,7 @@ module.exports = React.createClass({
     for (var i = 0; i < cannedResponses.length; i++) {
       result.push(
         <MenuItem
+          key={i}
           eventKey={i}
           onSelect={this.crSelected}
         >

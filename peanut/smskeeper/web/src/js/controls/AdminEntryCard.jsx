@@ -55,7 +55,7 @@ module.exports = React.createClass({
 		    				defaultValue={this.state.model.remind_recur}
 		    			>
 		    				{this.props.model.recurOptions().map(function(option){
-		    					return (<option value={option.value}>{option.longText}</option>);
+		    					return (<option value={option.value} key={option.value}>{option.longText}</option>);
 		    				})};
     					</Input>
     					<Input ref="hidden" type='checkbox' label="Hidden" defaultChecked={this.state.model.hidden}/>
