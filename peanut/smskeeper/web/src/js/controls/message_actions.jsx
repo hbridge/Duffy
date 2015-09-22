@@ -42,8 +42,14 @@ module.exports = React.createClass({
       var text = option.text;
       if (this.state.message && this.state.message.get("classification_scores")) {
         var score = this.state.message.get("classification_scores")[option.value];
+        var smartScores = this.state.message.get("classification_scores")["smrt"];
+        if (smartScores) {
+          var smartScore = smartScores[option.value];
+        }
         if (score != undefined) {
-          text = text + " (" + score.toFixed(1) + ")"
+          text = text + " (" + score.toFixed(1);
+          if (smartScore) text = text + ", smart: " + smartScore.toFixed(1);
+          text = text + ")";
         }
       }
 
