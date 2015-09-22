@@ -54,8 +54,10 @@ class FeatureGenerator():
 		classified_messages = json.loads(response)
 
 		harness = EngineSimHarness()
+		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+		outputFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'features.csv'
 
-		with open('output.csv', 'w') as csvfile:
+		with open(outputFileLoc, 'w') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
 			headersOut = False
@@ -98,7 +100,7 @@ def main(argv):
 	print "Donezo!"
 
 if __name__ == "__main__":
-	logging.basicConfig(filename='/mnt/log/massSMS.log',
+	logging.basicConfig(filename='/mnt/log/createFeatures.log',
 						level=logging.DEBUG,
 						format='%(asctime)s %(levelname)s %(message)s')
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR)

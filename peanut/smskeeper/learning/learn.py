@@ -1,9 +1,19 @@
+import os
+import sys
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import cross_validation
 import numpy as np
 import scipy as sp
 import csv
 from sklearn.externals import joblib
+
+parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0], "..")
+
+if parentPath not in sys.path:
+    sys.path.insert(0, parentPath)
+
+from smskeeper import keeper_constants
 
 
 def llfun(act, pred):
@@ -16,8 +26,11 @@ def llfun(act, pred):
 
 
 def main():
+    parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+    featuresLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'features.csv'
+
     # read in  data, parse into training and target sets
-    dataset = np.genfromtxt(open('output.csv', 'r'), delimiter=',')[1:]
+    dataset = np.genfromtxt(open(featuresLoc, 'r'), delimiter=',')[1:]
     target = np.array([x[-1] for x in dataset])
     train = np.array([x[:-2] for x in dataset])
 
@@ -37,9 +50,12 @@ def main():
 
     # print out the mean of the cross-validated results
     print "Results: " + str(np.array(results).mean())
-    joblib.dump(cfr, 'smskeeper/learning/models/model')
 
-    with open('output.csv', 'r') as csvfile:
+    parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+    joblib.dump(cfr, parentPath + keeper_constants.LEARNING_DIR_LOC + 'model')
+
+    # output the headers
+    with open(featuresLoc, 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         done = False
         for row in reader:
