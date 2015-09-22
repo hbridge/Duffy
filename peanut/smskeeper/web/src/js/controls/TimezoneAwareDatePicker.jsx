@@ -1,5 +1,5 @@
-React = require('react');
-DateTimePicker = require('react-bootstrap-datetimepicker');
+var React = require('react');
+var DateTimePicker = require('react-bootstrap-datetimepicker');
 var moment = require("moment-timezone");
 var Bootstrap = require('react-bootstrap');
   Button = Bootstrap.Button;
