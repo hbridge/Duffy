@@ -98,7 +98,7 @@ REMINDER_DIGEST_HEADERS = [
 	],
 	[  # copy for Tuesday
 		u"Tuesday, it is \U000026F2",
-		u"Happy Tuesday, :NAME:! :v:",
+		u"Happy Tuesday :v:",
 	],
 	[  # copy for Wednesday
 		u"Wednesday is here already!",
