@@ -69,6 +69,8 @@ class SmrtEngine:
 	def __init__(self, actionList, minScore):
 		self.actionList = actionList
 		self.minScore = minScore
+
+		logger.info("Loading model for SMRT")
 		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
 		self.model = joblib.load(parentPath + keeper_constants.LEARNING_DIR_LOC + 'model')
@@ -81,6 +83,7 @@ class SmrtEngine:
 				if not done:
 					self.headers = row
 				done = True
+		logger.info("Done loading model")
 
 	def getActionFromCode(self, code):
 		for entry in keeper_constants.CLASS_MENU_OPTIONS:
