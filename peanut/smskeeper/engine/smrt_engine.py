@@ -1,6 +1,7 @@
 import logging
 import csv
 import os
+import operator
 
 from smskeeper import keeper_constants
 from smskeeper.engine.stop import StopAction
@@ -70,9 +71,10 @@ class SmrtEngine:
 		self.minScore = minScore
 		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
-		self.model = joblib.load(parentPath + '/learning/models/model')
+		self.model = joblib.load(parentPath + keeper_constants.LEARNING_DIR_LOC + 'model')
 
-		with open(parentPath + '/learning/models/headers.csv', 'r') as csvfile:
+		headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
+		with open(headersFileLoc, 'r') as csvfile:
 			reader = csv.reader(csvfile, delimiter=',')
 			done = False
 			for row in reader:
@@ -90,6 +92,23 @@ class SmrtEngine:
 					return action
 		return None
 
+	def getScoresByAction(self, scores):
+		result = dict()
+		nparr = scores[0]
+
+		for code in range(len(nparr)):
+			action = self.getActionFromCode(code)
+			if action:
+				score = nparr[code]
+				result[action] = float("{0:.2f}".format(score))
+		return result
+
+	def getScoresByActionName(self, scoresByAction):
+		result = dict()
+		for action, score in scoresByAction.iteritems():
+			result[action.ACTION_CLASS] = score
+		return result
+
 	def process(self, user, chunk, overrideClassification=None, simulate=False):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
@@ -102,25 +121,28 @@ class SmrtEngine:
 		for header in self.headers[:-2]:
 			data.append(featuresDict[header])
 
-		prediction = self.model.predict(data)
+		scores = self.model.predict_proba(data)
+		scoresByAction = self.getScoresByAction(scores)
+		scoresByActionName = self.getScoresByActionName(scoresByAction)
 
-		predictionCode = int(prediction[0])
-		action = self.getActionFromCode(predictionCode)
+		for actionName, score in sorted(scoresByActionName.items(), key=operator.itemgetter(1), reverse=True):
+			logger.info("User %s: SMRT Action %s got score %s" % (user.id, actionName, score))
 
-		if action and not simulate:
-			logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
-			processed = action.execute(chunk, user)
+		processed = False
+
+		for action, score in sorted(scoresByAction.items(), key=operator.itemgetter(1), reverse=True):
+			if processed or simulate:
+				break
+
+			if score < self.minScore:
+				logger.info("User %s: SMRT For msg '%s' got highest score of %s for action %s but below min of %s" % (user.id, chunk.originalText, score, action.ACTION_CLASS, self.minScore))
+				return False, keeper_constants.CLASS_UNKNOWN, None
+
+			if not simulate:
+				logger.info("User %s: SMRT I think '%s' is a %s command, executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
+				processed = action.execute(chunk, user)
 
 		if processed or simulate:
-			return True, action.ACTION_CLASS, []
+			return True, action.ACTION_CLASS, scoresByActionName
 
 		return False, keeper_constants.CLASS_UNKNOWN, None
-
-
-	def getActionScores(self, sortedActionsByScore):
-		result = dict()
-		for score, actions in sortedActionsByScore.iteritems():
-			for action in actions:
-				result[action.ACTION_CLASS] = score
-		return result
-

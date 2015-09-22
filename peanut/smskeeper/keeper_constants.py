@@ -305,11 +305,11 @@ CLASS_MENU_OPTIONS = ([
 
 ALL_CLASS_OPTIONS = map(lambda option: option["value"], CLASS_MENU_OPTIONS)
 
-OUTGOING_DIGEST = "digest"
-OUTGOING_SURVEY = "survey"
-OUTGOING_REMINDER = "reminder"
-OUTGOING_JOKE = "joke"
-OUTGOING_CHANGE_DIGEST_TIME = "change-digest-time"
+OUTGOING_DIGEST = "outgoing-digest"
+OUTGOING_SURVEY = "outgoing-survey"
+OUTGOING_REMINDER = "outgoing-reminder"
+OUTGOING_JOKE = "outgoing-joke"
+OUTGOING_CHANGE_DIGEST_TIME = "outgoing-change-digest-time"
 OUTGOING_SHARE_PROMPT = "outgoing-share-prompt"
 OUTGOING_UNKNOWN = "outgoing-unknown"
 
@@ -367,3 +367,5 @@ LAST_JOKE_SENT_KEY = "last-joke-sent"
 JOKE_STEP_KEY = "step"  # This should be changed to joke-step at some point
 JOKE_NUM_KEY = "joke-num"
 JOKE_COUNT_KEY = "joke-recent-count"  # Jokes sent that day
+
+LEARNING_DIR_LOC = "/learning/models/"

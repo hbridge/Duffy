@@ -13,6 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import mechanize
 from smskeeper import keeper_constants
 from smskeeper.engine.engine_harness import EngineSimHarness
+from smskeeper.engine.smrt_engine import SmrtEngine
 from smskeeper.models import Message
 from smskeeper.scripts import importZipdata
 from smskeeper.tests import test_base
@@ -88,7 +89,8 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 		classified_messages = json.loads(response)
 
-		harness = EngineSimHarness()
+		engine = SmrtEngine(SmrtEngine.DEFAULT, 0.0)
+		harness = EngineSimHarness(engine)
 
 		for message in classified_messages:
 			try:

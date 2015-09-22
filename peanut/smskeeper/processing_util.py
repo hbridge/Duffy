@@ -13,6 +13,7 @@ from smskeeper.chunk import Chunk
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
 from smskeeper.engine import Engine
+from smskeeper.engine.smrt_engine import SmrtEngine
 
 logger = logging.getLogger(__name__)
 
@@ -95,9 +96,12 @@ def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber
 			logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
 	return True
 
+keeperEngine = Engine(Engine.DEFAULT, 0.0)
+smrtEngine = SmrtEngine(SmrtEngine.DEFAULT, .1)
 
-def processWithEngine(user, msgs, messageObject):
-	keeperEngine = Engine(Engine.DEFAULT, 0.0)
+
+def processWithEngine(user, msgs, messageObject, useSMRT):
+
 	multichunk = len(msgs) > 1
 
 	if multichunk:
@@ -116,7 +120,11 @@ def processWithEngine(user, msgs, messageObject):
 		lineCount = 0
 		for msg in msgs:
 			chunk = Chunk(msg, True, lineCount)
-			chunkProcessed, classification, actionScores = keeperEngine.process(user, chunk)
+
+			if useSMRT:
+				chunkProcessed, classification, actionScores = smrtEngine.process(user, chunk)
+			else:
+				chunkProcessed, classification, actionScores = keeperEngine.process(user, chunk)
 
 			if not chunkProcessed:
 				allProcessed = False
@@ -134,11 +142,25 @@ def processWithEngine(user, msgs, messageObject):
 		# We don't record the classification on the message since it was multi-line
 	else:
 		chunk = Chunk(msgs[0])
-		processed, classification, actionScores = keeperEngine.process(
-			user,
-			chunk,
-			overrideClassification=messageObject.classification
-		)
+		if useSMRT:
+			processed, classification, actionScores = smrtEngine.process(
+				user,
+				chunk,
+				overrideClassification=messageObject.classification
+			)
+		else:
+			processed, classification, actionScores = keeperEngine.process(
+				user,
+				chunk,
+				overrideClassification=messageObject.classification
+			)
+
+			ignore1, ignore2, smrtActionScores = smrtEngine.process(
+				user,
+				chunk,
+				simulate=True
+			)
+			actionScores["smrt"] = smrtActionScores
 
 		messageObject.auto_classification = classification
 		messageObject.classification_scores_json = json.dumps(actionScores)
@@ -154,7 +176,7 @@ def processWithEngine(user, msgs, messageObject):
 		messageObject.save()
 
 
-def processMessage(phoneNumber, msg, requestDict, keeperNumber):
+def processMessage(phoneNumber, msg, requestDict, keeperNumber, useSMRT=False):
 	user, created = getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber)
 
 	# This is true if this is from a manual entry off the history page
@@ -203,7 +225,7 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber):
 
 		# We might have changed state to NORMAL and it didn't process...so now use engine
 		if not processed:
-			processWithEngine(user, msgs, messageObject)
+			processWithEngine(user, msgs, messageObject, useSMRT)
 	else:
 		if user.paused:
 			logger.debug("User %s: not processing '%s' because they are paused" % (user.id, msg))

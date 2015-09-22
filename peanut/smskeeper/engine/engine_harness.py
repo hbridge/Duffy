@@ -8,13 +8,15 @@ from smskeeper import processing_util, keeper_constants, chunk_features
 from smskeeper.chunk import Chunk
 from smskeeper.models import Entry
 from smskeeper.models import User
-from smskeeper.engine import Engine
 
 logger = logging.getLogger(__name__)
 
 
 class EngineSimHarness():
 	entriesCount = 0
+
+	def __init__(self, engine=None):
+		self.engine = engine
 
 	@patch('common.date_util.utcnow')
 	@patch('smskeeper.models.User.wasRecentlySentMsgOfClass')
@@ -34,8 +36,7 @@ class EngineSimHarness():
 		# actually score the message
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
 		chunk = Chunk(lines[0])  # only process first line for now
-		engine = Engine(Engine.DEFAULT, 0.0)
-		processed, classification, actionScores = engine.process(user, chunk, simulate=True)
+		processed, classification, actionScores = self.engine.process(user, chunk, simulate=True)
 
 		# set the correct classification for the message object
 		return classification, actionScores

@@ -43,7 +43,7 @@ def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False, keeperNumber
 	if cli:
 		keeperNumber = constants.SMSKEEPER_CLI_NUM
 
-	processing_util.processMessage(phoneNumber, msg, jsonDict, keeperNumber)
+	processing_util.processMessage(phoneNumber, msg, jsonDict, keeperNumber, False)
 
 
 def main():
