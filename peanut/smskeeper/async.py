@@ -258,7 +258,7 @@ def cleanUpRecurringReminders(user, pendingEntries):
 	return filter(lambda x: not x.hidden, pendingEntries)
 
 
-def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, overrideKeeperNumber=None):
+def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, overrideKeeperNumber=None, webFooter=False):
 	keeperNumber = user.getKeeperNumber() if overrideKeeperNumber is None else overrideKeeperNumber
 
 	# Not great at this low level but want to make sure it always gets called
@@ -271,6 +271,8 @@ def sendDigestForUser(user, pendingEntries, weatherDataCache, userRequested, ove
 
 	# We send the message here
 	msg = getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested, sweptEntries)
+	if webFooter:
+		msg += (keeper_strings.FETCH_DIGEST_FOOTER % user.getWebAppURL())
 
 	sendToSlack = userRequested
 	sms_util.sendMsg(user, msg, None, keeperNumber, classification=keeper_constants.OUTGOING_DIGEST, sendToSlack=sendToSlack)
@@ -388,7 +390,7 @@ def sendAllRemindersForUserId(userId, overrideKeeperNumber=None):
 	user = User.objects.get(id=userId)
 	pendingEntries = user_util.pendingTodoEntries(user, includeAll=True)
 
-	sendDigestForUser(user, pendingEntries, dict(), True, overrideKeeperNumber=overrideKeeperNumber)
+	sendDigestForUser(user, pendingEntries, dict(), True, overrideKeeperNumber=overrideKeeperNumber, webFooter=True)
 
 
 @app.task

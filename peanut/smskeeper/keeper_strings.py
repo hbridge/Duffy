@@ -172,6 +172,8 @@ CHANGE_MORNING_DIGEST_TIME_TEXT = "Great, I'll send you a daily summary at %s fo
 # When we move the old tasks off your daily list
 SWEEP_MESSAGE_TEXT = "Btw, I moved these old tasks to %s to keep your list fresh:\n"
 
+# when people manually request their tasks, we add this to the bottom to tell them how they can manage on the web
+FETCH_DIGEST_FOOTER = "\nYou can also see and manage your tasks at %s"
 
 
 #########################

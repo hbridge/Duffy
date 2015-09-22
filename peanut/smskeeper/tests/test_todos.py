@@ -1633,6 +1633,17 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			self.getTestUser().paused = False
 			self.getTestUser().save()
 
+	def test_digest_fetch_web_footer(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tasks")
+			self.assertIn(self.getTestUser().getWebAppURL(), self.getOutput(mock))
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tasks for today")
+			self.assertNotIn(self.getTestUser().getWebAppURL(), self.getOutput(mock))
+
+
 	def test_done_only_affects_last_created(self, dateMock):
 		self.setupUser(dateMock)
 
