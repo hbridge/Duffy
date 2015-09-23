@@ -1,6 +1,7 @@
 import json
 import logging
 import pytz
+import operator
 from datetime import timedelta
 
 from smskeeper import keeper_constants
@@ -13,7 +14,8 @@ from smskeeper.chunk import Chunk
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
 from smskeeper.engine import Engine
-#from smskeeper.engine.smrt_engine import SmrtEngine
+from smskeeper.engine.v1_scorer import V1Scorer
+from smskeeper.engine.smrt_scorer import SmrtScorer
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +62,14 @@ def processSigAndSplitLines(user, msg):
 		return lines[:len(lines) - user.signature_num_lines]
 
 
+def getScoreByActionName(actionsByScore):
+	result = dict()
+	for score, actionsList in sorted(actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
+		for action in actionsList:
+			result[action.ACTION_CLASS] = score
+	return result
+
+
 def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber):
 	# Stop, and tutorial states
 	count = 0
@@ -75,7 +85,7 @@ def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber
 		stateModule = stateCallbacks[user.state]
 
 		logger.debug("User %s: About to process '%s' with state: %s and state_data: %s" % (user.id, msg, user.state, user.state_data))
-		processed, classification, actionScores = stateModule.process(user, msg, requestDict, keeperNumber)
+		processed, classification, actionsByScore = stateModule.process(user, msg, requestDict, keeperNumber)
 
 		if processed is None:
 			raise TypeError("modules must return True or False for processed")
@@ -84,7 +94,7 @@ def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber
 			user.last_state = user.state
 			user.save()
 			messageObject.auto_classification = classification
-			messageObject.classification_scores_json = json.dumps(actionScores)
+			messageObject.classification_scores_json = json.dumps(getScoreByActionName(actionsByScore))
 			messageObject.save()
 			logger.debug("User %s: DONE with '%s' with state: %s  and state_data: %s" % (user.id, msg, user.state, user.state_data))
 
@@ -96,8 +106,13 @@ def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber
 			logger.error("User %s: Hit endless loop for msg '%s'" % (user.id, msg))
 	return True
 
+
+# These do scoring
+v1Scorer = V1Scorer(Engine.DEFAULT, 0.0)
+smrtScorer = SmrtScorer(Engine.DEFAULT, 0.0)
+
+# This does the processing
 keeperEngine = Engine(Engine.DEFAULT, 0.0)
-#smrtEngine = SmrtEngine(SmrtEngine.DEFAULT, .1)
 
 
 def processWithEngine(user, msgs, messageObject, useSMRT):
@@ -121,9 +136,11 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 			chunk = Chunk(msg, True, lineCount)
 
 			if useSMRT:
-				chunkProcessed, classification, actionScores = smrtEngine.process(user, chunk)
+				actionsByScore = smrtScorer.score(user, chunk)
 			else:
-				chunkProcessed, classification, actionScores = keeperEngine.process(user, chunk)
+				actionsByScore = v1Scorer.score(user, chunk)
+
+			chunkProcessed, classification = keeperEngine.process(user, chunk, actionsByScore)
 
 			if not chunkProcessed:
 				allProcessed = False
@@ -141,37 +158,29 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 		# We don't record the classification on the message since it was multi-line
 	else:
 		chunk = Chunk(msgs[0])
+
+		smrtActionsByScore = smrtScorer.score(user, chunk)
+		v1ActionsByScore = v1Scorer.score(user, chunk)
+
 		if useSMRT:
-			"""
-			processed, classification, actionScores = smrtEngine.process(
-				user,
-				chunk,
-				overrideClassification=messageObject.classification
-			)
-			"""
+			actionsByScore = smrtActionsByScore
 		else:
-			processed, classification, actionScores = keeperEngine.process(
-				user,
-				chunk,
-				overrideClassification=messageObject.classification
-			)
+			actionsByScore = v1ActionsByScore
 
-			"""
-
-			ignore1, ignore2, smrtActionScores = smrtEngine.process(
-				user,
-				chunk,
-				simulate=True
-			)
-			actionScores["smrt"] = smrtActionScores
-			"""
-
+		chunkProcessed, classification = keeperEngine.process(user, chunk, actionsByScore)
 
 		messageObject.auto_classification = classification
-		messageObject.classification_scores_json = json.dumps(actionScores)
+		scoreByActionName = getScoreByActionName(v1ActionsByScore)
+
+		if not useSMRT:
+			scoreByActionName["smrt"] = getScoreByActionName(smrtActionsByScore)
+
+		messageObject.classification_scores_json = json.dumps(scoreByActionName)
+
 		messageObject.save()
 
-		if not processed:
+		if not chunkProcessed:
+			logger.info("User %s: Chunk '%s' not processed, treating as unknown" % (user.id, chunk.originalText))
 			actions.unknown(user, '\n'.join(msgs), user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_ZERO_SCORE_SINGLE)
 
 	# This gets set in actions.unknown. Means that the engine didn't know something and we should

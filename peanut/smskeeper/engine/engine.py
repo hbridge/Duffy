@@ -65,33 +65,12 @@ class Engine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def process(self, user, chunk, overrideClassification=None, simulate=False):
+	def process(self, user, chunk, actionsByScore, overrideClassification=None, simulate=False):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
-			return False, None, {}
+			return False, None
 
-		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
-		actionsByScore = dict()
-		if not overrideClassification:
-			for action in self.actionList:
-				score = action.getScore(chunk, user)
-				if score not in actionsByScore:
-					actionsByScore[score] = list()
-				actionsByScore[score].append(action)
-		else:
-			logger.info("User %s: Action class overridden to %s" % (user.id, overrideClassification))
-			for action in self.actionList:
-				if action.ACTION_CLASS == overrideClassification:
-					actionsByScore[1.0] = [action]
-					break
-
-		sortedActionsByScore = collections.OrderedDict(sorted(actionsByScore.items(), reverse=True))
-		actionScores = self.getActionScores(sortedActionsByScore)
-
-		for action, score in sorted(actionScores.items(), key=operator.itemgetter(1), reverse=True):
-			logger.info("User %s: Action %s got score %s" % (user.id, action, score))
-
-		for score, actions in sortedActionsByScore.iteritems():
+		for score, actions in sorted(actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
 			if score > self.minScore:
 				if len(actions) > 1:
 					actions = self.tieBreakActions(actions)
@@ -99,16 +78,17 @@ class Engine:
 				# Pick the first one after sorting
 				# Later on we might want to look at the 'processed' return code
 				for action in actions:
-					logger.info("User %s: I think '%s' is a %s command" % (user.id, chunk.originalText, action.ACTION_CLASS))
+					logger.info("User %s: I think '%s' is a %s command...executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
 					if not simulate:
 						processed = action.execute(chunk, user)
 					else:
 						processed = True
 
 					if processed:
-						return True, action.ACTION_CLASS, actionScores
+						logger.info("User %s: Successfully processed '%s' as a %s command" % (user.id, chunk.originalText, action.ACTION_CLASS))
+						return True, action.ACTION_CLASS
 
-		return False, keeper_constants.CLASS_UNKNOWN, actionScores
+		return False, keeper_constants.CLASS_UNKNOWN
 
 	def tieBreakActions(self, actions):
 		sortedActions = list()
@@ -120,10 +100,3 @@ class Engine:
 		return sortedActions
 
 		raise NameError("Couldn't tie break")
-
-	def getActionScores(self, sortedActionsByScore):
-		result = dict()
-		for score, actions in sortedActionsByScore.iteritems():
-			for action in actions:
-				result[action.ACTION_CLASS] = score
-		return result

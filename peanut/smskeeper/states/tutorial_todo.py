@@ -14,6 +14,7 @@ from smskeeper.models import Message
 from smskeeper.chunk import Chunk
 
 from smskeeper.engine import Engine
+from smskeeper.engine.v1_scorer import V1Scorer
 
 from common import date_util
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 def process(user, msg, requestDict, keeperNumber):
-	actionScores = dict()
+	actionsByScore = dict()
 	step = user.getStateData(keeper_constants.TUTORIAL_STEP_KEY)
 
 	if step:
@@ -38,12 +39,15 @@ def process(user, msg, requestDict, keeperNumber):
 		}
 	)
 
+	v1Scorer = V1Scorer(Engine.TUTORIAL_BASIC, 0.5)
 	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
 	chunk = Chunk(msg)
-	processed, classification, actionScores = keeperEngine.process(user, chunk)
+
+	actionsByScore = v1Scorer.score(user, chunk)
+	processed, classification = keeperEngine.process(user, chunk, actionsByScore)
 
 	if processed:
-		return True, classification, actionScores
+		return True, classification, actionsByScore
 
 	classification = None
 	# Tutorial stuff
@@ -59,7 +63,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, random.choice(keeper_strings.ASK_AGAIN_FOR_NAME), None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 			else:
 				user.name = msg.strip(string.punctuation)
 
@@ -84,10 +88,10 @@ def process(user, msg, requestDict, keeperNumber):
 
 		if postalCode:
 			timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
-			logger.debug("%s, %s, %s"%(timezone, wxcode, tempFormat))
+			logger.debug("%s, %s, %s" % (timezone, wxcode, tempFormat))
 			if timezone is None:
 				sms_util.sendMsg(user, random.choice(keeper_strings.ZIPCODE_NOT_VALID_TEXT), None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 			else:
 				user.postal_code = postalCode
 				user.timezone = timezone
@@ -101,10 +105,10 @@ def process(user, msg, requestDict, keeperNumber):
 			# If we last sent a message over 2 minutes ago, then send back I'm not sure
 			if lastMessageOut.added < cutoff:
 				sms_util.sendMsg(user, keeper_strings.ASK_AGAIN_FOR_ZIPCODE_TEXT, None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 			else:
 				# else ignore
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 
 		sms_util.sendMsgs(user, [random.choice(keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT), random.choice(keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT)], keeperNumber)
 
@@ -115,16 +119,19 @@ def process(user, msg, requestDict, keeperNumber):
 		if postalCode:
 			logger.info("User %s: Ignoring '%s' since I think it has a postal code of '%s' in it and I have one already" % (user.id, msg, postalCode))
 			# ignore
-			return True, keeper_constants.CLASS_NONE, actionScores
+			return True, keeper_constants.CLASS_NONE, actionsByScore
 
+		v1Scorer = V1Scorer(Engine.TUTORIAL_STEP_2, 0.5)
 		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
 		chunk = Chunk(msg)
-		finishedWithCreate, classification, actionScores = keeperEngine.process(user, chunk)
+
+		actionsByScore = v1Scorer.score(user, chunk)
+		finishedWithCreate, classification = keeperEngine.process(user, chunk, actionsByScore)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text
 		if not finishedWithCreate:
-			return True, keeper_constants.CLASS_CREATE_TODO, actionScores
+			return True, keeper_constants.CLASS_CREATE_TODO, actionsByScore
 
 		if keeper_constants.isRealKeeperNumber(keeperNumber):
 			time.sleep(1)
@@ -162,4 +169,4 @@ def process(user, msg, requestDict, keeperNumber):
 		analytics.setUserInfo(user)
 
 	user.save()
-	return True, classification, actionScores
+	return True, classification, actionsByScore

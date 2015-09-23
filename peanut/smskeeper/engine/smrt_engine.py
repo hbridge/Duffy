@@ -28,12 +28,13 @@ from smskeeper import chunk_features
 
 logger = logging.getLogger(__name__)
 
-smrtModel = None
+
 
 
 class SmrtEngine:
 	actionList = None
 	minScore = 0.0
+	model = None
 
 	DEFAULT = ([
 		StopAction(),
@@ -68,36 +69,32 @@ class SmrtEngine:
 		CreateTodoAction(tutorial=True)
 	])
 
-	def __init__(self, actionList, minScore):
+	def __init__(self, actionList, minScore, scoreOnly=True):
 		self.actionList = actionList
 		self.minScore = minScore
 
-		global smrtModel
+		logger.info("Loading model for SMRT")
+		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+		modelPath = parentPath + keeper_constants.LEARNING_DIR_LOC + 'model'
+		logger.info("Using model path: %s " % modelPath)
+		try:
+			self.model = joblib.load(modelPath)
+		except Exception, e:
+			logger.info("Got exception %s loading model" % e)
 
-		if not smrtModel:
-			logger.info("Loading model for SMRT")
-			parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-			modelPath = parentPath + keeper_constants.LEARNING_DIR_LOC + 'model'
-			logger.info("Using model path: %s " % modelPath)
-			try:
-				smrtModel = joblib.load(modelPath)
-			except Exception, e:
-				logger.info("Got exception %s loading model" % e)
-				smrtModel = False
+		headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
+		logger.info("Using headers path: %s " % headersFileLoc)
 
-			headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
-			logger.info("Using headers path: %s " % headersFileLoc)
+		with open(headersFileLoc, 'r') as csvfile:
+			logger.info("Successfully read file")
+			reader = csv.reader(csvfile, delimiter=',')
+			done = False
+			for row in reader:
+				if not done:
+					self.headers = row
+				done = True
 
-			with open(headersFileLoc, 'r') as csvfile:
-				logger.info("Successfully read file")
-				reader = csv.reader(csvfile, delimiter=',')
-				done = False
-				for row in reader:
-					if not done:
-						self.headers = row
-					done = True
-
-			logger.info("Done loading model")
+		logger.info("Done loading model")
 
 	def getActionFromCode(self, code):
 		for entry in keeper_constants.CLASS_MENU_OPTIONS:
@@ -126,16 +123,7 @@ class SmrtEngine:
 			result[action.ACTION_CLASS] = score
 		return result
 
-	def process(self, user, chunk, overrideClassification=None, simulate=False):
-		global smrtModel
-
-		if not smrtModel:
-			return False, keeper_constants.CLASS_UNKNOWN, None
-
-		# TODO when we implement start in the engine this check needs to move
-		if user.state == keeper_constants.STATE_STOPPED:
-			return False, None, {}
-
+	def score(self, user, chunk):
 		features = chunk_features.ChunkFeatures(chunk, user)
 		featuresDict = chunk_features.getFeaturesDict(features)
 
@@ -143,12 +131,18 @@ class SmrtEngine:
 		for header in self.headers[:-2]:
 			data.append(featuresDict[header])
 
-		scores = smrtModel.predict_proba(data)
+		scores = self.model.predict_proba(data)
 		scoresByAction = self.getScoresByAction(scores)
 		scoresByActionName = self.getScoresByActionName(scoresByAction)
 
 		for actionName, score in sorted(scoresByActionName.items(), key=operator.itemgetter(1), reverse=True):
 			logger.info("User %s: SMRT Action %s got score %s" % (user.id, actionName, score))
+
+		return scoresByAction
+
+	def process(self, user, chunk, overrideClassification=None, simulate=False):
+		scoresByAction = self.score(user, chunk)
+		scoresByActionName = self.getScoresByActionName(scoresByAction)
 
 		processed = False
 

@@ -12,6 +12,7 @@ from smskeeper.models import Message
 from smskeeper.chunk import Chunk
 
 from smskeeper.engine import Engine
+from smskeeper.engine.v1_scorer import V1Scorer
 
 from common import date_util
 
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def process(user, msg, requestDict, keeperNumber):
-	actionScores = dict()
+	actionsByScore = dict()
 	step = user.getStateData(keeper_constants.TUTORIAL_STEP_KEY)
 
 	if step:
@@ -36,12 +37,15 @@ def process(user, msg, requestDict, keeperNumber):
 		}
 	)
 
+	v1Scorer = V1Scorer(Engine.TUTORIAL_BASIC, 0.5)
 	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
 	chunk = Chunk(msg)
-	processed, classification, actionScores = keeperEngine.process(user, chunk)
+
+	actionsByScore = v1Scorer.score(user, chunk)
+	processed, classification = keeperEngine.process(user, chunk, actionsByScore)
 
 	if processed:
-		return True, classification, actionScores
+		return True, classification, actionsByScore
 
 	classification = None
 	# Tutorial stuff
@@ -57,7 +61,7 @@ def process(user, msg, requestDict, keeperNumber):
 			# If there's more than two words, then reject
 			if len(msg.split(' ')) > 2:
 				sms_util.sendMsg(user, u"We'll get to that, but first what's your name?", None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 			else:
 				user.name = msg.strip(string.punctuation)
 
@@ -85,7 +89,7 @@ def process(user, msg, requestDict, keeperNumber):
 			if timezone is None:
 				response = "Sorry, I don't know that zipcode. Could you check that?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 			else:
 				user.postal_code = postalCode
 				user.timezone = timezone
@@ -100,10 +104,10 @@ def process(user, msg, requestDict, keeperNumber):
 			if lastMessageOut.added < cutoff:
 				response = "Got it, but first thing, what's your zipcode?"
 				sms_util.sendMsg(user, response, None, keeperNumber)
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 			else:
 				# else ignore
-				return True, keeper_constants.CLASS_NONE, actionScores
+				return True, keeper_constants.CLASS_NONE, actionsByScore
 
 		sms_util.sendMsgs(user, [u"\U0001F44F Thanks! Let's create a reminder \u2705  What medicine do you need and when?", u"You can say things like 'remind me to take vitamins at 10am everyday' or 'Remind me to take Ibuprofen 3 times a day'"], keeperNumber)
 
@@ -114,16 +118,19 @@ def process(user, msg, requestDict, keeperNumber):
 		if postalCode:
 			logger.info("User %s: Ignoring '%s' since I think it has a postal code of '%s' in it and I have one already" % (user.id, msg, postalCode))
 			# ignore
-			return True, keeper_constants.CLASS_NONE, actionScores
+			return True, keeper_constants.CLASS_NONE, actionsByScore
 
+		v1Scorer = V1Scorer(Engine.TUTORIAL_STEP_2, 0.5)
 		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
 		chunk = Chunk(msg)
-		finishedWithCreate, classification, actionScores = keeperEngine.process(user, chunk)
+
+		actionsByScore = v1Scorer.score(user, chunk)
+		finishedWithCreate, classification = keeperEngine.process(user, chunk, actionsByScore)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text
 		if not finishedWithCreate:
-			return True, keeper_constants.CLASS_CREATE_TODO, actionScores
+			return True, keeper_constants.CLASS_CREATE_TODO, actionsByScore
 
 		if keeper_constants.isRealKeeperNumber(keeperNumber):
 			time.sleep(1)
@@ -152,4 +159,4 @@ def process(user, msg, requestDict, keeperNumber):
 		analytics.setUserInfo(user)
 
 	user.save()
-	return True, classification, actionScores
+	return True, classification, actionsByScore
