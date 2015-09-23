@@ -48,7 +48,7 @@ module.exports = React.createClass({
         }
         if (score != undefined) {
           text = text + " (" + score.toFixed(1);
-          if (smartScore) text = text + ", smart: " + smartScore.toFixed(1);
+          if (smartScore) text = text + ", smrt: " + smartScore.toFixed(2);
           text = text + ")";
         }
       }
