@@ -146,7 +146,7 @@ def handleRequestsUsing(scoreFunc):
 
 
 def main():
-	logger.info("Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
+	logger.info("Server Starts - Init %s:%s" % (HOST_NAME, PORT_NUMBER))
 
 	server_address = (HOST_NAME, PORT_NUMBER)
 
@@ -154,7 +154,7 @@ def main():
 
 	handler = handleRequestsUsing(smrtScorer.score)
 	httpd = HTTPServer(server_address, handler)
-	logger.info("Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
+	logger.info("Server Starts - Running %s:%s" % (HOST_NAME, PORT_NUMBER))
 	httpd.serve_forever()
 
 if __name__ == '__main__':
