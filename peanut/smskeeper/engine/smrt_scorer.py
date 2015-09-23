@@ -5,6 +5,7 @@ import json
 import urllib
 from urllib2 import URLError
 
+from smskeeper import chunk_features
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +30,14 @@ class SmrtScorer():
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
 		actionsByScore = dict()
 
+		features = chunk_features.ChunkFeatures(chunk, user)
+		featuresDict = chunk_features.getFeaturesDict(features)
+
 		# converting back to utf-8 for urllib
 		params = {"msg": unicode(chunk.originalText).encode('utf-8')}
 
 		params["userId"] = str(user.id)
+		params["featuresDict"] = json.dumps(featuresDict)
 
 		smrtServerUrl = "http://localhost:%s/?%s" % (self.smrtServerPort, urllib.urlencode(params))
 

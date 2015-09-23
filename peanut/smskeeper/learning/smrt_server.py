@@ -18,11 +18,8 @@ import django
 django.setup()
 
 from smskeeper import keeper_constants
-from smskeeper.chunk import Chunk
-from smskeeper.models import User
 
 from sklearn.externals import joblib
-from smskeeper import chunk_features
 
 
 logger = logging.getLogger(__name__)
@@ -60,16 +57,17 @@ class SmrtServerHTTPRequestHandler(BaseHTTPRequestHandler):
 				msg = urldata["msg"][0]
 				response["msg"] = msg
 
-				user = User.objects.get(id=userId)
-				chunk = Chunk(unicode(msg))
+				featuresDictStr = urldata["featuresDict"][0]
 
-				scoresByAction = self.scoreFunc(user, chunk)
+				logger.info("User %s: For msg '%s' got features %s" % (userId, msg, featuresDictStr))
+				featuresDict = json.loads(featuresDictStr)
+				scoresByAction = self.scoreFunc(userId, msg, featuresDict)
 
 				response["scores"] = scoresByAction
 			except Exception, e:
 				response["result"] = False
 				response["error"] = str(e)
-				print(traceback.format_exc())
+				logger.error(traceback.format_exc())
 
 		else:
 			response["result"] = False
@@ -106,10 +104,8 @@ class SmrtScorer():
 
 		logger.info("Done loading model")
 
-	def score(self, user, chunk):
-		logger.info("User %s: Scoring msg '%s'" % (user.id, chunk.originalText))
-		features = chunk_features.ChunkFeatures(chunk, user)
-		featuresDict = chunk_features.getFeaturesDict(features)
+	def score(self, userId, msg, featuresDict):
+		logger.info("User %s: Scoring msg '%s'" % (userId, msg))
 
 		data = list()
 		for header in self.headers[:-2]:
@@ -119,7 +115,7 @@ class SmrtScorer():
 		scoresByActionName = self.getScoresByActionName(scores)
 
 		for actionName, score in sorted(scoresByActionName.items(), key=operator.itemgetter(1), reverse=True):
-			logger.info("User %s: SMRT Action %s got score %s" % (user.id, actionName, score))
+			logger.info("User %s: SMRT Action %s got score %s" % (userId, actionName, score))
 
 		return scoresByActionName
 
