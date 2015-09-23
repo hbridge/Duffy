@@ -15,7 +15,7 @@ class QuestionAction(Action):
 			score = .6
 
 		if QuestionAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
+			score = .5
 
 		if features.inTutorial():
 			score = 0.0

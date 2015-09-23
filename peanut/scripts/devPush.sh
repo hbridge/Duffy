@@ -14,6 +14,8 @@ sudo apachectl -k restart
 EOF
 
 echo "Restarting scripts..."
+sudo stop duffy-smrt-server
+sudo start duffy-smrt-server
 sudo stop duffy-celery
 sudo start duffy-celery
 sudo stop duffy-celery-beat

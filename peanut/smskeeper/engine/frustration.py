@@ -15,7 +15,7 @@ class FrustrationAction(Action):
 			score = 0.6
 
 		if FrustrationAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
+			score = .5
 
 		return score
 
