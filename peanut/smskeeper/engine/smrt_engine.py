@@ -79,7 +79,11 @@ class SmrtEngine:
 			parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 			modelPath = parentPath + keeper_constants.LEARNING_DIR_LOC + 'model'
 			logger.info("Using model path: %s " % modelPath)
-			smrtModel = joblib.load(modelPath)
+			try:
+				smrtModel = joblib.load(modelPath)
+			except Exception, e:
+				logger.info("Got exception %s loading model" % e)
+				smrtModel = False
 
 			headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
 			logger.info("Using headers path: %s " % headersFileLoc)
@@ -124,6 +128,10 @@ class SmrtEngine:
 
 	def process(self, user, chunk, overrideClassification=None, simulate=False):
 		global smrtModel
+
+		if not smrtModel:
+			return False, keeper_constants.CLASS_UNKNOWN, None
+
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None, {}
