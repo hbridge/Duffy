@@ -28,6 +28,7 @@ from smskeeper import chunk_features
 
 logger = logging.getLogger(__name__)
 
+smrtModel = None
 
 class SmrtEngine:
 	actionList = None
@@ -70,25 +71,28 @@ class SmrtEngine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-		logger.info("Loading model for SMRT")
-		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-		modelPath = parentPath + keeper_constants.LEARNING_DIR_LOC + 'model'
-		logger.info("Using model path: %s " % modelPath)
-		self.model = joblib.load()
+		global smrtModel
 
-		headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
-		logger.info("Using headers path: %s " % headersFileLoc)
+		if not smrtModel:
+			logger.info("Loading model for SMRT")
+			parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+			modelPath = parentPath + keeper_constants.LEARNING_DIR_LOC + 'model'
+			logger.info("Using model path: %s " % modelPath)
+			smrtModel = joblib.load()
 
-		with open(headersFileLoc, 'r') as csvfile:
-			logger.info("Successfully read file")
-			reader = csv.reader(csvfile, delimiter=',')
-			done = False
-			for row in reader:
-				if not done:
-					self.headers = row
-				done = True
+			headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
+			logger.info("Using headers path: %s " % headersFileLoc)
 
-		logger.info("Done loading model")
+			with open(headersFileLoc, 'r') as csvfile:
+				logger.info("Successfully read file")
+				reader = csv.reader(csvfile, delimiter=',')
+				done = False
+				for row in reader:
+					if not done:
+						self.headers = row
+					done = True
+
+			logger.info("Done loading model")
 
 	def getActionFromCode(self, code):
 		for entry in keeper_constants.CLASS_MENU_OPTIONS:
@@ -118,6 +122,7 @@ class SmrtEngine:
 		return result
 
 	def process(self, user, chunk, overrideClassification=None, simulate=False):
+		global smrtModel
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None, {}
@@ -129,7 +134,7 @@ class SmrtEngine:
 		for header in self.headers[:-2]:
 			data.append(featuresDict[header])
 
-		scores = self.model.predict_proba(data)
+		scores = smrtModel.predict_proba(data)
 		scoresByAction = self.getScoresByAction(scores)
 		scoresByActionName = self.getScoresByActionName(scoresByAction)
 
