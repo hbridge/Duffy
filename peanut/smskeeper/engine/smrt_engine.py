@@ -72,17 +72,22 @@ class SmrtEngine:
 
 		logger.info("Loading model for SMRT")
 		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
-		self.model = joblib.load(parentPath + keeper_constants.LEARNING_DIR_LOC + 'model')
+		modelPath = parentPath + keeper_constants.LEARNING_DIR_LOC + 'model'
+		logger.info("Using model path: %s " % modelPath)
+		self.model = joblib.load()
 
 		headersFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
+		logger.info("Using headers path: %s " % headersFileLoc)
+
 		with open(headersFileLoc, 'r') as csvfile:
+			logger.info("Successfully read file")
 			reader = csv.reader(csvfile, delimiter=',')
 			done = False
 			for row in reader:
 				if not done:
 					self.headers = row
 				done = True
+
 		logger.info("Done loading model")
 
 	def getActionFromCode(self, code):
