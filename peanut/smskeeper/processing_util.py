@@ -13,7 +13,7 @@ from smskeeper.chunk import Chunk
 from smskeeper.models import User, Message
 from common import slack_logger, date_util
 from smskeeper.engine import Engine
-from smskeeper.engine.smrt_engine import SmrtEngine
+#from smskeeper.engine.smrt_engine import SmrtEngine
 
 logger = logging.getLogger(__name__)
 
@@ -97,11 +97,10 @@ def processWithStateMachine(user, msgs, messageObject, requestDict, keeperNumber
 	return True
 
 keeperEngine = Engine(Engine.DEFAULT, 0.0)
-smrtEngine = SmrtEngine(SmrtEngine.DEFAULT, .1)
+#smrtEngine = SmrtEngine(SmrtEngine.DEFAULT, .1)
 
 
 def processWithEngine(user, msgs, messageObject, useSMRT):
-
 	multichunk = len(msgs) > 1
 
 	if multichunk:
@@ -143,11 +142,13 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 	else:
 		chunk = Chunk(msgs[0])
 		if useSMRT:
+			"""
 			processed, classification, actionScores = smrtEngine.process(
 				user,
 				chunk,
 				overrideClassification=messageObject.classification
 			)
+			"""
 		else:
 			processed, classification, actionScores = keeperEngine.process(
 				user,
@@ -155,12 +156,15 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 				overrideClassification=messageObject.classification
 			)
 
+			"""
+
 			ignore1, ignore2, smrtActionScores = smrtEngine.process(
 				user,
 				chunk,
 				simulate=True
 			)
 			actionScores["smrt"] = smrtActionScores
+			"""
 
 
 		messageObject.auto_classification = classification
