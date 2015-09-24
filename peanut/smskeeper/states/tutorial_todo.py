@@ -110,7 +110,7 @@ def process(user, msg, requestDict, keeperNumber):
 				# else ignore
 				return True, keeper_constants.CLASS_NONE, actionsByScore
 
-		sms_util.sendMsgs(user, [random.choice(keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT), random.choice(keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT)], keeperNumber)
+		sms_util.sendMsgs(user, [random.choice(keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT)], keeperNumber)
 
 		user.setStateData(keeper_constants.TUTORIAL_STEP_KEY, 2)
 	elif step == 2:
@@ -141,18 +141,19 @@ def process(user, msg, requestDict, keeperNumber):
 			],
 			keeperNumber)
 
-		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
-		if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
-			sms_util.sendMsg(user, random.choice(keeper_strings.TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT), keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
-		else:
-			sms_util.sendMsg(user, keeper_strings.TUTORIAL_MORNING_DIGEST_ONLY_TEXT, None, eta=delayedTime)
-
 		# Ask for referral if needed
+		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=20)
 		signupData = json.loads(user.signup_data_json)
 		if "source" not in signupData or ("fb" not in signupData["source"] and 'referrer' in signupData and len(signupData["referrer"]) == 0):
 			referralTip = tips.tipWithId(tips.REFERRAL_ASK_TIP_ID)
 			sms_util.sendMsg(user, referralTip.renderMini(), classification=tips.REFERRAL_ASK_TIP_ID, eta=delayedTime + datetime.timedelta(seconds=10))
 			tips.markTipSent(user, referralTip, isMini=True)
+
+		delayedTime = date_util.now(pytz.utc) + datetime.timedelta(minutes=60)
+		if user.product_id != keeper_constants.WHATSAPP_TODO_PRODUCT_ID:
+			sms_util.sendMsg(user, random.choice(keeper_strings.TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT), keeper_constants.KEEPER_TODO_VCARD_URL, keeperNumber, eta=delayedTime)
+		else:
+			sms_util.sendMsg(user, keeper_strings.TUTORIAL_MORNING_DIGEST_ONLY_TEXT, None, eta=delayedTime)
 
 		user.setTutorialComplete()
 		classification = keeper_constants.CLASS_CREATE_TODO

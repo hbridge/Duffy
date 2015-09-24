@@ -34,7 +34,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		# Activation message asks for their zip
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT)
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT)
 			self.assertEqual(self.getTestUser().postal_code, "10012")
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -82,7 +82,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 		# Activation message asks for their zip
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "10012")
-			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT)
+			self.assertContainsOneOf(self.getOutput(mock), keeper_strings.TUTORIAL_ADD_FIRST_REMINDER_TEXT)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "hello")

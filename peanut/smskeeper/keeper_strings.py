@@ -57,22 +57,15 @@ ASK_FOR_TIME_TEXT = [
 	u"Noted! What time would you like to be reminded?"
 ]
 
-# Note that this and TUTORIAL_ADD_FIRST_REMINDER_TEXT go out together at this point in the tutorial
-TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT = [
-	u"\U0001F44F Thanks! Let's add something you need to get done. \u2705",
-	u"Thanks! Let's get this to do list started.",
-	u"Name some stuff you need to get done, and I'll remind you.",
-]
-
 # Immediately follows one of the above lines
 TUTORIAL_ADD_FIRST_REMINDER_TEXT = [
-	u"What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday'.",
+	u":thumbsup: What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday' and I'll remind you.",
 ]
 
 # Student-only tutorial: Immediately follows one of the above lines in TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT
 TUTORIAL_STUDENT_ADD_FIRST_REMINDER_TEXT = [
-	u"What's an item on your todo list right now? You can say things like 'Submit club dues on Friday' or 'Meet with advisor on Monday at 4pm'.",
-	u"What's on your todo list right now? Things like 'finish homework by 4pm' or 'walk the dog tonight' are some examples.",
+	u":thumbsup: What's an item on your todo list right now? You can say things like 'Pay club dues on Friday' or 'Meet with advisor on Monday at 4pm' and I'll remind you.",
+	u":thumbsup: What's on your todo list right now? Things like 'finish homework by 4pm' or 'walk the dog tonight' are some examples.",
 ]
 
 TUTORIAL_DONE_TEXT = u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do?"
@@ -330,7 +323,7 @@ DIGEST_QUESTION_MINITIP_TEXT = "btw, how useful do you find these morning txts? 
 DIGEST_CHANGE_TIME_MINITIP_TEXT = "btw, when do you wake up? I can send this to you earlier or later in the day, just let me know what time is best"
 SHARED_REMINDER_MINITIP_TEXT = "FYI - I can remind other people directly for you!"
 DIGEST_QUESTION_NPS_MINITIP_TEXT = "Quick q! How likely are you to recommend me to a friend?  1 (not likely) - 10 (extremely likely)"
-REFERRAL_ASK_MINITIP_TEXT = "btw, I'm curious, how did you hear about me?"
+REFERRAL_ASK_MINITIP_TEXT = "Also, I'm curious, how did you hear about me?"
 
 # This footer is appended only to the full tips
 SMSKEEPER_TIP_FOOTER = "Want fewer tips? Type 'send me tips weekly/monthly/never'"

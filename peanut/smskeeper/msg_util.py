@@ -518,8 +518,7 @@ def naturalize(now, futureTime, includeTime=True):
     return result
 
 
-# right now, just emojizes, could do more in the future, i.e. replace username etc
-# returns the message text
+# returns the message text and replaces name and emojis
 def renderMsg(user, msg):
     if user.name and len(user.name) > 0:
         msg = msg.replace(':NAME:', user.name.partition(' ')[0])
