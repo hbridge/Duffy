@@ -85,6 +85,7 @@ def main():
 	httpd = HTTPServer(server_address, handler)
 	logger.info("Server Starts - Running %s:%s" % (HOST_NAME, PORT_NUMBER))
 	httpd.serve_forever()
+	logger.info("Server Stopped or crashed")
 
 if __name__ == '__main__':
 	logging.basicConfig(filename='/mnt/log/smrt-server.log',
