@@ -12,10 +12,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "../..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
-import django
-django.setup()
 
-from smskeeper.engine.smrt_scorer import LocalSmrtScorer
+from smskeeper.engine.local_smrt_scorer import LocalSmrtScorer
 
 
 logger = logging.getLogger(__name__)
