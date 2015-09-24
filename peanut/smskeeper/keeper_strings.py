@@ -106,7 +106,7 @@ REMINDER_DIGEST_HEADERS = [
 	],
 	[  # copy for Thursday
 		u"How did Thursday sneak up on us? :cat:",
-		u"How is it already Wednesday? :eyes:"],
+		u"Happy Thursday :sunglasses:"],
 	[  # copy for Friday
 		u"Friday funday! :party_popper:",
 		u"TGIF :tada:",
