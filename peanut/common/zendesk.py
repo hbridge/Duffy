@@ -7,12 +7,14 @@ from zdesk import get_id_from_url
 
 if hasattr(settings, "ZENDESK_URL"):
 	zendesk = Zendesk(settings.ZENDESK_URL, 'henry@duffytech.co', settings.ZENDESK_TOKEN, True)
+else:
+	zendesk = None
 
 from smskeeper.models import Message
 
 
 def createUnknownCommandTicket(user, msg):
-	if not zendesk:
+	if zendesk is None:
 		return
 	zendeskId = getOrCreateZendeskUserId(user)
 
@@ -46,7 +48,7 @@ def createUnknownCommandTicket(user, msg):
 
 
 def getOrCreateZendeskUserId(user):
-	if not zendesk:
+	if zendesk is None:
 		return 0
 	if user.zendesk_id:
 		return user.zendesk_id
