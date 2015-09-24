@@ -9,7 +9,7 @@ from smskeeper import keeper_constants, keeper_strings
 from smskeeper.models import Entry, Contact, User, Message
 from smskeeper import analytics
 
-from common import slack_logger, date_util
+from common import slack_logger, date_util, zendesk
 
 logger = logging.getLogger(__name__)
 
@@ -311,6 +311,8 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 			keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS
 		)
 		ret = False
+
+	zendesk.createUnknownCommandTicket(user, msg)
 
 	if doPause:
 		user_util.setPaused(user, True, keeperNumber, infoMessage)

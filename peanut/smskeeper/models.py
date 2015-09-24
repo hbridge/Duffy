@@ -25,6 +25,7 @@ class User(models.Model):
 	tutorial_step = models.IntegerField(default=0)
 
 	product_id = models.IntegerField(default=0)
+	zendesk_id = models.IntegerField(null=True, blank=True)
 
 	# TODO(Derek): Rename this to activated_timestamp
 	activated = models.DateTimeField(null=True, blank=True)
