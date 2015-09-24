@@ -665,7 +665,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(entry.text, "Something different")
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			async.processReminder(entry)
-			self.assertIn("Btw, you can always snooze", self.getOutput(mock))
+			self.assertIn("you can always snooze", self.getOutput(mock))
 
 		self.setNow(dateMock, self.TUE_9AM)
 		cliMsg.msg(self.testPhoneNumber, "Remind me buy sox in 1 minute")

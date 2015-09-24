@@ -201,7 +201,6 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 
 	if not userRequested:  # Include a header and weather if not user requested
 		headerPhrase = random.choice(keeper_strings.REMINDER_DIGEST_HEADERS[userNow.weekday()])
-		headerPhrase.replace(':NAME:', user.name)
 		msg += u"%s\n" % (headerPhrase)
 
 		if user.wxcode:

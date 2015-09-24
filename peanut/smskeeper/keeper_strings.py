@@ -12,8 +12,8 @@ from smskeeper import keeper_constants
 INTRO_MESSAGES = [
 	[
 		u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
-		u"Hi! I'm Keeper :wave:, I'm here to help you remember anything and everything.",
-		u"Yo! I'm Keeper, I can help you remember things any time."
+		u"Hi, I'm Keeper :wave:! I'm here to help you remember anything and everything.",
+		u"Hey, I'm Keeper! I can help you remember things any time."
 	],
 	[
 		u"Let me show you how I can help you. First, what's your name?",
@@ -72,7 +72,7 @@ TUTORIAL_ADD_FIRST_REMINDER_TEXT = [
 # Student-only tutorial: Immediately follows one of the above lines in TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT
 TUTORIAL_STUDENT_ADD_FIRST_REMINDER_TEXT = [
 	u"What's an item on your todo list right now? You can say things like 'Submit club dues on Friday' or 'Meet with advisor on Monday at 4pm'.",
-	u"What's on your todo list right now? Things like 'finish homework by 4' or 'walk the dog tonight' are some examples.",
+	u"What's on your todo list right now? Things like 'finish homework by 4pm' or 'walk the dog tonight' are some examples.",
 ]
 
 TUTORIAL_DONE_TEXT = u"It's that easy. Just txt me when things pop in your head and I'll track them for you. \U0001F60E What else do you need to do?"
@@ -81,7 +81,7 @@ TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT = [
 	u"Oh and here's my card. Tap it to save me to your address book. I'll also send you your tasks in the morning \U0001F304 with that day's weather \U0001F31E",
 	u"BTW, here's my info. Tap it to save me to your address book :ok_hand:",
 ]
-TUTORIAL_MORNING_DIGEST_ONLY_TEXT = u"Oh and I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks."  # used for whatsapp users
+TUTORIAL_MORNING_DIGEST_ONLY_TEXT = u"I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks."  # used for whatsapp users
 
 
 
@@ -95,31 +95,46 @@ REMINDER_DIGEST_HEADERS = [
 		u":sunrise: G'morning sunshine",
 		u"Rise 'n grind, Monday is here :sunny:",
 		u"Good morning!",
+		u"Morning, :NAME:! :coffee:",
+		u"Monday got me like: :sleeping:",
+		u"How is it already Monday again? :ghost:",
 	],
 	[  # copy for Tuesday
 		u"Tuesday, it is \U000026F2",
-		u"Happy Tuesday :v:",
+		u"Happy Tuesday, :NAME:!",
+		u":see_no_evil: Morning! :hear_no_evil:"
 	],
 	[  # copy for Wednesday
 		u"Wednesday is here already!",
 		u"How is it already Wednesday? :eyes:",
+		u"Happy hump day",
+		u"It's a brand new day! :sunny:",
+		u"Mornin'! :dog:",
 	],
 	[  # copy for Thursday
 		u"How did Thursday sneak up on us? :cat:",
-		u"Happy Thursday :sunglasses:"],
+		u"Happy Thursday :sunglasses:",
+		u"How is it already Thursday? :eyes:",
+		u"Happy Thursday, :NAME:! :punch:",
+		u"Good morning :innocent:",
+	],
 	[  # copy for Friday
 		u"Friday funday! :party_popper:",
 		u"TGIF :tada:",
+		u"Shout out to Friday :raised_hands:",
+		u"Ahh, Friday. :ok_hand:",
 	],
 	[  # copy for Saturday
 		u"It's sit-around-day \U0001F344",
 		u":wavy_dash:Saturday vibes:wavy_dash:",
 		u"Ahh, Saturday... The best day of the week.",
+		u"So much yes to Saturday :open_hands:",
 	],
 	[  # copy for Sunday
 		u"Sunday Sunday Sunday! \U0001F366",
 		u"Sunday funday! :raised_hands:",
 		u"Good morning!",
+		u"Sunday is for :zzz:",
 	],
 ]
 
@@ -132,31 +147,37 @@ DIGEST_HEADER_USER_REQUESTED = u"Your current tasks: \U0001F4DD"  # this means u
 REMINDER_DIGEST_EMPTY = [
 	[  # Monday
 		u"Start the week off right. Tell me what you need to get done! \U0001F60E",
+		u"Anything on your todo list for Monday? :pencil:",
 	],
 	[  # Tuesday
 		u"No tasks today. I know it's hard to believe, but I'm really good at helping you get stuff done \U0001F4AD",
 	],
 	[  # Wednesday
 		u"A day with nothing to do is the best. Unless you forgot your Mom's birthday. Don't be that kid \U0001F60E",
+		u"No tasks today, but I'm sure you can think of something for me to help you with.",
 	],
 	[  # Thursday
 		u"Empty day. Surely, there's something you need me help with? \U0001F62E",
+		u"Don't forget to get stuff done before the weekend!",
 	],
 	[  # Friday
 		u"No tasks for today. Then again, Fridays should be free days. \U0001F61B",
+		u"Dang, Friday really is your funday. No tasks!",
 	],
 	[  # Saturday
-		u"It might be the weekend but we still gotta keep moving. What can I do? \U0001F60E",
+		u"It might be the weekend but the hustle never sleeps. What can I do? \U0001F60E",
+		u"What can I help you with? Surely you've got something you're forgetting :smirk:",
 	],
 	[  # Sunday
 		u"Last day of the week to get stuff done! \U0001F636",
+		u"Quick, before Monday rolls around. What can I help you get done?",
 	],
 ]
 
 USER_REQUESTED_DIGEST_EMPTY = [
 	u"I don't have anything on record :eyeglasses: for you",
 	u"Nothing on your list, need to add anything? :ear:",
-	u"Your todo list :scroll: is clear right now"
+	u"Your todo list :scroll: is clear right now",
 ]
 
 # Goes out with a digest until a user has checked off three tasks
@@ -184,9 +205,11 @@ FETCH_DIGEST_FOOTER = "\nYou can also see and manage your tasks at %s"
 REMINDER_PHRASES = [
 	u"Reminder for you:",
 	u"Reminder:",
-	u"Hi there! Wanted to remind you: ",
-	u"Hello. Friendly reminder: ",
+	u"Hi there! Wanted to remind you:",
+	u"Hello. Friendly reminder:",
 	u"Hi! Don't forget:",
+	u":NAME:, reminder for you:",
+	u"Quick thing!",
 ]
 
 # When you set a reminder, we ask you if you prefer another time.
@@ -210,7 +233,7 @@ ENTRY_NOT_FOUND_TEXT = [
 
 # When someone gets a shared reminder, we send this out as a teaser
 SHARED_REMINDER_RECIPIENT_UPSELL = (
-	"Btw, I can help you stay organized as well. "
+	"I can help you stay organized as well :innocent:. "
 	"Say 'tell me more' for more info on my free personal assistant services. :raising_hand:"
 )
 
@@ -250,6 +273,8 @@ UNKNOWN_COMMAND_PHRASES = [
 	u"Mmm...say again?",
 	u"Hmmm...I'm not sure what you mean :hatching_chick:.",
 	u"Err... Not sure what you mean.",
+	u"Not sure what that means :grimacing:",
+	u"Mind saying that again? I didn't get it :pensive:",
 ]
 
 # When someone says 'report' to let us know something went wrong
@@ -279,7 +304,7 @@ ZIPCODE_CHANGE_ERROR_TEXT = "I'm sorry, I don't know that postal code"
 
 # Full tips: these go out every 1, 3, 7 or 30 days, depending on user preference
 
-PILLS_TIP_TEXT = "Pro tip: I can help remind you to take your medicine and other frequent tasks. :pill: Just say 'Remind me to take my medicine every day' etc"
+PILLS_TIP_TEXT = "Pro tip: I can remind you to take your medicine and other frequent tasks. :pill: Just say 'Remind me to take my medicine every day' etc."
 WEATHER_TIP_TEXT = "Handy tip for you :NAME:, I can give you weather forecasts for tomorrow and this weekend. :sunny: :cloud: :umbrella: Try saying 'what's the weather tomorrow?'"
 BIRTHDAY_TIP_TEXT = "Hey :NAME:, if you've got a friend's birthday :birthday: coming up and don't want to forget, just let me know with 'Julie's birthday is next Sunday'"
 JOKE_TIP_TEXT = "Hey :NAME:, I'm the funniest digital assistant around! Just ask me to tell you a joke - guaranteed laughs or you get a pony :sunglasses:"
@@ -292,19 +317,19 @@ SHARED_REMINDER_TIP1_TEXT = "I can now remind other people on your behalf. Just 
 TVSHOW_TIP_TEXT = "Want me to remind you when your favorite show is on TV? Just say 'Remind me to watch Law & Order SVU at 9pm every Wednesday'"
 GET_TASKS_TIP_TEXT = "Btw, you can see a list of all your tasks anytime. Just say 'What are my tasks?'"
 SHARED_REMINDER_TIP2_TEXT = "I can directly remind your other half for you. Just say 'Remind my boyfriend (or girlfriend) to get groceries tmrw at 7pm'"
-WORKOUT_SCHEDULE_TEXT = "Hey :NAME:, having trouble going to the gym? Just let me know when you want to go and I'll remind you."
+WORKOUT_SCHEDULE_TEXT = "Hey :NAME:, having trouble going to the gym? Just let me know when you want to go and I'll remind you. :muscle:"
 
 # Mini tips: these go out at specific instances. Like when a user takes an action
 
 DONE_ALL_MINITIP_TEXT = "Pro tip: You can also say 'Done with everything' to mark all items as done."
 DONE_TIP1_MINITIP_TEXT = "Just let me know when you're done and I'll check it off your list"
 DONE_TIP2_MINITIP_TEXT = "Let me know when you're done and I'll check it off for you"
-DONE_TIP3_MINITIP_TEXT = "Btw, let me know when you're done"
-SNOOZE_MINITIP_TEXT = "Btw, you can always snooze a reminder by saying 'snooze for 5 mins' or 'snooze till 9pm'"
+DONE_TIP3_MINITIP_TEXT = "Let me know when you're done!"
+SNOOZE_MINITIP_TEXT = "Also, you can always snooze a reminder by saying 'snooze for 5 mins' or 'snooze till 9pm'"
 DIGEST_QUESTION_MINITIP_TEXT = "btw, how useful do you find these morning txts? 1 (not useful) - 5 (very useful)"
 DIGEST_CHANGE_TIME_MINITIP_TEXT = "btw, when do you wake up? I can send this to you earlier or later in the day, just let me know what time is best"
-SHARED_REMINDER_MINITIP_TEXT = "I can remind other people directly for you!"
-DIGEST_QUESTION_NPS_MINITIP_TEXT = "btw, how likely are you to recommend me to a friend?  1 (not likely) - 10 (extremely likely)"
+SHARED_REMINDER_MINITIP_TEXT = "FYI - I can remind other people directly for you!"
+DIGEST_QUESTION_NPS_MINITIP_TEXT = "Quick q! How likely are you to recommend me to a friend?  1 (not likely) - 10 (extremely likely)"
 REFERRAL_ASK_MINITIP_TEXT = "btw, I'm curious, how did you hear about me?"
 
 # This footer is appended only to the full tips
@@ -447,11 +472,11 @@ NICETIES_LIST = [
 	],
 	[
 		"I(m| am) sorry|apologies|I apologize|sry",
-		[u"That's ok.", "Don't worry about it.", "No worries.", "I'm over it."]
+		[u"That's ok.", u"Don't worry about it.", u"No worries.", u"I'm over it.", u"All good :ok_hand:"]
 	],
 	[
 		"see you later|i have to go$",
-		[u"Ok, I'm here if you need me! \U0001F603"]
+		[u"Ok, I'm here if you need me! \U0001F603", u"Sounds good! I'll be here. :sparkles:"]
 	],
 	[
 		"thats (all|it)( for (right )?now)?|(nothing|not) ((right|for) now|at the moment)",
@@ -503,11 +528,11 @@ NICETIES_LIST = [
 	],
 	[
 		"(can you |please )?call me\b|can i call you",
-		["Sorry, I can only txt at the moment."]
+		["Sorry, I can only txt at the moment.", "Txt only :bow:"]
 	],
 	[
 		"are we friends|can we be friends",
-		["I like to think so! :smiling_face_with_smiling_eyes:"]
+		["I like to think so! :smiling_face_with_smiling_eyes:", "BFFs :nail_care:"]
 	],
 	[
 		"will you be my friend",

@@ -88,7 +88,7 @@ def sendMsg(user, msg, mediaUrl=None, keeperNumber=None, eta=None, manual=False,
 	if keeperNumber is None:
 		keeperNumber = user.getKeeperNumber()
 
-	msg = msg_util.renderMsg(msg)
+	msg = msg_util.renderMsg(user, msg)
 	if keeper_constants.isRealKeeperNumber(keeperNumber):
 		asyncSendMsg.apply_async((user.id, msg, mediaUrl, keeperNumber, manual, stopOverride, classification, sendToSlack), eta=eta)
 	else:
