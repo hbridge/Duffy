@@ -477,6 +477,7 @@ class Entry(models.Model):
 
 class Message(models.Model):
 	user = models.ForeignKey(User, db_index=True)
+	body = models.TextField(null=True)
 	msg_json = models.TextField(null=True)
 	incoming = models.BooleanField(default=None)
 	manual = models.BooleanField(default=None)
