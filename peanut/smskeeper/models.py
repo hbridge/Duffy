@@ -507,6 +507,11 @@ class Message(models.Model):
 	def getClassifiedAs(cls, classification):
 		return Message.objects.filter(classification=classification)
 
+	@classmethod
+	def recentIncomingMessagesForUserWithClassification(cls, user):
+		recentIncoming = Message.objects.filter(user=user, incoming=True, classification__isnull=False).order_by("-id")[:3]
+		return recentIncoming
+
 	def getMessageAttribute(self, attribute):
 		if self.messageDict is None:
 			self.messageDict = json.loads(self.msg_json)

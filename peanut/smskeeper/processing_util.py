@@ -135,10 +135,13 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 		for msg in msgs:
 			chunk = Chunk(msg, True, lineCount)
 
+			smrtActionsByScore = smrtScorer.score(user, chunk)
+			v1ActionsByScore = v1Scorer.score(user, chunk)
+
 			if useSMRT:
-				actionsByScore = smrtScorer.score(user, chunk)
+				actionsByScore = smrtActionsByScore
 			else:
-				actionsByScore = v1Scorer.score(user, chunk)
+				actionsByScore = v1ActionsByScore
 
 			chunkProcessed, classification = keeperEngine.process(user, chunk, actionsByScore)
 
