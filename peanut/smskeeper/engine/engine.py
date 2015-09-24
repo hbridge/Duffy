@@ -1,25 +1,24 @@
 import logging
-import collections
 import operator
 
 from smskeeper import keeper_constants
-from smskeeper.engine.stop import StopAction
-from smskeeper.engine.fetch_weather import FetchWeatherAction
-from smskeeper.engine.question import QuestionAction
-from smskeeper.engine.nicety import NicetyAction
-from smskeeper.engine.silent_nicety import SilentNicetyAction
-from smskeeper.engine.help import HelpAction
-from smskeeper.engine.change_setting import ChangeSettingAction
-from smskeeper.engine.frustration import FrustrationAction
-from smskeeper.engine.fetch_digest import FetchDigestAction
-from smskeeper.engine.changetime_most_recent import ChangetimeMostRecentAction
-from smskeeper.engine.changetime_specific import ChangetimeSpecificAction
-from smskeeper.engine.create_todo import CreateTodoAction
-from smskeeper.engine.complete_todo_most_recent import CompleteTodoMostRecentAction
-from smskeeper.engine.complete_todo_specific import CompleteTodoSpecificAction
-from smskeeper.engine.tip_question_response import TipQuestionResponseAction
-from smskeeper.engine.share_reminder import ShareReminderAction
-from smskeeper.engine.jokes import JokeAction
+from smskeeper.engine.actions.stop import StopAction
+from smskeeper.engine.actions.fetch_weather import FetchWeatherAction
+from smskeeper.engine.actions.question import QuestionAction
+from smskeeper.engine.actions.nicety import NicetyAction
+from smskeeper.engine.actions.silent_nicety import SilentNicetyAction
+from smskeeper.engine.actions.help import HelpAction
+from smskeeper.engine.actions.change_setting import ChangeSettingAction
+from smskeeper.engine.actions.frustration import FrustrationAction
+from smskeeper.engine.actions.fetch_digest import FetchDigestAction
+from smskeeper.engine.actions.changetime_most_recent import ChangetimeMostRecentAction
+from smskeeper.engine.actions.changetime_specific import ChangetimeSpecificAction
+from smskeeper.engine.actions.create_todo import CreateTodoAction
+from smskeeper.engine.actions.complete_todo_most_recent import CompleteTodoMostRecentAction
+from smskeeper.engine.actions.complete_todo_specific import CompleteTodoSpecificAction
+from smskeeper.engine.actions.tip_question_response import TipQuestionResponseAction
+from smskeeper.engine.actions.share_reminder import ShareReminderAction
+from smskeeper.engine.actions.jokes import JokeAction
 
 logger = logging.getLogger(__name__)
 

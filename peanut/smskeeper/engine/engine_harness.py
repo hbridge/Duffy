@@ -1,7 +1,6 @@
 import pytz
 import datetime
 import logging
-import operator
 
 from common import date_util
 from mock import patch
