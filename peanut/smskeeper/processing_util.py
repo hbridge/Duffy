@@ -203,7 +203,10 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber, useSMRT=False):
 	if not manual and isDuplicateMsg(user, msg):
 		logger.info("User %s: Ignoring duplicate message: %s" % (user.id, msg))
 		# TODO figure out better logic so we aren't repeating this statement
-		messageObject = Message.objects.create(user=user, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
+		body = None
+		if "Body" in requestDict:
+			body = requestDict["Body"]
+		messageObject = Message.objects.create(user=user, body=body, msg_json=json.dumps(requestDict), incoming=True, manual=manual)
 		return False
 
 	# Deal with keeper number stuff...if its cli or test, we set overrideKeeperNumber
@@ -221,9 +224,13 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber, useSMRT=False):
 	# Create Message object and post to slack
 	# there may be an override message classification, if so create the message with it
 	classification = requestDict.get("OverrideClass", None)
+	body = None
+	if "Body" in requestDict:
+		body = requestDict["Body"]
 	messageObject = Message.objects.create(
 		user=user,
 		msg_json=json.dumps(requestDict),
+		body=body,
 		incoming=True,
 		manual=manual,
 		classification=classification
