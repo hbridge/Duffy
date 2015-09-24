@@ -1,4 +1,6 @@
 #!/usr/bin/python
+
+# To Run:  python smskeeper/learning/createFeaturesFile.py
 import sys
 import os
 import json

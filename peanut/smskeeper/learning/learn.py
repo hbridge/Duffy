@@ -1,3 +1,6 @@
+# To Run:  python smskeeper/learning/learn.py
+
+
 import os
 import sys
 

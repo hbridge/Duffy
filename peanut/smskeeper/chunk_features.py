@@ -1,11 +1,12 @@
 import datetime
 import logging
 import pytz
+import json
 
 from smskeeper import entry_util
 import phonenumbers
 from smskeeper import keeper_constants
-from smskeeper import msg_util, niceties
+from smskeeper import msg_util, niceties, tips
 import collections
 
 from common import date_util
@@ -87,6 +88,21 @@ class ChunkFeatures:
 		else:
 			return None
 
+	def isInt(self, word):
+		try:
+			int(word)
+			return True
+		except ValueError:
+			return False
+
+	def getFirstInt(self, chunk):
+		words = chunk.normalizedText().split(' ')
+		for word in words:
+			if self.isInt(word):
+				firstInt = int(word)
+				return firstInt
+		return None
+
 	# Features
 	@feature
 	def hasTimingInfo(self):
@@ -98,6 +114,13 @@ class ChunkFeatures:
 	def hasTimeOfDay(self):
 		nattyResult = self.chunk.getNattyResult(self.user)
 		if nattyResult and nattyResult.hadTime:
+			return True
+		return False
+
+	@feature
+	def hasDate(self):
+		nattyResult = self.chunk.getNattyResult(self.user)
+		if nattyResult and nattyResult.hadDate:
 			return True
 		return False
 
@@ -275,6 +298,58 @@ class ChunkFeatures:
 	@feature
 	def wasRecentlySentMsgOfClassJoke(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE)
+
+	@feature
+	def wasRecentlySentMsgOfClassChangeDigestTime(self):
+		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_CHANGE_DIGEST_TIME, 2)
+
+	@feature
+	def wasRecentlySentMsgOfClassReferralAsk(self):
+		return self.user.wasRecentlySentMsgOfClass(tips.REFERRAL_ASK_TIP_ID, 2)
+
+	@feature
+	def wasRecentlySentMsgOfClassNpsTip(self):
+		return self.user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID, 2)
+
+	@feature
+	def wasRecentlySentMsgOfClassDigestSurvey(self):
+		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY, 2)
+
+	@feature
+	def userMissingNpsInfo(self):
+		return self.user.getStateData(keeper_constants.NPS_DATA_KEY) is None
+
+	@feature
+	def userMissingReferralInfo(self):
+		if self.user.signup_data_json:
+			signupData = json.loads(self.user.signup_data_json)
+		else:
+			signupData = "{}"
+
+		return ("referrer" not in signupData or len(signupData["referrer"]) == 0)
+
+	@feature
+	def userMissingDigestSurveyInfo(self):
+		return self.user.getStateData(keeper_constants.DIGEST_SURVEY_DATA_KEY) is None
+
+	@feature
+	def hasIntFirst(self):
+		words = self.chunk.normalizedText().split(' ')
+
+		if len(words) > 0:
+			return self.isInt(words[0])
+		return False
+
+	@feature
+	def hasInt(self):
+		words = self.chunk.normalizedText().split(' ')
+
+		hasInt = False
+
+		for word in words:
+			if self.isInt(word):
+				hasInt = True
+		return hasInt
 
 	@feature
 	def numCharactersInCleanedText(self):

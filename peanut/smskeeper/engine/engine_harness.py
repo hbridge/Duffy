@@ -1,6 +1,7 @@
 import pytz
 import datetime
 import logging
+import operator
 
 from common import date_util
 from mock import patch
@@ -15,7 +16,8 @@ logger = logging.getLogger(__name__)
 class EngineSimHarness():
 	entriesCount = 0
 
-	def __init__(self, engine=None):
+	def __init__(self, scorer=None, engine=None):
+		self.scorer = scorer
 		self.engine = engine
 
 	@patch('common.date_util.utcnow')
@@ -36,10 +38,10 @@ class EngineSimHarness():
 		# actually score the message
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
 		chunk = Chunk(lines[0])  # only process first line for now
-		processed, classification, actionScores = self.engine.process(user, chunk, simulate=True)
+		actionsByScore = self.scorer.score(user, chunk)
+		processed, classification = self.engine.process(user, chunk, actionsByScore, simulate=True)
 
-		# set the correct classification for the message object
-		return classification, actionScores
+		return classification, actionsByScore
 
 	@patch('common.date_util.utcnow')
 	@patch('smskeeper.models.User.wasRecentlySentMsgOfClass')

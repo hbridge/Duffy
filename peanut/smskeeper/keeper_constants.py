@@ -313,6 +313,9 @@ OUTGOING_CHANGE_DIGEST_TIME = "outgoing-change-digest-time"
 OUTGOING_SHARE_PROMPT = "outgoing-share-prompt"
 OUTGOING_UNKNOWN = "outgoing-unknown"
 
+DIGEST_SURVEY_DATA_KEY = "digest-survey-result"
+NPS_DATA_KEY = "nps-result"
+
 TEMP_FORMAT_METRIC = 'metric'
 TEMP_FORMAT_IMPERIAL = 'imperial'
 

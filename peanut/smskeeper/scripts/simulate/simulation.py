@@ -13,7 +13,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 import mechanize
 from smskeeper import keeper_constants
 from smskeeper.engine.engine_harness import EngineSimHarness
-from smskeeper.engine.smrt_engine import SmrtEngine
+from smskeeper.engine import Engine
+from smskeeper.engine.smrt_scorer import SmrtScorer
 from smskeeper.models import Message
 from smskeeper.scripts import importZipdata
 from smskeeper.tests import test_base
@@ -89,8 +90,9 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 		classified_messages = json.loads(response)
 
-		engine = SmrtEngine(SmrtEngine.DEFAULT, 0.0)
-		harness = EngineSimHarness(engine)
+		scorer = SmrtScorer(Engine.DEFAULT, 0.0, local=True)
+		engine = Engine(Engine.DEFAULT, 0.0)
+		harness = EngineSimHarness(scorer, engine)
 
 		for message in classified_messages:
 			try:
@@ -99,10 +101,15 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 				logger.info("\n Processing message: %s", message)
 				self.message_count += 1
 
-				classification, actionScores = harness.scoreMessage(message)
+				classification, actionsByScore = harness.scoreMessage(message)
+
+				scoresByActionName = dict()
+				for score, actions in actionsByScore.iteritems():
+					for action in actions:
+						scoresByActionName[action.ACTION_CLASS] = score
 
 				message["simulated_classification"] = classification
-				message["simulated_scores"] = actionScores
+				message["simulated_scores"] = scoresByActionName
 				logger.info("Scored message %s", message)
 				self.classified_messages.append(message)
 			except Exception as e:

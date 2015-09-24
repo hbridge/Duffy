@@ -26,7 +26,7 @@ class Action:
 			className = cls.ACTION_CLASS
 		pastMessages = Message.getClassifiedAs(className)
 
-		if len(chunk.normalizedText()) <= 2:
+		if len(chunk.normalizedText()) <= 5:
 			return False
 
 		for pastMsg in pastMessages:
