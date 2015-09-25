@@ -455,7 +455,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 
 		self.assertEqual(self.getTestUser().digest_hour, 9)
 
-
 	# Had a bug where just 'remind me' would create an entry
 	def test_just_remind_me(self, dateMock):
 		self.setupUser(dateMock)
@@ -1643,7 +1642,6 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "tasks for today")
 			self.assertNotIn(self.getTestUser().getWebAppURL(), self.getOutput(mock))
 
-
 	def test_done_only_affects_last_created(self, dateMock):
 		self.setupUser(dateMock)
 
@@ -1663,8 +1661,8 @@ class SMSKeeperTodoCase(test_base.SMSKeeperBaseCase):
 		self.assertTrue(entries[1].hidden)
 
 	def test_stop_classification(self, dateMock):
-		phrase1 = "Please stop texting me"
-		phrase2 = "please stop texting me!"  # Slightly different
+		phrase1 = "Please foobar texting me"
+		phrase2 = "please foobar texting me!"  # Slightly different
 		self.setupUser(dateMock)
 
 		self.setNow(dateMock, self.TUE_9AM)
