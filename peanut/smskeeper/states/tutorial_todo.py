@@ -44,7 +44,8 @@ def process(user, msg, requestDict, keeperNumber):
 	chunk = Chunk(msg)
 
 	actionsByScore = v1Scorer.score(user, chunk)
-	processed, classification = keeperEngine.process(user, chunk, actionsByScore)
+	bestActions = keeperEngine.getBestActions(user, chunk, actionsByScore, dict())
+	processed, classification = keeperEngine.process(user, chunk, bestActions)
 
 	if processed:
 		return True, classification, actionsByScore
@@ -126,7 +127,9 @@ def process(user, msg, requestDict, keeperNumber):
 		chunk = Chunk(msg)
 
 		actionsByScore = v1Scorer.score(user, chunk)
-		finishedWithCreate, classification = keeperEngine.process(user, chunk, actionsByScore)
+		bestActions = keeperEngine.getBestActions(user, chunk, actionsByScore, dict())
+
+		finishedWithCreate, classification = keeperEngine.process(user, chunk, bestActions)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text

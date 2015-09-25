@@ -137,13 +137,9 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 
 			smrtActionsByScore = smrtScorer.score(user, chunk)
 			v1ActionsByScore = v1Scorer.score(user, chunk)
+			bestActions = keeperEngine.getBestActions(user, chunk, v1ActionsByScore, smrtActionsByScore)
 
-			if useSMRT:
-				actionsByScore = smrtActionsByScore
-			else:
-				actionsByScore = v1ActionsByScore
-
-			chunkProcessed, classification = keeperEngine.process(user, chunk, actionsByScore)
+			chunkProcessed, classification = keeperEngine.process(user, chunk, bestActions)
 
 			if not chunkProcessed:
 				allProcessed = False
@@ -164,20 +160,14 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 
 		smrtActionsByScore = smrtScorer.score(user, chunk)
 		v1ActionsByScore = v1Scorer.score(user, chunk)
+		bestActions = keeperEngine.getBestActions(user, chunk, v1ActionsByScore, smrtActionsByScore)
 
-		if useSMRT:
-			actionsByScore = smrtActionsByScore
-		else:
-			actionsByScore = v1ActionsByScore
+		chunkProcessed, classification = keeperEngine.process(user, chunk, bestActions)
 
-		chunkProcessed, classification = keeperEngine.process(user, chunk, actionsByScore)
-
+		# Save scores and final classification
 		messageObject.auto_classification = classification
 		scoreByActionName = getScoreByActionName(v1ActionsByScore)
-
-		if not useSMRT:
-			scoreByActionName["smrt"] = getScoreByActionName(smrtActionsByScore)
-
+		scoreByActionName["smrt"] = getScoreByActionName(smrtActionsByScore)
 		messageObject.classification_scores_json = json.dumps(scoreByActionName)
 
 		messageObject.save()
@@ -202,7 +192,6 @@ def processMessage(phoneNumber, msg, requestDict, keeperNumber, useSMRT=False):
 	# Deal with Dup messages (same thing sent in short amount of time)
 	if not manual and isDuplicateMsg(user, msg):
 		logger.info("User %s: Ignoring duplicate message: %s" % (user.id, msg))
-		# TODO figure out better logic so we aren't repeating this statement
 		body = None
 		if "Body" in requestDict:
 			body = requestDict["Body"]
@@ -272,13 +261,13 @@ stateCallbacks = {
 	keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER: not_activated_from_reminder,
 }
 
+
 # Checks for duplicate message
 def isDuplicateMsg(user, msg):
-	incomingMsg = Message.objects.filter(user=user, incoming=True, added__gt=date_util.now(pytz.utc) - timedelta(minutes=2)).order_by('-added')
-	if len(incomingMsg) > 0:
-		if incomingMsg[0].msg_json:
-			content = json.loads(incomingMsg[0].msg_json)
-			if 'Body' in content and content['Body'] == msg:
-				return True
+	pastMsgs = user.getPastIncomingMsgs()
+	if len(pastMsgs) > 0 and pastMsgs[0].added > date_util.now(pytz.utc) - timedelta(minutes=2):
+		content = json.loads(pastMsgs[0].msg_json)
+		if 'Body' in content and content['Body'] == msg:
+			return True
 
 	return False

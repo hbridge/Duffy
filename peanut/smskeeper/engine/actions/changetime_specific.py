@@ -35,9 +35,6 @@ class ChangetimeSpecificAction(ChangetimeAction):
 		if features.beginsWithChangeTimeWord() and features.hasTimingInfo() and len(okEntries) > 0:
 			score = 0.95
 
-		if ChangetimeSpecificAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
-
 		return score
 
 	# execute is in the parent ChangetimeAction

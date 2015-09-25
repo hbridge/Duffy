@@ -87,7 +87,7 @@ class Chunk:
 					if re.match(verbWhitelistRegex, word.lower()):
 						whitelistedVerbLocations.append(idx)
 
-		# we get some messages from people where very word is capped
+		# we get some messages from people where every word is capped
 		useCapitalizationSignal = (numWordsStartAlpha is not numWordsStartUpper)
 
 		# if there's verb whitelist regex but no instances of the verb, return []

@@ -4,7 +4,7 @@ import json
 from smskeeper import keeper_constants, keeper_strings
 from .action import Action
 from smskeeper import sms_util, actions, chunk_features
-from smskeeper import analytics, tips
+from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,6 @@
 import logging
 import operator
+import json
 
 from smskeeper import keeper_constants
 from smskeeper.engine.actions.stop import StopAction
@@ -19,6 +20,7 @@ from smskeeper.engine.actions.complete_todo_specific import CompleteTodoSpecific
 from smskeeper.engine.actions.tip_question_response import TipQuestionResponseAction
 from smskeeper.engine.actions.share_reminder import ShareReminderAction
 from smskeeper.engine.actions.jokes import JokeAction
+from smskeeper.chunk import Chunk
 
 logger = logging.getLogger(__name__)
 
@@ -64,31 +66,27 @@ class Engine:
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def process(self, user, chunk, actionsByScore, overrideClassification=None, simulate=False):
+	def process(self, user, chunk, actions, overrideClassification=None, simulate=False):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None
 
-		for score, actions in sorted(actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
-			if score > self.minScore:
-				if len(actions) > 1:
-					actions = self.tieBreakActions(actions)
+		# Pick the first one after sorting
+		# Later on we might want to look at the 'processed' return code
+		for action in actions:
+			logger.info("User %s: I think '%s' is a %s command...executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
+			if not simulate:
+				processed = action.execute(chunk, user)
+			else:
+				processed = True
 
-				# Pick the first one after sorting
-				# Later on we might want to look at the 'processed' return code
-				for action in actions:
-					logger.info("User %s: I think '%s' is a %s command...executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
-					if not simulate:
-						processed = action.execute(chunk, user)
-					else:
-						processed = True
-
-					if processed:
-						logger.info("User %s: Successfully processed '%s' as a %s command" % (user.id, chunk.originalText, action.ACTION_CLASS))
-						return True, action.ACTION_CLASS
+			if processed:
+				logger.info("User %s: Successfully processed '%s' as a %s command" % (user.id, chunk.originalText, action.ACTION_CLASS))
+				return True, action.ACTION_CLASS
 
 		return False, keeper_constants.CLASS_UNKNOWN
 
+	# These functions don't really belong here, could move more to a scorer
 	def tieBreakActions(self, actions):
 		sortedActions = list()
 		actionOrder = [StopAction, FetchWeatherAction, HelpAction, NicetyAction, SilentNicetyAction, FetchDigestAction, JokeAction, ChangeSettingAction, TipQuestionResponseAction, ChangetimeSpecificAction, ChangetimeMostRecentAction, CompleteTodoSpecificAction, CompleteTodoMostRecentAction, CreateTodoAction, QuestionAction, FrustrationAction]
@@ -99,3 +97,32 @@ class Engine:
 		return sortedActions
 
 		raise NameError("Couldn't tie break")
+
+	def getActionByName(self, actionName):
+		for action in self.actionList:
+			if action.ACTION_CLASS == actionName:
+				return action
+		return None
+
+	def getBestActions(self, user, chunk, v1actionsByScore, smrtActionsByScore):
+		result = list()
+		# Look through past messages of this user to find an exact match that has been classified
+		# If found, put that action first
+		pastMsgs = user.getPastIncomingMsgs()
+
+		for msg in pastMsgs:
+			content = json.loads(msg.msg_json)
+			tmpChunk = Chunk(content["Body"])
+			if "Body" in content and tmpChunk.normalizedText() == chunk.normalizedText() and msg.classification:
+				action = self.getActionByName(msg.classification)
+				if action:
+					logger.info("User %s: In getBestActions, found an identical match to msg %s so prioritizing class %s" % (user.id, msg.id, msg.classification))
+					result.append(action)
+					break
+
+		for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
+			if score > self.minScore:
+				if len(actions) > 1:
+					actions = self.tieBreakActions(actions)
+				result.extend(actions)
+		return result

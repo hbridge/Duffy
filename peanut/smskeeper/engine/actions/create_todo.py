@@ -51,9 +51,6 @@ class CreateTodoAction(Action):
 			if recurScores[frequency] >= 0.5:
 				score = recurScores[frequency]
 
-		if CreateTodoAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
-
 		if score < 0.3 and features.beginsWithCreateWord():
 			score += 0.2  # give an extra boost if nothing else matches
 		elif score < 0.9 and features.beginsWithCreateWord():

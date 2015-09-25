@@ -14,9 +14,6 @@ class FrustrationAction(Action):
 		if features.beginsWithNo():
 			score = 0.6
 
-		if FrustrationAction.HasHistoricalMatchForChunk(chunk):
-			score = .5
-
 		return score
 
 	def execute(self, chunk, user):

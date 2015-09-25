@@ -81,7 +81,9 @@ class User(models.Model):
 	done_count = models.IntegerField(default=0)
 	create_todo_count = models.IntegerField(default=0)
 
+	# These are not tied to the db, and instead are single instance
 	overrideKeeperNumber = None
+	pastIncomingMsgs = None
 
 	def print_last_message_date(self, incoming=True):
 		lastMsg = Message.objects.filter(user=self, incoming=incoming).order_by("-added")[:1]
@@ -103,6 +105,13 @@ class User(models.Model):
 		if self.name is not None and len(self.name) > 0:
 			return self.name
 		return self.phone_number
+
+
+
+	def getPastIncomingMsgs(self):
+		if not self.pastIncomingMsgs:
+			self.pastIncomingMsgs = Message.objects.filter(user=self, incoming=True).order_by('-added')
+		return self.pastIncomingMsgs
 
 	def getFirstName(self):
 		if self.name:

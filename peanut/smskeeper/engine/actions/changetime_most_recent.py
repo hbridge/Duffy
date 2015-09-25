@@ -37,9 +37,6 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 			if features.isFollowup():
 				score = 0.9
 
-		if ChangetimeMostRecentAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
-
 		if features.hasPhoneNumber():
 			score = 0.0
 

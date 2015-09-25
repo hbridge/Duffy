@@ -23,9 +23,6 @@ class SilentNicetyAction(Action):
 			if matchScore > .9:
 				score = .95
 
-		if SilentNicetyAction.HasHistoricalMatchForChunk(chunk):
-			score = 0.5
-
 		if chunk.isPartOfMultiChunk and chunk.lineNum == 0 and chunk.originalText.endswith(":"):
 			score = 1.0
 

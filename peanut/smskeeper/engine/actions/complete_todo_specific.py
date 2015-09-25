@@ -30,9 +30,6 @@ class CompleteTodoSpecificAction(Action):
 		if features.hasTimingInfo():
 			score -= .15
 
-		if CompleteTodoSpecificAction.HasHistoricalMatchForChunk(chunk):
-			score = 1.0
-
 		if score < 0.9 and features.beginsWithDoneWord():
 			score += 0.1
 
