@@ -38,7 +38,7 @@ def process(user, msg, requestDict, keeperNumber):
 	)
 
 	v1Scorer = V1Scorer(Engine.TUTORIAL_BASIC, 0.5)
-	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5)
+	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5, tutorial=True)
 	chunk = Chunk(msg)
 
 	actionsByScore = v1Scorer.score(user, chunk)
@@ -123,7 +123,7 @@ def process(user, msg, requestDict, keeperNumber):
 			return True, keeper_constants.CLASS_NONE, actionsByScore
 
 		v1Scorer = V1Scorer(Engine.TUTORIAL_STEP_2, 0.5)
-		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5)
+		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5, tutorial=True)
 		chunk = Chunk(msg)
 
 		actionsByScore = v1Scorer.score(user, chunk)

@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 class Engine:
 	actionList = None
 	minScore = 0.0
+	tutorial = False
 
 	DEFAULT = ([
 		StopAction(),
@@ -62,9 +63,10 @@ class Engine:
 		CreateTodoAction(tutorial=True)
 	])
 
-	def __init__(self, actionList, minScore):
+	def __init__(self, actionList, minScore, tutorial=False):
 		self.actionList = actionList
 		self.minScore = minScore
+		self.tutorial = tutorial
 
 	def process(self, user, chunk, actions, overrideClassification=None, simulate=False):
 		# TODO when we implement start in the engine this check needs to move
@@ -106,23 +108,31 @@ class Engine:
 
 	def getBestActions(self, user, chunk, v1actionsByScore, smrtActionsByScore):
 		result = list()
-		# Look through past messages of this user to find an exact match that has been classified
-		# If found, put that action first
-		pastMsgs = user.getPastIncomingMsgs()
-
-		for msg in pastMsgs:
-			content = json.loads(msg.msg_json)
-			tmpChunk = Chunk(content["Body"])
-			if "Body" in content and tmpChunk.normalizedText() == chunk.normalizedText() and msg.classification:
-				action = self.getActionByName(msg.classification)
-				if action:
-					logger.info("User %s: In getBestActions, found an identical match to msg %s so prioritizing class %s" % (user.id, msg.id, msg.classification))
-					result.append(action)
+		if self.tutorial:
+			for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
+				if score >= self.minScore:
+					if len(actions) > 1:
+						actions = self.tieBreakActions(actions)
+					result.extend(actions)
 					break
+		else:
+			# Look through past messages of this user to find an exact match that has been classified
+			# If found, put that action first
+			pastMsgs = user.getPastIncomingMsgs()
 
-		for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
-			if score > self.minScore:
-				if len(actions) > 1:
-					actions = self.tieBreakActions(actions)
-				result.extend(actions)
+			for msg in pastMsgs:
+				content = json.loads(msg.msg_json)
+				tmpChunk = Chunk(content["Body"])
+				if "Body" in content and tmpChunk.normalizedText() == chunk.normalizedText() and msg.classification:
+					action = self.getActionByName(msg.classification)
+					if action:
+						logger.info("User %s: In getBestActions, found an identical match to msg %s so prioritizing class %s" % (user.id, msg.id, msg.classification))
+						result.append(action)
+						break
+
+			for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
+				if score > self.minScore:
+					if len(actions) > 1:
+						actions = self.tieBreakActions(actions)
+					result.extend(actions)
 		return result
