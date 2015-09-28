@@ -13,7 +13,8 @@ INTRO_MESSAGES = [
 	[
 		u"\U0001F44B Hi, I'm Keeper! I'm here to help you remember small things that are easy to forget.",
 		u"Hi, I'm Keeper :wave:! I'm here to help you remember anything and everything.",
-		u"Hey, I'm Keeper! I can help you remember things any time."
+		u"Hey, I'm Keeper! I can help you remember things any time.",
+		u"Hey, I'm Keeper! I'm here to help you rememeber your tasks.",
 	],
 	[
 		u"Let me show you how I can help you. First, what's your name?",
@@ -30,7 +31,7 @@ INTRO_MESSAGES_MEDICAL = [
 
 ASK_AGAIN_FOR_NAME = [
 	u"We'll get to that, but first what's your name?",
-	u"Whoa, whoa, slow down. What's your name first?"
+	u"One sec, what's your name first?"
 ]
 GOT_NAME_RESPONSE = [
 	u"Great, nice to meet you %s! \U0001F44B",
@@ -54,12 +55,12 @@ ASK_FOR_TIME_TEXT = [
 	u"Great, and when would you like to be reminded?",
 	u"Perfect, what time would you like to be reminded?",
 	u"Cool, what time should I remind you?",
-	u"Noted! What time would you like to be reminded?"
+	u"Noted! What time would you like to be reminded?",
 ]
 
 # Immediately follows one of the above lines
 TUTORIAL_ADD_FIRST_REMINDER_TEXT = [
-	u":thumbsup: What's an item on your todo list right now? You can say things like 'Buy flip flops tomorrow' or 'Pick up Susie at 2:30 Friday' and I'll remind you.",
+	u":thumbsup: What's an item on your todo list right now? You can say things like 'Buy sneakers tomorrow' or 'Pick up Mike at 2:30 Friday' and I'll remind you.",
 ]
 
 # Student-only tutorial: Immediately follows one of the above lines in TUTORIAL_POST_NAME_AND_ZIPCODE_TEXT
@@ -91,11 +92,16 @@ REMINDER_DIGEST_HEADERS = [
 		u"Morning, :NAME:! :coffee:",
 		u"Monday got me like: :sleeping:",
 		u"How is it already Monday again? :ghost:",
+		u"Monday funday, amirite?",
+		u"Happy Monday! :sun_with_face:",
+
 	],
 	[  # copy for Tuesday
 		u"Tuesday, it is \U000026F2",
 		u"Happy Tuesday, :NAME:!",
-		u":see_no_evil: Morning! :hear_no_evil:"
+		u":see_no_evil: Morning! :hear_no_evil:",
+		u"Top of the mornin' to ya!",
+
 	],
 	[  # copy for Wednesday
 		u"Wednesday is here already!",
@@ -103,6 +109,8 @@ REMINDER_DIGEST_HEADERS = [
 		u"Happy hump day",
 		u"It's a brand new day! :sunny:",
 		u"Mornin'! :dog:",
+		u"Yay for Wednesday.",
+		u"Good morning,:NAME:!",
 	],
 	[  # copy for Thursday
 		u"How did Thursday sneak up on us? :cat:",
@@ -110,24 +118,32 @@ REMINDER_DIGEST_HEADERS = [
 		u"How is it already Thursday? :eyes:",
 		u"Happy Thursday, :NAME:! :punch:",
 		u"Good morning :innocent:",
+		u"Morning! The weekend is almost here :smile:",
 	],
 	[  # copy for Friday
 		u"Friday funday! :party_popper:",
 		u"TGIF :tada:",
 		u"Shout out to Friday :raised_hands:",
 		u"Ahh, Friday. :ok_hand:",
+		u"The best day of the week...",
+		u"Happy Friday :smile:",
+
 	],
 	[  # copy for Saturday
 		u"It's sit-around-day \U0001F344",
 		u":wavy_dash:Saturday vibes:wavy_dash:",
 		u"Ahh, Saturday... The best day of the week.",
 		u"So much yes to Saturday :open_hands:",
+		u"Happy Saturday, :NAME:!:smile:",
 	],
 	[  # copy for Sunday
 		u"Sunday Sunday Sunday! \U0001F366",
 		u"Sunday funday! :raised_hands:",
 		u"Good morning!",
 		u"Sunday is for :zzz:",
+		u"Happy Sunday, :NAME:!,
+		u"Can you believe it's already Sunday?",
+
 	],
 ]
 
@@ -412,7 +428,7 @@ WHATSAPP_STATUS = u"\U0001F64B Hi, I'm here to help!"
 QUESTION_ACKNOWLEDGE_OK_RESPONSE_TEXT = "Got it, thanks."
 QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT = "Great to hear!"
 
-RESPONSE_FOR_WHO_REFERRED_YOU = 'Great, thanks!'
+RESPONSE_FOR_WHO_REFERRED_YOU = 'Great, thanks!', " Thanks! :thumbsup:"
 
 
 ####################
@@ -453,7 +469,7 @@ NICETIES_LIST = [
 	],
 	[
 		"i hate you|you suck|this is stupid|you[\S]{0,2} (stupid|fat|dumb|ugly)",
-		["Well that's not very nice. :pouting_face:", "I'm doing my best. :disappointed_face:", ":broken_heart:"]
+		["Well that's not very nice. :pouting_face:", "I'm doing my best. :disappointed_face:", ":broken_heart:", "Heart = broken", "Brb, crying. :sob:", " ]
 	],
 	[
 		"whats your name|who are you|what do you call yourself",
@@ -461,11 +477,11 @@ NICETIES_LIST = [
 	],
 	[
 		"i love you|.*you[\S]{0,2} ((pretty|so) )?(cool|neat|smart|(the (best|greatest)))|you rock",
-		[u"You're pretty cool too! :sunglasses:"]
+		[u"You're pretty cool too! :sunglasses:", "Aw shucks :relaxed:", ":blush:" ]
 	],
 	[
 		"I(m| am) sorry|apologies|I apologize|sry",
-		[u"That's ok.", u"Don't worry about it.", u"No worries.", u"I'm over it.", u"All good :ok_hand:"]
+		[u"That's ok.", u"Don't worry about it.", u"No worries.", u"I'm over it.", u"All good :ok_hand:", "NP!"]
 	],
 	[
 		"see you later|i have to go$",
@@ -497,7 +513,7 @@ NICETIES_LIST = [
 	],
 	[
 		"(is this|are you)( kind of|kinda)? like siri",
-		[u"We're distantly related. I text and throw better parties though! \U0001f389"]
+		[u"We're distantly related. I text and throw better parties though! \U0001f389", "She never called me back :information_desk_person:",]
 	],
 	[
 		"what do you think of siri",
@@ -513,7 +529,7 @@ NICETIES_LIST = [
 	],
 	[
 		"bye(bye)?|keep in touch",
-		[u":wave: See ya! Lmk if you need anything!"]
+		[u":wave: See ya! Lmk if you need anything!", "I'll be here!:wave:",]
 	],
 	[
 		"have a(n)? [\w]+ day",
@@ -529,15 +545,15 @@ NICETIES_LIST = [
 	],
 	[
 		"will you be my friend",
-		["Certainly! But I'm not very smart yet. :hatching_chick:"]
+		["Certainly! But I'm not very smart yet. :hatching_chick:", "BFFs :dizzy:",]
 	],
 	[
 		"can .* motivational support",
-		["Go go go! :chequered_flag:", "You can do it! :face_with_ok_gesture:", "To infinity, and beyond! :rocket:"]
+		["Go go go! :chequered_flag:", "You can do it! :face_with_ok_gesture:", "To infinity, and beyond! :rocket:", "You've got this :punch:"]
 	],
 	[
 		"do you (like|love) me",
-		["I think you're pretty cool! :sunglasses:"]
+		["I think you're pretty cool! :sunglasses:", "DUH :astonished:", "You're the best :thumbsup:",]
 	],
 	[
 		"do you like .+",
@@ -545,11 +561,11 @@ NICETIES_LIST = [
 	],
 	[
 		"whats (up|going on|new)",
-		["Chillin :sunglasses:", "Workin hard. :information_desk_person:", "Nothing much. :bath:"]
+		["Chillin :sunglasses:", "Workin hard. :information_desk_person:", "Nothing much. :bath:", "Hanging tough :sunglasses:", "Snacking :pizza:", "Just a quick snooze! :zzz:" ]
 	],
 	[
 		"this is (weird|strange|odd|different)",
-		["You're telling me!"]
+		["You're telling me!", "But isn't it great!?",]
 	],
 	[
 		"can i call you .+|i('m| am) going to call you .+",
@@ -578,7 +594,7 @@ NICETIES_LIST = [
 ]
 
 
-THANKYOU_RESPONSES = ["You're welcome.", "Happy to help.", "No problem.", "Sure thing."]
+THANKYOU_RESPONSES = ["You're welcome.", "Happy to help.", "No problem.", "Sure thing.", "Of course!", "You got it!", ":kissing_heart:",]
 AGE_RESPONSE = u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423"
 HOW_DO_I_SHARE_KEEPER_RESPONSE = ":clapping_hands_sign: Please send them to %s and thanks!"
 MY_NAME_IS_NOT_ROGER_RESPONSE = "I know, it's just an expression %s!"
