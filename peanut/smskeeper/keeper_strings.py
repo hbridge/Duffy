@@ -141,7 +141,7 @@ REMINDER_DIGEST_HEADERS = [
 		u"Sunday funday! :raised_hands:",
 		u"Good morning!",
 		u"Sunday is for :zzz:",
-		u"Happy Sunday, :NAME:!,
+		u"Happy Sunday, :NAME:!",
 		u"Can you believe it's already Sunday?",
 
 	],
