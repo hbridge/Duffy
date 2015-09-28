@@ -117,6 +117,11 @@ class ChangeSettingAction(Action):
 
 		user.postal_code = postalCode
 		timezone, wxcode, tempFormat = msg_util.dataForPostalCode(postalCode)
+
+		if not timezone:
+			sms_util.sendMsg(user, keeper_strings.ZIPCODE_CHANGE_ERROR_TEXT)
+			return True
+
 		user.timezone = timezone
 		user.wxcode = wxcode
 		user.temp_format = tempFormat
