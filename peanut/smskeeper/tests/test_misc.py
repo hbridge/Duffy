@@ -609,6 +609,16 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "Who is the bestests")
 			self.assertIn(self.getOutput(mock), emoji.emojize(str(keeper_strings.UNKNOWN_COMMAND_PHRASES), use_aliases=True))
 
+	# Had a bug where cr7 looked like a zipcode
+	def test_wrong_postal_code(self, dateMock):
+		self.setupUser(True, True, dateMock=dateMock)
+
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "11:00am order cr7")
+			self.assertIn("11am", self.getOutput(mock).lower())
+
+
 	def test_unknown_zero_message_when_no_followup(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
 

@@ -24,7 +24,7 @@ class ChangeSettingAction(Action):
 			if features.containsZipCodeWord():
 				score = .9
 			else:
-				score = .6
+				score = .2
 
 		if msg_util.nameInSetName(normalizedText, tutorial=False):
 			score = .9
