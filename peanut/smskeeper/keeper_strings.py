@@ -78,7 +78,6 @@ TUTORIAL_VCARD_AND_MORNING_DIGEST_TEXT = [
 TUTORIAL_MORNING_DIGEST_ONLY_TEXT = u"I'll also send you a morning txt \U0001F304 with with weather forecast \U0001F31E and daily tasks."  # used for whatsapp users
 
 
-
 ######################
 # MORNING DIGEST
 ######################
@@ -235,7 +234,6 @@ ENTRY_NOT_FOUND_TEXT = [
 ]
 
 
-
 #########################
 # SHARED REMINDERS
 #########################
@@ -258,7 +256,6 @@ SHARED_REMINDER_TEXT_TO_UNACTIVATED_USER = "Hi :wave: I'm %s's digital assistant
 SHARED_REMINDER_TEXT_TO_ACTIVATED_USER = "Hi! Friendly reminder from %s: %s"
 
 
-
 #####################
 # HELP MESSAGES
 #####################
@@ -270,7 +267,6 @@ HELP_MESSAGES = [
 	u"Like 'Pay rent on the 1st' or 'Wish Dad happy birthday on Tuesday'",
 	REMINDER_DIGEST_DONE_INSTRUCTIONS,
 ]
-
 
 
 #############################
@@ -296,7 +292,6 @@ STOP_RESPONSE = u"I won't txt you anymore \U0001F61E. If you didn't mean to do t
 START_RESPONSE = u"\U0001F44B Welcome back!"
 
 
-
 ###################################
 # UPDATE INFORMATION: NAME, ZIPCODE
 ###################################
@@ -304,7 +299,6 @@ START_RESPONSE = u"\U0001F44B Welcome back!"
 NAME_CHANGE_CONFIRMATION_TEXT = "Great, I'll call you %s from now on."
 NAME_CHANGE_ERROR_TEXT = "Sorry, I didn't catch that, try saying something like 'My name is Keeper'"
 ZIPCODE_CHANGE_ERROR_TEXT = "I'm sorry, I don't know that postal code"
-
 
 
 ###############
@@ -354,7 +348,6 @@ TIP_MONTHLY_CONFIRMATION_TEXT = "Ok, I'll send you tips monthly."
 TIP_FREQUENCY_CHANGE_ERROR_TEXT = "Sorry, I didn't get that. You can type 'send me tips weekly/monthly/never' to change how often I send you tips."
 
 
-
 #################
 # JOKES
 #################
@@ -395,10 +388,10 @@ JOKE_LAST_STEP = ":sunglasses:"
 ###############
 
 # When someone says "Done" for a task
-DONE_RESPONSE = "%s Checked :ARTICLE: off :white_check_mark:" # uses DONE_PHRASES for the first part
+DONE_RESPONSE = "%s Checked :ARTICLE: off :white_check_mark:"  # uses DONE_PHRASES for the first part
 DONE_SHORT_PHRASES = ["Nice!", "Sweet!", ":+1:", "Well done!", "Woohoo!"]
 
-DELETE_RESPONSE = "Ok. Removed :ARTICLE: :cross_mark:" # replaces :ARTICLE: with 'that' or 'those'
+DELETE_RESPONSE = "Ok. Removed :ARTICLE: :cross_mark:"  # replaces :ARTICLE: with 'that' or 'those'
 
 
 #################
@@ -469,7 +462,13 @@ NICETIES_LIST = [
 	],
 	[
 		"i hate you|you suck|this is stupid|you[\S]{0,2} (stupid|fat|dumb|ugly)",
-		["Well that's not very nice. :pouting_face:", "I'm doing my best. :disappointed_face:", ":broken_heart:", "Heart = broken", "Brb, crying. :sob:", " ]
+		[
+			"Well that's not very nice. :pouting_face:",
+			"I'm doing my best. :disappointed_face:",
+			":broken_heart:",
+			"Heart = broken",
+			"Brb, crying. :sob:",
+		]
 	],
 	[
 		"whats your name|who are you|what do you call yourself",
@@ -477,7 +476,7 @@ NICETIES_LIST = [
 	],
 	[
 		"i love you|.*you[\S]{0,2} ((pretty|so) )?(cool|neat|smart|(the (best|greatest)))|you rock",
-		[u"You're pretty cool too! :sunglasses:", "Aw shucks :relaxed:", ":blush:" ]
+		[u"You're pretty cool too! :sunglasses:", "Aw shucks :relaxed:", ":blush:"]
 	],
 	[
 		"I(m| am) sorry|apologies|I apologize|sry",
@@ -513,7 +512,10 @@ NICETIES_LIST = [
 	],
 	[
 		"(is this|are you)( kind of|kinda)? like siri",
-		[u"We're distantly related. I text and throw better parties though! \U0001f389", "She never called me back :information_desk_person:",]
+		[
+			u"We're distantly related. I text and throw better parties though! \U0001f389",
+			"She never called me back :information_desk_person:"
+		]
 	],
 	[
 		"what do you think of siri",
@@ -529,7 +531,10 @@ NICETIES_LIST = [
 	],
 	[
 		"bye(bye)?|keep in touch",
-		[u":wave: See ya! Lmk if you need anything!", "I'll be here!:wave:",]
+		[
+			u":wave: See ya! Lmk if you need anything!",
+			"I'll be here!:wave:",
+		]
 	],
 	[
 		"have a(n)? [\w]+ day",
@@ -545,7 +550,10 @@ NICETIES_LIST = [
 	],
 	[
 		"will you be my friend",
-		["Certainly! But I'm not very smart yet. :hatching_chick:", "BFFs :dizzy:",]
+		[
+			"Certainly! But I'm not very smart yet. :hatching_chick:",
+			"BFFs :dizzy:"
+		]
 	],
 	[
 		"can .* motivational support",
@@ -553,7 +561,11 @@ NICETIES_LIST = [
 	],
 	[
 		"do you (like|love) me",
-		["I think you're pretty cool! :sunglasses:", "DUH :astonished:", "You're the best :thumbsup:",]
+		[
+			"I think you're pretty cool! :sunglasses:",
+			"DUH :astonished:",
+			"You're the best :thumbsup:",
+		]
 	],
 	[
 		"do you like .+",
@@ -561,11 +573,21 @@ NICETIES_LIST = [
 	],
 	[
 		"whats (up|going on|new)",
-		["Chillin :sunglasses:", "Workin hard. :information_desk_person:", "Nothing much. :bath:", "Hanging tough :sunglasses:", "Snacking :pizza:", "Just a quick snooze! :zzz:" ]
+		[
+			"Chillin :sunglasses:",
+			"Workin hard. :information_desk_person:",
+			"Nothing much. :bath:",
+			"Hanging tough :sunglasses:",
+			"Snacking :pizza:",
+			"Just a quick snooze! :zzz:",
+		]
 	],
 	[
 		"this is (weird|strange|odd|different)",
-		["You're telling me!", "But isn't it great!?",]
+		[
+			"You're telling me!",
+			"But isn't it great!?"
+		]
 	],
 	[
 		"can i call you .+|i('m| am) going to call you .+",
@@ -594,7 +616,15 @@ NICETIES_LIST = [
 ]
 
 
-THANKYOU_RESPONSES = ["You're welcome.", "Happy to help.", "No problem.", "Sure thing.", "Of course!", "You got it!", ":kissing_heart:",]
+THANKYOU_RESPONSES = [
+	"You're welcome.",
+	"Happy to help.",
+	"No problem.",
+	"Sure thing.",
+	"Of course!",
+	"You got it!",
+	":kissing_heart:",
+]
 AGE_RESPONSE = u"I was born on April 29th, 2015. That makes me about %s old! \U0001F423"
 HOW_DO_I_SHARE_KEEPER_RESPONSE = ":clapping_hands_sign: Please send them to %s and thanks!"
 MY_NAME_IS_NOT_ROGER_RESPONSE = "I know, it's just an expression %s!"
