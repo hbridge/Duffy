@@ -5,6 +5,7 @@ import json
 import urllib
 from urllib2 import URLError
 import pickle
+import string
 import hashlib
 
 from smskeeper import chunk_features
