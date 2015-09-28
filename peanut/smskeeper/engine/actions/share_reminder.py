@@ -43,6 +43,9 @@ class ShareReminderAction(Action):
 		elif resolvedHandles and len(resolvedHandles) > 0:
 			score += 0.2
 
+		if chunk.matches(r'(remind me)'):
+			score = 0
+
 		return score
 
 	def execute(self, chunk, user):
