@@ -38,7 +38,8 @@ class SmrtScorer():
 
 	def getCacheKey(self, chunk, user):
 		date = date_util.unixTime(date_util.now())
-		key = "smrtscorer %s %s %s" % (date, user.getTimezone(), chunk.normalizedText())
+		txt = filter(lambda x: x in string.printable, chunk.normalizedText())
+		key = "smrtscorer %s %s %s" % (date, user.getTimezone(), txt)
 		return hashlib.md5(key.encode()).hexdigest()
 
 	def score(self, user, chunk, overrideClassification=None):
