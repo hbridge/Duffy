@@ -501,6 +501,8 @@ class Message(models.Model):
 	added = models.DateTimeField(db_index=True, null=True)
 	updated = models.DateTimeField(db_index=True, null=True)
 
+	natty_result_pkl = models.TextField(null=True)
+
 	# calculated attributes
 	messageDict = None
 
