@@ -134,8 +134,9 @@ class Engine:
 
 			if USE_SMRT:
 				for score, actions in sorted(smrtActionsByScore.items(), key=operator.itemgetter(0), reverse=True):
-					if score >= .55:
-						result.extend(actions)
+					#if score >= .3:
+					result.extend(actions)
+
 
 			foundV1 = False
 			for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
@@ -143,10 +144,12 @@ class Engine:
 					if len(actions) > 1:
 						actions = self.tieBreakActions(actions)
 
-					if score >= .6:
-						result = actions + result
-					else:
-						result.extend(actions)
+
+					#if score >= .8:
+					#	result = actions + result
+					#else:
+					result.extend(actions)
+
 					foundV1 = True
 					break
 

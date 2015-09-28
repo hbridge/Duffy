@@ -4,10 +4,14 @@ import urllib2
 import json
 import urllib
 from urllib2 import URLError
+import pickle
+import hashlib
 
 from smskeeper import chunk_features
 from smskeeper.engine.local_smrt_scorer import LocalSmrtScorer
-
+from common import date_util
+from django.core.cache import cache
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +36,21 @@ class SmrtScorer():
 				return action
 		return None
 
+	def getCacheKey(self, chunk, user):
+		date = date_util.unixTime(date_util.now())
+		key = "smrtscorer %s %s %s" % (date, user.getTimezone(), chunk.normalizedText())
+		return hashlib.md5(key.encode()).hexdigest()
+
 	def score(self, user, chunk, overrideClassification=None):
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
 		actionsByScore = dict()
+
+		if settings.USE_CACHE:
+			cacheResult = cache.get(self.getCacheKey(chunk, user))
+			if cacheResult:
+				result = pickle.loads(cacheResult)
+				logger.debug("User %s: Found cache hit in SmrtScorer, returning %s" % (user.id, result))
+				return result
 
 		features = chunk_features.ChunkFeatures(chunk, user)
 		featuresDict = chunk_features.getFeaturesDict(features)
@@ -67,10 +83,13 @@ class SmrtScorer():
 		for actionName, score in sorted(scoresByActionName.items(), key=operator.itemgetter(1), reverse=True):
 			action = self.getActionByName(actionName)
 			if action:
-				logger.info("User %s: Action %s got score %s" % (user.id, action.ACTION_CLASS, score))
+				logger.info("User %s: SMRT Action %s got score %s" % (user.id, action.ACTION_CLASS, score))
 
 				if score not in actionsByScore:
 					actionsByScore[score] = list()
 				actionsByScore[score].append(action)
+
+		if settings.USE_CACHE:
+			cache.set(self.getCacheKey(chunk, user), pickle.dumps(actionsByScore))
 
 		return actionsByScore

@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 class EngineSimHarness():
 	entriesCount = 0
 
-	def __init__(self, scorer=None, engine=None):
-		self.scorer = scorer
+	def __init__(self, v1Scorer=None, smrtScorer=None, engine=None):
+		self.v1Scorer = v1Scorer
+		self.smrtScorer = smrtScorer
 		self.engine = engine
 
 	@patch('common.date_util.utcnow')
@@ -37,10 +38,13 @@ class EngineSimHarness():
 		# actually score the message
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
 		chunk = Chunk(lines[0])  # only process first line for now
-		actionsByScore = self.scorer.score(user, chunk)
-		processed, classification = self.engine.process(user, chunk, actionsByScore, simulate=True)
 
-		return classification, actionsByScore
+		smrtActionsByScore = self.smrtScorer.score(user, chunk)
+		v1ActionsByScore = self.v1Scorer.score(user, chunk)
+		bestActions = self.engine.getBestActions(user, chunk, v1ActionsByScore, smrtActionsByScore)
+
+		processed, classification = self.engine.process(user, chunk, bestActions, simulate=True)
+		return classification, smrtActionsByScore
 
 	@patch('common.date_util.utcnow')
 	@patch('smskeeper.models.User.wasRecentlySentMsgOfClass')

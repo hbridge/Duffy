@@ -6,9 +6,15 @@ import re
 import logging
 from urllib2 import URLError
 import pytz
+import pickle
+import hashlib
+import string
 from dateutil import relativedelta
 
 from common import date_util
+
+from django.core.cache import cache
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +43,22 @@ class NattyResult():
 		return "=%s '%s' '%s' hadDate:%s hadTime:%s=" % (self.utcTime, self.queryWithoutTiming, self.textUsed, self.hadDate, self.hadTime)
 
 
+def getCacheKey(msg, user):
+	date = date_util.unixTime(date_util.now())
+	txt = filter(lambda x: x in string.printable, msg)
+	key = "natty %s %s %s" % (date, user.getTimezone(), txt)
+	return hashlib.md5(key.encode()).hexdigest()
+
+
 # Main External method
 def getNattyResult(msg, user):
+	if settings.USE_CACHE:
+		cacheResult = cache.get(getCacheKey(msg, user))
+		if cacheResult:
+			result = pickle.loads(cacheResult)
+			logger.debug("User %s: Found cache hit, returning %s" % (user.id, result))
+			return result
+
 	nattyMsg = fixMsgForNatty(msg, user)
 	nattyResults = getNattyInfo(nattyMsg, user.getTimezone())
 
@@ -144,6 +164,9 @@ def getNattyResult(msg, user):
 						uniqueResults[1].hadDate and uniqueResults[1].hadTime)):
 			uniqueResults = sorted(uniqueResults, key=lambda x: x.utcTime)
 			return uniqueResults[0]
+
+	if settings.USE_CACHE:
+		cache.set(getCacheKey(msg, user), pickle.dumps(nattyResults[0]))
 
 	return nattyResults[0]
 

@@ -15,6 +15,7 @@ from smskeeper import keeper_constants
 from smskeeper.engine.engine_harness import EngineSimHarness
 from smskeeper.engine import Engine
 from smskeeper.engine.smrt_scorer import SmrtScorer
+from smskeeper.engine.v1_scorer import V1Scorer
 from smskeeper.models import Message
 from smskeeper.scripts import importZipdata
 from smskeeper.tests import test_base
@@ -90,9 +91,10 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 
 		classified_messages = json.loads(response)
 
-		scorer = SmrtScorer(Engine.DEFAULT, 0.0, local=True)
+		v1Scorer = V1Scorer(Engine.DEFAULT, 0.0)
+		smrtScorer = SmrtScorer(Engine.DEFAULT, 0.0, local=True)
 		engine = Engine(Engine.DEFAULT, 0.0)
-		harness = EngineSimHarness(scorer, engine)
+		harness = EngineSimHarness(v1Scorer, smrtScorer, engine)
 
 		for message in classified_messages:
 			try:

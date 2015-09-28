@@ -26,3 +26,5 @@ WHATSAPP_CREDENTIALS = ("", "")
 
 if len(sys.argv) > 2:  # If we're running an individual test
 	logging.disable(logging.DEBUG)
+
+USE_CACHE = False

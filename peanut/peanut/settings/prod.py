@@ -65,3 +65,5 @@ USER_HISTORY_PATH = "http://prod.strand.duffyapp.com/smskeeper/history?user_id="
 MIXPANEL_TOKEN = "165ffa12b4eac14005ec6d97872a9c63"
 ZENDESK_URL = 'https://duffy.zendesk.com'
 ZENDESK_TOKEN = 'kkOHt9PAYkNz3ZBFluI1oCqx2U1jWdE6Q8SV57wo'
+
+USE_CACHE = False

@@ -93,3 +93,11 @@ WHATSAPP_PRESENCE_NAME = u"\U0001F64B DevKeeper"
 
 MIXPANEL_TOKEN = "d309a366da36d3f897ad2772390d1679"
 
+CACHES = {
+	'default': {
+		'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+		'LOCATION': '127.0.0.1:11211',
+		'TIMEOUT': 86400,
+	}
+}
+USE_CACHE = True
