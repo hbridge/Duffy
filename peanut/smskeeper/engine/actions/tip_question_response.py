@@ -1,5 +1,6 @@
 import logging
 import json
+import random
 
 from smskeeper import keeper_constants, keeper_strings
 from .action import Action
@@ -195,7 +196,7 @@ class TipQuestionResponseAction(Action):
 					user.save()
 					logger.info("User %s: Updated referrer to %s" % (user.id, chunk.originalText))
 
-				sms_util.sendMsg(user, keeper_strings.RESPONSE_FOR_WHO_REFERRED_YOU)
+				sms_util.sendMsg(user, random.choice(keeper_strings.RESPONSE_FOR_WHO_REFERRED_YOU))
 		else:
 			return False
 
