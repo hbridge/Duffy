@@ -38,6 +38,7 @@ from smskeeper.serializers import MessageSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
+from common import phone_info_util
 
 from common.api_util import DuffyJsonEncoder
 
@@ -425,6 +426,7 @@ def getUserDataDict(user, phoneNumToContactDict):
 		"completed_tutorial": user.completed_tutorial,
 		"timezone": str(user.getTimezone()),
 		"postal_code": user.postal_code,
+		"carrier": phone_info_util.getUserCarrierInfo(user).get('name', 'unknown')
 	}
 	return userData
 

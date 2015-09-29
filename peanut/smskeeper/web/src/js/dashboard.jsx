@@ -98,7 +98,7 @@ var UserTable = React.createClass({
           rowHeight={rowHeight}
           rowGetter={rowGetter}
           rowsCount={this.props.users.length}
-          width={1200}
+          width={1280}
           maxHeight={rowHeight * 10}
           headerHeight={60}
           >
@@ -111,6 +111,7 @@ var UserTable = React.createClass({
           <Column label="msgs (in/out)" width={80} dataKey={6} />
           <Column label="last in" width={130} dataKey={7} />
           <Column label="product id" width={80} dataKey={8} />
+          <Column label="carrier" width={80} dataKey={9} />
         </Table>
       </div>
       );
@@ -147,7 +148,6 @@ var UserTable = React.createClass({
     var rowClasses = classNames({
       'oddrow' : this.props.highlighted == true,
     });
-    console.log("HERE");
     return ([
       format("{id} ({phone_number})", user),
       //format("<a href=/{key}?internal=1>{name}</a>", user),
@@ -159,7 +159,8 @@ var UserTable = React.createClass({
       format("{message_stats.incoming.count}/{message_stats.outgoing.count}", user),
       timeago_text,
       user.product_id,
-      user,
+      user.carrier,
+      user
     ]);
   },
 });
@@ -306,7 +307,7 @@ var DashboardApp = React.createClass({
 
 		return (
       <div>
-        <FilterForm filterFields={["name", "id", "source"]} onChange={this._onFilterChange} />
+        <FilterForm filterFields={["name", "id", "source", "carrier"]} onChange={this._onFilterChange} />
         <DailyTable stats={ this.state.daily_stats} />
         <UserTable users={ pausedUsers } showActivated={ true } title={"Paused (" + pausedUsers.length  + ")"}/>
         <UserTable users={ normalUsers } showActivated={ true } title={"Active (" + normalUsers.length  + ")"}/>
