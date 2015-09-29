@@ -421,7 +421,10 @@ WHATSAPP_STATUS = u"\U0001F64B Hi, I'm here to help!"
 QUESTION_ACKNOWLEDGE_OK_RESPONSE_TEXT = "Got it, thanks."
 QUESTION_ACKNOWLEDGE_GREAT_RESPONSE_TEXT = "Great to hear!"
 
-RESPONSE_FOR_WHO_REFERRED_YOU = 'Great, thanks!', " Thanks! :thumbsup:"
+RESPONSE_FOR_WHO_REFERRED_YOU = [
+	'Great, thanks!',
+	"Thanks! :thumbsup:"
+]
 
 
 ####################

@@ -328,7 +328,7 @@ class SMSKeeperTodoTutorialCase(test_base.SMSKeeperBaseCase):
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "Bobby told me")
-			self.assertIn("Great, thanks", self.getOutput(mock))
+			self.assertIn("thanks", self.getOutput(mock).lower())
 
 		user = self.getTestUser()
 		info = json.loads(user.signup_data_json)
