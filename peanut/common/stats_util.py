@@ -7,6 +7,7 @@ lastCheckinTime = None
 lastCheckinQueryCount = 0
 statsInited = False
 
+
 def startProfiling():
 	global requestStartTime
 	global lastCheckinTime
@@ -17,22 +18,23 @@ def startProfiling():
 	lastCheckinTime = requestStartTime
 	lastCheckinQueryCount = 0
 
-def printStats(title, printQueries = False):
+
+def printStats(title, printQueries=False):
 	global lastCheckinTime
 	global lastCheckinQueryCount
 	global statsInited
-	
+
 	if not statsInited:
 		return
 
 	now = datetime.datetime.now()
-	msTime = ((now-lastCheckinTime).microseconds / 1000 + (now-lastCheckinTime).seconds * 1000)
+	checkinDiff = ((now - lastCheckinTime).microseconds / 1000 + (now - lastCheckinTime).seconds * 1000)
+	startDiff = ((now - requestStartTime).microseconds / 1000 + (now - requestStartTime).seconds * 1000)
 	lastCheckinTime = now
 
 	queryCount = len(connection.queries) - lastCheckinQueryCount
-	
 
-	print "%s took %s ms and did %s queries" % (title, msTime, queryCount)
+	print "PROFILING %s took %s ms (%s total) and did %s queries" % (title, checkinDiff, startDiff, queryCount)
 
 	if printQueries:
 		print "QUERIES for %s" % title
