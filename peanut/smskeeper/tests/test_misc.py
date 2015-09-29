@@ -11,6 +11,8 @@ from common import date_util
 import test_base
 import emoji
 from common import phone_info_util
+import json
+from mock import Mock
 
 
 @patch('common.date_util.utcnow')
@@ -41,11 +43,38 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		sms_util.sendDelayedMsg(self.getTestUser(), "hi", 1, None, classification="testclass")
 		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass("testclass"))
 
+	def test_test_carrier_info(self, dateMock):
+		self.setupUser(True, True)
+		carrierInfo = json.loads(phone_info_util.fetchCarrierInfoJsonForUser(self.getTestUser()))
+		self.assertEqual(carrierInfo['name'], "test")
+
 	def test_long_sms_blacklist(self, dateMock):
 		self.setupUser(True, True)
 		user = self.getTestUser()
-		user.carrier_info_json = '{"mobile_network_code": "012", "name": "Verizon Wireless"}'
-		user.save()
+
+		with patch('smskeeper.keeper_constants.isRealKeeperNumber') as realNumberMock:
+			realNumberMock.return_value = True  # force fetch
+			with patch('twilio.rest.resources.base.make_twilio_request') as reqMock:
+				# fake the twilio data
+				resp = Mock()
+				resp.content = json.dumps({
+					"country_code": "US",
+					"phone_number": "+15555555555",
+					"national_format": "(555) 555-5555",
+					"url": "https://lookups.twilio.com/v1/PhoneNumber/+15555555555",
+					"carrier": {
+						"type": "mobile",
+						"error_code": None,
+						"mobile_network_code": "120",  # blacklisted
+						"mobile_country_code": "310",
+						"name": "Sprint Spectrum, L.P."
+					}
+				})
+				reqMock.return_value = resp
+
+				user.carrier_info_json = phone_info_util.fetchCarrierInfoJsonForUser(user)
+				user.save()
+
 		self.assertFalse(phone_info_util.userCarrierSupportsLongSMS(self.getTestUser()))
 
 	"""

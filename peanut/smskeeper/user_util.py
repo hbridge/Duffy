@@ -17,6 +17,7 @@ from smskeeper.models import Entry, User
 
 from common import date_util
 from common import slack_logger
+from common import phone_info_util
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +47,14 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 	if not user.key:
 		user.key = "P" + str(productId) + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
-	user.save()
+	# we need to set this before activating so we know whether to split tutorial messages etc
+	user.carrier_info_json = phone_info_util.fetchCarrierInfoJsonForUser(user)
 
 	if not isShare:
 		tutorialState = activateUser(user, introPhrase, keeperNumber)
 	else:
 		user.setActivated(False)
 		user.setState(keeper_constants.STATE_NOT_ACTIVATED_FROM_REMINDER)
-		user.save()
 		tutorialState = None
 
 	analytics.logUserEvent(
@@ -67,6 +68,7 @@ def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase
 		}
 	)
 
+	user.save()
 	return user
 
 

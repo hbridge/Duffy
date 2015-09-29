@@ -13,33 +13,40 @@ LONG_MESSAGE_CARRIER_CODE_BLACKLIST = [
 ]
 
 
-def updatePhoneInfoForUser(user):
-	client = TwilioLookupsClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
-	try:
-		info = client.phone_numbers.get(user.phone_number, include_carrier_info=True)
-		user.carrier_info_json = json.dumps(info.carrier)
-		user.save()
-		logger.info('User %d: found carrier: %s', user.id, info.carrier.get('name', "null"))
-	except Exception as e:
-		logger.error("Couldn't set phoneInfoFor user %d: %s", user.id, e)
-
-
-def getUserCarrierInfo(user):
+def fetchCarrierInfoJsonForUser(user):
+	carrierInfo = None
 	keeperNumber = user.getKeeperNumber()
+
+	# if this is a fake number or a whatsapp number, don't ask twilio
 	if whatsapp_util.isWhatsappNumber(keeperNumber):
-		return {
+		carrierInfo = {
 			"mobile_network_code": "0",
 			"name": "whatsapp"
 		}
-	elif user.carrier_info_json is None or user.carrier_info_json == "":
-		if not keeper_constants.isRealKeeperNumber(keeperNumber):
-			return {
-				"mobile_network_code": "0",
-				"name": "test"
-			}
+	elif not keeper_constants.isRealKeeperNumber(keeperNumber):
+		carrierInfo = {
+			"mobile_network_code": "0",
+			"name": "test"
+		}
+	else:  # otherwise, look it up from twilio
+		client = TwilioLookupsClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
+		try:
+			info = client.phone_numbers.get(user.phone_number, include_carrier_info=True)
+			carrierInfo = info.carrier
+			logger.info('User %d: found carrier: %s', user.id, info.carrier.get('name', "null"))
+		except Exception as e:
+			logger.error("Couldn't get carrier info from Twillio for user %d: %s", user.id, e)
+			return None
+
+	return json.dumps(carrierInfo)
+
+
+def getUserCarrierInfo(user):
+	carrierInfo = None
+
+	if user.carrier_info_json is None or user.carrier_info_json == "":
 		return None
 
-	carrierInfo = None
 	try:
 		carrierInfo = json.loads(user.carrier_info_json)
 	except Exception as e:
