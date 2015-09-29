@@ -20,7 +20,7 @@ from django.db.models import F
 class User(models.Model):
 	history = HistoricalRecords()
 	phone_number = models.CharField(max_length=100, unique=True)
-	phone_number_info = models.TextField(null=True)
+	carrier_info_json = models.TextField(null=True)
 	name = models.CharField(max_length=100, blank=True)
 	completed_tutorial = models.BooleanField(default=False)
 	tutorial_step = models.IntegerField(default=0)

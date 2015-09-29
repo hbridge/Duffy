@@ -10,6 +10,7 @@ from common import date_util
 
 import test_base
 import emoji
+from common import phone_info_util
 
 
 @patch('common.date_util.utcnow')
@@ -39,6 +40,13 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		sms_util.sendDelayedMsg(self.getTestUser(), "hi", 1, None, classification="testclass")
 		self.assertTrue(self.getTestUser().wasRecentlySentMsgOfClass("testclass"))
+
+	def test_long_sms_blacklist(self, dateMock):
+		self.setupUser(True, True)
+		user = self.getTestUser()
+		user.carrier_info_json = '{"mobile_network_code": "012", "name": "Verizon Wireless"}'
+		user.save()
+		self.assertFalse(phone_info_util.userCarrierSupportsLongSMS(self.getTestUser()))
 
 	"""
 	Commented out by Derek while we experiement with no not-activated state
