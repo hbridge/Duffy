@@ -281,3 +281,46 @@ monday = datetime(2015, 7, 13, 0, 0, 0, tzinfo=pytz.timezone('US/Eastern'))
 diff = getDiffOfUsers(None, monday, 5, 9)
 print diff
 
+
+##########
+
+import pytz
+import datetime
+import json
+import operator
+
+from smskeeper.models import User, Message
+from common import date_util
+
+def get7dayActives():
+    users = list()
+    daily_stats = {}
+    date_filter = date_util.now(pytz.utc) - datetime.timedelta(days=7)
+    for direction in ["incoming"]:
+        incoming = (direction == "incoming")
+        messages = Message.objects.filter(incoming=incoming, added__gt=date_filter)
+        message_count = messages.count()
+        msg_users = messages.values_list('user').distinct()
+        users = msg_users
+    return users
+
+def getCarrierCounts(users):
+    users = User.objects.filter(id__in=users)
+    carrierDict = {}
+    for user in users:
+        info = json.loads(user.carrier_info_json)
+        carrier = info.get('name', "None")
+        countForCarrier = carrierDict.get(carrier, 0)
+        countForCarrier += 1
+        carrierDict[carrier] = countForCarrier
+    carrierDict = sorted(carrierDict.items(), key=operator.itemgetter(1), reverse=True)
+    return carrierDict
+
+def getUsersWithCarrier(users, carrier):
+    users = User.objects.filter(id__in=users)
+    userList = list()
+    for user in users:
+        if carrier.lower() in user.carrier_info_json.lower():
+            userList.append(user)
+    return userList
+
