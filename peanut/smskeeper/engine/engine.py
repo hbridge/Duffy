@@ -24,7 +24,7 @@ from smskeeper.chunk import Chunk
 
 logger = logging.getLogger(__name__)
 
-USE_SMRT = False
+USE_SMRT = True
 
 
 class Engine:
@@ -137,26 +137,31 @@ class Engine:
 					result.extend(actions)
 
 			foundV1 = False
+			v1scoresByActionName = dict()
 			for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
 				if score > self.minScore:
 					if len(actions) > 1:
 						actions = self.tieBreakActions(actions)
 
 					result.extend(actions)
-
 					foundV1 = True
-					break
+
+				for action in actions:
+					v1scoresByActionName[action.ACTION_CLASS] = score
 
 			# Exception case:
 			# smrt really likes to do createtodo on unknown things.  So if v1 says unknown
 			# and smrt says create, treat as unknown
-			if len(result) > 0 and result[0].ACTION_CLASS == "createtodo" and not foundV1:
-				result = list()
+			#if len(result) > 0 and result[0].ACTION_CLASS == "createtodo" and not foundV1:
+			#	result = list()
 
 			# Temporary hack:
 			# If old engine doesn't find anything, then ignore smrt engine
-			if not foundV1:
-				result = list()
+			#if not foundV1:
+			#	result = list()
+
+			if v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .7 and result[0].ACTION_CLASS == "createtodo":
+				result = [self.getActionByName(keeper_constants.CLASS_TIP_QUESTION_RESPONSE)] + result
 
 		logger.debug("User %s: in getBestActions, final actions: %s" % (user.id, [x.ACTION_CLASS for x in result]))
 		return result
