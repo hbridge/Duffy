@@ -229,7 +229,7 @@ FOLLOWUP_TIME_TEXT = [
 
 # Used when you say "Done with mom" and we can't tell which entry you mean
 ENTRY_NOT_FOUND_TEXT = [
-	u"Sorry, I'm not sure what entry you mean. Could you rephrase?"
+	u"Sorry, I'm not sure what entry you mean. Could you rephrase?",
 	u"Didn't catch that, mind rephrasing?"
 ]
 
