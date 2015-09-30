@@ -109,7 +109,7 @@ REMINDER_DIGEST_HEADERS = [
 		u"It's a brand new day! :sunny:",
 		u"Mornin'! :dog:",
 		u"Yay for Wednesday.",
-		u"Good morning,:NAME:!",
+		u"Good morning, :NAME:!",
 	],
 	[  # copy for Thursday
 		u"How did Thursday sneak up on us? :cat:",
