@@ -2,6 +2,7 @@ import datetime
 import logging
 import pytz
 import json
+from memorised.decorators import memorise
 
 from smskeeper import entry_util
 import phonenumbers
@@ -14,34 +15,49 @@ from common import date_util
 logger = logging.getLogger(__name__)
 
 
-def makeRegisteringDecorator(foreignDecorator):
-	"""
-		Returns a copy of foreignDecorator, which is identical in every
-		way(*), except also appends a .decorator property to the callable it
-		spits out.
-	"""
-	def newDecorator(func):
-		# Call to newDecorator(method)
-		# Exactly like old decorator, but output keeps track of what decorated it
-		R = foreignDecorator(func)  # apply foreignDecorator, like call to foreignDecorator(method) would have done
-		R.decorator = newDecorator  # keep track of decorator
-		return R
+class memoized_property(object):
+    def __init__(self, fget=None, fset=None, fdel=None, doc=None):
+        if doc is None and fget is not None and hasattr(fget, "__doc__"):
+            doc = fget.__doc__
+        self.__get = fget
+        self.__set = fset
+        self.__del = fdel
+        self.__doc__ = doc
+        if fget is not None:
+            self._attr_name = '___' + fget.func_name
 
-	newDecorator.__name__ = foreignDecorator.__name__
-	newDecorator.__doc__ = foreignDecorator.__doc__
-	# (*)We can be somewhat "hygienic", but newDecorator still isn't signature-preserving, i.e. you will not be able to get a runtime list of parameters. For that, you need hackish libraries...but in this case, the only argument is func, so it's not a big issue
+    def __get__(self, inst, type=None):
+        if inst is None:
+            return self
+        if self.__get is None:
+            raise AttributeError, "unreadable attribute"
 
-	return newDecorator
+        if not hasattr(inst, self._attr_name):
+            result = self.__get(inst)
+            setattr(inst, self._attr_name, result)
+        return getattr(inst, self._attr_name)
+
+    def __set__(self, inst, value):
+        if self.__set is None:
+            raise AttributeError, "can't set attribute"
+        delattr(inst, self._attr_name)
+        return self.__set(inst, value)
+
+    def __delete__(self, inst):
+        if self.__del is None:
+            raise AttributeError, "can't delete attribute"
+        delattr(inst, self._attr_name)
+        return self.__del(inst)
 
 
-def feature(fn):
-	def new(*args):
-		return fn(*args)
-
-	new.__name__ = fn.__name__
-	return new
-
-feature = makeRegisteringDecorator(feature)
+def memoized_property_set(inst, func_name, value):
+    if isinstance(func_name, basestring):
+        property_name = '___' + func_name
+    elif hasattr(func_name, 'func_name'):
+        property_name = '___' + func_name.func_name
+    else:
+        raise
+    setattr(inst, property_name, value)
 
 
 class ChunkFeatures:
@@ -76,6 +92,8 @@ class ChunkFeatures:
 	# Stop
 	stopRegex = r"stop$|silent stop$|cancel( keeper)?$"
 
+
+
 	# PRIVATE
 	def getInterestingWords(self):
 		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
@@ -103,82 +121,101 @@ class ChunkFeatures:
 				return firstInt
 		return None
 
+	def getMatchingEntriesStrict(self):
+		return entry_util.fuzzyMatchEntries(self.user, ' '.join(self.getInterestingWords()), 80)
+
+	def getMatchingEntriesBroad(self):
+		return entry_util.fuzzyMatchEntries(self.user, ' '.join(self.getInterestingWords()), 65)
+
+	def getJustNotifiedEntryIds(self):
+		return self.user.getLastEntriesIds()
+
 	# Features
-	@feature
+	@memoized_property
 	def hasTimingInfo(self):
 		if self.chunk.getNattyResult(self.user):
 			return True
 		return False
 
-	@feature
+	@memoized_property
 	def hasTimeOfDay(self):
 		nattyResult = self.chunk.getNattyResult(self.user)
 		if nattyResult and nattyResult.hadTime:
 			return True
 		return False
 
-	@feature
+	@memoized_property
 	def hasDate(self):
 		nattyResult = self.chunk.getNattyResult(self.user)
 		if nattyResult and nattyResult.hadDate:
 			return True
 		return False
 
-	@feature
+	@memoized_property
 	def numInterestingWords(self):
 		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
 		return len(msg_util.getInterestingWords(cleanedText))
 
-	@feature
+	@memoized_property
 	def hasDoneWord(self):
 		return msg_util.done_re.search(self.chunk.normalizedText()) is not None
 
-	@feature
+	@memoized_property
 	def beginsWithDoneWord(self):
 		return self.chunk.matches(self.beginsWithDoneWordRegex)
 
-	@feature
+	@memoized_property
 	def beginsWithNo(self):
 		return msg_util.startsWithNo(self.chunk.normalizedText())
 
-	@feature
+	@memoized_property
 	def hasChangeTimeWord(self):
 		return self.chunk.contains(self.changeTimeBasicRegex)
 
-	@feature
+	@memoized_property
 	def beginsWithChangeTimeWord(self):
 		return self.chunk.matches(self.changeTimeBeginsWithRegex)
 
-	@feature
+	@memoized_property
 	def numMatchingEntriesStrict(self):
-		return len(entry_util.fuzzyMatchEntries(self.user, ' '.join(self.getInterestingWords()), 80))
+		return len(self.getMatchingEntriesStrict())
 
-	@feature
+	@memoized_property
+	def numEntriesJustNotifiedAbout(self):
+		bestEntries = self.getMatchingEntriesBroad()
+		bestEntryIds = [x.id for x in bestEntries]
+		justNotifiedEntryIds = self.user.getLastEntriesIds()
+
+		return len(set(bestEntryIds).intersection(set(justNotifiedEntryIds)))
+
+	@memoized_property
 	def numMatchingEntriesBroad(self):
-		return len(entry_util.fuzzyMatchEntries(self.user, ' '.join(self.getInterestingWords()), 65))
+		return len(self.getMatchingEntriesBroad())
 
-	@feature
+	@memoized_property
 	def hasCreateWord(self):
 		return self.chunk.contains(self.containsCreateWordhRegex)
 
-	@feature
+	@memoized_property
 	def hasReminderPhrase(self):
 		return msg_util.reminder_re.search(self.chunk.normalizedText()) is not None
 
-	@feature
+	@memoized_property
 	def beginsWithCreateWord(self):
 		return self.chunk.matches(self.beginsWithCreateWordRegex)
 
-	@feature
+	@memoized_property
 	def beginsWithAndWord(self):
 		return self.chunk.matches(r'and|also')
 
-	@feature
+	@memoized_property
+	@memorise(parent_keys=['chunk'])
 	def hasPhoneNumber(self):
 		matches = phonenumbers.PhoneNumberMatcher(self.chunk.originalText, 'US')
 		return matches.has_next()
 
-	@feature
+	@memoized_property
+	@memorise(parent_keys=['chunk'])
 	def isPhoneNumber(self):
 		matches = phonenumbers.PhoneNumberMatcher(self.chunk.originalText, 'US')
 		if not matches.has_next():
@@ -190,19 +227,19 @@ class ChunkFeatures:
 
 	# is the primary verb of the chunk "remind" as in "remind me to poop"
 	# as opposed to "call fred tonight"
-	@feature
+	@memoized_property
 	def primaryActionIsRemind(self):
 		return self.chunk.matches(keeper_constants.SHARED_REMINDER_VERB_WHITELIST_REGEX)
 
-	@feature
+	@memoized_property
 	def hasWeatherWord(self):
 		return self.chunk.contains(self.weatherRegex)
 
-	@feature
+	@memoized_property
 	def numWords(self):
 		return len(self.chunk.normalizedText().split(' '))
 
-	@feature
+	@memoized_property
 	def isQuestion(self):
 		isQuestion = False
 		if self.chunk.endsWith("\?", punctuationWhitelist="?"):
@@ -213,11 +250,11 @@ class ChunkFeatures:
 
 		return isQuestion
 
-	@feature
+	@memoized_property
 	def isBroadQuestion(self):
 		return self.chunk.matches(r'(where|how|why|who|should|would|are)\b')
 
-	@feature
+	@memoized_property
 	def numFetchDigestWords(self):
 		fetchDigestWords = ["tasks", "todo", "reminders", "list", "left", "reminding", "schedule", "all"]
 		normalizedText = self.chunk.normalizedText()
@@ -231,19 +268,19 @@ class ChunkFeatures:
 
 		return count
 
-	@feature
+	@memoized_property
 	def isFetchDigestPhrase(self):
 		return self.chunk.matches(r'tasks|todo|whats left|what am i doing')
 
-	@feature
+	@memoized_property
 	def couldBeDone(self):
 		return msg_util.done_re.search(self.chunk.normalizedText()) is not None
 
-	@feature
+	@memoized_property
 	def containsToday(self):
 		return self.chunk.contains('today')
 
-	@feature
+	@memoized_property
 	def containsDeleteWord(self):
 		return self.chunk.contains(r'delete|clear|remove')
 
@@ -263,63 +300,63 @@ class ChunkFeatures:
 			sorted(results.items(), key=lambda t: t[1], reverse=True)
 		)
 
-	@feature
+	@memoized_property
 	def containsTipWord(self):
 		return self.chunk.contains(r'tip')
 
-	@feature
+	@memoized_property
 	def containsNegativeWord(self):
 		return self.chunk.contains(r'(no|dont|not|never|stop)')
 
-	@feature
+	@memoized_property
 	def containsPostalCode(self):
 		return msg_util.getPostalCode(self.chunk.normalizedText()) is not None
 
-	@feature
+	@memoized_property
 	def containsZipCodeWord(self):
 		return self.chunk.contains(r'(zip|zip code|zipcode|moved)')
 
-	@feature
+	@memoized_property
 	def containsFirstPersonWord(self):
 		return self.chunk.contains(r'(\bI\b|\bmy\b)')
 
-	@feature
+	@memoized_property
 	def looksLikeList(self):
 		return self.chunk.contains(r'[:]', punctuationWhitelist=':')
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassReminder(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_REMINDER)
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassDigest(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_DIGEST)
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassJoke(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_JOKE)
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassChangeDigestTime(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_CHANGE_DIGEST_TIME, 2)
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassReferralAsk(self):
 		return self.user.wasRecentlySentMsgOfClass(tips.REFERRAL_ASK_TIP_ID, 2)
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassNpsTip(self):
 		return self.user.wasRecentlySentMsgOfClass(tips.DIGEST_QUESTION_NPS_TIP_ID, 2)
 
-	@feature
+	@memoized_property
 	def wasRecentlySentMsgOfClassDigestSurvey(self):
 		return self.user.wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SURVEY, 2)
 
-	@feature
+	@memoized_property
 	def userMissingNpsInfo(self):
 		return self.user.getStateData(keeper_constants.NPS_DATA_KEY) is None
 
-	@feature
+	@memoized_property
 	def userMissingReferralInfo(self):
 		if self.user.signup_data_json:
 			signupData = json.loads(self.user.signup_data_json)
@@ -328,11 +365,11 @@ class ChunkFeatures:
 
 		return ("referrer" not in signupData or len(signupData["referrer"]) == 0)
 
-	@feature
+	@memoized_property
 	def userMissingDigestSurveyInfo(self):
 		return self.user.getStateData(keeper_constants.DIGEST_SURVEY_DATA_KEY) is None
 
-	@feature
+	@memoized_property
 	def hasIntFirst(self):
 		words = self.chunk.normalizedText().split(' ')
 
@@ -340,7 +377,7 @@ class ChunkFeatures:
 			return self.isInt(words[0])
 		return False
 
-	@feature
+	@memoized_property
 	def hasInt(self):
 		words = self.chunk.normalizedText().split(' ')
 
@@ -351,13 +388,13 @@ class ChunkFeatures:
 				hasInt = True
 		return hasInt
 
-	@feature
+	@memoized_property
 	def numCharactersInCleanedText(self):
 		cleanedText = msg_util.cleanedReminder(msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user)))
 		return len(cleanedText)
 
 	# This could be a problem since it looks at now
-	@feature
+	@memoized_property
 	def isRecentAction(self):
 		now = date_util.now(pytz.utc)
 
@@ -366,41 +403,44 @@ class ChunkFeatures:
 
 		return isRecentAction
 
-	@feature
+	@memoized_property
+	@memorise(parent_keys=['chunk'])
 	def hasAnyNicety(self):
 		return True if niceties.getNicety(self.chunk.originalText) else False
 
-	@feature
+	@memoized_property
+	@memorise(parent_keys=['chunk'])
 	def hasSilentNicety(self):
 		nicety = niceties.getNicety(self.chunk.originalText)
 		if nicety and nicety.isSilent():
 			return True
 		return False
 
-	@feature
+	@memoized_property
+	@memorise(parent_keys=['chunk'])
 	def nicetyMatchScore(self):
 		nicety = niceties.getNicety(self.chunk.originalText)
 		if nicety:
 			return nicety.matchScore(self.chunk.originalText)
 		return 0
 
-	@feature
+	@memoized_property
 	def inTutorial(self):
 		return not self.user.isTutorialComplete()
 
-	@feature
+	@memoized_property
 	def startsWithHelpPhrase(self):
 		return self.chunk.matches(self.help_re)
 
-	@feature
+	@memoized_property
 	def hasJokePhrase(self):
 		return self.chunk.contains(self.jokeRequestRegex)
 
-	@feature
+	@memoized_property
 	def hasJokeFollowupPhrase(self):
 		return self.chunk.contains(self.jokeFollowupRegex)
 
-	@feature
+	@memoized_property
 	def secondsSinceLastJoke(self):
 		if self.user.getStateData(keeper_constants.LAST_JOKE_SENT_KEY):
 			now = date_util.now(pytz.utc)
@@ -409,7 +449,7 @@ class ChunkFeatures:
 		else:
 			return 10000000  # Big number to say its been a while
 
-	@feature
+	@memoized_property
 	def hasStopPhrase(self):
 		return self.chunk.matches(self.stopRegex)
 
@@ -418,70 +458,45 @@ class ChunkFeatures:
 	# Like "remind me again in 5 minutes"
 	# If the message (without timing info) only is "remind me" then also is a followup due to "remind me in 5 minutes"
 	# Otherwise False
-	@feature
+	@memoized_property
 	def isFollowup(self):
-		if not self.hasTimingInfo():
+		if not self.hasTimingInfo:
 			return False
 
 		# Covers cases where there the cleanedText is "in" or "around"
-		if self.numCharactersInCleanedText() <= 2:
+		if self.numCharactersInCleanedText <= 2:
 			logger.info("User %s: I think this is a followup to bc its less than 2 letters" % (self.user.id))
 			return True
 		# If they write "no, remind me sunday instead" then want to process as followup
-		elif self.beginsWithNo():
+		elif self.beginsWithNo:
 			logger.info("User %s: I think this is a followup bc it starts with a No" % (self.user.id))
 			return True
-		elif self.numInterestingWords() == 0:
+		elif self.numInterestingWords == 0:
 			logger.info("User %s: I think this is a followup bc there's no interesting words" % (self.user.id))
 			return True
-		elif self.isRecentAction() and self.numInterestingWords() < 2:
+		elif self.isRecentAction and self.numInterestingWords < 2:
 			logger.info("User %s: I think this is a followup bc we updated it recently and <2 interesting words" % (self.user.id))
 			return True
 
 		return False
 
 
-def methodsWithDecorator(cls, decorator):
-	"""
-		Returns all methods in CLS with DECORATOR as the
-		outermost decorator.
-
-		DECORATOR must be a "registering decorator"; one
-		can make any decorator "registering" via the
-		makeRegisteringDecorator function.
-	"""
-	for maybeDecorated in cls.__dict__.values():
-		if hasattr(maybeDecorated, 'decorator'):
-			if maybeDecorated.decorator == decorator:
-				yield maybeDecorated
-
-
-def getFeatureFunctions():
-	return methodsWithDecorator(ChunkFeatures, feature)
-
-
 def getFeatureNames():
-	result = list()
-	fs = getFeatureFunctions()
-
-	for f in fs:
-		result.append(fs.__name__)
-	return result
+	return [p for p in dir(ChunkFeatures) if isinstance(getattr(ChunkFeatures, p), memoized_property)]
 
 
 def getFeaturesDict(chunkFeatures):
-	fs = getFeatureFunctions()
+	fs = getFeatureNames()
 
 	result = dict()
 	for f in fs:
-		ret = f(chunkFeatures)
+		ret = getattr(chunkFeatures, f)
 
 		if ret is True:
 			ret = 1
 		elif ret is False:
 			ret = 0
 
-		result[f.__name__] = ret
+		result[f] = ret
 
 	return result
-

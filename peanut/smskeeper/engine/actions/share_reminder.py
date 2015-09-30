@@ -2,10 +2,9 @@ import logging
 
 from smskeeper import keeper_constants
 from .action import Action
-from smskeeper import actions, chunk_features
+from smskeeper import actions
 from smskeeper import reminder_util
 from smskeeper.models import Entry
-from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
 
@@ -20,16 +19,15 @@ class ShareReminderAction(Action):
 		except ValueError:
 			return False
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
 
-		features = chunk_features.ChunkFeatures(chunk, user)
 		unresolvedHandles, resolvedHandles = user.getSharePromptHandles()
 		# Check for recently asked to resolve handle
 		if len(resolvedHandles) > 0:
 			resolvedHandlesRe = "|".join(resolvedHandles)
 
-		if features.hasPhoneNumber():
+		if features.hasPhoneNumber:
 			score += 0.5
 		if chunk.matches(r'(text|.* directly|.* for me|remind|yes)'):
 			score += 0.3
@@ -48,7 +46,7 @@ class ShareReminderAction(Action):
 
 		return score
 
-	def execute(self, chunk, user):
+	def execute(self, chunk, user, features):
 		# figure out which handle to resolve
 		unresolvedHandles, resolvedHandles = user.getSharePromptHandles()
 		entryIds = user.getStateData(keeper_constants.LAST_ENTRIES_IDS_KEY)

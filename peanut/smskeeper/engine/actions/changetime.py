@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 class ChangetimeAction(Action):
 	snoozeRegex = r"\b(snooze|again)\b"
 
-	def execute(self, chunk, user):
-		entries = self.getEntriesToExecuteOn(chunk, user)
+	def execute(self, chunk, user, features):
+		entries = self.getEntriesToExecuteOn(chunk, user, features)
 		snoozeRegexHit = chunk.matches(self.snoozeRegex)
 
 		justNotified = (user.last_state == "remindersent")

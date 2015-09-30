@@ -5,23 +5,21 @@ from smskeeper import sms_util, msg_util, helper_util, actions
 from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from .action import Action
-from smskeeper.chunk_features import ChunkFeatures
 
 
 class ChangeSettingAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_CHANGE_SETTING
 	summaryRegex = re.compile(r"(daily|morning) summary", re.I)
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
-		features = ChunkFeatures(chunk, user)
 
 		normalizedText = chunk.normalizedText()
 		if self.looksLikeTip(features, user):
 			score = 1.0
 
-		if features.containsPostalCode():
-			if features.containsZipCodeWord():
+		if features.containsPostalCode:
+			if features.containsZipCodeWord:
 				score = .9
 			else:
 				score = .2
@@ -38,13 +36,11 @@ class ChangeSettingAction(Action):
 
 		return score
 
-	def execute(self, chunk, user):
-		features = ChunkFeatures(chunk, user)
-
+	def execute(self, chunk, user, features):
 		if self.looksLikeTip(features, user):
 			self.setTipFrequency(user, features)
 
-		elif features.containsPostalCode():
+		elif features.containsPostalCode:
 			self.setPostalCode(user, chunk.originalText)
 
 		elif msg_util.nameInSetName(chunk.originalText, tutorial=False):
@@ -57,14 +53,14 @@ class ChangeSettingAction(Action):
 		return True
 
 	def looksLikeTip(self, features, user):
-		if features.containsTipWord():
-			if features.containsNegativeWord() or max(features.recurScores().values()) > 0.5:
+		if features.containsTipWord:
+			if features.containsNegativeWord or max(features.recurScores().values()) > 0.5:
 				return True
 		return False
 
 	def setTipFrequency(self, user, features):
 		old_tip_frequency = user.tip_frequency_days
-		if features.containsNegativeWord():
+		if features.containsNegativeWord:
 			user.tip_frequency_days = 0
 			user.save()
 			sms_util.sendMsg(user, keeper_strings.TIP_STOP_CONFIRMATION_TEXT)

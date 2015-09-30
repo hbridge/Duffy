@@ -5,7 +5,7 @@ import random
 from common import date_util
 
 from smskeeper import reminder_util, sms_util
-from smskeeper import keeper_constants, chunk_features, keeper_strings
+from smskeeper import keeper_constants, keeper_strings
 from .action import Action
 from smskeeper.models import Contact
 from smskeeper import user_util
@@ -22,27 +22,25 @@ class CreateTodoAction(Action):
 	def __init__(self, tutorial=False):
 		self.tutorial = tutorial
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
 
-		features = chunk_features.ChunkFeatures(chunk, user)
-
-		if features.hasTimingInfo() and not features.hasReminderPhrase():
+		if features.hasTimingInfo and not features.hasReminderPhrase:
 			score = 0.5
 
-		if not features.hasTimingInfo() and features.hasReminderPhrase() and features.numCharactersInCleanedText() > 2:
+		if not features.hasTimingInfo and features.hasReminderPhrase and features.numCharactersInCleanedText > 2:
 			score = 0.5
 
-		if features.hasTimingInfo() and features.hasCreateWord():
+		if features.hasTimingInfo and features.hasCreateWord:
 			score = 0.6
 
-		if features.inTutorial():
+		if features.inTutorial:
 			score = 0.7
 
-		if features.hasTimingInfo() and features.hasReminderPhrase():
+		if features.hasTimingInfo and features.hasReminderPhrase:
 			score = 0.9
 
-		if score < 0.3 and features.beginsWithAndWord():
+		if score < 0.3 and features.beginsWithAndWord:
 			score += 0.3  # for "and socks" lists of stuff
 
 		# Get scores for recurrence and set the first frequency with a score of > 0.9
@@ -51,18 +49,17 @@ class CreateTodoAction(Action):
 			if recurScores[frequency] >= 0.5:
 				score = recurScores[frequency]
 
-		if score < 0.3 and features.beginsWithCreateWord():
+		if score < 0.3 and features.beginsWithCreateWord:
 			score += 0.2  # give an extra boost if nothing else matches
-		elif score < 0.9 and features.beginsWithCreateWord():
+		elif score < 0.9 and features.beginsWithCreateWord:
 			score += 0.1  # don't make us overly certain if it's already higher match
 
-		if features.isBroadQuestion():
+		if features.isBroadQuestion:
 			score -= 0.3
 
 		return score
 
-	def execute(self, chunk, user):
-		features = chunk_features.ChunkFeatures(chunk, user)
+	def execute(self, chunk, user, features):
 		nattyResult = chunk.getNattyResult(user)
 		keeperNumber = user.getKeeperNumber()
 
@@ -85,7 +82,7 @@ class CreateTodoAction(Action):
 				break
 
 		# eval sharing
-		shareContacts, shareFollowups, paused = self.evaluateSharing(chunk, user)
+		shareContacts, shareFollowups, paused = self.evaluateSharing(chunk, user, features)
 		if paused:
 			return True
 		followups += shareFollowups
@@ -117,15 +114,13 @@ class CreateTodoAction(Action):
 			user.setStateData(keeper_constants.LAST_ACTION_KEY, date_util.unixTime(date_util.now(pytz.utc)))
 		return True
 
-	def evaluateSharing(self, chunk, user):
-		features = chunk_features.ChunkFeatures(chunk, user)
-
+	def evaluateSharing(self, chunk, user, features):
 		shareHandles = None
 		unresolvedHandles = None
 		shareContacts = []
 		followups = []
 
-		if len(chunk.sharedReminderHandles()) > 0 and features.primaryActionIsRemind():
+		if len(chunk.sharedReminderHandles()) > 0 and features.primaryActionIsRemind:
 			shareHandles = chunk.sharedReminderHandles()
 			if len(shareHandles) > 1:
 				# we don't handle more than one share handle at the moment

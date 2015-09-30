@@ -1,17 +1,16 @@
 from .action import Action
 from smskeeper import sms_util
 from smskeeper import keeper_constants, keeper_strings
-from smskeeper import analytics, chunk_features
+from smskeeper import analytics
 
 
 class StopAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_STOP
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
-		features = chunk_features.ChunkFeatures(chunk, user)
 
-		if features.hasStopPhrase():
+		if features.hasStopPhrase:
 			score = .9
 
 		if StopAction.HasHistoricalMatchForChunk(chunk):
@@ -19,7 +18,7 @@ class StopAction(Action):
 
 		return score
 
-	def execute(self, chunk, user):
+	def execute(self, chunk, user, features):
 		user.setState(keeper_constants.STATE_STOPPED, saveCurrent=True, override=True)
 
 		isSilent = chunk.matches('silent')

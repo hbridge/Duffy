@@ -43,6 +43,8 @@ class LocalSmrtScorer():
 
 		data = list()
 		for header in self.headers[:-2]:
+			if header not in featuresDict:
+				print "%s not found in %s" % (header, featuresDict)
 			data.append(featuresDict[header])
 
 		scores = self.model.predict_proba(data)

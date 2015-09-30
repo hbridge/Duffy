@@ -4,7 +4,7 @@ import random
 
 from smskeeper import keeper_constants, keeper_strings
 from .action import Action
-from smskeeper import sms_util, actions, chunk_features
+from smskeeper import sms_util, actions
 from smskeeper import analytics
 
 logger = logging.getLogger(__name__)
@@ -62,10 +62,10 @@ class TipQuestionResponseAction(Action):
 		score = 0.0
 
 		if justNotified:
-			if features.hasInt():
-				if features.numWords() == 1:
+			if features.hasInt:
+				if features.numWords == 1:
 					score = 1.0
-				elif features.hasIntFirst():
+				elif features.hasIntFirst:
 					score = .7
 			else:
 				score = 0.1
@@ -74,12 +74,12 @@ class TipQuestionResponseAction(Action):
 	def surveyScore(self, features):
 		score = 0.0
 
-		digestSurveyJustNotified = features.wasRecentlySentMsgOfClassDigestSurvey()
-		npsJustNotified = features.wasRecentlySentMsgOfClassNpsTip()
+		digestSurveyJustNotified = features.wasRecentlySentMsgOfClassDigestSurvey
+		npsJustNotified = features.wasRecentlySentMsgOfClassNpsTip
 
 		# nps comes after survey, so assume answer is most recent
 		# hacky here
-		if digestSurveyJustNotified and not npsJustNotified and features.userMissingDigestSurveyInfo():
+		if digestSurveyJustNotified and not npsJustNotified and features.userMissingDigestSurveyInfo:
 			score = self.getIntResponseScore(digestSurveyJustNotified, features)
 
 		return score
@@ -87,8 +87,8 @@ class TipQuestionResponseAction(Action):
 	def npsScore(self, features):
 		score = 0.0
 
-		if features.wasRecentlySentMsgOfClassNpsTip() and features.userMissingNpsInfo():
-			score = self.getIntResponseScore(features.wasRecentlySentMsgOfClassNpsTip(), features)
+		if features.wasRecentlySentMsgOfClassNpsTip and features.userMissingNpsInfo:
+			score = self.getIntResponseScore(features.wasRecentlySentMsgOfClassNpsTip, features)
 
 		return score
 
@@ -97,7 +97,7 @@ class TipQuestionResponseAction(Action):
 
 		# Only score if we don't have any current referrer
 		# So we don't score anything on the second message
-		if (features.wasRecentlySentMsgOfClassReferralAsk() and features.userMissingReferralInfo()):
+		if (features.wasRecentlySentMsgOfClassReferralAsk and features.userMissingReferralInfo):
 			score = .6
 
 		return score
@@ -105,38 +105,35 @@ class TipQuestionResponseAction(Action):
 	def digestChangeScore(self, features):
 		score = 0.0
 
-		if features.wasRecentlySentMsgOfClassChangeDigestTime():
-			if features.hasTimingInfo():
-				if features.hasTimeOfDay() and not features.hasDate():
+		if features.wasRecentlySentMsgOfClassChangeDigestTime:
+			if features.hasTimingInfo:
+				if features.hasTimeOfDay and not features.hasDate:
 					score = .95
 				else:
 					score = .4
 			else:
 				score = .5
 
-			if features.hasCreateWord() and score > .5:
+			if features.hasCreateWord and score > .5:
 				score -= .2
 
-			if features.beginsWithCreateWord() and score > .5:
+			if features.beginsWithCreateWord and score > .5:
 				score -= .4
 
 		return score
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
-
-		features = chunk_features.ChunkFeatures(chunk, user)
 
 		score, typeId = self.getHighestScoreWithType(features)
 
 		# none of our questions ask for a phone number at the moment, and this could conflict with resolve handle
-		if features.hasPhoneNumber():
+		if features.hasPhoneNumber:
 			score -= 0.5
 
 		return score
 
-	def execute(self, chunk, user):
-		features = chunk_features.ChunkFeatures(chunk, user)
+	def execute(self, chunk, user, features):
 		score, typeId = self.getHighestScoreWithType(features)
 
 		firstInt = self.getFirstInt(chunk)

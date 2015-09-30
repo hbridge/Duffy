@@ -9,10 +9,10 @@ class Action:
 		if self.ACTION_CLASS is None:
 			raise NameError("ActionClass must not be None")
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		raise NameError("Abstract")
 
-	def execute(self, chunk, user):
+	def execute(self, chunk, user, features):
 		raise NameError("Abstract")
 
 	# TODO this is a hack, going off historical messages for now

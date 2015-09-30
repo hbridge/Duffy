@@ -70,7 +70,7 @@ class Engine:
 		self.minScore = minScore
 		self.tutorial = tutorial
 
-	def process(self, user, chunk, actions, overrideClassification=None, simulate=False):
+	def process(self, user, chunk, features, actions, overrideClassification=None, simulate=False):
 		# TODO when we implement start in the engine this check needs to move
 		if user.state == keeper_constants.STATE_STOPPED:
 			return False, None
@@ -80,7 +80,7 @@ class Engine:
 		for action in actions:
 			logger.info("User %s: I think '%s' is a %s command...executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
 			if not simulate:
-				processed = action.execute(chunk, user)
+				processed = action.execute(chunk, user, features)
 			else:
 				processed = True
 
@@ -134,9 +134,7 @@ class Engine:
 
 			if USE_SMRT:
 				for score, actions in sorted(smrtActionsByScore.items(), key=operator.itemgetter(0), reverse=True):
-					#if score >= .3:
 					result.extend(actions)
-
 
 			foundV1 = False
 			for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
@@ -144,10 +142,6 @@ class Engine:
 					if len(actions) > 1:
 						actions = self.tieBreakActions(actions)
 
-
-					#if score >= .8:
-					#	result = actions + result
-					#else:
 					result.extend(actions)
 
 					foundV1 = True

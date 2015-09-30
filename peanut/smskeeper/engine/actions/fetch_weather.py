@@ -2,7 +2,7 @@ import pytz
 
 from common import date_util, weather_util
 
-from smskeeper import sms_util, chunk_features
+from smskeeper import sms_util
 from smskeeper import keeper_constants, analytics, keeper_strings
 from .action import Action
 
@@ -13,15 +13,14 @@ logger = logging.getLogger(__name__)
 class FetchWeatherAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_FETCH_WEATHER
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
 
-		features = chunk_features.ChunkFeatures(chunk, user)
 		scoreVector = []
-		scoreVector.append(0.8 if features.hasWeatherWord() else 0)
-		scoreVector.append(0.1 if features.isQuestion() else 0)
-		scoreVector.append(-0.5 if features.isBroadQuestion() else 0)
-		scoreVector.append(0.1 if features.containsToday() else 0)
+		scoreVector.append(0.8 if features.hasWeatherWord else 0)
+		scoreVector.append(0.1 if features.isQuestion else 0)
+		scoreVector.append(-0.5 if features.isBroadQuestion else 0)
+		scoreVector.append(0.1 if features.containsToday else 0)
 
 		logger.debug("User %d: fetch weather score vector: %s", user.id, scoreVector)
 		score = sum(scoreVector)
@@ -31,7 +30,7 @@ class FetchWeatherAction(Action):
 
 		return score
 
-	def execute(self, chunk, user):
+	def execute(self, chunk, user, features):
 		nattyResult = chunk.getNattyResult(user)
 
 		if nattyResult and nattyResult.hadDate:

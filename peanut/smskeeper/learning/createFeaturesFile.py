@@ -58,6 +58,7 @@ class FeatureGenerator():
 		harness = EngineSimHarness()
 		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 		outputFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'features.csv'
+		headersOutputFileLoc = parentPath + keeper_constants.LEARNING_DIR_LOC + 'headers.csv'
 
 		with open(outputFileLoc, 'w') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -86,10 +87,20 @@ class FeatureGenerator():
 					l = list(headers)
 					l.append("classification")
 					writer.writerow(l)
+
+					# output the headers
+					with open(headersOutputFileLoc, 'w') as out:
+						headersWriter = csv.writer(out, delimiter=',')
+						headersWriter.writerow(l)
+
 				data = [featuresDict[h] for h in headers]
 
 				data.append(self.getClassCode(message['classification']))
 				writer.writerow(data)
+
+
+
+
 
 
 def main(argv):

@@ -300,18 +300,24 @@ class User(models.Model):
 	def getDigestMinute(self):
 		return self.digest_minute
 
-	def getLastEntries(self):
+	def getLastEntriesIds(self):
+		entryIds = list()
 		if self.getStateData(keeper_constants.LAST_ENTRIES_IDS_KEY):
 			entryIds = self.getStateData(keeper_constants.LAST_ENTRIES_IDS_KEY)
 		elif self.getStateData(keeper_constants.ENTRY_IDS_DATA_KEY):
 			entryIds = self.getStateData(keeper_constants.ENTRY_IDS_DATA_KEY)
 		elif self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY):
 			entryIds = [self.getStateData(keeper_constants.ENTRY_ID_DATA_KEY)]
-		else:
-			return []
 
-		entries = Entry.objects.filter(id__in=entryIds)
-		return entries
+		return entryIds
+
+	def getLastEntries(self):
+		entryIds = self.getLastEntriesIds()
+
+		if len(entryIds) > 0:
+			return Entry.objects.filter(id__in=entryIds)
+		else:
+			return list()
 
 	def getActiveEntries(self):
 		return Entry.objects.filter(creator=self, label="#reminders", hidden=False)

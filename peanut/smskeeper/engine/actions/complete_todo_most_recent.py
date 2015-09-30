@@ -4,7 +4,6 @@ from smskeeper import msg_util, sms_util
 from smskeeper import keeper_constants
 from .action import Action
 from smskeeper import analytics
-from smskeeper.chunk_features import ChunkFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -12,21 +11,19 @@ logger = logging.getLogger(__name__)
 class CompleteTodoMostRecentAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
 
-		features = ChunkFeatures(chunk, user)
-
-		if features.hasDoneWord() and features.numInterestingWords() == 0 and features.numMatchingEntriesBroad() == 0:
-			if features.wasRecentlySentMsgOfClassReminder() or features.wasRecentlySentMsgOfClassDigest():
+		if features.hasDoneWord and features.numInterestingWords == 0 and features.numMatchingEntriesBroad == 0:
+			if features.wasRecentlySentMsgOfClassReminder or features.wasRecentlySentMsgOfClassDigest:
 				score = 0.9
 			else:
 				score = 0.7
 
-		if features.hasDoneWord() and features.hasAnyNicety():
+		if features.hasDoneWord and features.hasAnyNicety:
 			score = 0.6
 
-		if features.hasTimingInfo():
+		if features.hasTimingInfo:
 			score = 0.0
 
 		if CompleteTodoMostRecentAction.HasHistoricalMatchForChunk(chunk):
@@ -34,7 +31,7 @@ class CompleteTodoMostRecentAction(Action):
 
 		return score
 
-	def execute(self, chunk, user):
+	def execute(self, chunk, user, features):
 		entries = user.getLastEntries()
 
 		for entry in entries:
@@ -45,8 +42,7 @@ class CompleteTodoMostRecentAction(Action):
 			else:
 				logger.debug("User %s: Didn't mark off entry %s as hidden since its not recur_default" % (user.id, entry.id))
 
-		features = ChunkFeatures(chunk, user)
-		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord())
+		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord)
 
 		if msgBack:
 			sms_util.sendMsg(user, msgBack)

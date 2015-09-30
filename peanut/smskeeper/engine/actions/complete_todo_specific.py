@@ -1,11 +1,10 @@
 import logging
 import random
 
-from smskeeper import entry_util, sms_util, actions, chunk_features, msg_util
+from smskeeper import entry_util, sms_util, actions, msg_util
 from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from .action import Action
-from smskeeper.chunk_features import ChunkFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -13,29 +12,27 @@ logger = logging.getLogger(__name__)
 class CompleteTodoSpecificAction(Action):
 	ACTION_CLASS = keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
 
-		features = chunk_features.ChunkFeatures(chunk, user)
-
-		if features.numMatchingEntriesStrict() > 0 and features.numInterestingWords() >= 2:
+		if features.numMatchingEntriesStrict > 0 and features.numInterestingWords >= 2:
 			score = 0.3
 
-		if features.hasDoneWord() and features.numInterestingWords() >= 2:
+		if features.hasDoneWord and features.numInterestingWords >= 2:
 			score = 0.5
 
-		if features.hasDoneWord() and features.numMatchingEntriesStrict() > 0:
+		if features.hasDoneWord and features.numMatchingEntriesStrict > 0:
 			score = 0.9
 
-		if features.hasTimingInfo():
+		if features.hasTimingInfo:
 			score -= .15
 
-		if score < 0.9 and features.beginsWithDoneWord():
+		if score < 0.9 and features.beginsWithDoneWord:
 			score += 0.1
 
 		return score
 
-	def execute(self, chunk, user):
+	def execute(self, chunk, user, features):
 		cleanedCommand = msg_util.getInterestingWords(chunk.originalText, removeDones=True)
 
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(cleanedCommand))
@@ -45,8 +42,7 @@ class CompleteTodoSpecificAction(Action):
 			logger.info("User %s: Marking off entry %s as hidden" % (user.id, entry.id))
 			entry.save()
 
-		features = ChunkFeatures(chunk, user)
-		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord())
+		msgBack = msg_util.renderDoneResponse(entries, features.containsDeleteWord)
 
 		if msgBack:
 			sms_util.sendMsg(user, msgBack)

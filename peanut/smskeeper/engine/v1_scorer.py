@@ -1,7 +1,6 @@
 import logging
 import operator
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -13,12 +12,13 @@ class V1Scorer():
 		self.actionList = actionList
 		self.minScore = minScore
 
-	def score(self, user, chunk, overrideClassification=None):
+	def score(self, user, chunk, features, overrideClassification=None):
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
 		actionsByScore = dict()
+
 		if not overrideClassification:
 			for action in self.actionList:
-				score = action.getScore(chunk, user)
+				score = action.getScore(chunk, user, features)
 
 				if score not in actionsByScore:
 					actionsByScore[score] = list()

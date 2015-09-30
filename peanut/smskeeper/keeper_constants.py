@@ -217,89 +217,84 @@ CLASS_MENU_OPTIONS = ([
 		"code": 2
 	},
 	{
-		"text": "Delete/Cancel",
-		"value": CLASS_DELETE,
-		"code": 3
-	},
-	{
 		"text": "Fetch Digest",
 		"value": CLASS_FETCH_DIGEST,
-		"code": 4
+		"code": 3
 	},
 	{
 		"text": "Nicety",
 		"value": CLASS_NICETY,
-		"code": 5
+		"code": 4
 	},
 	{
 		"text": "Nicety (Silent)",
 		"value": CLASS_SILENT_NICETY,
-		"code": 6
+		"code": 5
 	},
 	{
 		"text": "Change time (most recent)",
 		"value": CLASS_CHANGETIME_MOST_RECENT,
-		"code": 7
+		"code": 6
 	},
 	{
 		"text": "Change time (specific)",
 		"value": CLASS_CHANGETIME_SPECIFIC,
-		"code": 8
+		"code": 7
 	},
 	{
 		"text": "Help",
 		"value": CLASS_HELP,
-		"code": 9
+		"code": 8
 	},
 	{
 		"text": "Stop",
 		"value": CLASS_STOP,
-		"code": 10
+		"code": 9
 	},
 	{
 		"text": "Get weather",
 		"value": CLASS_FETCH_WEATHER,
-		"code": 11
+		"code": 10
 	},
 	{
 		"text": "Change Setting",
 		"value": CLASS_CHANGE_SETTING,
-		"code": 12
+		"code": 11
 	},
 	{
 		"text": "Question",
 		"value": CLASS_QUESTION,
-		"code": 13
+		"code": 12
 	},
 	{
 		"text": "Frustration",
 		"value": CLASS_FRUSTRATION,
-		"code": 14
+		"code": 13
 	},
 	{
 		"text": "Tip question response",
 		"value": CLASS_TIP_QUESTION_RESPONSE,
-		"code": 15
+		"code": 14
 	},
 	{
 		"text": "Joke request",
 		"value": CLASS_JOKE,
-		"code": 16
+		"code": 15
 	},
 	{
 		"text": "Shared reminder recipient upsell",
 		"value": CLASS_SHARED_REMINDER_RECIPIENT_UPSELL,
-		"code": 17
+		"code": 16
 	},
 	{
 		"text": "Share Reminder",
 		"value": CLASS_SHARE_REMINDER,
-		"code": 18
+		"code": 17
 	},
 	{
 		"text": "NoCategory",
 		"value": CLASS_NONE,
-		"code": 19
+		"code": 18
 	},
 ])
 

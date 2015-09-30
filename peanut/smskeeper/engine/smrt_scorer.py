@@ -43,7 +43,7 @@ class SmrtScorer():
 		key = "smrtscorer %s %s %s" % (date, user.getTimezone(), txt)
 		return hashlib.md5(key.encode()).hexdigest()
 
-	def score(self, user, chunk, overrideClassification=None):
+	def score(self, user, chunk, features, overrideClassification=None):
 		logger.info("User %s: Starting processing of chunk: '%s'" % (user.id, chunk.originalText))
 		actionsByScore = dict()
 
@@ -54,7 +54,6 @@ class SmrtScorer():
 				logger.debug("User %s: Found cache hit in SmrtScorer, returning %s" % (user.id, result))
 				return result
 
-		features = chunk_features.ChunkFeatures(chunk, user)
 		featuresDict = chunk_features.getFeaturesDict(features)
 
 		if self.local:

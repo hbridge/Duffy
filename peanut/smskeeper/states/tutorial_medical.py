@@ -8,6 +8,7 @@ from smskeeper import sms_util
 from smskeeper import keeper_constants
 from smskeeper import msg_util
 from smskeeper import analytics
+from smskeeper import chunk_features
 from smskeeper.models import Message
 from smskeeper.chunk import Chunk
 
@@ -40,11 +41,12 @@ def process(user, msg, requestDict, keeperNumber):
 	v1Scorer = V1Scorer(Engine.TUTORIAL_BASIC, 0.5)
 	keeperEngine = Engine(Engine.TUTORIAL_BASIC, 0.5, tutorial=True)
 	chunk = Chunk(msg)
+	features = chunk_features.ChunkFeatures(chunk, user)
 
-	actionsByScore = v1Scorer.score(user, chunk)
+	actionsByScore = v1Scorer.score(user, chunk, features)
 	bestActions = keeperEngine.getBestActions(user, chunk, actionsByScore, dict())
 
-	processed, classification = keeperEngine.process(user, chunk, bestActions)
+	processed, classification = keeperEngine.process(user, chunk, features, bestActions)
 
 	if processed:
 		return True, classification, actionsByScore
@@ -125,11 +127,12 @@ def process(user, msg, requestDict, keeperNumber):
 		v1Scorer = V1Scorer(Engine.TUTORIAL_STEP_2, 0.5)
 		keeperEngine = Engine(Engine.TUTORIAL_STEP_2, 0.5, tutorial=True)
 		chunk = Chunk(msg)
+		features = chunk_features.ChunkFeatures(chunk, user)
 
-		actionsByScore = v1Scorer.score(user, chunk)
+		actionsByScore = v1Scorer.score(user, chunk, features)
 		bestActions = keeperEngine.getBestActions(user, chunk, actionsByScore, dict())
 
-		finishedWithCreate, classification = keeperEngine.process(user, chunk, bestActions)
+		finishedWithCreate, classification = keeperEngine.process(user, chunk, features, bestActions)
 
 		# Hacky, if the action (createtodo) wanted the user to followup then it returns false
 		# Then we'll come back here and once we get a followup, we'll post the last text

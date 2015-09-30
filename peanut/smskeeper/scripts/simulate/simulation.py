@@ -1,6 +1,6 @@
 # to run use ./manage.py test smskeeper.scripts.simulateClassifiedMessages
 
-from datetime import datetime
+import datetime
 import json
 from urllib2 import URLError
 import urllib2
@@ -72,31 +72,56 @@ class SMSKeeperSimulationCase(test_base.SMSKeeperBaseCase):
 	'post_results_url'
 	'''
 
+	prodDataFilename = "prod_classified_messages.json"
+
+	def modification_date(self, filename):
+		t = os.path.getmtime(filename)
+		return datetime.datetime.fromtimestamp(t)
+
 	def test_parse_accuracy(self):
 		if not self.SIMULATION_CONFIGURATION:
 			raise NameError("This is the base simulation class, use a speicific configuration.")
 
-		logger.info("Starting simulation on %s", datetime.now())
+		logger.info("Starting simulation on %s", datetime.datetime.now())
 		# self.setupAuthenticatedBrowser()
 
 		logger.info("Importing zip data...")
+		print "Importing zip data..."
 		importZipdata.loadZipDataFromTGZ("./smskeeper/data/zipdata.tgz")
 
-		logger.info("Getting classified messages from %s...", self.SIMULATION_CONFIGURATION['classified_messages_url'])
-		try:
-			response = urllib2.urlopen(self.SIMULATION_CONFIGURATION['classified_messages_url']).read()
-		except URLError as e:
-			logger.info("Could not connect to server for messages: %s" % (e))
-			response = {"users": []}
+		downloadData = True
+		if os.path.isfile(self.prodDataFilename):
+			dt = self.modification_date(self.prodDataFilename)
 
-		classified_messages = json.loads(response)
+			if datetime.datetime.now() - dt < datetime.timedelta(days=1):
+				downloadData = False
+
+		if downloadData:
+			logger.info("Getting classified messages from %s...", self.SIMULATION_CONFIGURATION['classified_messages_url'])
+			try:
+				response = urllib2.urlopen(self.SIMULATION_CONFIGURATION['classified_messages_url']).read()
+			except URLError as e:
+				logger.info("Could not connect to server for messages: %s" % (e))
+				response = {"users": []}
+
+			classified_messages = json.loads(response)
+			with open(self.prodDataFilename, 'w') as outfile:
+				json.dump(classified_messages, outfile)
+		else:
+			logger.info("Reading data from %s" % self.prodDataFilename)
+			with open(self.prodDataFilename, 'r') as f:
+				classified_messages = json.load(f)
 
 		v1Scorer = V1Scorer(Engine.DEFAULT, 0.0)
 		smrtScorer = SmrtScorer(Engine.DEFAULT, 0.0, local=True)
 		engine = Engine(Engine.DEFAULT, 0.0)
 		harness = EngineSimHarness(v1Scorer, smrtScorer, engine)
 
+		count = 0
 		for message in classified_messages:
+			count += 1
+			print "Starting message... %s / %s" % (count, len(classified_messages))
+
 			try:
 				if self.SIMULATION_CONFIGURATION['sim_type'] == 'p' and int(message["user"]) < MIN_USER_ID:
 					continue

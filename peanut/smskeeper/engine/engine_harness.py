@@ -39,11 +39,15 @@ class EngineSimHarness():
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
 		chunk = Chunk(lines[0])  # only process first line for now
 
-		smrtActionsByScore = self.smrtScorer.score(user, chunk)
-		v1ActionsByScore = self.v1Scorer.score(user, chunk)
+		features = chunk_features.ChunkFeatures(chunk, user)
+
+		smrtActionsByScore = self.smrtScorer.score(user, chunk, features)
+		v1ActionsByScore = self.v1Scorer.score(user, chunk, features)
+
 		bestActions = self.engine.getBestActions(user, chunk, v1ActionsByScore, smrtActionsByScore)
 
-		processed, classification = self.engine.process(user, chunk, bestActions, simulate=True)
+		processed, classification = self.engine.process(user, chunk, features, bestActions, simulate=True)
+
 		return classification, smrtActionsByScore
 
 	@patch('common.date_util.utcnow')

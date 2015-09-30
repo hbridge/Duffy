@@ -8,7 +8,7 @@ from smskeeper import keeper_constants
 from smskeeper import analytics
 
 from smskeeper.states import stopped, tutorial_todo, tutorial_medical, tutorial_student, suspended, not_activated_from_reminder
-from smskeeper import actions, user_util, sms_util, helper_util
+from smskeeper import actions, user_util, sms_util, helper_util, chunk_features
 from smskeeper.chunk import Chunk
 
 from smskeeper.models import User, Message
@@ -135,11 +135,13 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 		for msg in msgs:
 			chunk = Chunk(msg, True, lineCount)
 
-			smrtActionsByScore = smrtScorer.score(user, chunk)
-			v1ActionsByScore = v1Scorer.score(user, chunk)
+			features = chunk_features.ChunkFeatures(chunk, user)
+
+			smrtActionsByScore = smrtScorer.score(user, chunk, features)
+			v1ActionsByScore = v1Scorer.score(user, chunk, features)
 			bestActions = keeperEngine.getBestActions(user, chunk, v1ActionsByScore, smrtActionsByScore)
 
-			chunkProcessed, classification = keeperEngine.process(user, chunk, bestActions)
+			chunkProcessed, classification = keeperEngine.process(user, chunk, features, bestActions)
 
 			if not chunkProcessed:
 				allProcessed = False
@@ -158,11 +160,13 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 	else:
 		chunk = Chunk(msgs[0])
 
-		smrtActionsByScore = smrtScorer.score(user, chunk)
-		v1ActionsByScore = v1Scorer.score(user, chunk)
+		features = chunk_features.ChunkFeatures(chunk, user)
+
+		smrtActionsByScore = smrtScorer.score(user, chunk, features)
+		v1ActionsByScore = v1Scorer.score(user, chunk, features)
 		bestActions = keeperEngine.getBestActions(user, chunk, v1ActionsByScore, smrtActionsByScore)
 
-		chunkProcessed, classification = keeperEngine.process(user, chunk, bestActions)
+		chunkProcessed, classification = keeperEngine.process(user, chunk, features, bestActions)
 
 		# Save scores and final classification
 		messageObject.auto_classification = classification

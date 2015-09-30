@@ -57,16 +57,5 @@ def main():
     parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
     joblib.dump(cfr, parentPath + keeper_constants.LEARNING_DIR_LOC + 'model')
 
-    # output the headers
-    with open(featuresLoc, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        done = False
-        for row in reader:
-            if not done:
-                with open('smskeeper/learning/models/headers.csv', 'w') as out:
-                    writer = csv.writer(out, delimiter=',')
-                    writer.writerow(row)
-            done = True
-
 if __name__ == "__main__":
     main()

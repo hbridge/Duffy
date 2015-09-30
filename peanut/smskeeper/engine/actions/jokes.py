@@ -5,7 +5,7 @@ from smskeeper import keeper_constants, keeper_strings
 from .action import Action
 from smskeeper import sms_util
 from common import date_util
-from smskeeper import joke_list, chunk_features, analytics
+from smskeeper import joke_list, analytics
 
 
 logger = logging.getLogger(__name__)
@@ -19,28 +19,25 @@ class JokeAction(Action):
 	JOKE_DONE = 2
 	SUNGLASSES_SENT = 3
 
-	def getScore(self, chunk, user):
+	def getScore(self, chunk, user, features):
 		score = 0.0
 
-		features = chunk_features.ChunkFeatures(chunk, user)
-
-		if features.secondsSinceLastJoke() < 120:
+		if features.secondsSinceLastJoke < 120:
 			score = .7
 
-		if features.wasRecentlySentMsgOfClassJoke():
+		if features.wasRecentlySentMsgOfClassJoke:
 			score = .7
 
-		if features.hasJokePhrase():
+		if features.hasJokePhrase:
 			score = .8
 
-		if features.hasTimingInfo():
+		if features.hasTimingInfo:
 			score = 0
 
 		return score
 
-	def execute(self, chunk, user):
-		features = chunk_features.ChunkFeatures(chunk, user)
-		regexHit = (features.hasJokePhrase() or features.hasJokeFollowupPhrase())
+	def execute(self, chunk, user, features):
+		regexHit = (features.hasJokePhrase or features.hasJokeFollowupPhrase)
 
 		# Which joke we're currently on
 		jokeNum = 0
@@ -54,10 +51,10 @@ class JokeAction(Action):
 			return True
 
 		# How many jokes we've told in the last 6 hours
-		recentJokeCount = self.getRecentJokeCount(user, features.secondsSinceLastJoke())
+		recentJokeCount = self.getRecentJokeCount(user, features.secondsSinceLastJoke)
 
 		recent = False
-		if features.secondsSinceLastJoke() < 120:
+		if features.secondsSinceLastJoke < 120:
 			recent = True
 
 		# If we've told too many, then see if they're asking for another
@@ -77,7 +74,7 @@ class JokeAction(Action):
 			step = self.JOKE_START
 
 		if step == self.JOKE_START:
-			self.sendJokePart1(user, joke, recentJokeCount, features.secondsSinceLastJoke())
+			self.sendJokePart1(user, joke, recentJokeCount, features.secondsSinceLastJoke)
 
 			analytics.logUserEvent(
 				user,
@@ -88,11 +85,11 @@ class JokeAction(Action):
 		elif step == self.JOKE_PART1_SENT:
 			# eval guess
 			joke.send(user, step, chunk.normalizedText())
-			self.jokeIsDone(user, jokeNum, recentJokeCount, features.secondsSinceLastJoke())
+			self.jokeIsDone(user, jokeNum, recentJokeCount, features.secondsSinceLastJoke)
 		elif step == self.JOKE_DONE:
 			# if regex hit, then send another
 			if regexHit:
-				self.sendJokePart1(user, joke, recentJokeCount, features.secondsSinceLastJoke())
+				self.sendJokePart1(user, joke, recentJokeCount, features.secondsSinceLastJoke)
 			elif recent:
 				sms_util.sendMsg(user, keeper_strings.JOKE_LAST_STEP)
 				user.setStateData(keeper_constants.JOKE_STEP_KEY, self.SUNGLASSES_SENT)
@@ -101,7 +98,7 @@ class JokeAction(Action):
 				return False
 		elif step == self.SUNGLASSES_SENT:
 			if regexHit:
-				self.sendJokePart1(user, joke, recentJokeCount, features.secondsSinceLastJoke())
+				self.sendJokePart1(user, joke, recentJokeCount, features.secondsSinceLastJoke)
 			elif chunk.contains("pony"):
 				sms_util.sendMsg(user, keeper_strings.PONY_RESPONSE)
 			else:
@@ -134,4 +131,3 @@ class JokeAction(Action):
 			return int(user.getStateData(keeper_constants.JOKE_COUNT_KEY))
 		else:
 			return 0
-
