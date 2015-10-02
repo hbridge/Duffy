@@ -24,7 +24,7 @@ from smskeeper.chunk import Chunk
 
 logger = logging.getLogger(__name__)
 
-USE_SMRT = True
+USE_SMRT = False
 
 
 class Engine:

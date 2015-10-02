@@ -82,6 +82,8 @@ class User(models.Model):
 	done_count = models.IntegerField(default=0)
 	create_todo_count = models.IntegerField(default=0)
 
+	sweeping_activated = models.BooleanField(default=True)
+
 	# These are not tied to the db, and instead are single instance
 	overrideKeeperNumber = None
 	pastIncomingMsgs = None
