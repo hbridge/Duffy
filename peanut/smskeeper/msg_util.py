@@ -107,6 +107,7 @@ punctuation_tbl = dict.fromkeys(
 # Lowercase
 def cleanMsgText(msg):
     cleaned = msg.strip().lower()
+    return cleaned
     cleaned = cleaned.translate(punctuation_tbl)
     return cleaned
 

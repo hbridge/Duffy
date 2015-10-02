@@ -32,7 +32,7 @@ class CompleteTodoSpecificAction(Action):
 
 		return score
 
-	def execute(self, chunk, user, features):
+	def execute(self, chunk, user, features, nextAction=None):
 		cleanedCommand = msg_util.getInterestingWords(chunk.originalText, removeDones=True)
 
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(cleanedCommand))
@@ -49,6 +49,10 @@ class CompleteTodoSpecificAction(Action):
 			user.done_count += 1
 			user.save()
 		else:
+			if user.nextAction and user.nextAction.ACTION_CLASS == keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT:
+				logger.info("User %s: I thought '%s' was a completetodo specific command but couldn't find an entry to match on so going to most recent code" % (user.id, chunk.originalText))
+				return False
+
 			logger.info("User %s: I thought '%s' was a completetodo specific command but couldn't find an entry to match on, pausing" % (user.id, chunk.originalText))
 			daytime = actions.unknown(user, chunk.originalText, user.getKeeperNumber(), keeper_constants.UNKNOWN_TYPE_DONE, sendMsg=False, doAlert=True)
 

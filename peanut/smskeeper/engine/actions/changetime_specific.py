@@ -14,13 +14,13 @@ class ChangetimeSpecificAction(ChangetimeAction):
 		score = 0.0
 
 		if features.beginsWithChangeTimeWord and features.numMatchingEntriesStrict > 0:
-			if features.numEntriesJustNotifiedAbout > 0:
+			if features.numBroadEntriesJustNotifiedAbout > 0:
 				score = 0.6
 			else:
 				score = 0.3
 
 		if features.hasTimingInfo and features.numMatchingEntriesStrict > 0:
-			if features.numEntriesJustNotifiedAbout > 0:
+			if features.numBroadEntriesJustNotifiedAbout > 0:
 				score = 0.8
 			else:
 				score = 0.7

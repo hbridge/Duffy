@@ -77,9 +77,10 @@ class Engine:
 
 		# Pick the first one after sorting
 		# Later on we might want to look at the 'processed' return code
-		for action in actions:
+		for i, action in enumerate(actions):
 			logger.info("User %s: I think '%s' is a %s command...executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
 			if not simulate:
+				user.nextAction = actions[i+1]
 				processed = action.execute(chunk, user, features)
 			else:
 				processed = True
@@ -132,9 +133,13 @@ class Engine:
 						result.append(action)
 						return result
 
+			smrtScoresByActionName = dict()
 			if USE_SMRT:
 				for score, actions in sorted(smrtActionsByScore.items(), key=operator.itemgetter(0), reverse=True):
 					result.extend(actions)
+
+					for action in actions:
+						smrtScoresByActionName[action.ACTION_CLASS] = score
 
 			foundV1 = False
 			v1scoresByActionName = dict()
@@ -160,8 +165,15 @@ class Engine:
 			#if not foundV1:
 			#	result = list()
 
-			if v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .7 and result[0].ACTION_CLASS == "createtodo":
-				result = [self.getActionByName(keeper_constants.CLASS_TIP_QUESTION_RESPONSE)] + result
+			if result[0].ACTION_CLASS == "createtodo":
+				if v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .7:
+					result = [self.getActionByName(keeper_constants.CLASS_TIP_QUESTION_RESPONSE)] + result
+				if v1scoresByActionName[keeper_constants.CLASS_CHANGE_SETTING] >= .9:
+					result = [self.getActionByName(keeper_constants.CLASS_CHANGE_SETTING)] + result
+			elif result[0].ACTION_CLASS == keeper_constants.CLASS_NICETY:
+				if (smrtScoresByActionName[keeper_constants.CLASS_NICETY] < .6 and
+						v1scoresByActionName[keeper_constants.CLASS_NICETY] == 0):
+					result = result[1:]
 
 		logger.debug("User %s: in getBestActions, final actions: %s" % (user.id, [x.ACTION_CLASS for x in result]))
 		return result

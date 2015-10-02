@@ -181,12 +181,16 @@ class ChunkFeatures:
 		return len(self.getMatchingEntriesStrict())
 
 	@memoized_property
-	def numEntriesJustNotifiedAbout(self):
+	def numBroadEntriesJustNotifiedAbout(self):
 		bestEntries = self.getMatchingEntriesBroad()
 		bestEntryIds = [x.id for x in bestEntries]
 		justNotifiedEntryIds = self.user.getLastEntriesIds()
 
 		return len(set(bestEntryIds).intersection(set(justNotifiedEntryIds)))
+
+	@memoized_property
+	def numLastNotifiedEntries(self):
+		return len(self.getJustNotifiedEntryIds())
 
 	@memoized_property
 	def numMatchingEntriesBroad(self):

@@ -42,18 +42,38 @@ class FeatureGenerator():
 
 	messageCount = 0
 
+	def modification_date(self, filename):
+		t = os.path.getmtime(filename)
+		return datetime.datetime.fromtimestamp(t)
+
+	prodDataFilename = "prod_classified_messages.json"
+
 	def generate(self):
 		logger.info("Starting simulation on %s", datetime.datetime.now())
 		# self.setupAuthenticatedBrowser()
 
-		logger.info("Getting classified messages from %s...", self.CONFIGURATION['classified_messages_url'])
-		try:
-			response = urllib2.urlopen(self.CONFIGURATION['classified_messages_url']).read()
-		except URLError as e:
-			logger.info("Could not connect to server for messages: %s" % (e))
-			response = {"users": []}
+		downloadData = True
+		if os.path.isfile(self.prodDataFilename):
+			dt = self.modification_date(self.prodDataFilename)
 
-		classified_messages = json.loads(response)
+			if datetime.datetime.now() - dt < datetime.timedelta(days=1):
+				downloadData = False
+
+		if downloadData:
+			logger.info("Getting classified messages from %s...", self.CONFIGURATION['classified_messages_url'])
+			try:
+				response = urllib2.urlopen(self.CONFIGURATION['classified_messages_url']).read()
+			except URLError as e:
+				logger.info("Could not connect to server for messages: %s" % (e))
+				response = {"users": []}
+
+			classified_messages = json.loads(response)
+			with open(self.prodDataFilename, 'w') as outfile:
+				json.dump(classified_messages, outfile)
+		else:
+			logger.info("Reading data from %s" % self.prodDataFilename)
+			with open(self.prodDataFilename, 'r') as f:
+				classified_messages = json.load(f)
 
 		harness = EngineSimHarness()
 		parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
@@ -69,9 +89,7 @@ class FeatureGenerator():
 			for message in classified_messages:
 				if int(message["user"]) < MIN_USER_ID:
 					continue
-				if "userSnapshot" not in message:
-					continue
-				#if not message["userSnapshot"]:
+				#if "userSnapshot" not in message:
 				#	continue
 
 				logger.info("\n Processing message: %s", message)
