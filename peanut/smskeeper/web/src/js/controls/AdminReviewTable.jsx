@@ -94,7 +94,7 @@ var EntryRow = React.createClass({
 		return (
 			<tr>
 		        <td> { approveButton } </td>
-		        <td> <a href={'../history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creator_name} </a></td>
+		        <td> <a href={'/smskeeper/history?user_id=' + this.state.model.creator } target="_blank"> {this.state.model.creator_name} </a></td>
 		        <td>
 		        	<a onClick={this.handleRowClicked} href="#" className="userText">{ this.state.model.text } </a><br />
 		        	[{ _.map(JSON.parse(this.state.model.orig_text), this.getUnsquashLink) }]
