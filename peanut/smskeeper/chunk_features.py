@@ -410,12 +410,12 @@ class ChunkFeatures:
 	@memoized_property
 	@memorise(parent_keys=['chunk'])
 	def hasAnyNicety(self):
-		return True if niceties.getNicety(self.chunk.originalText) else False
+		return True if niceties.getNicety(self.chunk.normalizedText()) else False
 
 	@memoized_property
 	@memorise(parent_keys=['chunk'])
 	def hasSilentNicety(self):
-		nicety = niceties.getNicety(self.chunk.originalText)
+		nicety = niceties.getNicety(self.chunk.normalizedText())
 		if nicety and nicety.isSilent():
 			return True
 		return False
@@ -423,9 +423,9 @@ class ChunkFeatures:
 	@memoized_property
 	@memorise(parent_keys=['chunk'])
 	def nicetyMatchScore(self):
-		nicety = niceties.getNicety(self.chunk.originalText)
+		nicety = niceties.getNicety(self.chunk.normalizedText())
 		if nicety:
-			return nicety.matchScore(self.chunk.originalText)
+			return nicety.matchScore(self.chunk.normalizedText())
 		return 0
 
 	@memoized_property

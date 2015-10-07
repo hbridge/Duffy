@@ -135,6 +135,7 @@ class Engine:
 						return result
 
 			smrtScoresByActionName = dict()
+			topSmrtScore = 0
 			if USE_SMRT:
 				for score, actions in sorted(smrtActionsByScore.items(), key=operator.itemgetter(0), reverse=True):
 					result.extend(actions)
@@ -142,39 +143,50 @@ class Engine:
 					for action in actions:
 						smrtScoresByActionName[action.ACTION_CLASS] = score
 
+					if score > topSmrtScore:
+						topSmrtScore = score
+
+
 			foundV1 = False
 			v1scoresByActionName = dict()
+			topV1Score = 0
+			v1Actions = list()
 			for score, actions in sorted(v1actionsByScore.items(), key=operator.itemgetter(0), reverse=True):
 				if score > self.minScore:
 					if len(actions) > 1:
 						actions = self.tieBreakActions(actions)
 
 					result.extend(actions)
+					v1Actions.extend(actions)
 					foundV1 = True
+
+				if score > topV1Score:
+					topV1Score = score
 
 				for action in actions:
 					v1scoresByActionName[action.ACTION_CLASS] = score
 
-			# Exception case:
-			# smrt really likes to do createtodo on unknown things.  So if v1 says unknown
-			# and smrt says create, treat as unknown
-			#if len(result) > 0 and result[0].ACTION_CLASS == "createtodo" and not foundV1:
-			#	result = list()
+			if USE_SMRT:
+				# If SMRT says "create":
+				#   if v1 says tip question response or change settings, then go with v1
+				#   if v1 says nothing...then do nothing
+				if result[0].ACTION_CLASS == "createtodo":
+					if v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .7:
+						result = [self.getActionByName(keeper_constants.CLASS_TIP_QUESTION_RESPONSE)] + result
+					elif v1scoresByActionName[keeper_constants.CLASS_CHANGE_SETTING] >= .9:
+						result = [self.getActionByName(keeper_constants.CLASS_CHANGE_SETTING)] + result
+					elif not foundV1:
+						result = list()
+				# If SMRT says "nicety" but v1 says its def not a nicety, then ignore smrt's first guess
+				elif result[0].ACTION_CLASS == keeper_constants.CLASS_NICETY:
+					if (smrtScoresByActionName[keeper_constants.CLASS_NICETY] < .6 and
+								v1scoresByActionName[keeper_constants.CLASS_NICETY] == 0):
+						result = result[1:]
 
-			# Temporary hack:
-			# If old engine doesn't find anything, then ignore smrt engine
-			#if not foundV1:
-			#	result = list()
-
-			if result[0].ACTION_CLASS == "createtodo":
-				if v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .7:
-					result = [self.getActionByName(keeper_constants.CLASS_TIP_QUESTION_RESPONSE)] + result
-				if v1scoresByActionName[keeper_constants.CLASS_CHANGE_SETTING] >= .9:
-					result = [self.getActionByName(keeper_constants.CLASS_CHANGE_SETTING)] + result
-			elif result[0].ACTION_CLASS == keeper_constants.CLASS_NICETY:
-				if (smrtScoresByActionName[keeper_constants.CLASS_NICETY] < .6 and
-						v1scoresByActionName[keeper_constants.CLASS_NICETY] == 0):
-					result = result[1:]
+				# If SMRT isn't that confident and v1 is, go with v1
+				if (topSmrtScore < .4 and
+							topV1Score >= .9):
+					result = v1Actions
 
 		logger.debug("User %s: in getBestActions, final actions: %s" % (user.id, [x.ACTION_CLASS for x in result]))
 		return result

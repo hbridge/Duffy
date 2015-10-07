@@ -31,7 +31,7 @@ class NicetyAction(Action):
 		return score
 
 	def execute(self, chunk, user, features):
-		nicety = niceties.getNicety(chunk.originalText)
+		nicety = niceties.getNicety(chunk.normalizedText())
 
 		if nicety is None:
 			logger.error("User %s: Executing nicety but don't have a response to send" % (user.id))
