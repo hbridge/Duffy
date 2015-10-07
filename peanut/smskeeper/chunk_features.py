@@ -75,7 +75,7 @@ class ChunkFeatures:
 
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	# things that match this RE will get a boost for create
-	createWordRegex = "(remind|to do|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop)"
+	createWordRegex = "(remind|to do|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop|read|invite|follow up|eat|check on|bring|set up|straighten up|work on|need to|sweep)"
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'\b%s ' % createWordRegex
 

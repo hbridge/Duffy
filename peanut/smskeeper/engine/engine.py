@@ -24,7 +24,7 @@ from smskeeper.chunk import Chunk
 
 logger = logging.getLogger(__name__)
 
-USE_SMRT = False
+USE_SMRT = True
 
 
 class Engine:
@@ -177,11 +177,20 @@ class Engine:
 						result = [self.getActionByName(keeper_constants.CLASS_CHANGE_SETTING)] + result
 					elif not foundV1:
 						result = list()
-				# If SMRT says "nicety" but v1 says its def not a nicety, then ignore smrt's first guess
+				# If SMRT says "nicety":
+				#   if v1 says its def not a nicety, then ignore smrt's first guess
+				#   if v1 says its a joke, go with that
 				elif result[0].ACTION_CLASS == keeper_constants.CLASS_NICETY:
 					if (smrtScoresByActionName[keeper_constants.CLASS_NICETY] < .6 and
 								v1scoresByActionName[keeper_constants.CLASS_NICETY] == 0):
 						result = result[1:]
+					# SMRT things
+					elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_JOKE):
+						result = v1Actions
+				# If v1 really thinks its a nicety, go with that
+				elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_NICETY
+										and v1scoresByActionName[keeper_constants.CLASS_NICETY] > .9):
+					result = v1Actions
 
 				# If SMRT isn't that confident and v1 is, go with v1
 				if (topSmrtScore < .4 and
