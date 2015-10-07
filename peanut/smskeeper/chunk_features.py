@@ -197,6 +197,16 @@ class ChunkFeatures:
 		return len(self.getMatchingEntriesBroad())
 
 	@memoized_property
+	def scoreOfTopEntry(self):
+		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
+		cleanedText = ' '.join(msg_util.getInterestingWords(cleanedText))
+		entry, score = entry_util.getBestEntryMatch(self.user, cleanedText)
+		if entry:
+			return score
+		else:
+			return 0
+
+	@memoized_property
 	def numActiveEntries(self):
 		return len(self.user.getActiveEntries())
 
