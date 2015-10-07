@@ -80,7 +80,8 @@ class Engine:
 		for i, action in enumerate(actions):
 			logger.info("User %s: I think '%s' is a %s command...executing" % (user.id, chunk.originalText, action.ACTION_CLASS))
 			if not simulate:
-				user.nextAction = actions[i+1]
+				if i < len(actions) - 1:
+					user.nextAction = actions[i + 1]
 				processed = action.execute(chunk, user, features)
 			else:
 				processed = True
