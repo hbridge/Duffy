@@ -191,7 +191,10 @@ class Engine:
 				elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_NICETY
 										and v1scoresByActionName[keeper_constants.CLASS_NICETY] > .9):
 					result = v1Actions
-
+				# If v1 really thinks is a shared reminder, go with that
+				elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_SHARE_REMINDER
+										and v1scoresByActionName[keeper_constants.CLASS_SHARE_REMINDER] > .9):
+					result = v1Actions
 				# If SMRT isn't that confident and v1 is, go with v1
 				if (topSmrtScore < .4 and
 							topV1Score >= .9):
