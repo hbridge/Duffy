@@ -197,6 +197,10 @@ class ChunkFeatures:
 		return len(self.getMatchingEntriesBroad())
 
 	@memoized_property
+	def numActiveEntries(self):
+		return len(self.user.getActiveEntries())
+
+	@memoized_property
 	def hasCreateWord(self):
 		return self.chunk.contains(self.containsCreateWordhRegex)
 
