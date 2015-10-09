@@ -28,6 +28,7 @@ from smskeeper.serializers import DetailedSimulationRunSerializer
 from smskeeper.serializers import SimulationResultSerializer
 from smskeeper.serializers import SimulationRunSummarySerializer
 from smskeeper.views import renderReact
+from smskeeper import serializers
 logger = logging.getLogger(__name__)
 
 
@@ -122,6 +123,14 @@ def simulation_run_compare(request, simId, compareId):
 
 	return HttpResponse(json.dumps(diffClassDetails, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 
+
+def compound_messages_feed(request):
+	compound_messages = Message.objects.filter(incoming=True).order_by('user')
+	compound_messages = compound_messages.exclude(statement_bounds_json__isnull=True)
+	compound_messages = compound_messages.exclude(statement_bounds_json__exact='')
+	compound_messages = compound_messages.exclude(statement_bounds_json__exact='[]')
+	serializer = serializers.MessageSerializer(compound_messages, many=True)
+	return HttpResponse(json.dumps(serializer.data, cls=DjangoJSONEncoder), content_type="text/json", status=200)
 
 
 @login_required(login_url='/admin/login/')
