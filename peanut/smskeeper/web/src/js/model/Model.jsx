@@ -29,6 +29,12 @@ var Message = Backbone.Model.extend({
     	var result = this.save({classification: newClassification}, {patch: true});
     	console.log("update classification result: " + result);
     },
+
+    setStatementBoundaries: function(newBoundaries) {
+      this.set({statement_bounds: newBoundaries});
+      var result = this.save({statement_bounds_json: JSON.stringify(newBoundaries)}, {patch: true});
+      console.log("update statementBoundaries result", result);
+    }
 });
 
 var MessageList = Backbone.Collection.extend({

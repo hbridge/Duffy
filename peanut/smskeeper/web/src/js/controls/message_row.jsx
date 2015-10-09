@@ -20,9 +20,6 @@ module.exports = React.createClass({
   render: function() {
     var message = this.state.model;
 		var body = message.Body;
-    if (message.manual) {
-      body = "(MANUAL) " + body;
-    }
 
     var mediaUrl = message.MediaUrls;
     if (!mediaUrl && message.MediaUrl0) {
@@ -47,7 +44,7 @@ module.exports = React.createClass({
 			<div id={ this.getId() } className="message">
         <MessageHeader message={message} />
         <div className={ cssClasses }>
-           <MessageBody text={body} />
+           <MessageBody text={body} isManual={message.manual} statementBounds={this.state.model.statement_bounds}/>
           <div>
             <AttachmentView mediaUrl={mediaUrl} mediaType={message.MediaContentType0} />
           </div>
@@ -131,9 +128,25 @@ var ClassificationChooser = React.createClass({
   }
 });
 
+var separator = "||";
 var MessageBody = React.createClass({
   render: function() {
-    var lines = this.props.text.split("\n");
+    // add a statement boundaries indicator where applicable
+    var newText = this.props.text;
+    var statementBounds = this.props.statementBounds ? this.props.statementBounds : [];
+    for (var i = statementBounds.length-1; i >= 0; i--){
+      var pos = this.props.statementBounds[i];
+      console.log("splicing in at pos:%d", pos);
+      newText = [newText.slice(0, pos), separator, newText.slice(pos)].join('');
+    }
+
+    // add (MANUAL) if the message is manual
+    if (this.props.manual) {
+      newText = "(MANUAL) " + newText;
+    }
+
+    // split up newlines so they render right in HTML
+    var lines = newText.split("\n");
     var result = [];
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];

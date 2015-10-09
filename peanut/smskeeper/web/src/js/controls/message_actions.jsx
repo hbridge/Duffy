@@ -2,13 +2,82 @@ var React = require('react')
 var $ = require('jquery');
 var classNames = require('classnames');
 var emoji = require("node-emoji");
+var _ = require("underscore");
 var Bootstrap = require('react-bootstrap');
   Modal = Bootstrap.Modal;
   Button = Bootstrap.Button;
+  ButtonGroup = Bootstrap.ButtonGroup;
   Input = Bootstrap.Input;
   ListGroup = Bootstrap.ListGroup;
   ListGroupItem = Bootstrap.ListGroupItem;
   Well = Bootstrap.Well;
+  Panel = Bootstrap.Panel;
+
+var wordRegex = /[^ \n^]+/g;
+
+
+var getAllMatches = function(str, regex){
+  var matches = [];
+  while (match=regex.exec(str)) {
+    matches.push(match);
+  }
+  return matches;
+}
+
+
+MessageSplitter = React.createClass({
+  getInitialState(){
+    var statementBounds = this.props.message.get("statement_bounds");
+    statementBounds = statementBounds ? statementBounds : [];
+    return ({statementBounds: statementBounds});
+  },
+
+  render(){
+    console.log("Message", this.props.message);
+    var wordMatches = getAllMatches(this.props.message.get("Body"), wordRegex);
+    console.log("Word matches", wordMatches);
+    var buttons = [];
+    for (var i = 0; i < wordMatches.length; i++) {
+      var wordIndex = wordMatches[i].index;
+      var selected = _.contains(this.state.statementBounds, wordIndex);
+      var style = selected ? 'primary' : 'default';
+      var clickHandler = (function(idx, selected){
+        return function(){this.setStatementBoundary(idx, !selected)}.bind(this)
+      }.bind(this))(wordIndex, selected);
+      buttons.push(
+        <Button
+            key={i}
+            bsStyle={style}
+            onClick={clickHandler}>
+          {wordMatches[i][0]}
+        </Button>
+      );
+    }
+
+    return (
+     <Panel collapsible defaultExpanded header="Split Message">
+      <ButtonGroup>
+        {buttons}
+      </ButtonGroup>
+     </Panel>
+    );
+  },
+
+  setStatementBoundary(wordIndex, isBoundary){
+    var newBoundaries = null;
+    if (isBoundary) {
+      newBoundaries = _.union([wordIndex], this.state.statementBounds);
+    } else {
+      newBoundaries = _.without(this.state.statementBounds, wordIndex);
+    }
+    newBoundaries.sort(function(a, b){return a-b});
+
+    console.log("newBoundaries", newBoundaries);
+
+    this.setState({statementBounds: newBoundaries});
+    this.props.message.setStatementBoundaries(newBoundaries);
+  }
+});
 
 
 module.exports = React.createClass({
@@ -90,6 +159,7 @@ module.exports = React.createClass({
             </ListGroup>
             {jsonElement}
             {categorizationActions}
+            <MessageSplitter message={this.state.message} />
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.onDialogSubmit}>Done</Button>
