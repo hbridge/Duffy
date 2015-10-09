@@ -82,6 +82,7 @@ class ChunkFeatures:
 	weatherRegex = r"\b(weather|forecast|rain|temp|temperature|how hot)\b"
 
 	# Changetime most recent
+	snoozeRegex = r"\b(snooze)\b"
 	changeTimeBasicRegex = r"\b(snooze|again|change)\b"
 	changeTimeBeginsWithRegex = r'^(change|snooze|update|again|remind (me )?again) '
 
@@ -175,6 +176,10 @@ class ChunkFeatures:
 	@memoized_property
 	def beginsWithChangeTimeWord(self):
 		return self.chunk.matches(self.changeTimeBeginsWithRegex)
+
+	@memoized_property
+	def beginsWithSnooze(self):
+		return self.chunk.matches(self.snoozeRegex)
 
 	@memoized_property
 	def numMatchingEntriesStrict(self):
