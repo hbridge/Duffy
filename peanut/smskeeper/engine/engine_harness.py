@@ -33,7 +33,7 @@ class EngineSimHarness():
 		self.setUserProps(user, message.get("userSnapshot"))
 
 		self.setRecentOutgoingMessageClasses(message, recentMsgMock)
-		self.setActiveEntries(message, activeEntriesMock)
+		self.setActiveEntries(user, message, activeEntriesMock)
 
 		# actually score the message
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
@@ -63,7 +63,7 @@ class EngineSimHarness():
 		self.setUserProps(user, message.get("userSnapshot"))
 
 		self.setRecentOutgoingMessageClasses(message, recentMsgMock)
-		self.setActiveEntries(message, activeEntriesMock)
+		self.setActiveEntries(user, message, activeEntriesMock)
 
 		# actually score the message
 		lines = processing_util.processSigAndSplitLines(user, message["body"])
@@ -78,6 +78,7 @@ class EngineSimHarness():
 		if userSnapshot:
 			for key in userSnapshot.keys():
 				setattr(user, key, userSnapshot.get(key))
+			user.hasSnapshot = True
 		else:
 			# default values
 			user.productId = keeper_constants.TODO_PRODUCT_ID
@@ -86,6 +87,7 @@ class EngineSimHarness():
 			dt = date_util.now(pytz.utc)
 			user.activated = datetime.datetime(day=dt.day, year=dt.year, month=dt.month, hour=dt.hour, minute=dt.minute, second=dt.second).replace(tzinfo=pytz.utc)
 			user.signature_num_lines = 0
+			user.hasSnapshot = False
 
 	def setRecentOutgoingMessageClasses(self, message, mock):
 		self.recentOutgoingMessageClasses = message.get("recentOutgoingMessageClasses")
@@ -97,11 +99,11 @@ class EngineSimHarness():
 		logger.info("Was recently sent %s for user %s", outgoingMsgClass, result)
 		return result
 
-	def setActiveEntries(self, message, mock):
-		self.activeEntries = message.get("activeEntriesSnapshot", [])
+	def setActiveEntries(self, user, message, mock):
+		activeEntries = message.get("activeEntriesSnapshot", [])
 
 		newActiveEntries = []
-		for entrySnapshot in self.activeEntries:
+		for entrySnapshot in activeEntries:
 			text = entrySnapshot.get("text", "")
 			remind_timestamp = date_util.fromIsoString(entrySnapshot.get("remind_timestamp"))
 

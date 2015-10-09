@@ -75,6 +75,7 @@ class Nicety():
 
 SMSKEEPER_NICETIES = [Nicety(x[0], x[1]) for x in keeper_strings.NICETIES_LIST]
 
+
 def getNicety(msg):
 	for nicety in SMSKEEPER_NICETIES:
 		if (nicety.matchesMsg(msg)):

@@ -34,6 +34,9 @@ class NicetyAction(Action):
 		nicety = niceties.getNicety(chunk.normalizedText())
 
 		if nicety is None:
+			nicety = niceties.getNicety(chunk.originalText)
+
+		if nicety is None:
 			logger.error("User %s: Executing nicety but don't have a response to send" % (user.id))
 		else:
 			response = nicety.getResponse(user, {}, user.getKeeperNumber())

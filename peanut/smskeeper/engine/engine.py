@@ -24,7 +24,7 @@ from smskeeper.chunk import Chunk
 
 logger = logging.getLogger(__name__)
 
-USE_SMRT = True
+USE_SMRT = False
 
 
 class Engine:
@@ -145,7 +145,10 @@ class Engine:
 
 					if score > topSmrtScore:
 						topSmrtScore = score
-
+			if len(result) > 0:
+				topSmrtAction = result[0].ACTION_CLASS
+			else:
+				topSmrtAction = None
 
 			foundV1 = False
 			v1scoresByActionName = dict()
@@ -166,39 +169,81 @@ class Engine:
 				for action in actions:
 					v1scoresByActionName[action.ACTION_CLASS] = score
 
+			if len(v1Actions) > 0:
+				topV1Action = v1Actions[0].ACTION_CLASS
+			else:
+				topV1Action = None
+
 			if USE_SMRT:
+				# If v1 really thinks its a nicety, go with that
+				if (topV1Action and topV1Action == keeper_constants.CLASS_NICETY
+								and v1scoresByActionName[keeper_constants.CLASS_NICETY] > .9):
+					result = v1Actions
+				# If v1 really thinks is a shared reminder, go with that
+				elif (topV1Action and topV1Action == keeper_constants.CLASS_SHARE_REMINDER
+										and v1scoresByActionName[keeper_constants.CLASS_SHARE_REMINDER] > .9):
+					result = v1Actions
+				# If v1 thinks is a tip question response and smrt doesn't have a good number, go with v1
+				elif (topV1Action and topV1Action == keeper_constants.CLASS_TIP_QUESTION_RESPONSE
+										and v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .6
+										and topSmrtScore < .5):
+					result = v1Actions
 				# If SMRT says "create":
 				#   if v1 says tip question response or change settings, then go with v1
 				#   if v1 says nothing...then do nothing
-				if result[0].ACTION_CLASS == "createtodo":
+				elif topSmrtAction == "createtodo":
 					if v1scoresByActionName[keeper_constants.CLASS_TIP_QUESTION_RESPONSE] >= .7:
 						result = [self.getActionByName(keeper_constants.CLASS_TIP_QUESTION_RESPONSE)] + result
 					elif v1scoresByActionName[keeper_constants.CLASS_CHANGE_SETTING] >= .9:
 						result = [self.getActionByName(keeper_constants.CLASS_CHANGE_SETTING)] + result
+					elif v1scoresByActionName[keeper_constants.CLASS_CHANGETIME_SPECIFIC] >= .8:
+						result = [self.getActionByName(keeper_constants.CLASS_CHANGETIME_SPECIFIC)] + result
+					elif topV1Action == keeper_constants.CLASS_QUESTION:
+						result = [self.getActionByName(keeper_constants.CLASS_QUESTION)] + result
 					elif not foundV1:
 						result = list()
 				# If SMRT says "nicety":
 				#   if v1 says its def not a nicety, then ignore smrt's first guess
-				#   if v1 says its a joke, go with that
-				elif result[0].ACTION_CLASS == keeper_constants.CLASS_NICETY:
-					if (smrtScoresByActionName[keeper_constants.CLASS_NICETY] < .6 and
-								v1scoresByActionName[keeper_constants.CLASS_NICETY] == 0):
-						result = result[1:]
-					# SMRT things
-					elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_JOKE):
+				#   if v1 says its a joke, frustration or stop go with that
+				elif topSmrtAction == keeper_constants.CLASS_NICETY:
+					if (topV1Action and (topV1Action == keeper_constants.CLASS_QUESTION or
+									topV1Action == keeper_constants.CLASS_FRUSTRATION or
+									topV1Action == keeper_constants.CLASS_JOKE)):
 						result = v1Actions
-				# If v1 really thinks its a nicety, go with that
-				elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_NICETY
-										and v1scoresByActionName[keeper_constants.CLASS_NICETY] > .9):
-					result = v1Actions
-				# If v1 really thinks is a shared reminder, go with that
-				elif (len(v1Actions) > 0 and v1Actions[0].ACTION_CLASS == keeper_constants.CLASS_SHARE_REMINDER
-										and v1scoresByActionName[keeper_constants.CLASS_SHARE_REMINDER] > .9):
-					result = v1Actions
+					elif (smrtScoresByActionName[keeper_constants.CLASS_NICETY] < .6 and
+											v1scoresByActionName[keeper_constants.CLASS_NICETY] == 0 and
+											v1scoresByActionName[keeper_constants.CLASS_SILENT_NICETY] == 0):
+						result = result[1:]
+				# If SMRT says "silent-nicety"
+				#    if v1 says stop or fetch digest, go with that
+				elif topSmrtAction == keeper_constants.CLASS_SILENT_NICETY:
+					if (topV1Action and (topV1Action == keeper_constants.CLASS_STOP or
+									topV1Action == keeper_constants.CLASS_FETCH_DIGEST)):
+						result = v1Actions
+				# If SMRT says "changetime-most-recent"
+				#    if theres no entries, then goto next best one
+				elif (topSmrtAction == keeper_constants.CLASS_CHANGETIME_MOST_RECENT or
+										topSmrtAction == keeper_constants.CLASS_CHANGETIME_SPECIFIC or
+										topSmrtAction == keeper_constants.CLASS_COMPLETE_TODO_MOST_RECENT or
+										topSmrtAction == keeper_constants.CLASS_COMPLETE_TODO_SPECIFIC):
+					if len(user.getActiveEntries()) == 0:
+						# This is here for the simulator which sets this attribute.
+						#    if we don't have a snapshot, just go with the default (don't skip first entry)
+						if hasattr(user, "hasSnapshot"):
+							if user.hasSnapshot:
+								result = result[1:]
+						else:
+							result = result[1:]
+				elif topSmrtAction == keeper_constants.CLASS_STOP:
+					if v1scoresByActionName[keeper_constants.CLASS_STOP] == 0:
+						result = result[1:]
+
 				# If SMRT isn't that confident and v1 is, go with v1
-				if (topSmrtScore < .4 and
-							topV1Score >= .9):
-					result = v1Actions
+				if len(result) > 0 and (smrtScoresByActionName[result[0].ACTION_CLASS] < .35):
+					if topV1Score >= .5:
+						result = v1Actions
+					else:
+						result = list()
 
 		logger.debug("User %s: in getBestActions, final actions: %s" % (user.id, [x.ACTION_CLASS for x in result]))
 		return result
