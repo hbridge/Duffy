@@ -501,6 +501,7 @@ class Message(models.Model):
 	manual = models.BooleanField(default=None)
 	classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
 	auto_classification = models.CharField(max_length=100, db_index=True, null=True, blank=True)
+	statement_bounds_json = models.TextField(null=True)
 
 	# manually = True means that it needs to be reviewed
 	manually_check = models.BooleanField(default=False)
