@@ -232,13 +232,11 @@ class ChunkFeatures:
 		return self.chunk.matches(r'and|also')
 
 	@memoized_property
-	@memorise(parent_keys=['chunk'])
 	def hasPhoneNumber(self):
 		matches = phonenumbers.PhoneNumberMatcher(self.chunk.originalText, 'US')
 		return matches.has_next()
 
 	@memoized_property
-	@memorise(parent_keys=['chunk'])
 	def isPhoneNumber(self):
 		matches = phonenumbers.PhoneNumberMatcher(self.chunk.originalText, 'US')
 		if not matches.has_next():
@@ -427,24 +425,29 @@ class ChunkFeatures:
 		return isRecentAction
 
 	@memoized_property
-	@memorise(parent_keys=['chunk'])
 	def hasAnyNicety(self):
-		return True if niceties.getNicety(self.chunk.normalizedText()) else False
+		if niceties.getNicety(self.chunk.originalText):
+			return True
+		elif niceties.getNicety(self.chunk.normalizedText()):
+			return True
+		return False
 
 	@memoized_property
-	@memorise(parent_keys=['chunk'])
 	def hasSilentNicety(self):
-		nicety = niceties.getNicety(self.chunk.normalizedText())
+		nicety = niceties.getNicety(self.chunk.originalText)
+
+		if not nicety:
+			nicety = niceties.getNicety(self.chunk.normalizedText())
+
 		if nicety and nicety.isSilent():
 			return True
 		return False
 
 	@memoized_property
-	@memorise(parent_keys=['chunk'])
 	def nicetyMatchScore(self):
-		nicety = niceties.getNicety(self.chunk.normalizedText())
+		nicety = niceties.getNicety(self.chunk.originalText)
 		if nicety:
-			return nicety.matchScore(self.chunk.normalizedText())
+			return nicety.matchScore(self.chunk.originalText)
 		return 0
 
 	@memoized_property
