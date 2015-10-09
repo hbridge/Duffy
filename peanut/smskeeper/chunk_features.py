@@ -75,13 +75,14 @@ class ChunkFeatures:
 
 	# NOTE: Make sure there's a space after these words, otherwise "printed" will match
 	# things that match this RE will get a boost for create
-	createWordRegex = "(remind|to do|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop)"
+	createWordRegex = "(remind|to do|buy|watch|print|fax|go|get|study|wake|fix|make|schedule|fill|find|clean|pick up|cut|renew|fold|mop|pack|pay|call|send|wash|email|edit|talk|do|prepare|order|shop|read|invite|follow up|eat|check on|bring|set up|straighten up|work on|need to|sweep)"
 	beginsWithCreateWordRegex = r'^%s ' % createWordRegex
 	containsCreateWordhRegex = r'\b%s ' % createWordRegex
 
 	weatherRegex = r"\b(weather|forecast|rain|temp|temperature|how hot)\b"
 
 	# Changetime most recent
+	snoozeRegex = r"\b(snooze)\b"
 	changeTimeBasicRegex = r"\b(snooze|again|change)\b"
 	changeTimeBeginsWithRegex = r'^(change|snooze|update|again|remind (me )?again) '
 
@@ -177,11 +178,15 @@ class ChunkFeatures:
 		return self.chunk.matches(self.changeTimeBeginsWithRegex)
 
 	@memoized_property
+	def beginsWithSnooze(self):
+		return self.chunk.matches(self.snoozeRegex)
+
+	@memoized_property
 	def numMatchingEntriesStrict(self):
 		return len(self.getMatchingEntriesStrict())
 
 	@memoized_property
-	def numEntriesJustNotifiedAbout(self):
+	def numBroadEntriesJustNotifiedAbout(self):
 		bestEntries = self.getMatchingEntriesBroad()
 		bestEntryIds = [x.id for x in bestEntries]
 		justNotifiedEntryIds = self.user.getLastEntriesIds()
@@ -189,8 +194,26 @@ class ChunkFeatures:
 		return len(set(bestEntryIds).intersection(set(justNotifiedEntryIds)))
 
 	@memoized_property
+	def numLastNotifiedEntries(self):
+		return len(self.getJustNotifiedEntryIds())
+
+	@memoized_property
 	def numMatchingEntriesBroad(self):
 		return len(self.getMatchingEntriesBroad())
+
+	@memoized_property
+	def scoreOfTopEntry(self):
+		cleanedText = msg_util.cleanedDoneCommand(self.chunk.normalizedTextWithoutTiming(self.user))
+		cleanedText = ' '.join(msg_util.getInterestingWords(cleanedText))
+		entry, score = entry_util.getBestEntryMatch(self.user, cleanedText)
+		if entry:
+			return score
+		else:
+			return 0
+
+	@memoized_property
+	def numActiveEntries(self):
+		return len(self.user.getActiveEntries())
 
 	@memoized_property
 	def hasCreateWord(self):
@@ -406,12 +429,12 @@ class ChunkFeatures:
 	@memoized_property
 	@memorise(parent_keys=['chunk'])
 	def hasAnyNicety(self):
-		return True if niceties.getNicety(self.chunk.originalText) else False
+		return True if niceties.getNicety(self.chunk.normalizedText()) else False
 
 	@memoized_property
 	@memorise(parent_keys=['chunk'])
 	def hasSilentNicety(self):
-		nicety = niceties.getNicety(self.chunk.originalText)
+		nicety = niceties.getNicety(self.chunk.normalizedText())
 		if nicety and nicety.isSilent():
 			return True
 		return False
@@ -419,9 +442,9 @@ class ChunkFeatures:
 	@memoized_property
 	@memorise(parent_keys=['chunk'])
 	def nicetyMatchScore(self):
-		nicety = niceties.getNicety(self.chunk.originalText)
+		nicety = niceties.getNicety(self.chunk.normalizedText())
 		if nicety:
-			return nicety.matchScore(self.chunk.originalText)
+			return nicety.matchScore(self.chunk.normalizedText())
 		return 0
 
 	@memoized_property

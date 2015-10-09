@@ -1237,7 +1237,7 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.MON_9AM)
 
 		with patch('smskeeper.sms_util.recordOutput') as mock:
-			cliMsg.msg(self.testPhoneNumber, "wub wub robckeres\nCall Va, and registration\nPay electric and water bill")
+			cliMsg.msg(self.testPhoneNumber, "this should be unknown\nCall Va, and registration\nPay electric and water bill")
 			# We should be pausing, so no output
 			self.assertEqual("", self.getOutput(mock))
 

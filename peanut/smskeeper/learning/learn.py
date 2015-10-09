@@ -4,7 +4,8 @@
 import os
 import sys
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
+from sklearn.neural_network import BernoulliRBM
 from sklearn import cross_validation
 import numpy as np
 import scipy as sp
@@ -39,6 +40,8 @@ def main():
 
     # In this case we'll use a random forest, but this could be any classifier
     cfr = RandomForestClassifier(n_estimators=100)
+    #nn = BernoulliRBM()
+    #gbc = BaggingClassifier()
 
     # Simple K-Fold cross validation. 5 folds.
     # (Note: in older scikit-learn versions the "n_folds" argument is named "k".)
@@ -50,9 +53,11 @@ def main():
     for traincv, testcv in cv:
         probas = cfr.fit(train[traincv], target[traincv]).predict_proba(train[testcv])
         results.append(llfun(target[testcv], [x[1] for x in probas]))
+        #nn.fit(train[traincv], target[traincv])
 
     # print out the mean of the cross-validated results
     print "Results: " + str(np.array(results).mean())
+    print "Don't forget to run:   echo 'flush_all' | nc localhost 11211"
 
     parentPath = os.path.join(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
     joblib.dump(cfr, parentPath + keeper_constants.LEARNING_DIR_LOC + 'model')

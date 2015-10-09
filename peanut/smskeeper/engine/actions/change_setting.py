@@ -1,10 +1,14 @@
 import re
 import string
+import logging
 
 from smskeeper import sms_util, msg_util, helper_util, actions
 from smskeeper import keeper_constants, keeper_strings
 from smskeeper import analytics
 from .action import Action
+
+
+logger = logging.getLogger(__name__)
 
 
 class ChangeSettingAction(Action):
@@ -49,6 +53,11 @@ class ChangeSettingAction(Action):
 
 		elif chunk.contains(self.summaryRegex):
 			return actions.updateDigestTime(user, chunk)
+		else:
+			# TODO(Derek): Probably should combine change setting and tip question response
+			if user.nextAction and user.nextAction.ACTION_CLASS == keeper_constants.CLASS_CLASS_TIP_QUESTION_RESPONSE:
+				logger.info("User %s: I thought '%s' was a change setting but couldn't see what to do...I see next option is tip-question-response so kicking to that" % (user.id, chunk.originalText))
+				return False
 
 		return True
 

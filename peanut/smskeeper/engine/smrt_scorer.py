@@ -67,7 +67,8 @@ class SmrtScorer():
 
 			smrtServerUrl = "http://localhost:%s/?%s" % (self.smrtServerPort, urllib.urlencode(params))
 
-			logger.debug("User %s: Hitting smrtServer url: %s" % (user.id, smrtServerUrl))
+			logger.debug("User %s: Hitting smrtServer with data: %s" % (user.id, params["featuresDict"]))
+			#logger.debug("User %s: Hitting smrtServer url: %s" % (user.id, smrtServerUrl))
 
 			try:
 				smrtServerResult = urllib2.urlopen(smrtServerUrl).read()

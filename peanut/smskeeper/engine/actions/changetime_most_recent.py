@@ -19,7 +19,7 @@ class ChangetimeMostRecentAction(ChangetimeAction):
 		if not features.hasTimingInfo and features.hasChangeTimeWord:
 			score = 0.2
 
-		if features.numMatchingEntriesStrict == 0:
+		if features.numMatchingEntriesStrict == 0 and features.numLastNotifiedEntries > 0:
 			if features.hasTimingInfo and features.hasChangeTimeWord:
 				if features.wasRecentlySentMsgOfClassReminder:
 					score = 0.9

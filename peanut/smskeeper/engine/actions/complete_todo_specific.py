@@ -32,7 +32,7 @@ class CompleteTodoSpecificAction(Action):
 
 		return score
 
-	def execute(self, chunk, user, features):
+	def execute(self, chunk, user, features, nextAction=None):
 		cleanedCommand = msg_util.getInterestingWords(chunk.originalText, removeDones=True)
 
 		entries = entry_util.fuzzyMatchEntries(user, ' '.join(cleanedCommand))
