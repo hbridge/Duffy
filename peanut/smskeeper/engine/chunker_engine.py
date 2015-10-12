@@ -2,6 +2,7 @@ import re
 from smskeeper.chunk import Chunk
 
 wordRe = re.compile(r'[^ \n^]+')
+MIN_BOUNDARY_SCORE = 0.5
 
 
 class ChunkerEngine:
@@ -19,12 +20,21 @@ class ChunkerEngine:
 		wordIter = wordRe.finditer(self.message)
 		lastSegmentStart = 0
 		for word in wordIter:
-			wordFeatures = WordFeatures(word.start(), self.message)
-			if wordFeatures.isFirstWordInSentence() and word.start() != 0:
+			if word.start() == 0:
+				continue
+			if self.segmentBoundaryScore(self.message[word.start():word.end()], word.start()):
 				segments.append({"start": lastSegmentStart, "end": word.start()})
 				lastSegmentStart = word.start()
 		segments.append({"start": lastSegmentStart, "end": len(self.message)})
 		return segments
+
+	def segmentBoundaryScore(self, word, wordLocation):
+		wordFeatures = WordFeatures(word, wordLocation, self.message)
+
+		scoreVector = []
+		scoreVector.append(1.0 if wordFeatures.isFirstWordInSentence() else 0.0)
+
+		return sum(scoreVector)
 
 	def getChunkStartIndices(self):
 		return map(lambda segment: segment["start"], self.segments())
@@ -35,11 +45,10 @@ class WordFeatures:
 	containingString = None
 	location = None
 
-	def __init__(self, location, string):
+	def __init__(self, word, location, string):
 		self.location = location
 		self.containingString = string
-		match = wordRe.match(string[location:])
-		self.word = string[location:(location + match.end())]
+		self.word = word
 
 	def isFirstWordInSentence(self):
 		# print "isFirstWordInSentence: %d %s %s" % (self.location, self.word, self.containingString)
