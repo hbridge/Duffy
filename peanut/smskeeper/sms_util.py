@@ -147,11 +147,13 @@ def maybeSendConfusedMsg(user, keeperNumber=None):
 		# asyncMaybeSendConfusedMsg(user.id, date_util.unixTime(now))
 
 
+# This method takes in a time and looks to see if any messages were updated since then
+# If so, we assume an admin took an action or a user did...so don't send a confused msg
 @app.task
 def asyncMaybeSendConfusedMsg(userId, msgTimeSinceEpoch):
 	user = User.objects.get(id=userId)
 	dt = datetime.datetime.fromtimestamp(msgTimeSinceEpoch)
-	messagesAfter = Message.objects.filter(user=user, added__gt=dt)
+	messagesAfter = Message.objects.filter(user=user, updated__gt=dt)
 
 	if len(messagesAfter) == 0:
 		logger.debug("User %s: Sending out confused message because 0 messages came after my time %s", user.id, dt)
