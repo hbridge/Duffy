@@ -13,7 +13,7 @@ var Bootstrap = require('react-bootstrap');
   Well = Bootstrap.Well;
   Panel = Bootstrap.Panel;
 
-var wordRegex = /[^ \n^]+/g;
+var wordRegex = /[a-zA-Z0-9]+|[^ \n^a-z-A-Z0-9]+/g;
 
 
 var getAllMatches = function(str, regex){

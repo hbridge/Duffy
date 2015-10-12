@@ -1,7 +1,7 @@
 import re
 from smskeeper.chunk import Chunk
 
-wordRe = re.compile(r'[^ \n^]+')
+wordRe = re.compile(r'[a-zA-Z0-9]+|[^ \n^a-z-A-Z0-9]+')
 MIN_BOUNDARY_SCORE = 0.5
 
 
@@ -20,6 +20,7 @@ class ChunkerEngine:
 		wordIter = wordRe.finditer(self.message)
 		lastSegmentStart = 0
 		for word in wordIter:
+			# print "word: %s" % self.message[word.start():word.end()]
 			if word.start() == 0:
 				continue
 			if self.segmentBoundaryScore(self.message[word.start():word.end()], word.start()):
@@ -29,10 +30,11 @@ class ChunkerEngine:
 		return segments
 
 	def segmentBoundaryScore(self, word, wordLocation):
-		wordFeatures = WordFeatures(word, wordLocation, self.message)
+		wordFeatures = WordFeatures(word, wordLocation	, self.message)
 
 		scoreVector = []
 		scoreVector.append(1.0 if wordFeatures.isFirstWordInSentence() else 0.0)
+		scoreVector.append(0.5 if wordFeatures.isStartNewClauseWord() else 0.0)
 
 		return sum(scoreVector)
 
@@ -57,3 +59,6 @@ class WordFeatures:
 		beforeWord = self.containingString[:self.location]
 		reversedStr = beforeWord[::-1]
 		return re.match(r'\W+[.]', reversedStr) is not None
+
+	def isStartNewClauseWord(self):
+		return re.match('(also)', self.word, re.I) is not None
