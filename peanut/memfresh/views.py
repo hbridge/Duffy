@@ -19,8 +19,8 @@ from django_inbound_email.signals import email_received
 from oauth2client.django_orm import Storage
 
 from memfresh.models import User, FollowUp, ContactEntry, CredentialsModel
-from memfresh.forms import UserIdForm, AuthForm, SmsContentForm
-from memfresh import utils 
+from memfresh.forms import UserIdForm, AuthForm, SmsContentForm, TelegramForm
+from memfresh import utils
 from peanut.settings import constants
 
 from common import api_util
@@ -31,7 +31,7 @@ AUTH_LINK = "http://dev.duffyapp.com/memfresh/do_auth"
 
 def getAuthLink(user):
 	return "%s?user_id=%s" % (AUTH_LINK, user.id)
-	
+
 def on_email_received(sender, **kwargs):
 	"""Handle inbound emails."""
 	email = kwargs.pop('email')
@@ -90,6 +90,18 @@ def incoming_sms(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+
+@csrf_exempt
+def incoming_telegram(request):
+	form = TelegramForm(api_util.getRequestData(request))
+
+	if form.is_valid():
+		updateId = form.cleaned_data['update_id']
+		message = json.loads(form.cleaned_data['message'])
+		logger.info("Received telegram update %d: %s", updateId, message)
+	else:
+		logger.info("Received malformed telegram message: %s", request)
+
 def do_auth(request):
 	response = dict({'result': True})
 	form = UserIdForm(api_util.getRequestData(request))
@@ -108,7 +120,7 @@ def do_auth(request):
 			user.name = people_document["displayName"]
 			user.email = people_document["emails"][0]["value"]
 			user.save()
-		
+
 		event = utils.getMostCompletedRecentEvent(calService, datetime.timedelta(hours=4))
 		utils.askForFollowUpForEvent(user, event)
 

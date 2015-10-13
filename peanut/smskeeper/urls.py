@@ -7,6 +7,7 @@ urlpatterns = patterns(
 	'',
 	# external services
 	url(r'^incoming_sms', 'smskeeper.views.incoming_sms'),
+	url(r'^incoming_telegram', 'smskeeper.views.incoming_telegram'),
 	url(r'^keeper_app', 'smskeeper.views.keeper_app'),
 	url(r'^history', 'smskeeper.views.history'),
 	url(r'^review/?$', 'smskeeper.views.review'),

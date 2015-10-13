@@ -11,3 +11,7 @@ class AuthForm(forms.Form):
 class SmsContentForm(forms.Form):
 	From = forms.CharField(required=True)
 	Body = forms.CharField(required=False)
+
+class TelegramForm(forms.Form):
+	update_id = forms.IntegerField(required=True)
+	message = forms.CharField(required=True)
