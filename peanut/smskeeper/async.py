@@ -103,6 +103,10 @@ def updateEntryAfterProcessing(entry):
 			newEntry.save()
 			logger.info("User %s: Created new entry %s since its recurring for next time %s" % (newEntry.creator.id, newEntry.id, newEntry.remind_timestamp))
 
+		# Change original entry to be one time.  So if its snoozed, it doesn't turn stay recurring
+		entry.remind_recur = keeper_constants.RECUR_ONE_TIME
+		entry.save()
+
 	return entry
 
 

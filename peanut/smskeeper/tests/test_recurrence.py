@@ -296,6 +296,28 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 			self.assertIn("Wake up", self.getOutput(mock))
 			self.assertIn("skiing", self.getOutput(mock))
 
+	def test_snoozed_recur_turns_into_one_time(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am everyday")
+
+		# But it should be in the user requested list
+		self.setNow(dateMock, self.MON_10AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processAllReminders()
+			self.assertIn("Wake up", self.getOutput(mock))
+
+		cliMsg.msg(self.testPhoneNumber, "snooze 1 hour")
+
+		entries = Entry.objects.filter(label="#reminders")
+
+		# Make sure we created the new entry
+		self.assertEqual(len(entries), 2)
+
+		# Make sure the first reminder (that was snoozed) is now a one time
+		self.assertEqual(entries[0].remind_recur, keeper_constants.RECUR_ONE_TIME)
+
 	def test_weekday_reminder(self, dateMock):
 		self.setupUser(dateMock)
 
