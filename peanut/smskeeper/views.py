@@ -26,7 +26,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from smskeeper import sms_util, processing_util, keeper_constants, user_util
-from smskeeper.forms import UserIdForm, SendMediaForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm
+from smskeeper.forms import UserIdForm, SendMediaForm, SmsContentForm, SendSMSForm, ResendMsgForm, WebsiteRegistrationForm, StripeForm, TelegramForm
 from smskeeper.models import User, Entry, Message
 from smskeeper import admin
 
@@ -101,6 +101,19 @@ def incoming_sms(request):
 		return sendNoResponse()
 
 	else:
+		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+
+@csrf_exempt
+def incoming_telegram(request):
+	form = TelegramForm(api_util.getRequestData(request))
+
+	if form.is_valid():
+		updateId = form.cleaned_data['update_id']
+		message = json.loads(form.cleaned_data['message'])
+		logger.info("Received telegram update %d: %s", updateId, message)
+		return send_response("Got it")
+	else:
+		logger.info("Received malformed telegram message: %s", json.dumps(form.errors))
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 

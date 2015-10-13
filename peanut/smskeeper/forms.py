@@ -76,3 +76,8 @@ class WebsiteRegistrationForm(forms.Form):
 	referrer = forms.CharField(min_length=1, max_length=100, required=False)
 	paid = forms.CharField(min_length=1, max_length=100, required=False)
 	exp = forms.CharField(min_length=1, max_length=100, required=False)
+
+
+class TelegramForm(forms.Form):
+	update_id = forms.IntegerField(required=True)
+	message = forms.CharField(required=True)

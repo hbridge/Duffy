@@ -19,7 +19,7 @@ from django_inbound_email.signals import email_received
 from oauth2client.django_orm import Storage
 
 from memfresh.models import User, FollowUp, ContactEntry, CredentialsModel
-from memfresh.forms import UserIdForm, AuthForm, SmsContentForm, TelegramForm
+from memfresh.forms import UserIdForm, AuthForm, SmsContentForm
 from memfresh import utils
 from peanut.settings import constants
 
@@ -89,18 +89,6 @@ def incoming_sms(request):
 			return send_response("Got it")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
-
-
-@csrf_exempt
-def incoming_telegram(request):
-	form = TelegramForm(api_util.getRequestData(request))
-
-	if form.is_valid():
-		updateId = form.cleaned_data['update_id']
-		message = json.loads(form.cleaned_data['message'])
-		logger.info("Received telegram update %d: %s", updateId, message)
-	else:
-		logger.info("Received malformed telegram message: %s", request)
 
 def do_auth(request):
 	response = dict({'result': True})
