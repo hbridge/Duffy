@@ -1200,6 +1200,14 @@ class SMSKeeperReminderCase(test_base.SMSKeeperBaseCase):
 		self.assertEqual(self.TUE_9AM, entries[0].remind_timestamp)
 		self.assertEqual(self.TUE_8AM, entries[1].remind_timestamp)
 
+	def test_multi_line_with_blank_line(self, dateMock):
+		self.setupUser(dateMock)
+		self.setNow(dateMock, self.MON_9AM)
+
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "Doctors app in vanburen at 4 pm Thursday \n\nRemind me pooping tomorrow at 8 pm")
+			self.assertIn(self.getOutput(mock), keeper_strings.ACKNOWLEDGEMENT_PHRASES)
+
 	def test_multi_line_no_times(self, dateMock):
 		self.setupUser(dateMock)
 		self.setNow(dateMock, self.MON_9AM)

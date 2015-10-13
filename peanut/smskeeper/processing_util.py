@@ -133,6 +133,12 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 		allProcessed = True
 		lineCount = 0
 		for msg in msgs:
+			lineCount += 1
+
+			# If the line is a blank line, then skip
+			if not msg:
+				continue
+
 			chunk = Chunk(msg, True, lineCount)
 
 			features = chunk_features.ChunkFeatures(chunk, user)
@@ -145,7 +151,7 @@ def processWithEngine(user, msgs, messageObject, useSMRT):
 
 			if not chunkProcessed:
 				allProcessed = False
-			lineCount += 1
+
 
 		# Make sure we can send messages again
 		user.overrideKeeperNumber = None

@@ -77,6 +77,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 		self.assertFalse(phone_info_util.userCarrierSupportsLongSMS(self.getTestUser()))
 
+
 	"""
 	Commented out by Derek while we experiement with no not-activated state
 	def test_unactivated_connect(self, dateMock):
@@ -218,6 +219,8 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.testPhoneNumber, "#hashtag")
 			self.assertIn("(1)", self.getOutput(mock))
 	"""
+
+
 	# See if we get into the paused state when we enter an invalid command during daytime hours
 	def test_ignore_one_word(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
