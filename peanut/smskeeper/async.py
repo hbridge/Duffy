@@ -183,17 +183,6 @@ def processAllReminders():
 			processReminder(entry)
 
 
-def shouldIncludeEntry(entry):
-	# Cutoff time is 23 hours ahead, could be changed later to be more tz aware
-	localNow = date_util.now(entry.creator.getTimezone())
-	# Cutoff time is midnight local time
-	cutoffTime = (localNow + datetime.timedelta(days=1)).replace(hour=0, minute=0)
-
-	if not entry.hidden and entry.remind_timestamp < cutoffTime:
-		return True
-	return False
-
-
 def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequested, sweptEntries):
 	now = date_util.now(pytz.utc)
 	userNow = date_util.now(user.getTimezone())
@@ -223,6 +212,11 @@ def getDigestMessageForUser(user, pendingEntries, weatherDataCache, userRequeste
 			# If this is the digest and this reminder was timed to this day and time...then process it (mark it as sent)
 			if not userRequested and user.isDigestTime(entry.remind_timestamp) and now.day == entry.remind_timestamp.day:
 				updateEntryAfterProcessing(entry)
+
+			# If this is a daily entry not set for digest time, then skip including the message
+			if not userRequested and entry.remind_recur == keeper_constants.RECUR_DAILY and not user.isDigestTime(entry.remind_timestamp):
+				continue
+
 			msg += generateTaskStringForDigest(user, entry)
 
 	if not userRequested and len(sweptEntries) > 0:

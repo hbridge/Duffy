@@ -164,12 +164,6 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 			async.processAllReminders()
 			self.assertIn("Wake up", self.getOutput(mock))
 
-		# Should be in the digest
-		self.setNow(dateMock, self.TUE_9AM)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			async.processDailyDigest()
-			self.assertIn("Wake up", self.getOutput(mock))
-
 		# Should be sent out at 10 am
 		self.setNow(dateMock, self.MON_10AM + datetime.timedelta(days=1))
 		with patch('smskeeper.sms_util.recordOutput') as mock:
@@ -273,10 +267,6 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 		cliMsg.msg(self.testPhoneNumber, "remind me to go skiing at 3pm")
 
 		self.setNow(dateMock, self.MON_9AM)
-		with patch('smskeeper.sms_util.recordOutput') as mock:
-			async.processDailyDigest()
-			self.assertIn("Wake up", self.getOutput(mock))
-
 		cliMsg.msg(self.testPhoneNumber, "done with all")
 
 		entries = Entry.objects.filter(label="#reminders")
@@ -284,6 +274,27 @@ class SMSKeeperRecurCase(test_base.SMSKeeperBaseCase):
 		# Make sure we only mark the non-recur one done
 		self.assertFalse(entries[0].hidden)
 		self.assertTrue(entries[1].hidden)
+
+	def test_daily_recur_not_in_digest(self, dateMock):
+		self.setupUser(dateMock)
+
+		self.setNow(dateMock, self.MON_8AM)
+		cliMsg.msg(self.testPhoneNumber, "remind me wake up at 10am everyday")
+		cliMsg.msg(self.testPhoneNumber, "remind me to go skiing at 3pm")
+
+		# Wake up shouldn't be in digest
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			async.processDailyDigest()
+			self.assertNotIn("Wake up", self.getOutput(mock))
+			self.assertIn("skiing", self.getOutput(mock))
+
+		# But it should be in the user requested list
+		self.setNow(dateMock, self.MON_9AM)
+		with patch('smskeeper.sms_util.recordOutput') as mock:
+			cliMsg.msg(self.testPhoneNumber, "tasks")
+			self.assertIn("Wake up", self.getOutput(mock))
+			self.assertIn("skiing", self.getOutput(mock))
 
 	def test_weekday_reminder(self, dateMock):
 		self.setupUser(dateMock)
