@@ -421,7 +421,7 @@ def resend_msg(request):
 
 			requestDict = json.loads(message.msg_json)
 			requestDict["Manual"] = True
-			processing_util.processMessage(message.user.phone_number, requestDict["Body"], requestDict, keeperNumber)
+			processing_util.processMessage(message.user.phone_number, message.getBody(), requestDict, keeperNumber)
 		else:
 			sms_util.sendMsg(message.user, message.getBody(), None, keeperNumber)
 
