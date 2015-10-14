@@ -105,28 +105,29 @@ def incoming_sms(request):
 
 @csrf_exempt
 def incoming_telegram(request):
-	form = TelegramForm(api_util.getRequestData(request))
-	requestDict = api_util.getRequestData(request)
+	try:
+		requestDict = json.loads(request.body)
+	except Exception as e:
+		logger.error("Couldn't parse telegram request body: %s", request.body)
+		return HttpResponse(json.dumps({"Error": "Not JSON"}), content_type="text/json", status=400)
+
+	form = TelegramForm(requestDict)
 
 	logger.info("Incoming telegram request: %s\n\nBody:%s", request, request.body)
 
 	if form.is_valid():
 		updateId = form.cleaned_data.get('update_id', None)
-		message = form.cleaned_data.get('message', None)
-		if updateId and message:
-			logger.info("Received telegram update %d: %s", updateId, message)
-			fakePhoneNumber = message['from']['id'] + keeper_constants.TELEGRAM_NUMBER_SUFFIX  # it's not an actual phone number
-			if message:
-				processing_util.processMessage(
-					fakePhoneNumber,
-					message['text'],
-					requestDict,
-					settings.TELEGRAM_BOT_NAME + keeper_constants.TELEGRAM_NUMBER_SUFFIX
-				)
-			return sendNoResponse()
-		else:
-			logger.info("Received telegram ping")
-			return sendNoResponse()
+		message = json.loads(form.cleaned_data.get('message', None))
+		logger.info("Received telegram update %d: %s", updateId, message)
+		fakePhoneNumber = message['from']['id'] + keeper_constants.TELEGRAM_NUMBER_SUFFIX  # it's not an actual phone number
+		if message:
+			processing_util.processMessage(
+				fakePhoneNumber,
+				message['text'],
+				requestDict,
+				settings.TELEGRAM_BOT_NAME + keeper_constants.TELEGRAM_NUMBER_SUFFIX
+			)
+		return sendNoResponse()
 	else:
 		logger.info("Received malformed telegram message: %s\n\nerror:%s", json.dumps(requestDict), json.dumps(form.errors))
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
