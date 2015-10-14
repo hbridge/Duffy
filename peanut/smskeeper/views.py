@@ -6,7 +6,6 @@ import phonenumbers
 import logging
 import pytz
 import string
-import re
 from time import time
 from operator import add
 
@@ -111,7 +110,6 @@ To enable the webhook, load python and call
 >>> bot = telegram.Bot(token='TOKEN')
 >>> bot.setWebhook('https://prod.strand.duffyapp.com/smskeeper/incoming_telegram', open('/PATH/TO/CERT'))
 '''
-
 
 @csrf_exempt
 def incoming_telegram(request):
@@ -650,13 +648,17 @@ def update_stripe_info(request):
 	form = StripeForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		stripe_data = form.cleaned_data['stripe_data']
+		stripeDataJson = form.cleaned_data['stripe_data']
+		tipAmount = form.cleaned_data['tip_amount']
 
-		user.stripe_data_json = stripe_data
+		stripeData = json.loads(stripeDataJson)
+
+		stripeData["tip_amount"] = tipAmount
+		user.stripe_data_json = json.dumps(stripeData)
 		user.save()
 
-		sms_util.sendMsg(user, "Thanks for subscribing! You can now schedule unlimited reminders :sunglasses:")
-		logger.info("Registered users %s for medical" % (user.id))
+		sms_util.sendMsg(user, "Thanks so much!! :sunglasses:")
+		logger.info("Got tip from user %s of amount %s" % (user.id, tipAmount))
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 

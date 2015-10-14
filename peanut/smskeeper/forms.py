@@ -52,6 +52,7 @@ class SendMediaForm(UserMixin):
 
 class StripeForm(UserIdForm):
 	stripe_data = forms.CharField(required=True)
+	tip_amount = forms.CharField(required=True)
 
 
 class ResendMsgForm(UserMixin):
@@ -76,7 +77,6 @@ class WebsiteRegistrationForm(forms.Form):
 	referrer = forms.CharField(min_length=1, max_length=100, required=False)
 	paid = forms.CharField(min_length=1, max_length=100, required=False)
 	exp = forms.CharField(min_length=1, max_length=100, required=False)
-
 
 class TelegramForm(forms.Form):
 	update_id = forms.IntegerField(required=True)
