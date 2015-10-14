@@ -29,8 +29,7 @@ def main(argv):
 
 	f = open('workfile', 'w')
 	for msg in classified_messages:
-		msgData = json.loads(msg.msg_json)
-		body = ''.join([i if ord(i) < 128 else ' ' for i in msgData["Body"]])
+		body = ''.join([i if ord(i) < 128 else ' ' for i in msg.getBody()])
 
 		f.write("%s\t%s\n" % (msg.classification, body))
 		#print "%s\t%s\n" % (msg.classification, msgData["Body"])
