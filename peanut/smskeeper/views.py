@@ -122,7 +122,7 @@ def incoming_telegram(request):
 			)
 		return sendNoResponse()
 	else:
-		logger.info("Received malformed telegram message: %s", json.dumps(form.errors))
+		logger.info("Received malformed telegram message: %s\n\nerror:%s", json.dumps(requestDict), json.dumps(form.errors))
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
 
