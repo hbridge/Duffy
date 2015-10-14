@@ -79,5 +79,5 @@ class WebsiteRegistrationForm(forms.Form):
 
 
 class TelegramForm(forms.Form):
-	update_id = forms.IntegerField(required=True)
-	message = forms.CharField(required=True)
+	update_id = forms.IntegerField(required=False)
+	message = forms.CharField(required=False)
