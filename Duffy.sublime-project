@@ -3,7 +3,7 @@
 	[
 	{
 		"path": ".",
-		"folder_exclude_patterns": ["node_modules"],
+		"folder_exclude_patterns": ["node_modules", "migrations", "build"],
 		"binary_file_patters": ["*.min.*"]
 	}
 	],
