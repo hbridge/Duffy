@@ -39,7 +39,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
 from common import phone_info_util
-from smskeeper import telegram_util
+from smskeeper.telegram import telegram_util
 
 from common.api_util import DuffyJsonEncoder
 
@@ -106,6 +106,7 @@ def incoming_sms(request):
 
 @csrf_exempt
 def incoming_telegram(request):
+	logger.info("Incoming telegram request: %s\n\nBody:%s", request, request.body)
 	try:
 		requestDict = json.loads(request.body)
 	except Exception:
@@ -114,24 +115,35 @@ def incoming_telegram(request):
 
 	form = TelegramForm(requestDict)
 
-	logger.info("Incoming telegram request: %s\n\nBody:%s", request, request.body)
-
+	error = None
 	if form.is_valid():
 		updateId = form.cleaned_data.get('update_id', None)
 		message = requestDict.get('message', None)
-		logger.info("Received telegram update %d: %s", updateId, message)
-		fakePhoneNumber = telegram_util.telegramUidToPhoneNumber(message['from']['id'])  # it's not an actual phone number
+
 		if message:
-			processing_util.processMessage(
-				fakePhoneNumber,
-				message['text'],
-				requestDict,
-				settings.TELEGRAM_BOT_NAME + keeper_constants.TELEGRAM_NUMBER_SUFFIX
-			)
-		return sendNoResponse()
+			logger.info("Received telegram update %d: %s", updateId, message)
+			fromInfo = message.get('from', {'id': None})
+			telegramUid = fromInfo['id']
+			if telegramUid:
+				fakePhoneNumber = telegram_util.telegramUidToPhoneNumber(telegramUid)  # it's not an actual phone number
+				processing_util.processMessage(
+					fakePhoneNumber,
+					message['text'],
+					requestDict,
+					settings.TELEGRAM_BOT_NAME + keeper_constants.TELEGRAM_NUMBER_SUFFIX
+				)
+			else:
+				error = {"Error": "UID not found"}
+		else:
+			error = {"Error": "message object not found"}
 	else:
-		logger.info("Received malformed telegram message: %s\n\nerror:%s", json.dumps(requestDict), json.dumps(form.errors))
-		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
+		error = form.errors
+
+	if error:
+		logger.info("Received malformed telegram message: %s\n\nerror:%s", json.dumps(requestDict), json.dumps(error))
+		return HttpResponse(json.dumps(error), content_type="text/json", status=400)
+	else:
+		return sendNoResponse()
 
 
 @login_required(login_url='/admin/login/')
