@@ -124,7 +124,8 @@ def incoming_telegram(request):
 			logger.info("Received telegram update %d: %s", updateId, message)
 			fromInfo = message.get('from', {'id': None})
 			telegramUid = fromInfo['id']
-			if telegramUid:
+			text = message.get('text', None)
+			if telegramUid and text:
 				fakePhoneNumber = telegram_util.telegramUidToPhoneNumber(telegramUid)  # it's not an actual phone number
 				processing_util.processMessage(
 					fakePhoneNumber,
@@ -132,6 +133,8 @@ def incoming_telegram(request):
 					requestDict,
 					settings.TELEGRAM_BOT_NAME + keeper_constants.TELEGRAM_NUMBER_SUFFIX
 				)
+			elif telegramUid and not text:
+				logger.info('User %s: sent a non-text message, ignorning', telegram_util.telegramUidToPhoneNumber(telegramUid))
 			else:
 				error = {"Error": "UID not found"}
 		else:
