@@ -108,6 +108,8 @@ def incoming_telegram(request):
 	form = TelegramForm(api_util.getRequestData(request))
 	requestDict = api_util.getRequestData(request)
 
+	logger.info("Incoming telegram request: %s\n\nBody:%s", request, request.body)
+
 	if form.is_valid():
 		updateId = form.cleaned_data.get('update_id', None)
 		message = form.cleaned_data.get('message', None)
