@@ -125,9 +125,9 @@ class Engine:
 			pastMsgs = user.getPastIncomingMsgs()
 
 			for msg in pastMsgs:
-				content = json.loads(msg.msg_json)
-				tmpChunk = Chunk(content["Body"])
-				if "Body" in content and tmpChunk.normalizedText() == chunk.normalizedText() and msg.classification:
+				body = msg.getBody()
+				tmpChunk = Chunk(body)
+				if body and tmpChunk.normalizedText() == chunk.normalizedText() and msg.classification:
 					action = self.getActionByName(msg.classification)
 					if action:
 						logger.info("User %s: In getBestActions, found an identical match to msg %s so prioritizing class %s" % (user.id, msg.id, msg.classification))
