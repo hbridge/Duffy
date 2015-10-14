@@ -106,7 +106,7 @@ def incoming_sms(request):
 
 @csrf_exempt
 def incoming_telegram(request):
-	logger.info("Incoming telegram request: %s\n\nBody:%s", request, request.body)
+	logger.info("Incoming telegram request with body:\n%s", request, request.body)
 	try:
 		requestDict = json.loads(request.body)
 	except Exception:
