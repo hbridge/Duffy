@@ -104,6 +104,15 @@ def incoming_sms(request):
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
 
+'''
+Incoming webhook for Telegram
+To enable the webhook, load python and call
+>>> import telegram
+>>> bot = telegram.Bot(token='TOKEN')
+>>> bot.setWebhook('https://prod.strand.duffyapp.com/smskeeper/incoming_telegram', open('/PATH/TO/CERT'))
+'''
+
+
 @csrf_exempt
 def incoming_telegram(request):
 	logger.info("Incoming telegram request with body:\n%s", request.body)
