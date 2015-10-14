@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN http://www.apple.com/DTDs/PropertyList-1.0.dtd >
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.duffyapp.osx.smrt_server</string>
+    <key>Program</key>
+    <string>/usr/local/bin/python</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/python</string>
+        <string>/Users/hbridge/Documents/Repos/Duffy/peanut/smskeeper/learning/smrt_server.py</string>
+    </array>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/mnt/log/smrt-server.log</string>
+    <key>StandardErrorPath</key>
+    <string>/mnt/log/smrt-server-error.log</string>
+    <key>WorkingDirectory</key>
+    <string>/Users/hbridge/Documents/Repos/Duffy/peanut/smskeeper/learning</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+           <key>DJANGO_SETTINGS_MODULE</key>
+           <string>peanut.settings.local</string>
+    </dict>
+  </dict>
+</plist>
