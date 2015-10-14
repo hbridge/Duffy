@@ -10,6 +10,10 @@ def isTelegramNumber(phoneNumber):
 	return keeper_constants.TELEGRAM_NUMBER_SUFFIX in phoneNumber
 
 
+def telegramUidToPhoneNumber(uid):
+	return str(uid) + keeper_constants.TELEGRAM_NUMBER_SUFFIX
+
+
 def privateChatIdForUser(user):
 	if not isTelegramNumber(user.phone_number):
 		return None

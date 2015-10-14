@@ -39,6 +39,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import authentication
 from common import phone_info_util
+from smskeeper import telegram_util
 
 from common.api_util import DuffyJsonEncoder
 
@@ -107,7 +108,7 @@ def incoming_sms(request):
 def incoming_telegram(request):
 	try:
 		requestDict = json.loads(request.body)
-	except Exception as e:
+	except Exception:
 		logger.error("Couldn't parse telegram request body: %s", request.body)
 		return HttpResponse(json.dumps({"Error": "Not JSON"}), content_type="text/json", status=400)
 
@@ -119,7 +120,7 @@ def incoming_telegram(request):
 		updateId = form.cleaned_data.get('update_id', None)
 		message = requestDict.get('message', None)
 		logger.info("Received telegram update %d: %s", updateId, message)
-		fakePhoneNumber = message['from']['id'] + keeper_constants.TELEGRAM_NUMBER_SUFFIX  # it's not an actual phone number
+		fakePhoneNumber = telegram_util.telegramUidToPhoneNumber(message['from']['id'])  # it's not an actual phone number
 		if message:
 			processing_util.processMessage(
 				fakePhoneNumber,
