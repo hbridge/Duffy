@@ -90,7 +90,7 @@ def postMessage(message, channel):
     msgContent = json.loads(message.msg_json)
     if (isProdMessage(message)):
         params = dict()
-        text = msgContent['Body']
+        text = message.getBody()
 
         if message.incoming:
             userName = message.user.name + ' (' + message.user.phone_number + ')'

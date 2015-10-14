@@ -23,6 +23,13 @@ logger = logging.getLogger(__name__)
 
 
 def createUser(phoneNumber, signupDataJson, keeperNumber, productId, introPhrase, isShare=False):
+	logger.debug(
+		"creating user with \nphoneNum: %s \nkeepernumber: %s \nproductId:%s \nkeeperNumberDict:%s\n\n",
+		phoneNumber,
+		keeperNumber,
+		str(productId),
+		settings.KEEPER_NUMBER_DICT,
+	)
 	if keeperNumber and productId is None:
 		productId = keeper_constants.TODO_PRODUCT_ID
 		for pId, number in settings.KEEPER_NUMBER_DICT.iteritems():

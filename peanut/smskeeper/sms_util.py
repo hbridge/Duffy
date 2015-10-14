@@ -16,6 +16,7 @@ from common import slack_logger, date_util
 
 from peanut.celery import app
 from smskeeper.whatsapp import whatsapp_util
+from smskeeper.telegram import telegram_util
 
 logger = get_task_logger(__name__)
 
@@ -30,7 +31,7 @@ def recordOutput(msgText, doPrint=False):
 # Note: Adding params here will break existing entries queued up
 @app.task
 def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, classification, sendToSlack):
-	logger.info("User %s: asyncSendMsg to keeperNumber: %s", userId, keeperNumber)
+	logger.info("User %s: asyncSendMsg from keeperNumber: %s", userId, keeperNumber)
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -65,6 +66,11 @@ def asyncSendMsg(userId, msgText, mediaUrl, keeperNumber, manual, stopOverride, 
 		whatsapp_util.sendMessage(user.phone_number, msgText, mediaUrl, keeperNumber)
 		message.save()
 
+		if sendToSlack:
+			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
+	elif telegram_util.isTelegramNumber(keeperNumber) or telegram_util.isTelegramNumber(user.phone_number):
+		telegram_util.sendMessage(user, msgText, mediaUrl, keeperNumber)
+		message.save()
 		if sendToSlack:
 			slack_logger.postMessage(message, keeper_constants.SLACK_CHANNEL_FEED)
 	else:

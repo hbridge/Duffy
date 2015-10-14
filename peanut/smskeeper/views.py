@@ -108,10 +108,19 @@ def incoming_telegram(request):
 	form = TelegramForm(api_util.getRequestData(request))
 
 	if form.is_valid():
+		requestDict = api_util.getRequestData(request)
 		updateId = form.cleaned_data['update_id']
 		message = json.loads(form.cleaned_data['message'])
 		logger.info("Received telegram update %d: %s", updateId, message)
-		return send_response("Got it")
+		fakePhoneNumber = message['from']['id'] + keeper_constants.TELEGRAM_NUMBER_SUFFIX  # it's not an actual phone number
+		if message:
+			processing_util.processMessage(
+				fakePhoneNumber,
+				message['text'],
+				requestDict,
+				settings.TELEGRAM_BOT_NAME + keeper_constants.TELEGRAM_NUMBER_SUFFIX
+			)
+		return sendNoResponse()
 	else:
 		logger.info("Received malformed telegram message: %s", json.dumps(form.errors))
 		return HttpResponse(json.dumps(form.errors), content_type="text/json", status=400)
@@ -178,6 +187,11 @@ def getMessagesForUser(user):
 
 	for message in messages:
 		message_dict = json.loads(message.msg_json)
+		if message_dict.get("message"):  # telegram message
+			message_dict = {
+				'Body': message_dict['message']['text'],
+				'NumMedia': 0
+			}
 		if len(message_dict.keys()) > 0:
 			message_dict["id"] = message.id
 			if not message_dict.get("From", None):
@@ -272,24 +286,22 @@ def unknown_messages_feed(request):
 		message_dict = dict()
 		message_dict["id"] = message.id
 		message_dict["user"] = message.user_id
-		msgJson = json.loads(message.msg_json)
-		message_dict["body"] = msgJson["Body"]
+		message_dict["body"] = message.getBody()
 		message_dict["manually_check"] = message.manually_check
 		message_dict["user_name"] = message.user.name
 
 		followupBodies = list()
 		followups = Message.objects.filter(user=message.user, added__gt=message.added).order_by("added")
 		for followup in followups:
-			msgJson = json.loads(followup.msg_json)
 			manualStr = " (manual)" if followup.manual else ""
 
 			if followup.incoming:
-				followupBodies.append("Them%s:  %s" % (manualStr, msgJson["Body"]))
+				followupBodies.append("Them%s:  %s" % (manualStr, followup.getBody()))
 			else:
 				if followup.manual:
-					followupBodies.append("Us%s: %s" % (manualStr, msgJson["Body"]))
+					followupBodies.append("Us%s: %s" % (manualStr, followup.getBody()))
 				else:
-					followupBodies.append("Us%s:      %s" % (manualStr, msgJson["Body"]))
+					followupBodies.append("Us%s:      %s" % (manualStr, followup.getBody()))
 
 		message_dict["followups"] = followupBodies
 
@@ -367,7 +379,6 @@ def resend_msg(request):
 		keeperNumber = form.cleaned_data['from_num']
 
 		message = Message.objects.get(id=msgId)
-		data = json.loads(message.msg_json)
 
 		if not keeperNumber:
 			keeperNumber = message.user.getKeeperNumber()
@@ -380,7 +391,7 @@ def resend_msg(request):
 			requestDict["Manual"] = True
 			processing_util.processMessage(message.user.phone_number, requestDict["Body"], requestDict, keeperNumber)
 		else:
-			sms_util.sendMsg(message.user, data["Body"], None, keeperNumber)
+			sms_util.sendMsg(message.user, message.getBody(), None, keeperNumber)
 
 		response["result"] = True
 		return HttpResponse(json.dumps(response), content_type="text/json", status=200)

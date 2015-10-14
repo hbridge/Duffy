@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def getOrCreateUserFromPhoneNumber(phoneNumber, keeperNumber):
 	# normalize the phone number
 	normalized = phoneNumber.replace(keeper_constants.WHATSAPP_NUMBER_SUFFIX, "")
-	if not normalized[0] == '+':
+	if "@" not in phoneNumber and not normalized[0] == '+':
 		normalized = "+%s" % normalized
 	try:
 		user = User.objects.get(phone_number=normalized)
@@ -43,7 +43,7 @@ def processSigAndSplitLines(user, msg):
 		# Get the first msg and see how many lines it is. Do this to support legacy users
 		# This assumes a sig always shows up and will be on seperate lines and will be at the first msg
 		firstMessage = Message.objects.filter(user=user, incoming=True).first()
-		body = json.loads(firstMessage.msg_json)["Body"]
+		body = firstMessage.getBody()
 		user.signature_num_lines = len(body.split('\n')) - 1
 		user.save()
 		logger.info("User %s: Setting signature_num_lines to %s" % (user.id, user.signature_num_lines))

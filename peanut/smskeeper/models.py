@@ -538,6 +538,10 @@ class Message(models.Model):
 	def getMessageAttribute(self, attribute):
 		if self.messageDict is None:
 			self.messageDict = json.loads(self.msg_json)
+			if self.messageDict.get("message"):  # this is a telegram message
+				self.messageDict = self.messageDict.get("message")
+				self.messageDict['Body'] = self.messageDict['text']
+
 		return self.messageDict.get(attribute, None)
 
 	def getSenderName(self):

@@ -3,6 +3,8 @@
 
 import sys, os
 import argparse
+import random
+import time
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -22,7 +24,35 @@ from smskeeper import processing_util
 
 	NOTE:  Make sure all values here are strings instead of ints so it accuratly reflects what comes in on the web
 """
-def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False, keeperNumber=None):
+
+def msgTelegram(telegramId, msg, cli=False):
+	jsonDict = {
+		'update_id': random.randint(1, 10000000),
+		'message': {
+			'from': {
+				'first_name': u'Test',
+				'last_name': u'User',
+				'id': int(telegramId)
+			},
+			'chat': {
+				'first_name': u'Test',
+				'last_name': u'User',
+				'id': int(telegramId),
+				'type': u'private'
+			},
+			'text': msg,
+			'date': int(time.time()),
+			'message_id': 0,
+		}
+	}
+
+	userNumber = telegramId + "@telegram.me"
+	keeperNumber = "Henry_bot@telegram.me"
+
+	processing_util.processMessage(userNumber, msg, jsonDict, keeperNumber, False)
+
+
+def msgTwilio(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False, keeperNumber=None):
 	numMedia = 0
 	jsonDict = {
 		"Body": msg,
@@ -44,6 +74,13 @@ def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False, keeperNumber
 		keeperNumber = constants.SMSKEEPER_CLI_NUM
 
 	processing_util.processMessage(phoneNumber, msg, jsonDict, keeperNumber, False)
+
+
+def msg(phoneNumber, msg, mediaURL=None, mediaType=None, cli=False, keeperNumber=None):
+	if "@telegram" in phoneNumber:
+		msgTelegram(phoneNumber.split("@")[0], msg, cli)
+	else:
+		msgTwilio(phoneNumber, msg, mediaURL, mediaType, cli, keeperNumber)
 
 
 def main():

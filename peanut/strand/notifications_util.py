@@ -125,6 +125,9 @@ def sendSMS(phoneNumber, msg, mmsUrl):
 		sendSMSThroughTwilio(phoneNumber, msg, mmsUrl)
 
 def sendSMSThroughTwilio(phoneNumber, msg, mediaUrl, fromNumber=constants.TWILIO_PHONE_NUM):
+	if "@" in phoneNumber:
+		raise NameError("Send misrouted to SMS. From: %s to %s", fromNumber, phoneNumber)
+
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
 
 	if mediaUrl:

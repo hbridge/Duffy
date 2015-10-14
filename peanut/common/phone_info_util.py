@@ -2,6 +2,7 @@ import json
 from twilio.rest.lookups import TwilioLookupsClient
 from peanut.settings import constants
 from smskeeper.whatsapp import whatsapp_util
+from smskeeper.telegram import telegram_util
 from smskeeper import keeper_constants
 
 import logging
@@ -22,6 +23,11 @@ def fetchCarrierInfoJsonForUser(user):
 		carrierInfo = {
 			"mobile_network_code": "0",
 			"name": "whatsapp"
+		}
+	elif telegram_util.isTelegramNumber(keeperNumber):
+		carrierInfo = {
+			"mobile_network_code": "0",
+			"name": "telegram"
 		}
 	elif not keeper_constants.isRealKeeperNumber(keeperNumber):
 		carrierInfo = {
