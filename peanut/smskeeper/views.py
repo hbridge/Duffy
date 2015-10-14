@@ -117,7 +117,7 @@ def incoming_telegram(request):
 
 	if form.is_valid():
 		updateId = form.cleaned_data.get('update_id', None)
-		message = form.cleaned_data.get('message', None)
+		message = requestDict.get('message', None)
 		logger.info("Received telegram update %d: %s", updateId, message)
 		fakePhoneNumber = message['from']['id'] + keeper_constants.TELEGRAM_NUMBER_SUFFIX  # it's not an actual phone number
 		if message:
