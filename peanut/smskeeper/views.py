@@ -106,9 +106,9 @@ def incoming_sms(request):
 @csrf_exempt
 def incoming_telegram(request):
 	form = TelegramForm(api_util.getRequestData(request))
+	requestDict = api_util.getRequestData(request)
 
 	if form.is_valid():
-		requestDict = api_util.getRequestData(request)
 		updateId = form.cleaned_data['update_id']
 		message = json.loads(form.cleaned_data['message'])
 		logger.info("Received telegram update %d: %s", updateId, message)
