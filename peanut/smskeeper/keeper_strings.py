@@ -411,7 +411,7 @@ SHARE_UPSELL_PHRASES = [
 	#[u"And if you have anyone else who needs help, just ask them to say 'hello' to me at", keeper_constants.SHARE_UPSELL_PHONE],
 	[u"btw, I only earn money from tips. If I've been helpful please consider", keeper_constants.SHARE_UPSELL_PAYLINK],
 	[u"I appreciate tips. These texts cost me real money", keeper_constants.SHARE_UPSELL_PAYLINK],
-	[u"People who tip are way cooler :sunglasses:", keeper_constants.SHARE_UPSELL_PAYLINK],
+	[u"also, people who tip are way cooler :sunglasses:", keeper_constants.SHARE_UPSELL_PAYLINK],
 ]
 
 # Every now and then we'll ask you whether you want to talk to us directly to give us feedback

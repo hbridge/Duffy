@@ -279,6 +279,10 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 				self.assertNotIn(output, keeper_strings.UNKNOWN_COMMAND_PHRASES, "nicety not detected: %s" % (phrase))
 
 	def test_thanks_upsell(self, dateMock):
+		phrases = list()
+		for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
+			phrases.append(phrase)
+
 		# this will setup user's activated time to be TUE_8AM
 		self.setupUser(True, True, dateMock=dateMock)
 
@@ -286,33 +290,18 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
-			output = self.getOutput(mock)
-			found = False
-			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
-				if phrase in output:
-					found = True
-			self.assertEqual(found, False)
+			self.assertNotContainsOneOf(self.getOutput(mock), phrases)
 
 		# a day later it should do the upsell
 		self.setNow(dateMock, self.WED_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thank you")
-			output = self.getOutput(mock)
-			found = False
-			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
-				if phrase in output:
-					found = True
-			self.assertEqual(found, True)
+			self.assertContainsOneOf(self.getOutput(mock), phrases)
 
 		# make sure we don't send it immediately after
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks Keeper")
-			output = self.getOutput(mock)
-			found = False
-			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
-				if phrase in output:
-					found = True
-			self.assertEqual(found, False)
+			self.assertNotContainsOneOf(self.getOutput(mock), phrases)
 
 		# make sure we do send if the last share date was more than SHARE_UPSELL_FREQ prior
 		self.user.last_share_upsell = self.TUE_8AM - datetime.timedelta(
@@ -321,25 +310,18 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 		self.user.save()
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
-			output = self.getOutput(mock)
-			found = False
-			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
-				if phrase in output:
-					found = True
-			self.assertEqual(found, True)
+			self.assertContainsOneOf(self.getOutput(mock), phrases)
 
 	def test_thanks_upsell_before_tutorial_completed(self, dateMock):
 		self.setupUser(True, False, dateMock=dateMock)
+		phrases = list()
+		for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
+			phrases.append(phrase)
 
 		self.setNow(dateMock, self.TUE_9AM)
 		with patch('smskeeper.sms_util.recordOutput') as mock:
 			cliMsg.msg(self.testPhoneNumber, "thanks")
-			output = self.getOutput(mock)
-			found = False
-			for phrase, link in keeper_strings.SHARE_UPSELL_PHRASES:
-				if phrase in output:
-					found = True
-			self.assertEqual(found, False)
+			self.assertNotContainsOneOf(self.getOutput(mock), phrases)
 
 	'''
 	def test_feedback_upsell(self, dateMock):
