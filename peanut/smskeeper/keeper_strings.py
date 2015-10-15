@@ -405,10 +405,13 @@ ACKNOWLEDGEMENT_PHRASES = ["Got it.", "Roger that.", "Copy that.", "Sure thing."
 # Phrases used to ask the user to share us with other people
 # Note, second parameter is whether to send out a website link or phone number
 SHARE_UPSELL_PHRASES = [
-	[u"Btw, I'm great for anyone who forgets things \U0001F433. Know anyone who could use my help? Send them to", keeper_constants.SHARE_UPSELL_WEBLINK],
-	[u"Think any of your friends would want to try me? I like making new friends \U0001F38E. Tell them say 'hi' to me at", keeper_constants.SHARE_UPSELL_PHONE],
-	[u"Is there anyone you know who can use a little more sanity \U0001F0CF in their life? Just send them to \U00002615", keeper_constants.SHARE_UPSELL_PHONE],
-	[u"And if you have anyone else who needs help, just ask them to say 'hello' to me at", keeper_constants.SHARE_UPSELL_PHONE],
+	#[u"Btw, I'm great for anyone who forgets things \U0001F433. Know anyone who could use my help? Send them to", keeper_constants.SHARE_UPSELL_WEBLINK],
+	#[u"Think any of your friends would want to try me? I like making new friends \U0001F38E. Tell them say 'hi' to me at", keeper_constants.SHARE_UPSELL_PHONE],
+	#[u"Is there anyone you know who can use a little more sanity \U0001F0CF in their life? Just send them to \U00002615", keeper_constants.SHARE_UPSELL_PHONE],
+	#[u"And if you have anyone else who needs help, just ask them to say 'hello' to me at", keeper_constants.SHARE_UPSELL_PHONE],
+	[u"btw, I only earn money from tips. If I've been helpful please consider", keeper_constants.SHARE_UPSELL_PAYLINK],
+	[u"I appreciate tips. These texts cost me real money", keeper_constants.SHARE_UPSELL_PAYLINK],
+	[u"People who tip are way cooler :sunglasses:", keeper_constants.SHARE_UPSELL_PAYLINK],
 ]
 
 # Every now and then we'll ask you whether you want to talk to us directly to give us feedback

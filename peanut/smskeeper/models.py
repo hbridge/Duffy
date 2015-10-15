@@ -253,6 +253,12 @@ class User(models.Model):
 			url += "/%s" % (self.invite_code)
 		return url
 
+	def getPayUrl(self):
+		url = "tip.getkeeper.com"
+		if self.invite_code:
+			url += "/%s" % (self.key)
+		return url
+
 	def getKeeperNumber(self):
 		if self.overrideKeeperNumber:
 			return self.overrideKeeperNumber

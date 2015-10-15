@@ -113,6 +113,8 @@ def renderThankYouResponse(user, requestDict, keeperNumber):
 		phrase, link = random.choice(keeper_strings.SHARE_UPSELL_PHRASES)
 		if link == keeper_constants.SHARE_UPSELL_WEBLINK:
 			link = user.getInviteUrl()
+		if link == keeper_constants.SHARE_UPSELL_PAYLINK:
+			link = user.getPayUrl()
 		else:
 			link = user.getKeeperNumber()
 			if len(link) > 5:  # dealing with 'test' phone numbers
