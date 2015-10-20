@@ -270,7 +270,7 @@ class SMSKeeperMiscCase(test_base.SMSKeeperBaseCase):
 
 	def test_common_niceties(self, dateMock):
 		self.setupUser(True, True, dateMock=dateMock)
-		dumb_phrases = ["hi", "thanks", "no", "yes", "thanks, keeper!", "cool", "OK", u"\U0001F44D"]
+		dumb_phrases = ["hi", "thanks", "yes", "thanks, keeper!", "cool", "OK", u"\U0001F44D"]
 
 		for phrase in dumb_phrases:
 			with patch('smskeeper.sms_util.recordOutput') as mock:

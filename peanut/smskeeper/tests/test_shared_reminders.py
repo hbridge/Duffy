@@ -178,6 +178,11 @@ class SMSKeeperSharedReminderCase(test_base.SMSKeeperBaseCase):
 			cliMsg.msg(self.recipientPhoneNumber, "cool")
 			self.assertNotIn("None", self.getOutput(mock))
 
+	def test_remind_me_exception(self, dateMock):
+		self.setupUser(dateMock)
+		cliMsg.msg(self.testPhoneNumber, "remind me Charlie needs to buy something")
+		self.assertFalse(self.getTestUser().wasRecentlySentMsgOfClass(keeper_constants.OUTGOING_SHARE_PROMPT))
+
 	def test_shared_reminder_other_person_tell_me_more(self, dateMock):
 		self.setupUser(dateMock)
 		self.createSharedReminder()

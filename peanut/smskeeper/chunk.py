@@ -78,6 +78,10 @@ class Chunk:
 		numWordsStartAlpha = 0
 		whitelistedVerbLocations = []
 
+		# Hack to cover the case where someone types remind me
+		if "remind me" in self.normalizeText(self.originalText, lowercase=False):
+			return handles
+
 		for idx, word in enumerate(words):
 			if len(word) > 0 and word[0].isalpha:
 				numWordsStartAlpha += 1
