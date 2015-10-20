@@ -141,7 +141,7 @@ var MessageBody = React.createClass({
     }
 
     // add (MANUAL) if the message is manual
-    if (this.props.manual) {
+    if (this.props.isManual) {
       newText = "(MANUAL) " + newText;
     }
 
