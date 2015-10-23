@@ -491,9 +491,9 @@ def testCelery():
 
 
 @app.task
-def suspendInactiveUsers(doit=False):
+def suspendInactiveUsers(doit=False, days=7):
 	now = date_util.now(pytz.utc)
-	cutoff = now - datetime.timedelta(days=7)
+	cutoff = now - datetime.timedelta(days=days)
 
 	users = User.objects.exclude(state=keeper_constants.STATE_SUSPENDED).exclude(state=keeper_constants.STATE_STOPPED)
 	for user in users:
