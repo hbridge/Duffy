@@ -63,9 +63,9 @@ def getOrCreateZendeskUserId(user):
 	try:
 		result = zendesk.user_create(data=new_user)
 		zendesk_id = get_id_from_url(result)
+		user.zendesk_id = zendesk_id
+		user.save()
 	except Exception as e:
 		logger.error("Couldn't create zendesk user for uid: %d: %s", user.id, e)
 
-	user.zendesk_id = zendesk_id
-	user.save()
 	return zendesk_id
