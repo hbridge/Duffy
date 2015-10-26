@@ -312,8 +312,6 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 		)
 		ret = False
 
-	zendesk.createUnknownCommandTicket(user, msg)
-
 	if doPause:
 		user_util.setPaused(user, True, keeperNumber, infoMessage)
 
