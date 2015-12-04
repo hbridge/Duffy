@@ -289,8 +289,8 @@ def unknown(user, msg, keeperNumber, unknownType, sendMsg=True, doPause=False, d
 			sendMsg = False
 
 	if now.hour >= 9 and now.hour <= 22 and keeperNumber != keeper_constants.SMSKEEPER_CLI_NUM:
-		if doAlert or doPause:
-			infoMessage += "   @derek @aseem @henry"  # Add ourselves to get alerted during the day
+		#  if doAlert or doPause:
+		#	  infoMessage += "   @derek @aseem @henry"  # Add ourselves to get alerted during the day
 
 		slack_logger.postManualAlert(user, infoMessage, keeperNumber, keeper_constants.SLACK_CHANNEL_MANUAL_ALERTS)
 
