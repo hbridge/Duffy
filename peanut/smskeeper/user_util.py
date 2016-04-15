@@ -144,7 +144,9 @@ def pendingTodoEntries(user, includeAll=False, before=None, after=None):
 
 
 def setPaused(user, paused, keeperNumber, reason):
-	user.paused = paused
+	if not paused:
+		user.paused = paused
+
 	infoText = "User %s: " % (user.id)
 	if (paused):
 		user.last_paused_timestamp = date_util.now(pytz.utc)
