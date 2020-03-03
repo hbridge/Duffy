@@ -9,7 +9,7 @@ MySQL-python==1.2.5
 Pillow==2.4.0
 PyYAML==3.11
 Theano==0.7.0
-Twisted==14.0.0
+Twisted==19.7.0
 Werkzeug==0.9.6
 ago==0.0.6
 amqp==1.4.6
